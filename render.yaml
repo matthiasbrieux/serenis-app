@@ -1,0 +1,47 @@
+services:
+  - type: web
+    name: serenis-app
+    env: node
+    region: frankfurt
+    plan: free
+    buildCommand: npm install
+    startCommand: node server.js
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+      - key: STRIPE_SECRET_KEY
+        sync: false
+      - key: STRIPE_PUBLISHABLE_KEY
+        sync: false
+      - key: STRIPE_WEBHOOK_SECRET
+        sync: false
+      - key: STRIPE_PRICE_AUTONOME
+        sync: false
+      - key: STRIPE_PRICE_SERENITE
+        sync: false
+      - key: TWILIO_ACCOUNT_SID
+        sync: false
+      - key: TWILIO_AUTH_TOKEN
+        sync: false
+      - key: SENDGRID_API_KEY
+        sync: false
+      - key: SENDGRID_FROM_EMAIL
+        value: contact@serenis.fr
+      - key: CLOUDINARY_URL
+        sync: false
+      - key: JWT_SECRET
+        generateValue: true
+      - key: ADMIN_EMAIL
+        value: matthias@serenis.fr
+      - key: ADMIN_PASSWORD
+        sync: false
+      - key: DATABASE_URL
+        value: ./database.db
+      - key: BASE_URL
+        value: https://serenis-app.onrender.com
+    disk:
+      name: serenis-data
+      mountPath: /opt/render/project/src
+      sizeGB: 1

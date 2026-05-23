@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Connexion — Serenis</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;1,400&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body class="page-auth">
+  <div class="auth-box">
+    <div class="auth-logo">
+      <a href="/" style="display:inline-flex;align-items:center;gap:8px;text-decoration:none;">
+        <svg width="36" height="36" viewBox="0 0 32 32"><path d="M16 2L3 13v17h8v-8h10v8h8V13L16 2z" fill="#3D5A47"/></svg>
+        <span style="font-family:'Cormorant Garamond',serif;font-size:1.8rem;color:#3D5A47;">Sere<em style="color:#C4785A;">nis</em></span>
+      </a>
+    </div>
+    <h1>Espace vendeur</h1>
+    <p class="auth-sub">Connectez-vous pour accéder à vos outils</p>
+    <form id="loginForm">
+      <div class="form-group">
+        <label>Email</label>
+        <input type="email" id="loginEmail" required placeholder="votre@email.fr" autocomplete="email">
+      </div>
+      <div class="form-group">
+        <label>Mot de passe</label>
+        <input type="password" id="loginPassword" required placeholder="••••••••" autocomplete="current-password">
+      </div>
+      <button type="submit" class="btn-primary btn-full" id="loginBtn">Me connecter</button>
+      <div id="loginError" class="form-error hidden"></div>
+    </form>
+    <div class="auth-footer">
+      <p>Pas encore de compte ? <a href="#offres-home" onclick="window.location='/#offres'">Choisir une offre →</a></p>
+      <p style="margin-top:8px;">Une question ? <strong>06 95 44 36 54</strong></p>
+    </div>
+  </div>
+  <script>
+    document.getElementById('loginForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const btn = document.getElementById('loginBtn');
+      const err = document.getElementById('loginError');
+      btn.textContent = 'Connexion...'; btn.disabled = true;
+      err.classList.add('hidden');
+      try {
+        const res = await fetch('/login', {
+          method: 'POST',
+          headers: {'Content-Type':'application/json'},
+          body: JSON.stringify({
+            email: document.getElementById('loginEmail').value,
+            password: document.getElementById('loginPassword').value
+          })
+        });
+        const data = await res.json();
+        if (data.success) { window.location.href = data.redirect; }
+        else { err.textContent = data.error; err.classList.remove('hidden'); }
+      } catch { err.textContent = 'Erreur réseau.'; err.classList.remove('hidden'); }
+      btn.textContent = 'Me connecter'; btn.disabled = false;
+    });
+  </script>
+</body>
+</html>

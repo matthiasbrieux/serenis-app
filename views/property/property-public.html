@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title id="pageTitle">Bien à vendre — Serenis</title>
+  <meta name="description" id="pageDesc" content="Dossier complet disponible — Serenis">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+
+<!-- Nav minimal -->
+<nav style="position:fixed;top:0;left:0;right:0;background:rgba(26,26,22,0.85);backdrop-filter:blur(12px);z-index:100;padding:16px 24px;display:flex;justify-content:space-between;align-items:center;">
+  <a href="/" style="font-family:'Cormorant Garamond',serif;color:#FDFCF8;font-size:1.3rem;">Sere<em style="color:#C4785A">nis</em></a>
+  <a href="/#offres" style="background:#C4785A;color:#fff;padding:8px 18px;border-radius:50px;font-size:0.85rem;font-weight:600;">Vendre avec Serenis</a>
+</nav>
+
+<!-- Hero gallery -->
+<div class="property-hero" id="propertyHero">
+  <div id="heroGallery" style="width:100%;height:100%;position:relative;overflow:hidden;">
+    <div id="mainPhoto" style="width:100%;height:100%;background:#2a2a2a;display:flex;align-items:center;justify-content:center;">
+      <span style="color:#555;font-size:1rem;">Chargement...</span>
+    </div>
+  </div>
+  <div class="property-hero-content" id="heroContent">
+    <div class="property-price" id="heroPrice">...</div>
+    <div class="property-title" id="heroTitle">...</div>
+  </div>
+</div>
+
+<!-- Gallery nav -->
+<div id="galleryNav" style="display:flex;gap:8px;padding:12px 48px;background:#111;overflow-x:auto;"></div>
+
+<!-- Main content -->
+<div class="property-body">
+  <div>
+    <h1 id="propTitle" style="font-family:'Cormorant Garamond',serif;font-size:2.2rem;color:#1A1A16;margin-bottom:16px;"></h1>
+    <p id="propAddress" style="color:#666;font-size:1rem;margin-bottom:32px;"></p>
+
+    <!-- Key details -->
+    <div class="property-details-grid" id="propDetailsGrid"></div>
+
+    <!-- Description -->
+    <div style="margin:32px 0;">
+      <h2 style="font-family:'Cormorant Garamond',serif;font-size:1.6rem;color:#3D5A47;margin-bottom:16px;">Description</h2>
+      <p id="propDescription" style="color:#444;line-height:1.8;font-size:0.95rem;"></p>
+    </div>
+
+    <!-- Proximité -->
+    <div id="proximiteSection" style="margin:32px 0;">
+      <h2 style="font-family:'Cormorant Garamond',serif;font-size:1.6rem;color:#3D5A47;margin-bottom:16px;">Environnement</h2>
+      <div id="proximiteGrid" style="display:grid;grid-template-columns:1fr 1fr;gap:12px;"></div>
+    </div>
+
+    <!-- Documents -->
+    <div id="documentsSection" style="margin:32px 0;display:none;">
+      <h2 style="font-family:'Cormorant Garamond',serif;font-size:1.6rem;color:#3D5A47;margin-bottom:16px;">Documents disponibles</h2>
+      <div id="documentsList" style="display:flex;flex-direction:column;gap:8px;"></div>
+    </div>
+
+    <!-- Numéro contact -->
+    <div id="contactNumberBox" style="display:none;margin:32px 0;background:#D4E4D8;padding:24px;border-radius:12px;text-align:center;">
+      <p style="font-weight:600;color:#3D5A47;margin-bottom:8px;">📞 Recevoir le dossier complet par email</p>
+      <p style="font-size:0.9rem;color:#555;">Appelez ou envoyez votre adresse email par SMS au</p>
+      <div id="contactNumber" style="font-family:'Cormorant Garamond',serif;font-size:2rem;font-weight:600;color:#3D5A47;margin:8px 0;"></div>
+      <p style="font-size:0.8rem;color:#888;">Numéro dédié — votre dossier vous sera envoyé automatiquement</p>
+    </div>
+
+    <!-- Legal -->
+    <div style="margin-top:48px;padding:16px;background:#f9f9f6;border-radius:8px;font-size:0.78rem;color:#aaa;line-height:1.6;">
+      Cette annonce est publiée par un particulier. Serenis est une plateforme numérique d'outils et de formation.
+      Le vendeur reste seul responsable de sa vente, de ses visites, de ses négociations et de ses décisions.
+      Activité validée par l'Autorité de la Concurrence, avis n°23-A-07, juin 2023.
+    </div>
+  </div>
+
+  <!-- Booking sidebar -->
+  <div>
+    <div class="booking-card" id="reservation">
+      <h3>Réserver une visite</h3>
+      <p style="color:#666;font-size:0.88rem;margin-bottom:20px;">Choisissez un créneau dans le calendrier du vendeur</p>
+
+      <form id="bookingForm">
+        <div class="form-group">
+          <label>Votre nom *</label>
+          <input type="text" name="buyer_name" required placeholder="Prénom Nom">
+        </div>
+        <div class="form-group">
+          <label>Votre email *</label>
+          <input type="email" name="buyer_email" required placeholder="votre@email.fr">
+        </div>
+        <div class="form-group">
+          <label>Votre téléphone</label>
+          <input type="tel" name="buyer_phone" placeholder="06 xx xx xx xx">
+        </div>
+        <div class="form-group">
+          <label>Date souhaitée *</label>
+          <input type="date" name="visit_date" required id="visitDate">
+        </div>
+        <div class="form-group">
+          <label>Heure souhaitée *</label>
+          <select name="visit_time" required id="visitTime">
+            <option value="">Choisir...</option>
+          </select>
+        </div>
+        <button type="submit" class="btn-primary btn-full">Confirmer ma demande de visite</button>
+        <div id="bookingSuccess" class="form-success hidden" style="margin-top:12px;">✓ Demande envoyée ! Vous recevrez une confirmation par email.</div>
+        <div id="bookingError" class="form-error hidden" style="margin-top:12px;"></div>
+      </form>
+
+      <div style="margin-top:16px;font-size:0.78rem;color:#aaa;text-align:center;">
+        La confirmation sera envoyée par email automatiquement.
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Footer -->
+<footer style="background:#1A1A16;color:rgba(253,252,248,0.5);padding:32px 48px;font-size:0.78rem;line-height:1.6;">
+  <p>Serenis est une plateforme numérique d'outils et de formation. Le vendeur reste seul responsable de sa vente, de ses visites, de ses négociations et de ses décisions. Activité validée par l'Autorité de la Concurrence, avis n°23-A-07, juin 2023.</p>
+  <p style="margin-top:8px;">Matthias Brieux — 06 95 44 36 54 — Douai (59)</p>
+</footer>
+
+<script>
+const slug = window.location.pathname.split('/bien/')[1];
+let propertyData = null;
+
+async function loadProperty() {
+  const res = await fetch(`/api/bien/${slug}`);
+  if (!res.ok) { document.body.innerHTML = '<div style="text-align:center;padding:100px 24px;"><h1>Bien non trouvé</h1><a href="/">Retour à l\'accueil</a></div>'; return; }
+  const data = await res.json();
+  propertyData = data.property;
+  renderProperty(data.property, data.contact_number);
+}
+
+function renderProperty(p, contactNumber) {
+  document.title = `${p.type || 'Bien'} ${p.city || ''} — ${p.price ? Number(p.price).toLocaleString('fr-FR') + ' €' : ''} — Serenis`;
+
+  document.getElementById('heroPrice').textContent = p.price ? Number(p.price).toLocaleString('fr-FR') + ' €' : '';
+  document.getElementById('heroTitle').textContent = `${p.type || ''} — ${p.city || ''} (${p.postal_code || ''})`;
+  document.getElementById('propTitle').textContent = `${p.type || ''} à vendre — ${p.city || ''}`;
+  document.getElementById('propAddress').textContent = p.address ? `📍 ${p.address}, ${p.city} ${p.postal_code}` : '';
+  document.getElementById('propDescription').textContent = p.description || '';
+
+  // Photos
+  if (p.photos?.length) {
+    const main = document.getElementById('mainPhoto');
+    main.innerHTML = `<img src="${p.photos[0].url}" style="width:100%;height:100%;object-fit:cover;" alt="Photo principale">`;
+
+    const nav = document.getElementById('galleryNav');
+    nav.innerHTML = p.photos.map((ph, i) => `
+      <img src="${ph.thumbnail_url || ph.url}" style="height:70px;width:100px;object-fit:cover;cursor:pointer;border-radius:4px;border:2px solid ${i===0?'#C4785A':'transparent'};flex-shrink:0;"
+        onclick="changePhoto('${ph.url}', this)">
+    `).join('');
+  }
+
+  // Details grid
+  const details = [
+    p.surface_habitable ? { label: 'Surface', value: p.surface_habitable + ' m²' } : null,
+    p.rooms ? { label: 'Pièces', value: p.rooms } : null,
+    p.bedrooms ? { label: 'Chambres', value: p.bedrooms } : null,
+    p.year_built ? { label: 'Construction', value: p.year_built } : null,
+    p.dpe_class ? { label: 'DPE', value: 'Classe ' + p.dpe_class } : null,
+    p.taxe_fonciere ? { label: 'Taxe foncière', value: Number(p.taxe_fonciere).toLocaleString('fr-FR') + ' €/an' } : null,
+    p.heating_type ? { label: 'Chauffage', value: p.heating_type } : null,
+    p.surface_terrain ? { label: 'Terrain', value: p.surface_terrain + ' m²' } : null,
+    p.garden ? { label: 'Jardin', value: 'Oui' } : null,
+    p.terrace ? { label: 'Terrasse', value: 'Oui' } : null,
+    p.exposition ? { label: 'Exposition', value: p.exposition } : null,
+  ].filter(Boolean);
+
+  document.getElementById('propDetailsGrid').innerHTML = details.map(d => `
+    <div class="property-detail-item">
+      <div class="property-detail-label">${d.label}</div>
+      <div class="property-detail-value">${d.value}</div>
+    </div>
+  `).join('');
+
+  // Proximité
+  const prox = [
+    p.commerces ? { icon: '🛒', label: 'Commerces', value: p.commerces } : null,
+    p.school_maternelle ? { icon: '🏫', label: 'Maternelle', value: p.school_maternelle } : null,
+    p.school_primaire ? { icon: '🏫', label: 'Primaire', value: p.school_primaire } : null,
+    p.school_college ? { icon: '🏫', label: 'Collège', value: p.school_college } : null,
+    p.school_lycee ? { icon: '🏫', label: 'Lycée', value: p.school_lycee } : null,
+    p.highway ? { icon: '🛣️', label: 'Autoroute', value: p.highway } : null,
+    p.train_station ? { icon: '🚂', label: 'Gare', value: p.train_station } : null,
+  ].filter(Boolean);
+
+  if (prox.length) {
+    document.getElementById('proximiteGrid').innerHTML = prox.map(item => `
+      <div style="display:flex;gap:10px;padding:10px 12px;background:var(--creme);border-radius:8px;font-size:0.88rem;">
+        <span>${item.icon}</span>
+        <div><strong style="display:block;font-size:0.78rem;color:#888;">${item.label}</strong>${item.value}</div>
+      </div>
+    `).join('');
+  }
+
+  // Documents
+  if (p.documents?.length) {
+    document.getElementById('documentsSection').style.display = 'block';
+    document.getElementById('documentsList').innerHTML = p.documents.map(d => `
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;background:#f5f5f2;border-radius:6px;">
+        <span style="font-size:0.88rem;">📄 ${d.name}</span>
+        <a href="${d.url}" target="_blank" style="color:#C4785A;font-size:0.82rem;font-weight:600;">Télécharger →</a>
+      </div>
+    `).join('');
+  }
+
+  // Contact number
+  if (contactNumber) {
+    document.getElementById('contactNumberBox').style.display = 'block';
+    document.getElementById('contactNumber').textContent = contactNumber;
+  }
+
+  loadSlots();
+}
+
+function changePhoto(url, img) {
+  document.getElementById('mainPhoto').innerHTML = `<img src="${url}" style="width:100%;height:100%;object-fit:cover;">`;
+  document.querySelectorAll('#galleryNav img').forEach(i => i.style.borderColor = 'transparent');
+  img.style.borderColor = '#C4785A';
+}
+
+async function loadSlots() {
+  const res = await fetch(`/api/bien/${slug}/creneaux`);
+  const data = await res.json();
+  const timeSelect = document.getElementById('visitTime');
+  const times = ['08:00','08:30','09:00','09:30','10:00','10:30','11:00','11:30','12:00','14:00','14:30','15:00','15:30','16:00','16:30','17:00','17:30','18:00','18:30','19:00'];
+
+  document.getElementById('visitDate').addEventListener('change', function() {
+    const date = new Date(this.value);
+    const dow = date.getDay();
+    const slot = data.slots?.find(s => s.day_of_week === dow);
+    timeSelect.innerHTML = '<option value="">Choisir...</option>';
+    if (slot) {
+      times.filter(t => t >= slot.start_time && t <= slot.end_time).forEach(t => {
+        const booked = data.booked?.some(b => b.visit_date === this.value && b.visit_time === t);
+        if (!booked) {
+          const opt = document.createElement('option');
+          opt.value = t; opt.textContent = t;
+          timeSelect.appendChild(opt);
+        }
+      });
+    } else {
+      timeSelect.innerHTML = '<option value="">Aucun créneau ce jour-là</option>';
+    }
+  });
+
+  // Set min date to tomorrow
+  const tomorrow = new Date();
+  tomorrow.setDate(tomorrow.getDate() + 1);
+  document.getElementById('visitDate').min = tomorrow.toISOString().split('T')[0];
+}
+
+document.getElementById('bookingForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const formData = new FormData(e.target);
+  const data = Object.fromEntries(formData);
+  const btn = e.target.querySelector('button[type="submit"]');
+  const success = document.getElementById('bookingSuccess');
+  const error = document.getElementById('bookingError');
+
+  btn.textContent = 'Envoi...'; btn.disabled = true;
+  success.classList.add('hidden'); error.classList.add('hidden');
+
+  const res = await fetch(`/api/bien/${slug}/reserver`, {
+    method: 'POST', headers: {'Content-Type':'application/json'},
+    body: JSON.stringify(data)
+  });
+  const result = await res.json();
+  if (result.success) {
+    success.classList.remove('hidden');
+    e.target.reset();
+  } else {
+    error.textContent = result.error || 'Erreur. Réessayez.';
+    error.classList.remove('hidden');
+  }
+  btn.textContent = 'Confirmer ma demande de visite'; btn.disabled = false;
+});
+
+loadProperty();
+</script>
+</body>
+</html>

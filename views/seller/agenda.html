@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mon agenda — Serenis</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+<div class="app-layout">
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <a href="/" class="logo"><svg width="28" height="28" viewBox="0 0 32 32"><path d="M16 2L3 13v17h8v-8h10v8h8V13L16 2z" fill="#D4E4D8"/></svg>
+      <span class="logo-text" style="color:#FDFCF8">Sere<em style="color:#C4785A">nis</em></span></a>
+    </div>
+    <nav class="sidebar-nav">
+      <a href="/dashboard" class="sidebar-item"><span class="sidebar-item-icon">📊</span> Tableau de bord</a>
+      <a href="/mon-bien" class="sidebar-item"><span class="sidebar-item-icon">🏠</span> Mon bien</a>
+      <a href="/ma-formation" class="sidebar-item"><span class="sidebar-item-icon">📚</span> Ma formation</a>
+      <a href="/mon-agenda" class="sidebar-item active"><span class="sidebar-item-icon">📅</span> Mon agenda</a>
+    </nav>
+    <div style="position:absolute;bottom:24px;left:0;right:0;padding:0 24px;">
+      <a href="/logout" style="color:rgba(212,228,216,0.5);font-size:0.8rem;">Déconnexion →</a>
+    </div>
+  </aside>
+
+  <main class="main-content">
+    <div class="page-header">
+      <h1>Mon agenda</h1>
+      <p>Configurez vos disponibilités — les acheteurs réservent directement en ligne</p>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1.2fr 1fr;gap:24px;align-items:start;">
+
+      <!-- Disponibilités -->
+      <div class="form-section">
+        <h3>🗓️ Mes créneaux disponibles</h3>
+        <p style="color:#666;font-size:0.88rem;margin-bottom:24px;">Sélectionnez les jours et horaires où vous êtes disponible pour les visites.</p>
+
+        <div class="days-grid">
+          <button class="day-btn" data-day="1">Lun</button>
+          <button class="day-btn" data-day="2">Mar</button>
+          <button class="day-btn" data-day="3">Mer</button>
+          <button class="day-btn" data-day="4">Jeu</button>
+          <button class="day-btn" data-day="5">Ven</button>
+          <button class="day-btn" data-day="6">Sam</button>
+          <button class="day-btn" data-day="0">Dim</button>
+        </div>
+
+        <div id="slotsContainer" style="margin-top:24px;display:flex;flex-direction:column;gap:12px;"></div>
+
+        <button id="addSlot" class="btn-secondary" style="margin-top:16px;width:100%;">+ Ajouter un créneau horaire</button>
+        <button id="saveAgenda" class="btn-primary" style="margin-top:12px;width:100%;">Sauvegarder mes disponibilités</button>
+        <div id="agendaSuccess" class="form-success hidden" style="margin-top:8px;">✓ Agenda mis à jour</div>
+      </div>
+
+      <!-- Visites à venir -->
+      <div>
+        <div class="form-section">
+          <h3>📋 Visites planifiées</h3>
+          <div id="visitsList">
+            <p style="color:#aaa;font-size:0.9rem;">Aucune visite planifiée.</p>
+          </div>
+        </div>
+
+        <!-- Lien de réservation -->
+        <div class="form-section" style="margin-top:0;">
+          <h3>🔗 Lien de réservation</h3>
+          <p style="color:#666;font-size:0.88rem;margin-bottom:12px;">Partagez ce lien dans votre dossier acheteur pour que les acheteurs réservent directement :</p>
+          <div id="bookingLinkBox" style="display:none;">
+            <div style="display:flex;gap:8px;align-items:center;">
+              <input type="text" id="bookingLink" readonly style="flex:1;background:var(--creme);font-size:0.82rem;">
+              <button onclick="copyBookingLink()" class="btn-primary" style="white-space:nowrap;">Copier</button>
+            </div>
+          </div>
+          <p id="noLinkMsg" style="color:#aaa;font-size:0.85rem;">Publiez votre bien pour obtenir votre lien de réservation.</p>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script>
+let selectedDays = new Set();
+let slots = [];
+
+// Load existing data
+async function loadAgenda() {
+  const res = await fetch('/api/agenda');
+  const data = await res.json();
+  if (data.slots?.length) {
+    slots = data.slots.map(s => ({ day: s.day_of_week, start: s.start_time, end: s.end_time }));
+    slots.forEach(s => { selectedDays.add(s.day); document.querySelector(`.day-btn[data-day="${s.day}"]`)?.classList.add('selected'); });
+    renderSlots();
+  }
+}
+
+async function loadVisits() {
+  const res = await fetch('/api/visits');
+  const data = await res.json();
+  const list = document.getElementById('visitsList');
+  if (!data.visits?.length) return;
+  list.innerHTML = data.visits.map(v => `
+    <div style="padding:10px 0;border-bottom:1px solid var(--vert-pale);">
+      <div style="display:flex;justify-content:space-between;">
+        <strong style="font-size:0.88rem;">${v.buyer_name}</strong>
+        <span class="status-badge ${v.status === 'confirmed' ? 'status-en-ligne' : 'status-preparation'}" style="font-size:0.72rem;">${v.status}</span>
+      </div>
+      <div style="font-size:0.82rem;color:#666;margin-top:4px;">${v.visit_date} à ${v.visit_time}</div>
+      <div style="font-size:0.78rem;color:#aaa;">${v.buyer_email}</div>
+    </div>
+  `).join('');
+}
+
+// Day selection
+document.querySelectorAll('.day-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const day = parseInt(btn.dataset.day);
+    if (selectedDays.has(day)) {
+      selectedDays.delete(day);
+      btn.classList.remove('selected');
+      slots = slots.filter(s => s.day !== day);
+    } else {
+      selectedDays.add(day);
+      btn.classList.add('selected');
+      if (!slots.find(s => s.day === day)) {
+        slots.push({ day, start: '09:00', end: '18:00' });
+      }
+    }
+    renderSlots();
+  });
+});
+
+function renderSlots() {
+  const container = document.getElementById('slotsContainer');
+  const dayNames = ['Dimanche', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi'];
+  container.innerHTML = slots.map((slot, i) => `
+    <div style="display:flex;align-items:center;gap:12px;padding:12px;background:var(--creme);border-radius:8px;">
+      <span style="font-weight:600;font-size:0.88rem;width:80px;">${dayNames[slot.day]}</span>
+      <input type="time" value="${slot.start}" onchange="updateSlot(${i},'start',this.value)" style="border:1px solid var(--vert-pale);border-radius:4px;padding:6px 8px;font-size:0.88rem;">
+      <span style="color:#888;">→</span>
+      <input type="time" value="${slot.end}" onchange="updateSlot(${i},'end',this.value)" style="border:1px solid var(--vert-pale);border-radius:4px;padding:6px 8px;font-size:0.88rem;">
+      <button onclick="removeSlot(${i})" style="color:#d9534f;font-size:1rem;padding:4px 8px;">✕</button>
+    </div>
+  `).join('');
+}
+
+function updateSlot(i, field, value) { slots[i][field] = value; }
+
+function removeSlot(i) {
+  const day = slots[i].day;
+  slots.splice(i, 1);
+  if (!slots.find(s => s.day === day)) {
+    selectedDays.delete(day);
+    document.querySelector(`.day-btn[data-day="${day}"]`)?.classList.remove('selected');
+  }
+  renderSlots();
+}
+
+document.getElementById('addSlot').addEventListener('click', () => {
+  const day = [...selectedDays][0] ?? 1;
+  slots.push({ day, start: '09:00', end: '18:00' });
+  renderSlots();
+});
+
+document.getElementById('saveAgenda').addEventListener('click', async () => {
+  const res = await fetch('/api/agenda', {
+    method: 'POST',
+    headers: {'Content-Type':'application/json'},
+    body: JSON.stringify({ slots })
+  });
+  const data = await res.json();
+  if (data.success) {
+    document.getElementById('agendaSuccess').classList.remove('hidden');
+    setTimeout(() => document.getElementById('agendaSuccess').classList.add('hidden'), 3000);
+    window.showToast('Agenda sauvegardé');
+  }
+});
+
+// Booking link
+async function loadBookingLink() {
+  const res = await fetch('/api/property');
+  const data = await res.json();
+  if (data.property?.published && data.property?.slug) {
+    const url = `${window.location.origin}/bien/${data.property.slug}#reservation`;
+    document.getElementById('bookingLinkBox').style.display = 'block';
+    document.getElementById('bookingLink').value = url;
+    document.getElementById('noLinkMsg').style.display = 'none';
+  }
+}
+
+function copyBookingLink() {
+  const input = document.getElementById('bookingLink');
+  input.select();
+  document.execCommand('copy');
+  window.showToast('Lien copié !');
+}
+
+window.showToast = function(msg, type='success') {
+  let toast = document.querySelector('.toast');
+  if (!toast) { toast = document.createElement('div'); toast.className = 'toast'; document.body.appendChild(toast); }
+  toast.textContent = msg; toast.className = `toast ${type==='error'?'error':''}`;
+  toast.classList.add('show'); setTimeout(()=>toast.classList.remove('show'), 3500);
+};
+
+loadAgenda();
+loadVisits();
+loadBookingLink();
+</script>
+</body>
+</html>

@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tableau de bord — Serenis</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+<div class="app-layout">
+  <!-- Sidebar -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-logo">
+      <a href="/" class="logo logo-white">
+        <svg width="28" height="28" viewBox="0 0 32 32"><path d="M16 2L3 13v17h8v-8h10v8h8V13L16 2z" fill="#D4E4D8"/></svg>
+        <span class="logo-text" style="color:#FDFCF8">Sere<em style="color:#C4785A">nis</em></span>
+      </a>
+    </div>
+    <div id="sidebarPack" class="sidebar-pack" style="display:none">
+      <strong id="packLabel">Pack Sérénité</strong>
+      <span>Actif</span>
+    </div>
+    <nav class="sidebar-nav">
+      <a href="/dashboard" class="sidebar-item active">
+        <span class="sidebar-item-icon">📊</span> Tableau de bord
+      </a>
+      <a href="/mon-bien" class="sidebar-item">
+        <span class="sidebar-item-icon">🏠</span> Mon bien
+      </a>
+      <a href="/ma-formation" class="sidebar-item">
+        <span class="sidebar-item-icon">📚</span> Ma formation
+      </a>
+      <a href="/mon-agenda" class="sidebar-item">
+        <span class="sidebar-item-icon">📅</span> Mon agenda
+      </a>
+    </nav>
+    <div style="position:absolute;bottom:24px;left:0;right:0;padding:0 24px;">
+      <a href="/logout" style="color:rgba(212,228,216,0.5);font-size:0.8rem;">Déconnexion →</a>
+    </div>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="main-content">
+    <div class="page-header">
+      <h1>Tableau de bord</h1>
+      <p id="welcomeMsg">Bienvenue sur votre espace vendeur Serenis</p>
+    </div>
+
+    <!-- Stats -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-label">Statut vente</div>
+        <div id="statStatus" class="stat-value" style="font-size:1rem;"><span class="status-badge status-preparation">En préparation</span></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Contacts acheteurs</div>
+        <div class="stat-value" id="statContacts">0</div>
+        <div class="stat-sub">dossiers envoyés</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Visites planifiées</div>
+        <div class="stat-value" id="statVisits">0</div>
+      </div>
+      <div class="stat-card highlight">
+        <div class="stat-label">Votre numéro 09</div>
+        <div class="stat-value" id="statTwilio" style="font-size:0.9rem;color:#888;">—</div>
+        <div class="stat-sub" id="twilioHint" style="display:none">À mettre dans votre annonce</div>
+      </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-bottom:32px;">
+      <div class="form-section">
+        <h3>Actions rapides</h3>
+        <div style="display:flex;flex-direction:column;gap:12px;">
+          <a href="/mon-bien" class="btn-primary" style="text-align:center;">Compléter ma fiche bien</a>
+          <a href="/ma-formation" class="btn-secondary" style="text-align:center;">Accéder à la formation</a>
+          <a href="/mon-agenda" class="btn-secondary" style="text-align:center;">Configurer mon agenda</a>
+        </div>
+      </div>
+      <div class="form-section">
+        <h3>Mon profil</h3>
+        <form id="profileForm">
+          <div class="form-row">
+            <div class="form-group">
+              <label>Prénom</label>
+              <input type="text" name="first_name" id="pfFirstName" placeholder="Prénom">
+            </div>
+            <div class="form-group">
+              <label>Nom</label>
+              <input type="text" name="last_name" id="pfLastName" placeholder="Nom">
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Téléphone personnel</label>
+            <input type="tel" name="phone" id="pfPhone" placeholder="06 xx xx xx xx">
+          </div>
+          <div class="form-group">
+            <label>Nouveau mot de passe</label>
+            <input type="password" name="password" placeholder="Laisser vide = inchangé" autocomplete="new-password">
+            <p class="form-hint">Minimum 8 caractères</p>
+          </div>
+          <button type="submit" class="btn-primary">Sauvegarder</button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Statut vente -->
+    <div class="form-section">
+      <h3>Avancement de votre vente</h3>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        <button class="status-btn" data-status="preparation">En préparation</button>
+        <button class="status-btn" data-status="en-ligne">En ligne</button>
+        <button class="status-btn" data-status="visites">Visites en cours</button>
+        <button class="status-btn" data-status="offre">Offre reçue</button>
+        <button class="status-btn" data-status="compromis">Compromis</button>
+        <button class="status-btn" data-status="vendu">Vendu !</button>
+      </div>
+    </div>
+
+    <!-- Visites à venir -->
+    <div class="form-section">
+      <h3>Prochaines visites</h3>
+      <div id="visitsList">
+        <p style="color:#aaa;font-size:0.9rem;">Aucune visite planifiée pour le moment.</p>
+      </div>
+    </div>
+
+    <!-- Bien publié -->
+    <div id="propertyLinkBox" class="form-section" style="display:none;">
+      <h3>Page publique de votre bien</h3>
+      <p style="color:#555;font-size:0.9rem;margin-bottom:12px;">Partagez ce lien dans votre annonce LeBonCoin / PAP :</p>
+      <div style="display:flex;gap:12px;align-items:center;">
+        <input type="text" id="propertyLink" readonly style="flex:1;background:var(--creme);">
+        <button onclick="copyLink()" class="btn-primary">Copier</button>
+        <a id="propertyLinkBtn" href="#" target="_blank" class="btn-secondary">Voir →</a>
+      </div>
+    </div>
+
+    <p style="text-align:center;color:#aaa;font-size:0.78rem;margin-top:48px;">Matthias Brieux — 06 95 44 36 54 — Douai (59)<br>
+    Serenis est une plateforme numérique d'outils et de formation. Le vendeur reste seul responsable de sa vente.</p>
+  </main>
+</div>
+
+<style>
+.status-btn { padding: 8px 16px; border-radius: 50px; border: 2px solid var(--vert-pale); font-size: 0.82rem; font-weight: 600; cursor: pointer; transition: 0.2s; background: var(--blanc); }
+.status-btn:hover { border-color: var(--vert-moyen); }
+.status-btn.active { background: var(--vert-foret); color: #fff; border-color: var(--vert-foret); }
+</style>
+<script>
+const API = '/api';
+let sellerData = null;
+
+async function loadData() {
+  const res = await fetch(`${API}/me`);
+  const data = await res.json();
+  sellerData = data.seller;
+
+  if (data.seller.first_name) {
+    document.getElementById('welcomeMsg').textContent = `Bonjour ${data.seller.first_name} 👋`;
+  }
+
+  const packLabel = data.seller.pack === 'serenite' ? 'Pack Sérénité' : 'Pack Autonome';
+  document.getElementById('packLabel').textContent = packLabel;
+  document.getElementById('sidebarPack').style.display = 'block';
+
+  document.getElementById('pfFirstName').value = data.seller.first_name || '';
+  document.getElementById('pfLastName').value = data.seller.last_name || '';
+  document.getElementById('pfPhone').value = data.seller.phone || '';
+
+  document.getElementById('statContacts').textContent = data.stats.contacts;
+  document.getElementById('statVisits').textContent = data.stats.visits;
+
+  if (data.seller.twilio_number) {
+    document.getElementById('statTwilio').textContent = data.seller.twilio_number;
+    document.getElementById('twilioHint').style.display = 'block';
+  } else if (data.seller.pack !== 'serenite') {
+    document.getElementById('statTwilio').textContent = 'Pack Autonome';
+    document.querySelector('#statTwilio').closest('.stat-card').style.opacity = '0.5';
+  }
+
+  if (data.property) {
+    const statusMap = {
+      'preparation': 'status-preparation',
+      'en-ligne': 'status-en-ligne',
+      'visites': 'status-visites',
+      'offre': 'status-offre',
+      'compromis': 'status-compromis',
+      'vendu': 'status-vendu'
+    };
+    const statusLabels = {
+      'preparation': 'En préparation', 'en-ligne': 'En ligne', 'visites': 'Visites en cours',
+      'offre': 'Offre reçue', 'compromis': 'Compromis', 'vendu': 'Vendu !'
+    };
+    const st = data.property.status || 'preparation';
+    document.getElementById('statStatus').innerHTML = `<span class="status-badge ${statusMap[st]}">${statusLabels[st]}</span>`;
+
+    document.querySelectorAll('.status-btn').forEach(b => {
+      b.classList.toggle('active', b.dataset.status === st);
+    });
+
+    if (data.property.published && data.property.slug) {
+      const url = `${window.location.origin}/bien/${data.property.slug}`;
+      document.getElementById('propertyLinkBox').style.display = 'block';
+      document.getElementById('propertyLink').value = url;
+      document.getElementById('propertyLinkBtn').href = url;
+    }
+  }
+}
+
+async function loadVisits() {
+  const res = await fetch(`${API}/visits`);
+  const data = await res.json();
+  const list = document.getElementById('visitsList');
+  if (!data.visits?.length) return;
+  list.innerHTML = data.visits.slice(0, 5).map(v => `
+    <div style="padding:12px 0;border-bottom:1px solid var(--vert-pale);display:flex;justify-content:space-between;align-items:center;">
+      <div>
+        <strong>${v.buyer_name}</strong> — ${v.buyer_email}
+        ${v.buyer_phone ? `— ${v.buyer_phone}` : ''}
+      </div>
+      <div style="text-align:right;font-size:0.85rem;color:#666;">
+        ${v.visit_date}<br>${v.visit_time}
+      </div>
+    </div>
+  `).join('');
+}
+
+document.querySelectorAll('.status-btn').forEach(btn => {
+  btn.addEventListener('click', async () => {
+    const res = await fetch(`${API}/property/status`, {
+      method: 'POST', headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ status: btn.dataset.status })
+    });
+    const data = await res.json();
+    if (data.success) {
+      document.querySelectorAll('.status-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      window.showToast('Statut mis à jour');
+    }
+  });
+});
+
+document.getElementById('profileForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const form = e.target;
+  const data = {};
+  new FormData(form).forEach((v, k) => { if (v) data[k] = v; });
+  const res = await fetch(`${API}/profile`, {
+    method: 'POST', headers: {'Content-Type':'application/json'},
+    body: JSON.stringify(data)
+  });
+  const result = await res.json();
+  if (result.success) window.showToast('Profil mis à jour');
+  else window.showToast(result.error || 'Erreur', 'error');
+});
+
+function copyLink() {
+  const input = document.getElementById('propertyLink');
+  input.select();
+  document.execCommand('copy');
+  window.showToast('Lien copié !');
+}
+
+window.showToast = function(msg, type = 'success') {
+  let toast = document.querySelector('.toast');
+  if (!toast) { toast = document.createElement('div'); toast.className = 'toast'; document.body.appendChild(toast); }
+  toast.textContent = msg;
+  toast.className = `toast ${type === 'error' ? 'error' : ''}`;
+  toast.classList.add('show');
+  setTimeout(() => toast.classList.remove('show'), 3500);
+};
+
+loadData();
+loadVisits();
+</script>
+</body>
+</html>

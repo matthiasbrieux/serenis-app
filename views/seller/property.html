@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mon bien — Serenis</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+<div class="app-layout">
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <a href="/" class="logo"><svg width="28" height="28" viewBox="0 0 32 32"><path d="M16 2L3 13v17h8v-8h10v8h8V13L16 2z" fill="#D4E4D8"/></svg>
+      <span class="logo-text" style="color:#FDFCF8">Sere<em style="color:#C4785A">nis</em></span></a>
+    </div>
+    <nav class="sidebar-nav">
+      <a href="/dashboard" class="sidebar-item"><span class="sidebar-item-icon">📊</span> Tableau de bord</a>
+      <a href="/mon-bien" class="sidebar-item active"><span class="sidebar-item-icon">🏠</span> Mon bien</a>
+      <a href="/ma-formation" class="sidebar-item"><span class="sidebar-item-icon">📚</span> Ma formation</a>
+      <a href="/mon-agenda" class="sidebar-item"><span class="sidebar-item-icon">📅</span> Mon agenda</a>
+    </nav>
+    <div style="position:absolute;bottom:24px;left:0;right:0;padding:0 24px;">
+      <a href="/logout" style="color:rgba(212,228,216,0.5);font-size:0.8rem;">Déconnexion →</a>
+    </div>
+  </aside>
+
+  <main class="main-content">
+    <div class="page-header">
+      <h1>Mon bien</h1>
+      <p>Renseignez toutes les informations — elles constituent votre dossier acheteur</p>
+    </div>
+
+    <!-- Tabs -->
+    <div style="display:flex;gap:8px;margin-bottom:32px;flex-wrap:wrap;">
+      <button class="tab-btn active" data-tab="infos">Informations</button>
+      <button class="tab-btn" data-tab="photos">Photos</button>
+      <button class="tab-btn" data-tab="documents">Documents</button>
+      <button class="tab-btn" data-tab="publication">Publication</button>
+    </div>
+
+    <!-- TAB: INFORMATIONS -->
+    <div class="tab-content" id="tab-infos">
+      <form id="propertyForm">
+        <div class="form-section">
+          <h3>🏠 Type et localisation</h3>
+          <div class="form-grid-3">
+            <div class="form-group">
+              <label>Type de bien *</label>
+              <select name="type" required>
+                <option value="">Choisir...</option>
+                <option value="Maison">Maison</option>
+                <option value="Appartement">Appartement</option>
+                <option value="Villa">Villa</option>
+                <option value="Terrain">Terrain</option>
+              </select>
+            </div>
+            <div class="form-group" style="grid-column:span 2">
+              <label>Adresse complète *</label>
+              <input type="text" name="address" required placeholder="12 rue des Lilas">
+            </div>
+          </div>
+          <div class="form-grid-3">
+            <div class="form-group">
+              <label>Ville *</label>
+              <input type="text" name="city" required placeholder="Douai">
+            </div>
+            <div class="form-group">
+              <label>Code postal *</label>
+              <input type="text" name="postal_code" required placeholder="59500">
+            </div>
+            <div class="form-group">
+              <label>Prix souhaité (€) *</label>
+              <input type="number" name="price" required placeholder="185000">
+            </div>
+          </div>
+        </div>
+
+        <div class="form-section">
+          <h3>📐 Surfaces et composition</h3>
+          <div class="form-grid-3">
+            <div class="form-group">
+              <label>Surface habitable (m²)</label>
+              <input type="number" name="surface_habitable" placeholder="90">
+            </div>
+            <div class="form-group">
+              <label>Surface terrain (m²)</label>
+              <input type="number" name="surface_terrain" placeholder="450">
+            </div>
+            <div class="form-group">
+              <label>Nombre de pièces</label>
+              <input type="number" name="rooms" placeholder="5">
+            </div>
+            <div class="form-group">
+              <label>Nombre de chambres</label>
+              <input type="number" name="bedrooms" placeholder="3">
+            </div>
+            <div class="form-group">
+              <label>Année de construction</label>
+              <input type="number" name="year_built" placeholder="1985">
+            </div>
+          </div>
+        </div>
+
+        <div class="form-section">
+          <h3>🔥 Chauffage et DPE</h3>
+          <div class="form-grid-3">
+            <div class="form-group">
+              <label>Type de chauffage</label>
+              <select name="heating_type">
+                <option value="">Choisir...</option>
+                <option>Gaz naturel</option>
+                <option>Électrique</option>
+                <option>Fioul</option>
+                <option>Pompe à chaleur</option>
+                <option>Bois / poêle</option>
+                <option>Géothermique</option>
+                <option>Autre</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Année chaudière</label>
+              <input type="number" name="heating_year" placeholder="2015">
+            </div>
+            <div class="form-group">
+              <label>Classe DPE</label>
+              <select name="dpe_class">
+                <option value="">Classe DPE...</option>
+                <option>A</option><option>B</option><option>C</option>
+                <option>D</option><option>E</option><option>F</option><option>G</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Taxe foncière annuelle (€)</label>
+              <input type="number" name="taxe_fonciere" placeholder="1200">
+            </div>
+          </div>
+        </div>
+
+        <div class="form-section">
+          <h3>🌿 Extérieur et exposition</h3>
+          <div class="form-grid-3">
+            <div class="form-group">
+              <label>Exposition jardin</label>
+              <select name="exposition">
+                <option value="">Choisir...</option>
+                <option>Nord</option><option>Sud</option><option>Est</option>
+                <option>Ouest</option><option>Sud-Est</option><option>Sud-Ouest</option>
+              </select>
+            </div>
+            <div class="form-group" style="display:flex;align-items:center;gap:12px;padding-top:28px;">
+              <input type="checkbox" name="garden" id="garden" style="width:18px;height:18px;">
+              <label for="garden" style="margin:0;">Jardin</label>
+              <input type="checkbox" name="terrace" id="terrace" style="width:18px;height:18px;margin-left:16px;">
+              <label for="terrace" style="margin:0;">Terrasse</label>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-section">
+          <h3>📍 Proximité et commodités</h3>
+          <div class="form-group">
+            <label>Commerces à proximité</label>
+            <input type="text" name="commerces" placeholder="Supermarché 500m, boulangerie 200m...">
+          </div>
+          <div class="form-grid-2">
+            <div class="form-group">
+              <label>École maternelle + distance</label>
+              <input type="text" name="school_maternelle" placeholder="École Jules Ferry — 350m">
+            </div>
+            <div class="form-group">
+              <label>École primaire + distance</label>
+              <input type="text" name="school_primaire" placeholder="École Jean Jaurès — 500m">
+            </div>
+            <div class="form-group">
+              <label>Collège + distance</label>
+              <input type="text" name="school_college" placeholder="Collège Victor Hugo — 1km">
+            </div>
+            <div class="form-group">
+              <label>Lycée + distance</label>
+              <input type="text" name="school_lycee" placeholder="Lycée Baudelaire — 2km">
+            </div>
+            <div class="form-group">
+              <label>Accès autoroute + temps</label>
+              <input type="text" name="highway" placeholder="A1 — 5 min">
+            </div>
+            <div class="form-group">
+              <label>Gare la plus proche + temps</label>
+              <input type="text" name="train_station" placeholder="Gare de Douai — 10 min à pied">
+            </div>
+          </div>
+        </div>
+
+        <div class="form-section">
+          <h3>✏️ Description et informations complémentaires</h3>
+          <div class="form-group">
+            <label>Équipements inclus dans la vente</label>
+            <input type="text" name="equipment" placeholder="Cuisine équipée, chaudière, volets roulants motorisés...">
+          </div>
+          <div class="form-grid-2">
+            <div class="form-group">
+              <label>Raison de la vente</label>
+              <select name="sale_reason">
+                <option value="">Choisir...</option>
+                <option>Déménagement professionnel</option>
+                <option>Achat d'un bien plus grand</option>
+                <option>Achat d'un bien plus petit</option>
+                <option>Succession</option>
+                <option>Projet de vie</option>
+                <option>Autre</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Description libre du bien</label>
+            <textarea name="description" rows="5" placeholder="Décrivez votre bien : atouts, rénovations récentes, ambiance du quartier, luminosité, calme..."></textarea>
+            <p class="form-hint">Soyez précis et honnête. C'est ce que les acheteurs sérieux lisent en premier.</p>
+          </div>
+        </div>
+
+        <div style="display:flex;gap:16px;">
+          <button type="submit" class="btn-primary">Sauvegarder la fiche</button>
+          <div id="saveSuccess" class="form-success hidden">✓ Fiche sauvegardée</div>
+          <div id="saveError" class="form-error hidden"></div>
+        </div>
+      </form>
+    </div>
+
+    <!-- TAB: PHOTOS -->
+    <div class="tab-content hidden" id="tab-photos">
+      <div class="form-section">
+        <h3>📸 Photos du bien <span style="font-size:0.8rem;color:#888;font-weight:400">(max 20 photos — formats JPG, PNG, WEBP)</span></h3>
+        <div class="upload-zone" id="uploadZone">
+          <input type="file" id="photoInput" multiple accept="image/jpeg,image/png,image/webp">
+          <div class="upload-zone-icon">📷</div>
+          <p style="font-weight:600;color:#3D5A47;">Cliquez ou glissez vos photos ici</p>
+          <p style="font-size:0.85rem;color:#888;margin-top:4px;">Jusqu'à 20 photos — max 20 Mo par photo</p>
+        </div>
+        <div id="uploadProgress" class="hidden" style="margin-top:16px;">
+          <div style="background:#e0e0e0;border-radius:4px;height:6px;">
+            <div id="progressBar" style="background:#3D5A47;height:100%;border-radius:4px;width:0%;transition:width 0.3s;"></div>
+          </div>
+          <p id="progressText" style="font-size:0.85rem;color:#666;margin-top:8px;"></p>
+        </div>
+        <div class="photos-grid" id="photosGrid"></div>
+        <div style="margin-top:24px;padding:16px;background:var(--creme);border-radius:8px;">
+          <strong>Checklist avant photos</strong>
+          <p style="font-size:0.85rem;color:#666;margin-top:4px;">Consultez la checklist dans votre espace <a href="/ma-formation" style="color:var(--terracotta)">Formation</a> avant de prendre les photos.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB: DOCUMENTS -->
+    <div class="tab-content hidden" id="tab-documents">
+      <div class="form-section">
+        <h3>📄 Documents (PDF uniquement)</h3>
+        <p style="color:#666;font-size:0.9rem;margin-bottom:20px;">Uploadez vos diagnostics et documents. Ils seront accessibles dans le dossier acheteur.</p>
+        <div style="display:grid;grid-template-columns:2fr 1fr auto;gap:12px;align-items:end;margin-bottom:20px;">
+          <div class="form-group" style="margin:0">
+            <label>Nom du document</label>
+            <input type="text" id="docName" placeholder="Ex: DPE 2024">
+          </div>
+          <div class="form-group" style="margin:0">
+            <label>Type</label>
+            <select id="docType">
+              <option value="dpe">DPE</option>
+              <option value="amiante">Amiante</option>
+              <option value="plomb">Plomb</option>
+              <option value="electricite">Électricité</option>
+              <option value="gaz">Gaz</option>
+              <option value="assainissement">Assainissement</option>
+              <option value="erp">État des risques (ERP)</option>
+              <option value="titre">Titre de propriété</option>
+              <option value="taxe">Taxe foncière</option>
+              <option value="autre">Autre</option>
+            </select>
+          </div>
+          <div>
+            <input type="file" id="docInput" accept=".pdf" style="display:none">
+            <button onclick="document.getElementById('docInput').click()" class="btn-primary">+ Ajouter un PDF</button>
+          </div>
+        </div>
+        <div id="documentsList" style="display:flex;flex-direction:column;gap:8px;"></div>
+        <div style="margin-top:24px;padding:16px;background:var(--creme);border-radius:8px;">
+          <strong>Documents recommandés</strong>
+          <p style="font-size:0.85rem;color:#666;margin-top:4px;">Consultez la <a href="/ma-formation" style="color:var(--terracotta)">checklist documents</a> dans votre espace Formation.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB: PUBLICATION -->
+    <div class="tab-content hidden" id="tab-publication">
+      <div class="form-section">
+        <h3>🚀 Publier votre bien</h3>
+        <div id="publishStatus"></div>
+        <div id="publishActions" style="margin-top:24px;"></div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script>
+// Tab system
+document.querySelectorAll('.tab-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.tab-content').forEach(c => c.classList.add('hidden'));
+    btn.classList.add('active');
+    document.getElementById('tab-' + btn.dataset.tab).classList.remove('hidden');
+  });
+});
+
+// Load property data
+async function loadProperty() {
+  const res = await fetch('/api/property');
+  const data = await res.json();
+  if (!data.property) return;
+  const p = data.property;
+  const form = document.getElementById('propertyForm');
+  Object.keys(p).forEach(key => {
+    const el = form.elements[key];
+    if (!el) return;
+    if (el.type === 'checkbox') el.checked = !!p[key];
+    else el.value = p[key] || '';
+  });
+
+  // Photos
+  if (data.photos?.length) renderPhotos(data.photos);
+
+  // Documents
+  if (data.documents?.length) renderDocuments(data.documents);
+
+  // Publication
+  renderPublishTab(p);
+}
+
+function renderPublishTab(property) {
+  const statusDiv = document.getElementById('publishStatus');
+  const actionsDiv = document.getElementById('publishActions');
+
+  if (property.published) {
+    const url = `${window.location.origin}/bien/${property.slug}`;
+    statusDiv.innerHTML = `
+      <div style="background:#e8f5e9;padding:16px;border-radius:8px;margin-bottom:20px;">
+        <strong style="color:#2e7d32;">✓ Votre bien est en ligne !</strong>
+        <div style="display:flex;gap:12px;align-items:center;margin-top:12px;">
+          <input type="text" value="${url}" readonly style="flex:1;background:#fff;padding:8px 12px;border:1px solid #c8e6c9;border-radius:4px;font-size:0.85rem;">
+          <button onclick="navigator.clipboard.writeText('${url}');showToast('Lien copié !')" class="btn-primary">Copier</button>
+          <a href="${url}" target="_blank" class="btn-secondary">Voir →</a>
+        </div>
+      </div>
+    `;
+    actionsDiv.innerHTML = `<p style="color:#555;font-size:0.9rem;">Vous pouvez mettre à jour votre fiche à tout moment — les changements sont appliqués immédiatement.</p>`;
+  } else {
+    const requirements = [];
+    if (!property.type) requirements.push('Type de bien');
+    if (!property.address) requirements.push('Adresse');
+    if (!property.price) requirements.push('Prix');
+    if (!property.description) requirements.push('Description');
+
+    if (requirements.length > 0) {
+      statusDiv.innerHTML = `
+        <div style="background:#fff3e0;padding:16px;border-radius:8px;margin-bottom:20px;">
+          <strong style="color:#e65100;">Complétez avant de publier :</strong>
+          <ul style="margin:8px 0 0 20px;font-size:0.9rem;color:#666;">${requirements.map(r => `<li>${r}</li>`).join('')}</ul>
+        </div>
+      `;
+    } else {
+      statusDiv.innerHTML = `<div style="background:#e8f5e9;padding:16px;border-radius:8px;margin-bottom:20px;"><strong style="color:#2e7d32;">✓ Votre fiche est complète. Vous pouvez publier.</strong></div>`;
+    }
+
+    actionsDiv.innerHTML = `
+      <button class="btn-primary btn-large" id="publishBtn" ${requirements.length ? 'disabled style="opacity:0.5"' : ''}>
+        Publier mon bien en ligne
+      </button>
+      <p style="font-size:0.82rem;color:#888;margin-top:12px;">Une URL unique sera créée. Vous la mettrez dans votre annonce LeBonCoin ou PAP.</p>
+    `;
+
+    document.getElementById('publishBtn')?.addEventListener('click', publishProperty);
+  }
+}
+
+async function publishProperty() {
+  const btn = document.getElementById('publishBtn');
+  btn.textContent = 'Publication en cours...'; btn.disabled = true;
+  const res = await fetch('/api/property/publish', { method: 'POST' });
+  const data = await res.json();
+  if (data.success) {
+    window.showToast('Bien publié !');
+    loadProperty();
+  } else {
+    window.showToast(data.error || 'Erreur', 'error');
+    btn.textContent = 'Publier mon bien en ligne'; btn.disabled = false;
+  }
+}
+
+// Property form save
+document.getElementById('propertyForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const formData = new FormData(e.target);
+  const data = {};
+  formData.forEach((v, k) => { data[k] = v; });
+  data.garden = document.getElementById('garden').checked ? 1 : 0;
+  data.terrace = document.getElementById('terrace').checked ? 1 : 0;
+
+  const btn = e.target.querySelector('button[type="submit"]');
+  btn.textContent = 'Sauvegarde...'; btn.disabled = true;
+
+  const res = await fetch('/api/property', {
+    method: 'POST', headers: {'Content-Type':'application/json'},
+    body: JSON.stringify(data)
+  });
+  const result = await res.json();
+  if (result.success) {
+    document.getElementById('saveSuccess').classList.remove('hidden');
+    setTimeout(() => document.getElementById('saveSuccess').classList.add('hidden'), 3000);
+    window.showToast('Fiche sauvegardée');
+  } else {
+    document.getElementById('saveError').textContent = result.error;
+    document.getElementById('saveError').classList.remove('hidden');
+  }
+  btn.textContent = 'Sauvegarder la fiche'; btn.disabled = false;
+});
+
+// Photo upload
+const uploadZone = document.getElementById('uploadZone');
+const photoInput = document.getElementById('photoInput');
+
+uploadZone.addEventListener('click', () => photoInput.click());
+uploadZone.addEventListener('dragover', (e) => { e.preventDefault(); uploadZone.classList.add('drag-over'); });
+uploadZone.addEventListener('dragleave', () => uploadZone.classList.remove('drag-over'));
+uploadZone.addEventListener('drop', (e) => { e.preventDefault(); uploadZone.classList.remove('drag-over'); uploadPhotos(e.dataTransfer.files); });
+photoInput.addEventListener('change', () => uploadPhotos(photoInput.files));
+
+async function uploadPhotos(files) {
+  const progress = document.getElementById('uploadProgress');
+  const bar = document.getElementById('progressBar');
+  const text = document.getElementById('progressText');
+  progress.classList.remove('hidden');
+
+  for (let i = 0; i < files.length; i++) {
+    text.textContent = `Upload ${i + 1}/${files.length}...`;
+    bar.style.width = `${((i + 1) / files.length) * 100}%`;
+    const fd = new FormData();
+    fd.append('photos', files[i]);
+    const res = await fetch('/api/property/photos', { method: 'POST', body: fd });
+    const data = await res.json();
+    if (data.photos) renderPhotos(data.photos, true);
+  }
+  text.textContent = 'Upload terminé !';
+  setTimeout(() => progress.classList.add('hidden'), 2000);
+  photoInput.value = '';
+}
+
+let allPhotos = [];
+function renderPhotos(photos, append = false) {
+  if (!append) allPhotos = photos;
+  else allPhotos = [...allPhotos, ...photos];
+  const grid = document.getElementById('photosGrid');
+  grid.innerHTML = allPhotos.map(p => `
+    <div class="photo-thumb">
+      <img src="${p.url || p.thumbnail_url}" alt="Photo bien">
+      <button class="photo-delete" onclick="deletePhoto('${p.cloudinary_id}')">✕</button>
+    </div>
+  `).join('');
+}
+
+async function deletePhoto(cid) {
+  if (!confirm('Supprimer cette photo ?')) return;
+  await fetch(`/api/property/photos/${encodeURIComponent(cid)}`, { method: 'DELETE' });
+  allPhotos = allPhotos.filter(p => p.cloudinary_id !== cid);
+  renderPhotos(allPhotos);
+  window.showToast('Photo supprimée');
+}
+
+// Document upload
+document.getElementById('docInput').addEventListener('change', async (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+  const fd = new FormData();
+  fd.append('document', file);
+  fd.append('name', document.getElementById('docName').value || file.name);
+  fd.append('doc_type', document.getElementById('docType').value);
+  const res = await fetch('/api/property/documents', { method: 'POST', body: fd });
+  const data = await res.json();
+  if (data.success) { window.showToast('Document ajouté'); loadProperty(); }
+  e.target.value = '';
+});
+
+function renderDocuments(docs) {
+  const list = document.getElementById('documentsList');
+  list.innerHTML = docs.map(d => `
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:12px 16px;background:var(--blanc);border:1px solid var(--vert-pale);border-radius:8px;">
+      <div>
+        <strong style="font-size:0.9rem;">${d.name}</strong>
+        <span style="font-size:0.78rem;color:#888;margin-left:8px;">${d.doc_type}</span>
+      </div>
+      <a href="${d.url}" target="_blank" class="btn-ghost" style="font-size:0.8rem;padding:6px 12px;">Voir →</a>
+    </div>
+  `).join('');
+}
+
+window.showToast = function(msg, type='success') {
+  let toast = document.querySelector('.toast');
+  if (!toast) { toast = document.createElement('div'); toast.className = 'toast'; document.body.appendChild(toast); }
+  toast.textContent = msg; toast.className = `toast ${type==='error'?'error':''}`;
+  toast.classList.add('show'); setTimeout(()=>toast.classList.remove('show'), 3500);
+};
+
+// Tab CSS
+document.head.insertAdjacentHTML('beforeend', `<style>
+.tab-btn { padding:10px 20px;border-radius:50px;border:2px solid var(--vert-pale);font-size:0.88rem;font-weight:600;cursor:pointer;transition:0.2s;background:var(--blanc);color:var(--noir); }
+.tab-btn.active { background:var(--vert-foret);color:#fff;border-color:var(--vert-foret); }
+.tab-btn:hover:not(.active) { border-color:var(--vert-moyen); }
+</style>`);
+
+loadProperty();
+</script>
+</body>
+</html>
