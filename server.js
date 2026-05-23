@@ -78,4 +78,21 @@ app.use((err, req, res, next) => {
 
 app.listen(PORT, () => {
   console.log(`✓ Serenis démarré — http://localhost:${PORT}`);
+
+  // Rappels visites — tourne chaque jour à 18h
+  const { sendVisitReminders } = require('./services/reminders');
+  function scheduleReminders() {
+    const now = new Date();
+    const next18h = new Date();
+    next18h.setHours(18, 0, 0, 0);
+    if (now >= next18h) next18h.setDate(next18h.getDate() + 1);
+    const msUntil18h = next18h - now;
+    setTimeout(() => {
+      sendVisitReminders().catch(e => console.error('Reminder job error:', e.message));
+      setInterval(() => {
+        sendVisitReminders().catch(e => console.error('Reminder job error:', e.message));
+      }, 24 * 60 * 60 * 1000);
+    }, msUntil18h);
+  }
+  scheduleReminders();
 });
