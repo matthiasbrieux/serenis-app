@@ -24,7 +24,11 @@ router.post('/login', express.json(), async (req, res) => {
     { expiresIn: '30d' }
   );
 
-  res.cookie('token', token, { httpOnly: true, secure: process.env.NODE_ENV === 'production', maxAge: 30 * 24 * 3600 * 1000 });
+  res.cookie('token', token, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    maxAge: 30 * 24 * 3600 * 1000
+  });
   res.json({ success: true, redirect: '/dashboard' });
 });
 
@@ -37,19 +41,25 @@ router.get('/admin/login', (req, res) => {
   res.sendFile('admin-login.html', { root: './public' });
 });
 
-router.post('/admin/login', express.json(), async (req, res) => {
+router.post('/admin/login', express.json(), (req, res) => {
   const { email, password } = req.body;
-  if (email !== process.env.ADMIN_EMAIL) return res.json({ error: 'Accès refusé' });
-
-  const valid = await bcrypt.compare(password, await bcrypt.hash(process.env.ADMIN_PASSWORD, 10).then(() => {
-    return password === process.env.ADMIN_PASSWORD ? '$2b$10$valid' : '$2b$10$invalid';
-  }));
-
-  if (password !== process.env.ADMIN_PASSWORD) return res.json({ error: 'Accès refusé' });
-
-  const token = jwt.sign({ role: 'admin', email }, process.env.JWT_SECRET, { expiresIn: '8h' });
-  res.cookie('admin_token', token, { httpOnly: true, secure: process.env.NODE_ENV === 'production', maxAge: 8 * 3600 * 1000 });
-  res.json({ success: true, redirect: '/admin' });
+  if (!process.env.ADMIN_PASSWORD || !process.env.JWT_SECRET) {
+    return res.json({ error: 'Configuration serveur incomplète. Contactez le support.' });
+  }
+  if (email !== process.env.ADMIN_EMAIL || password !== process.env.ADMIN_PASSWORD) {
+    return res.json({ error: 'Accès refusé' });
+  }
+  try {
+    const token = jwt.sign({ role: 'admin', email }, process.env.JWT_SECRET, { expiresIn: '8h' });
+    res.cookie('admin_token', token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      maxAge: 8 * 3600 * 1000
+    });
+    res.json({ success: true, redirect: '/admin' });
+  } catch (e) {
+    res.json({ error: 'Erreur serveur. Contactez le support.' });
+  }
 });
 
 router.get('/admin/logout', (req, res) => {

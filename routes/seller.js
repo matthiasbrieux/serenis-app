@@ -7,10 +7,11 @@ const { requireAuth } = require('../middleware/auth');
 const { uploadPhoto, uploadDocument } = require('../services/upload');
 const { assignTwilioNumber } = require('../services/twilio');
 
-// Dashboard
-router.get('/dashboard', requireAuth, (req, res) => {
-  res.sendFile('dashboard.html', { root: './views/seller' });
-});
+// Pages vendeur (toutes protégées)
+router.get('/dashboard', requireAuth, (req, res) => res.sendFile('dashboard.html', { root: './views/seller' }));
+router.get('/mon-bien', requireAuth, (req, res) => res.sendFile('property.html', { root: './views/seller' }));
+router.get('/ma-formation', requireAuth, (req, res) => res.sendFile('library.html', { root: './views/seller' }));
+router.get('/mon-agenda', requireAuth, (req, res) => res.sendFile('agenda.html', { root: './views/seller' }));
 
 // API — seller data
 router.get('/api/me', requireAuth, (req, res) => {
