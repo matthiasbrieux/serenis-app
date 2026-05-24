@@ -10,6 +10,24 @@ router.get('/', requireAdmin, (req, res) => {
   res.sendFile('dashboard.html', { root: './views/admin' });
 });
 
+// Route de création rapide de compte vendeur (protégée par clé admin)
+router.get('/create-seller', async (req, res) => {
+  const { key, email, password } = req.query;
+  if (!key || key !== process.env.ADMIN_PASSWORD) {
+    return res.status(403).send('Clé invalide');
+  }
+  if (!email || !password) {
+    return res.status(400).send('Paramètres manquants : ?key=...&email=...&password=...');
+  }
+  const existing = db.prepare('SELECT id FROM sellers WHERE email = ?').get(email.toLowerCase());
+  if (existing) return res.send(`Compte déjà existant pour ${email}`);
+  const hashed = await bcrypt.hash(password, 12);
+  const uuid = uuidv4();
+  db.prepare('INSERT INTO sellers (uuid, email, password, pack, paid_at) VALUES (?,?,?,?,CURRENT_TIMESTAMP)')
+    .run(uuid, email.toLowerCase(), hashed, 'serenite');
+  res.send(`✓ Compte créé — email: ${email} — vous pouvez vous connecter sur /login`);
+});
+
 router.get('/api/stats', requireAdmin, (req, res) => {
   const sellers = db.prepare('SELECT COUNT(*) as count FROM sellers').get();
   const revenue_autonome = db.prepare("SELECT COUNT(*) as count FROM sellers WHERE pack='autonome' AND paid_at IS NOT NULL").get();
