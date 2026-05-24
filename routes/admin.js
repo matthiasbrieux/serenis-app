@@ -10,17 +10,18 @@ router.get('/', requireAdmin, (req, res) => {
   res.sendFile('dashboard.html', { root: './views/admin' });
 });
 
-// Route de création rapide de compte vendeur (premier compte uniquement)
+// Route de création / reset compte vendeur (premier compte ou reset password)
 router.get('/create-seller', async (req, res) => {
   const { email, password } = req.query;
   if (!email || !password) {
     return res.status(400).send('Paramètres manquants : ?email=...&password=...');
   }
-  const count = db.prepare('SELECT COUNT(*) as n FROM sellers').get();
-  if (count.n > 0) return res.status(403).send('Des comptes existent déjà. Utilisez le panel admin.');
-  const existing = db.prepare('SELECT id FROM sellers WHERE email = ?').get(email.toLowerCase());
-  if (existing) return res.send(`Compte déjà existant pour ${email}`);
   const hashed = await bcrypt.hash(password, 12);
+  const existing = db.prepare('SELECT id FROM sellers WHERE email = ?').get(email.toLowerCase());
+  if (existing) {
+    db.prepare('UPDATE sellers SET password=? WHERE email=?').run(hashed, email.toLowerCase());
+    return res.send(`✓ Mot de passe mis à jour pour ${email} — connectez-vous sur /login`);
+  }
   const uuid = uuidv4();
   db.prepare('INSERT INTO sellers (uuid, email, password, pack, paid_at) VALUES (?,?,?,?,CURRENT_TIMESTAMP)')
     .run(uuid, email.toLowerCase(), hashed, 'serenite');
