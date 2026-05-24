@@ -6,15 +6,407 @@
   <title>Tableau de bord — Serenis</title>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/css/style.css">
+  <style>
+    /* ——— Base ——— */
+    *, *::before, *::after { box-sizing: border-box; }
+    body { font-family: 'DM Sans', sans-serif; background: #F5F0E8; margin: 0; }
+
+    /* ——— Layout ——— */
+    .app-layout { display: flex; min-height: 100vh; }
+
+    /* ——— Sidebar ——— */
+    .sidebar {
+      width: 240px;
+      min-height: 100vh;
+      background: #3D5A47;
+      display: flex;
+      flex-direction: column;
+      position: fixed;
+      top: 0; left: 0; bottom: 0;
+      z-index: 100;
+      transition: transform 0.3s cubic-bezier(0.16,1,0.3,1);
+    }
+    .sidebar-logo {
+      padding: 28px 24px 20px;
+      border-bottom: 1px solid rgba(212,228,216,0.15);
+    }
+    .sidebar-logo a {
+      display: flex; align-items: center; gap: 10px; text-decoration: none;
+    }
+    .logo-text {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.4rem; font-weight: 600; color: #FDFCF8; letter-spacing: 0.02em;
+    }
+    .sidebar-pack {
+      margin: 12px 24px;
+      padding: 10px 14px;
+      background: rgba(212,228,216,0.12);
+      border-radius: 8px;
+      display: flex; flex-direction: column; gap: 2px;
+    }
+    .sidebar-pack strong { color: #D4E4D8; font-size: 0.82rem; font-weight: 600; }
+    .sidebar-pack span { color: rgba(212,228,216,0.6); font-size: 0.73rem; }
+    .sidebar-nav {
+      flex: 1;
+      padding: 16px 0;
+      display: flex; flex-direction: column; gap: 2px;
+    }
+    .sidebar-item {
+      display: flex; align-items: center; gap: 11px;
+      padding: 10px 24px;
+      color: rgba(212,228,216,0.7);
+      text-decoration: none;
+      font-size: 0.88rem; font-weight: 400;
+      border-radius: 0;
+      transition: all 0.2s;
+    }
+    .sidebar-item:hover {
+      color: #FDFCF8;
+      background: rgba(212,228,216,0.08);
+    }
+    .sidebar-item.active {
+      color: #FDFCF8;
+      background: rgba(212,228,216,0.14);
+      font-weight: 500;
+      border-left: 3px solid #C4785A;
+    }
+    .sidebar-footer {
+      padding: 20px 24px;
+      border-top: 1px solid rgba(212,228,216,0.12);
+    }
+    .sidebar-footer a {
+      color: rgba(212,228,216,0.4);
+      font-size: 0.78rem;
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+    .sidebar-footer a:hover { color: rgba(212,228,216,0.7); }
+
+    /* ——— Main content ——— */
+    .main-content {
+      margin-left: 240px;
+      flex: 1;
+      padding: 36px 40px 60px;
+      min-width: 0;
+    }
+
+    /* ——— Page header ——— */
+    .page-header {
+      margin-bottom: 28px;
+    }
+    .page-header h1 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 2rem; font-weight: 600;
+      color: #3D5A47; margin: 0 0 4px;
+    }
+    .page-header p {
+      color: #7a7065; font-size: 0.92rem; margin: 0;
+    }
+
+    /* ——— Progression bar ——— */
+    .progression-bar {
+      background: #fff;
+      border: 1.5px solid #e8e0d6;
+      border-radius: 14px;
+      padding: 24px 28px;
+      margin-bottom: 24px;
+    }
+    .progression-steps {
+      display: flex; align-items: center;
+      gap: 0;
+      margin-bottom: 20px;
+      overflow-x: auto;
+      padding-bottom: 4px;
+    }
+    .prog-step {
+      display: flex; flex-direction: column; align-items: center; gap: 6px;
+      flex-shrink: 0; min-width: 54px;
+    }
+    .prog-circle {
+      width: 28px; height: 28px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.7rem; font-weight: 600;
+      transition: all 0.3s cubic-bezier(0.16,1,0.3,1);
+      position: relative;
+    }
+    .prog-circle.done {
+      background: #3D5A47; border: 2px solid #3D5A47;
+    }
+    .prog-circle.active {
+      background: #3D5A47; border: 2px solid #3D5A47;
+      box-shadow: 0 0 0 4px rgba(61,90,71,0.14);
+    }
+    .prog-circle.pending {
+      background: #fff; border: 2px solid #d5cfc6;
+      color: #b0a89f;
+    }
+    .prog-label {
+      font-size: 0.63rem; color: #9a9087; text-align: center;
+      line-height: 1.2; max-width: 54px;
+      font-weight: 400;
+    }
+    .prog-label.active { color: #3D5A47; font-weight: 600; }
+    .prog-label.done { color: #5a8a6a; }
+    .prog-connector {
+      flex: 1; height: 2px;
+      min-width: 8px; max-width: 40px;
+      margin-bottom: 22px;
+      border-radius: 2px;
+      transition: background 0.4s;
+    }
+    .prog-connector.done { background: linear-gradient(90deg, #5a8a6a, #3D5A47); }
+    .prog-connector.pending { background: #e8e0d6; }
+    .progression-footer {
+      display: flex; align-items: center; gap: 14px;
+    }
+    .progression-pct {
+      font-size: 0.86rem; color: #5a6e5f; font-weight: 500; white-space: nowrap;
+    }
+    .progression-track {
+      flex: 1; height: 6px;
+      background: #ede7de;
+      border-radius: 3px; overflow: hidden;
+    }
+    .progression-fill {
+      height: 100%; border-radius: 3px;
+      background: linear-gradient(90deg, #5a8a6a, #3D5A47);
+      width: 0%;
+      transition: width 0.9s cubic-bezier(0.16,1,0.3,1);
+    }
+
+    /* ——— Stats grid ——— */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin-bottom: 28px;
+    }
+    .stat-card {
+      background: #fff;
+      border: 1.5px solid #e8e0d6;
+      border-radius: 14px;
+      padding: 20px;
+      transition: box-shadow 0.3s cubic-bezier(0.16,1,0.3,1);
+    }
+    .stat-card:hover {
+      box-shadow: 0 4px 20px rgba(61,90,71,0.08);
+    }
+    .stat-label {
+      font-size: 0.76rem; color: #9a9087; font-weight: 500;
+      text-transform: uppercase; letter-spacing: 0.05em;
+      margin-bottom: 8px;
+    }
+    .stat-value {
+      font-size: 2rem; font-weight: 600; color: #2d3e33;
+      font-family: 'Cormorant Garamond', serif;
+      line-height: 1;
+    }
+    .stat-value.green { color: #3D5A47; }
+    .stat-value.orange { color: #C4785A; }
+    .stat-value.red { color: #c45a5a; }
+    .stat-value-small {
+      font-size: 0.95rem; font-weight: 500; color: #4a5e52;
+      font-family: 'DM Sans', sans-serif;
+      margin-top: 2px;
+    }
+    .stat-sub {
+      font-size: 0.78rem; color: #b0a89f; margin-top: 4px;
+    }
+    .stat-score-denom {
+      font-size: 1.1rem; color: #b0a89f; font-weight: 400;
+    }
+
+    /* ——— Two-column grid ——— */
+    .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 24px; }
+    .one-col { margin-bottom: 24px; }
+
+    /* ——— Cards ——— */
+    .card {
+      background: #fff;
+      border: 1.5px solid #e8e0d6;
+      border-radius: 14px;
+      padding: 24px;
+      transition: box-shadow 0.3s cubic-bezier(0.16,1,0.3,1);
+    }
+    .card:hover { box-shadow: 0 4px 20px rgba(61,90,71,0.08); }
+    .card h3 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.2rem; font-weight: 600; color: #3D5A47;
+      margin: 0 0 16px;
+    }
+
+    /* ——— Score breakdown ——— */
+    .score-breakdown { display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; }
+    .score-row { display: flex; align-items: center; gap: 10px; }
+    .score-row-label { font-size: 0.8rem; color: #6b6560; width: 90px; flex-shrink: 0; }
+    .score-row-track { flex: 1; height: 6px; background: #ede7de; border-radius: 3px; overflow: hidden; }
+    .score-row-fill { height: 100%; border-radius: 3px; background: linear-gradient(90deg, #5a8a6a, #3D5A47); transition: width 0.7s cubic-bezier(0.16,1,0.3,1); }
+    .score-row-val { font-size: 0.75rem; color: #9a9087; width: 38px; text-align: right; flex-shrink: 0; }
+
+    .score-reco-title {
+      font-size: 0.78rem; font-weight: 600; color: #9a9087;
+      text-transform: uppercase; letter-spacing: 0.05em;
+      margin: 0 0 10px;
+    }
+    .reco-list { display: flex; flex-direction: column; gap: 8px; }
+    .reco-item {
+      display: flex; align-items: center; gap: 10px;
+      padding: 10px 14px;
+      background: #faf7f2;
+      border-radius: 9px;
+      border: 1px solid #ede7de;
+      text-decoration: none;
+      transition: background 0.2s, border-color 0.2s;
+    }
+    .reco-item:hover { background: #f0f7f2; border-color: #c8ddd0; }
+    .reco-icon { font-size: 1rem; flex-shrink: 0; }
+    .reco-text { flex: 1; font-size: 0.83rem; color: #3d3830; font-weight: 400; }
+    .reco-cta { font-size: 0.8rem; color: #C4785A; font-weight: 600; flex-shrink: 0; }
+
+    /* ——— Timeline ——— */
+    .timeline-row {
+      display: flex; align-items: center; gap: 0;
+      overflow-x: auto; padding-bottom: 8px; margin: 8px 0 16px;
+    }
+    .timeline-tip {
+      font-size: 0.85rem; color: #6b6560;
+      padding: 11px 16px;
+      background: #faf7f2;
+      border-radius: 9px;
+      border: 1px solid #ede7de;
+    }
+
+    /* ——— Visits list ——— */
+    .visit-row {
+      padding: 13px 0;
+      border-bottom: 1px solid #f0ebe2;
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .visit-row:last-child { border-bottom: none; }
+    .visit-name { font-size: 0.88rem; font-weight: 500; color: #2d3e33; }
+    .visit-contact { font-size: 0.8rem; color: #9a9087; margin-top: 2px; }
+    .visit-date { text-align: right; font-size: 0.82rem; color: #6b6560; font-weight: 500; }
+
+    /* ——— Profile form ——— */
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .form-group { display: flex; flex-direction: column; gap: 6px; margin-bottom: 14px; }
+    .form-group label { font-size: 0.8rem; font-weight: 500; color: #6b6560; }
+    .form-group input {
+      padding: 10px 14px;
+      border: 1.5px solid #e0d8ce;
+      border-radius: 8px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.9rem;
+      color: #2d3e33;
+      background: #fdfcf8;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .form-group input:focus { border-color: #3D5A47; }
+    .form-hint { font-size: 0.75rem; color: #b0a89f; margin: 4px 0 0; }
+
+    /* ——— Buttons ——— */
+    .btn-primary {
+      display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+      padding: 10px 20px;
+      background: #3D5A47; color: #FDFCF8;
+      border: none; border-radius: 8px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.88rem; font-weight: 500;
+      cursor: pointer; text-decoration: none;
+      transition: background 0.2s, box-shadow 0.2s;
+    }
+    .btn-primary:hover { background: #2d4535; box-shadow: 0 4px 14px rgba(61,90,71,0.2); }
+    .btn-secondary {
+      display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+      padding: 10px 20px;
+      background: transparent; color: #3D5A47;
+      border: 1.5px solid #c8ddd0; border-radius: 8px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.88rem; font-weight: 500;
+      cursor: pointer; text-decoration: none;
+      transition: background 0.2s, border-color 0.2s;
+    }
+    .btn-secondary:hover { background: #f0f7f2; border-color: #3D5A47; }
+
+    /* ——— Link box ——— */
+    .link-input-group { display: flex; gap: 10px; align-items: center; }
+    .link-input-group input {
+      flex: 1; padding: 10px 14px;
+      border: 1.5px solid #e0d8ce;
+      border-radius: 8px;
+      font-size: 0.85rem; color: #5a6e5f;
+      background: #F5F0E8;
+      font-family: 'DM Sans', sans-serif;
+    }
+
+    /* ——— Footer note ——— */
+    .footer-note {
+      text-align: center; color: #c0b8ae; font-size: 0.76rem;
+      margin-top: 52px; line-height: 1.6;
+    }
+
+    /* ——— Toast ——— */
+    .toast {
+      position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%) translateY(20px);
+      background: #3D5A47; color: #fff;
+      padding: 11px 22px; border-radius: 50px;
+      font-size: 0.88rem; font-weight: 500;
+      opacity: 0; transition: all 0.35s cubic-bezier(0.16,1,0.3,1);
+      pointer-events: none; z-index: 9999;
+    }
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+    .toast.error { background: #c45a5a; }
+
+    /* ——— Mobile burger ——— */
+    .mobile-menu-btn {
+      display: none; position: fixed; top: 16px; left: 16px; z-index: 200;
+      width: 40px; height: 40px; background: #3D5A47; border: none;
+      border-radius: 9px; cursor: pointer; align-items: center; justify-content: center;
+    }
+    .sidebar-overlay {
+      display: none; position: fixed; inset: 0;
+      background: rgba(0,0,0,0.3); z-index: 99;
+    }
+
+    /* ——— Responsive ——— */
+    @media (max-width: 1100px) {
+      .stats-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 768px) {
+      .sidebar { transform: translateX(-100%); }
+      .sidebar.open { transform: translateX(0); }
+      .sidebar-overlay.open { display: block; }
+      .mobile-menu-btn { display: flex; }
+      .main-content { margin-left: 0; padding: 24px 16px 48px; padding-top: 68px; }
+      .stats-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
+      .two-col { grid-template-columns: 1fr; }
+      .form-row { grid-template-columns: 1fr; }
+      .page-header h1 { font-size: 1.6rem; }
+    }
+    @media (max-width: 480px) {
+      .stats-grid { grid-template-columns: 1fr 1fr; }
+    }
+  </style>
 </head>
 <body>
+
+<!-- Mobile burger -->
+<button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Menu">
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#FDFCF8" stroke-width="2" stroke-linecap="round">
+    <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
+  </svg>
+</button>
+<div class="sidebar-overlay" id="sidebarOverlay"></div>
+
 <div class="app-layout">
-  <!-- Sidebar -->
+  <!-- ——— Sidebar ——— -->
   <aside class="sidebar" id="sidebar">
     <div class="sidebar-logo">
       <a href="/" class="logo logo-white">
-        <svg width="28" height="28" viewBox="0 0 32 32"><path d="M16 2L3 13v17h8v-8h10v8h8V13L16 2z" fill="#D4E4D8"/></svg>
-        <span class="logo-text" style="color:#FDFCF8">Sere<em style="color:#C4785A">nis</em></span>
+        <svg width="26" height="26" viewBox="0 0 32 32"><path d="M16 2L3 13v17h8v-8h10v8h8V13L16 2z" fill="#D4E4D8"/></svg>
+        <span class="logo-text">Sere<em style="color:#C4785A;font-style:normal;">nis</em></span>
       </a>
     </div>
     <div id="sidebarPack" class="sidebar-pack" style="display:none">
@@ -23,63 +415,113 @@
     </div>
     <nav class="sidebar-nav">
       <a href="/dashboard" class="sidebar-item active">
-        <span class="sidebar-item-icon">📊</span> Tableau de bord
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/>
+          <rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>
+        </svg>Tableau de bord
       </a>
       <a href="/mon-bien" class="sidebar-item">
-        <span class="sidebar-item-icon">🏠</span> Mon bien
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/>
+        </svg>Mon bien
       </a>
       <a href="/ma-formation" class="sidebar-item">
-        <span class="sidebar-item-icon">📚</span> Ma formation
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
+        </svg>Ma formation
       </a>
       <a href="/mon-agenda" class="sidebar-item">
-        <span class="sidebar-item-icon">📅</span> Mon agenda
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="4" width="18" height="18" rx="2"/>
+          <line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>
+        </svg>Mon agenda
+      </a>
+      <a href="/mes-publications" class="sidebar-item">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M5 12.55a11 11 0 0 1 14.08 0"/><path d="M1.42 9a16 16 0 0 1 21.16 0"/>
+          <path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><circle cx="12" cy="20" r="1"/>
+        </svg>Mes publications
+      </a>
+      <a href="/mes-performances" class="sidebar-item">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/>
+        </svg>Performances
       </a>
     </nav>
-    <div style="position:absolute;bottom:24px;left:0;right:0;padding:0 24px;">
-      <a href="/logout" style="color:rgba(212,228,216,0.5);font-size:0.8rem;">Déconnexion →</a>
+    <div class="sidebar-footer">
+      <a href="/logout">Déconnexion →</a>
     </div>
   </aside>
 
-  <!-- Main Content -->
+  <!-- ——— Main Content ——— -->
   <main class="main-content">
+
+    <!-- Progression bar (9 étapes) -->
+    <div class="progression-bar" id="progressionBar">
+      <div class="progression-steps" id="progressionSteps">
+        <!-- généré par JS -->
+      </div>
+      <div class="progression-footer">
+        <span class="progression-pct" id="progressionPct">Votre vente est complétée à 0 %</span>
+        <div class="progression-track">
+          <div class="progression-fill" id="progressionFill"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Page header -->
     <div class="page-header">
       <h1>Tableau de bord</h1>
       <p id="welcomeMsg">Bienvenue sur votre espace vendeur Serenis</p>
     </div>
 
-    <!-- Stats -->
+    <!-- Stats principales (4 cartes) -->
     <div class="stats-grid">
+      <!-- Score de vente -->
       <div class="stat-card">
-        <div class="stat-label">Statut vente</div>
-        <div id="statStatus" class="stat-value" style="font-size:1rem;"><span class="status-badge status-preparation">En préparation</span></div>
+        <div class="stat-label">Score de vente</div>
+        <div style="display:flex;align-items:baseline;gap:3px;">
+          <div class="stat-value" id="statScore">—</div>
+          <span class="stat-score-denom">/100</span>
+        </div>
+        <div class="stat-sub">Score global</div>
       </div>
+      <!-- Contacts -->
       <div class="stat-card">
         <div class="stat-label">Contacts acheteurs</div>
         <div class="stat-value" id="statContacts">0</div>
-        <div class="stat-sub">dossiers envoyés</div>
+        <div class="stat-sub">dossiers reçus</div>
       </div>
+      <!-- Visites -->
       <div class="stat-card">
         <div class="stat-label">Visites planifiées</div>
         <div class="stat-value" id="statVisits">0</div>
+        <div class="stat-sub">cette semaine</div>
       </div>
-      <div class="stat-card highlight">
-        <div class="stat-label">Votre numéro 09</div>
-        <div class="stat-value" id="statTwilio" style="font-size:0.9rem;color:#888;">—</div>
-        <div class="stat-sub" id="twilioHint" style="display:none">À mettre dans votre annonce</div>
+      <!-- Numéro dédié -->
+      <div class="stat-card">
+        <div class="stat-label">Numéro dédié</div>
+        <div class="stat-value-small" id="statTwilio" style="margin-top:6px;">—</div>
+        <div class="stat-sub" id="twilioHint" style="display:none;">À mettre dans votre annonce</div>
       </div>
     </div>
 
-    <!-- Quick Actions -->
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-bottom:32px;">
-      <div class="form-section">
-        <h3>Actions rapides</h3>
-        <div style="display:flex;flex-direction:column;gap:12px;">
-          <a href="/mon-bien" class="btn-primary" style="text-align:center;">Compléter ma fiche bien</a>
-          <a href="/ma-formation" class="btn-secondary" style="text-align:center;">Accéder à la formation</a>
-          <a href="/mon-agenda" class="btn-secondary" style="text-align:center;">Configurer mon agenda</a>
+    <!-- Score & Actions + Profil rapide -->
+    <div class="two-col">
+
+      <!-- Score & recommandations -->
+      <div class="card" id="scoreCard" style="display:none;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;">
+          <h3 style="margin:0;">Score de votre dossier</h3>
+          <div id="scoreBadge" style="font-family:'Cormorant Garamond',serif;font-size:2rem;font-weight:600;color:#3D5A47;line-height:1;">0</div>
         </div>
+        <div class="score-breakdown" id="scoreBreakdown"></div>
+        <p class="score-reco-title">Recommandations</p>
+        <div class="reco-list" id="recoList"></div>
       </div>
-      <div class="form-section">
+
+      <!-- Profil rapide -->
+      <div class="card">
         <h3>Mon profil</h3>
         <form id="profileForm">
           <div class="form-row">
@@ -101,154 +543,261 @@
             <input type="password" name="password" placeholder="Laisser vide = inchangé" autocomplete="new-password">
             <p class="form-hint">Minimum 8 caractères</p>
           </div>
-          <button type="submit" class="btn-primary">Sauvegarder</button>
+          <button type="submit" class="btn-primary" style="width:100%;">Sauvegarder</button>
         </form>
       </div>
     </div>
 
-    <!-- Statut vente -->
-    <div class="form-section">
-      <h3>Avancement de votre vente</h3>
-      <div style="display:flex;gap:8px;flex-wrap:wrap;">
-        <button class="status-btn" data-status="preparation">En préparation</button>
-        <button class="status-btn" data-status="en-ligne">En ligne</button>
-        <button class="status-btn" data-status="visites">Visites en cours</button>
-        <button class="status-btn" data-status="offre">Offre reçue</button>
-        <button class="status-btn" data-status="compromis">Compromis</button>
-        <button class="status-btn" data-status="vendu">Vendu !</button>
+    <!-- Timeline statut vente -->
+    <div class="card one-col">
+      <h3>Où en est votre vente ?</h3>
+      <div class="timeline-row" id="statusTimeline"></div>
+      <div class="timeline-tip" id="statusTip" style="display:none;"></div>
+    </div>
+
+    <!-- Prochaines visites + lien public -->
+    <div class="two-col">
+
+      <!-- Visites -->
+      <div class="card">
+        <h3>Prochaines visites</h3>
+        <div id="visitsList">
+          <p style="color:#b0a89f;font-size:0.88rem;margin:0;">Aucune visite planifiée pour le moment.</p>
+        </div>
+      </div>
+
+      <!-- Lien public -->
+      <div id="propertyLinkBox" class="card" style="display:none;">
+        <h3>Page publique de votre bien</h3>
+        <p style="color:#7a7065;font-size:0.86rem;margin:0 0 14px;">Partagez ce lien dans votre annonce LeBonCoin / PAP :</p>
+        <div class="link-input-group">
+          <input type="text" id="propertyLink" readonly>
+          <button onclick="copyLink()" class="btn-primary">Copier</button>
+          <a id="propertyLinkBtn" href="#" target="_blank" class="btn-secondary">Voir →</a>
+        </div>
       </div>
     </div>
 
-    <!-- Visites à venir -->
-    <div class="form-section">
-      <h3>Prochaines visites</h3>
-      <div id="visitsList">
-        <p style="color:#aaa;font-size:0.9rem;">Aucune visite planifiée pour le moment.</p>
-      </div>
-    </div>
+    <p class="footer-note">
+      Serenis est une plateforme numérique d'outils et de formation.<br>
+      Le vendeur reste seul responsable de sa vente.
+    </p>
 
-    <!-- Bien publié -->
-    <div id="propertyLinkBox" class="form-section" style="display:none;">
-      <h3>Page publique de votre bien</h3>
-      <p style="color:#555;font-size:0.9rem;margin-bottom:12px;">Partagez ce lien dans votre annonce LeBonCoin / PAP :</p>
-      <div style="display:flex;gap:12px;align-items:center;">
-        <input type="text" id="propertyLink" readonly style="flex:1;background:var(--creme);">
-        <button onclick="copyLink()" class="btn-primary">Copier</button>
-        <a id="propertyLinkBtn" href="#" target="_blank" class="btn-secondary">Voir →</a>
-      </div>
-    </div>
-
-    <p style="text-align:center;color:#aaa;font-size:0.78rem;margin-top:48px;">Matthias Brieux — 06 95 44 36 54 — Douai (59)<br>
-    Serenis est une plateforme numérique d'outils et de formation. Le vendeur reste seul responsable de sa vente.</p>
   </main>
 </div>
 
-<style>
-.status-btn { padding: 8px 16px; border-radius: 50px; border: 2px solid var(--vert-pale); font-size: 0.82rem; font-weight: 600; cursor: pointer; transition: 0.2s; background: var(--blanc); }
-.status-btn:hover { border-color: var(--vert-moyen); }
-.status-btn.active { background: var(--vert-foret); color: #fff; border-color: var(--vert-foret); }
-</style>
+<!-- Toast -->
+<div class="toast" id="toastEl"></div>
+
 <script>
 const API = '/api';
-let sellerData = null;
 
-async function loadData() {
-  const res = await fetch(`${API}/me`);
-  const data = await res.json();
-  sellerData = data.seller;
+/* ——— Toast ——— */
+window.showToast = function(msg, type = 'success') {
+  const toast = document.getElementById('toastEl');
+  toast.textContent = msg;
+  toast.className = 'toast' + (type === 'error' ? ' error' : '');
+  toast.classList.add('show');
+  setTimeout(() => toast.classList.remove('show'), 3500);
+};
 
-  if (data.seller.first_name) {
-    document.getElementById('welcomeMsg').textContent = `Bonjour ${data.seller.first_name} 👋`;
-  }
-
-  const packLabel = data.seller.pack === 'serenite' ? 'Pack Sérénité' : 'Pack Autonome';
-  document.getElementById('packLabel').textContent = packLabel;
-  document.getElementById('sidebarPack').style.display = 'block';
-
-  document.getElementById('pfFirstName').value = data.seller.first_name || '';
-  document.getElementById('pfLastName').value = data.seller.last_name || '';
-  document.getElementById('pfPhone').value = data.seller.phone || '';
-
-  document.getElementById('statContacts').textContent = data.stats.contacts;
-  document.getElementById('statVisits').textContent = data.stats.visits;
-
-  if (data.seller.twilio_number) {
-    document.getElementById('statTwilio').textContent = data.seller.twilio_number;
-    document.getElementById('twilioHint').style.display = 'block';
-  } else if (data.seller.pack !== 'serenite') {
-    document.getElementById('statTwilio').textContent = 'Pack Autonome';
-    document.querySelector('#statTwilio').closest('.stat-card').style.opacity = '0.5';
-  }
-
-  if (data.property) {
-    const statusMap = {
-      'preparation': 'status-preparation',
-      'en-ligne': 'status-en-ligne',
-      'visites': 'status-visites',
-      'offre': 'status-offre',
-      'compromis': 'status-compromis',
-      'vendu': 'status-vendu'
-    };
-    const statusLabels = {
-      'preparation': 'En préparation', 'en-ligne': 'En ligne', 'visites': 'Visites en cours',
-      'offre': 'Offre reçue', 'compromis': 'Compromis', 'vendu': 'Vendu !'
-    };
-    const st = data.property.status || 'preparation';
-    document.getElementById('statStatus').innerHTML = `<span class="status-badge ${statusMap[st]}">${statusLabels[st]}</span>`;
-
-    document.querySelectorAll('.status-btn').forEach(b => {
-      b.classList.toggle('active', b.dataset.status === st);
-    });
-
-    if (data.property.published && data.property.slug) {
-      const url = `${window.location.origin}/bien/${data.property.slug}`;
-      document.getElementById('propertyLinkBox').style.display = 'block';
-      document.getElementById('propertyLink').value = url;
-      document.getElementById('propertyLinkBtn').href = url;
-    }
-  }
-}
-
-async function loadVisits() {
-  const res = await fetch(`${API}/visits`);
-  const data = await res.json();
-  const list = document.getElementById('visitsList');
-  if (!data.visits?.length) return;
-  list.innerHTML = data.visits.slice(0, 5).map(v => `
-    <div style="padding:12px 0;border-bottom:1px solid var(--vert-pale);display:flex;justify-content:space-between;align-items:center;">
-      <div>
-        <strong>${v.buyer_name}</strong> — ${v.buyer_email}
-        ${v.buyer_phone ? `— ${v.buyer_phone}` : ''}
-      </div>
-      <div style="text-align:right;font-size:0.85rem;color:#666;">
-        ${v.visit_date}<br>${v.visit_time}
-      </div>
-    </div>
-  `).join('');
-}
-
-document.querySelectorAll('.status-btn').forEach(btn => {
-  btn.addEventListener('click', async () => {
-    const res = await fetch(`${API}/property/status`, {
-      method: 'POST', headers: {'Content-Type':'application/json'},
-      body: JSON.stringify({ status: btn.dataset.status })
-    });
-    const data = await res.json();
-    if (data.success) {
-      document.querySelectorAll('.status-btn').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      window.showToast('Statut mis à jour');
-    }
-  });
+/* ——— Mobile sidebar ——— */
+document.getElementById('mobileMenuBtn').addEventListener('click', () => {
+  document.getElementById('sidebar').classList.toggle('open');
+  document.getElementById('sidebarOverlay').classList.toggle('open');
+});
+document.getElementById('sidebarOverlay').addEventListener('click', () => {
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('sidebarOverlay').classList.remove('open');
 });
 
+/* ——— Timeline ——— */
+const STATUS_STEPS = [
+  { key: 'preparation', label: 'En préparation', icon: '📋', tip: 'Complétez votre fiche bien et ajoutez vos photos pour être prêt à publier.' },
+  { key: 'en-ligne',    label: 'En ligne',        icon: '🌐', tip: 'Votre annonce est publiée ! Partagez le lien sur LeBonCoin, PAP et SeLoger.' },
+  { key: 'visites',     label: 'Visites',          icon: '🏠', tip: 'Des acheteurs visitent. Utilisez les scripts de visite dans votre formation.' },
+  { key: 'offre',       label: 'Offre reçue',      icon: '✉️', tip: 'Vous avez reçu une offre. Vérifiez le financement avant d\'accepter.' },
+  { key: 'compromis',   label: 'Compromis',        icon: '📝', tip: 'Compromis signé. L\'acte authentique chez le notaire dans ~3 mois.' },
+  { key: 'vendu',       label: 'Vendu !',          icon: '🎉', tip: 'Félicitations ! Votre bien est vendu. Pensez à rembourser votre crédit.' }
+];
+
+function renderTimeline(currentStatus) {
+  const container = document.getElementById('statusTimeline');
+  const tipEl = document.getElementById('statusTip');
+  const currentIdx = STATUS_STEPS.findIndex(s => s.key === currentStatus);
+
+  const checkSVG = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>`;
+
+  container.innerHTML = STATUS_STEPS.map((step, i) => {
+    const done   = i < currentIdx;
+    const active = i === currentIdx;
+    const lineColor = (done || active) ? 'linear-gradient(90deg,#5a8a6a,#3D5A47)' : '#e8e0d6';
+    const circleBg  = (active || done) ? '#3D5A47' : '#fff';
+    const circleBorder = (active || done) ? '#3D5A47' : '#d0c8be';
+    const labelColor = active ? '#3D5A47' : done ? '#5a8a6a' : '#b0a89f';
+    const labelWeight = active ? '600' : '400';
+    const shadow = active ? 'box-shadow:0 0 0 5px rgba(61,90,71,0.12);' : '';
+
+    return `
+      ${i > 0 ? `<div style="flex:1;height:2px;background:${lineColor};min-width:8px;max-width:36px;margin-bottom:22px;border-radius:2px;"></div>` : ''}
+      <button onclick="updateStatus('${step.key}')" title="Passer à : ${step.label}"
+        style="display:flex;flex-direction:column;align-items:center;gap:5px;background:none;border:none;cursor:pointer;padding:0;min-width:56px;flex-shrink:0;">
+        <div style="width:38px;height:38px;border-radius:50%;background:${circleBg};border:2px solid ${circleBorder};display:flex;align-items:center;justify-content:center;font-size:0.9rem;transition:all 0.3s;${shadow}">
+          ${done ? checkSVG : `<span>${step.icon}</span>`}
+        </div>
+        <span style="font-size:0.67rem;font-weight:${labelWeight};color:${labelColor};text-align:center;line-height:1.2;max-width:58px;">${step.label}</span>
+      </button>
+    `;
+  }).join('');
+
+  const step = STATUS_STEPS[currentIdx];
+  if (step?.tip) { tipEl.textContent = step.tip; tipEl.style.display = 'block'; }
+}
+
+async function updateStatus(status) {
+  const res = await fetch(`${API}/property/status`, {
+    method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ status })
+  });
+  const data = await res.json();
+  if (data.success) {
+    renderTimeline(status);
+    window.showToast('Statut mis à jour');
+  }
+}
+
+/* ——— Progression bar (9 étapes) ——— */
+const PROG_STEPS = [
+  'Estimation',
+  'Préparation',
+  'Photos',
+  'Annonce',
+  'Publication',
+  'Acheteurs',
+  'Visites',
+  'Négociation',
+  'Vente finale'
+];
+
+function computeProgression(seller, property, photos, publications, stats) {
+  const p = property || {};
+  const pubs = publications || [];
+  const st = stats || {};
+  return [
+    !!p.price,
+    !!(p.type && p.address && p.surface_habitable && p.dpe_class),
+    (photos || []).length >= 5,
+    (p.description || '').length >= 100,
+    !!(p.published || pubs.length > 0),
+    (st.contacts || 0) > 0,
+    (st.visits || 0) > 0,
+    ['offre','compromis','vendu'].includes(p.status),
+    ['compromis','vendu'].includes(p.status)
+  ];
+}
+
+function renderProgressionBar(seller, property, photos, publications, stats) {
+  const steps = computeProgression(seller, property, photos, publications, stats);
+  const doneCount = steps.filter(Boolean).length;
+  const pct = Math.round(doneCount / steps.length * 100);
+
+  // Find first incomplete step index
+  const firstPending = steps.findIndex(s => !s);
+  const activeIdx = firstPending === -1 ? steps.length - 1 : firstPending;
+
+  const checkSVG = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>`;
+
+  let html = '';
+  steps.forEach((done, i) => {
+    const active = !done && (i === activeIdx);
+    const circleClass = done ? 'done' : active ? 'active' : 'pending';
+    const labelClass  = done ? 'done' : active ? 'active' : '';
+
+    if (i > 0) {
+      html += `<div class="prog-connector ${done || steps[i-1] ? 'done' : 'pending'}"></div>`;
+    }
+    html += `
+      <div class="prog-step">
+        <div class="prog-circle ${circleClass}">
+          ${done ? checkSVG : `<span style="color:${active ? '#fff' : '#b0a89f'}">${i + 1}</span>`}
+        </div>
+        <span class="prog-label ${labelClass}">${PROG_STEPS[i]}</span>
+      </div>
+    `;
+  });
+
+  document.getElementById('progressionSteps').innerHTML = html;
+  document.getElementById('progressionPct').textContent = `Votre vente est complétée à ${pct} %`;
+  setTimeout(() => {
+    document.getElementById('progressionFill').style.width = `${pct}%`;
+  }, 80);
+}
+
+/* ——— Score breakdown ——— */
+function renderScore(scoreData) {
+  if (!scoreData) return;
+  const card = document.getElementById('scoreCard');
+  card.style.display = 'block';
+
+  const score = scoreData.score || 0;
+  const badge = document.getElementById('scoreBadge');
+  badge.textContent = score;
+  badge.className = '';
+  if (score >= 70) badge.style.color = '#3D5A47';
+  else if (score >= 50) badge.style.color = '#C4785A';
+  else badge.style.color = '#c45a5a';
+
+  const bd = scoreData.breakdown || {};
+  const breakdownItems = [
+    { label: 'Photos',      key: 'photos',      max: 20 },
+    { label: 'Description', key: 'description', max: 20 },
+    { label: 'Prix',        key: 'prix',        max: 20 },
+    { label: 'Documents',   key: 'documents',   max: 15 },
+    { label: 'Publication', key: 'publication', max: 15 },
+    { label: 'Profil',      key: 'profil',      max: 10 },
+  ];
+
+  document.getElementById('scoreBreakdown').innerHTML = breakdownItems.map(item => {
+    const val = bd[item.key] || 0;
+    const pct = Math.round(val / item.max * 100);
+    return `
+      <div class="score-row">
+        <span class="score-row-label">${item.label}</span>
+        <div class="score-row-track">
+          <div class="score-row-fill" style="width:0%" data-target="${pct}"></div>
+        </div>
+        <span class="score-row-val">${val}/${item.max}</span>
+      </div>
+    `;
+  }).join('');
+
+  // animate bars
+  setTimeout(() => {
+    document.querySelectorAll('.score-row-fill').forEach(el => {
+      el.style.width = el.dataset.target + '%';
+    });
+  }, 100);
+
+  // Recommandations
+  const recos = scoreData.recommendations || [];
+  document.getElementById('recoList').innerHTML = recos.length
+    ? recos.slice(0, 4).map(r => `
+        <a href="${r.link || '#'}" class="reco-item">
+          <span class="reco-icon">${r.icon || '→'}</span>
+          <span class="reco-text">${r.text}</span>
+          <span class="reco-cta">→ Agir</span>
+        </a>
+      `).join('')
+    : `<p style="color:#5a8a6a;font-size:0.86rem;font-weight:600;margin:0;">Dossier complet — vous êtes prêt à publier !</p>`;
+}
+
+/* ——— Profile form ——— */
 document.getElementById('profileForm').addEventListener('submit', async (e) => {
   e.preventDefault();
-  const form = e.target;
   const data = {};
-  new FormData(form).forEach((v, k) => { if (v) data[k] = v; });
+  new FormData(e.target).forEach((v, k) => { if (v) data[k] = v; });
   const res = await fetch(`${API}/profile`, {
-    method: 'POST', headers: {'Content-Type':'application/json'},
+    method: 'POST', headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(data)
   });
   const result = await res.json();
@@ -256,6 +805,7 @@ document.getElementById('profileForm').addEventListener('submit', async (e) => {
   else window.showToast(result.error || 'Erreur', 'error');
 });
 
+/* ——— Copy link ——— */
 function copyLink() {
   const input = document.getElementById('propertyLink');
   input.select();
@@ -263,17 +813,101 @@ function copyLink() {
   window.showToast('Lien copié !');
 }
 
-window.showToast = function(msg, type = 'success') {
-  let toast = document.querySelector('.toast');
-  if (!toast) { toast = document.createElement('div'); toast.className = 'toast'; document.body.appendChild(toast); }
-  toast.textContent = msg;
-  toast.className = `toast ${type === 'error' ? 'error' : ''}`;
-  toast.classList.add('show');
-  setTimeout(() => toast.classList.remove('show'), 3500);
-};
+/* ——— Load all data ——— */
+async function loadData() {
+  try {
+    const [meRes, propRes, visitsRes, scoreRes, pubsRes] = await Promise.all([
+      fetch(`${API}/me`),
+      fetch(`${API}/property`),
+      fetch(`${API}/visits`),
+      fetch(`${API}/score`),
+      fetch(`${API}/publications`)
+    ]);
+
+    const [meData, propData, visitsData, scoreData, pubsData] = await Promise.all([
+      meRes.json(), propRes.json(), visitsRes.json(), scoreRes.json(), pubsRes.json()
+    ]);
+
+    const seller       = meData.seller || {};
+    const property     = meData.property || propData.property || {};
+    const stats        = meData.stats || {};
+    const photos       = propData.photos || [];
+    const publications = pubsData.publications || [];
+
+    /* — Welcome — */
+    if (seller.first_name) {
+      document.getElementById('welcomeMsg').textContent = `Bonjour ${seller.first_name} — voici l'état de votre vente.`;
+    }
+
+    /* — Sidebar pack — */
+    const packLabel = seller.pack === 'serenite' ? 'Pack Sérénité' : 'Pack Autonome';
+    document.getElementById('packLabel').textContent = packLabel;
+    document.getElementById('sidebarPack').style.display = 'flex';
+
+    /* — Profile form — */
+    document.getElementById('pfFirstName').value = seller.first_name || '';
+    document.getElementById('pfLastName').value  = seller.last_name  || '';
+    document.getElementById('pfPhone').value     = seller.phone      || '';
+
+    /* — Stat cards — */
+    // Score
+    const score = scoreData.score || 0;
+    const scoreEl = document.getElementById('statScore');
+    scoreEl.textContent = score;
+    if (score >= 70) scoreEl.classList.add('green');
+    else if (score >= 50) scoreEl.classList.add('orange');
+    else scoreEl.classList.add('red');
+
+    document.getElementById('statContacts').textContent = stats.contacts || 0;
+    document.getElementById('statVisits').textContent   = stats.visits   || 0;
+
+    // Twilio
+    if (seller.twilio_number) {
+      document.getElementById('statTwilio').textContent = seller.twilio_number;
+      document.getElementById('twilioHint').style.display = 'block';
+    } else {
+      document.getElementById('statTwilio').textContent = 'Pack Autonome';
+    }
+
+    /* — Progression bar — */
+    renderProgressionBar(seller, property, photos, publications, stats);
+
+    /* — Score section — */
+    renderScore(scoreData);
+
+    /* — Timeline — */
+    const st = property.status || 'preparation';
+    renderTimeline(st);
+
+    /* — Visits — */
+    const visits = visitsData.visits || [];
+    if (visits.length) {
+      document.getElementById('visitsList').innerHTML = visits.slice(0, 5).map(v => `
+        <div class="visit-row">
+          <div>
+            <div class="visit-name">${v.buyer_name || '—'}</div>
+            <div class="visit-contact">${v.buyer_email || ''}${v.buyer_phone ? ' · ' + v.buyer_phone : ''}</div>
+          </div>
+          <div class="visit-date">${v.visit_date}<br>${v.visit_time}</div>
+        </div>
+      `).join('');
+    }
+
+    /* — Public link — */
+    if (property.published && property.slug) {
+      const url = `${window.location.origin}/bien/${property.slug}`;
+      document.getElementById('propertyLinkBox').style.display = 'block';
+      document.getElementById('propertyLink').value = url;
+      document.getElementById('propertyLinkBtn').href = url;
+    }
+
+  } catch (err) {
+    console.error('Erreur chargement dashboard :', err);
+  }
+}
 
 loadData();
-loadVisits();
 </script>
+<script src="/js/transitions.js"></script>
 </body>
 </html>

@@ -3,22 +3,117 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Ma formation — Serenis</title>
+  <title>Ma Formation — Vendu Par Moi</title>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/css/style.css">
+  <style>
+    .formation-layout { display: grid; grid-template-columns: 1fr 340px; gap: 24px; align-items: start; }
+    .formation-main { min-width: 0; }
+    .formation-coach { position: sticky; top: 24px; }
+    .video-wrapper { background: #000; border-radius: 14px; overflow: hidden; aspect-ratio: 16/9; width: 100%; }
+    .video-wrapper video { width: 100%; height: 100%; object-fit: contain; }
+    .modules-nav { display: flex; gap: 8px; flex-wrap: wrap; margin: 20px 0; }
+    .module-btn { padding: 7px 16px; border-radius: 100px; border: 1.5px solid #e5e0d8; background: transparent; font-size: 0.82rem; font-family: 'DM Sans', sans-serif; cursor: pointer; color: #666; transition: all 0.2s; white-space: nowrap; }
+    .module-btn.active { background: #3D5A47; border-color: #3D5A47; color: #fff; font-weight: 500; }
+    .module-btn:hover:not(.active) { border-color: #3D5A47; color: #3D5A47; }
+    .module-content { display: none; }
+    .module-content.active { display: block; }
+    .module-header { display: flex; align-items: center; gap: 14px; margin-bottom: 24px; padding: 20px 24px; background: linear-gradient(135deg, #3D5A47, #5C7A65); border-radius: 14px; color: #fff; }
+    .module-num { width: 44px; height: 44px; border-radius: 50%; background: rgba(255,255,255,0.15); display: flex; align-items: center; justify-content: center; font-family: 'Cormorant Garamond', serif; font-size: 1.4rem; flex-shrink: 0; }
+    .module-header h2 { font-size: 1.1rem; color: #fff; border: none; padding: 0; margin: 0; }
+    .module-header p { font-size: 0.83rem; color: rgba(255,255,255,0.75); margin-top: 3px; }
+    .steps-list { display: flex; flex-direction: column; gap: 16px; margin-bottom: 24px; }
+    .step-card { border: 1.5px solid #e5e0d8; border-radius: 12px; overflow: hidden; transition: box-shadow 0.2s; }
+    .step-card:hover { box-shadow: 0 4px 20px rgba(61,90,71,0.08); }
+    .step-card.done { border-color: #3D5A47; }
+    .step-header { display: flex; align-items: center; gap: 14px; padding: 14px 18px; cursor: pointer; background: #fff; user-select: none; }
+    .step-check { width: 26px; height: 26px; border-radius: 50%; border: 2px solid #ccc; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: all 0.2s; font-size: 0.75rem; color: transparent; }
+    .step-card.done .step-check { background: #3D5A47; border-color: #3D5A47; color: #fff; }
+    .step-title-wrap { flex: 1; }
+    .step-title { font-size: 0.9rem; font-weight: 500; color: #1a1a1a; }
+    .step-meta { font-size: 0.75rem; color: #999; margin-top: 2px; }
+    .step-arrow { font-size: 0.7rem; color: #aaa; transition: transform 0.25s; }
+    .step-card.open .step-arrow { transform: rotate(90deg); }
+    .step-body { display: none; padding: 0 18px 18px; border-top: 1px solid #f0ece6; background: #fdfcf8; }
+    .step-card.open .step-body { display: block; }
+    .step-section { margin-top: 18px; }
+    .step-section-title { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.08em; color: #999; margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
+    .step-section-title::after { content: ''; flex: 1; height: 1px; background: #eee; }
+    .step-text { font-size: 0.88rem; line-height: 1.75; color: #444; }
+    .tips-list { display: flex; flex-direction: column; gap: 8px; }
+    .tip-item { display: flex; gap: 10px; align-items: flex-start; background: #f0f7f3; border-left: 3px solid #3D5A47; border-radius: 0 8px 8px 0; padding: 10px 14px; font-size: 0.85rem; color: #2a4a35; }
+    .tip-icon { font-size: 1rem; flex-shrink: 0; margin-top: 1px; }
+    .warning-item { display: flex; gap: 10px; align-items: flex-start; background: #fff8f0; border-left: 3px solid #C4785A; border-radius: 0 8px 8px 0; padding: 10px 14px; font-size: 0.85rem; color: #7a3a20; margin-top: 8px; }
+    .data-table { width: 100%; border-collapse: collapse; font-size: 0.83rem; margin-top: 4px; }
+    .data-table th { background: #3D5A47; color: #fff; padding: 9px 14px; text-align: left; font-weight: 500; font-size: 0.78rem; }
+    .data-table td { padding: 9px 14px; border-bottom: 1px solid #f0ece6; color: #444; vertical-align: top; }
+    .data-table tr:nth-child(even) td { background: #faf8f4; }
+    .data-table tr:last-child td { border-bottom: none; }
+    .schema-flow { display: flex; align-items: center; gap: 0; flex-wrap: wrap; margin-top: 4px; }
+    .schema-step { background: #fff; border: 1.5px solid #3D5A47; border-radius: 8px; padding: 8px 14px; font-size: 0.78rem; color: #3D5A47; font-weight: 500; text-align: center; min-width: 80px; }
+    .schema-arrow { color: #C4785A; font-size: 1rem; padding: 0 6px; font-weight: 700; }
+    .script-block { background: #f9f7f3; border-radius: 10px; padding: 16px 18px; font-size: 0.85rem; line-height: 1.8; color: #333; }
+    .script-speaker { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.06em; font-weight: 600; margin-top: 12px; margin-bottom: 4px; }
+    .script-speaker.vendeur { color: #3D5A47; }
+    .script-speaker.acheteur { color: #C4785A; }
+    .script-line { padding-left: 12px; border-left: 2px solid #e0e0e0; color: #444; font-style: italic; }
+    .ask-coach-btn { margin-top: 16px; padding: 8px 18px; background: transparent; border: 1.5px solid #3D5A47; color: #3D5A47; border-radius: 100px; font-size: 0.82rem; font-family: 'DM Sans', sans-serif; cursor: pointer; transition: all 0.2s; }
+    .ask-coach-btn:hover { background: #3D5A47; color: #fff; }
+    .progress-bar-wrap { background: #eee; border-radius: 100px; height: 5px; margin-top: 12px; overflow: hidden; }
+    .progress-bar-fill { height: 100%; background: linear-gradient(90deg, #3D5A47, #7aaa8a); border-radius: 100px; transition: width 0.5s ease; }
+    .coach-card { background: #fff; border: 1.5px solid #e5e0d8; border-radius: 16px; overflow: hidden; display: flex; flex-direction: column; height: 560px; }
+    .coach-header { background: linear-gradient(135deg, #1a1a1a, #2a2a2a); padding: 16px 18px; display: flex; align-items: center; gap: 12px; }
+    .coach-avatar { width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(135deg, #3D5A47, #C4785A); display: flex; align-items: center; justify-content: center; font-size: 1.1rem; flex-shrink: 0; }
+    .coach-name { color: #fff; font-size: 0.9rem; font-weight: 500; }
+    .coach-status { color: #7aaa8a; font-size: 0.73rem; display: flex; align-items: center; gap: 5px; }
+    .coach-dot { width: 6px; height: 6px; border-radius: 50%; background: #7aaa8a; animation: pulse 2s infinite; }
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+    .coach-messages { flex: 1; overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 12px; background: #fdfcf8; }
+    .msg { max-width: 85%; padding: 10px 14px; border-radius: 14px; font-size: 0.85rem; line-height: 1.6; }
+    .msg-coach { background: #fff; border: 1px solid #e5e0d8; border-bottom-left-radius: 4px; align-self: flex-start; color: #333; }
+    .msg-user { background: #3D5A47; color: #fff; border-bottom-right-radius: 4px; align-self: flex-end; }
+    .msg-typing { background: #fff; border: 1px solid #e5e0d8; border-bottom-left-radius: 4px; align-self: flex-start; color: #999; font-style: italic; display: none; }
+    .msg-typing.show { display: block; }
+    .coach-input-wrap { padding: 12px 14px; border-top: 1px solid #e5e0d8; display: flex; gap: 8px; background: #fff; }
+    .coach-input { flex: 1; border: 1.5px solid #e5e0d8; border-radius: 10px; padding: 9px 14px; font-size: 0.85rem; font-family: 'DM Sans', sans-serif; outline: none; resize: none; line-height: 1.4; max-height: 90px; overflow-y: auto; }
+    .coach-input:focus { border-color: #3D5A47; }
+    .coach-send { width: 38px; height: 38px; border-radius: 10px; background: #3D5A47; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; color: #fff; flex-shrink: 0; align-self: flex-end; transition: background 0.2s; }
+    .coach-send:hover { background: #2e4535; }
+    .coach-send:disabled { background: #ccc; cursor: not-allowed; }
+    .quick-questions { padding: 0 14px 12px; display: flex; gap: 6px; flex-wrap: wrap; background: #fff; }
+    .quick-q { font-size: 0.73rem; padding: 4px 10px; border-radius: 100px; border: 1px solid #e0dbd2; color: #666; cursor: pointer; transition: all 0.15s; white-space: nowrap; }
+    .quick-q:hover { background: #f0f7f3; border-color: #3D5A47; color: #3D5A47; }
+    @media (max-width: 900px) { .formation-layout { grid-template-columns: 1fr; } .formation-coach { position: static; } .coach-card { height: 420px; } }
+  </style>
 </head>
 <body>
 <div class="app-layout">
   <aside class="sidebar">
     <div class="sidebar-logo">
-      <a href="/" class="logo"><svg width="28" height="28" viewBox="0 0 32 32"><path d="M16 2L3 13v17h8v-8h10v8h8V13L16 2z" fill="#D4E4D8"/></svg>
-      <span class="logo-text" style="color:#FDFCF8">Sere<em style="color:#C4785A">nis</em></span></a>
+      <a href="/" class="logo">
+        <svg width="28" height="28" viewBox="0 0 32 32"><path d="M16 2L3 13v17h8v-8h10v8h8V13L16 2z" fill="#D4E4D8"/></svg>
+        <span class="logo-text" style="color:#FDFCF8">Sere<em style="color:#C4785A">nis</em></span>
+      </a>
     </div>
     <nav class="sidebar-nav">
-      <a href="/dashboard" class="sidebar-item"><span class="sidebar-item-icon">📊</span> Tableau de bord</a>
-      <a href="/mon-bien" class="sidebar-item"><span class="sidebar-item-icon">🏠</span> Mon bien</a>
-      <a href="/ma-formation" class="sidebar-item active"><span class="sidebar-item-icon">📚</span> Ma formation</a>
-      <a href="/mon-agenda" class="sidebar-item"><span class="sidebar-item-icon">📅</span> Mon agenda</a>
+      <a href="/dashboard" class="sidebar-item">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg> Tableau de bord
+      </a>
+      <a href="/mon-bien" class="sidebar-item">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg> Mon bien
+      </a>
+      <a href="/ma-formation" class="sidebar-item active">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg> Ma formation
+      </a>
+      <a href="/mon-agenda" class="sidebar-item">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg> Mon agenda
+      </a>
+      <a href="/mes-publications" class="sidebar-item">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.55a11 11 0 0 1 14.08 0"/><path d="M1.42 9a16 16 0 0 1 21.16 0"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><circle cx="12" cy="20" r="1"/></svg> Mes publications
+      </a>
+      <a href="/mes-performances" class="sidebar-item">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg> Performances
+      </a>
     </nav>
     <div style="position:absolute;bottom:24px;left:0;right:0;padding:0 24px;">
       <a href="/logout" style="color:rgba(212,228,216,0.5);font-size:0.8rem;">Déconnexion →</a>
@@ -28,325 +123,427 @@
   <main class="main-content">
     <div class="page-header">
       <h1>Ma formation</h1>
-      <p>Tous les outils pour vendre comme un professionnel</p>
+      <p id="progressLabel">0 étapes complétées · Commencez par le module 1</p>
+      <div class="progress-bar-wrap" style="max-width:300px;margin-top:10px">
+        <div class="progress-bar-fill" id="globalProgress" style="width:0%"></div>
+      </div>
     </div>
 
-    <!-- Guide PDF -->
-    <div class="form-section" style="background:linear-gradient(135deg,#3D5A47,#5C7A65);color:#fff;">
-      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:16px;">
-        <div>
-          <h3 style="color:#fff;border:none;margin:0;padding:0;">📘 Guide vendeur complet — 14 chapitres</h3>
-          <p style="color:rgba(212,228,216,0.8);margin-top:8px;font-size:0.9rem;">De la préparation de votre bien jusqu'à la signature chez le notaire.</p>
+    <div class="formation-layout">
+
+      <!-- GAUCHE : contenu -->
+      <div class="formation-main">
+        <div class="video-wrapper">
+          <video id="mainVideo" controls>
+            <source src="/videos/formation-intro.mp4" type="video/mp4">
+          </video>
         </div>
-        <a href="/download/guide-vendeur" class="btn-primary" style="background:#C4785A;white-space:nowrap;">⬇ Télécharger le PDF</a>
+        <div class="modules-nav" id="modulesNav"></div>
+        <div id="modulesContainer"></div>
+      </div>
+
+      <!-- DROITE : Coach IA -->
+      <div class="formation-coach">
+        <div class="coach-card">
+          <div class="coach-header">
+            <div class="coach-avatar">🧠</div>
+            <div>
+              <div class="coach-name">Alex — Coach IA</div>
+              <div class="coach-status"><span class="coach-dot"></span> En ligne · Disponible</div>
+            </div>
+          </div>
+          <div class="quick-questions">
+            <span class="quick-q" data-q="Quel prix fixer pour mon bien ?">Prix à fixer ?</span>
+            <span class="quick-q" data-q="Comment préparer ma maison pour les visites ?">Préparer les visites</span>
+            <span class="quick-q" data-q="Comment répondre à une offre trop basse ?">Offre trop basse</span>
+            <span class="quick-q" data-q="Quels documents dois-je avoir pour vendre ?">Documents requis</span>
+          </div>
+          <div class="coach-messages" id="coachMessages">
+            <div class="msg msg-coach">Bonjour ! Je suis Alex, votre coach IA. Je suis là pour répondre à toutes vos questions sur la vente de votre bien. Par quoi commençons-nous ?</div>
+          </div>
+          <div class="msg msg-typing" id="typingIndicator">Alex réfléchit…</div>
+          <div class="coach-input-wrap">
+            <textarea class="coach-input" id="coachInput" placeholder="Posez votre question…" rows="1"></textarea>
+            <button class="coach-send" id="coachSend">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+            </button>
+          </div>
+        </div>
       </div>
     </div>
 
-    <!-- 7 Mails Types -->
-    <div class="form-section">
-      <h3>✉️ 7 mails types prêts à copier</h3>
-      <p style="color:#666;font-size:0.88rem;margin-bottom:20px;">Cliquez sur un mail pour le voir. Personnalisez les champs entre [crochets].</p>
-
-      <div id="mailsList"></div>
-    </div>
-
-    <!-- Checklists -->
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;">
-
-      <!-- Checklist Photos -->
+    <!-- Mails & Checklists -->
+    <div style="margin-top:40px">
       <div class="form-section">
-        <h3>📸 Checklist avant photos <span id="progressPhotos" style="font-size:0.8rem;color:#888;font-weight:400"></span></h3>
-        <div id="checklist-photos" class="checklist-container"></div>
+        <h3>7 mails types prêts à copier</h3>
+        <p style="color:#666;font-size:0.88rem;margin-bottom:24px;">Personnalisez les champs entre <strong>[crochets]</strong> avant d'envoyer.</p>
+        <div id="mailsList"></div>
       </div>
-
-      <!-- Checklist Documents -->
-      <div class="form-section">
-        <h3>📁 Documents à réunir <span id="progressDocs" style="font-size:0.8rem;color:#888;font-weight:400"></span></h3>
-        <div id="checklist-docs" class="checklist-container"></div>
-      </div>
-
-      <!-- Checklist État des lieux -->
-      <div class="form-section" style="grid-column:span 2">
-        <h3>🔑 Checklist état des lieux compteurs <span id="progressEdl" style="font-size:0.8rem;color:#888;font-weight:400"></span></h3>
-        <div id="checklist-edl" class="checklist-container"></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-top:24px">
+        <div class="form-section">
+          <h3>Checklist avant photos <span id="progressPhotos" style="font-size:0.8rem;color:#888;font-weight:400"></span></h3>
+          <div id="checklist-photos" class="checklist-container"></div>
+        </div>
+        <div class="form-section">
+          <h3>Documents à réunir <span id="progressDocs" style="font-size:0.8rem;color:#888;font-weight:400"></span></h3>
+          <div id="checklist-docs" class="checklist-container"></div>
+        </div>
+        <div class="form-section" style="grid-column:span 2">
+          <h3>Checklist état des lieux <span id="progressEdl" style="font-size:0.8rem;color:#888;font-weight:400"></span></h3>
+          <div id="checklist-edl" class="checklist-container"></div>
+        </div>
       </div>
     </div>
-
-    <p style="text-align:center;color:#aaa;font-size:0.78rem;margin-top:48px;">Matthias Brieux — 06 95 44 36 54 — Douai (59)</p>
   </main>
 </div>
 
+<script src="/js/transitions.js"></script>
 <script>
-const MAILS = [
+const MODULES = [
   {
-    title: '1. Dossier complet prospect (avant visite)',
-    body: `Objet : Dossier complet — [Type de bien] [Ville]
-
-Bonjour [Prénom acheteur],
-
-Suite à votre contact concernant mon bien situé [Adresse], je vous adresse le dossier complet.
-
-Vous y trouverez :
-• Les photos HD et la visite virtuelle 360°
-• La fiche technique complète (surface, DPE, taxe foncière…)
-• Les diagnostics disponibles
-• Les informations sur le quartier et les commodités
-
-Prix : [Prix] €
-Surface habitable : [Surface] m²
-[X] pièces — [X] chambres
-
-Pour organiser une visite, je suis disponible :
-[Vos disponibilités]
-
-N'hésitez pas à me contacter directement au [votre numéro].
-
-Bien cordialement,
-[Prénom Nom]`
+    num:'01', title:'Estimer son bien', subtitle:'Trouver le prix juste pour vendre vite et bien',
+    steps:[
+      { title:'Comprendre le marché local', meta:'5 min · Fondamentaux',
+        explication:`Le prix de votre bien se fixe en comparant les ventes récentes dans votre secteur — pas les annonces actuelles. Une annonce n'est pas une vente. <strong>Regardez ce qui s'est réellement vendu dans les 6 derniers mois.</strong>`,
+        schema:['DVF.fr','MeilleursAgents','Notaires.fr','Prix/m²','Prix final'],
+        tableau:{ headers:['Source','Ce qu\'elle donne','Fiabilité'], rows:[['DVF.fr (gouvernement)','Prix réels des ventes notariées','⭐⭐⭐⭐⭐'],['MeilleursAgents','Estimation automatique','⭐⭐⭐⭐'],['Annonces voisins','Prix demandés (pas vendus)','⭐⭐'],['Agences locales','Estimation commerciale','⭐⭐⭐']] },
+        tips:['Cherchez au moins 5 ventes comparables dans un rayon de 500m','Privilégiez les ventes de moins de 6 mois','Filtrez par type de bien et surface (±15%)'],
+        warnings:['Ne regardez PAS les prix des annonces actuelles — elles gonflent votre référentiel']
+      },
+      { title:'Calculer le prix au m²', meta:'8 min · Méthode',
+        explication:`La méthode comparative est la plus fiable. Calculez un prix au m² de référence à partir des ventes récentes, puis <strong>ajustez selon les caractéristiques de votre bien</strong>.`,
+        schema:['Prix ventes réf.','÷ m²','Prix/m² moyen','× vos m²','Prix de base','+ ajustements','Prix final'],
+        tableau:{ headers:['Caractéristique','Impact sur le prix'], rows:[['Dernier étage avec vue','+5% à +12%'],['Rez-de-chaussée','-5% à -10%'],['Travaux à prévoir','-10% à -25%'],['Double exposition','+3% à +8%'],['Parking inclus','+5 000€ à +20 000€'],['DPE F ou G','-5% à -20%']] },
+        tips:['Appliquez les ajustements avec modération','Votre bien ne peut pas valoir 30% de plus que la médiane locale'],
+        warnings:['L\'erreur classique : surestimer de 10-15% "pour négocier". Résultat : 0 visite pendant 2 mois.']
+      },
+      { title:'Définir sa stratégie de prix', meta:'5 min · Stratégie',
+        explication:`Deux stratégies existent. <strong>Prix juste dès le départ</strong> : urgence, plusieurs offres, vente rapide. <strong>Prix haut puis baisse</strong> : tue l'intérêt initial — un bien "vieux" sur le marché inquiète les acheteurs.`,
+        schema:['Prix juste','→ Visites dès J+3','→ Offres J+15','→ Vente rapide'],
+        script:[{speaker:'vendeur',line:'Je mets à 295 000€ alors que le marché est �� 270 000€.'},{speaker:'acheteur',line:'(3 semaines plus tard) Pourquoi c\'est encore là ? Il y a un problème ?'},{speaker:'vendeur',line:'(Baisse à 275 000€) — L\'annonce perd toute crédibilité.'}],
+        tips:['Une annonce > 45 jours sans offre doit être réévaluée','Le bon prix = maximum de visites dans les 15 premiers jours','Tolérance de négociation : +2% à +4% maximum'],
+        warnings:[]
+      }
+    ]
   },
   {
-    title: '2. Pièces acheteur après visite concluante',
-    body: `Objet : Suite à notre visite — pièces à préparer
-
-Bonjour [Prénom acheteur],
-
-Merci pour votre visite de [date]. Votre intérêt pour mon bien m'a fait plaisir.
-
-Si vous souhaitez aller plus loin, voici les éléments que vous devrez préparer pour votre dossier de financement :
-
-• Justificatif d'identité (CNI ou passeport)
-• 3 derniers bulletins de salaire
-• Dernier avis d'imposition
-• 3 derniers relevés bancaires
-• Attestation de la banque ou courtier (accord de principe)
-• Justificatif de domicile actuel
-
-De mon côté, j'ai réuni tous les diagnostics et documents obligatoires, disponibles à la demande.
-
-Pour toute question, contactez-moi au [numéro].
-
-Bien cordialement,
-[Prénom Nom]`
+    num:'02', title:'Préparer son bien', subtitle:'Home staging et mise en valeur',
+    steps:[
+      { title:'Le home staging en 1 heure', meta:'6 min · Pratique',
+        explication:`Le home staging ne coûte rien et peut faire gagner 5 à 10% sur le prix. L'objectif : <strong>dépersonnaliser, désencombrer, nettoyer et illuminer</strong>. Un acheteur doit se projeter dans le bien — pas dans votre vie.`,
+        schema:['Désencombrer','Dépersonnaliser','Réparer','Nettoyer','Illuminer','= Coup de cœur'],
+        tableau:{ headers:['Priorité','Action','Coût','Impact'], rows:[['1 — Urgent','Ranger et désencombrer','0€','Très élevé'],['2 — Urgent','Nettoyer joints, vitres, sol','< 30€','Élevé'],['3 — Important','Changer ampoules (blanc chaud)','< 20€','Élevé'],['4 — Important','Peindre les murs en blanc cassé','< 100€','Élevé'],['5 — Optionnel','Fleurs fraîches le jour J','< 15€','Moyen']] },
+        tips:['Enlevez les photos de famille','Ouvrez rideaux et allumez TOUTES les lumières pour les photos','Une odeur neutre est indispensable'],
+        warnings:['N\'investissez pas dans une rénovation complète avant de vendre']
+      },
+      { title:'Photos qui convertissent', meta:'7 min · Technique',
+        explication:`Les photos sont votre seul argument de vente en ligne. <strong>90% des acheteurs décident de visiter en 8 secondes</strong> sur les photos. Avec le Pack Sérénité, vos photos sont prises par un photographe professionnel.`,
+        schema:['Préparation','Lumière naturelle','Grand-angle','HDR + retouche','Publication'],
+        tableau:{ headers:['Photo','Priorité','Conseil'], rows:[['Façade / entrée','⭐⭐⭐⭐⭐','Journée ensoleillée, voiture absente'],['Salon / séjour','⭐⭐⭐⭐⭐','Depuis le coin opposé à la fenêtre'],['Cuisine','⭐⭐⭐⭐⭐','Plan de travail dégagé'],['Chambre principale','⭐⭐⭐⭐','Lit fait, rideaux ouverts'],['Salle de bain','⭐⭐⭐⭐','Abattant fermé, tout rangé'],['Jardin','⭐⭐⭐⭐','Tondu, salon de jardin en place']] },
+        tips:['Minimum 10 photos — idéalement 15 à 20','La première photo doit être la MEILLEURE','Visite virtuelle 360° : multiplie le taux de contact par 3'],
+        warnings:['Photo de salle de bain avec abattant ouvert = impression négative immédiate']
+      }
+    ]
   },
   {
-    title: '3. Notaire — demande compromis',
-    body: `Objet : Demande de compromis — [Adresse du bien]
-
-Bonjour Maître,
-
-Je vous contacte suite à l'accord verbal trouvé avec M./Mme [Nom acheteur] pour la vente de mon bien situé [Adresse complète].
-
-Conditions convenues :
-• Prix de vente : [Prix] € net vendeur
-• Conditions suspensives : obtention d'un prêt immobilier (si applicable)
-• Date de signature acte authentique envisagée : [Date]
-
-Je reste à votre disposition pour vous faire parvenir l'ensemble des documents nécessaires.
-
-Coordonnées vendeur : [Prénom Nom] — [email] — [téléphone]
-Coordonnées acheteur : [Prénom Nom] — [email] — [téléphone]
-
-Bien cordialement,
-[Prénom Nom]`
+    num:'03', title:'Rédiger l\'annonce', subtitle:'Accroche, texte et multi-diffusion',
+    steps:[
+      { title:'Structure d\'une annonce parfaite', meta:'5 min · Copywriting',
+        explication:`Une bonne annonce répond en 10 secondes à : <strong>Pourquoi ce bien ? Pourquoi ce prix ?</strong> Le titre contient les informations clés. La description suit le plan AIDA.`,
+        schema:['Titre accrocheur','Mise en valeur','Description','Points forts','Infos pratiques','Contact'],
+        tableau:{ headers:['Section','Contenu','Longueur'], rows:[['Titre','Type + surface + ville + prix + 1 atout','< 60 caractères'],['1er paragraphe','Situation, type, surface, état','3-4 lignes'],['Points forts','Liste des atouts (3-5 max)','5-7 items'],['Infos pratiques','DPE, charges, taxe foncière','2-3 lignes'],['CTA','Disponibilité, mode de contact','1 ligne']] },
+        script:[{speaker:'vendeur',line:'✅ BON : "Appartement 68m² lumineux — Paris 11e — 2ch — 520 000€ — Cachet ancien"'},{speaker:'acheteur',line:'❌ MAUVAIS : "Bel appartement à vendre, très bien situé, à saisir"'}],
+        tips:['Évitez les superlatifs vides : "magnifique", "exceptionnel"','Mentionnez le DPE — les acheteurs le cherchent systématiquement','Indiquez les transports proches avec la distance exacte'],
+        warnings:['Ne mentez pas sur la surface ou l\'état — c\'est illégal et détruit la confiance en visite']
+      }
+    ]
   },
   {
-    title: '4. Relance financement J+30',
-    body: `Objet : Point sur votre financement — [Adresse]
-
-Bonjour [Prénom acheteur],
-
-Nous sommes maintenant un mois après la signature du compromis.
-Je me permets de vous demander où en est votre demande de financement.
-
-Pourriez-vous me confirmer :
-• Votre banque / courtier a bien reçu votre dossier ?
-• Avez-vous des retours ou besoin de pièces complémentaires de ma part ?
-
-Rappel : le délai de condition suspensive prêt expire le [date limite].
-
-N'hésitez pas à me contacter si je peux vous aider à accélérer le processus.
-
-Bien cordialement,
-[Prénom Nom]
-[téléphone]`
+    num:'04', title:'Gérer les visites', subtitle:'Qualifier, accueillir et convaincre',
+    steps:[
+      { title:'Qualifier les prospects', meta:'4 min · Organisation',
+        explication:`Avant de donner votre adresse à n'importe qui, <strong>qualifiez l'acheteur</strong>. 3 questions suffisent pour savoir si la visite vaut votre temps.`,
+        schema:['Contact entrant','3 questions','Décision','RDV ou refus poli'],
+        tableau:{ headers:['Question','Ce que vous cherchez'], rows:[['"Votre budget ?"','Alignement avec votre prix'],['"Êtes-vous en contact avec votre banque ?"','Capacité de financement réelle'],['"Dans quel délai souhaitez-vous acheter ?"','< 3 mois = acheteur chaud']] },
+        script:[{speaker:'vendeur',line:'Avant de fixer un rendez-vous, permettez-moi de vous poser 2-3 questions pour m\'assurer que le bien correspond à vos critères.'},{speaker:'acheteur',line:'Bien sûr, je vous écoute.'},{speaker:'vendeur',line:'Votre budget global est de combien ? Et avez-vous déjà un accord de principe de votre banque ?'}],
+        tips:['Créneaux de 45 min minimum','Horaires idéaux : semaine après 18h ou samedi matin','Confirmez par SMS la veille avec l\'adresse exacte'],
+        warnings:['Ne laissez jamais entrer quelqu\'un que vous n\'avez pas qualifié']
+      },
+      { title:'Script de visite', meta:'8 min · Technique',
+        explication:`Une visite dure 20 à 45 minutes : <strong>accueil → visite guidée → temps libre → questions → congé</strong>. Votre rôle : valoriser sans survendre, répondre sans mentir, déceler les signaux d'intérêt.`,
+        schema:['Accueil chaleureux','Visite guidée','Temps libre','Questions','Prise de congé'],
+        script:[{speaker:'vendeur',line:'Bienvenue ! Je commence par le salon qui est la pièce maîtresse. Vous pouvez voir que...'},{speaker:'vendeur',line:'Je vous laisse quelques minutes pour voir à votre rythme. N\'hésitez pas à ouvrir les placards...'},{speaker:'acheteur',line:'On a une question sur le voisinage...'},{speaker:'vendeur',line:'[Réponse honnête] Souhaitez-vous organiser une seconde visite ?'}],
+        tips:['Signaux d\'intérêt : questions sur les délais, les voisins, l\'école — prenez-les au sérieux','Ne suivez pas les acheteurs pas à pas — donnez-leur de l\'espace','Préparez un dossier papier (diagnostics, charges) à laisser'],
+        warnings:['Ne parlez pas trop. Silence = l\'acheteur se projette. C\'est bon signe.'],
+        tableau:{ headers:['Signal d\'intérêt','Signification'], rows:[['Questions sur les délais de vente','Prêt à avancer rapidement'],['Demande d\'une seconde visite','Très intéressé'],['Questions sur les charges/taxe','Calcule son budget'],['Prend des photos','Se projette dans le bien'],['Vient avec un proche','Veut un avis extérieur pour décider']] }
+      }
+    ]
   },
   {
-    title: '5. Relance financement J+45 (ton ferme)',
-    body: `Objet : Urgence — Condition suspensive prêt — [Adresse]
-
-Bonjour [Prénom acheteur],
-
-Je vous contacte en urgence car la condition suspensive d'obtention de prêt expire dans [X] jours.
-
-Sans réponse de votre part avant le [date limite], je serai contraint de considérer que la condition suspensive n'est pas levée et de me réserver le droit de remettre le bien en vente.
-
-Merci de me contacter impérativement avant le [date limite] au [téléphone] ou par réponse à cet email.
-
-Cordialement,
-[Prénom Nom]`
-  },
-  {
-    title: '6. Convocation signature + état des lieux',
-    body: `Objet : Signature acte authentique + état des lieux — [Adresse]
-
-Bonjour [Prénom acheteur],
-
-Je vous confirme la signature de l'acte authentique :
-
-📅 Date : [Date]
-⏰ Heure : [Heure]
-📍 Lieu : Office notarial [Nom notaire] — [Adresse notaire]
-
-Un état des lieux aura lieu le même jour, avant la signature, à [heure].
-
-Pensez à apporter :
-• Pièce d'identité
-• Chéquier (si solde à régler)
-• Coordonnées bancaires (RIB pour le virement)
-
-L'ensemble des clés et documents vous seront remis à l'issue de la signature.
-
-À bientôt,
-[Prénom Nom]`
-  },
-  {
-    title: '7. Rappel état des lieux la veille',
-    body: `Objet : Rappel état des lieux demain — [Heure] — [Adresse]
-
-Bonjour [Prénom acheteur],
-
-Je vous rappelle que l'état des lieux a lieu demain :
-
-⏰ [Heure] — [Adresse complète]
-
-Je serai présent avec :
-• Les relevés de compteurs (eau, gaz, électricité)
-• L'ensemble des clés et télécommandes
-• Les manuels des équipements
-
-N'oubliez pas votre pièce d'identité.
-
-À demain,
-[Prénom Nom]
-[téléphone]`
+    num:'05', title:'Négocier & Conclure', subtitle:'Offres, contre-offres et compromis',
+    steps:[
+      { title:'Recevoir et répondre à une offre', meta:'6 min · Négociation',
+        explication:`Recevoir une offre est une excellente nouvelle — même en dessous de votre prix. <strong>Ne jamais refuser sèchement</strong>. Toujours contre-proposer. L'offre ouvre une négociation, pas une décision finale.`,
+        schema:['Offre reçue','Analyse','Contre-offre','Accord verbal','Compromis notaire'],
+        tableau:{ headers:['Offre reçue','Votre réaction recommandée'], rows:[['Au prix demandé','Acceptez immédiatement'],['��2% à −5%','Contre-proposez à −1% ou tenez votre prix'],['−5% à −10%','Contre-proposez avec justificatif'],['> −10%','Déclinez poliment avec explication']] },
+        script:[{speaker:'acheteur',line:'On vous propose 260 000€ pour votre bien à 275 000€.'},{speaker:'vendeur',line:'Merci pour votre offre. Elle est en dessous de ma valorisation. J\'ai refait [travaux]. Je peux descendre à 270 000€, c\'est mon prix ferme.'},{speaker:'acheteur',line:'265 000€ ?'},{speaker:'vendeur',line:'268 000€ et je laisse [équipement], c\'est ma dernière position.'}],
+        tips:['Répondez dans les 24h — au-delà, l\'acheteur cherche ailleurs','Demandez toujours une preuve de financement avant d\'accepter','Une offre au comptant vaut souvent mieux qu\'une offre plus haute avec crédit'],
+        warnings:['Ne signez rien sans un notaire — même un accord écrit entre particuliers peut créer des obligations']
+      }
+    ]
   }
 ];
 
-const CHECKLIST_PHOTOS = [
-  'Tous les volets ouverts',
-  'Lumières d\'ambiance allumées (pas les plafonniers)',
-  'Télévision éteinte',
-  'Plan de travail cuisine entièrement vide',
-  'Rideau de douche ouvert',
-  'Cuvette des toilettes fermée',
-  'Canapé : max 2 coussins',
-  'Poubelle cuisine sortie ou cachée',
-  'Photos de famille retirées',
-  'Portemanteau derrière les portes retiré',
-  'Température 19-20°C — aérer 20 min avant'
+let activeModule = 0;
+const doneSteps = JSON.parse(localStorage.getItem('vpm_done_steps') || '{}');
+
+function renderModules() {
+  const nav = document.getElementById('modulesNav');
+  const container = document.getElementById('modulesContainer');
+  nav.innerHTML = '';
+  container.innerHTML = '';
+
+  MODULES.forEach((mod, mi) => {
+    const btn = document.createElement('button');
+    btn.className = 'module-btn' + (mi === activeModule ? ' active' : '');
+    btn.textContent = `${mod.num} · ${mod.title}`;
+    btn.onclick = () => { activeModule = mi; renderModules(); };
+    nav.appendChild(btn);
+
+    const div = document.createElement('div');
+    div.className = 'module-content' + (mi === activeModule ? ' active' : '');
+
+    let html = `<div class="module-header"><div class="module-num">${mod.num}</div><div><h2>${mod.title}</h2><p>${mod.subtitle}</p></div></div><div class="steps-list">`;
+
+    mod.steps.forEach((step, si) => {
+      const key = `${mi}_${si}`;
+      const done = !!doneSteps[key];
+      html += `<div class="step-card${done ? ' done' : ''}" id="step-${mi}-${si}">
+        <div class="step-header" onclick="toggleStep(${mi},${si})">
+          <div class="step-check" onclick="markDone(event,${mi},${si})">✓</div>
+          <div class="step-title-wrap"><div class="step-title">${step.title}</div><div class="step-meta">${step.meta}</div></div>
+          <div class="step-arrow">▶</div>
+        </div>
+        <div class="step-body">
+          <div class="step-section"><div class="step-section-title">Explication</div><div class="step-text">${step.explication}</div></div>`;
+
+      if (step.schema) {
+        html += `<div class="step-section"><div class="step-section-title">Schéma</div><div class="schema-flow">`;
+        step.schema.forEach((s, i) => {
+          html += `<div class="schema-step">${s}</div>`;
+          if (i < step.schema.length - 1) html += `<div class="schema-arrow">→</div>`;
+        });
+        html += `</div></div>`;
+      }
+
+      if (step.tableau) {
+        html += `<div class="step-section"><div class="step-section-title">Tableau</div><table class="data-table"><thead><tr>`;
+        step.tableau.headers.forEach(h => { html += `<th>${h}</th>`; });
+        html += `</tr></thead><tbody>`;
+        step.tableau.rows.forEach(row => { html += `<tr>`; row.forEach(c => { html += `<td>${c}</td>`; }); html += `</tr>`; });
+        html += `</tbody></table></div>`;
+      }
+
+      if (step.script) {
+        html += `<div class="step-section"><div class="step-section-title">Script</div><div class="script-block">`;
+        step.script.forEach(line => {
+          html += `<div class="script-speaker ${line.speaker}">${line.speaker === 'vendeur' ? '🟢 Vous' : '🟠 Acheteur'}</div><div class="script-line">"${line.line}"</div>`;
+        });
+        html += `</div></div>`;
+      }
+
+      if (step.tips && step.tips.length) {
+        html += `<div class="step-section"><div class="step-section-title">Tips</div><div class="tips-list">`;
+        step.tips.forEach(tip => { html += `<div class="tip-item"><span class="tip-icon">💡</span><span>${tip}</span></div>`; });
+        html += `</div></div>`;
+      }
+
+      if (step.warnings && step.warnings.length) {
+        step.warnings.forEach(w => { html += `<div class="warning-item"><span class="tip-icon">⚠️</span><span>${w}</span></div>`; });
+      }
+
+      html += `<button class="ask-coach-btn" onclick="askCoach('${step.title.replace(/'/g,"\\'")}')">Demander à Alex sur cette étape →</button></div></div>`;
+    });
+
+    html += `</div>`;
+    div.innerHTML = html;
+    container.appendChild(div);
+  });
+  updateProgress();
+}
+
+function toggleStep(mi, si) {
+  document.getElementById(`step-${mi}-${si}`).classList.toggle('open');
+}
+
+function markDone(e, mi, si) {
+  e.stopPropagation();
+  const key = `${mi}_${si}`;
+  doneSteps[key] = !doneSteps[key];
+  localStorage.setItem('vpm_done_steps', JSON.stringify(doneSteps));
+  renderModules();
+}
+
+function updateProgress() {
+  const total = MODULES.reduce((s, m) => s + m.steps.length, 0);
+  const done = Object.values(doneSteps).filter(Boolean).length;
+  const pct = Math.round((done / total) * 100);
+  document.getElementById('globalProgress').style.width = pct + '%';
+  document.getElementById('progressLabel').textContent = `${done} étape${done>1?'s':''} complétée${done>1?'s':''} sur ${total} · ${pct}%`;
+}
+
+// ── Coach IA ──
+let chatHistory = [];
+
+function askCoach(stepTitle) {
+  const input = document.getElementById('coachInput');
+  input.value = `J'ai une question sur "${stepTitle}" — `;
+  input.focus();
+  document.querySelector('.formation-coach').scrollIntoView({ behavior: 'smooth' });
+}
+
+async function sendCoachMessage(text) {
+  if (!text.trim()) return;
+  const messages = document.getElementById('coachMessages');
+  const typing = document.getElementById('typingIndicator');
+  const btn = document.getElementById('coachSend');
+
+  const userMsg = document.createElement('div');
+  userMsg.className = 'msg msg-user';
+  userMsg.textContent = text;
+  messages.appendChild(userMsg);
+  messages.scrollTop = messages.scrollHeight;
+
+  chatHistory.push({ role: 'user', content: text });
+  btn.disabled = true;
+  typing.classList.add('show');
+  messages.scrollTop = messages.scrollHeight;
+
+  try {
+    const res = await fetch('/api/formation/chat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ message: text, module: MODULES[activeModule]?.title, history: chatHistory.slice(-6) })
+    });
+    const data = await res.json();
+    typing.classList.remove('show');
+    const coachMsg = document.createElement('div');
+    coachMsg.className = 'msg msg-coach';
+    coachMsg.innerHTML = (data.reply || data.error || 'Erreur.').replace(/\n/g, '<br>');
+    messages.appendChild(coachMsg);
+    chatHistory.push({ role: 'assistant', content: data.reply || '' });
+  } catch {
+    typing.classList.remove('show');
+    const err = document.createElement('div');
+    err.className = 'msg msg-coach';
+    err.textContent = 'Erreur de connexion. Réessayez.';
+    messages.appendChild(err);
+  }
+
+  btn.disabled = false;
+  messages.scrollTop = messages.scrollHeight;
+}
+
+document.getElementById('coachSend').addEventListener('click', () => {
+  const input = document.getElementById('coachInput');
+  const text = input.value.trim();
+  input.value = '';
+  input.style.height = 'auto';
+  sendCoachMessage(text);
+});
+
+document.getElementById('coachInput').addEventListener('keydown', e => {
+  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); document.getElementById('coachSend').click(); }
+});
+
+document.getElementById('coachInput').addEventListener('input', function() {
+  this.style.height = 'auto';
+  this.style.height = Math.min(this.scrollHeight, 90) + 'px';
+});
+
+document.querySelectorAll('.quick-q').forEach(btn => {
+  btn.addEventListener('click', () => sendCoachMessage(btn.dataset.q));
+});
+
+// ── Mails ──
+const MAILS = [
+  { title:'1. Confirmation de rendez-vous', body:`Bonjour [Prénom],\n\nJe confirme notre rendez-vous pour la visite du bien situé au [Adresse], le [Date] à [Heure].\n\nDurée estimée : 30 à 45 minutes. Sonnez au nom : [Votre nom].\n\nN'hésitez pas à me contacter si vous avez des questions.\n\nCordialement,\n[Votre prénom]` },
+  { title:'2. Relance après visite sans retour', body:`Bonjour [Prénom],\n\nJe me permets de vous recontacter suite à votre visite du [Date].\n\nAvez-vous eu le temps de réfléchir ? Je serais ravi(e) de répondre à vos questions ou d'organiser une seconde visite.\n\nMon bien est toujours disponible.\n\nCordialement,\n[Votre prénom]` },
+  { title:'3. Réponse à une offre trop basse', body:`Bonjour [Prénom],\n\nMerci pour votre offre de [Montant]€.\n\nAprès réflexion, je ne peux pas accepter ce prix compte tenu de [valorisation/travaux/marché]. Je serais prêt(e) à descendre à [Contre-offre]€.\n\nJe reste disponible si vous souhaitez en discuter.\n\nCordialement,\n[Votre prénom]` },
+  { title:'4. Acceptation d\'une offre', body:`Bonjour [Prénom],\n\nJ'ai le plaisir d'accepter votre offre de [Montant]€ pour le bien au [Adresse].\n\nLa prochaine étape est la signature du compromis chez le notaire. Mon notaire : [Nom et coordonnées].\n\nMerci de me confirmer votre notaire afin de fixer une date.\n\nCordialement,\n[Votre prénom]` },
+  { title:'5. Demande de documents à l\'acheteur', body:`Bonjour [Prénom],\n\nPour préparer le compromis, pourriez-vous me transmettre :\n\n✓ Pièce d'identité valide\n✓ Justificatif de domicile récent\n✓ Attestation de financement (accord banque ou attestation de fonds)\n\nCes documents sont nécessaires pour que le notaire puisse avancer rapidement.\n\nMerci,\n[Votre prénom]` },
+  { title:'6. Alerte offre concurrente', body:`Bonjour [Prénom],\n\nJe vous contacte car j'ai reçu une offre sérieuse sur le bien que vous avez visité le [Date].\n\nSi votre projet est toujours d'actualité, je vous invite à me faire part de votre position dans les 48 heures.\n\nCordialement,\n[Votre prénom]` },
+  { title:'7. Premier contact acheteur', body:`Bonjour [Prénom],\n\nMerci pour votre intérêt pour mon bien au [Adresse].\n\nRésumé :\n- Surface : [X] m²\n- Pièces : [N]\n- DPE : [Lettre]\n- Taxe foncière : [X]€/an\n- Charges : [X]€/mois\n\nJe suis disponible [jours et horaires]. Merci de m'indiquer votre budget et situation de financement.\n\n[Votre prénom] — [Téléphone]` },
 ];
 
-const CHECKLIST_DOCS = [
-  'Titre de propriété',
-  'Dernier avis de taxe foncière',
-  'DPE (Diagnostic de Performance Énergétique)',
-  'Diagnostic amiante',
-  'Diagnostic plomb (si avant 1949)',
-  'Diagnostic électricité',
-  'Diagnostic gaz',
-  'Diagnostic assainissement',
-  'État des risques et pollutions (ERP)',
-  'Factures de travaux + garanties décennales',
-  'Déclarations mairie (DP + DAACT si travaux)',
-  'Factures énergétiques 12 derniers mois',
-  'Plans de la maison si disponibles',
-  'Règlement de copropriété (si appartement)',
-  '3 derniers PV d\'AG (si copropriété)'
-];
-
-const CHECKLIST_EDL = [
-  'Compteur eau — index m³ + numéro + photo',
-  'Compteur gaz — index m³ + numéro PCE + photo',
-  'Compteur électricité HP — index kWh + numéro PDL + photo',
-  'Compteur électricité HC — index kWh + photo',
-  'Date et heure du relevé notées',
-  'Signature vendeur + acheteur sur le document'
-];
-
-// Render mails
 function renderMails() {
   const container = document.getElementById('mailsList');
   container.innerHTML = MAILS.map((m, i) => `
-    <div class="mail-item">
-      <div class="mail-header" onclick="toggleMail(${i})">
-        <span>${m.title}</span>
-        <span class="mail-arrow-${i}">▼</span>
+    <div class="mail-item" id="mail-item-${i}">
+      <div id="mail-header-${i}" style="display:flex;align-items:center;justify-content:space-between;padding:14px 0;cursor:pointer;border-bottom:1px solid #f0ece6;gap:12px">
+        <div style="pointer-events:none;display:flex;align-items:center;gap:12px">
+          <span style="background:#3D5A47;color:#fff;width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:0.78rem;font-weight:600;flex-shrink:0">${i+1}</span>
+          <span style="font-size:0.9rem;font-weight:500">${m.title.replace(/^\d+\.\s*/,'')}</span>
+        </div>
+        <span class="mail-toggle-icon" style="pointer-events:none;color:#aaa;font-size:1.1rem;width:20px;text-align:center">+</span>
       </div>
-      <div class="mail-body" id="mail-body-${i}">
-        <pre style="white-space:pre-wrap;font-family:var(--font-body);font-size:0.88rem;line-height:1.6;color:#333;">${m.body}</pre>
-        <button class="btn-copy" onclick="copyMail(${i}, this)">Copier ce mail</button>
+      <div id="mail-body-${i}" style="display:none;padding:16px 0">
+        <pre style="white-space:pre-wrap;font-family:inherit;font-size:0.85rem;line-height:1.7;color:#444;background:#f9f7f3;border-radius:8px;padding:14px 16px;border:1px solid #eee">${m.body}</pre>
+        <button id="btn-copy-${i}" style="margin-top:10px;padding:8px 18px;background:transparent;border:1.5px solid #3D5A47;color:#3D5A47;border-radius:100px;font-size:0.82rem;font-family:inherit;cursor:pointer">Copier ce mail</button>
       </div>
-    </div>
-  `).join('');
-}
+    </div>`).join('');
 
-function toggleMail(i) {
-  const body = document.getElementById(`mail-body-${i}`);
-  body.classList.toggle('open');
-}
-
-function copyMail(i, btn) {
-  navigator.clipboard.writeText(MAILS[i].body).then(() => {
-    btn.textContent = '✓ Copié !';
-    btn.classList.add('copied');
-    setTimeout(() => { btn.textContent = 'Copier ce mail'; btn.classList.remove('copied'); }, 2500);
+  MAILS.forEach((m, i) => {
+    document.getElementById(`mail-header-${i}`).addEventListener('click', () => {
+      const body = document.getElementById(`mail-body-${i}`);
+      const icon = document.querySelector(`#mail-header-${i} .mail-toggle-icon`);
+      const isOpen = body.style.display !== 'none';
+      body.style.display = isOpen ? 'none' : 'block';
+      icon.textContent = isOpen ? '+' : '−';
+    });
+    document.getElementById(`btn-copy-${i}`).addEventListener('click', () => {
+      navigator.clipboard.writeText(m.body);
+      const btn = document.getElementById(`btn-copy-${i}`);
+      btn.textContent = '✓ Copié !';
+      setTimeout(() => btn.textContent = 'Copier ce mail', 2000);
+    });
   });
 }
 
-// Render checklists
-async function renderChecklist(items, containerId, type, progressId) {
-  const res = await fetch(`/api/checklist/${type}`);
-  const data = await res.json();
-  const checked = {};
-  data.items?.forEach(item => { checked[item.item_index] = item.checked; });
-
-  const container = document.getElementById(containerId);
-  container.innerHTML = items.map((item, i) => `
-    <div class="checklist-item ${checked[i] ? 'done' : ''}" id="${type}-item-${i}">
-      <input type="checkbox" id="${type}-${i}" ${checked[i] ? 'checked' : ''} onchange="toggleChecklist('${type}', ${i}, this)">
-      <label for="${type}-${i}">${item}</label>
-    </div>
-  `).join('');
-
-  updateProgress(type, items.length, checked, progressId);
-}
-
-function updateProgress(type, total, checked, progressId) {
-  const done = Object.values(checked).filter(v => v).length;
-  document.getElementById(progressId).textContent = `${done}/${total}`;
-}
-
-async function toggleChecklist(type, index, checkbox) {
-  const item = document.getElementById(`${type}-item-${index}`);
-  item.classList.toggle('done', checkbox.checked);
-  await fetch('/api/checklist', {
-    method: 'POST',
-    headers: {'Content-Type':'application/json'},
-    body: JSON.stringify({ checklist_type: type, item_index: index, checked: checkbox.checked })
-  });
-}
-
-window.showToast = function(msg, type='success') {
-  let toast = document.querySelector('.toast');
-  if (!toast) { toast = document.createElement('div'); toast.className = 'toast'; document.body.appendChild(toast); }
-  toast.textContent = msg; toast.className = `toast ${type==='error'?'error':''}`;
-  toast.classList.add('show'); setTimeout(()=>toast.classList.remove('show'), 3500);
+const CHECKLISTS = {
+  photos:['Ranger et désencombrer chaque pièce','Faire les vitres','Nettoyer les joints de salle de bain','Sortir la poubelle','Enlever les tapis si possible','Allumer toutes les lumières','Ouvrir rideaux et volets','Enlever les photos personnelles','Plan de travail cuisine dégagé','Abattant WC fermé','Salon de jardin sorti (si extérieur)','Voiture sortie (pour la façade)'],
+  docs:['Titre de propriété','Diagnostics techniques (DPE, amiante, plomb...)','Taxe foncière dernière année','Charges de copropriété (si applicable)','Règlement de copropriété (si applicable)','Plans du bien','Factures travaux récents','Garanties décennales (si travaux < 10 ans)'],
+  edl:['Relevé compteur électricité','Relevé compteur gaz','Relevé compteur eau froide','Relevé compteur eau chaude','Numéro PDL électricité (sur compteur Linky)','Codes boîte aux lettres','Codes digicode/interphone','Emplacement des compteurs expliqué','Clés remises en totalité','Notice chaudière transmise'],
 };
 
+function renderChecklist(type, containerId, progressId) {
+  const saved = JSON.parse(localStorage.getItem(`checklist_${type}`) || '{}');
+  const container = document.getElementById(containerId);
+  container.innerHTML = CHECKLISTS[type].map((item, i) => `
+    <label style="display:flex;align-items:flex-start;gap:10px;padding:8px 0;border-bottom:1px solid #f5f0e8;cursor:pointer;font-size:0.87rem;color:#444">
+      <input type="checkbox" ${saved[i]?'checked':''} data-index="${i}" data-type="${type}" style="margin-top:3px;accent-color:#3D5A47">
+      <span>${item}</span>
+    </label>`).join('');
+
+  const updateP = () => {
+    const checked = container.querySelectorAll('input:checked').length;
+    document.getElementById(progressId).textContent = `(${checked}/${CHECKLISTS[type].length})`;
+  };
+  container.querySelectorAll('input').forEach(input => {
+    input.addEventListener('change', () => {
+      saved[input.dataset.index] = input.checked;
+      localStorage.setItem(`checklist_${type}`, JSON.stringify(saved));
+      updateP();
+    });
+  });
+  updateP();
+}
+
+renderModules();
 renderMails();
-renderChecklist(CHECKLIST_PHOTOS, 'checklist-photos', 'photos', 'progressPhotos');
-renderChecklist(CHECKLIST_DOCS, 'checklist-docs', 'docs', 'progressDocs');
-renderChecklist(CHECKLIST_EDL, 'checklist-edl', 'edl', 'progressEdl');
+renderChecklist('photos','checklist-photos','progressPhotos');
+renderChecklist('docs','checklist-docs','progressDocs');
+renderChecklist('edl','checklist-edl','progressEdl');
 </script>
 </body>
 </html>

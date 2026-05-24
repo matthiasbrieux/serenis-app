@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mes publications — Serenis</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css">
+  <style>
+    .platforms-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      margin-top: 24px;
+    }
+    @media (max-width: 700px) {
+      .platforms-grid { grid-template-columns: 1fr; }
+    }
+    .platform-card {
+      background: var(--blanc);
+      border: 1.5px solid #e0d8cc;
+      border-radius: 14px;
+      padding: 20px 22px;
+      transition: box-shadow 0.2s;
+    }
+    .platform-card:hover {
+      box-shadow: 0 4px 18px rgba(61,90,71,0.08);
+    }
+    .platform-card.is-active {
+      border-color: #3D5A47;
+    }
+    .platform-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+    }
+    .platform-identity {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .platform-logo {
+      font-size: 1.5rem;
+      line-height: 1;
+    }
+    .platform-name {
+      font-weight: 600;
+      font-size: 0.95rem;
+    }
+    .platform-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 3px 10px;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+    .platform-badge.active {
+      background: #e8f5e9;
+      color: #2e7d32;
+    }
+    .platform-badge.inactive {
+      background: #f0f0f0;
+      color: #888;
+    }
+    .badge-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: currentColor;
+    }
+    .badge-dot.pulsing {
+      animation: badgePulse 1.8s ease-in-out infinite;
+    }
+    @keyframes badgePulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.4; transform: scale(0.7); }
+    }
+    .platform-toggle-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+    .platform-toggle-label {
+      font-size: 0.85rem;
+      color: #555;
+    }
+    .toggle-switch-pub {
+      width: 40px;
+      height: 22px;
+      border-radius: 11px;
+      background: #ddd;
+      position: relative;
+      cursor: pointer;
+      transition: background 0.2s;
+      flex-shrink: 0;
+    }
+    .toggle-switch-pub.on {
+      background: #3D5A47;
+    }
+    .toggle-switch-pub::after {
+      content: '';
+      position: absolute;
+      top: 3px;
+      left: 3px;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: #fff;
+      transition: transform 0.2s;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+    }
+    .toggle-switch-pub.on::after {
+      transform: translateX(18px);
+    }
+    .platform-field {
+      margin-bottom: 12px;
+    }
+    .platform-field label {
+      display: block;
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: #888;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 5px;
+    }
+    .platform-field input {
+      width: 100%;
+      padding: 9px 12px;
+      border: 1.5px solid #e0d8cc;
+      border-radius: 8px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.88rem;
+      background: var(--blanc);
+      color: #333;
+      box-sizing: border-box;
+      transition: border-color 0.15s;
+    }
+    .platform-field input:focus {
+      outline: none;
+      border-color: #3D5A47;
+    }
+    .platform-link {
+      font-size: 0.8rem;
+      color: var(--terracotta);
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      margin-top: 4px;
+    }
+    .platform-link:hover { text-decoration: underline; }
+    .platform-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-top: 16px;
+    }
+    .btn-save-platform {
+      padding: 8px 20px;
+      background: #3D5A47;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: opacity 0.15s, transform 0.15s;
+    }
+    .btn-save-platform:hover { opacity: 0.9; transform: translateY(-1px); }
+    .btn-save-platform:active { transform: none; }
+    .save-feedback {
+      font-size: 0.8rem;
+      color: #3D5A47;
+      font-weight: 600;
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+    .save-feedback.show { opacity: 1; }
+    .intro-card {
+      background: var(--vert-pale, #D4E4D8);
+      border-radius: 12px;
+      padding: 18px 22px;
+      margin-bottom: 8px;
+      display: flex;
+      gap: 14px;
+      align-items: flex-start;
+    }
+    .intro-card-icon { font-size: 1.4rem; flex-shrink: 0; margin-top: 2px; }
+    .intro-card-text { font-size: 0.88rem; color: #2a4030; line-height: 1.6; }
+    .active-count-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: #3D5A47;
+      color: #fff;
+      padding: 4px 14px;
+      border-radius: 20px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      margin-left: 12px;
+    }
+    .section-cta {
+      margin-top: 32px;
+      padding: 18px 22px;
+      background: var(--creme, #F5F0E8);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    .section-cta p {
+      font-size: 0.88rem;
+      color: #555;
+      margin: 0;
+    }
+    .section-cta a {
+      color: var(--terracotta, #C4785A);
+      font-weight: 600;
+      text-decoration: none;
+      font-size: 0.9rem;
+    }
+    .section-cta a:hover { text-decoration: underline; }
+  </style>
+</head>
+<body>
+<div class="app-layout">
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-logo">
+      <a href="/" class="logo logo-white">
+        <svg width="28" height="28" viewBox="0 0 32 32"><path d="M16 2L3 13v17h8v-8h10v8h8V13L16 2z" fill="#D4E4D8"/></svg>
+        <span class="logo-text" style="color:#FDFCF8">Sere<em style="color:#C4785A">nis</em></span>
+      </a>
+    </div>
+    <div id="sidebarPack" class="sidebar-pack" style="display:none">
+      <strong id="packLabel">Pack Sérénité</strong>
+      <span>Actif</span>
+    </div>
+    <nav class="sidebar-nav">
+      <a href="/dashboard" class="sidebar-item">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg> Tableau de bord
+      </a>
+      <a href="/mon-bien" class="sidebar-item">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg> Mon bien
+      </a>
+      <a href="/ma-formation" class="sidebar-item">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg> Ma formation
+      </a>
+      <a href="/mon-agenda" class="sidebar-item">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg> Mon agenda
+      </a>
+      <a href="/mes-publications" class="sidebar-item active">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.55a11 11 0 0 1 14.08 0"/><path d="M1.42 9a16 16 0 0 1 21.16 0"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><circle cx="12" cy="20" r="1"/></svg> Mes publications
+      </a>
+      <a href="/mes-performances" class="sidebar-item">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg> Performances
+      </a>
+    </nav>
+    <div style="position:absolute;bottom:24px;left:0;right:0;padding:0 24px;">
+      <a href="/logout" style="color:rgba(212,228,216,0.5);font-size:0.8rem;">Déconnexion →</a>
+    </div>
+  </aside>
+
+  <main class="main-content">
+    <div class="page-header">
+      <h1>Mes publications <span id="activeCountBadge" class="active-count-badge" style="display:none">Actif sur 0 plateforme(s)</span></h1>
+      <p>Gérez vos annonces sur toutes les plateformes</p>
+    </div>
+
+    <div class="intro-card">
+      <div class="intro-card-icon">💡</div>
+      <div class="intro-card-text">
+        <strong>Vous publiez vous-même vos annonces.</strong> Serenis génère votre texte d'annonce optimisé — copiez-le depuis <a href="/mon-bien" style="color:#3D5A47;font-weight:600;">Mon bien</a> et collez-le sur chaque plateforme. Indiquez ici les URLs de vos annonces pour suivre leur statut.
+      </div>
+    </div>
+
+    <div class="platforms-grid" id="platformsGrid">
+      <!-- Cards injectées par JS -->
+    </div>
+
+    <div class="section-cta">
+      <p>Vous n'avez pas encore rédigé votre texte d'annonce ?</p>
+      <a href="/mon-bien">Générer mon texte avec l'IA dans "Mon bien" →</a>
+    </div>
+  </main>
+</div>
+
+<script>
+const PLATFORMS = [
+  { key: 'leboncoin',  name: 'LeBonCoin',           color: '#F56B2A', logo: '🟠', hint: 'leboncoin.fr/annonces/offres/...' },
+  { key: 'pap',        name: 'PAP.fr',               color: '#003478', logo: '🔵', hint: 'pap.fr/annonce/...' },
+  { key: 'seloger',    name: 'SeLoger',              color: '#e30613', logo: '🔴', hint: 'seloger.com/annonces/...' },
+  { key: 'bienici',    name: "Bien'ici",             color: '#00B4FF', logo: '🔷', hint: 'bienici.com/annonce/...' },
+  { key: 'facebook',   name: 'Facebook Marketplace', color: '#1877F2', logo: '🔹', hint: 'facebook.com/marketplace/item/...' },
+  { key: 'other',      name: 'Autre plateforme',     color: '#888',    logo: '🌐', hint: "URL de votre annonce" },
+];
+
+// State: platform key → { id, url, active, published_at }
+const pubState = {};
+PLATFORMS.forEach(p => { pubState[p.key] = { id: null, url: '', active: false, published_at: '' }; });
+
+function renderGrid() {
+  const grid = document.getElementById('platformsGrid');
+  grid.innerHTML = PLATFORMS.map(p => {
+    const s = pubState[p.key];
+    return `
+    <div class="platform-card${s.active ? ' is-active' : ''}" id="card-${p.key}">
+      <div class="platform-header">
+        <div class="platform-identity">
+          <span class="platform-logo">${p.logo}</span>
+          <span class="platform-name" style="color:${p.color}">${p.name}</span>
+        </div>
+        <span class="platform-badge ${s.active ? 'active' : 'inactive'}">
+          <span class="badge-dot${s.active ? ' pulsing' : ''}"></span>
+          ${s.active ? 'Actif' : 'Inactif'}
+        </span>
+      </div>
+
+      <div class="platform-toggle-row">
+        <div class="toggle-switch-pub${s.active ? ' on' : ''}" id="toggle-${p.key}" onclick="toggleActive('${p.key}')"></div>
+        <span class="platform-toggle-label">${s.active ? 'Annonce active' : 'Annonce inactive'}</span>
+      </div>
+
+      <div class="platform-field">
+        <label>URL de l'annonce</label>
+        <input type="url" id="url-${p.key}" placeholder="${p.hint}" value="${escHtml(s.url)}">
+        ${s.url ? `<a class="platform-link" href="${escHtml(s.url)}" target="_blank" rel="noopener">Voir l'annonce →</a>` : ''}
+      </div>
+
+      <div class="platform-field">
+        <label>Date de publication</label>
+        <input type="date" id="date-${p.key}" value="${s.published_at ? s.published_at.split('T')[0] : ''}">
+      </div>
+
+      <div class="platform-actions">
+        <button class="btn-save-platform" onclick="savePlatform('${p.key}')">Sauvegarder</button>
+        <span class="save-feedback" id="feedback-${p.key}">Sauvegardé !</span>
+      </div>
+    </div>`;
+  }).join('');
+  updateActiveCount();
+}
+
+function escHtml(str) {
+  return String(str).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function toggleActive(key) {
+  pubState[key].active = !pubState[key].active;
+  renderGrid();
+}
+
+function updateActiveCount() {
+  const count = PLATFORMS.filter(p => pubState[p.key].active).length;
+  const badge = document.getElementById('activeCountBadge');
+  if (count > 0) {
+    badge.style.display = 'inline-flex';
+    badge.textContent = `Actif sur ${count} plateforme${count > 1 ? 's' : ''}`;
+  } else {
+    badge.style.display = 'none';
+  }
+}
+
+async function loadPublications() {
+  try {
+    const res = await fetch('/api/publications');
+    const data = await res.json();
+    if (data.publications && Array.isArray(data.publications)) {
+      data.publications.forEach(pub => {
+        if (pubState[pub.platform] !== undefined) {
+          pubState[pub.platform] = {
+            id: pub.id,
+            url: pub.url || '',
+            active: !!pub.active,
+            published_at: pub.published_at || '',
+          };
+        }
+      });
+    }
+  } catch(e) {}
+  renderGrid();
+}
+
+async function savePlatform(key) {
+  const url = document.getElementById('url-' + key).value.trim();
+  const date = document.getElementById('date-' + key).value;
+  const active = pubState[key].active;
+
+  pubState[key].url = url;
+  pubState[key].published_at = date;
+
+  try {
+    const res = await fetch('/api/publications', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ platform: key, url, active, published_at: date })
+    });
+    const data = await res.json();
+    if (data.success) {
+      if (data.id) pubState[key].id = data.id;
+      const fb = document.getElementById('feedback-' + key);
+      fb.classList.add('show');
+      setTimeout(() => fb.classList.remove('show'), 2500);
+      renderGrid();
+    }
+  } catch(e) {
+    showToast('Erreur réseau', 'error');
+  }
+}
+
+window.showToast = function(msg, type = 'success') {
+  let toast = document.querySelector('.toast');
+  if (!toast) { toast = document.createElement('div'); toast.className = 'toast'; document.body.appendChild(toast); }
+  toast.textContent = msg;
+  toast.className = `toast ${type === 'error' ? 'error' : ''}`;
+  toast.classList.add('show');
+  setTimeout(() => toast.classList.remove('show'), 3000);
+};
+
+loadPublications();
+</script>
+<script src="/js/transitions.js"></script>
+</body>
+</html>

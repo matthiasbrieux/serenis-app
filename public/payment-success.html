@@ -4,30 +4,108 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Paiement confirmé — Serenis</title>
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;1,400&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/css/style.css">
   <style>
-    .success-icon { font-size: 5rem; margin-bottom: 24px; }
-    .success-steps { text-align: left; margin: 32px 0; }
-    .success-steps li { display: flex; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--vert-pale); font-size: 0.9rem; }
-    .success-steps li:last-child { border-bottom: none; }
-    .success-steps .step-n { background: var(--vert-foret); color: #fff; width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 700; flex-shrink: 0; }
+    body { background: #F5F0E8; min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 24px; }
+    .success-card { background: #FDFCF8; border-radius: 20px; max-width: 560px; width: 100%; overflow: hidden; box-shadow: 0 24px 60px rgba(61,90,71,0.1); }
+    .success-top { background: linear-gradient(135deg, #3D5A47 0%, #5C7A65 100%); padding: 48px 40px 40px; text-align: center; position: relative; overflow: hidden; }
+    .success-top::before { content: ''; position: absolute; top: -40px; right: -40px; width: 180px; height: 180px; border-radius: 50%; background: rgba(255,255,255,0.04); }
+    .success-top::after { content: ''; position: absolute; bottom: -60px; left: -20px; width: 150px; height: 150px; border-radius: 50%; background: rgba(255,255,255,0.03); }
+    .check-ring { width: 80px; height: 80px; border-radius: 50%; background: rgba(255,255,255,0.15); display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; animation: popIn 0.5s cubic-bezier(0.16,1,0.3,1) both; }
+    @keyframes popIn { from { transform: scale(0); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+    .check-ring svg { animation: drawCheck 0.4s 0.3s ease both; stroke-dasharray: 30; stroke-dashoffset: 30; }
+    @keyframes drawCheck { to { stroke-dashoffset: 0; } }
+    .success-title { font-family: 'Cormorant Garamond', serif; font-size: 2rem; color: #FDFCF8; margin: 0 0 8px; position: relative; z-index: 1; }
+    .success-sub { color: #D4E4D8; font-size: 0.9rem; margin: 0; position: relative; z-index: 1; }
+    .pack-badge { display: inline-block; background: rgba(196,120,90,0.3); border: 1px solid rgba(196,120,90,0.5); border-radius: 20px; padding: 4px 14px; font-size: 0.78rem; font-weight: 600; color: #f5c4a8; margin-top: 14px; position: relative; z-index: 1; }
+    .success-body { padding: 36px 40px; }
+    .email-notice { background: linear-gradient(135deg, #fff8f0, #fdf5ec); border: 1px solid #f0d9c8; border-radius: 12px; padding: 20px; margin-bottom: 32px; display: flex; gap: 14px; align-items: flex-start; }
+    .email-icon { width: 40px; height: 40px; border-radius: 10px; background: #C4785A; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .email-notice strong { display: block; font-size: 0.9rem; color: #1A1A16; margin-bottom: 4px; }
+    .email-notice p { font-size: 0.83rem; color: #666; margin: 0; line-height: 1.5; }
+    .steps-title { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.08em; color: #aaa; font-weight: 600; margin-bottom: 16px; }
+    .step-item { display: flex; align-items: flex-start; gap: 14px; margin-bottom: 16px; }
+    .step-num { width: 32px; height: 32px; border-radius: 50%; background: #3D5A47; color: #fff; display: flex; align-items: center; justify-content: center; font-size: 0.78rem; font-weight: 700; flex-shrink: 0; margin-top: 1px; }
+    .step-text strong { display: block; font-size: 0.88rem; font-weight: 600; color: #1A1A16; margin-bottom: 2px; }
+    .step-text span { font-size: 0.82rem; color: #888; }
+    .cta-wrap { margin-top: 32px; border-top: 1px solid #f0ece6; padding-top: 28px; }
+    .btn-success { display: block; background: #C4785A; color: #fff; text-align: center; padding: 15px 32px; border-radius: 10px; font-weight: 600; font-size: 0.95rem; text-decoration: none; transition: background 0.2s; }
+    .btn-success:hover { background: #b36a4e; }
+    .contact-line { text-align: center; margin-top: 16px; font-size: 0.82rem; color: #aaa; }
+    .contact-line strong { color: #3D5A47; }
+    .logo-footer { text-align: center; margin-top: 24px; }
+    .logo-footer a { font-family: 'Cormorant Garamond', serif; font-size: 1.1rem; color: #888; text-decoration: none; }
   </style>
 </head>
-<body class="page-auth">
-  <div class="auth-box" style="max-width:520px;text-align:center;">
-    <div class="success-icon">✅</div>
-    <h1 style="font-size:2rem;color:#3D5A47;">Paiement confirmé !</h1>
-    <p style="color:#666;margin:12px 0 24px;font-size:1rem;">Vos identifiants d'accès ont été envoyés par email. Vérifiez votre boîte de réception (et vos spams).</p>
-    <ol class="success-steps">
-      <li><span class="step-n">1</span><span>Consultez votre email — identifiants envoyés dans les 5 minutes</span></li>
-      <li><span class="step-n">2</span><span>Connectez-vous à votre espace vendeur</span></li>
-      <li><span class="step-n">3</span><span>Renseignez les informations de votre bien</span></li>
-      <li><span class="step-n">4</span><span>Uploadez vos photos et publiez votre annonce</span></li>
-    </ol>
-    <a href="/login" class="btn-primary btn-full" style="margin-top:8px;">Accéder à mon espace vendeur</a>
-    <p style="margin-top:24px;font-size:0.85rem;color:#888;">Une question ? <strong>Matthias Brieux — 06 95 44 36 54</strong></p>
-    <p style="margin-top:8px;font-size:0.78px;color:#aaa;">Serenis est une plateforme numérique d'outils et de formation. Le vendeur reste seul responsable de sa vente.</p>
+<body>
+  <div class="success-card">
+    <div class="success-top">
+      <div class="check-ring">
+        <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="20 6 9 17 4 12"/>
+        </svg>
+      </div>
+      <h1 class="success-title">Paiement confirmé !</h1>
+      <p class="success-sub">Bienvenue dans la communauté Serenis</p>
+      <div class="pack-badge" id="packBadge">Pack activé</div>
+    </div>
+
+    <div class="success-body">
+      <div class="email-notice">
+        <div class="email-icon">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+        </div>
+        <div>
+          <strong>Vérifiez votre boîte email</strong>
+          <p>Vos identifiants de connexion ont été envoyés dans les 2 minutes. Vérifiez vos spams si nécessaire.</p>
+        </div>
+      </div>
+
+      <p class="steps-title">Vos 3 premières étapes</p>
+
+      <div class="step-item">
+        <div class="step-num">1</div>
+        <div class="step-text">
+          <strong>Connectez-vous avec vos identifiants</strong>
+          <span>Email + mot de passe temporaire reçu par email</span>
+        </div>
+      </div>
+      <div class="step-item">
+        <div class="step-num">2</div>
+        <div class="step-text">
+          <strong>Complétez l'onboarding (3 min)</strong>
+          <span>Profil, type de bien, prix, checklist documents</span>
+        </div>
+      </div>
+      <div class="step-item">
+        <div class="step-num">3</div>
+        <div class="step-text">
+          <strong>Publiez votre annonce</strong>
+          <span>Ajoutez vos photos, générez votre texte avec l'IA, mettez en ligne</span>
+        </div>
+      </div>
+
+      <div class="cta-wrap">
+        <a href="/login" class="btn-success">Accéder à mon espace vendeur →</a>
+        <p class="contact-line">Une question ? Matthias répond directement — <strong>06 95 44 36 54</strong></p>
+      </div>
+    </div>
   </div>
+
+  <div class="logo-footer">
+    <a href="/">Serenis</a>
+  </div>
+
+  <p style="text-align:center;font-size:0.72rem;color:#bbb;margin-top:12px;max-width:400px;">
+    Serenis est une plateforme numérique d'outils et de formation. Le vendeur reste seul responsable de sa vente.
+  </p>
+
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const pack = params.get('pack');
+    if (pack === 'serenite') document.getElementById('packBadge').textContent = 'Pack Sérénité activé';
+    else if (pack === 'autonome') document.getElementById('packBadge').textContent = 'Pack Autonome activé';
+  </script>
 </body>
 </html>

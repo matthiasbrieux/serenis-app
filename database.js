@@ -143,6 +143,63 @@ db.exec(`
     message TEXT,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP
   );
+
+  CREATE TABLE IF NOT EXISTS property_publications (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    seller_id INTEGER NOT NULL REFERENCES sellers(id),
+    platform TEXT NOT NULL,
+    url TEXT,
+    active BOOLEAN DEFAULT 1,
+    published_at TEXT,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+  );
+
+  CREATE TABLE IF NOT EXISTS property_performances (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    seller_id INTEGER NOT NULL REFERENCES sellers(id),
+    platform TEXT NOT NULL,
+    views INTEGER DEFAULT 0,
+    favorites INTEGER DEFAULT 0,
+    messages INTEGER DEFAULT 0,
+    visits_done INTEGER DEFAULT 0,
+    offers INTEGER DEFAULT 0,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE(seller_id, platform)
+  );
 `);
+
+// Migrations: add columns not in original CREATE TABLE
+const newCols = [
+  "ALTER TABLE properties ADD COLUMN heating_mechanism TEXT",
+  "ALTER TABLE properties ADD COLUMN hauteur_plafond REAL",
+  "ALTER TABLE properties ADD COLUMN assainissement_type TEXT",
+  "ALTER TABLE properties ADD COLUMN certificat_assainissement BOOLEAN DEFAULT 0",
+  "ALTER TABLE properties ADD COLUMN toiture_couverture TEXT",
+  "ALTER TABLE properties ADD COLUMN volets_type TEXT",
+  "ALTER TABLE properties ADD COLUMN sols_dalle TEXT",
+  "ALTER TABLE properties ADD COLUMN stationnement_type TEXT",
+  "ALTER TABLE properties ADD COLUMN mitoyennete TEXT",
+  "ALTER TABLE properties ADD COLUMN heating_details TEXT",
+  "ALTER TABLE properties ADD COLUMN garage_motorise TEXT",
+  "ALTER TABLE properties ADD COLUMN garage_sol TEXT",
+  "ALTER TABLE properties ADD COLUMN garage_surface REAL",
+  "ALTER TABLE properties ADD COLUMN terrace_revetement TEXT",
+  "ALTER TABLE properties ADD COLUMN terrace_surface REAL",
+  "ALTER TABLE properties ADD COLUMN fenetres_type TEXT",
+  "ALTER TABLE properties ADD COLUMN cheminee_type TEXT",
+  "ALTER TABLE properties ADD COLUMN eau_chaude_type TEXT",
+  "ALTER TABLE properties ADD COLUMN wc_count INTEGER DEFAULT 1",
+  "ALTER TABLE properties ADD COLUMN cuisine_type TEXT",
+  "ALTER TABLE properties ADD COLUMN grenier TEXT",
+  "ALTER TABLE properties ADD COLUMN dpe_conso_energie REAL",
+  "ALTER TABLE properties ADD COLUMN dpe_ges REAL",
+  "ALTER TABLE properties ADD COLUMN dpe_cout_min INTEGER",
+  "ALTER TABLE properties ADD COLUMN dpe_cout_max INTEGER",
+  "ALTER TABLE properties ADD COLUMN facture_eau INTEGER",
+  "ALTER TABLE properties ADD COLUMN facture_electricite INTEGER",
+  "ALTER TABLE properties ADD COLUMN facture_gaz INTEGER",
+  "ALTER TABLE properties ADD COLUMN grenier_present BOOLEAN DEFAULT 0",
+];
+newCols.forEach(sql => { try { db.exec(sql); } catch(e) {} });
 
 module.exports = db;

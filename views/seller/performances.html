@@ -1,0 +1,665 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mes performances — Serenis</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css">
+  <style>
+    /* ── Tabs plateforme ────────────────────────────── */
+    .platform-tabs {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      margin-bottom: 20px;
+    }
+    .ptab-btn {
+      padding: 7px 16px;
+      border-radius: 100px;
+      border: 1.5px solid #e0d8cc;
+      background: var(--blanc);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.83rem;
+      font-weight: 500;
+      cursor: pointer;
+      color: #555;
+      transition: all 0.18s;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .ptab-btn:hover:not(.active) { border-color: #3D5A47; color: #3D5A47; }
+    .ptab-btn.active { background: #3D5A47; border-color: #3D5A47; color: #fff; }
+
+    /* ── Stats form ─────────────────────────────────── */
+    .stats-form { display: none; }
+    .stats-form.active { display: block; }
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+      margin-bottom: 18px;
+    }
+    @media (max-width: 600px) { .stats-grid { grid-template-columns: 1fr 1fr; } }
+    .stat-field {
+      background: var(--blanc);
+      border: 1.5px solid #e0d8cc;
+      border-radius: 10px;
+      padding: 14px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      transition: border-color 0.15s;
+    }
+    .stat-field:focus-within { border-color: #3D5A47; }
+    .stat-field label {
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: #888;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .stat-field input {
+      border: none;
+      outline: none;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: #3D5A47;
+      background: transparent;
+      width: 100%;
+      padding: 0;
+    }
+    .stat-field input::placeholder { color: #ccc; font-weight: 400; font-size: 1rem; }
+    .updated-at {
+      font-size: 0.78rem;
+      color: #bbb;
+      margin-bottom: 12px;
+    }
+
+    /* ── Récap table ────────────────────────────────── */
+    .recap-table-wrap { overflow-x: auto; margin-top: 8px; }
+    .recap-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.83rem;
+      min-width: 640px;
+    }
+    .recap-table th {
+      background: #3D5A47;
+      color: #fff;
+      padding: 10px 12px;
+      text-align: left;
+      font-weight: 500;
+      font-size: 0.78rem;
+      white-space: nowrap;
+    }
+    .recap-table td {
+      padding: 10px 12px;
+      border-bottom: 1px solid #f0ece6;
+      color: #444;
+      vertical-align: middle;
+    }
+    .recap-table tr:nth-child(even) td { background: #faf8f4; }
+    .recap-table tr:last-child td { border-bottom: none; font-weight: 700; background: #f0f7f2; color: #2a4030; }
+    .rate-good { color: #2e7d32; font-weight: 600; }
+    .rate-mid  { color: #f57f17; font-weight: 600; }
+    .rate-bad  { color: #c62828; font-weight: 600; }
+    .plat-logo { margin-right: 5px; }
+
+    /* ── Coach IA ────────────────────────────────────── */
+    .coach-card-dark {
+      background: linear-gradient(135deg, #1a1a1a, #2d2d2d);
+      border-radius: 16px;
+      padding: 28px 30px;
+      color: #fff;
+    }
+    .coach-header-dark {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 20px;
+    }
+    .coach-avatar-dark {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #3D5A47, #C4785A);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.4rem;
+      flex-shrink: 0;
+    }
+    .coach-name-dark { font-size: 1rem; font-weight: 600; }
+    .coach-sub-dark { font-size: 0.8rem; color: rgba(212,228,216,0.7); margin-top: 2px; }
+    .btn-analyze {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 11px 24px;
+      background: linear-gradient(135deg, #3D5A47, #5a8a6a);
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: opacity 0.2s, transform 0.15s;
+    }
+    .btn-analyze:hover { opacity: 0.92; transform: translateY(-1px); }
+    .btn-analyze:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+    .analysis-output {
+      margin-top: 18px;
+      font-size: 0.88rem;
+      line-height: 1.75;
+      color: rgba(255,255,255,0.88);
+      min-height: 24px;
+      white-space: pre-wrap;
+    }
+    .analysis-loading { color: rgba(212,228,216,0.6); font-style: italic; }
+
+    /* ── Conseils conditionnels ──────────────────────── */
+    .advice-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .advice-item {
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+      padding: 14px 16px;
+      background: #fff8e1;
+      border-left: 3px solid #ffc107;
+      border-radius: 0 10px 10px 0;
+      font-size: 0.86rem;
+      color: #795548;
+    }
+    .advice-item.good {
+      background: #e8f5e9;
+      border-color: #4caf50;
+      color: #2e7d32;
+    }
+    .advice-icon { font-size: 1.1rem; flex-shrink: 0; margin-top: 1px; }
+    .advice-empty {
+      text-align: center;
+      padding: 24px;
+      color: #bbb;
+      font-size: 0.88rem;
+    }
+
+    /* ── Summary top ─────────────────────────────────── */
+    .summary-bar {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+      margin-bottom: 28px;
+    }
+    .summary-kpi {
+      flex: 1;
+      min-width: 120px;
+      background: var(--blanc);
+      border: 1.5px solid #e0d8cc;
+      border-radius: 10px;
+      padding: 14px 16px;
+      text-align: center;
+    }
+    .summary-kpi-val {
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: #3D5A47;
+      line-height: 1;
+    }
+    .summary-kpi-lbl {
+      font-size: 0.75rem;
+      color: #888;
+      margin-top: 4px;
+      font-weight: 500;
+    }
+  </style>
+</head>
+<body>
+<div class="app-layout">
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-logo">
+      <a href="/" class="logo logo-white">
+        <svg width="28" height="28" viewBox="0 0 32 32"><path d="M16 2L3 13v17h8v-8h10v8h8V13L16 2z" fill="#D4E4D8"/></svg>
+        <span class="logo-text" style="color:#FDFCF8">Sere<em style="color:#C4785A">nis</em></span>
+      </a>
+    </div>
+    <div id="sidebarPack" class="sidebar-pack" style="display:none">
+      <strong id="packLabel">Pack Sérénité</strong>
+      <span>Actif</span>
+    </div>
+    <nav class="sidebar-nav">
+      <a href="/dashboard" class="sidebar-item">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg> Tableau de bord
+      </a>
+      <a href="/mon-bien" class="sidebar-item">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg> Mon bien
+      </a>
+      <a href="/ma-formation" class="sidebar-item">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg> Ma formation
+      </a>
+      <a href="/mon-agenda" class="sidebar-item">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg> Mon agenda
+      </a>
+      <a href="/mes-publications" class="sidebar-item">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.55a11 11 0 0 1 14.08 0"/><path d="M1.42 9a16 16 0 0 1 21.16 0"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><circle cx="12" cy="20" r="1"/></svg> Mes publications
+      </a>
+      <a href="/mes-performances" class="sidebar-item active">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg> Performances
+      </a>
+    </nav>
+    <div style="position:absolute;bottom:24px;left:0;right:0;padding:0 24px;">
+      <a href="/logout" style="color:rgba(212,228,216,0.5);font-size:0.8rem;">Déconnexion →</a>
+    </div>
+  </aside>
+
+  <main class="main-content">
+    <div class="page-header">
+      <h1>Mes performances commerciales</h1>
+      <p>Saisissez vos statistiques et obtenez une analyse personnalisée de votre Coach Alex</p>
+    </div>
+
+    <!-- KPIs globaux -->
+    <div class="summary-bar" id="summaryBar">
+      <div class="summary-kpi">
+        <div class="summary-kpi-val" id="totalViews">—</div>
+        <div class="summary-kpi-lbl">Vues totales</div>
+      </div>
+      <div class="summary-kpi">
+        <div class="summary-kpi-val" id="totalMessages">—</div>
+        <div class="summary-kpi-lbl">Messages reçus</div>
+      </div>
+      <div class="summary-kpi">
+        <div class="summary-kpi-val" id="totalVisits">—</div>
+        <div class="summary-kpi-lbl">Visites réalisées</div>
+      </div>
+      <div class="summary-kpi">
+        <div class="summary-kpi-val" id="totalOffers">—</div>
+        <div class="summary-kpi-lbl">Offres reçues</div>
+      </div>
+    </div>
+
+    <!-- Section 1 : Saisie par plateforme -->
+    <div class="form-section" style="margin-bottom:24px;">
+      <h3 style="margin-bottom:4px;">Statistiques par plateforme</h3>
+      <p style="color:#888;font-size:0.85rem;margin-bottom:20px;">Saisissez les chiffres visibles dans votre espace vendeur sur chaque plateforme</p>
+
+      <div class="platform-tabs" id="platformTabs"></div>
+
+      <div id="statsForms"></div>
+    </div>
+
+    <!-- Section 2 : Tableau récapitulatif -->
+    <div class="form-section" style="margin-bottom:24px;">
+      <h3 style="margin-bottom:16px;">Tableau récapitulatif — toutes plateformes</h3>
+      <div class="recap-table-wrap">
+        <table class="recap-table" id="recapTable">
+          <thead>
+            <tr>
+              <th>Plateforme</th>
+              <th>Vues</th>
+              <th>Favoris</th>
+              <th>Messages</th>
+              <th>Visites</th>
+              <th>Offres</th>
+              <th>Vue → Contact</th>
+              <th>Contact → Visite</th>
+              <th>Visite → Offre</th>
+            </tr>
+          </thead>
+          <tbody id="recapBody">
+            <tr><td colspan="9" style="text-align:center;color:#bbb;padding:20px;">Aucune donnée. Saisissez vos statistiques ci-dessus.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Section 3 : Analyse IA -->
+    <div style="margin-bottom:24px;">
+      <div class="coach-card-dark">
+        <div class="coach-header-dark">
+          <div class="coach-avatar-dark">🤖</div>
+          <div>
+            <div class="coach-name-dark">Alex — Coach IA</div>
+            <div class="coach-sub-dark">Analyse vos données de performance et donne des conseils personnalisés</div>
+          </div>
+        </div>
+        <button class="btn-analyze" id="analyzeBtn" onclick="analyzeWithAI()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+          Obtenir l'analyse de mes performances
+        </button>
+        <div class="analysis-output" id="analysisOutput"></div>
+      </div>
+    </div>
+
+    <!-- Section 4 : Conseils conditionnels -->
+    <div class="form-section">
+      <h3 style="margin-bottom:16px;">Conseils selon vos taux</h3>
+      <div class="advice-list" id="adviceList">
+        <div class="advice-empty">Enregistrez vos statistiques pour voir vos conseils personnalisés.</div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script>
+const PLATFORMS = [
+  { key: 'leboncoin',  name: 'LeBonCoin',           logo: '🟠' },
+  { key: 'pap',        name: 'PAP.fr',               logo: '🔵' },
+  { key: 'seloger',    name: 'SeLoger',              logo: '🔴' },
+  { key: 'bienici',    name: "Bien'ici",             logo: '🔷' },
+  { key: 'facebook',   name: 'Facebook Marketplace', logo: '🔹' },
+  { key: 'other',      name: 'Autre',                logo: '🌐' },
+];
+
+// State: key → { id, views, favorites, messages, visits_done, offers, updated_at }
+const perfState = {};
+PLATFORMS.forEach(p => {
+  perfState[p.key] = { id: null, views: '', favorites: '', messages: '', visits_done: '', offers: '', updated_at: null };
+});
+
+let activeTab = PLATFORMS[0].key;
+
+// ── Build tabs + forms ────────────────────────────────
+function buildUI() {
+  const tabsEl = document.getElementById('platformTabs');
+  const formsEl = document.getElementById('statsForms');
+  tabsEl.innerHTML = '';
+  formsEl.innerHTML = '';
+
+  PLATFORMS.forEach(p => {
+    // Tab button
+    const btn = document.createElement('button');
+    btn.className = 'ptab-btn' + (p.key === activeTab ? ' active' : '');
+    btn.innerHTML = `${p.logo} ${p.name}`;
+    btn.addEventListener('click', () => { activeTab = p.key; buildUI(); });
+    tabsEl.appendChild(btn);
+
+    // Form
+    const form = document.createElement('div');
+    form.className = 'stats-form' + (p.key === activeTab ? ' active' : '');
+    form.id = 'form-' + p.key;
+    const s = perfState[p.key];
+    form.innerHTML = `
+      ${s.updated_at ? `<div class="updated-at">Dernière mise à jour : ${new Date(s.updated_at).toLocaleDateString('fr-FR', {day:'2-digit',month:'long',year:'numeric'})}</div>` : ''}
+      <div class="stats-grid">
+        <div class="stat-field">
+          <label>👁 Vues</label>
+          <input type="number" min="0" id="views-${p.key}" placeholder="0" value="${s.views}">
+        </div>
+        <div class="stat-field">
+          <label>❤️ Favoris</label>
+          <input type="number" min="0" id="favorites-${p.key}" placeholder="0" value="${s.favorites}">
+        </div>
+        <div class="stat-field">
+          <label>✉️ Messages reçus</label>
+          <input type="number" min="0" id="messages-${p.key}" placeholder="0" value="${s.messages}">
+        </div>
+        <div class="stat-field">
+          <label>🏠 Visites réalisées</label>
+          <input type="number" min="0" id="visits_done-${p.key}" placeholder="0" value="${s.visits_done}">
+        </div>
+        <div class="stat-field">
+          <label>💶 Offres reçues</label>
+          <input type="number" min="0" id="offers-${p.key}" placeholder="0" value="${s.offers}">
+        </div>
+      </div>
+      <div style="display:flex;align-items:center;gap:12px;">
+        <button class="btn-primary" onclick="savePerformances('${p.key}')">Enregistrer</button>
+        <span id="save-feedback-${p.key}" style="font-size:0.8rem;color:#3D5A47;font-weight:600;opacity:0;transition:opacity 0.3s;">Enregistré !</span>
+      </div>`;
+    formsEl.appendChild(form);
+  });
+}
+
+// ── Load performances ─────────────────────────────────
+async function loadPerformances() {
+  try {
+    const res = await fetch('/api/performances');
+    const data = await res.json();
+    if (data.performances && Array.isArray(data.performances)) {
+      data.performances.forEach(perf => {
+        if (perfState[perf.platform] !== undefined) {
+          perfState[perf.platform] = {
+            id: perf.id,
+            views:       perf.views       || '',
+            favorites:   perf.favorites   || '',
+            messages:    perf.messages    || '',
+            visits_done: perf.visits_done || '',
+            offers:      perf.offers      || '',
+            updated_at:  perf.updated_at  || null,
+          };
+        }
+      });
+    }
+  } catch(e) {}
+  buildUI();
+  updateTable();
+}
+
+// ── Save one platform ─────────────────────────────────
+async function savePerformances(key) {
+  const views       = parseInt(document.getElementById('views-'       + key).value) || 0;
+  const favorites   = parseInt(document.getElementById('favorites-'   + key).value) || 0;
+  const messages    = parseInt(document.getElementById('messages-'    + key).value) || 0;
+  const visits_done = parseInt(document.getElementById('visits_done-' + key).value) || 0;
+  const offers      = parseInt(document.getElementById('offers-'      + key).value) || 0;
+
+  perfState[key].views       = views;
+  perfState[key].favorites   = favorites;
+  perfState[key].messages    = messages;
+  perfState[key].visits_done = visits_done;
+  perfState[key].offers      = offers;
+  perfState[key].updated_at  = new Date().toISOString();
+
+  try {
+    const res = await fetch('/api/performances', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ platform: key, views, favorites, messages, visits_done, offers })
+    });
+    const data = await res.json();
+    if (data.success) {
+      const fb = document.getElementById('save-feedback-' + key);
+      fb.style.opacity = '1';
+      setTimeout(() => { fb.style.opacity = '0'; }, 2500);
+    }
+  } catch(e) {}
+
+  updateTable();
+  buildUI();
+}
+
+// ── Update recap table ────────────────────────────────
+function updateTable() {
+  const tbody = document.getElementById('recapBody');
+  let totalViews = 0, totalFavs = 0, totalMsg = 0, totalVisits = 0, totalOffers = 0;
+  let hasData = false;
+
+  const rows = PLATFORMS.map(p => {
+    const s = perfState[p.key];
+    const v  = parseInt(s.views)       || 0;
+    const f  = parseInt(s.favorites)   || 0;
+    const m  = parseInt(s.messages)    || 0;
+    const vi = parseInt(s.visits_done) || 0;
+    const o  = parseInt(s.offers)      || 0;
+    if (v || m || vi || o) hasData = true;
+    totalViews   += v;
+    totalFavs    += f;
+    totalMsg     += m;
+    totalVisits  += vi;
+    totalOffers  += o;
+    const r1 = v  > 0 ? (m  / v  * 100).toFixed(1) + '%' : '—';
+    const r2 = m  > 0 ? (vi / m  * 100).toFixed(1) + '%' : '—';
+    const r3 = vi > 0 ? (o  / vi * 100).toFixed(1) + '%' : '—';
+    return `<tr>
+      <td><span class="plat-logo">${p.logo}</span>${p.name}</td>
+      <td>${v || '—'}</td>
+      <td>${f || '—'}</td>
+      <td>${m || '—'}</td>
+      <td>${vi || '—'}</td>
+      <td>${o || '—'}</td>
+      <td class="${rateClass(v,m,1)}">${r1}</td>
+      <td class="${rateClass(m,vi,20)}">${r2}</td>
+      <td class="${rateClass(vi,o,10)}">${r3}</td>
+    </tr>`;
+  });
+
+  if (!hasData) {
+    tbody.innerHTML = '<tr><td colspan="9" style="text-align:center;color:#bbb;padding:20px;">Aucune donnée. Saisissez vos statistiques ci-dessus.</td></tr>';
+  } else {
+    const r1t = totalViews   > 0 ? (totalMsg    / totalViews   * 100).toFixed(1) + '%' : '—';
+    const r2t = totalMsg     > 0 ? (totalVisits / totalMsg     * 100).toFixed(1) + '%' : '—';
+    const r3t = totalVisits  > 0 ? (totalOffers / totalVisits  * 100).toFixed(1) + '%' : '—';
+    rows.push(`<tr>
+      <td>Total</td>
+      <td>${totalViews}</td>
+      <td>${totalFavs}</td>
+      <td>${totalMsg}</td>
+      <td>${totalVisits}</td>
+      <td>${totalOffers}</td>
+      <td>${r1t}</td>
+      <td>${r2t}</td>
+      <td>${r3t}</td>
+    </tr>`);
+    tbody.innerHTML = rows.join('');
+  }
+
+  // Update summary bar
+  document.getElementById('totalViews').textContent   = totalViews   || '—';
+  document.getElementById('totalMessages').textContent = totalMsg     || '—';
+  document.getElementById('totalVisits').textContent  = totalVisits  || '—';
+  document.getElementById('totalOffers').textContent  = totalOffers  || '—';
+
+  updateAdvice(totalViews, totalMsg, totalVisits, totalOffers);
+}
+
+function rateClass(denom, num, threshold) {
+  if (!denom) return '';
+  const pct = num / denom * 100;
+  if (pct >= threshold) return 'rate-good';
+  if (pct >= threshold / 2) return 'rate-mid';
+  return 'rate-bad';
+}
+
+// ── Conseils conditionnels ────────────────────────────
+function updateAdvice(views, messages, visits, offers) {
+  const list = document.getElementById('adviceList');
+  const advices = [];
+
+  if (!views && !messages && !visits && !offers) {
+    list.innerHTML = '<div class="advice-empty">Enregistrez vos statistiques pour voir vos conseils personnalisés.</div>';
+    return;
+  }
+
+  const rateVC = views   > 0 ? messages / views   * 100 : null;
+  const rateCVi = messages > 0 ? visits   / messages * 100 : null;
+  const rateViO = visits  > 0 ? offers   / visits   * 100 : null;
+
+  if (rateVC !== null && rateVC < 1) {
+    advices.push({ type: 'warn', icon: '📸', text: 'Vos photos ou votre prix freinent les clics. Consultez notre <a href="/ma-formation" style="color:#795548;font-weight:600;">guide photos</a>.' });
+  } else if (rateVC !== null) {
+    advices.push({ type: 'good', icon: '✅', text: `Bon taux vue → contact (${rateVC.toFixed(1)}%). Votre annonce attire les acheteurs.` });
+  }
+
+  if (rateCVi !== null && rateCVi < 20) {
+    advices.push({ type: 'warn', icon: '⚡', text: 'Répondez plus vite aux messages — les acheteurs contactent plusieurs vendeurs. Visez moins de 2h de délai.' });
+  } else if (rateCVi !== null) {
+    advices.push({ type: 'good', icon: '✅', text: `Bon taux contact → visite (${rateCVi.toFixed(1)}%). Votre réactivité est efficace.` });
+  }
+
+  if (rateViO !== null && rateViO < 10) {
+    advices.push({ type: 'warn', icon: '🏠', text: "L'annonce crée de l'attente différente de la réalité. Vérifiez vos photos et votre description pour qu'elles correspondent au bien réel." });
+  } else if (rateViO !== null) {
+    advices.push({ type: 'good', icon: '✅', text: `Bon taux visite → offre (${rateViO.toFixed(1)}%). Vos visites sont convaincantes.` });
+  }
+
+  if (advices.length === 0) {
+    list.innerHTML = '<div class="advice-empty">Pas assez de données pour générer des conseils. Saisissez plus de statistiques.</div>';
+    return;
+  }
+
+  list.innerHTML = advices.map(a => `
+    <div class="advice-item${a.type === 'good' ? ' good' : ''}">
+      <span class="advice-icon">${a.icon}</span>
+      <span>${a.text}</span>
+    </div>`).join('');
+}
+
+// ── Analyse IA ────────────────────────────────────────
+async function analyzeWithAI() {
+  const btn = document.getElementById('analyzeBtn');
+  const output = document.getElementById('analysisOutput');
+
+  // Collect all perf data
+  const performances = PLATFORMS.map(p => {
+    const s = perfState[p.key];
+    return {
+      platform:    p.name,
+      views:       parseInt(s.views)       || 0,
+      favorites:   parseInt(s.favorites)   || 0,
+      messages:    parseInt(s.messages)    || 0,
+      visits_done: parseInt(s.visits_done) || 0,
+      offers:      parseInt(s.offers)      || 0,
+    };
+  });
+
+  const hasData = performances.some(p => p.views || p.messages || p.visits_done || p.offers);
+  if (!hasData) {
+    output.textContent = "Aucune donnée saisie. Commencez par entrer vos statistiques dans les onglets ci-dessus pour qu'Alex puisse vous aider.";
+    return;
+  }
+
+  btn.disabled = true;
+  output.className = 'analysis-output analysis-loading';
+  output.textContent = 'Alex analyse vos données...';
+
+  try {
+    const res = await fetch('/api/performances/analyze', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ performances })
+    });
+    const data = await res.json();
+    const text = data.analysis || 'Impossible d\'obtenir une analyse. Réessayez plus tard.';
+
+    // Simulated typewriter effect
+    output.className = 'analysis-output';
+    output.textContent = '';
+    let i = 0;
+    const interval = setInterval(() => {
+      output.textContent += text[i];
+      i++;
+      if (i >= text.length) clearInterval(interval);
+    }, 20);
+  } catch(e) {
+    output.className = 'analysis-output';
+    output.textContent = 'Erreur de connexion. Vérifiez votre réseau et réessayez.';
+  }
+
+  btn.disabled = false;
+}
+
+window.showToast = function(msg, type = 'success') {
+  let toast = document.querySelector('.toast');
+  if (!toast) { toast = document.createElement('div'); toast.className = 'toast'; document.body.appendChild(toast); }
+  toast.textContent = msg;
+  toast.className = `toast ${type === 'error' ? 'error' : ''}`;
+  toast.classList.add('show');
+  setTimeout(() => toast.classList.remove('show'), 3000);
+};
+
+loadPerformances();
+</script>
+<script src="/js/transitions.js"></script>
+</body>
+</html>

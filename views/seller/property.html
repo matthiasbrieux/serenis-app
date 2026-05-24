@@ -6,6 +6,573 @@
   <title>Mon bien — Serenis</title>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/css/style.css">
+  <style>
+    /* ── Chip selectors ─────────────────────────── */
+    .chip-group { display:flex;flex-wrap:wrap;gap:10px;margin-top:8px; }
+    .chip-option {
+      display:flex;align-items:center;gap:8px;padding:10px 18px;
+      border:2px solid #ddd;border-radius:50px;background:#fff;
+      font-family:'DM Sans',sans-serif;font-size:0.9rem;font-weight:500;
+      cursor:pointer;transition:all 0.18s;color:#333;
+    }
+    .chip-option:hover { border-color:#3D5A47;color:#3D5A47; }
+    .chip-option.active { background:#3D5A47;border-color:#3D5A47;color:#fff; }
+    .chip-option .chip-icon { font-size:1.1rem; }
+
+    /* ── DPE selector ───────────────────────────── */
+    .dpe-group { display:flex;gap:8px;flex-wrap:wrap;margin-top:8px; }
+    .dpe-badge {
+      width:42px;height:42px;border-radius:8px;border:2px solid transparent;
+      font-weight:700;font-size:1rem;cursor:pointer;transition:all 0.15s;
+      display:flex;align-items:center;justify-content:center;color:#fff;
+      font-family:'DM Sans',sans-serif;
+    }
+    .dpe-badge[data-value="A"]{ background:#1a9e5a; }
+    .dpe-badge[data-value="B"]{ background:#4cb84c; }
+    .dpe-badge[data-value="C"]{ background:#b5d332;color:#333; }
+    .dpe-badge[data-value="D"]{ background:#f5c518;color:#333; }
+    .dpe-badge[data-value="E"]{ background:#f5a818;color:#333; }
+    .dpe-badge[data-value="F"]{ background:#e05a1a; }
+    .dpe-badge[data-value="G"]{ background:#cc1a1a; }
+    .dpe-badge.active { outline:3px solid #3D5A47;outline-offset:2px;transform:scale(1.12); }
+    .dpe-badge:not(.active):hover { transform:scale(1.06); }
+
+    /* ── Toggle switch ──────────────────────────── */
+    .toggle-group { display:flex;gap:20px;flex-wrap:wrap;margin-top:8px; }
+    .toggle-item { display:flex;align-items:center;gap:10px;cursor:pointer;background:none;border:none;padding:0;font-family:inherit;font-size:inherit; }
+    .toggle-label { font-size:0.9rem;font-weight:500;color:#333; }
+    .toggle-switch {
+      width:44px;height:24px;border-radius:12px;background:#ddd;
+      position:relative;transition:0.2s;cursor:pointer;flex-shrink:0;
+    }
+    .toggle-switch.on { background:#3D5A47; }
+    .toggle-switch::after {
+      content:'';position:absolute;top:2px;left:2px;width:20px;height:20px;
+      border-radius:50%;background:#fff;transition:0.2s;
+      box-shadow:0 1px 3px rgba(0,0,0,0.2);
+    }
+    .toggle-switch.on::after { left:22px; }
+
+    /* ── Stepper ────────────────────────────────── */
+    .stepper-group { display:flex;flex-wrap:wrap;gap:16px;margin-top:8px; }
+    .stepper-item { display:flex;flex-direction:column;align-items:center;gap:6px; }
+    .stepper-item label { font-size:0.78rem;color:#888;font-weight:500;text-align:center; }
+    .stepper-controls { display:flex;align-items:center;gap:0; }
+    .stepper-btn {
+      width:32px;height:32px;border:1px solid #ddd;background:#fff;
+      font-size:1.1rem;cursor:pointer;transition:0.15s;color:#3D5A47;
+      display:flex;align-items:center;justify-content:center;
+    }
+    .stepper-btn:first-child { border-radius:6px 0 0 6px; }
+    .stepper-btn:last-child { border-radius:0 6px 6px 0; }
+    .stepper-btn:hover { background:#f0f5f1; }
+    .stepper-input {
+      width:48px;height:32px;border:1px solid #ddd;border-left:none;border-right:none;
+      text-align:center;font-size:0.95rem;font-weight:600;background:#fff;
+      font-family:'DM Sans',sans-serif;
+    }
+    .stepper-input:focus { outline:none; }
+
+    /* ── Coach Prix ─────────────────────────────── */
+    .prix-coach {
+      margin-top:16px;padding:20px;border-radius:12px;
+      background:linear-gradient(135deg,#f0f7f2 0%,#faf7f2 100%);
+      border:1px solid #c8ddd0;
+    }
+    .prix-coach-header {
+      display:flex;align-items:center;justify-content:space-between;
+      margin-bottom:16px;font-weight:600;color:#3D5A47;
+    }
+    .prix-coach-ville {
+      font-size:0.82rem;color:#888;background:#fff;
+      padding:3px 10px;border-radius:20px;border:1px solid #ddd;
+    }
+    .delais-grid { display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px; }
+    @media(max-width:600px){ .delais-grid { grid-template-columns:1fr; } }
+    .delai-card {
+      padding:14px;border-radius:10px;text-align:center;border:2px solid transparent;
+    }
+    .delai-card.good { background:#e8f5e9;border-color:#a5d6a7; }
+    .delai-card.medium { background:#fff8e1;border-color:#ffe082; }
+    .delai-card.bad { background:#fce4ec;border-color:#f48fb1; }
+    .delai-days { font-size:1.1rem;font-weight:700;margin:4px 0; }
+    .delai-card.good .delai-days { color:#2e7d32; }
+    .delai-card.medium .delai-days { color:#f57f17; }
+    .delai-card.bad .delai-days { color:#c62828; }
+    .delai-label { font-size:0.8rem;font-weight:600;color:#555;margin-bottom:2px; }
+    .delai-desc { font-size:0.75rem;color:#888;line-height:1.3; }
+    .prix-rule {
+      padding:10px 14px;background:#fff;border-radius:8px;
+      font-size:0.84rem;color:#555;border-left:3px solid #3D5A47;
+    }
+
+    /* ── Mise en situation ──────────────────────── */
+    .situation-toggle {
+      display:inline-flex;align-items:center;gap:6px;
+      font-size:0.82rem;color:#C4785A;cursor:pointer;margin-top:6px;
+      padding:4px 10px;background:#fff5f1;border-radius:20px;border:1px solid #f0c8b8;
+      transition:0.15s;font-weight:500;
+    }
+    .situation-toggle:hover { background:#f5e8e0; }
+    .situation-block {
+      margin-top:10px;padding:16px;background:#fff8f5;border-radius:10px;
+      border:1px solid #f0c8b8;
+    }
+    .situation-block.hidden { display:none; }
+    .situation-line {
+      display:flex;gap:10px;margin-bottom:10px;font-size:0.86rem;
+    }
+    .situation-line:last-child { margin-bottom:0; }
+    .situation-role {
+      font-weight:700;min-width:72px;flex-shrink:0;
+    }
+    .situation-role.acheteur { color:#C4785A; }
+    .situation-role.vendeur { color:#3D5A47; }
+    .situation-text { color:#444;line-height:1.5; }
+
+    /* ── Inline coaching tip ────────────────────── */
+    .coach-tip {
+      display:flex;gap:8px;align-items:flex-start;margin-top:8px;
+      padding:10px 12px;background:#f0f7f2;border-radius:8px;
+      font-size:0.82rem;color:#3D5A47;border-left:3px solid #3D5A47;
+    }
+    .coach-tip-icon { font-size:1rem;flex-shrink:0; }
+
+    /* ── Section title ──────────────────────────── */
+    .section-divider {
+      display:flex;align-items:center;gap:12px;margin:32px 0 20px;
+    }
+    .section-divider h3 {
+      font-family:'DM Sans',sans-serif;font-size:0.78rem;font-weight:700;
+      text-transform:uppercase;letter-spacing:0.08em;color:#888;white-space:nowrap;margin:0;
+    }
+    .section-divider::after {
+      content:'';flex:1;height:1px;background:#e8e0d6;
+    }
+
+    /* ── Progress dots ──────────────────────────── */
+    .form-completion {
+      display:flex;align-items:center;gap:10px;margin-bottom:28px;
+      padding:14px 18px;background:var(--creme);border-radius:10px;
+    }
+    .completion-label { font-size:0.83rem;color:#666;font-weight:500; }
+    .completion-bar { flex:1;height:6px;background:#ddd;border-radius:3px;overflow:hidden; }
+    .completion-fill { height:100%;background:#3D5A47;border-radius:3px;transition:0.4s; }
+    .completion-pct { font-size:0.83rem;font-weight:700;color:#3D5A47;min-width:32px;text-align:right; }
+
+    /* ── Fiche acheteur ─────────────────────────── */
+    .fiche-empty {
+      text-align:center;padding:60px 24px;color:#999;
+    }
+    .fiche-empty svg { opacity:0.3;margin-bottom:12px; }
+    .fiche-container {
+      background:#fff;border:1px solid #e0d8cc;border-radius:12px;overflow:hidden;
+    }
+    .fiche-header {
+      padding:28px 32px;background:linear-gradient(135deg,#3D5A47,#2a4030);color:#fff;
+    }
+    .fiche-type-badge {
+      display:inline-flex;align-items:center;gap:6px;
+      background:rgba(255,255,255,0.15);padding:4px 12px;border-radius:20px;
+      font-size:0.8rem;font-weight:600;letter-spacing:0.05em;text-transform:uppercase;
+      margin-bottom:10px;
+    }
+    .fiche-price {
+      font-family:'Cormorant Garamond',serif;font-size:2.4rem;font-weight:600;
+      margin:6px 0;
+    }
+    .fiche-address { font-size:0.9rem;opacity:0.8;margin-top:4px; }
+    .fiche-body { padding:28px 32px; }
+    .fiche-stats {
+      display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:24px;
+    }
+    @media(max-width:500px){ .fiche-stats{grid-template-columns:repeat(2,1fr);} }
+    .fiche-stat {
+      text-align:center;padding:16px 8px;background:#f8f5f0;border-radius:10px;
+    }
+    .fiche-stat-val { font-size:1.4rem;font-weight:700;color:#3D5A47; }
+    .fiche-stat-lbl { font-size:0.75rem;color:#888;margin-top:2px; }
+    .fiche-dpe-badge {
+      display:inline-block;width:36px;height:36px;border-radius:6px;
+      font-weight:700;font-size:1.1rem;color:#fff;
+      display:flex;align-items:center;justify-content:center;margin:0 auto;
+    }
+    .fiche-section { margin-bottom:22px; }
+    .fiche-section-title {
+      font-size:0.75rem;text-transform:uppercase;letter-spacing:0.08em;
+      color:#888;font-weight:700;margin-bottom:10px;
+      padding-bottom:6px;border-bottom:1px solid #eee;
+    }
+    .fiche-desc { font-size:0.9rem;color:#444;line-height:1.65; }
+    .fiche-tags { display:flex;flex-wrap:wrap;gap:6px; }
+    .fiche-tag {
+      padding:4px 10px;background:#f0f5f1;border-radius:20px;
+      font-size:0.8rem;color:#3D5A47;font-weight:500;
+    }
+    .fiche-proximity { display:flex;flex-direction:column;gap:6px; }
+    .fiche-prox-item {
+      display:flex;align-items:center;gap:8px;font-size:0.85rem;color:#444;
+    }
+    .fiche-prox-dot {
+      width:6px;height:6px;border-radius:50%;background:#3D5A47;flex-shrink:0;
+    }
+    .fiche-footer {
+      padding:20px 32px;background:#f8f5f0;
+      border-top:1px solid #e0d8cc;
+      display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;
+    }
+    .fiche-contact { font-size:0.88rem;color:#555; }
+    .fiche-contact strong { color:#3D5A47;display:block;font-size:1rem; }
+    .fiche-docs { display:flex;gap:8px;flex-wrap:wrap; }
+    .fiche-doc-tag {
+      padding:3px 10px;background:#e8f5e9;border-radius:20px;
+      font-size:0.75rem;color:#2e7d32;font-weight:600;
+    }
+
+    /* ── AI description button ──────────────────── */
+    .btn-ai {
+      display:inline-flex;align-items:center;gap:6px;
+      padding:8px 16px;border-radius:8px;border:none;cursor:pointer;
+      background:linear-gradient(135deg,#3D5A47,#2a4030);color:#fff;
+      font-family:'DM Sans',sans-serif;font-size:0.85rem;font-weight:600;
+      transition:0.2s;
+    }
+    .btn-ai:hover { opacity:0.9;transform:translateY(-1px);box-shadow:0 4px 12px rgba(61,90,71,0.3); }
+    .btn-ai:disabled { opacity:0.6;cursor:not-allowed;transform:none; }
+    .ai-generating { font-size:0.82rem;color:#888;font-style:italic;margin-left:8px; }
+
+    /* ── Photo grid enhanced ─────────────────────── */
+    .photo-badge-main {
+      position:absolute;top:8px;left:8px;
+      background:rgba(196,120,90,0.92);color:#fff;
+      font-size:0.68rem;font-weight:700;padding:3px 8px;border-radius:20px;
+      text-transform:uppercase;letter-spacing:0.05em;
+    }
+    .photo-uploading-overlay {
+      position:absolute;inset:0;background:rgba(0,0,0,0.45);
+      display:flex;align-items:center;justify-content:center;
+      font-size:1.6rem;
+    }
+    .photos-empty-state {
+      grid-column:span 4;text-align:center;padding:40px 24px;
+      color:#bbb;border:2px dashed #e0d8cc;border-radius:12px;margin-top:8px;
+      font-size:0.9rem;line-height:1.5;
+    }
+    .photo-count-info {
+      display:flex;align-items:center;gap:8px;margin-top:14px;
+      font-size:0.83rem;color:#555;
+    }
+    .photo-count-pill {
+      padding:3px 10px;background:#3D5A47;color:#fff;
+      border-radius:20px;font-size:0.78rem;font-weight:700;
+    }
+
+    /* ── Document dossier ─────────────────────────── */
+    .doc-card {
+      display:flex;align-items:center;gap:14px;
+      padding:14px 16px;background:#fff;
+      border:1px solid #e8e0d6;border-radius:10px;
+      transition:0.15s;
+    }
+    .doc-card:hover { border-color:#c8ddd0;box-shadow:0 2px 8px rgba(0,0,0,0.06); }
+    .doc-icon-wrap {
+      width:44px;height:44px;border-radius:10px;
+      display:flex;align-items:center;justify-content:center;
+      font-size:1.3rem;flex-shrink:0;
+    }
+    .doc-info { flex:1;min-width:0; }
+    .doc-name-text { font-weight:600;font-size:0.9rem;color:#222;white-space:nowrap;overflow:hidden;text-overflow:ellipsis; }
+    .doc-type-chip {
+      display:inline-block;margin-top:3px;padding:2px 8px;border-radius:20px;
+      font-size:0.7rem;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;
+    }
+
+    /* ── Print ──────────────────────────────────── */
+    @media print {
+      .sidebar, .page-header, [class*="tab-btn"], .fiche-actions,
+      .main-content > *:not(#tab-fiche) { display:none !important; }
+      #tab-fiche { display:block !important; }
+      .fiche-container { border:none; }
+    }
+
+    /* ── Section tip warning ────────────────────── */
+    .inline-warn {
+      display:flex;gap:8px;margin-top:8px;padding:10px 12px;
+      background:#fff8e1;border-radius:8px;font-size:0.82rem;color:#795548;
+      border-left:3px solid #ffc107;
+    }
+    @keyframes spin { from { transform:rotate(0deg); } to { transform:rotate(360deg); } }
+
+    /* ── Pièces par niveau ─────────────────────────────── */
+    .add-floor-btn {
+      padding:6px 14px;border-radius:50px;border:2px solid #e8e0d6;
+      background:#fff;font-size:0.8rem;font-weight:600;cursor:pointer;transition:0.15s;color:#555;
+    }
+    .add-floor-btn.active { background:#3D5A47;border-color:#3D5A47;color:#fff; }
+    .add-floor-btn:hover:not(.active) { border-color:#3D5A47;color:#3D5A47; }
+    .rtype-btn {
+      display:flex;flex-direction:column;align-items:center;gap:3px;
+      padding:9px 4px 7px;border-radius:10px;border:2px solid #e8e0d6;
+      background:#fff;cursor:pointer;transition:all 0.15s;text-align:center;font-family:'DM Sans',sans-serif;
+    }
+    .rtype-btn:hover { border-color:#C4785A;background:#fff8f4; }
+    .rtype-btn.chosen { border-color:#C4785A;background:#fff8f4; }
+    .rtype-btn .rt-icon { font-size:1.3rem;line-height:1; }
+    .rtype-btn .rt-name { font-size:0.62rem;font-weight:600;color:#666;line-height:1.2; }
+    .rtype-btn.chosen .rt-name { color:#C4785A; }
+    .add-etage-btn {
+      padding:5px 12px;border-radius:50px;border:2px dashed #c8ddd0;
+      background:#f0f5f1;font-size:0.78rem;font-weight:700;cursor:pointer;transition:0.15s;color:#3D5A47;
+    }
+    .add-etage-btn:hover { background:#d4e4d8;border-color:#3D5A47; }
+    .rooms-table { width:100%;border-collapse:collapse;margin-bottom:4px; }
+    .rooms-table thead th {
+      font-size:0.7rem;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;
+      color:#aaa;padding:0 8px 6px;text-align:left;border-bottom:2px solid #e8e0d6;
+    }
+    .rooms-table tbody tr { border-bottom:1px solid #f0ebe3;transition:background 0.1s; }
+    .rooms-table tbody tr:hover { background:#fafaf7; }
+    .rooms-table tbody td { padding:8px 8px;font-size:0.85rem;vertical-align:middle; }
+    .rooms-table td.rt-level {
+      font-size:0.7rem;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:0.05em;white-space:nowrap;
+    }
+    .rooms-table td.rt-piece { font-weight:600;color:#222; }
+    .rooms-table td.rt-surface { color:#888;font-size:0.8rem;white-space:nowrap; }
+    .rooms-table td.rt-del { width:28px;text-align:center; }
+    .rt-del-btn {
+      width:22px;height:22px;border-radius:50%;border:none;background:#fee;
+      color:#c00;font-size:0.8rem;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;transition:0.12s;
+    }
+    .rt-del-btn:hover { background:#fcc; }
+    @keyframes fadeIn { from{opacity:0;transform:translateY(4px)} to{opacity:1;transform:none} }
+    .rooms-table tbody tr { animation:fadeIn 0.2s; }
+    .rooms-summary {
+      padding:12px 18px;background:#f0f5f1;border-radius:10px;
+      display:flex;gap:20px;align-items:center;flex-wrap:wrap;border:1px solid #c8ddd0;
+    }
+    .rooms-summary-stat { font-size:0.88rem;color:#444; }
+    .rooms-summary-stat strong { font-size:1.2rem;color:#3D5A47;margin-right:4px; }
+
+    /* ── Chauffage icon grid ─────────────────────────── */
+    .heating-grid { display:grid;grid-template-columns:repeat(auto-fill,minmax(88px,1fr));gap:10px;margin-top:8px; }
+    .heating-card {
+      display:flex;flex-direction:column;align-items:center;gap:6px;
+      padding:16px 8px;border-radius:12px;border:2px solid #e8e0d6;
+      background:#fff;cursor:pointer;transition:all 0.18s cubic-bezier(0.16,1,0.3,1);text-align:center;
+    }
+    .heating-card:hover { border-color:#3D5A47;transform:translateY(-2px); }
+    .heating-card.active { border-color:#C4785A;background:#fff8f4;box-shadow:0 0 0 3px rgba(196,120,90,0.1); }
+    .heating-card-icon { font-size:1.8rem;line-height:1; }
+    .heating-card-name { font-size:0.72rem;font-weight:600;color:#555; }
+    .heating-card.active .heating-card-name { color:#C4785A; }
+    .heating-detail {
+      margin-top:14px;padding:18px;background:#f8f5f0;border-radius:10px;
+      border:1px solid #e8e0d6;display:none;
+    }
+    .heating-detail.visible { display:block;animation:fadeIn 0.2s; }
+    .heating-detail-grid { display:grid;grid-template-columns:1fr 1fr;gap:12px; }
+    @media(max-width:480px){ .heating-detail-grid { grid-template-columns:1fr; } }
+
+    /* ── Équipements tile grid ───────────────────────── */
+    .equip-grid { display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:8px;margin-top:8px; }
+    .equip-tile {
+      display:flex;align-items:center;gap:8px;
+      padding:10px 12px;border-radius:8px;border:2px solid #e8e0d6;
+      background:#fff;cursor:pointer;transition:0.15s;user-select:none;
+    }
+    .equip-tile:hover { border-color:#3D5A47; }
+    .equip-tile.selected { border-color:#3D5A47;background:#f0f5f1; }
+    .equip-tile-icon { font-size:1rem;flex-shrink:0; }
+    .equip-tile-name { font-size:0.78rem;font-weight:500;color:#555;line-height:1.2; }
+    .equip-tile.selected .equip-tile-name { color:#3D5A47;font-weight:600; }
+
+    /* ── Autosave indicator ──────────────────────────── */
+    .autosave-badge {
+      display:inline-flex;align-items:center;gap:5px;font-size:0.75rem;
+      color:#aaa;padding:4px 10px;border-radius:20px;background:#f5f5f5;
+      transition:all 0.3s;
+    }
+    .autosave-badge.saving { color:#C4785A;background:#fff5f1; }
+    .autosave-badge.saved { color:#3D5A47;background:#f0f5f1; }
+
+    /* ── Bento photo grid ───────────────────────────── */
+    .bento-grid { display:grid;grid-template-columns:repeat(4,1fr);grid-auto-rows:160px;gap:8px;margin-top:16px; }
+    @media(max-width:700px){ .bento-grid { grid-template-columns:repeat(2,1fr);grid-auto-rows:120px; } }
+    .bento-item { position:relative;overflow:hidden;border-radius:10px;cursor:pointer;background:#f5f0e8; }
+    .bento-item img { width:100%;height:100%;object-fit:cover;transition:transform 0.35s ease;display:block; }
+    .bento-item:hover img { transform:scale(1.05); }
+    .bento-item.bento-c2 { grid-column:span 2; }
+    .bento-item.bento-r2 { grid-row:span 2; }
+    .bento-overlay {
+      position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,0.55) 0%,transparent 55%);
+      opacity:0;transition:opacity 0.25s;
+      display:flex;align-items:flex-end;justify-content:space-between;padding:10px 12px;
+    }
+    .bento-item:hover .bento-overlay { opacity:1; }
+    .bento-main-badge {
+      position:absolute;top:8px;left:8px;
+      background:rgba(196,120,90,0.92);color:#fff;
+      font-size:0.68rem;font-weight:700;padding:3px 8px;border-radius:20px;
+      text-transform:uppercase;letter-spacing:0.05em;pointer-events:none;
+    }
+    .bento-delete-btn {
+      background:rgba(220,50,50,0.85);color:#fff;border:none;
+      width:28px;height:28px;border-radius:50%;cursor:pointer;
+      font-size:0.75rem;display:flex;align-items:center;justify-content:center;
+      transition:0.15s;flex-shrink:0;
+    }
+    .bento-delete-btn:hover { background:rgba(200,30,30,0.95); }
+    .bento-uploading {
+      position:absolute;inset:0;background:rgba(0,0,0,0.45);
+      display:flex;align-items:center;justify-content:center;font-size:1.6rem;
+    }
+
+    /* ── Lightbox ────────────────────────────────────── */
+    .lightbox-overlay {
+      position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:9000;
+      display:flex;align-items:center;justify-content:center;
+      opacity:0;pointer-events:none;transition:opacity 0.2s;
+    }
+    .lightbox-overlay.open { opacity:1;pointer-events:all; }
+    .lightbox-img { max-width:90vw;max-height:85vh;border-radius:8px;object-fit:contain; }
+    .lightbox-close {
+      position:absolute;top:20px;right:24px;background:rgba(255,255,255,0.12);
+      color:#fff;border:none;width:40px;height:40px;border-radius:50%;cursor:pointer;
+      font-size:1.2rem;display:flex;align-items:center;justify-content:center;transition:0.15s;
+    }
+    .lightbox-close:hover { background:rgba(255,255,255,0.22); }
+    .lightbox-arrow {
+      position:absolute;top:50%;transform:translateY(-50%);
+      background:rgba(255,255,255,0.12);color:#fff;border:none;
+      width:48px;height:48px;border-radius:50%;cursor:pointer;
+      font-size:1.8rem;display:flex;align-items:center;justify-content:center;transition:0.15s;
+    }
+    .lightbox-arrow:hover { background:rgba(255,255,255,0.22); }
+    .lightbox-prev { left:24px; }
+    .lightbox-next { right:24px; }
+    .lightbox-counter {
+      position:absolute;bottom:20px;left:50%;transform:translateX(-50%);
+      color:rgba(255,255,255,0.65);font-size:0.82rem;font-family:'DM Sans',sans-serif;
+    }
+
+    /* ── Command palette ─────────────────────────────── */
+    .cmd-overlay {
+      position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:8000;
+      display:flex;align-items:flex-start;justify-content:center;padding-top:100px;
+      opacity:0;pointer-events:none;transition:opacity 0.18s;
+    }
+    .cmd-overlay.open { opacity:1;pointer-events:all; }
+    .cmd-palette {
+      width:520px;max-width:calc(100vw - 32px);background:#fff;border-radius:16px;overflow:hidden;
+      box-shadow:0 24px 60px rgba(0,0,0,0.22);
+      transform:translateY(-12px);transition:transform 0.18s;
+    }
+    .cmd-overlay.open .cmd-palette { transform:translateY(0); }
+    .cmd-search {
+      display:flex;align-items:center;gap:10px;
+      padding:14px 18px;border-bottom:1px solid #f0ebe4;
+    }
+    .cmd-search-icon { font-size:1rem;color:#999;flex-shrink:0; }
+    .cmd-search input {
+      flex:1;border:none;outline:none;font-family:'DM Sans',sans-serif;
+      font-size:0.95rem;color:#222;background:transparent;
+    }
+    .cmd-search input::placeholder { color:#bbb; }
+    .cmd-list { max-height:340px;overflow-y:auto;padding:6px 0; }
+    .cmd-item {
+      display:flex;align-items:center;gap:12px;padding:10px 18px;cursor:pointer;
+      transition:background 0.1s;font-family:'DM Sans',sans-serif;font-size:0.9rem;color:#333;
+    }
+    .cmd-item:hover,.cmd-item.cmd-selected { background:#f0f5f1;color:#3D5A47; }
+    .cmd-item-icon { font-size:1rem;flex-shrink:0;width:22px;text-align:center; }
+    .cmd-item-label { flex:1; }
+    .cmd-item-shortcut {
+      font-size:0.7rem;color:#bbb;background:#f5f0e8;padding:2px 7px;border-radius:4px;
+    }
+    .cmd-section-label {
+      padding:8px 18px 3px;font-size:0.68rem;font-weight:700;
+      text-transform:uppercase;letter-spacing:0.08em;color:#bbb;
+    }
+    .cmd-empty { padding:24px;text-align:center;color:#aaa;font-size:0.88rem; }
+    .cmd-kbd-badge {
+      display:inline-flex;align-items:center;gap:3px;font-size:0.72rem;color:#888;
+      background:#f5f0e8;padding:3px 9px;border-radius:6px;font-family:'DM Sans',sans-serif;
+      font-weight:600;cursor:pointer;transition:0.15s;border:1px solid #e8e0d6;
+    }
+    .cmd-kbd-badge:hover { background:#f0f5f1;color:#3D5A47;border-color:#c8ddd0; }
+
+    /* ── Type cards ─────────────────────────────────── */
+    .type-card-group { display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:8px; }
+    @media(max-width:500px){ .type-card-group { grid-template-columns:1fr; } }
+    .type-card {
+      display:flex;flex-direction:column;align-items:center;justify-content:center;
+      padding:24px 16px;border-radius:16px;border:2px solid #e8e0d6;
+      background:#fff;cursor:pointer;transition:all 0.2s cubic-bezier(0.16,1,0.3,1);
+      text-align:center;gap:10px;min-height:110px;
+    }
+    .type-card:hover { border-color:#3D5A47;transform:translateY(-2px);box-shadow:0 6px 20px rgba(61,90,71,0.12); }
+    .type-card.active { border-color:#C4785A;background:#fff8f4;box-shadow:0 0 0 3px rgba(196,120,90,0.15); }
+    .type-card svg { transition:stroke 0.2s; }
+    .type-card.active svg { stroke:#C4785A; }
+    .type-card-name { font-weight:700;font-size:0.95rem;color:#222; }
+    .type-card.active .type-card-name { color:#C4785A; }
+    .type-card-desc { font-size:0.75rem;color:#aaa;margin-top:2px; }
+
+    /* ── Mitoyenneté cards ──────────────────────────── */
+    .mito-group { display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:8px; }
+    @media(max-width:600px){ .mito-group { grid-template-columns:repeat(2,1fr); } }
+    .mito-card {
+      display:flex;flex-direction:column;align-items:center;gap:8px;
+      padding:16px 10px;border-radius:12px;border:2px solid #e8e0d6;background:#fff;
+      cursor:pointer;transition:all 0.2s;text-align:center;
+    }
+    .mito-card:hover { border-color:#3D5A47; }
+    .mito-card.active { border-color:#C4785A;background:#fff8f4; }
+    .mito-card svg { transition:stroke 0.2s; }
+    .mito-card.active svg { stroke:#C4785A; }
+    .mito-card-label { font-size:0.78rem;font-weight:600;color:#555; }
+    .mito-card.active .mito-card-label { color:#C4785A; }
+
+    /* ── Year slider ─────────────────────────────────── */
+    .year-slider-wrap { padding:8px 0; }
+    .year-display { font-size:2.4rem;font-weight:700;color:#3D5A47;font-family:'Cormorant Garamond',serif;text-align:center;margin:0 0 10px; }
+    .year-limits { display:flex;justify-content:space-between;font-size:0.72rem;color:#bbb;margin-top:4px; }
+    .year-slider {
+      width:100%;-webkit-appearance:none;appearance:none;
+      height:6px;border-radius:3px;background:#ddd;outline:none;cursor:pointer;
+    }
+    .year-slider::-webkit-slider-thumb {
+      -webkit-appearance:none;width:22px;height:22px;border-radius:50%;
+      background:#3D5A47;cursor:pointer;border:3px solid #fff;
+      box-shadow:0 2px 6px rgba(0,0,0,0.25);
+    }
+    .year-badge { display:inline-block;margin-top:8px;padding:5px 14px;border-radius:20px;font-size:0.78rem;font-weight:600; }
+    .year-badge.avant1948 { background:#fce4ec;color:#c62828; }
+    .year-badge.ancien { background:#fff3e0;color:#e65100; }
+    .year-badge.moderne { background:#f3f8f4;color:#3D5A47; }
+    .year-badge.recent { background:#e3f2fd;color:#1565c0; }
+
+    /* ── DPE official bars ───────────────────────────── */
+    .dpe-bars { display:flex;flex-direction:column;gap:5px;margin-top:8px; }
+    .dpe-bar-row {
+      display:flex;align-items:center;gap:10px;cursor:pointer;
+      border-radius:8px;padding:5px 8px 5px 4px;
+      transition:0.15s;border:2px solid transparent;
+    }
+    .dpe-bar-row:hover { background:rgba(0,0,0,0.03); }
+    .dpe-bar-row.active { border-color:rgba(0,0,0,0.18);box-shadow:0 0 0 2px rgba(61,90,71,0.12); }
+    .dpe-bar-letter {
+      width:32px;height:32px;border-radius:6px;flex-shrink:0;
+      display:flex;align-items:center;justify-content:center;
+      font-weight:800;font-size:1rem;color:#fff;
+    }
+    .dpe-bar-fill {
+      height:22px;border-radius:0 5px 5px 0;flex-shrink:0;
+      transition:opacity 0.15s;
+    }
+    .dpe-bar-row:not(.active) .dpe-bar-fill { opacity:0.65; }
+    .dpe-bar-kwh { font-size:0.73rem;color:#999;margin-left:auto;white-space:nowrap; }
+  </style>
 </head>
 <body>
 <div class="app-layout">
@@ -15,10 +582,24 @@
       <span class="logo-text" style="color:#FDFCF8">Sere<em style="color:#C4785A">nis</em></span></a>
     </div>
     <nav class="sidebar-nav">
-      <a href="/dashboard" class="sidebar-item"><span class="sidebar-item-icon">📊</span> Tableau de bord</a>
-      <a href="/mon-bien" class="sidebar-item active"><span class="sidebar-item-icon">🏠</span> Mon bien</a>
-      <a href="/ma-formation" class="sidebar-item"><span class="sidebar-item-icon">📚</span> Ma formation</a>
-      <a href="/mon-agenda" class="sidebar-item"><span class="sidebar-item-icon">📅</span> Mon agenda</a>
+      <a href="/dashboard" class="sidebar-item">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg> Tableau de bord
+      </a>
+      <a href="/mon-bien" class="sidebar-item active">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg> Mon bien
+      </a>
+      <a href="/ma-formation" class="sidebar-item">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg> Ma formation
+      </a>
+      <a href="/mon-agenda" class="sidebar-item">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg> Mon agenda
+      </a>
+      <a href="/mes-publications" class="sidebar-item">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.55a11 11 0 0 1 14.08 0"/><path d="M1.42 9a16 16 0 0 1 21.16 0"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><circle cx="12" cy="20" r="1"/></svg> Mes publications
+      </a>
+      <a href="/mes-performances" class="sidebar-item">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg> Performances
+      </a>
     </nav>
     <div style="position:absolute;bottom:24px;left:0;right:0;padding:0 24px;">
       <a href="/logout" style="color:rgba(212,228,216,0.5);font-size:0.8rem;">Déconnexion →</a>
@@ -28,208 +609,951 @@
   <main class="main-content">
     <div class="page-header">
       <h1>Mon bien</h1>
-      <p>Renseignez toutes les informations — elles constituent votre dossier acheteur</p>
+      <p>Construisez votre dossier acheteur — plus c'est complet, plus vous vendez vite</p>
     </div>
 
     <!-- Tabs -->
-    <div style="display:flex;gap:8px;margin-bottom:32px;flex-wrap:wrap;">
-      <button class="tab-btn active" data-tab="infos">Informations</button>
-      <button class="tab-btn" data-tab="photos">Photos</button>
-      <button class="tab-btn" data-tab="documents">Documents</button>
-      <button class="tab-btn" data-tab="publication">Publication</button>
+    <div style="display:flex;gap:8px;margin-bottom:28px;flex-wrap:wrap;">
+      <button type="button" class="tab-btn active" data-tab="infos">📋 Informations</button>
+      <button type="button" class="tab-btn" data-tab="photos">📸 Photos</button>
+      <button type="button" class="tab-btn" data-tab="documents">📁 Documents</button>
+      <button type="button" class="tab-btn" data-tab="fiche">👤 Fiche acheteur</button>
+      <button type="button" class="tab-btn" data-tab="publication">🚀 Publication</button>
     </div>
 
-    <!-- TAB: INFORMATIONS -->
+    <!-- ═══════════════════════════════════════════════════
+         TAB: INFORMATIONS
+    ════════════════════════════════════════════════════ -->
     <div class="tab-content" id="tab-infos">
+
+      <!-- Barre de complétion -->
+      <div class="form-completion">
+        <span class="completion-label">Complétion du dossier</span>
+        <div class="completion-bar"><div class="completion-fill" id="completionFill" style="width:0%"></div></div>
+        <span class="completion-pct" id="completionPct">0%</span>
+      </div>
+
       <form id="propertyForm">
-        <div class="form-section">
-          <h3>🏠 Type et localisation</h3>
-          <div class="form-grid-3">
-            <div class="form-group">
-              <label>Type de bien *</label>
-              <select name="type" required>
-                <option value="">Choisir...</option>
-                <option value="Maison">Maison</option>
-                <option value="Appartement">Appartement</option>
-                <option value="Villa">Villa</option>
-                <option value="Terrain">Terrain</option>
-              </select>
-            </div>
-            <div class="form-group" style="grid-column:span 2">
-              <label>Adresse complète *</label>
-              <input type="text" name="address" required placeholder="12 rue des Lilas">
-            </div>
+        <!-- Type de bien -->
+        <div class="section-divider"><h3>Type de bien</h3></div>
+        <input type="hidden" name="type" id="field-type">
+        <div class="type-card-group">
+          <div class="type-card" data-type="Maison" onclick="selectType('Maison')">
+            <svg width="38" height="38" viewBox="0 0 24 24" fill="none" stroke="#3D5A47" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+            <div class="type-card-name">Maison</div>
+            <div class="type-card-desc">Individuelle, jumelée...</div>
           </div>
-          <div class="form-grid-3">
-            <div class="form-group">
-              <label>Ville *</label>
-              <input type="text" name="city" required placeholder="Douai">
+          <div class="type-card" data-type="Appartement" onclick="selectType('Appartement')">
+            <svg width="38" height="38" viewBox="0 0 24 24" fill="none" stroke="#3D5A47" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="18" rx="2"/><line x1="9" y1="3" x2="9" y2="21"/><line x1="15" y1="3" x2="15" y2="21"/><line x1="2" y1="9" x2="22" y2="9"/><line x1="2" y1="15" x2="22" y2="15"/></svg>
+            <div class="type-card-name">Appartement</div>
+            <div class="type-card-desc">Studio, F1, F2...</div>
+          </div>
+          <div class="type-card" data-type="Terrain" onclick="selectType('Terrain')">
+            <svg width="38" height="38" viewBox="0 0 24 24" fill="none" stroke="#3D5A47" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17l4-8 4 5 3-4 4 7H3z"/><line x1="3" y1="21" x2="21" y2="21"/></svg>
+            <div class="type-card-name">Terrain</div>
+            <div class="type-card-desc">Constructible, agricole...</div>
+          </div>
+        </div>
+
+        <!-- Mitoyenneté (visible uniquement pour Maison) -->
+        <div id="section-mitoyennete" style="display:none">
+          <div class="section-divider" style="margin-top:28px;"><h3>Mitoyenneté</h3></div>
+          <input type="hidden" name="mitoyennete" id="field-mitoyennete">
+          <div class="mito-group">
+            <div class="mito-card" data-mito="Individuelle" onclick="selectMito('Individuelle')">
+              <svg width="48" height="36" viewBox="0 0 48 36" fill="none" stroke="#3D5A47" stroke-width="1.5">
+                <rect x="10" y="16" width="28" height="18" rx="1"/><polygon points="4,16 24,2 44,16"/>
+              </svg>
+              <span class="mito-card-label">Individuelle</span>
             </div>
-            <div class="form-group">
-              <label>Code postal *</label>
-              <input type="text" name="postal_code" required placeholder="59500">
+            <div class="mito-card" data-mito="Jumelée 1 côté" onclick="selectMito('Jumelée 1 côté')">
+              <svg width="64" height="36" viewBox="0 0 64 36" fill="none" stroke="#3D5A47" stroke-width="1.5">
+                <rect x="2" y="16" width="24" height="18" rx="1"/><polygon points="0,16 14,3 28,16"/>
+                <rect x="28" y="16" width="34" height="18" rx="1" stroke-width="2.2"/><polygon points="28,16 45,2 62,16" stroke-width="2.2"/>
+              </svg>
+              <span class="mito-card-label">1 côté</span>
             </div>
-            <div class="form-group">
-              <label>Prix souhaité (€) *</label>
-              <input type="number" name="price" required placeholder="185000">
+            <div class="mito-card" data-mito="Mitoyenne 2 côtés" onclick="selectMito('Mitoyenne 2 côtés')">
+              <svg width="80" height="36" viewBox="0 0 80 36" fill="none" stroke="#3D5A47" stroke-width="1.5">
+                <rect x="2" y="16" width="20" height="18" rx="1"/><polygon points="0,16 12,3 24,16"/>
+                <rect x="24" y="16" width="32" height="18" rx="1" stroke-width="2.2"/><polygon points="24,16 40,1 56,16" stroke-width="2.2"/>
+                <rect x="56" y="16" width="22" height="18" rx="1"/><polygon points="56,16 67,3 78,16"/>
+              </svg>
+              <span class="mito-card-label">2 côtés</span>
+            </div>
+            <div class="mito-card" data-mito="Jumelée par garage" onclick="selectMito('Jumelée par garage')">
+              <svg width="64" height="36" viewBox="0 0 64 36" fill="none" stroke="#3D5A47" stroke-width="1.5">
+                <rect x="2" y="16" width="24" height="18" rx="1"/><polygon points="0,16 14,3 28,16"/>
+                <rect x="28" y="20" width="34" height="14" rx="1" stroke-dasharray="3,2"/>
+              </svg>
+              <span class="mito-card-label">Garage mitoyen</span>
             </div>
           </div>
         </div>
 
-        <div class="form-section">
-          <h3>📐 Surfaces et composition</h3>
-          <div class="form-grid-3">
-            <div class="form-group">
-              <label>Surface habitable (m²)</label>
-              <input type="number" name="surface_habitable" placeholder="90">
-            </div>
-            <div class="form-group">
-              <label>Surface terrain (m²)</label>
-              <input type="number" name="surface_terrain" placeholder="450">
-            </div>
-            <div class="form-group">
-              <label>Nombre de pièces</label>
-              <input type="number" name="rooms" placeholder="5">
-            </div>
-            <div class="form-group">
-              <label>Nombre de chambres</label>
-              <input type="number" name="bedrooms" placeholder="3">
-            </div>
-            <div class="form-group">
-              <label>Année de construction</label>
-              <input type="number" name="year_built" placeholder="1985">
-            </div>
-          </div>
+        <!-- Localisation -->
+        <div class="section-divider" style="margin-top:32px;"><h3>Localisation</h3></div>
+        <div style="display:flex;align-items:flex-start;gap:10px;padding:12px 16px;background:#f0f5f1;border-radius:10px;border:1px solid #c8ddd0;margin-bottom:16px;">
+          <span style="font-size:1.1rem;flex-shrink:0;margin-top:1px;">🔒</span>
+          <p style="margin:0;font-size:0.8rem;color:#3D5A47;line-height:1.5;"><strong>Confidentialité garantie</strong> — L'adresse exacte n'apparaît pas dans le dossier envoyé aux acheteurs. Elle sera communiquée uniquement après validation d'une demande de visite, selon vos disponibilités.</p>
         </div>
-
-        <div class="form-section">
-          <h3>🔥 Chauffage et DPE</h3>
-          <div class="form-grid-3">
-            <div class="form-group">
-              <label>Type de chauffage</label>
-              <select name="heating_type">
-                <option value="">Choisir...</option>
-                <option>Gaz naturel</option>
-                <option>Électrique</option>
-                <option>Fioul</option>
-                <option>Pompe à chaleur</option>
-                <option>Bois / poêle</option>
-                <option>Géothermique</option>
-                <option>Autre</option>
-              </select>
-            </div>
-            <div class="form-group">
-              <label>Année chaudière</label>
-              <input type="number" name="heating_year" placeholder="2015">
-            </div>
-            <div class="form-group">
-              <label>Classe DPE</label>
-              <select name="dpe_class">
-                <option value="">Classe DPE...</option>
-                <option>A</option><option>B</option><option>C</option>
-                <option>D</option><option>E</option><option>F</option><option>G</option>
-              </select>
-            </div>
-            <div class="form-group">
-              <label>Taxe foncière annuelle (€)</label>
-              <input type="number" name="taxe_fonciere" placeholder="1200">
-            </div>
-          </div>
+        <div class="form-group">
+          <label>Adresse complète *</label>
+          <input type="text" name="address" required placeholder="12 rue des Lilas">
         </div>
-
-        <div class="form-section">
-          <h3>🌿 Extérieur et exposition</h3>
-          <div class="form-grid-3">
-            <div class="form-group">
-              <label>Exposition jardin</label>
-              <select name="exposition">
-                <option value="">Choisir...</option>
-                <option>Nord</option><option>Sud</option><option>Est</option>
-                <option>Ouest</option><option>Sud-Est</option><option>Sud-Ouest</option>
-              </select>
-            </div>
-            <div class="form-group" style="display:flex;align-items:center;gap:12px;padding-top:28px;">
-              <input type="checkbox" name="garden" id="garden" style="width:18px;height:18px;">
-              <label for="garden" style="margin:0;">Jardin</label>
-              <input type="checkbox" name="terrace" id="terrace" style="width:18px;height:18px;margin-left:16px;">
-              <label for="terrace" style="margin:0;">Terrasse</label>
-            </div>
-          </div>
-        </div>
-
-        <div class="form-section">
-          <h3>📍 Proximité et commodités</h3>
+        <div class="form-grid-3">
           <div class="form-group">
-            <label>Commerces à proximité</label>
-            <input type="text" name="commerces" placeholder="Supermarché 500m, boulangerie 200m...">
+            <label>Ville *</label>
+            <input type="text" name="city" required placeholder="Douai">
           </div>
-          <div class="form-grid-2">
-            <div class="form-group">
-              <label>École maternelle + distance</label>
-              <input type="text" name="school_maternelle" placeholder="École Jules Ferry — 350m">
-            </div>
-            <div class="form-group">
-              <label>École primaire + distance</label>
-              <input type="text" name="school_primaire" placeholder="École Jean Jaurès — 500m">
-            </div>
-            <div class="form-group">
-              <label>Collège + distance</label>
-              <input type="text" name="school_college" placeholder="Collège Victor Hugo — 1km">
-            </div>
-            <div class="form-group">
-              <label>Lycée + distance</label>
-              <input type="text" name="school_lycee" placeholder="Lycée Baudelaire — 2km">
-            </div>
-            <div class="form-group">
-              <label>Accès autoroute + temps</label>
-              <input type="text" name="highway" placeholder="A1 — 5 min">
-            </div>
-            <div class="form-group">
-              <label>Gare la plus proche + temps</label>
-              <input type="text" name="train_station" placeholder="Gare de Douai — 10 min à pied">
+          <div class="form-group">
+            <label>Code postal *</label>
+            <input type="text" name="postal_code" required placeholder="59500">
+          </div>
+          <div class="form-group">
+            <label>Prix souhaité (€) *</label>
+            <input type="number" name="price" required placeholder="185000">
+            <span class="situation-toggle" onclick="toggleSituation('prix')">🎭 Mise en situation acheteur</span>
+            <div class="situation-block hidden" id="situation-prix">
+              <div class="situation-line">
+                <span class="situation-role acheteur">Acheteur</span>
+                <span class="situation-text">« Je trouve le prix un peu élevé par rapport au quartier... »</span>
+              </div>
+              <div class="situation-line">
+                <span class="situation-role vendeur">Vous</span>
+                <span class="situation-text">« J'ai fait faire une estimation par deux agences. Ce prix tient compte des rénovations récentes (cuisine 2022, toiture 2018) et de la qualité du quartier. Je suis ouvert à la discussion si vous faites une offre sérieuse. »</span>
+              </div>
+              <div class="situation-line">
+                <span class="situation-role acheteur">Acheteur</span>
+                <span class="situation-text">« Quels diagnostics avez-vous ? »</span>
+              </div>
+              <div class="situation-line">
+                <span class="situation-role vendeur">Vous</span>
+                <span class="situation-text">« J'ai le DPE, l'amiante, le plomb, l'électricité et l'ERP — tout est à jour. Je vous les transmets avant la visite si vous le souhaitez. »</span>
+              </div>
             </div>
           </div>
         </div>
 
-        <div class="form-section">
-          <h3>✏️ Description et informations complémentaires</h3>
-          <div class="form-group">
-            <label>Équipements inclus dans la vente</label>
-            <input type="text" name="equipment" placeholder="Cuisine équipée, chaudière, volets roulants motorisés...">
+        <!-- Coach Prix -->
+        <div class="prix-coach" id="prixCoach" style="display:none">
+          <div class="prix-coach-header">
+            <span>💡 Coach Prix</span>
+            <span class="prix-coach-ville" id="coachVilleLabel"></span>
           </div>
-          <div class="form-grid-2">
-            <div class="form-group">
-              <label>Raison de la vente</label>
-              <select name="sale_reason">
-                <option value="">Choisir...</option>
-                <option>Déménagement professionnel</option>
-                <option>Achat d'un bien plus grand</option>
-                <option>Achat d'un bien plus petit</option>
-                <option>Succession</option>
-                <option>Projet de vie</option>
-                <option>Autre</option>
-              </select>
+          <div class="delais-grid">
+            <div class="delai-card good">
+              <div class="delai-label">Prix de marché</div>
+              <div class="delai-days">30 – 45 jours</div>
+              <div class="delai-desc">Forte demande, peu de négociation</div>
+            </div>
+            <div class="delai-card medium">
+              <div class="delai-label">+ 5 % au-dessus</div>
+              <div class="delai-days">60 – 90 jours</div>
+              <div class="delai-desc">Visites réduites, négociations fréquentes</div>
+            </div>
+            <div class="delai-card bad">
+              <div class="delai-label">+ 10 % et plus</div>
+              <div class="delai-days">120 jours +</div>
+              <div class="delai-desc">Stagnation — l'annonce se grille</div>
+            </div>
+          </div>
+          <div class="prix-rule">
+            <strong>Règle d'or :</strong> Un bien au juste prix dès le départ se vend 3× plus vite. Une baisse tardive de 5 % est perçue comme un signal négatif par les acheteurs.
+          </div>
+        </div>
+
+        <!-- Surfaces et composition -->
+        <div class="section-divider" style="margin-top:32px;"><h3>Surfaces et composition</h3></div>
+        <div class="form-grid-2" style="margin-bottom:20px;">
+          <div class="form-group">
+            <label>Surface habitable (m²)</label>
+            <input type="number" name="surface_habitable" placeholder="90">
+          </div>
+          <div class="form-group">
+            <label style="display:flex;align-items:center;gap:6px;">Surface terrain (m²)
+              <span title="Comment trouver la superficie exacte ?" onclick="document.querySelector('[data-tab=infos]')?.click(); setTimeout(()=>document.getElementById('helpTerrain')?.scrollIntoView({behavior:'smooth'}),200)" style="display:inline-flex;align-items:center;justify-content:center;width:17px;height:17px;border-radius:50%;background:#C4785A;color:#fff;font-size:0.65rem;font-weight:700;cursor:pointer;flex-shrink:0;">?</span>
+            </label>
+            <input type="number" name="surface_terrain" placeholder="450">
+            <div id="helpTerrain" style="display:none;margin-top:6px;padding:10px 12px;background:#fff8f4;border-radius:8px;border:1px solid #f0d0be;font-size:0.78rem;color:#7a4a2a;line-height:1.5;">
+              📋 <strong>Comment trouver la superficie exacte :</strong><br>
+              1. Consultez votre acte de vente / titre de propriété<br>
+              2. Cadastre.gouv.fr → entrez votre adresse → cliquez sur votre parcelle<br>
+              3. Le chiffre "Contenance" = superficie officielle du terrain
             </div>
           </div>
           <div class="form-group">
-            <label>Description libre du bien</label>
-            <textarea name="description" rows="5" placeholder="Décrivez votre bien : atouts, rénovations récentes, ambiance du quartier, luminosité, calme..."></textarea>
-            <p class="form-hint">Soyez précis et honnête. C'est ce que les acheteurs sérieux lisent en premier.</p>
+            <label>Hauteur sous plafond (m)</label>
+            <input type="number" name="hauteur_plafond" placeholder="2.50" step="0.05" min="1" max="10">
+          </div>
+        </div>
+        <div class="form-group" style="margin-top:20px;">
+          <label style="margin-bottom:12px;display:block;">Pièces par niveau</label>
+          <input type="hidden" name="rooms" id="field-rooms" value="0">
+          <input type="hidden" name="bedrooms" id="field-bedrooms" value="0">
+
+          <!-- Panel d'ajout -->
+          <div id="roomAddPanel" style="border:2px dashed #e8e0d6;border-radius:12px;padding:18px;margin-top:8px;background:#fafaf8;">
+            <div style="font-size:0.8rem;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:#aaa;margin-bottom:12px;">Ajouter une pièce</div>
+            <!-- Niveau -->
+            <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-bottom:14px;" id="addFloorBtns">
+              <button type="button" class="add-floor-btn active" onclick="setAddFloor('RDC',this)">🏠 RDC</button>
+              <button type="button" class="add-floor-btn" onclick="setAddFloor('Sous-sol',this)">⬇ Sous-sol</button>
+              <button type="button" class="add-etage-btn" onclick="addNextEtage()">+ Ajouter un étage</button>
+            </div>
+            <!-- Type de pièce -->
+            <div style="font-size:0.72rem;color:#aaa;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:8px;">Type de pièce</div>
+            <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(76px,1fr));gap:7px;margin-bottom:14px;">
+              <button type="button" class="rtype-btn" id="rt-buanderie"  onclick="selectRoomType('buanderie',this)"><span class="rt-icon">🧺</span><span class="rt-name">Buanderie</span></button>
+              <button type="button" class="rtype-btn" id="rt-bureau"     onclick="selectRoomType('bureau',this)"><span class="rt-icon">📚</span><span class="rt-name">Bureau</span></button>
+              <button type="button" class="rtype-btn" id="rt-cave"       onclick="selectRoomType('cave',this)"><span class="rt-icon">🍷</span><span class="rt-name">Cave</span></button>
+              <button type="button" class="rtype-btn" id="rt-cellier"    onclick="selectRoomType('cellier',this)"><span class="rt-icon">📦</span><span class="rt-name">Cellier</span></button>
+              <button type="button" class="rtype-btn" id="rt-chambre"    onclick="selectRoomType('chambre',this)"><span class="rt-icon">🛏</span><span class="rt-name">Chambre</span></button>
+              <button type="button" class="rtype-btn" id="rt-cuisine"    onclick="selectRoomType('cuisine',this)"><span class="rt-icon">🍳</span><span class="rt-name">Cuisine</span></button>
+              <button type="button" class="rtype-btn" id="rt-dressing"   onclick="selectRoomType('dressing',this)"><span class="rt-icon">👗</span><span class="rt-name">Dressing</span></button>
+              <button type="button" class="rtype-btn" id="rt-entree"     onclick="selectRoomType('entree',this)"><span class="rt-icon">🚪</span><span class="rt-name">Entrée</span></button>
+              <button type="button" class="rtype-btn" id="rt-garage"     onclick="selectRoomType('garage',this)"><span class="rt-icon">🏠</span><span class="rt-name">Garage</span></button>
+              <button type="button" class="rtype-btn" id="rt-palier"     onclick="selectRoomType('palier',this)"><span class="rt-icon">↕️</span><span class="rt-name">Palier</span></button>
+              <button type="button" class="rtype-btn" id="rt-sam"        onclick="selectRoomType('sam',this)"><span class="rt-icon">🍽</span><span class="rt-name">Salle à manger</span></button>
+              <button type="button" class="rtype-btn" id="rt-sdb"        onclick="selectRoomType('sdb',this)"><span class="rt-icon">🛁</span><span class="rt-name">Salle de bain</span></button>
+              <button type="button" class="rtype-btn" id="rt-sde"        onclick="selectRoomType('sde',this)"><span class="rt-icon">🚿</span><span class="rt-name">Salle d'eau</span></button>
+              <button type="button" class="rtype-btn" id="rt-sejour"     onclick="selectRoomType('sejour',this)"><span class="rt-icon">🛋</span><span class="rt-name">Séjour</span></button>
+              <button type="button" class="rtype-btn" id="rt-veranda"    onclick="selectRoomType('veranda',this)"><span class="rt-icon">🌿</span><span class="rt-name">Véranda</span></button>
+              <button type="button" class="rtype-btn" id="rt-wc"         onclick="selectRoomType('wc',this)"><span class="rt-icon">🚽</span><span class="rt-name">WC</span></button>
+            </div>
+            <!-- Indicateur pièce sélectionnée -->
+            <div id="rtypeIndicator" style="display:none;font-size:0.82rem;font-weight:600;color:#C4785A;margin-bottom:10px;padding:6px 12px;background:#fff8f4;border-radius:8px;border:1.5px solid #C4785A;"></div>
+            <!-- Surface + bouton -->
+            <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
+              <div style="flex:1;min-width:120px;">
+                <label style="font-size:0.75rem;color:#888;margin-bottom:4px;display:block;">Superficie (optionnel)</label>
+                <div style="display:flex;align-items:center;gap:6px;">
+                  <input type="number" id="addRoomSurface" placeholder="0" min="1" max="500" style="width:80px;padding:8px 10px;border:1px solid #ddd;border-radius:8px;font-size:0.9rem;font-family:'DM Sans',sans-serif;">
+                  <span style="font-size:0.85rem;color:#888;">m²</span>
+                </div>
+              </div>
+              <button type="button" onclick="confirmAddRoom()" style="padding:10px 20px;background:#3D5A47;color:#fff;border:none;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:0.88rem;font-weight:600;cursor:pointer;transition:0.15s;align-self:flex-end;" onmouseover="this.style.background='#2a4030'" onmouseout="this.style.background='#3D5A47'">
+                + Ajouter
+              </button>
+            </div>
+          </div>
+
+          <!-- Liste des pièces ajoutées -->
+          <div id="roomsList" style="margin-top:12px;"></div>
+
+          <!-- Résumé -->
+          <div class="rooms-summary" id="roomsSummary" style="margin-top:12px;">
+            <div class="rooms-summary-stat"><strong id="totalRooms">0</strong> pièces</div>
+            <div class="rooms-summary-stat"><strong id="totalBedrooms">0</strong> chambres</div>
+            <div class="rooms-summary-stat" id="totalSurfaceRooms" style="display:none"><strong id="totalSurface">0</strong> m² détaillés</div>
+          </div>
+        </div>
+        <div class="form-group" style="margin-top:20px;">
+          <label>Année de construction</label>
+          <div class="year-slider-wrap">
+            <div class="year-display" id="yearDisplay">1990</div>
+            <input type="range" class="year-slider" id="yearSlider" name="year_built" min="1900" max="2026" value="1990">
+            <div class="year-limits"><span>1900</span><span>2026</span></div>
+            <div style="text-align:center"><span class="year-badge moderne" id="yearBadge">Construction standard</span></div>
           </div>
         </div>
 
-        <div style="display:flex;gap:16px;">
+        <!-- Chauffage et DPE -->
+        <div class="section-divider" style="margin-top:32px;"><h3>Chauffage</h3></div>
+        <div class="form-group">
+          <label>Type de chauffage <span style="font-size:0.75rem;color:#aaa;font-weight:400;">(sélection multiple)</span></label>
+          <input type="hidden" name="heating_type" id="field-heating_type">
+          <input type="hidden" name="heating_details" id="field-heating_details">
+          <div class="chip-group" data-multi="true" data-field="heating_type" style="gap:6px;">
+            <button type="button" class="chip-option" data-value="Aérothermie">Aérothermie</button>
+            <button type="button" class="chip-option" data-value="Aucun">Aucun</button>
+            <button type="button" class="chip-option" data-value="Bois">Bois</button>
+            <button type="button" class="chip-option" data-value="Bois + Électrique">Bois + Élec.</button>
+            <button type="button" class="chip-option" data-value="Charbon">Charbon</button>
+            <button type="button" class="chip-option" data-value="Chaudière à granulés">Chaudière granulés</button>
+            <button type="button" class="chip-option" data-value="Chauffage urbain">Chauffage urbain</button>
+            <button type="button" class="chip-option" data-value="Chauffe-eau thermodynamique">Chauffe-eau thermo.</button>
+            <button type="button" class="chip-option" data-value="Climatisation réversible">Clim. réversible</button>
+            <button type="button" class="chip-option" data-value="Climatisation réversible + électrique">Clim. réversible + Élec.</button>
+            <button type="button" class="chip-option" data-value="Électrique">Électrique</button>
+            <button type="button" class="chip-option" data-value="Éolienne">Éolienne</button>
+            <button type="button" class="chip-option" data-value="Fuel">Fuel</button>
+            <button type="button" class="chip-option" data-value="Fuel + électrique">Fuel + Élec.</button>
+            <button type="button" class="chip-option" data-value="Gaz">Gaz</button>
+            <button type="button" class="chip-option" data-value="Gaz + chauffe-eau solaire">Gaz + CES</button>
+            <button type="button" class="chip-option" data-value="Gaz + chauffe-eau thermodynamique">Gaz + CET</button>
+            <button type="button" class="chip-option" data-value="Gaz + Pompe à chaleur">Gaz + PAC</button>
+            <button type="button" class="chip-option" data-value="Gaz de ville">Gaz de ville</button>
+            <button type="button" class="chip-option" data-value="Géothermie">Géothermie</button>
+            <button type="button" class="chip-option" data-value="Mixte">Mixte</button>
+            <button type="button" class="chip-option" data-value="Panneaux solaires">Panneaux solaires</button>
+            <button type="button" class="chip-option" data-value="Poêle à granulés">Poêle granulés</button>
+            <button type="button" class="chip-option" data-value="Poêle hybride bois et granulés">Poêle hybride</button>
+            <button type="button" class="chip-option" data-value="Pompe à chaleur">Pompe à chaleur</button>
+            <button type="button" class="chip-option" data-value="Pompe à chaleur air/air">PAC air/air</button>
+            <button type="button" class="chip-option" data-value="Pompe à chaleur air/eau">PAC air/eau</button>
+            <button type="button" class="chip-option" data-value="Pompe à chaleur + fuel">PAC + Fuel</button>
+            <button type="button" class="chip-option" data-value="Pompe à chaleur + chauffe-eau thermodynamique">PAC + CET</button>
+            <button type="button" class="chip-option" data-value="Autres">Autres</button>
+          </div>
+
+          <!-- Détails année par système sélectionné -->
+          <div id="heatingDetails" style="margin-top:12px;display:flex;flex-direction:column;gap:8px;"></div>
+
+          <!-- Mécanisme de diffusion -->
+          <div style="margin-top:14px;">
+            <label style="font-size:0.82rem;font-weight:600;color:#555;margin-bottom:6px;display:block;">Mécanisme de diffusion</label>
+            <select name="heating_mechanism" style="width:100%;max-width:360px;padding:9px 12px;border:1px solid #ddd;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:0.88rem;">
+              <option value="">— Sélectionner —</option>
+              <option value="Radiateur">Radiateur</option>
+              <option value="Plancher chauffant">Plancher chauffant</option>
+              <option value="Convecteurs">Convecteurs</option>
+              <option value="Radiateur à inertie">Radiateur à inertie</option>
+              <option value="Air pulsé">Air pulsé</option>
+              <option value="Accumulateurs">Accumulateurs</option>
+              <option value="Poêle">Poêle</option>
+              <option value="Insert cheminée">Insert cheminée</option>
+              <option value="Climatisation réversible">Climatisation réversible</option>
+              <option value="Mixte">Mixte</option>
+            </select>
+          </div>
+
+          <!-- Upload factures -->
+          <div style="margin-top:14px;display:flex;gap:10px;flex-wrap:wrap;">
+            <label style="cursor:pointer;padding:9px 14px;border:1.5px solid #ddd;border-radius:8px;font-size:0.82rem;font-weight:600;color:#555;background:#fff;display:inline-flex;align-items:center;gap:6px;transition:0.15s;" onmouseover="this.style.borderColor='#3D5A47';this.style.color='#3D5A47'" onmouseout="this.style.borderColor='#ddd';this.style.color='#555'">
+              <input type="file" accept=".pdf,image/*" style="display:none" onchange="uploadContextualDoc(this,'facture_chaudiere','Facture chaudière',document.getElementById('heatingDocsList'))">
+              📄 Facture chaudière / poêle
+            </label>
+            <label style="cursor:pointer;padding:9px 14px;border:1.5px solid #ddd;border-radius:8px;font-size:0.82rem;font-weight:600;color:#555;background:#fff;display:inline-flex;align-items:center;gap:6px;transition:0.15s;" onmouseover="this.style.borderColor='#3D5A47';this.style.color='#3D5A47'" onmouseout="this.style.borderColor='#ddd';this.style.color='#555'">
+              <input type="file" accept=".pdf,image/*" style="display:none" onchange="uploadContextualDoc(this,'entretien_ramonage','Entretien / ramonage',document.getElementById('heatingDocsList'))">
+              📋 Entretien / ramonage
+            </label>
+          </div>
+          <div id="heatingDocsList" style="margin-top:6px;font-size:0.78rem;color:#3D5A47;"></div>
+        </div>
+
+        <!-- Cheminée -->
+        <div class="section-divider" style="margin-top:32px;"><h3>Cheminée</h3></div>
+        <div class="form-group">
+          <label>Type de cheminée <span style="font-size:0.75rem;color:#aaa;font-weight:400;">(sélection multiple)</span></label>
+          <input type="hidden" name="cheminee_type" id="field-cheminee_type">
+          <div class="chip-group" data-multi="true" data-field="cheminee_type">
+            <button type="button" class="chip-option" data-value="Foyer ouvert">Foyer ouvert</button>
+            <button type="button" class="chip-option" data-value="Insert">Insert</button>
+            <button type="button" class="chip-option" data-value="Poêle à bois">Poêle à bois</button>
+            <button type="button" class="chip-option" data-value="Poêle à granulés">Poêle à granulés</button>
+            <button type="button" class="chip-option" data-value="Poêle à fioul">Poêle à fioul</button>
+            <button type="button" class="chip-option" data-value="Poêle de masse">Poêle de masse</button>
+            <button type="button" class="chip-option" data-value="Conduit existant">Conduit existant</button>
+            <button type="button" class="chip-option" data-value="Pas de conduit">Pas de conduit</button>
+            <button type="button" class="chip-option" data-value="Autre">Autre</button>
+          </div>
+          <label style="cursor:pointer;display:inline-flex;align-items:center;gap:6px;margin-top:12px;padding:9px 14px;border:1.5px solid #ddd;border-radius:8px;font-size:0.82rem;font-weight:600;color:#555;background:#fff;transition:0.15s;" onmouseover="this.style.borderColor='#3D5A47';this.style.color='#3D5A47'" onmouseout="this.style.borderColor='#ddd';this.style.color='#555'">
+            <input type="file" accept=".pdf,image/*" style="display:none" onchange="uploadContextualDoc(this,'cheminee','Facture cheminée',document.getElementById('chemineeDocStatus'))">
+            📄 Joindre facture / ramonage
+          </label>
+          <div id="chemineeDocStatus" style="font-size:0.78rem;color:#3D5A47;margin-top:4px;"></div>
+        </div>
+
+        <!-- Production eau chaude -->
+        <div class="section-divider" style="margin-top:32px;"><h3>Production d'eau chaude</h3></div>
+        <div class="form-group">
+          <input type="hidden" name="eau_chaude_type" id="field-eau_chaude_type">
+          <div class="chip-group" data-multi="true" data-field="eau_chaude_type">
+            <button type="button" class="chip-option" data-value="Ballon électrique">Ballon électrique</button>
+            <button type="button" class="chip-option" data-value="Chaudière">Chaudière</button>
+            <button type="button" class="chip-option" data-value="Chauffage central">Chauffage central</button>
+            <button type="button" class="chip-option" data-value="Chauffe-eau">Chauffe-eau</button>
+            <button type="button" class="chip-option" data-value="Collective">Collective</button>
+            <button type="button" class="chip-option" data-value="Collective millièmes">Collective (millièmes)</button>
+            <button type="button" class="chip-option" data-value="Gaz">Gaz</button>
+            <button type="button" class="chip-option" data-value="Géothermie">Géothermie</button>
+            <button type="button" class="chip-option" data-value="Individuelle">Individuelle</button>
+            <button type="button" class="chip-option" data-value="Panneaux solaires">Panneaux solaires</button>
+            <button type="button" class="chip-option" data-value="Pompe à chaleur">Pompe à chaleur</button>
+            <button type="button" class="chip-option" data-value="Thermodynamique">Thermodynamique</button>
+          </div>
+        </div>
+
+        <!-- WC -->
+        <div class="section-divider" style="margin-top:32px;"><h3>WC</h3></div>
+        <div class="form-group">
+          <label>Nombre de WC</label>
+          <input type="hidden" name="wc_count" id="field-wc_count" value="1">
+          <div class="chip-group" data-field="wc_count" style="gap:8px;">
+            <button type="button" class="chip-option active" data-value="1">1</button>
+            <button type="button" class="chip-option" data-value="2">2</button>
+            <button type="button" class="chip-option" data-value="3">3</button>
+            <button type="button" class="chip-option" data-value="4">4</button>
+            <button type="button" class="chip-option" data-value="5+">5+</button>
+          </div>
+        </div>
+
+        <!-- Cuisine -->
+        <div class="section-divider" style="margin-top:32px;"><h3>Cuisine</h3></div>
+        <div class="form-group">
+          <label>Type de cuisine <span style="font-size:0.75rem;color:#aaa;font-weight:400;">(sélection multiple)</span></label>
+          <input type="hidden" name="cuisine_type" id="field-cuisine_type">
+          <div class="chip-group" data-multi="true" data-field="cuisine_type">
+            <button type="button" class="chip-option" data-value="Aménagée">Aménagée</button>
+            <button type="button" class="chip-option" data-value="Aménagée/équipée">Aménagée/équipée</button>
+            <button type="button" class="chip-option" data-value="Américaine">Américaine</button>
+            <button type="button" class="chip-option" data-value="Ouverte sur séjour">Ouverte sur séjour</button>
+            <button type="button" class="chip-option" data-value="Semi-ouverte">Semi-ouverte</button>
+            <button type="button" class="chip-option" data-value="Fermée">Fermée</button>
+            <button type="button" class="chip-option" data-value="Cuisine d'été">Cuisine d'été</button>
+          </div>
+        </div>
+
+        <!-- Assainissement -->
+        <div class="section-divider" style="margin-top:32px;"><h3>Assainissement</h3></div>
+        <div class="form-group">
+          <label>Type d'assainissement</label>
+          <input type="hidden" name="assainissement_type" id="field-assainissement_type">
+          <div class="chip-group" data-field="assainissement_type">
+            <button type="button" class="chip-option" data-value="Tout à l'égout">Tout à l'égout</button>
+            <button type="button" class="chip-option" data-value="Fosse septique">Fosse septique</button>
+            <button type="button" class="chip-option" data-value="Micro-station">Micro-station</button>
+            <button type="button" class="chip-option" data-value="Fosse toutes eaux">Fosse toutes eaux</button>
+            <button type="button" class="chip-option" data-value="Fosse à refaire">Fosse à refaire</button>
+            <button type="button" class="chip-option" data-value="Fosse morte">Fosse morte</button>
+            <button type="button" class="chip-option" data-value="Séparation des eaux">Séparation des eaux</button>
+            <button type="button" class="chip-option" data-value="Sans">Sans</button>
+          </div>
+        </div>
+        <div class="form-group" style="margin-top:12px;">
+          <label style="margin-bottom:8px;display:block;">Certificat assainissement</label>
+          <div class="toggle-group">
+            <button type="button" class="toggle-item" onclick="toggleSwitch('certificat_assainissement')">
+              <div class="toggle-switch" id="toggle-certificat_assainissement"></div>
+              <input type="hidden" name="certificat_assainissement" id="field-certificat_assainissement" value="0">
+              <span class="toggle-label">Oui, je l'ai</span>
+            </button>
+          </div>
+          <label class="doc-upload-btn" style="cursor:pointer;display:inline-flex;align-items:center;gap:6px;margin-top:10px;padding:9px 14px;border:1.5px solid #ddd;border-radius:8px;font-size:0.82rem;font-weight:600;color:#555;background:#fff;transition:border-color 0.15s,color 0.15s;" onmouseover="this.style.borderColor='#3D5A47';this.style.color='#3D5A47'" onmouseout="this.style.borderColor='#ddd';this.style.color='#555'">
+            <input type="file" accept=".pdf,image/*" style="display:none" onchange="uploadContextualDoc(this,'assainissement','Certificat de conformité assainissement',document.getElementById('assainissementDocStatus'))">
+            📄 Joindre le certificat de conformité
+          </label>
+          <div id="assainissementDocStatus" style="font-size:0.78rem;color:#3D5A47;margin-top:4px;"></div>
+        </div>
+        <div class="form-group" style="margin-top:16px;">
+          <label>Classe DPE</label>
+          <input type="hidden" name="dpe_class" id="field-dpe_class">
+          <div class="dpe-bars">
+            <div class="dpe-bar-row" data-value="A" onclick="selectDpe('A')">
+              <div class="dpe-bar-letter" style="background:#1a9e5a">A</div>
+              <div class="dpe-bar-fill" style="background:#1a9e5a;width:65px"></div>
+              <span class="dpe-bar-kwh">≤ 50 kWh/m²/an</span>
+            </div>
+            <div class="dpe-bar-row" data-value="B" onclick="selectDpe('B')">
+              <div class="dpe-bar-letter" style="background:#4cb84c">B</div>
+              <div class="dpe-bar-fill" style="background:#4cb84c;width:95px"></div>
+              <span class="dpe-bar-kwh">51–90 kWh/m²/an</span>
+            </div>
+            <div class="dpe-bar-row" data-value="C" onclick="selectDpe('C')">
+              <div class="dpe-bar-letter" style="background:#b5d332;color:#333">C</div>
+              <div class="dpe-bar-fill" style="background:#b5d332;width:125px"></div>
+              <span class="dpe-bar-kwh">91–150 kWh/m²/an</span>
+            </div>
+            <div class="dpe-bar-row" data-value="D" onclick="selectDpe('D')">
+              <div class="dpe-bar-letter" style="background:#f5c518;color:#333">D</div>
+              <div class="dpe-bar-fill" style="background:#f5c518;width:155px"></div>
+              <span class="dpe-bar-kwh">151–230 kWh/m²/an</span>
+            </div>
+            <div class="dpe-bar-row" data-value="E" onclick="selectDpe('E')">
+              <div class="dpe-bar-letter" style="background:#f5a818;color:#333">E</div>
+              <div class="dpe-bar-fill" style="background:#f5a818;width:185px"></div>
+              <span class="dpe-bar-kwh">231–330 kWh/m²/an</span>
+            </div>
+            <div class="dpe-bar-row" data-value="F" onclick="selectDpe('F')">
+              <div class="dpe-bar-letter" style="background:#e05a1a">F</div>
+              <div class="dpe-bar-fill" style="background:#e05a1a;width:215px"></div>
+              <span class="dpe-bar-kwh">331–450 kWh/m²/an</span>
+            </div>
+            <div class="dpe-bar-row" data-value="G" onclick="selectDpe('G')">
+              <div class="dpe-bar-letter" style="background:#cc1a1a">G</div>
+              <div class="dpe-bar-fill" style="background:#cc1a1a;width:245px"></div>
+              <span class="dpe-bar-kwh">> 450 kWh/m²/an</span>
+            </div>
+          </div>
+          <div class="inline-warn" id="dpeWarn" style="display:none">
+            ⚠️ Classe F ou G — les acheteurs peuvent négocier plus agressivement et certaines banques conditionnent leur prêt à des travaux. Préparez un devis de rénovation énergétique pour rassurer.
+          </div>
+          <div class="coach-tip" style="margin-top:10px;">
+            <span class="coach-tip-icon">💡</span>
+            <span>Le DPE est obligatoire pour publier une annonce. Un DPE A ou B permet souvent de justifier un prix 5–10 % plus élevé.</span>
+          </div>
+          <!-- DPE chiffres détaillés -->
+          <div style="margin-top:16px;padding:16px;background:#f8f5f0;border-radius:10px;border:1px solid #e8e0d6;">
+            <div style="font-size:0.78rem;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:#aaa;margin-bottom:12px;">Détails DPE (optionnel — figurent sur le certificat)</div>
+            <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px;">
+              <div>
+                <label style="font-size:0.78rem;color:#888;margin-bottom:4px;display:block;">Conso. énergie (kWh/m²/an)</label>
+                <input type="number" name="dpe_conso_energie" placeholder="150" min="0" max="9999" style="width:100%;padding:8px 10px;border:1px solid #ddd;border-radius:8px;font-size:0.9rem;font-family:'DM Sans',sans-serif;">
+              </div>
+              <div>
+                <label style="font-size:0.78rem;color:#888;margin-bottom:4px;display:block;">GES (kg CO₂/m²/an)</label>
+                <input type="number" name="dpe_ges" placeholder="35" min="0" max="9999" style="width:100%;padding:8px 10px;border:1px solid #ddd;border-radius:8px;font-size:0.9rem;font-family:'DM Sans',sans-serif;">
+              </div>
+              <div>
+                <label style="font-size:0.78rem;color:#888;margin-bottom:4px;display:block;">Coût estim. min (€/an)</label>
+                <input type="number" name="dpe_cout_min" placeholder="800" min="0" style="width:100%;padding:8px 10px;border:1px solid #ddd;border-radius:8px;font-size:0.9rem;font-family:'DM Sans',sans-serif;">
+              </div>
+              <div>
+                <label style="font-size:0.78rem;color:#888;margin-bottom:4px;display:block;">Coût estim. max (€/an)</label>
+                <input type="number" name="dpe_cout_max" placeholder="1200" min="0" style="width:100%;padding:8px 10px;border:1px solid #ddd;border-radius:8px;font-size:0.9rem;font-family:'DM Sans',sans-serif;">
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="form-group" style="margin-top:16px;">
+          <label>Taxe foncière annuelle (€)</label>
+          <input type="number" name="taxe_fonciere" placeholder="1200">
+          <label class="doc-upload-btn" style="cursor:pointer;display:inline-flex;align-items:center;gap:6px;margin-top:8px;padding:9px 14px;border:1.5px solid #ddd;border-radius:8px;font-size:0.82rem;font-weight:600;color:#555;background:#fff;transition:0.15s;" onmouseover="this.style.borderColor='#3D5A47';this.style.color='#3D5A47'" onmouseout="this.style.borderColor='#ddd';this.style.color='#555'">
+            <input type="file" accept=".pdf,image/*" style="display:none" onchange="uploadContextualDoc(this,'taxe','Taxe foncière')">
+            📄 Joindre la taxe foncière
+          </label>
+          <div id="taxeDocStatus" style="font-size:0.78rem;color:#3D5A47;margin-top:4px;"></div>
+          <div class="coach-tip" style="margin-top:6px;">
+            <span class="coach-tip-icon">💡</span>
+            <span>Mentionnez-la proactivement aux acheteurs — une taxe foncière élevée peut freiner. Si elle est raisonnable, c'est un argument positif.</span>
+          </div>
+        </div>
+
+        <!-- Factures énergie (privé) -->
+        <div class="section-divider" style="margin-top:32px;"><h3>Factures énergie</h3></div>
+        <div class="form-group">
+          <div style="display:flex;align-items:flex-start;gap:10px;padding:10px 14px;background:#fff8e1;border-radius:8px;border:1px solid #ffe082;margin-bottom:14px;">
+            <span style="font-size:1rem;flex-shrink:0;">🔒</span>
+            <p style="margin:0;font-size:0.78rem;color:#795548;line-height:1.5;">Ces informations sont <strong>strictement privées</strong> — elles n'apparaissent jamais dans le dossier acheteur. Elles vous aident à répondre aux questions en visite et à anticiper les négociations.</p>
+          </div>
+          <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px;">
+            <div>
+              <label style="font-size:0.82rem;color:#888;margin-bottom:4px;display:block;">Eau (€/mois)</label>
+              <input type="number" name="facture_eau" placeholder="25" min="0" style="width:100%;padding:8px 10px;border:1px solid #ddd;border-radius:8px;font-size:0.9rem;font-family:'DM Sans',sans-serif;">
+            </div>
+            <div>
+              <label style="font-size:0.82rem;color:#888;margin-bottom:4px;display:block;">Électricité (€/mois)</label>
+              <input type="number" name="facture_electricite" placeholder="80" min="0" style="width:100%;padding:8px 10px;border:1px solid #ddd;border-radius:8px;font-size:0.9rem;font-family:'DM Sans',sans-serif;">
+            </div>
+            <div>
+              <label style="font-size:0.82rem;color:#888;margin-bottom:4px;display:block;">Gaz (€/mois)</label>
+              <input type="number" name="facture_gaz" placeholder="60" min="0" style="width:100%;padding:8px 10px;border:1px solid #ddd;border-radius:8px;font-size:0.9rem;font-family:'DM Sans',sans-serif;">
+            </div>
+          </div>
+          <div style="margin-top:12px;display:flex;gap:10px;flex-wrap:wrap;">
+            <label style="cursor:pointer;padding:8px 12px;border:1.5px solid #ddd;border-radius:8px;font-size:0.8rem;font-weight:600;color:#555;background:#fff;display:inline-flex;align-items:center;gap:6px;transition:0.15s;" onmouseover="this.style.borderColor='#3D5A47';this.style.color='#3D5A47'" onmouseout="this.style.borderColor='#ddd';this.style.color='#555'">
+              <input type="file" accept=".pdf,image/*" style="display:none" onchange="uploadContextualDoc(this,'autre','Facture eau',document.getElementById('facturesEnerStatus'))">
+              💧 Facture eau
+            </label>
+            <label style="cursor:pointer;padding:8px 12px;border:1.5px solid #ddd;border-radius:8px;font-size:0.8rem;font-weight:600;color:#555;background:#fff;display:inline-flex;align-items:center;gap:6px;transition:0.15s;" onmouseover="this.style.borderColor='#3D5A47';this.style.color='#3D5A47'" onmouseout="this.style.borderColor='#ddd';this.style.color='#555'">
+              <input type="file" accept=".pdf,image/*" style="display:none" onchange="uploadContextualDoc(this,'autre','Facture électricité',document.getElementById('facturesEnerStatus'))">
+              ⚡ Facture élec.
+            </label>
+            <label style="cursor:pointer;padding:8px 12px;border:1.5px solid #ddd;border-radius:8px;font-size:0.8rem;font-weight:600;color:#555;background:#fff;display:inline-flex;align-items:center;gap:6px;transition:0.15s;" onmouseover="this.style.borderColor='#3D5A47';this.style.color='#3D5A47'" onmouseout="this.style.borderColor='#ddd';this.style.color='#555'">
+              <input type="file" accept=".pdf,image/*" style="display:none" onchange="uploadContextualDoc(this,'autre','Facture gaz',document.getElementById('facturesEnerStatus'))">
+              🔥 Facture gaz
+            </label>
+          </div>
+          <div id="facturesEnerStatus" style="font-size:0.78rem;color:#3D5A47;margin-top:4px;"></div>
+        </div>
+
+        <!-- Toiture -->
+        <div class="section-divider" style="margin-top:32px;"><h3>Toiture</h3></div>
+        <div class="form-group">
+          <label>Couverture</label>
+          <div style="font-size:0.78rem;color:#888;margin-bottom:8px;">Sélection multiple possible — ex : tuiles terre cuite + bac acier sur extension</div>
+          <input type="hidden" name="toiture_couverture" id="field-toiture_couverture">
+          <div class="chip-group" data-multi="true" data-field="toiture_couverture">
+            <button type="button" class="chip-option" data-value="Tuiles terre cuite">Tuiles terre cuite</button>
+            <button type="button" class="chip-option" data-value="Tuiles béton">Tuiles béton</button>
+            <button type="button" class="chip-option" data-value="Tuile Alsacienne">Tuile Alsacienne</button>
+            <button type="button" class="chip-option" data-value="Ardoises naturelles">Ardoises naturelles</button>
+            <button type="button" class="chip-option" data-value="Ardoises synthétiques">Ardoises synthétiques</button>
+            <button type="button" class="chip-option" data-value="Ardoises & Fibrociment">Ardoises & Fibrociment</button>
+            <button type="button" class="chip-option" data-value="Ardoises Mixtes">Ardoises Mixtes</button>
+            <button type="button" class="chip-option" data-value="Lauze">Lauze</button>
+            <button type="button" class="chip-option" data-value="Bac acier">Bac acier</button>
+            <button type="button" class="chip-option" data-value="Zinc">Zinc</button>
+            <button type="button" class="chip-option" data-value="Cuivre">Cuivre</button>
+            <button type="button" class="chip-option" data-value="Fibrociment">Fibrociment</button>
+            <button type="button" class="chip-option" data-value="Chaume">Chaume</button>
+            <button type="button" class="chip-option" data-value="Colombages">Colombages</button>
+            <button type="button" class="chip-option" data-value="Eternite">Eternite</button>
+            <button type="button" class="chip-option" data-value="Shingle">Shingle</button>
+            <button type="button" class="chip-option" data-value="Tôle">Tôle</button>
+            <button type="button" class="chip-option" data-value="Terrasse plate">Terrasse plate</button>
+            <button type="button" class="chip-option" data-value="Autre">Autre</button>
+          </div>
+        </div>
+
+        <!-- Grenier -->
+        <div class="section-divider" style="margin-top:32px;"><h3>Grenier</h3></div>
+        <div class="form-group">
+          <div class="toggle-group">
+            <button type="button" class="toggle-item" onclick="toggleSwitch('grenier_present')">
+              <div class="toggle-switch" id="toggle-grenier_present"></div>
+              <input type="hidden" name="grenier_present" id="field-grenier_present" value="0">
+              <span class="toggle-label">Oui, j'ai un grenier</span>
+            </button>
+          </div>
+          <div id="grenierDetail" style="display:none;margin-top:12px;">
+            <label style="font-size:0.82rem;font-weight:600;color:#555;margin-bottom:8px;display:block;">État du grenier</label>
+            <input type="hidden" name="grenier" id="field-grenier">
+            <div class="chip-group" data-field="grenier">
+              <button type="button" class="chip-option" data-value="Isolé">✓ Isolé</button>
+              <button type="button" class="chip-option" data-value="Non isolé">Non isolé</button>
+              <button type="button" class="chip-option" data-value="Aménageable">Aménageable</button>
+              <button type="button" class="chip-option" data-value="Aménagé">Aménagé</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Fenêtres -->
+        <div class="section-divider" style="margin-top:32px;"><h3>Fenêtres</h3></div>
+        <div class="form-group">
+          <label>Type de menuiseries</label>
+          <div style="font-size:0.78rem;color:#888;margin-bottom:8px;">Sélection multiple possible — ex : PVC double vitrage + Alu sur véranda</div>
+          <input type="hidden" name="fenetres_type" id="field-fenetres_type">
+          <div class="chip-group" data-multi="true" data-field="fenetres_type">
+            <button type="button" class="chip-option" data-value="Aluminium">Aluminium</button>
+            <button type="button" class="chip-option" data-value="Aluminium Double Vitrage">Alu Double Vitrage</button>
+            <button type="button" class="chip-option" data-value="Aluminium Simple Vitrage">Alu Simple Vitrage</button>
+            <button type="button" class="chip-option" data-value="Bois double vitrage">Bois DV</button>
+            <button type="button" class="chip-option" data-value="Bois simple vitrage">Bois SV</button>
+            <button type="button" class="chip-option" data-value="Double vitrage">Double vitrage</button>
+            <button type="button" class="chip-option" data-value="Mixte alu et PVC">Mixte alu et PVC</button>
+            <button type="button" class="chip-option" data-value="Mixte Bois - PVC">Mixte Bois - PVC</button>
+            <button type="button" class="chip-option" data-value="Mixte Bois et Alu">Mixte Bois et Alu</button>
+            <button type="button" class="chip-option" data-value="PVC">P.V.C.</button>
+            <button type="button" class="chip-option" data-value="PVC Double Vitrage">PVC Double Vitrage</button>
+            <button type="button" class="chip-option" data-value="PVC Simple Vitrage">PVC Simple Vitrage</button>
+            <button type="button" class="chip-option" data-value="Simple et double vitrage">Simple et double</button>
+            <button type="button" class="chip-option" data-value="Survitrage">Survitrage</button>
+            <button type="button" class="chip-option" data-value="Triple Vitrage">Triple Vitrage</button>
+          </div>
+          <!-- Upload facture fenêtres -->
+          <div style="margin-top:12px;">
+            <label class="doc-upload-btn" style="cursor:pointer;display:inline-flex;align-items:center;gap:6px;padding:9px 14px;border:1.5px solid #ddd;border-radius:8px;font-size:0.82rem;font-weight:600;color:#555;background:#fff;transition:0.15s;" onmouseover="this.style.borderColor='#3D5A47';this.style.color='#3D5A47'" onmouseout="this.style.borderColor='#ddd';this.style.color='#555'">
+              <input type="file" accept=".pdf,image/*" style="display:none" onchange="uploadContextualDoc(this,'autre','Facture fenêtres',document.getElementById('fenetresDocStatus'))">
+              📄 Joindre la facture fenêtres
+            </label>
+            <div id="fenetresDocStatus" style="font-size:0.78rem;color:#3D5A47;margin-top:4px;"></div>
+          </div>
+        </div>
+
+        <!-- Volets -->
+        <div class="section-divider" style="margin-top:32px;"><h3>Volets</h3></div>
+        <div class="form-group">
+          <label>Type de volets</label>
+          <div style="font-size:0.78rem;color:#888;margin-bottom:8px;">Sélection multiple possible — ex : battants + roulants électriques</div>
+          <input type="hidden" name="volets_type" id="field-volets_type">
+          <div class="chip-group" data-multi="true" data-field="volets_type">
+            <button type="button" class="chip-option" data-value="Aluminium">Aluminium</button>
+            <button type="button" class="chip-option" data-value="Bois">Bois</button>
+            <button type="button" class="chip-option" data-value="Électrique Métallique">Élec. Métallique</button>
+            <button type="button" class="chip-option" data-value="Électrique PVC">Élec. PVC</button>
+            <button type="button" class="chip-option" data-value="Métallique">Métallique</button>
+            <button type="button" class="chip-option" data-value="Mixte manuels-électriques">Mixte manuels-élec.</button>
+            <button type="button" class="chip-option" data-value="Mixte roulants-bois">Mixte roulants-bois</button>
+            <button type="button" class="chip-option" data-value="Pliants">Pliants</button>
+            <button type="button" class="chip-option" data-value="PVC">PVC</button>
+            <button type="button" class="chip-option" data-value="PVC Roulant">PVC Roulant</button>
+            <button type="button" class="chip-option" data-value="Roulants">Roulants</button>
+            <button type="button" class="chip-option" data-value="Roulants électriques">Roulants électriques</button>
+            <button type="button" class="chip-option" data-value="Solaires">Solaires</button>
+            <button type="button" class="chip-option" data-value="Sans">Sans</button>
+          </div>
+        </div>
+
+        <!-- Sols -->
+        <div class="section-divider" style="margin-top:32px;"><h3>Sols</h3></div>
+        <div class="form-group">
+          <label>Type de dalle (plancher)</label>
+          <input type="hidden" name="sols_dalle" id="field-sols_dalle">
+          <div class="chip-group" data-field="sols_dalle">
+            <button type="button" class="chip-option" data-value="Béton">Béton</button>
+            <button type="button" class="chip-option" data-value="Bois">Bois</button>
+            <button type="button" class="chip-option" data-value="Mixte Bois-Béton">Mixte Bois-Béton</button>
+            <button type="button" class="chip-option" data-value="Parpaing">Parpaing</button>
+            <button type="button" class="chip-option" data-value="Pierre">Pierre</button>
+          </div>
+        </div>
+
+        <!-- Stationnement -->
+        <div class="section-divider" style="margin-top:32px;"><h3>Stationnement</h3></div>
+        <div class="form-group">
+          <label>Type de stationnement</label>
+          <div style="font-size:0.78rem;color:#888;margin-bottom:8px;">Sélection multiple possible — ex : garage + place extérieure</div>
+          <input type="hidden" name="stationnement_type" id="field-stationnement_type">
+          <div class="chip-group" data-multi="true" data-field="stationnement_type">
+            <button type="button" class="chip-option" data-value="Garage fermé">Garage fermé</button>
+            <button type="button" class="chip-option" data-value="Garage double">Garage double</button>
+            <button type="button" class="chip-option" data-value="Box">Box</button>
+            <button type="button" class="chip-option" data-value="Couvert">Couvert</button>
+            <button type="button" class="chip-option" data-value="Extérieur">Extérieur</button>
+            <button type="button" class="chip-option" data-value="Extérieur et couvert">Extérieur et couvert</button>
+            <button type="button" class="chip-option" data-value="Sous-sol">Sous-sol</button>
+            <button type="button" class="chip-option" data-value="Sans">Sans</button>
+          </div>
+          <!-- Détail garage — visible si garage sélectionné -->
+          <input type="hidden" name="garage_motorise" id="field-garage_motorise">
+          <input type="hidden" name="garage_sol" id="field-garage_sol">
+          <div id="garageDetail" style="display:none;margin-top:12px;padding:16px;background:#f8f5f0;border-radius:10px;border:1px solid #e8e0d6;">
+            <div style="font-size:0.82rem;font-weight:700;color:#555;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:12px;">🚗 Détails garage</div>
+            <div style="margin-bottom:12px;">
+              <label style="font-size:0.82rem;color:#888;margin-bottom:4px;display:block;">Surface du garage (m²)</label>
+              <div style="display:flex;align-items:center;gap:8px;">
+                <input type="number" name="garage_surface" placeholder="18" min="1" max="500" style="width:90px;padding:8px 10px;border:1px solid #ddd;border-radius:8px;font-size:0.9rem;font-family:'DM Sans',sans-serif;">
+                <span style="font-size:0.85rem;color:#888;">m²</span>
+              </div>
+            </div>
+            <div style="margin-bottom:12px;">
+              <div style="font-size:0.82rem;font-weight:600;color:#555;margin-bottom:6px;">Sol du garage</div>
+              <div class="chip-group" data-field="garage_sol">
+                <button type="button" class="chip-option" data-value="Terre battue">Terre battue</button>
+                <button type="button" class="chip-option" data-value="Dalle béton">Dalle béton</button>
+                <button type="button" class="chip-option" data-value="Carrelé">Carrelé</button>
+                <button type="button" class="chip-option" data-value="Résine époxy">Résine époxy</button>
+              </div>
+            </div>
+            <div>
+              <div style="font-size:0.82rem;font-weight:600;color:#555;margin-bottom:6px;">Porte de garage</div>
+              <div class="chip-group" data-field="garage_motorise">
+                <button type="button" class="chip-option" data-value="Motorisée">⚙️ Motorisée</button>
+                <button type="button" class="chip-option" data-value="Manuelle">🖐 Manuelle</button>
+                <button type="button" class="chip-option" data-value="Mixte">Mixte</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Extérieur -->
+        <div class="section-divider" style="margin-top:32px;"><h3>Extérieur et exposition</h3></div>
+        <div class="form-group">
+          <label style="margin-bottom:10px;display:block;">Espaces extérieurs</label>
+          <div class="toggle-group">
+            <div class="toggle-item" onclick="toggleSwitch('garden')">
+              <div class="toggle-switch" id="toggle-garden"></div>
+              <input type="hidden" name="garden" id="field-garden" value="0">
+              <span class="toggle-label">🌿 Jardin</span>
+            </div>
+            <div class="toggle-item" onclick="toggleSwitch('terrace')">
+              <div class="toggle-switch" id="toggle-terrace"></div>
+              <input type="hidden" name="terrace" id="field-terrace" value="0">
+              <span class="toggle-label">🪴 Terrasse</span>
+            </div>
+          </div>
+          <!-- Détail terrasse — visible si terrasse activée -->
+          <input type="hidden" name="terrace_revetement" id="field-terrace_revetement">
+          <div id="terraceDetail" style="display:none;margin-top:12px;padding:16px;background:#f8f5f0;border-radius:10px;border:1px solid #e8e0d6;">
+            <div style="font-size:0.82rem;font-weight:700;color:#555;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:12px;">🪴 Détails terrasse</div>
+            <div style="display:grid;grid-template-columns:auto 1fr;gap:16px;align-items:start;">
+              <div>
+                <label style="font-size:0.82rem;color:#888;margin-bottom:4px;display:block;">Surface (m²)</label>
+                <div style="display:flex;align-items:center;gap:8px;">
+                  <input type="number" name="terrace_surface" placeholder="20" min="1" max="500" style="width:80px;padding:8px 10px;border:1px solid #ddd;border-radius:8px;font-size:0.9rem;font-family:'DM Sans',sans-serif;">
+                  <span style="font-size:0.85rem;color:#888;">m²</span>
+                </div>
+              </div>
+              <div>
+                <div style="font-size:0.82rem;font-weight:600;color:#555;margin-bottom:6px;">Revêtement</div>
+                <div class="chip-group" data-field="terrace_revetement">
+                  <button type="button" class="chip-option" data-value="Dalle brute">Dalle brute</button>
+                  <button type="button" class="chip-option" data-value="Carrelé">Carrelé</button>
+                  <button type="button" class="chip-option" data-value="Sur plots">Sur plots</button>
+                  <button type="button" class="chip-option" data-value="Bois / composite">Bois / composite</button>
+                  <button type="button" class="chip-option" data-value="Graviers">Graviers</button>
+                  <button type="button" class="chip-option" data-value="Pierre naturelle">Pierre naturelle</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="form-group" style="margin-top:20px;">
+          <label>Exposition principale</label>
+          <input type="hidden" name="exposition" id="field-exposition">
+          <div class="chip-group" data-field="exposition">
+            <button type="button" class="chip-option" data-value="Sud">☀️ Sud</button>
+            <button type="button" class="chip-option" data-value="Sud-Ouest">↙️ Sud-Ouest</button>
+            <button type="button" class="chip-option" data-value="Sud-Est">↘️ Sud-Est</button>
+            <button type="button" class="chip-option" data-value="Ouest">🌅 Ouest</button>
+            <button type="button" class="chip-option" data-value="Est">🌄 Est</button>
+            <button type="button" class="chip-option" data-value="Nord">🌨 Nord</button>
+          </div>
+          <div class="coach-tip" style="margin-top:8px;">
+            <span class="coach-tip-icon">💡</span>
+            <span>Exposition sud = argument fort. Une orientation nord peut être compensée par la luminosité intérieure (baies vitrées, puits de lumière).</span>
+          </div>
+        </div>
+
+        <!-- Proximité -->
+        <div class="section-divider" style="margin-top:32px;"><h3>Proximité et commodités</h3></div>
+        <div class="form-group">
+          <label>Commerces à proximité</label>
+          <input type="text" name="commerces" placeholder="Supermarché 500m, boulangerie 200m, pharmacie 300m...">
+        </div>
+        <div class="form-grid-2">
+          <div class="form-group">
+            <label>École maternelle + distance</label>
+            <input type="text" name="school_maternelle" placeholder="École Jules Ferry — 350m">
+          </div>
+          <div class="form-group">
+            <label>École primaire + distance</label>
+            <input type="text" name="school_primaire" placeholder="École Jean Jaurès — 500m">
+          </div>
+          <div class="form-group">
+            <label>Collège + distance</label>
+            <input type="text" name="school_college" placeholder="Collège Victor Hugo — 1km">
+          </div>
+          <div class="form-group">
+            <label>Lycée + distance</label>
+            <input type="text" name="school_lycee" placeholder="Lycée Baudelaire — 2km">
+          </div>
+          <div class="form-group">
+            <label>Accès autoroute + temps</label>
+            <input type="text" name="highway" placeholder="A1 — 5 min">
+          </div>
+          <div class="form-group">
+            <label>Gare + temps</label>
+            <input type="text" name="train_station" placeholder="Gare de Douai — 10 min à pied">
+          </div>
+        </div>
+
+        <!-- Description -->
+        <div class="section-divider" style="margin-top:32px;"><h3>Description et équipements</h3></div>
+        <div class="form-group">
+          <label>Équipements inclus dans la vente</label>
+          <input type="hidden" name="equipment" id="field-equipment">
+          <div class="equip-grid" id="equipGrid"></div>
+          <input type="text" id="equipCustom" placeholder="Autre équipement à ajouter..." style="margin-top:10px;width:100%;padding:9px 12px;border:1px solid #ddd;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:0.88rem;" onkeydown="if(event.key==='Enter'){event.preventDefault();addCustomEquip();}">
+          <div style="font-size:0.75rem;color:#aaa;margin-top:4px;">Appuyez sur Entrée pour ajouter un équipement personnalisé</div>
+        </div>
+        <div class="form-group">
+          <label>Raison de la vente</label>
+          <input type="hidden" name="sale_reason" id="field-sale_reason">
+          <div class="chip-group" data-field="sale_reason">
+            <button type="button" class="chip-option" data-value="Déménagement professionnel">💼 Mutation pro</button>
+            <button type="button" class="chip-option" data-value="Achat d'un bien plus grand">⬆️ Agrandissement</button>
+            <button type="button" class="chip-option" data-value="Achat d'un bien plus petit">⬇️ Réduction</button>
+            <button type="button" class="chip-option" data-value="Succession">📋 Succession</button>
+            <button type="button" class="chip-option" data-value="Projet de vie">🌱 Projet de vie</button>
+          </div>
+          <div class="coach-tip" style="margin-top:8px;">
+            <span class="coach-tip-icon">💡</span>
+            <span>Les acheteurs posent toujours la question. Avoir une réponse claire et honnête rassure et évite la méfiance.</span>
+          </div>
+        </div>
+        <div class="form-group" style="margin-top:16px;">
+          <label>Description libre du bien</label>
+          <textarea name="description" rows="5" placeholder="Décrivez votre bien : atouts, rénovations récentes, ambiance du quartier, luminosité, calme, vie de voisinage..."></textarea>
+          <div style="display:flex;align-items:center;gap:12px;margin-top:10px;flex-wrap:wrap;">
+            <button type="button" class="btn-ai" onclick="generateAIDescription()" id="aiDescBtn">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+              Générer avec l'IA
+            </button>
+            <span id="aiDescStatus" class="ai-generating" style="display:none">Rédaction en cours...</span>
+          </div>
+          <div class="coach-tip" style="margin-top:8px;">
+            <span class="coach-tip-icon">✍️</span>
+            <span>Commencez par le point fort du bien (ex : "Lumineuse maison de ville entièrement rénovée..."). Les acheteurs lisent les 2 premières lignes en priorité.</span>
+          </div>
+          <span class="situation-toggle" onclick="toggleSituation('desc')">🎭 Comment parler de mon bien en visite</span>
+          <div class="situation-block hidden" id="situation-desc">
+            <div class="situation-line">
+              <span class="situation-role acheteur">Acheteur</span>
+              <span class="situation-text">« Qu'est-ce qui vous plaît le plus dans ce bien ? »</span>
+            </div>
+            <div class="situation-line">
+              <span class="situation-role vendeur">Vous</span>
+              <span class="situation-text">« Ce que j'ai toujours adoré, c'est la lumière du salon l'après-midi — l'exposition sud fait que vous avez du soleil jusqu'au soir. Et le quartier est vraiment calme, on connaît tous nos voisins. »</span>
+            </div>
+            <div class="situation-line">
+              <span class="situation-role acheteur">Acheteur</span>
+              <span class="situation-text">« Il y a des travaux à prévoir ? »</span>
+            </div>
+            <div class="situation-line">
+              <span class="situation-role vendeur">Vous</span>
+              <span class="situation-text">« La cuisine et la salle de bain ont été refaites en 2022. La toiture a 8 ans, en bon état. Le seul point à prévoir serait de moderniser le couloir, mais c'est cosmétique. »</span>
+            </div>
+          </div>
+        </div>
+
+        <div style="display:flex;gap:12px;align-items:center;margin-top:32px;flex-wrap:wrap;">
           <button type="submit" class="btn-primary">Sauvegarder la fiche</button>
+          <button type="button" onclick="exportJSON()" style="padding:11px 20px;border-radius:8px;border:2px solid #e8e0d6;background:#fff;font-family:'DM Sans',sans-serif;font-size:0.88rem;font-weight:600;color:#555;cursor:pointer;transition:0.15s;" onmouseover="this.style.borderColor='#3D5A47';this.style.color='#3D5A47'" onmouseout="this.style.borderColor='#e8e0d6';this.style.color='#555'">
+            ↓ Export JSON
+          </button>
+          <span class="autosave-badge" id="autosaveBadge">Brouillon auto</span>
+          <button type="button" class="cmd-kbd-badge" onclick="openCmd()" title="Actions rapides (⌘K)">⌘ K</button>
           <div id="saveSuccess" class="form-success hidden">✓ Fiche sauvegardée</div>
           <div id="saveError" class="form-error hidden"></div>
         </div>
       </form>
     </div>
 
-    <!-- TAB: PHOTOS -->
+    <!-- ═══════════════════════════════════════════════════
+         TAB: PHOTOS
+    ════════════════════════════════════════════════════ -->
     <div class="tab-content hidden" id="tab-photos">
       <div class="form-section">
-        <h3>📸 Photos du bien <span style="font-size:0.8rem;color:#888;font-weight:400">(max 20 photos — formats JPG, PNG, WEBP)</span></h3>
+
+        <!-- Visite virtuelle -->
+        <div style="padding:18px 20px;background:#f0f5f1;border-radius:12px;border:1px solid #c8ddd0;margin-bottom:24px;">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">
+            <span style="font-size:1.2rem;">🥽</span>
+            <strong style="font-size:0.95rem;color:#3D5A47;">Visite virtuelle</strong>
+          </div>
+          <p style="font-size:0.82rem;color:#555;margin:0 0 10px;">Collez ici le lien de votre visite 3D (Matterport, Kuula, YouTube 360°…) — il apparaîtra dans la fiche acheteur.</p>
+          <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
+            <input type="url" name="virtual_tour_url" id="field-virtual_tour_url" placeholder="https://my.matterport.com/show/..." style="flex:1;min-width:200px;padding:9px 12px;border:1px solid #c8ddd0;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:0.88rem;background:#fff;">
+            <button type="button" onclick="saveTourUrl()" style="padding:9px 18px;background:#3D5A47;color:#fff;border:none;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:0.85rem;font-weight:600;cursor:pointer;transition:0.15s;" onmouseover="this.style.background='#2a4030'" onmouseout="this.style.background='#3D5A47'">Enregistrer</button>
+          </div>
+          <div id="tourUrlStatus" style="font-size:0.78rem;color:#3D5A47;margin-top:6px;"></div>
+        </div>
+
+        <!-- Catégories de photos -->
+        <div style="margin-bottom:24px;">
+          <h3 style="font-family:'DM Sans',sans-serif;font-size:0.88rem;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:#888;margin:0 0 14px;">Guide par catégorie</h3>
+          <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;">
+            <div style="padding:14px 16px;border-radius:10px;border:1.5px solid #c8ddd0;background:#f0f5f1;">
+              <div style="font-size:1.2rem;margin-bottom:6px;">🏠</div>
+              <div style="font-weight:700;font-size:0.85rem;color:#3D5A47;margin-bottom:4px;">Photos découverte</div>
+              <div style="font-size:0.76rem;color:#777;line-height:1.5;">Façade, extérieur, jardin, quartier. <strong>Commence l'annonce</strong> — décide du clic.</div>
+            </div>
+            <div style="padding:14px 16px;border-radius:10px;border:1.5px solid #e8e0d6;background:#fafaf8;">
+              <div style="font-size:1.2rem;margin-bottom:6px;">📐</div>
+              <div style="font-weight:700;font-size:0.85rem;color:#555;margin-bottom:4px;">Photos détaillées</div>
+              <div style="font-size:0.76rem;color:#777;line-height:1.5;">Pièce par pièce — salon, cuisine, chambres, SDB. Angle grand depuis le coin.</div>
+            </div>
+            <div style="padding:14px 16px;border-radius:10px;border:1.5px solid #f0d0be;background:#fff8f4;">
+              <div style="font-size:1.2rem;margin-bottom:6px;">✨</div>
+              <div style="font-weight:700;font-size:0.85rem;color:#C4785A;margin-bottom:4px;">Photos professionnelles</div>
+              <div style="font-size:0.76rem;color:#777;line-height:1.5;">Prises par un photographe — valorisent significativement. Jusqu'à <strong>+15 % de contacts</strong>.</div>
+            </div>
+            <div style="padding:14px 16px;border-radius:10px;border:1.5px solid #e8e0d6;background:#fafaf8;">
+              <div style="font-size:1.2rem;margin-bottom:6px;">🛠</div>
+              <div style="font-weight:700;font-size:0.85rem;color:#555;margin-bottom:4px;">Points forts</div>
+              <div style="font-size:0.76rem;color:#777;line-height:1.5;">Rénovations récentes, vue, cheminée, terrasse... Photographiez ce qui justifie le prix.</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Upload + compteur -->
+        <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:12px;">
+          <div>
+            <h3 style="margin:0 0 2px;">Vos photos</h3>
+            <p style="font-size:0.82rem;color:#888;margin:0;">JPG, PNG, WEBP — max 20 photos</p>
+          </div>
+          <div id="photoCountInfo" class="photo-count-info" style="display:none">
+            <span class="photo-count-pill" id="photoCountPill">0</span>
+            <span>photo(s) — <span id="photoCountMsg">ajoutez-en encore</span></span>
+          </div>
+        </div>
+        <div class="coach-tip" style="margin-bottom:16px;">
+          <span class="coach-tip-icon">📷</span>
+          <span><strong>La 1ère photo décide du clic</strong> sur LeBonCoin. Façade bien éclairée, propre. Minimum 8 photos pour un dossier crédible.</span>
+        </div>
         <div class="upload-zone" id="uploadZone">
           <input type="file" id="photoInput" multiple accept="image/jpeg,image/png,image/webp">
           <div class="upload-zone-icon">📷</div>
@@ -237,61 +1561,178 @@
           <p style="font-size:0.85rem;color:#888;margin-top:4px;">Jusqu'à 20 photos — max 20 Mo par photo</p>
         </div>
         <div id="uploadProgress" class="hidden" style="margin-top:16px;">
-          <div style="background:#e0e0e0;border-radius:4px;height:6px;">
-            <div id="progressBar" style="background:#3D5A47;height:100%;border-radius:4px;width:0%;transition:width 0.3s;"></div>
+          <div style="background:#e0e0e0;border-radius:4px;height:8px;overflow:hidden;">
+            <div id="progressBar" style="background:linear-gradient(90deg,#3D5A47,#5a8a6a);height:100%;width:0%;transition:width 0.3s;border-radius:4px;"></div>
           </div>
           <p id="progressText" style="font-size:0.85rem;color:#666;margin-top:8px;"></p>
         </div>
-        <div class="photos-grid" id="photosGrid"></div>
-        <div style="margin-top:24px;padding:16px;background:var(--creme);border-radius:8px;">
-          <strong>Checklist avant photos</strong>
-          <p style="font-size:0.85rem;color:#666;margin-top:4px;">Consultez la checklist dans votre espace <a href="/ma-formation" style="color:var(--terracotta)">Formation</a> avant de prendre les photos.</p>
+        <div class="photos-grid" id="photosGrid">
+          <div class="photos-empty-state" id="photosEmptyState">
+            <div style="font-size:2.5rem;margin-bottom:8px;">🏠</div>
+            <p>Aucune photo pour l'instant.</p>
+            <p style="font-size:0.8rem;margin-top:4px;color:#ccc;">Les photos sont le premier argument de vente.</p>
+          </div>
+        </div>
+
+        <!-- Ordre recommandé -->
+        <div style="margin-top:24px;padding:16px 20px;background:var(--creme);border-radius:10px;border-left:3px solid var(--terracotta);">
+          <strong>Ordre recommandé</strong>
+          <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:8px;margin-top:10px;">
+            <div style="font-size:0.8rem;color:#666;">1. 🏠 Façade extérieure</div>
+            <div style="font-size:0.8rem;color:#666;">2. 🛋 Salon / pièce de vie</div>
+            <div style="font-size:0.8rem;color:#666;">3. 🍳 Cuisine</div>
+            <div style="font-size:0.8rem;color:#666;">4. 🛏 Chambres</div>
+            <div style="font-size:0.8rem;color:#666;">5. 🚿 Salle de bain</div>
+            <div style="font-size:0.8rem;color:#666;">6. 🌿 Jardin / terrasse</div>
+            <div style="font-size:0.8rem;color:#666;">7. 📐 Caves / annexes</div>
+            <div style="font-size:0.8rem;color:#666;">8. 📍 Vue du quartier</div>
+          </div>
         </div>
       </div>
     </div>
 
-    <!-- TAB: DOCUMENTS -->
+    <!-- ═══════════════════════════════════════════════════
+         TAB: DOCUMENTS
+    ════════════════════════════════════════════════════ -->
     <div class="tab-content hidden" id="tab-documents">
+
+      <!-- ── Section 1 : Documents acheteurs ── -->
+      <div class="form-section" style="margin-bottom:28px;">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;">
+          <h3 style="margin:0;">📋 Documents acheteurs</h3>
+          <span style="padding:3px 10px;background:#e8f5e9;color:#2e7d32;border-radius:20px;font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:0.04em;">Visible dans la fiche</span>
+        </div>
+        <p style="font-size:0.85rem;color:#888;margin-bottom:16px;">Ces documents sont transmis aux acheteurs avant chaque visite — diagnostics, ERP, etc.</p>
+        <div class="coach-tip" style="margin-bottom:20px;">
+          <span class="coach-tip-icon">📋</span>
+          <span>Les diagnostics complets rassurent les acheteurs sérieux et évitent les négociations de dernière minute. Ayez-les tous avant la première visite.</span>
+        </div>
+
+        <!-- Upload zone diagnostics -->
+        <div style="background:#f8f5f0;border:1px solid #e8e0d6;border-radius:12px;padding:20px;margin-bottom:20px;">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;align-items:end;margin-bottom:14px;">
+            <div class="form-group" style="margin:0">
+              <label>Nom du document</label>
+              <input type="text" id="docName" placeholder="Ex: DPE 2024">
+            </div>
+            <div class="form-group" style="margin:0">
+              <label>Type de document</label>
+              <select id="docType">
+                <option value="dpe">🏷 DPE</option>
+                <option value="amiante">⚗️ Amiante</option>
+                <option value="plomb">🔩 Plomb</option>
+                <option value="electricite">⚡ Électricité</option>
+                <option value="gaz">🔥 Gaz</option>
+                <option value="assainissement">💧 Assainissement</option>
+                <option value="erp">⚠️ État des risques (ERP)</option>
+                <option value="facture_chaudiere">🔥 Facture chaudière / poêle</option>
+                <option value="entretien_ramonage">📋 Entretien / ramonage</option>
+                <option value="autre">📁 Autre diagnostic</option>
+              </select>
+            </div>
+          </div>
+          <input type="file" id="docInput" accept=".pdf" style="display:none">
+          <button type="button" onclick="document.getElementById('docInput').click()" class="btn-primary" style="width:100%;">
+            + Ajouter un document acheteur
+          </button>
+        </div>
+
+        <!-- Liste documents acheteurs -->
+        <div id="clientDocsList" style="display:flex;flex-direction:column;gap:10px;"></div>
+
+        <!-- Checklist diagnostics obligatoires -->
+        <div style="margin-top:20px;padding:18px 20px;background:var(--creme);border-radius:10px;">
+          <strong style="font-size:0.9rem;">Diagnostics obligatoires pour la vente</strong>
+          <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:6px;margin-top:10px;" id="docChecklist">
+            <div class="doc-required-item" data-type="dpe">🏷 DPE</div>
+            <div class="doc-required-item" data-type="amiante">⚗️ Amiante</div>
+            <div class="doc-required-item" data-type="plomb">🔩 Plomb</div>
+            <div class="doc-required-item" data-type="electricite">⚡ Électricité</div>
+            <div class="doc-required-item" data-type="erp">⚠️ ERP</div>
+            <div class="doc-required-item" data-type="assainissement">💧 Assainissement</div>
+          </div>
+          <p style="font-size:0.78rem;color:#888;margin-top:10px;">Les éléments en vert sont déjà uploadés. Consultez la <a href="/ma-formation" style="color:var(--terracotta)">checklist complète</a> dans Formation.</p>
+        </div>
+      </div>
+
+      <!-- ── Section 2 : Documents confidentiels ── -->
       <div class="form-section">
-        <h3>📄 Documents (PDF uniquement)</h3>
-        <p style="color:#666;font-size:0.9rem;margin-bottom:20px;">Uploadez vos diagnostics et documents. Ils seront accessibles dans le dossier acheteur.</p>
-        <div style="display:grid;grid-template-columns:2fr 1fr auto;gap:12px;align-items:end;margin-bottom:20px;">
-          <div class="form-group" style="margin:0">
-            <label>Nom du document</label>
-            <input type="text" id="docName" placeholder="Ex: DPE 2024">
-          </div>
-          <div class="form-group" style="margin:0">
-            <label>Type</label>
-            <select id="docType">
-              <option value="dpe">DPE</option>
-              <option value="amiante">Amiante</option>
-              <option value="plomb">Plomb</option>
-              <option value="electricite">Électricité</option>
-              <option value="gaz">Gaz</option>
-              <option value="assainissement">Assainissement</option>
-              <option value="erp">État des risques (ERP)</option>
-              <option value="titre">Titre de propriété</option>
-              <option value="taxe">Taxe foncière</option>
-              <option value="autre">Autre</option>
-            </select>
-          </div>
+        <div style="display:flex;align-items:flex-start;gap:12px;margin-bottom:6px;">
           <div>
-            <input type="file" id="docInput" accept=".pdf" style="display:none">
-            <button onclick="document.getElementById('docInput').click()" class="btn-primary">+ Ajouter un PDF</button>
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:4px;">
+              <h3 style="margin:0;">🔒 Documents confidentiels / Notaire</h3>
+              <span style="padding:3px 10px;background:#fce4ec;color:#c62828;border-radius:20px;font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:0.04em;">Jamais transmis</span>
+            </div>
+            <p style="font-size:0.85rem;color:#888;margin:0;">Pour usage notaire uniquement — titre de propriété, taxe foncière, compromis… Ces documents ne figurent jamais dans la fiche acheteur.</p>
           </div>
         </div>
-        <div id="documentsList" style="display:flex;flex-direction:column;gap:8px;"></div>
-        <div style="margin-top:24px;padding:16px;background:var(--creme);border-radius:8px;">
-          <strong>Documents recommandés</strong>
-          <p style="font-size:0.85rem;color:#666;margin-top:4px;">Consultez la <a href="/ma-formation" style="color:var(--terracotta)">checklist documents</a> dans votre espace Formation.</p>
+
+        <!-- Upload zone confidentiel -->
+        <div style="background:#fff8f5;border:1px solid #f0d0be;border-radius:12px;padding:20px;margin:16px 0 20px;">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;align-items:end;margin-bottom:14px;">
+            <div class="form-group" style="margin:0">
+              <label>Nom du document</label>
+              <input type="text" id="confDocName" placeholder="Ex: Titre de propriété 2018">
+            </div>
+            <div class="form-group" style="margin:0">
+              <label>Type de document</label>
+              <select id="confDocType">
+                <option value="titre">🏠 Titre de propriété</option>
+                <option value="taxe">📄 Taxe foncière</option>
+                <option value="compromis">📝 Compromis de vente</option>
+                <option value="acte">📋 Acte notarié</option>
+                <option value="identite">🪪 Pièce d'identité</option>
+                <option value="confidentiel">🔒 Autre (confidentiel)</option>
+              </select>
+            </div>
+          </div>
+          <input type="file" id="confDocInput" accept=".pdf,image/*" style="display:none">
+          <button type="button" onclick="document.getElementById('confDocInput').click()" style="width:100%;padding:11px;background:#fff;border:2px solid #C4785A;color:#C4785A;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:0.88rem;font-weight:700;cursor:pointer;transition:0.15s;" onmouseover="this.style.background='#fff5f0'" onmouseout="this.style.background='#fff'">
+            🔒 Ajouter un document confidentiel
+          </button>
+        </div>
+
+        <!-- Liste documents confidentiels -->
+        <div id="confDocsList" style="display:flex;flex-direction:column;gap:10px;"></div>
+      </div>
+
+      <style>
+        .doc-required-item {
+          font-size:0.8rem;color:#888;padding:5px 10px;
+          background:#fff;border-radius:6px;border:1px solid #e0d8cc;
+        }
+        .doc-required-item.done { background:#e8f5e9;color:#2e7d32;border-color:#a5d6a7; }
+      </style>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════
+         TAB: FICHE ACHETEUR
+    ════════════════════════════════════════════════════ -->
+    <div class="tab-content hidden" id="tab-fiche">
+      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:20px;">
+        <div>
+          <h3 style="margin:0 0 4px;font-family:'DM Sans',sans-serif;font-size:1rem;">Fiche de renseignements acheteur</h3>
+          <p style="font-size:0.85rem;color:#888;margin:0;">À transmettre avant chaque visite — remplace les questions répétitives</p>
+        </div>
+        <div class="fiche-actions" style="display:flex;gap:10px;flex-wrap:wrap;">
+          <button onclick="generateFiche()" class="btn-primary">Générer la fiche</button>
+          <button onclick="printFiche()" class="btn-secondary" id="printBtn" style="display:none">Imprimer / PDF</button>
+        </div>
+      </div>
+      <div id="ficheOutput">
+        <div class="fiche-empty">
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+          <p>Sauvegardez d'abord votre fiche dans l'onglet Informations,<br>puis cliquez sur "Générer la fiche".</p>
         </div>
       </div>
     </div>
 
-    <!-- TAB: PUBLICATION -->
+    <!-- ═══════════════════════════════════════════════════
+         TAB: PUBLICATION
+    ════════════════════════════════════════════════════ -->
     <div class="tab-content hidden" id="tab-publication">
       <div class="form-section">
-        <h3>🚀 Publier votre bien</h3>
+        <h3>Publier votre bien</h3>
         <div id="publishStatus"></div>
         <div id="publishActions" style="margin-top:24px;"></div>
       </div>
@@ -300,7 +1741,7 @@
 </div>
 
 <script>
-// Tab system
+// ── Tab system ────────────────────────────────────────
 document.querySelectorAll('.tab-btn').forEach(btn => {
   btn.addEventListener('click', () => {
     document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
@@ -310,30 +1751,295 @@ document.querySelectorAll('.tab-btn').forEach(btn => {
   });
 });
 
-// Load property data
+// ── Chip selectors — event delegation ────────────────
+document.addEventListener('click', function(e) {
+  // ── Chips multi/single select ────────────────────────
+  var chip = e.target.closest('[data-value]');
+  if (!chip) return;
+  var group = chip.closest('.chip-group');
+  if (!group) return;
+  var field = group.dataset.field;
+  var hidden = document.getElementById('field-' + field);
+  var isMulti = group.dataset.multi === 'true';
+  if (isMulti) {
+    chip.classList.toggle('active');
+    var vals = [];
+    group.querySelectorAll('[data-value].active').forEach(function(c) { vals.push(c.dataset.value); });
+    if (hidden) { hidden.value = vals.join(','); }
+    if (field === 'stationnement_type') updateGarageDetail(vals);
+  } else {
+    if (chip.classList.contains('active')) {
+      chip.classList.remove('active');
+      if (hidden) hidden.value = '';
+    } else {
+      group.querySelectorAll('[data-value]').forEach(function(c) { c.classList.remove('active'); });
+      chip.classList.add('active');
+      if (hidden) hidden.value = chip.dataset.value;
+    }
+  }
+  updateCompletion();
+  scheduleAutosave();
+});
+
+// ── Type cards ───────────────────────────────────────
+function selectType(val) {
+  document.querySelectorAll('.type-card').forEach(c => c.classList.remove('active'));
+  const card = document.querySelector(`.type-card[data-type="${val}"]`);
+  if (card) card.classList.add('active');
+  document.getElementById('field-type').value = val;
+  document.getElementById('section-mitoyennete').style.display = val === 'Maison' ? 'block' : 'none';
+  updateCompletion();
+}
+
+// ── Mitoyenneté ──────────────────────────────────────
+function selectMito(val) {
+  document.querySelectorAll('.mito-card').forEach(c => c.classList.remove('active'));
+  const card = document.querySelector(`.mito-card[data-mito="${val}"]`);
+  if (card) card.classList.add('active');
+  document.getElementById('field-mitoyennete').value = val;
+}
+
+// ── Year slider ──────────────────────────────────────
+(function() {
+  const slider = document.getElementById('yearSlider');
+  const display = document.getElementById('yearDisplay');
+  const badge = document.getElementById('yearBadge');
+  function updateYear(val) {
+    val = parseInt(val);
+    display.textContent = val;
+    if (val < 1948) {
+      badge.textContent = 'Avant 1948 — vérifier plomb & amiante';
+      badge.className = 'year-badge avant1948';
+    } else if (val < 1975) {
+      badge.textContent = 'Ancien — isolation à vérifier';
+      badge.className = 'year-badge ancien';
+    } else if (val < 2000) {
+      badge.textContent = 'Construction standard';
+      badge.className = 'year-badge moderne';
+    } else if (val < 2012) {
+      badge.textContent = 'RT 2005 — bonne isolation';
+      badge.className = 'year-badge recent';
+    } else {
+      badge.textContent = 'BBC / RT 2012 — très bonne performance';
+      badge.className = 'year-badge recent';
+    }
+  }
+  updateYear(slider.value);
+  slider.addEventListener('input', () => { updateYear(slider.value); updateCompletion(); });
+})();
+
+// ── DPE bars ─────────────────────────────────────────
+function selectDpe(val) {
+  document.querySelectorAll('.dpe-bar-row').forEach(r => r.classList.remove('active'));
+  const row = document.querySelector(`.dpe-bar-row[data-value="${val}"]`);
+  if (row) row.classList.add('active');
+  const hidden = document.getElementById('field-dpe_class');
+  if (hidden) hidden.value = val;
+  const warn = document.getElementById('dpeWarn');
+  if (warn) warn.style.display = ['F','G'].includes(val) ? 'flex' : 'none';
+  updateCompletion();
+}
+
+// ── Toggle switches ──────────────────────────────────
+function toggleSwitch(name) {
+  var sw = document.getElementById('toggle-' + name);
+  var hidden = document.getElementById('field-' + name);
+  var isOn = sw.classList.toggle('on');
+  hidden.value = isOn ? '1' : '0';
+  if (name === 'terrace') updateTerraceDetail(isOn);
+  if (name === 'grenier_present') updateGrenierDetail(isOn);
+  scheduleAutosave();
+}
+
+function updateTerraceDetail(isOn) {
+  var detail = document.getElementById('terraceDetail');
+  if (detail) detail.style.display = isOn ? 'block' : 'none';
+}
+
+function updateGrenierDetail(isOn) {
+  var detail = document.getElementById('grenierDetail');
+  if (detail) detail.style.display = isOn ? 'block' : 'none';
+}
+
+// ── Stepper buttons ──────────────────────────────────
+document.querySelectorAll('.stepper-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const input = btn.closest('.stepper-controls').querySelector('.stepper-input');
+    const delta = parseInt(btn.dataset.delta);
+    const min = parseInt(input.min ?? 0);
+    const max = parseInt(input.max ?? 99);
+    let val = parseInt(input.value) + delta;
+    val = Math.max(min, Math.min(max, val));
+    input.value = val;
+    updateCompletion();
+  });
+});
+
+// ── Prix Coach ───────────────────────────────────────
+function updatePrixCoach() {
+  const city = document.querySelector('[name="city"]').value.trim();
+  const price = document.querySelector('[name="price"]').value.trim();
+  const coach = document.getElementById('prixCoach');
+  if (city && price) {
+    coach.style.display = 'block';
+    document.getElementById('coachVilleLabel').textContent = city;
+  } else {
+    coach.style.display = 'none';
+  }
+}
+document.querySelector('[name="city"]').addEventListener('input', updatePrixCoach);
+document.querySelector('[name="price"]').addEventListener('input', updatePrixCoach);
+
+// ── Mise en situation toggles ────────────────────────
+function toggleSituation(id) {
+  document.getElementById('situation-' + id).classList.toggle('hidden');
+}
+
+// ── Completion bar ───────────────────────────────────
+function updateCompletion() {
+  const form = document.getElementById('propertyForm');
+  const scored = [
+    () => !!document.getElementById('field-type').value,
+    () => !!form.elements.address?.value,
+    () => !!form.elements.city?.value,
+    () => !!form.elements.price?.value,
+    () => !!form.elements.surface_habitable?.value,
+    () => !!form.elements.rooms?.value && form.elements.rooms.value > 0,
+    () => !!document.getElementById('field-dpe_class').value,
+    () => !!document.getElementById('field-exposition').value,
+    () => !!form.elements.description?.value?.trim(),
+    () => !!document.getElementById('field-sale_reason').value,
+  ];
+  const done = scored.filter(fn => { try { return fn(); } catch(e){ return false; } }).length;
+  const pct = Math.round((done / scored.length) * 100);
+  document.getElementById('completionFill').style.width = pct + '%';
+  document.getElementById('completionPct').textContent = pct + '%';
+}
+document.getElementById('propertyForm').addEventListener('input', updateCompletion);
+document.getElementById('propertyForm').addEventListener('change', updateCompletion);
+
+// ── Load property data ────────────────────────────────
+let _propertyData = null;
 async function loadProperty() {
   const res = await fetch('/api/property');
   const data = await res.json();
   if (!data.property) return;
+  _propertyData = data;
   const p = data.property;
   const form = document.getElementById('propertyForm');
-  Object.keys(p).forEach(key => {
-    const el = form.elements[key];
+
+  // Chip fields (handled separately)
+  var chipFields = ['type','dpe_class','exposition','sale_reason','assainissement_type','fenetres_type','toiture_couverture','volets_type','sols_dalle','stationnement_type','garage_motorise','garage_sol','terrace_revetement','cheminee_type','eau_chaude_type','wc_count','cuisine_type','grenier'];
+  var multiChipFields = ['toiture_couverture','volets_type','stationnement_type','fenetres_type','cheminee_type','eau_chaude_type','cuisine_type'];
+
+  var toggleFields = ['garden','terrace','certificat_assainissement','grenier_present'];
+  Object.keys(p).forEach(function(key) {
+    if (chipFields.includes(key)) return;
+    if (toggleFields.includes(key)) return;
+    if (key === 'heating_type' || key === 'heating_details') return;
+    var el = form.elements[key];
     if (!el) return;
-    if (el.type === 'checkbox') el.checked = !!p[key];
-    else el.value = p[key] || '';
+    el.value = p[key] || '';
   });
 
-  // Photos
-  if (data.photos?.length) renderPhotos(data.photos);
+  // Toggle fields restore
+  ['garden','terrace','certificat_assainissement','grenier_present'].forEach(function(name) {
+    if (p[name] && p[name] !== '0') {
+      var toggleEl = document.getElementById('toggle-' + name);
+      if (toggleEl) toggleEl.classList.add('on');
+      var fieldEl = document.getElementById('field-' + name);
+      if (fieldEl) fieldEl.value = '1';
+      if (name === 'terrace') updateTerraceDetail(true);
+      if (name === 'grenier_present') updateGrenierDetail(true);
+    }
+  });
+  // Restore garage detail if garage selected
+  if (p.stationnement_type) {
+    var gVals = p.stationnement_type.split(',').map(function(v) { return v.trim(); });
+    updateGarageDetail(gVals);
+  }
 
-  // Documents
+  // Chip fields sync (single + multi)
+  chipFields.forEach(function(field) {
+    if (!p[field]) return;
+    var group = document.querySelector('[data-field="' + field + '"]');
+    if (!group) return;
+    var isMulti = multiChipFields.includes(field);
+    group.querySelectorAll('[data-value]').forEach(function(c) { c.classList.remove('active'); });
+    if (isMulti) {
+      var vals = p[field].split(',').map(function(v) { return v.trim(); });
+      vals.forEach(function(val) {
+        var chip = group.querySelector('[data-value="' + val + '"]');
+        if (chip) chip.classList.add('active');
+      });
+      if (field === 'stationnement_type') updateGarageDetail(vals);
+    } else {
+      var chip = group.querySelector('[data-value="' + p[field] + '"]');
+      if (chip) chip.classList.add('active');
+    }
+    var hidden = document.getElementById('field-' + field);
+    if (hidden) hidden.value = p[field];
+    if (field === 'dpe_class' && ['F','G'].includes(p[field])) {
+      document.getElementById('dpeWarn').style.display = 'flex';
+    }
+  });
+
+  // Sync new visual components
+  if (p.type) selectType(p.type);
+  if (p.dpe_class) selectDpe(p.dpe_class);
+  if (p.mitoyennete) selectMito(p.mitoyennete);
+  // Heating multi-select restore
+  if (p.heating_type) {
+    p.heating_type.split(',').forEach(function(v) { v = v.trim(); if (v) toggleHeating(v); });
+    if (p.heating_details) {
+      try {
+        var hd = JSON.parse(p.heating_details);
+        setTimeout(function() {
+          Object.keys(hd).forEach(function(heat) {
+            var inp = document.querySelector('[data-heat-year="' + heat + '"]');
+            if (inp) { inp.value = hd[heat]; syncHeatingDetails(); }
+          });
+        }, 50);
+      } catch(e) {}
+    }
+  }
+  var yrSlider = document.getElementById('yearSlider');
+  if (yrSlider && p.year_built) { yrSlider.value = p.year_built; yrSlider.dispatchEvent(new Event('input')); }
+
+  // Restore equipment from saved value
+  if (p.equipment) {
+    const savedLabels = p.equipment.split(',').map(s => s.trim());
+    EQUIP_ITEMS.forEach(e => { if (savedLabels.includes(e.label)) selectedEquip.add(e.key); });
+    customEquipList = savedLabels.filter(l => !EQUIP_ITEMS.find(e => e.label === l));
+    initEquipGrid();
+    syncEquipValue();
+  }
+
+  // Restore room list from localStorage draft if available
+  var draft = (function() { try { return JSON.parse(localStorage.getItem(LS_DRAFT_KEY)); } catch(e){ return null; } })();
+  if (draft && draft._roomsList && draft._roomsList.length > 0) {
+    roomsList = draft._roomsList;
+    syncUnlockedEtagesFromList();
+    renderRoomsList();
+    computeRoomTotals();
+  }
+
+  // Visite virtuelle URL (hors formulaire)
+  if (p.virtual_tour_url) {
+    var tourInput = document.getElementById('field-virtual_tour_url');
+    if (tourInput) { tourInput.value = p.virtual_tour_url; document.getElementById('tourUrlStatus').textContent = '✓ Lien enregistré'; }
+  }
+
+  // Photos and documents
+  if (data.photos?.length) renderPhotos(data.photos);
   if (data.documents?.length) renderDocuments(data.documents);
 
-  // Publication
   renderPublishTab(p);
+  updatePrixCoach();
+  updateCompletion();
 }
 
+// ── Publish tab ───────────────────────────────────────
 function renderPublishTab(property) {
   const statusDiv = document.getElementById('publishStatus');
   const actionsDiv = document.getElementById('publishActions');
@@ -348,9 +2054,8 @@ function renderPublishTab(property) {
           <button onclick="navigator.clipboard.writeText('${url}');showToast('Lien copié !')" class="btn-primary">Copier</button>
           <a href="${url}" target="_blank" class="btn-secondary">Voir →</a>
         </div>
-      </div>
-    `;
-    actionsDiv.innerHTML = `<p style="color:#555;font-size:0.9rem;">Vous pouvez mettre à jour votre fiche à tout moment — les changements sont appliqués immédiatement.</p>`;
+      </div>`;
+    actionsDiv.innerHTML = `<p style="color:#555;font-size:0.9rem;">Toutes les modifications sont appliquées immédiatement.</p>`;
   } else {
     const requirements = [];
     if (!property.type) requirements.push('Type de bien');
@@ -363,19 +2068,15 @@ function renderPublishTab(property) {
         <div style="background:#fff3e0;padding:16px;border-radius:8px;margin-bottom:20px;">
           <strong style="color:#e65100;">Complétez avant de publier :</strong>
           <ul style="margin:8px 0 0 20px;font-size:0.9rem;color:#666;">${requirements.map(r => `<li>${r}</li>`).join('')}</ul>
-        </div>
-      `;
+        </div>`;
     } else {
       statusDiv.innerHTML = `<div style="background:#e8f5e9;padding:16px;border-radius:8px;margin-bottom:20px;"><strong style="color:#2e7d32;">✓ Votre fiche est complète. Vous pouvez publier.</strong></div>`;
     }
-
     actionsDiv.innerHTML = `
       <button class="btn-primary btn-large" id="publishBtn" ${requirements.length ? 'disabled style="opacity:0.5"' : ''}>
         Publier mon bien en ligne
       </button>
-      <p style="font-size:0.82rem;color:#888;margin-top:12px;">Une URL unique sera créée. Vous la mettrez dans votre annonce LeBonCoin ou PAP.</p>
-    `;
-
+      <p style="font-size:0.82rem;color:#888;margin-top:12px;">Une URL unique sera créée pour votre annonce LeBonCoin ou PAP.</p>`;
     document.getElementById('publishBtn')?.addEventListener('click', publishProperty);
   }
 }
@@ -386,22 +2087,30 @@ async function publishProperty() {
   const res = await fetch('/api/property/publish', { method: 'POST' });
   const data = await res.json();
   if (data.success) {
-    window.showToast('Bien publié !');
+    showToast('Bien publié !');
     loadProperty();
   } else {
-    window.showToast(data.error || 'Erreur', 'error');
+    showToast(data.error || 'Erreur', 'error');
     btn.textContent = 'Publier mon bien en ligne'; btn.disabled = false;
   }
 }
 
-// Property form save
+// ── Form save ─────────────────────────────────────────
 document.getElementById('propertyForm').addEventListener('submit', async (e) => {
   e.preventDefault();
   const formData = new FormData(e.target);
   const data = {};
   formData.forEach((v, k) => { data[k] = v; });
-  data.garden = document.getElementById('garden').checked ? 1 : 0;
-  data.terrace = document.getElementById('terrace').checked ? 1 : 0;
+
+  // Hidden / visual fields
+  ['type','heating_type','heating_details','dpe_class','exposition','sale_reason','garden','terrace',
+   'certificat_assainissement','assainissement_type','fenetres_type','toiture_couverture','volets_type',
+   'sols_dalle','stationnement_type','garage_motorise','garage_sol','terrace_revetement',
+   'mitoyennete','equipment','rooms','bedrooms',
+   'cheminee_type','eau_chaude_type','wc_count','cuisine_type','grenier','grenier_present'].forEach(f => {
+    const el = document.getElementById('field-' + f);
+    if (el) data[f] = el.value;
+  });
 
   const btn = e.target.querySelector('button[type="submit"]');
   btn.textContent = 'Sauvegarde...'; btn.disabled = true;
@@ -414,7 +2123,7 @@ document.getElementById('propertyForm').addEventListener('submit', async (e) => 
   if (result.success) {
     document.getElementById('saveSuccess').classList.remove('hidden');
     setTimeout(() => document.getElementById('saveSuccess').classList.add('hidden'), 3000);
-    window.showToast('Fiche sauvegardée');
+    showToast('Fiche sauvegardée');
   } else {
     document.getElementById('saveError').textContent = result.error;
     document.getElementById('saveError').classList.remove('hidden');
@@ -422,10 +2131,9 @@ document.getElementById('propertyForm').addEventListener('submit', async (e) => 
   btn.textContent = 'Sauvegarder la fiche'; btn.disabled = false;
 });
 
-// Photo upload
+// ── Photo upload ──────────────────────────────────────
 const uploadZone = document.getElementById('uploadZone');
 const photoInput = document.getElementById('photoInput');
-
 uploadZone.addEventListener('click', () => photoInput.click());
 uploadZone.addEventListener('dragover', (e) => { e.preventDefault(); uploadZone.classList.add('drag-over'); });
 uploadZone.addEventListener('dragleave', () => uploadZone.classList.remove('drag-over'));
@@ -438,14 +2146,29 @@ async function uploadPhotos(files) {
   const text = document.getElementById('progressText');
   progress.classList.remove('hidden');
 
+  // Show instant local previews
+  const tempIds = [];
+  Array.from(files).forEach((file, i) => {
+    const tempId = 'temp-' + Date.now() + i;
+    tempIds.push(tempId);
+    const localUrl = URL.createObjectURL(file);
+    allPhotos.push({ url: localUrl, cloudinary_id: tempId, _temp: true });
+  });
+  renderPhotosGrid();
+
   for (let i = 0; i < files.length; i++) {
-    text.textContent = `Upload ${i + 1}/${files.length}...`;
+    text.textContent = `Upload ${i + 1}/${files.length} — ${files[i].name}`;
     bar.style.width = `${((i + 1) / files.length) * 100}%`;
     const fd = new FormData();
     fd.append('photos', files[i]);
     const res = await fetch('/api/property/photos', { method: 'POST', body: fd });
     const data = await res.json();
-    if (data.photos) renderPhotos(data.photos, true);
+    if (data.photos && data.photos[0]) {
+      // Replace temp with real
+      const idx = allPhotos.findIndex(p => p.cloudinary_id === tempIds[i]);
+      if (idx !== -1) allPhotos[idx] = data.photos[0];
+      renderPhotosGrid();
+    }
   }
   text.textContent = 'Upload terminé !';
   setTimeout(() => progress.classList.add('hidden'), 2000);
@@ -456,24 +2179,118 @@ let allPhotos = [];
 function renderPhotos(photos, append = false) {
   if (!append) allPhotos = photos;
   else allPhotos = [...allPhotos, ...photos];
-  const grid = document.getElementById('photosGrid');
-  grid.innerHTML = allPhotos.map(p => `
-    <div class="photo-thumb">
-      <img src="${p.url || p.thumbnail_url}" alt="Photo bien">
-      <button class="photo-delete" onclick="deletePhoto('${p.cloudinary_id}')">✕</button>
-    </div>
-  `).join('');
+  renderPhotosGrid();
 }
+
+// Bento span pattern — cycles for large galleries
+const BENTO_SPANS = ['bento-c2 bento-r2','bento-r2','','bento-c2','','','bento-r2','','bento-c2',''];
+
+function renderPhotosGrid() {
+  const grid = document.getElementById('photosGrid');
+
+  if (allPhotos.length === 0) {
+    grid.className = 'photos-grid';
+    grid.innerHTML = `<div class="photos-empty-state" id="photosEmptyState">
+      <div style="font-size:2.5rem;margin-bottom:8px;">🏠</div>
+      <p>Aucune photo pour l'instant.</p>
+      <p style="font-size:0.8rem;margin-top:4px;color:#ccc;">Les photos sont le premier argument de vente.</p>
+    </div>`;
+    document.getElementById('photoCountInfo').style.display = 'none';
+    return;
+  }
+
+  grid.className = 'bento-grid';
+  grid.innerHTML = allPhotos.map((p, i) => {
+    const span = BENTO_SPANS[i % BENTO_SPANS.length] || '';
+    const imgSrc = p.url || p.thumbnail_url || '';
+    const thumbSrc = imgSrc.includes('/upload/') ? imgSrc.replace('/upload/', '/upload/w_600,c_fill,q_auto/') : imgSrc;
+    const cidSafe = (p.cloudinary_id || '').replace(/'/g, "\\'");
+    return `
+    <div class="bento-item ${span}" onclick="${p._temp ? '' : `openLightbox(${i})`}">
+      <img src="${thumbSrc}" alt="Photo ${i+1}" loading="lazy">
+      ${i === 0 ? '<div class="bento-main-badge">★ Principale</div>' : ''}
+      ${p._temp
+        ? '<div class="bento-uploading">⏳</div>'
+        : `<div class="bento-overlay">
+            <span style="color:rgba(255,255,255,0.75);font-size:0.78rem;">${i+1} / ${allPhotos.length}</span>
+            <button class="bento-delete-btn" onclick="event.stopPropagation();deletePhoto('${cidSafe}')">✕</button>
+           </div>`}
+    </div>`;
+  }).join('');
+
+  const countEl = document.getElementById('photoCountInfo');
+  const pill = document.getElementById('photoCountPill');
+  const msg = document.getElementById('photoCountMsg');
+  countEl.style.display = 'flex';
+  pill.textContent = allPhotos.length;
+  msg.textContent = allPhotos.length < 5 ? 'ajoutez-en encore pour un dossier solide' :
+                    allPhotos.length < 8 ? 'bien ! visez 8+ pour rassurer les acheteurs' : '✓ dossier photo complet';
+  if (allPhotos.length >= 8) pill.style.background = '#C4785A';
+}
+
+// ── Lightbox ──────────────────────────────────────────
+let _lbIdx = 0;
+function openLightbox(idx) {
+  if (!allPhotos[idx]) return;
+  _lbIdx = idx;
+  const p = allPhotos[idx];
+  document.getElementById('lightboxImg').src = p.url || p.thumbnail_url || '';
+  document.getElementById('lightboxCounter').textContent = `${idx + 1} / ${allPhotos.length}`;
+  const showArrows = allPhotos.length > 1;
+  document.getElementById('lightboxPrev').style.display = showArrows ? '' : 'none';
+  document.getElementById('lightboxNext').style.display = showArrows ? '' : 'none';
+  document.getElementById('lightboxOverlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeLightbox() {
+  document.getElementById('lightboxOverlay').classList.remove('open');
+  document.body.style.overflow = '';
+}
+function lightboxGo(dir) {
+  _lbIdx = (_lbIdx + dir + allPhotos.length) % allPhotos.length;
+  openLightbox(_lbIdx);
+}
+document.addEventListener('keydown', function(e) {
+  const lb = document.getElementById('lightboxOverlay');
+  if (lb && lb.classList.contains('open')) {
+    if (e.key === 'Escape') closeLightbox();
+    if (e.key === 'ArrowLeft') lightboxGo(-1);
+    if (e.key === 'ArrowRight') lightboxGo(1);
+  }
+});
 
 async function deletePhoto(cid) {
   if (!confirm('Supprimer cette photo ?')) return;
   await fetch(`/api/property/photos/${encodeURIComponent(cid)}`, { method: 'DELETE' });
   allPhotos = allPhotos.filter(p => p.cloudinary_id !== cid);
-  renderPhotos(allPhotos);
-  window.showToast('Photo supprimée');
+  renderPhotosGrid();
+  showToast('Photo supprimée');
 }
 
-// Document upload
+// ── Document upload ───────────────────────────────────
+const DOC_META = {
+  dpe:              { icon:'🏷',  color:'#e8f5e9', text:'#2e7d32', label:'DPE' },
+  amiante:          { icon:'⚗️', color:'#fce4ec', text:'#c62828', label:'Amiante' },
+  plomb:            { icon:'🔩', color:'#fce4ec', text:'#c62828', label:'Plomb' },
+  electricite:      { icon:'⚡', color:'#fff8e1', text:'#f57f17', label:'Électricité' },
+  gaz:              { icon:'🔥', color:'#fff3e0', text:'#e65100', label:'Gaz' },
+  assainissement:   { icon:'💧', color:'#e3f2fd', text:'#1565c0', label:'Assainissement' },
+  erp:              { icon:'⚠️', color:'#fff8e1', text:'#f57f17', label:'ERP' },
+  facture_chaudiere:{ icon:'🔥', color:'#fff3e0', text:'#e65100', label:'Facture chaudière' },
+  entretien_ramonage:{ icon:'📋', color:'#e3f2fd', text:'#1565c0', label:'Entretien / ramonage' },
+  cheminee:         { icon:'🔥', color:'#fff3e0', text:'#e65100', label:'Cheminée' },
+  autre:            { icon:'📁', color:'#f5f5f5', text:'#555', label:'Autre' },
+  titre:            { icon:'🏠', color:'#f0f5f1', text:'#3D5A47', label:'Titre propriété', confidentiel:true },
+  taxe:             { icon:'📄', color:'#f0f5f1', text:'#3D5A47', label:'Taxe foncière', confidentiel:true },
+  compromis:        { icon:'📝', color:'#f5f0ff', text:'#6a1b9a', label:'Compromis', confidentiel:true },
+  acte:             { icon:'📋', color:'#f5f0ff', text:'#6a1b9a', label:'Acte notarié', confidentiel:true },
+  identite:         { icon:'🪪', color:'#fce4ec', text:'#c62828', label:'Pièce d\'identité', confidentiel:true },
+  confidentiel:     { icon:'🔒', color:'#fce4ec', text:'#c62828', label:'Confidentiel', confidentiel:true },
+};
+
+const CONFIDENTIAL_TYPES = new Set(['titre','taxe','compromis','acte','identite','confidentiel']);
+
+// Upload document acheteur
 document.getElementById('docInput').addEventListener('change', async (e) => {
   const file = e.target.files[0];
   if (!file) return;
@@ -483,31 +2300,916 @@ document.getElementById('docInput').addEventListener('change', async (e) => {
   fd.append('doc_type', document.getElementById('docType').value);
   const res = await fetch('/api/property/documents', { method: 'POST', body: fd });
   const data = await res.json();
-  if (data.success) { window.showToast('Document ajouté'); loadProperty(); }
+  if (data.success) { showToast('Document ajouté au dossier'); loadProperty(); }
+  e.target.value = '';
+});
+
+// Upload document confidentiel
+document.getElementById('confDocInput').addEventListener('change', async (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+  const fd = new FormData();
+  fd.append('document', file);
+  fd.append('name', document.getElementById('confDocName').value || file.name);
+  fd.append('doc_type', document.getElementById('confDocType').value);
+  const res = await fetch('/api/property/documents', { method: 'POST', body: fd });
+  const data = await res.json();
+  if (data.success) { showToast('Document confidentiel enregistré'); loadProperty(); }
   e.target.value = '';
 });
 
 function renderDocuments(docs) {
-  const list = document.getElementById('documentsList');
-  list.innerHTML = docs.map(d => `
-    <div style="display:flex;justify-content:space-between;align-items:center;padding:12px 16px;background:var(--blanc);border:1px solid var(--vert-pale);border-radius:8px;">
-      <div>
-        <strong style="font-size:0.9rem;">${d.name}</strong>
-        <span style="font-size:0.78rem;color:#888;margin-left:8px;">${d.doc_type}</span>
+  const clientDocs = docs.filter(d => !CONFIDENTIAL_TYPES.has(d.doc_type));
+  const confDocs   = docs.filter(d => CONFIDENTIAL_TYPES.has(d.doc_type));
+
+  function docCardHtml(d) {
+    const m = DOC_META[d.doc_type] || DOC_META.autre;
+    return `<div class="doc-card">
+      <div class="doc-icon-wrap" style="background:${m.color};">${m.icon}</div>
+      <div class="doc-info">
+        <div class="doc-name-text">${d.name}</div>
+        <span class="doc-type-chip" style="background:${m.color};color:${m.text};">${m.label}</span>
       </div>
-      <a href="${d.url}" target="_blank" class="btn-ghost" style="font-size:0.8rem;padding:6px 12px;">Voir →</a>
-    </div>
-  `).join('');
+      <div style="display:flex;gap:8px;">
+        <a href="${d.url}" target="_blank" class="btn-ghost" style="font-size:0.82rem;padding:7px 14px;">Voir →</a>
+      </div>
+    </div>`;
+  }
+
+  const clientList = document.getElementById('clientDocsList');
+  if (clientList) clientList.innerHTML = clientDocs.length ? clientDocs.map(docCardHtml).join('') : '<p style="font-size:0.85rem;color:#bbb;text-align:center;padding:20px 0;">Aucun document acheteur pour l\'instant.</p>';
+
+  const confList = document.getElementById('confDocsList');
+  if (confList) confList.innerHTML = confDocs.length ? confDocs.map(docCardHtml).join('') : '<p style="font-size:0.85rem;color:#bbb;text-align:center;padding:20px 0;">Aucun document confidentiel pour l\'instant.</p>';
+
+  // Update checklist
+  const uploadedTypes = new Set(docs.map(d => d.doc_type));
+  document.querySelectorAll('.doc-required-item').forEach(el => {
+    el.classList.toggle('done', uploadedTypes.has(el.dataset.type));
+  });
 }
 
+// ── AI Description generator ───────────────────────────
+async function generateAIDescription() {
+  const btn = document.getElementById('aiDescBtn');
+  const status = document.getElementById('aiDescStatus');
+  const textarea = document.querySelector('[name="description"]');
+
+  btn.disabled = true;
+  btn.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="animation:spin 1s linear infinite"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg> Génération...`;
+  status.style.display = 'inline';
+
+  const form = document.getElementById('propertyForm');
+  const formData = new FormData(form);
+  const property = {};
+  formData.forEach((v, k) => { property[k] = v; });
+  ['type','heating_type','heating_details','dpe_class','exposition','sale_reason','garden','terrace',
+   'certificat_assainissement','assainissement_type','fenetres_type','toiture_couverture','volets_type','sols_dalle',
+   'stationnement_type','garage_motorise','garage_sol','terrace_revetement',
+   'cheminee_type','eau_chaude_type','wc_count','cuisine_type','grenier','grenier_present'].forEach(f => {
+    const el = document.getElementById('field-' + f);
+    if (el) property[f] = el.value;
+  });
+
+  try {
+    const res = await fetch('/api/property/generate-description', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ property })
+    });
+    const data = await res.json();
+    if (data.description) {
+      textarea.value = data.description;
+      textarea.style.background = '#f0f7f2';
+      setTimeout(() => textarea.style.background = '', 1500);
+      showToast('Texte généré !');
+      updateCompletion();
+    } else {
+      showToast(data.error || 'Erreur de génération', 'error');
+    }
+  } catch(e) {
+    showToast('Erreur réseau', 'error');
+  }
+
+  btn.disabled = false;
+  btn.innerHTML = `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg> Générer avec l'IA`;
+  status.style.display = 'none';
+}
+
+// ── Fiche acheteur ────────────────────────────────────
+const DPE_COLORS = {A:'#1a9e5a',B:'#4cb84c',C:'#b5d332',D:'#f5c518',E:'#f5a818',F:'#e05a1a',G:'#cc1a1a'};
+const TYPE_ICONS = {Maison:'🏠',Appartement:'🏢',Villa:'🌴',Terrain:'🌿'};
+
+function generateFiche() {
+  const form = document.getElementById('propertyForm');
+  const p = {};
+  const formData = new FormData(form);
+  formData.forEach((v,k) => { p[k] = v; });
+  ['type','heating_type','heating_details','dpe_class','exposition','sale_reason','garden','terrace',
+   'certificat_assainissement','assainissement_type','fenetres_type','toiture_couverture','volets_type','sols_dalle',
+   'stationnement_type','garage_motorise','garage_sol','terrace_revetement',
+   'cheminee_type','eau_chaude_type','wc_count','cuisine_type','grenier','grenier_present'].forEach(f => {
+    const el = document.getElementById('field-' + f);
+    if (el) p[f] = el.value;
+  });
+
+  if (!p.address && !p.city) {
+    showToast('Sauvegardez d\'abord votre fiche (onglet Informations).', 'error');
+    return;
+  }
+
+  const icon = TYPE_ICONS[p.type] || '🏡';
+  const dpeColor = DPE_COLORS[p.dpe_class] || '#aaa';
+  const dpeTextColor = ['C','D','E'].includes(p.dpe_class) ? '#333' : '#fff';
+  const priceFormatted = p.price ? parseInt(p.price).toLocaleString('fr-FR') + ' €' : '—';
+  const surface = p.surface_habitable ? p.surface_habitable + ' m²' : '—';
+  const terrainStr = p.surface_terrain ? p.surface_terrain + ' m² terrain' : '';
+
+  const extras = [
+    p.garden === '1' ? '🌿 Jardin' : null,
+    p.terrace === '1' ? '🪴 Terrasse' : null,
+    p.exposition ? '☀️ ' + p.exposition : null,
+    p.heating_type || null,
+    p.heating_mechanism ? p.heating_mechanism : null,
+    p.heating_year ? 'Chaudière ' + p.heating_year : null,
+    p.hauteur_plafond ? 'Hauteur plafond : ' + p.hauteur_plafond + ' m' : null,
+    p.assainissement_type ? 'Assainissement : ' + p.assainissement_type : null,
+    p.certificat_assainissement === '1' ? '✓ Certificat assainissement' : null,
+    p.toiture_couverture ? 'Toiture : ' + p.toiture_couverture : null,
+    p.volets_type ? 'Volets : ' + p.volets_type : null,
+    p.sols_dalle ? 'Dalle : ' + p.sols_dalle : null,
+    p.stationnement_type ? 'Stationnement : ' + p.stationnement_type : null,
+    p.cheminee_type ? 'Cheminée : ' + p.cheminee_type : null,
+    p.eau_chaude_type ? 'Eau chaude : ' + p.eau_chaude_type : null,
+    p.cuisine_type ? 'Cuisine : ' + p.cuisine_type : null,
+    p.wc_count ? p.wc_count + ' WC' : null,
+    p.grenier_present === '1' ? ('Grenier' + (p.grenier ? ' — ' + p.grenier : '')) : null,
+    p.fenetres_type ? 'Fenêtres : ' + p.fenetres_type : null,
+  ].filter(Boolean);
+
+  const prox = [
+    p.commerces ? { label: p.commerces } : null,
+    p.school_maternelle ? { label: 'Maternelle : ' + p.school_maternelle } : null,
+    p.school_primaire ? { label: 'Primaire : ' + p.school_primaire } : null,
+    p.school_college ? { label: 'Collège : ' + p.school_college } : null,
+    p.school_lycee ? { label: 'Lycée : ' + p.school_lycee } : null,
+    p.highway ? { label: 'Autoroute : ' + p.highway } : null,
+    p.train_station ? { label: 'Gare : ' + p.train_station } : null,
+  ].filter(Boolean);
+
+  const docsSection = (_propertyData?.documents?.length)
+    ? `<div class="fiche-section">
+        <div class="fiche-section-title">Documents disponibles</div>
+        <div class="fiche-docs">${_propertyData.documents.map(d => `<span class="fiche-doc-tag">✓ ${d.name}</span>`).join('')}</div>
+      </div>` : '';
+
+  document.getElementById('ficheOutput').innerHTML = `
+    <div class="fiche-container" id="ficheCard">
+      <div class="fiche-header">
+        <div class="fiche-type-badge">${icon} ${p.type || 'Bien immobilier'}</div>
+        <div class="fiche-price">${priceFormatted}</div>
+        <div class="fiche-address">${p.address || ''}${p.city ? ', ' + p.postal_code + ' ' + p.city : ''}</div>
+      </div>
+      <div class="fiche-body">
+        <div class="fiche-stats">
+          <div class="fiche-stat">
+            <div class="fiche-stat-val">${surface}</div>
+            <div class="fiche-stat-lbl">Habitable</div>
+          </div>
+          <div class="fiche-stat">
+            <div class="fiche-stat-val">${p.rooms || '—'}</div>
+            <div class="fiche-stat-lbl">Pièces</div>
+          </div>
+          <div class="fiche-stat">
+            <div class="fiche-stat-val">${p.bedrooms || '—'}</div>
+            <div class="fiche-stat-lbl">Chambres</div>
+          </div>
+          <div class="fiche-stat">
+            ${p.dpe_class
+              ? `<div class="fiche-dpe-badge" style="background:${dpeColor};color:${dpeTextColor}">${p.dpe_class}</div><div class="fiche-stat-lbl">DPE</div>`
+              : `<div class="fiche-stat-val">—</div><div class="fiche-stat-lbl">DPE</div>`}
+          </div>
+        </div>
+
+        ${terrainStr ? `<div style="font-size:0.85rem;color:#666;margin-bottom:20px;">📐 Surface terrain : ${terrainStr}</div>` : ''}
+
+        ${extras.length ? `
+        <div class="fiche-section">
+          <div class="fiche-section-title">Caractéristiques</div>
+          <div class="fiche-tags">${extras.map(e => `<span class="fiche-tag">${e}</span>`).join('')}</div>
+        </div>` : ''}
+
+        ${p.year_built || p.taxe_fonciere ? `
+        <div class="fiche-section">
+          <div class="fiche-section-title">Informations pratiques</div>
+          <div class="fiche-tags">
+            ${p.year_built ? `<span class="fiche-tag">Construit en ${p.year_built}</span>` : ''}
+            ${p.taxe_fonciere ? `<span class="fiche-tag">Taxe foncière : ${parseInt(p.taxe_fonciere).toLocaleString('fr-FR')} €/an</span>` : ''}
+          </div>
+        </div>` : ''}
+
+        ${prox.length ? `
+        <div class="fiche-section">
+          <div class="fiche-section-title">À proximité</div>
+          <div class="fiche-proximity">
+            ${prox.map(item => `<div class="fiche-prox-item"><div class="fiche-prox-dot"></div><span>${item.label}</span></div>`).join('')}
+          </div>
+        </div>` : ''}
+
+        ${p.equipment ? `
+        <div class="fiche-section">
+          <div class="fiche-section-title">Équipements inclus</div>
+          <div class="fiche-desc">${p.equipment}</div>
+        </div>` : ''}
+
+        ${p.description ? `
+        <div class="fiche-section">
+          <div class="fiche-section-title">Description</div>
+          <div class="fiche-desc">${p.description.replace(/\n/g, '<br>')}</div>
+        </div>` : ''}
+
+        ${p.virtual_tour_url ? `
+        <div class="fiche-section">
+          <div class="fiche-section-title">Visite virtuelle</div>
+          <a href="${p.virtual_tour_url}" target="_blank" style="display:inline-flex;align-items:center;gap:6px;padding:8px 14px;background:#f0f5f1;border-radius:8px;color:#3D5A47;font-size:0.85rem;font-weight:600;text-decoration:none;">🥽 Accéder à la visite 3D →</a>
+        </div>` : ''}
+
+        ${docsSection}
+      </div>
+      <div class="fiche-footer">
+        <div class="fiche-contact">
+          <strong id="ficheSellerName">Chargement...</strong>
+          <span id="ficheSellerPhone"></span>
+        </div>
+        <div style="font-size:0.78rem;color:#aaa;">Document généré par Serenis — confidentiel</div>
+      </div>
+    </div>`;
+
+  document.getElementById('printBtn').style.display = 'inline-flex';
+  fetchSellerForFiche();
+}
+
+// ── Visite virtuelle URL ──────────────────────────────
+async function saveTourUrl() {
+  var url = document.getElementById('field-virtual_tour_url').value.trim();
+  var res = await fetch('/api/property', {
+    method: 'POST', headers: {'Content-Type':'application/json'},
+    body: JSON.stringify({ virtual_tour_url: url })
+  });
+  var data = await res.json();
+  var status = document.getElementById('tourUrlStatus');
+  if (data.success) {
+    showToast('Lien enregistré');
+    if (status) status.textContent = url ? '✓ Lien enregistré' : '';
+  } else {
+    showToast(data.error || 'Erreur', 'error');
+  }
+}
+
+async function fetchSellerForFiche() {
+  try {
+    const res = await fetch('/api/me');
+    const data = await res.json();
+    if (data.seller) {
+      const name = [data.seller.first_name, data.seller.last_name].filter(Boolean).join(' ') || 'Vendeur particulier';
+      const phone = data.seller.phone || data.seller.twilio_number || '';
+      document.getElementById('ficheSellerName').textContent = name;
+      document.getElementById('ficheSellerPhone').textContent = phone;
+    }
+  } catch(e) {}
+}
+
+function printFiche() {
+  window.print();
+}
+
+// ── Toast ─────────────────────────────────────────────
 window.showToast = function(msg, type='success') {
   let toast = document.querySelector('.toast');
   if (!toast) { toast = document.createElement('div'); toast.className = 'toast'; document.body.appendChild(toast); }
-  toast.textContent = msg; toast.className = `toast ${type==='error'?'error':''}`;
-  toast.classList.add('show'); setTimeout(()=>toast.classList.remove('show'), 3500);
+  toast.textContent = msg;
+  toast.className = `toast ${type === 'error' ? 'error' : ''}`;
+  toast.classList.add('show');
+  setTimeout(() => toast.classList.remove('show'), 3500);
 };
 
-// Tab CSS
+// ═══════════════════════════════════════════════════════
+// PIÈCES PAR NIVEAU
+// ═══════════════════════════════════════════════════════
+var ROOM_DEFS = [
+  {key:'buanderie', label:'Buanderie',      icon:'🧺', countable:false, bedroom:false},
+  {key:'bureau',    label:'Bureau',         icon:'📚', countable:true,  bedroom:false},
+  {key:'cave',      label:'Cave',           icon:'🍷', countable:false, bedroom:false},
+  {key:'cellier',   label:'Cellier',        icon:'📦', countable:false, bedroom:false},
+  {key:'chambre',   label:'Chambre',        icon:'🛏', countable:true,  bedroom:true},
+  {key:'cuisine',   label:'Cuisine',        icon:'🍳', countable:false, bedroom:false},
+  {key:'dressing',  label:'Dressing',       icon:'👗', countable:false, bedroom:false},
+  {key:'entree',    label:'Entrée / Hall',  icon:'🚪', countable:false, bedroom:false},
+  {key:'garage',    label:'Garage',         icon:'🏠', countable:false, bedroom:false},
+  {key:'palier',    label:'Palier',         icon:'↕️', countable:false, bedroom:false},
+  {key:'sam',       label:'Salle à manger', icon:'🍽', countable:true,  bedroom:false},
+  {key:'sdb',       label:'Salle de bain',  icon:'🛁', countable:false, bedroom:false},
+  {key:'sde',       label:"Salle d'eau",    icon:'🚿', countable:false, bedroom:false},
+  {key:'sejour',    label:'Séjour',         icon:'🛋', countable:true,  bedroom:false},
+  {key:'veranda',   label:'Véranda',        icon:'🌿', countable:true,  bedroom:false},
+  {key:'wc',        label:'WC',             icon:'🚽', countable:false, bedroom:false},
+];
+
+var ALL_ETAGES = ['1er étage','2e étage','3e étage','4e étage','5e étage','6e étage'];
+var unlockedEtages = [];
+var addingFloor = 'RDC';
+var addingType = null;
+var roomsList = [];
+
+function addNextEtage() {
+  var next = ALL_ETAGES[unlockedEtages.length];
+  if (!next) return;
+  unlockedEtages.push(next);
+  addingFloor = next;
+  // Injecter le nouveau bouton avant le bouton "Ajouter un étage"
+  var wrap = document.getElementById('addFloorBtns');
+  var addBtn = wrap ? wrap.querySelector('.add-etage-btn') : null;
+  if (wrap && addBtn) {
+    var label = next === '1er étage' ? '1er' : next.replace(' étage','');
+    var newBtn = document.createElement('button');
+    newBtn.type = 'button';
+    newBtn.className = 'add-floor-btn active';
+    newBtn.textContent = label;
+    newBtn.onclick = function() { setAddFloor(next, newBtn); };
+    wrap.insertBefore(newBtn, addBtn);
+    // Désactiver tous les autres
+    wrap.querySelectorAll('.add-floor-btn').forEach(function(b) { b.classList.remove('active'); });
+    newBtn.classList.add('active');
+    if (unlockedEtages.length >= ALL_ETAGES.length) addBtn.style.display = 'none';
+  }
+}
+
+function setAddFloor(floor, btn) {
+  addingFloor = floor;
+  document.querySelectorAll('#addFloorBtns .add-floor-btn').forEach(function(b) { b.classList.remove('active'); });
+  if (btn) btn.classList.add('active');
+}
+
+function selectRoomType(key, btn) {
+  addingType = key;
+  // Reset all buttons inline (CSS-independent)
+  document.querySelectorAll('.rtype-btn').forEach(function(b) {
+    b.style.borderColor = '#e8e0d6';
+    b.style.background = '#fff';
+    b.classList.remove('chosen');
+  });
+  // Highlight selected button inline
+  if (btn) {
+    btn.style.borderColor = '#C4785A';
+    btn.style.background = '#fff8f4';
+    btn.classList.add('chosen');
+  }
+  // Show indicator
+  var ind = document.getElementById('rtypeIndicator');
+  if (ind) {
+    var def = ROOM_DEFS.find(function(r) { return r.key === key; });
+    ind.textContent = def ? '✓ ' + def.label + ' sélectionné' : '';
+    ind.style.display = 'block';
+  }
+}
+
+
+function confirmAddRoom() {
+  try {
+    if (!addingType) { showToast('Choisissez un type de pièce', 'error'); return; }
+    var def = ROOM_DEFS.find(function(r) { return r.key === addingType; });
+    if (!def) { showToast('Type de pièce inconnu', 'error'); return; }
+    var surfaceInput = document.getElementById('addRoomSurface');
+    var surface = surfaceInput ? (parseFloat((surfaceInput.value || '').replace(',','.')) || 0) : 0;
+    var countSameType = roomsList.filter(function(r) { return r.key === def.key; }).length;
+    var labelDisplay = def.countable && countSameType > 0 ? def.label + ' ' + (countSameType + 1) : def.label;
+    roomsList.push({
+      id: Date.now(),
+      floor: addingFloor,
+      key: def.key, label: labelDisplay, icon: def.icon,
+      surface: surface, countable: def.countable, bedroom: def.bedroom
+    });
+    if (surfaceInput) surfaceInput.value = '';
+    document.querySelectorAll('.rtype-btn').forEach(function(b) {
+      b.classList.remove('chosen');
+      b.style.borderColor = '#e8e0d6';
+      b.style.background = '#fff';
+    });
+    var ind = document.getElementById('rtypeIndicator');
+    if (ind) { ind.style.display = 'none'; ind.textContent = ''; }
+    addingType = null;
+    renderRoomsList();
+    computeRoomTotals();
+    scheduleAutosave();
+  } catch(err) {
+    showToast('Erreur: ' + err.message, 'error');
+  }
+}
+
+function removeRoom(id) {
+  roomsList = roomsList.filter(function(r) { return r.id !== id; });
+  renderRoomsList();
+  computeRoomTotals();
+  scheduleAutosave();
+}
+
+function syncUnlockedEtagesFromList() {
+  var wrap = document.getElementById('addFloorBtns');
+  ALL_ETAGES.forEach(function(fl) {
+    if (roomsList.some(function(r) { return r.floor === fl; }) && unlockedEtages.indexOf(fl) === -1) {
+      unlockedEtages.push(fl);
+      if (wrap) {
+        var addBtn = wrap.querySelector('.add-etage-btn');
+        var label = fl === '1er étage' ? '1er' : fl.replace(' étage','');
+        var newBtn = document.createElement('button');
+        newBtn.type = 'button';
+        newBtn.className = 'add-floor-btn';
+        newBtn.textContent = label;
+        var flCopy = fl;
+        newBtn.onclick = function() { setAddFloor(flCopy, newBtn); };
+        if (addBtn) wrap.insertBefore(newBtn, addBtn);
+        else wrap.appendChild(newBtn);
+      }
+    }
+  });
+  var addBtn2 = wrap ? wrap.querySelector('.add-etage-btn') : null;
+  if (addBtn2 && unlockedEtages.length >= ALL_ETAGES.length) addBtn2.style.display = 'none';
+}
+
+function renderRoomsList() {
+  var container = document.getElementById('roomsList');
+  if (!container) return;
+  if (roomsList.length === 0) { container.innerHTML = ''; return; }
+  var floorOrder = ['RDC','1er étage','2e étage','3e étage','4e étage','5e étage','6e étage','Sous-sol'];
+  var rows = '';
+  floorOrder.forEach(function(floor) {
+    var floorRooms = roomsList.filter(function(r) { return r.floor === floor; });
+    if (floorRooms.length === 0) return;
+    floorRooms.forEach(function(r, i) {
+      var niveauLabel = floor === 'RDC' ? 'rdc' : floor === 'Sous-sol' ? 'ss' : floor.replace(' étage','');
+      var niveauCell = i === 0
+        ? '<td class="rt-level">' + niveauLabel + '</td>'
+        : '<td class="rt-level" style="color:#ccc;">—</td>';
+      var surfTxt = r.surface > 0 ? r.surface.toString().replace('.',',') + ' m²' : '—';
+      rows += '<tr>' +
+        niveauCell +
+        '<td class="rt-piece">' + r.icon + ' ' + r.label + '</td>' +
+        '<td class="rt-surface">' + surfTxt + '</td>' +
+        '<td class="rt-del"><button type="button" class="rt-del-btn" onclick="removeRoom(' + r.id + ')">✕</button></td>' +
+      '</tr>';
+    });
+  });
+  container.innerHTML =
+    '<table class="rooms-table">' +
+      '<thead><tr><th>NIVEAU</th><th>NOM</th><th>SURFACE</th><th></th></tr></thead>' +
+      '<tbody>' + rows + '</tbody>' +
+    '</table>';
+  // Scroll la dernière ligne dans le viewport
+  try {
+    var lastRow = container.querySelector('tbody tr:last-child');
+    if (lastRow) lastRow.scrollIntoView({behavior:'smooth', block:'nearest'});
+  } catch(e) {}
+}
+
+function computeRoomTotals() {
+  var rooms = 0, beds = 0, surf = 0;
+  roomsList.forEach(function(r) {
+    if (r.countable) rooms++;
+    if (r.bedroom) beds++;
+    if (r.surface > 0) surf += r.surface;
+  });
+  document.getElementById('totalRooms').textContent = rooms;
+  document.getElementById('totalBedrooms').textContent = beds;
+  document.getElementById('field-rooms').value = rooms;
+  document.getElementById('field-bedrooms').value = beds;
+  var surfEl = document.getElementById('totalSurfaceRooms');
+  if (surf > 0) {
+    surfEl.style.display = 'block';
+    document.getElementById('totalSurface').textContent = Math.round(surf * 100) / 100;
+  } else { surfEl.style.display = 'none'; }
+  updateCompletion();
+}
+
+// ═══════════════════════════════════════════════════════
+// CHAUFFAGE ICON GRID — multi-select
+// ═══════════════════════════════════════════════════════
+var selectedHeatings = new Set();
+var HEATING_NEEDS_YEAR = ['Gaz naturel', 'Fioul', 'Bois / poêle', 'Cheminée', 'Pompe à chaleur'];
+
+function toggleHeating(val) {
+  var card = document.querySelector('.heating-card[data-heat="' + val + '"]');
+  if (!card) return;
+  if (selectedHeatings.has(val)) {
+    selectedHeatings.delete(val);
+    card.classList.remove('active');
+  } else {
+    selectedHeatings.add(val);
+    card.classList.add('active');
+  }
+  var hidden = document.getElementById('field-heating_type');
+  if (hidden) hidden.value = Array.from(selectedHeatings).join(',');
+  renderHeatingDetails();
+  scheduleAutosave();
+}
+
+function renderHeatingDetails() {
+  var container = document.getElementById('heatingDetails');
+  if (!container) return;
+  var saved = {};
+  container.querySelectorAll('[data-heat-year]').forEach(function(inp) {
+    saved[inp.dataset.heatYear] = inp.value;
+  });
+  var html = '';
+  selectedHeatings.forEach(function(val) {
+    if (!HEATING_NEEDS_YEAR.includes(val)) return;
+    html += '<div style="display:flex;align-items:center;gap:10px;padding:8px 12px;background:#fff;border-radius:8px;border:1px solid #e8e0d6;">' +
+      '<span style="font-size:0.82rem;font-weight:600;color:#555;min-width:145px;">' + val + ' — Année :</span>' +
+      '<input type="number" data-heat-year="' + val + '" placeholder="ex: 2015" min="1950" max="2026" ' +
+      'value="' + (saved[val] || '') + '" ' +
+      'style="width:90px;padding:5px 8px;border:1px solid #ddd;border-radius:6px;font-size:0.85rem;font-family:\'DM Sans\',sans-serif;" ' +
+      'oninput="syncHeatingDetails()">' +
+    '</div>';
+  });
+  container.innerHTML = html;
+  syncHeatingDetails();
+}
+
+function syncHeatingDetails() {
+  var details = {};
+  var container = document.getElementById('heatingDetails');
+  if (container) {
+    container.querySelectorAll('[data-heat-year]').forEach(function(inp) {
+      if (inp.value) details[inp.dataset.heatYear] = inp.value;
+    });
+  }
+  var hiddenDetails = document.getElementById('field-heating_details');
+  if (hiddenDetails) hiddenDetails.value = JSON.stringify(details);
+}
+
+// ── Garage detail visibility ─────────────────────────
+function updateGarageDetail(vals) {
+  var garageVals = ['Garage fermé', 'Garage double', 'Box'];
+  var hasGarage = Array.isArray(vals) && vals.some(function(v) { return garageVals.includes(v); });
+  var detail = document.getElementById('garageDetail');
+  if (detail) detail.style.display = hasGarage ? 'block' : 'none';
+}
+
+// ── Generic contextual document upload ───────────────
+async function uploadContextualDoc(input, docType, label, statusEl) {
+  var file = input.files[0];
+  if (!file) return;
+  var fd = new FormData();
+  fd.append('document', file);
+  fd.append('name', label + ' — ' + file.name);
+  fd.append('doc_type', docType);
+  try {
+    var res = await fetch('/api/property/documents', {method:'POST', body:fd});
+    var data = await res.json();
+    if (data.success) {
+      showToast(label + ' ajouté au dossier');
+      var el = statusEl || document.getElementById('taxeDocStatus');
+      if (el) {
+        var url = data.url || '#';
+        el.innerHTML = (el.innerHTML || '') + '<div style="margin-top:4px;">✓ ' + label + ' — <a href="' + url + '" target="_blank" style="color:#3D5A47;font-weight:600;">Voir</a></div>';
+      }
+    } else {
+      showToast(data.error || 'Erreur upload', 'error');
+    }
+  } catch(e) { showToast('Erreur réseau', 'error'); }
+  input.value = '';
+}
+
+// ═══════════════════════════════════════════════════════
+// ÉQUIPEMENTS TILE GRID
+// ═══════════════════════════════════════════════════════
+const EQUIP_ITEMS = [
+  { key:'cuisine_equipee',   label:'Cuisine équipée',       icon:'🍳' },
+  { key:'cheminee',          label:'Cheminée',              icon:'🔥' },
+  { key:'alarme',            label:'Alarme',                icon:'🔒' },
+  { key:'fibre',             label:'Fibre optique',         icon:'📡' },
+  { key:'panneaux_solaires', label:'Panneaux solaires',     icon:'☀️' },
+  { key:'piscine',           label:'Piscine',               icon:'🏊' },
+  { key:'spa',               label:'Spa / Jacuzzi',         icon:'🛁' },
+  { key:'clim',              label:'Climatisation',         icon:'❄️' },
+  { key:'borne_ev',          label:'Borne recharge VE',     icon:'🔋' },
+  { key:'interphone',        label:'Interphone / vidéo',    icon:'📹' },
+  { key:'pergola',           label:'Pergola / Tonnelle',    icon:'🌿' },
+  { key:'volets_elec',       label:'Volets électriques',    icon:'🪟' },
+  { key:'digicode',          label:'Portail électrique',    icon:'🔑' },
+  { key:'buanderie',         label:'Buanderie',             icon:'🧺' },
+  { key:'double_vitrage',    label:'Double vitrage',        icon:'🪟' },
+  { key:'cave_rangement',    label:'Cave / rangement',      icon:'🍷' },
+  { key:'grenier',           label:'Grenier aménageable',   icon:'🏠' },
+  { key:'domotique',         label:'Domotique',             icon:'📱' },
+];
+
+let selectedEquip = new Set();
+let customEquipList = [];
+
+function initEquipGrid() {
+  const grid = document.getElementById('equipGrid');
+  if (!grid) return;
+  grid.innerHTML = EQUIP_ITEMS.map(e => `
+    <div class="equip-tile ${selectedEquip.has(e.key) ? 'selected' : ''}"
+         data-equip="${e.key}" onclick="toggleEquip('${e.key}')">
+      <span class="equip-tile-icon">${e.icon}</span>
+      <span class="equip-tile-name">${e.label}</span>
+    </div>`).join('');
+  // Render custom tiles
+  customEquipList.forEach((item, i) => {
+    const div = document.createElement('div');
+    div.className = 'equip-tile selected';
+    div.innerHTML = `<span class="equip-tile-icon">+</span><span class="equip-tile-name">${item}</span>`;
+    div.onclick = () => { customEquipList.splice(i, 1); initEquipGrid(); syncEquipValue(); };
+    grid.appendChild(div);
+  });
+}
+
+function toggleEquip(key) {
+  if (selectedEquip.has(key)) selectedEquip.delete(key);
+  else selectedEquip.add(key);
+  initEquipGrid();
+  syncEquipValue();
+  scheduleAutosave();
+}
+
+function addCustomEquip() {
+  const input = document.getElementById('equipCustom');
+  const val = input.value.trim();
+  if (!val) return;
+  customEquipList.push(val);
+  input.value = '';
+  initEquipGrid();
+  syncEquipValue();
+  scheduleAutosave();
+}
+
+function syncEquipValue() {
+  const items = [];
+  EQUIP_ITEMS.forEach(e => { if (selectedEquip.has(e.key)) items.push(e.label); });
+  customEquipList.forEach(c => items.push(c));
+  document.getElementById('field-equipment').value = items.join(', ');
+}
+
+initEquipGrid();
+
+// ═══════════════════════════════════════════════════════
+// AUTOSAVE localStorage
+// ═══════════════════════════════════════════════════════
+const LS_DRAFT_KEY = 'serenis_property_draft';
+let autosaveTimer = null;
+
+function scheduleAutosave() {
+  const badge = document.getElementById('autosaveBadge');
+  if (badge) { badge.textContent = '● Enregistrement...'; badge.className = 'autosave-badge saving'; }
+  clearTimeout(autosaveTimer);
+  autosaveTimer = setTimeout(saveDraft, 900);
+}
+
+function saveDraft() {
+  const form = document.getElementById('propertyForm');
+  const fd = new FormData(form);
+  const data = {};
+  fd.forEach((v, k) => { data[k] = v; });
+  ['type','heating_type','heating_details','dpe_class','exposition','sale_reason','garden','terrace',
+   'certificat_assainissement','assainissement_type','fenetres_type','toiture_couverture','volets_type',
+   'sols_dalle','stationnement_type','garage_motorise','garage_sol','terrace_revetement',
+   'mitoyennete','equipment',
+   'cheminee_type','eau_chaude_type','wc_count','cuisine_type','grenier','grenier_present'].forEach(f => {
+    const el = document.getElementById('field-' + f);
+    if (el) data[f] = el.value;
+  });
+  data._roomsList = roomsList;
+  data._equip = [...selectedEquip];
+  data._customEquip = customEquipList;
+  data._savedAt = Date.now();
+  try {
+    localStorage.setItem(LS_DRAFT_KEY, JSON.stringify(data));
+    const badge = document.getElementById('autosaveBadge');
+    if (badge) {
+      const t = new Date().toLocaleTimeString('fr-FR', {hour:'2-digit', minute:'2-digit'});
+      badge.textContent = '✓ Brouillon à ' + t;
+      badge.className = 'autosave-badge saved';
+    }
+  } catch(e) {}
+}
+
+function restoreDraft(draft) {
+  if (!draft) return;
+  const form = document.getElementById('propertyForm');
+  Object.keys(draft).forEach(k => {
+    if (k.startsWith('_')) return;
+    const el = form.elements[k];
+    if (el && el.type !== 'hidden') el.value = draft[k] || '';
+  });
+  if (draft.type) selectType(draft.type);
+  if (draft.dpe_class) selectDpe(draft.dpe_class);
+  if (draft.mitoyennete) selectMito(draft.mitoyennete);
+  if (draft.heating_type) {
+    draft.heating_type.split(',').forEach(function(v) { v = v.trim(); if (v) toggleHeating(v); });
+    if (draft.heating_details) {
+      try {
+        var hdDraft = JSON.parse(draft.heating_details);
+        setTimeout(function() {
+          Object.keys(hdDraft).forEach(function(heat) {
+            var inp = document.querySelector('[data-heat-year="' + heat + '"]');
+            if (inp) { inp.value = hdDraft[heat]; syncHeatingDetails(); }
+          });
+        }, 50);
+      } catch(e) {}
+    }
+  }
+  if (draft.heating_mechanism) {
+    var sel = form.elements['heating_mechanism'];
+    if (sel) sel.value = draft.heating_mechanism;
+  }
+  if (draft.year_built) {
+    const s = document.getElementById('yearSlider');
+    if (s) { s.value = draft.year_built; s.dispatchEvent(new Event('input')); }
+  }
+  if (draft._roomsList) {
+    roomsList = draft._roomsList;
+    syncUnlockedEtagesFromList();
+    renderRoomsList();
+    computeRoomTotals();
+  }
+  if (draft._equip) {
+    selectedEquip = new Set(draft._equip);
+    customEquipList = draft._customEquip || [];
+    initEquipGrid();
+    syncEquipValue();
+  }
+  ['garden','terrace','certificat_assainissement','grenier_present'].forEach(function(name) {
+    if (draft[name] && draft[name] !== '0') {
+      var sw = document.getElementById('toggle-' + name);
+      var fld = document.getElementById('field-' + name);
+      if (sw) { sw.classList.add('on'); if (fld) fld.value = '1'; }
+      if (name === 'terrace') updateTerraceDetail(true);
+      if (name === 'grenier_present') updateGrenierDetail(true);
+    }
+  });
+  // Restore garage detail
+  if (draft.stationnement_type) {
+    var gDraftVals = draft.stationnement_type.split(',').map(function(v) { return v.trim(); });
+    updateGarageDetail(gDraftVals);
+  }
+  var multiDraftFields = ['toiture_couverture','volets_type','stationnement_type','fenetres_type','cheminee_type','eau_chaude_type','cuisine_type'];
+  ['exposition','sale_reason','assainissement_type','fenetres_type','toiture_couverture','volets_type','sols_dalle','stationnement_type','garage_motorise','garage_sol','terrace_revetement','cheminee_type','eau_chaude_type','wc_count','cuisine_type','grenier'].forEach(function(field) {
+    if (!draft[field]) return;
+    var group = document.querySelector('[data-field="' + field + '"]');
+    if (!group) return;
+    var isMulti = multiDraftFields.includes(field);
+    group.querySelectorAll('[data-value]').forEach(function(c) { c.classList.remove('active'); });
+    if (isMulti) {
+      var dvals = draft[field].split(',').map(function(v) { return v.trim(); });
+      dvals.forEach(function(val) {
+        var chip = group.querySelector('[data-value="' + val + '"]');
+        if (chip) chip.classList.add('active');
+      });
+      if (field === 'stationnement_type') updateGarageDetail(dvals);
+    } else {
+      var chip = group.querySelector('[data-value="' + draft[field] + '"]');
+      if (chip) chip.classList.add('active');
+    }
+    var hiddenDraft = document.getElementById('field-' + field);
+    if (hiddenDraft) hiddenDraft.value = draft[field];
+  });
+  updatePrixCoach();
+  updateCompletion();
+}
+
+document.getElementById('propertyForm').addEventListener('input', scheduleAutosave);
+document.getElementById('propertyForm').addEventListener('change', scheduleAutosave);
+
+// ═══════════════════════════════════════════════════════
+// JSON EXPORT
+// ═══════════════════════════════════════════════════════
+function exportJSON() {
+  const form = document.getElementById('propertyForm');
+  const fd = new FormData(form);
+  const data = { _export: new Date().toISOString(), _rooms_detail: roomsList };
+  fd.forEach((v, k) => { if (v) data[k] = v; });
+  ['type','heating_type','heating_details','dpe_class','exposition','sale_reason','garden','terrace',
+   'certificat_assainissement','assainissement_type','fenetres_type','toiture_couverture','volets_type',
+   'sols_dalle','stationnement_type','garage_motorise','garage_sol','terrace_revetement',
+   'mitoyennete','equipment',
+   'cheminee_type','eau_chaude_type','wc_count','cuisine_type','grenier','grenier_present'].forEach(f => {
+    const el = document.getElementById('field-' + f);
+    if (el?.value) data[f] = el.value;
+  });
+  const blob = new Blob([JSON.stringify(data, null, 2)], {type:'application/json'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'fiche-bien-serenis.json';
+  a.click();
+  URL.revokeObjectURL(a.href);
+  showToast('Export JSON téléchargé');
+}
+
+// ── Switch tab helper ─────────────────────────────────
+function switchTab(name) {
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.tab-content').forEach(c => c.classList.add('hidden'));
+  const btn = document.querySelector(`.tab-btn[data-tab="${name}"]`);
+  if (btn) btn.classList.add('active');
+  const content = document.getElementById('tab-' + name);
+  if (content) content.classList.remove('hidden');
+}
+
+// ── Command palette ───────────────────────────────────
+const CMD_ACTIONS = [
+  { section:'Navigation', icon:'📋', label:'Onglet Informations',    fn: () => switchTab('infos') },
+  { section:'Navigation', icon:'📸', label:'Onglet Photos',           fn: () => switchTab('photos') },
+  { section:'Navigation', icon:'📁', label:'Onglet Documents',        fn: () => switchTab('documents') },
+  { section:'Navigation', icon:'👤', label:'Fiche acheteur',          fn: () => { switchTab('fiche'); setTimeout(generateFiche, 200); } },
+  { section:'Navigation', icon:'🚀', label:'Publication',             fn: () => switchTab('publication') },
+  { section:'Actions',    icon:'💾', label:'Sauvegarder le formulaire', fn: () => document.querySelector('form')?.requestSubmit() },
+  { section:'Actions',    icon:'✨', label:'Générer la description IA', fn: () => { switchTab('infos'); setTimeout(generateAIDescription, 200); } },
+  { section:'Actions',    icon:'🔗', label:'Copier le lien public',   fn: () => {
+    const slugEl = document.querySelector('[data-slug]') || document.querySelector('input[name="slug"]');
+    const slugVal = slugEl?.value || slugEl?.dataset?.slug || window._propSlug;
+    if (slugVal) { navigator.clipboard.writeText(window.location.origin + '/bien/' + slugVal); showToast('Lien copié !'); }
+    else showToast('Publiez votre bien pour obtenir un lien', 'error');
+  }},
+  { section:'Pages', icon:'🏠', label:'Tableau de bord', fn: () => { window.location.href = '/seller'; } },
+  { section:'Pages', icon:'📅', label:'Agenda',          fn: () => { window.location.href = '/seller/agenda'; } },
+  { section:'Pages', icon:'📊', label:'Performances',    fn: () => { window.location.href = '/seller/performances'; } },
+];
+
+let _cmdSelected = 0;
+let _cmdFiltered = [...CMD_ACTIONS];
+
+function openCmd() {
+  document.getElementById('cmdOverlay').classList.add('open');
+  const input = document.getElementById('cmdInput');
+  input.value = '';
+  _cmdSelected = 0;
+  _cmdFiltered = [...CMD_ACTIONS];
+  renderCmdList();
+  setTimeout(() => input.focus(), 30);
+}
+function closeCmd() {
+  document.getElementById('cmdOverlay').classList.remove('open');
+}
+function filterCmd() {
+  const q = document.getElementById('cmdInput').value.toLowerCase().trim();
+  _cmdFiltered = q ? CMD_ACTIONS.filter(a => a.label.toLowerCase().includes(q)) : [...CMD_ACTIONS];
+  _cmdSelected = 0;
+  renderCmdList();
+}
+function renderCmdList() {
+  const list = document.getElementById('cmdList');
+  if (_cmdFiltered.length === 0) {
+    list.innerHTML = '<div class="cmd-empty">Aucune action trouvée</div>';
+    return;
+  }
+  let html = '';
+  let lastSection = null;
+  _cmdFiltered.forEach((a, i) => {
+    if (a.section !== lastSection) {
+      html += `<div class="cmd-section-label">${a.section}</div>`;
+      lastSection = a.section;
+    }
+    html += `<div class="cmd-item${i === _cmdSelected ? ' cmd-selected' : ''}" data-idx="${i}"
+      onmouseenter="cmdHover(${i})" onclick="cmdRun(${i})">
+      <span class="cmd-item-icon">${a.icon}</span>
+      <span class="cmd-item-label">${a.label}</span>
+    </div>`;
+  });
+  list.innerHTML = html;
+}
+function cmdHover(i) { _cmdSelected = i; highlightCmd(); }
+function highlightCmd() {
+  document.querySelectorAll('.cmd-item').forEach((el, i) => {
+    el.classList.toggle('cmd-selected', i === _cmdSelected);
+  });
+  const items = document.querySelectorAll('.cmd-item');
+  if (items[_cmdSelected]) items[_cmdSelected].scrollIntoView({ block: 'nearest' });
+}
+function cmdRun(i) {
+  const action = _cmdFiltered[i];
+  if (!action) return;
+  closeCmd();
+  setTimeout(() => action.fn(), 60);
+}
+function cmdKey(e) {
+  if (e.key === 'ArrowDown') { e.preventDefault(); _cmdSelected = Math.min(_cmdSelected + 1, _cmdFiltered.length - 1); highlightCmd(); }
+  else if (e.key === 'ArrowUp') { e.preventDefault(); _cmdSelected = Math.max(_cmdSelected - 1, 0); highlightCmd(); }
+  else if (e.key === 'Enter') { e.preventDefault(); cmdRun(_cmdSelected); }
+  else if (e.key === 'Escape') { closeCmd(); }
+}
+document.addEventListener('keydown', function(e) {
+  if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+    e.preventDefault();
+    const overlay = document.getElementById('cmdOverlay');
+    if (overlay.classList.contains('open')) closeCmd(); else openCmd();
+  }
+  if (e.key === 'Escape' && document.getElementById('cmdOverlay').classList.contains('open')) {
+    closeCmd();
+  }
+});
+
+// ── Tab button styles ─────────────────────────────────
 document.head.insertAdjacentHTML('beforeend', `<style>
 .tab-btn { padding:10px 20px;border-radius:50px;border:2px solid var(--vert-pale);font-size:0.88rem;font-weight:600;cursor:pointer;transition:0.2s;background:var(--blanc);color:var(--noir); }
 .tab-btn.active { background:var(--vert-foret);color:#fff;border-color:var(--vert-foret); }
@@ -516,5 +3218,26 @@ document.head.insertAdjacentHTML('beforeend', `<style>
 
 loadProperty();
 </script>
+<!-- ── Bento lightbox ─────────────────────────────────── -->
+<div class="lightbox-overlay" id="lightboxOverlay" onclick="if(event.target===this)closeLightbox()">
+  <img class="lightbox-img" id="lightboxImg" src="" alt="">
+  <button class="lightbox-close" onclick="closeLightbox()">✕</button>
+  <button class="lightbox-arrow lightbox-prev" id="lightboxPrev" onclick="lightboxGo(-1)">‹</button>
+  <button class="lightbox-arrow lightbox-next" id="lightboxNext" onclick="lightboxGo(1)">›</button>
+  <div class="lightbox-counter" id="lightboxCounter"></div>
+</div>
+
+<!-- ── Command palette ───────────────────────────────── -->
+<div class="cmd-overlay" id="cmdOverlay" onclick="if(event.target===this)closeCmd()">
+  <div class="cmd-palette">
+    <div class="cmd-search">
+      <span class="cmd-search-icon">⌘</span>
+      <input type="text" id="cmdInput" placeholder="Chercher une action…" oninput="filterCmd()" onkeydown="cmdKey(event)" autocomplete="off">
+    </div>
+    <div class="cmd-list" id="cmdList"></div>
+  </div>
+</div>
+
+<script src="/js/transitions.js"></script>
 </body>
 </html>

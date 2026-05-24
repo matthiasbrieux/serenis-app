@@ -45,6 +45,37 @@ app.use('/', require('./routes/seller'));
 app.use('/', require('./routes/buyer').router);
 app.use('/admin', require('./routes/admin'));
 
+// ── SEO : sitemap + robots ─────────────────────────────────────────
+app.get('/robots.txt', (req, res) => {
+  const base = process.env.BASE_URL || 'https://venduparmo.fr';
+  res.type('text/plain');
+  res.send([
+    'User-agent: *',
+    'Allow: /',
+    'Disallow: /dashboard',
+    'Disallow: /mon-bien',
+    'Disallow: /ma-formation',
+    'Disallow: /mon-agenda',
+    'Disallow: /admin',
+    `Sitemap: ${base}/sitemap.xml`,
+  ].join('\n'));
+});
+
+app.get('/sitemap.xml', (req, res) => {
+  const db = require('./database');
+  const base = process.env.BASE_URL || 'https://venduparmo.fr';
+  const properties = db.prepare('SELECT slug, updated_at FROM properties WHERE published=1').all();
+  const today = new Date().toISOString().split('T')[0];
+  const staticUrls = ['/', '/tarifs', '/faq'].map(p =>
+    `  <url><loc>${base}${p}</loc><lastmod>${today}</lastmod><changefreq>weekly</changefreq><priority>${p === '/' ? '1.0' : '0.7'}</priority></url>`
+  );
+  const propUrls = properties.map(p =>
+    `  <url><loc>${base}/bien/${p.slug}</loc><lastmod>${(p.updated_at || today).slice(0,10)}</lastmod><changefreq>daily</changefreq><priority>0.9</priority></url>`
+  );
+  res.type('application/xml');
+  res.send(`<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${[...staticUrls,...propUrls].join('\n')}\n</urlset>`);
+});
+
 // Contact form
 app.post('/api/contact', async (req, res) => {
   const { name, phone, email, offer, city, message } = req.body;

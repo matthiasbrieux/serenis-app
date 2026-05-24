@@ -7,8 +7,74 @@
   <meta name="description" content="Les outils des professionnels pour vendre votre bien entre particuliers. Pack Sérénité : 999€ au lieu de 10 000€ de commission agence.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/css/style.css">
+  <style>
+    /* ── Floating shapes — hero landing ──────────────────── */
+    @keyframes hsIn {
+      from { opacity: 0; transform: translateY(-150px) rotate(var(--r-start)); }
+      to   { opacity: 1; transform: translateY(0px) rotate(var(--rot)); }
+    }
+    @keyframes hsFloat {
+      0%, 100% { transform: translateY(0px)  rotate(var(--rot)); }
+      50%       { transform: translateY(15px) rotate(var(--rot)); }
+    }
+    .hero-shapes {
+      position: absolute; inset: 0; overflow: hidden; pointer-events: none; z-index: 0;
+    }
+    .hs {
+      position: absolute;
+      border-radius: 9999px;
+      border: 2px solid rgba(255,255,255,0.15);
+      backdrop-filter: blur(2px);
+      -webkit-backdrop-filter: blur(2px);
+      background: var(--hs-grad);
+      box-shadow: 0 8px 32px 0 rgba(0,0,0,0.12), inset 0 0 0 1px rgba(255,255,255,0.06);
+      opacity: 0;
+      animation:
+        hsIn    2.4s cubic-bezier(0.23, 0.86, 0.39, 0.96) var(--delay) both,
+        hsFloat  12s ease-in-out calc(var(--delay) + 2.4s) infinite;
+    }
+    /* Shape 1 — grande barre verte, haut gauche */
+    .hs-1 {
+      --rot: 12deg; --r-start: -3deg; --delay: 0.3s;
+      --hs-grad: linear-gradient(90deg, rgba(212,228,216,0.18) 0%, transparent 100%);
+      width: 600px; height: 140px;
+      left: -8%; top: 18%;
+    }
+    /* Shape 2 — barre terracotta, bas droite */
+    .hs-2 {
+      --rot: -15deg; --r-start: -30deg; --delay: 0.5s;
+      --hs-grad: linear-gradient(90deg, rgba(196,120,90,0.2) 0%, transparent 100%);
+      width: 520px; height: 120px;
+      right: -3%; top: 62%;
+    }
+    /* Shape 3 — petite barre vert moyen, bas gauche */
+    .hs-3 {
+      --rot: -8deg; --r-start: -23deg; --delay: 0.4s;
+      --hs-grad: linear-gradient(90deg, rgba(92,122,101,0.22) 0%, transparent 100%);
+      width: 300px; height: 80px;
+      left: 6%; bottom: 10%;
+    }
+    /* Shape 4 — petite barre crème, haut droite */
+    .hs-4 {
+      --rot: 20deg; --r-start: 5deg; --delay: 0.6s;
+      --hs-grad: linear-gradient(90deg, rgba(245,240,232,0.14) 0%, transparent 100%);
+      width: 210px; height: 58px;
+      right: 16%; top: 12%;
+    }
+    /* Shape 5 — mini barre, haut milieu */
+    .hs-5 {
+      --rot: -25deg; --r-start: -40deg; --delay: 0.7s;
+      --hs-grad: linear-gradient(90deg, rgba(212,228,216,0.12) 0%, transparent 100%);
+      width: 150px; height: 40px;
+      left: 22%; top: 7%;
+    }
+    /* Respect des préférences d'accessibilité */
+    @media (prefers-reduced-motion: reduce) {
+      .hs { animation: none !important; opacity: 0.7; }
+    }
+  </style>
 </head>
 <body>
 
@@ -16,7 +82,7 @@
 <nav class="nav" id="mainNav">
   <div class="nav-container">
     <a href="/" class="logo">
-      <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+      <svg width="30" height="30" viewBox="0 0 32 32" fill="none">
         <path d="M16 2L3 13v17h8v-8h10v8h8V13L16 2z" fill="#3D5A47"/>
         <path d="M16 2L3 13v17h8v-8h10v8h8V13L16 2z" fill="none" stroke="#FDFCF8" stroke-width="1.5" stroke-linejoin="round"/>
       </svg>
@@ -40,83 +106,135 @@
 
 <!-- HERO -->
 <section class="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-grid"></div>
+
+  <!-- Formes géométriques flottantes — inspirées de Shape Landing Hero (kokonutd) -->
+  <div class="hero-shapes" aria-hidden="true">
+    <div class="hs hs-1"></div>
+    <div class="hs hs-2"></div>
+    <div class="hs hs-3"></div>
+    <div class="hs hs-4"></div>
+    <div class="hs hs-5"></div>
+  </div>
+
   <div class="hero-container">
-    <div class="hero-badge">Plateforme numérique d'outils et de formation</div>
-    <h1 class="hero-title">
-      Vendez votre bien.<br><em>Sereinement.</em>
-    </h1>
-    <p class="hero-sub">Les outils des professionnels. Sans la commission.</p>
-    <div class="hero-comparatif">
-      <div class="comparatif-item comparatif-agency">
-        <div class="comparatif-label">Agence classique</div>
-        <div class="comparatif-price">~10 000 €</div>
-        <div class="comparatif-detail">de commission</div>
+    <div class="hero-left">
+      <div class="hero-badge">Plateforme d'outils et de formation</div>
+      <h1 class="hero-title">
+        Vendez votre bien.<br><em>Sereinement.</em>
+      </h1>
+      <p class="hero-sub">Les outils des professionnels de l'immobilier, accessibles à tous. Sans la commission.</p>
+      <div class="hero-cta">
+        <a href="#offres" class="btn-primary btn-large">Choisir mon offre</a>
+        <a href="#comment" class="btn-hero-ghost">Comment ça marche →</a>
       </div>
-      <div class="comparatif-vs">VS</div>
-      <div class="comparatif-item comparatif-serenis">
-        <div class="comparatif-label">Serenis</div>
-        <div class="comparatif-price">999 €</div>
-        <div class="comparatif-detail">tout compris</div>
+      <div class="hero-trust">
+        <div class="hero-trust-item"><span class="hero-trust-num">200+</span><span>vendeurs accompagnés</span></div>
+        <div class="hero-trust-sep"></div>
+        <div class="hero-trust-item"><span class="hero-trust-num">4.9/5</span><span>satisfaction client</span></div>
+        <div class="hero-trust-sep"></div>
+        <div class="hero-trust-item"><span class="hero-trust-num">30j</span><span>délai moyen</span></div>
       </div>
     </div>
-    <div class="hero-economy">
-      Vous économisez en moyenne <strong>9 001 €</strong>
+    <div class="hero-right">
+      <div class="hero-card" id="calcCard">
+        <div class="hero-card-label">Calculez votre économie</div>
+        <div style="margin:12px 0 16px;">
+          <label style="font-size:0.78rem;color:#888;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;">Prix de votre bien</label>
+          <div style="position:relative;margin-top:6px;">
+            <input type="number" id="calcPrice" value="250000" min="50000" max="2000000" step="5000"
+              style="width:100%;padding:12px 40px 12px 16px;border:2px solid #e0d8cc;border-radius:10px;font-size:1.2rem;font-weight:700;font-family:'DM Sans',sans-serif;color:#2a4030;background:#fff8f2;outline:none;box-sizing:border-box;">
+            <span style="position:absolute;right:14px;top:50%;transform:translateY(-50%);font-size:1rem;color:#888;font-weight:600;">€</span>
+          </div>
+          <input type="range" id="calcSlider" min="50000" max="2000000" step="5000" value="250000"
+            style="width:100%;margin-top:8px;accent-color:#C4785A;">
+        </div>
+        <div class="hero-card-divider"></div>
+        <div class="hero-card-row">
+          <div class="hero-card-col">
+            <div class="hero-card-col-label">Agence (4,5%)</div>
+            <div class="hero-card-col-price hero-card-col-strike" id="calcAgence">11 250 €</div>
+          </div>
+          <div class="hero-card-vs">VS</div>
+          <div class="hero-card-col hero-card-col-highlight">
+            <div class="hero-card-col-label">Serenis</div>
+            <div class="hero-card-col-price">999 €</div>
+          </div>
+        </div>
+        <div style="background:linear-gradient(135deg,#3D5A47,#2a4030);border-radius:10px;padding:14px 18px;margin-top:14px;text-align:center;">
+          <div style="font-size:0.75rem;color:rgba(212,228,216,0.8);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:4px;">Vous économisez</div>
+          <div id="calcEco" style="font-size:2rem;font-weight:700;color:#fff;font-family:'Cormorant Garamond',serif;">10 251 €</div>
+        </div>
+        <a href="#offres" class="hero-card-cta" style="margin-top:14px;">Commencer maintenant →</a>
+      </div>
+      <div class="hero-card-mention">Activité validée · Autorité de la Concurrence 2023</div>
     </div>
-    <div class="hero-cta">
-      <a href="#offres" class="btn-primary btn-large">Choisir mon offre</a>
-      <a href="#comment" class="btn-secondary btn-large">Voir comment ça marche</a>
-    </div>
-    <p class="hero-mention">Matthias Brieux — 06 95 44 36 54 — Douai (59)</p>
+  </div>
+  <div class="hero-scroll">
+    <div class="hero-scroll-line"></div>
+    <span>Découvrir</span>
   </div>
 </section>
 
-<!-- BANDEAU ÉCONOMIE -->
-<div class="bandeau-economie">
-  <div class="bandeau-inner">
-    <span class="bandeau-icon">💰</span>
-    <strong>Vous économisez en moyenne 9 001 €</strong> par rapport à une agence immobilière classique
-    <span class="bandeau-badge">10x moins cher</span>
+<!-- IMPACT STATEMENT — Apple style full-bleed -->
+<section class="section-impact">
+  <div class="impact-inner">
+    <p class="impact-overline">L'économie que vous faites</p>
+    <div class="impact-number">9 001<span class="impact-euro">€</span></div>
+    <p class="impact-sub">économisés en moyenne par rapport à une agence immobilière classique</p>
+    <div class="impact-compare">
+      <div class="impact-col impact-col-agency">
+        <span class="impact-col-label">Agence</span>
+        <span class="impact-col-price">~10 000 €</span>
+      </div>
+      <div class="impact-arrow">→</div>
+      <div class="impact-col impact-col-serenis">
+        <span class="impact-col-label">Serenis</span>
+        <span class="impact-col-price">999 €</span>
+      </div>
+    </div>
   </div>
-</div>
+</section>
 
 <!-- SECTION PROBLÈME -->
 <section class="section-probleme" id="probleme">
   <div class="container">
-    <div class="section-header">
+    <div class="section-header centered">
       <p class="section-overline">Le constat</p>
-      <h2>Vendre entre particuliers est souvent épuisant</h2>
+      <h2>Vendre entre particuliers<br>est souvent épuisant</h2>
       <p class="section-sub">Pas faute de vouloir — faute d'outils adaptés.</p>
     </div>
-    <div class="cards-grid">
+    <div class="problems-grid">
       <div class="problem-card">
-        <div class="problem-icon">📱</div>
-        <h3>Appels répétitifs de curieux</h3>
-        <p>Votre numéro personnel diffusé partout. Appels en soirée, week-end, de gens non qualifiés.</p>
+        <div class="problem-num">01</div>
+        <h3>Appels de curieux</h3>
+        <p>Votre numéro personnel diffusé partout. Appels en soirée, de gens non qualifiés.</p>
       </div>
       <div class="problem-card">
-        <div class="problem-icon">📁</div>
+        <div class="problem-num">02</div>
         <h3>Documents manquants</h3>
         <p>L'acheteur sérieux pose des questions auxquelles vous ne savez pas répondre. Il repart.</p>
       </div>
       <div class="problem-card">
-        <div class="problem-icon">📸</div>
+        <div class="problem-num">03</div>
         <h3>Présentation insuffisante</h3>
         <p>Photos floues, description incomplète — votre annonce se noie dans les résultats.</p>
       </div>
       <div class="problem-card">
-        <div class="problem-icon">🤝</div>
-        <h3>Négociation difficile</h3>
-        <p>Faire face à une offre basse sans méthode ni préparation. La pression dans le salon.</p>
+        <div class="problem-num">04</div>
+        <h3>Négociation sans méthode</h3>
+        <p>Faire face à une offre basse sans préparation. La pression dans le salon.</p>
       </div>
       <div class="problem-card">
-        <div class="problem-icon">🗓️</div>
+        <div class="problem-num">05</div>
         <h3>Organisation chronophage</h3>
         <p>Coordonner les visites par SMS, oublier des confirmations, gérer les annulations.</p>
       </div>
-      <div class="problem-card highlight-card">
-        <div class="problem-icon">💸</div>
+      <div class="problem-card problem-card-highlight">
+        <div class="problem-num">06</div>
         <h3>10 000 € de commission</h3>
-        <p>La "solution" traditionnelle — payer une agence classique — coûte en moyenne 10 000 € sur une maison à 200 000 €.</p>
+        <p>La "solution" traditionnelle — payer une agence — coûte en moyenne 10 000 € sur une maison à 200 000 €.</p>
       </div>
     </div>
   </div>
@@ -125,54 +243,90 @@
 <!-- COMMENT ÇA MARCHE -->
 <section class="section-comment" id="comment">
   <div class="container">
-    <div class="section-header">
+    <div class="section-header centered">
       <p class="section-overline">La méthode</p>
       <h2>Comment Serenis fonctionne</h2>
       <p class="section-sub">6 étapes. Tout automatisé. Vous décidez.</p>
     </div>
-    <div class="steps-grid">
-      <div class="step">
-        <div class="step-number">1</div>
-        <div class="step-content">
+    <div class="steps-list">
+      <div class="step-item">
+        <div class="step-num">01</div>
+        <div class="step-body">
           <h3>Choisissez votre formule</h3>
           <p>Pack Autonome (99 €) ou Pack Sérénité (999 €). Accès immédiat après paiement sécurisé.</p>
         </div>
       </div>
-      <div class="step">
-        <div class="step-number">2</div>
-        <div class="step-content">
+      <div class="step-item">
+        <div class="step-num">02</div>
+        <div class="step-body">
           <h3>Créez votre profil et renseignez votre bien</h3>
           <p>Caractéristiques, description, taxe foncière, DPE, équipements — tout ce qu'un acheteur sérieux veut savoir.</p>
         </div>
       </div>
-      <div class="step">
-        <div class="step-number">3</div>
-        <div class="step-content">
+      <div class="step-item">
+        <div class="step-num">03</div>
+        <div class="step-body">
           <h3>Uploadez vos photos</h3>
           <p>Le dossier numérique complet est généré automatiquement. Pack Sérénité : photographe partenaire en 48h.</p>
         </div>
       </div>
-      <div class="step">
-        <div class="step-number">4</div>
-        <div class="step-content">
+      <div class="step-item">
+        <div class="step-num">04</div>
+        <div class="step-body">
           <h3>Publiez votre annonce</h3>
-          <p>Sur LeBonCoin, PAP, SeLoger — en votre nom propre. Vous mettez votre numéro 09 dédié (Sérénité). Votre numéro personnel reste privé.</p>
+          <p>Sur LeBonCoin, PAP, SeLoger — en votre nom propre. Votre numéro 09 dédié protège votre vie privée.</p>
         </div>
       </div>
-      <div class="step">
-        <div class="step-number">5</div>
-        <div class="step-content">
+      <div class="step-item">
+        <div class="step-num">05</div>
+        <div class="step-body">
           <h3>Les acheteurs reçoivent le dossier automatiquement</h3>
-          <p>Ils appellent le 09, un message vocal leur demande leur email par SMS. Le dossier complet leur est envoyé instantanément. Vous êtes notifié.</p>
+          <p>Ils appellent le 09, le dossier complet leur est envoyé instantanément. Vous êtes notifié en temps réel.</p>
         </div>
       </div>
-      <div class="step">
-        <div class="step-number">6</div>
-        <div class="step-content">
+      <div class="step-item">
+        <div class="step-num">06</div>
+        <div class="step-body">
           <h3>Gérez vos visites selon vos disponibilités</h3>
-          <p>Votre agenda en ligne permet aux acheteurs de réserver directement. Confirmations automatiques. Rappels 24h avant.</p>
+          <p>Agenda en ligne, réservation directe par les acheteurs. Confirmations automatiques. Rappels 24h avant.</p>
         </div>
       </div>
+    </div>
+  </div>
+</section>
+
+<!-- SECTION IA -->
+<section style="padding:80px 0;background:#fff;">
+  <div class="container">
+    <div class="section-header centered">
+      <p class="section-overline">Intelligence artificielle</p>
+      <h2>Votre coach IA inclus<br>dans chaque pack</h2>
+      <p class="section-sub">Pas besoin d'être expert. Alex vous guide à chaque étape.</p>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:24px;margin-top:40px;">
+      <div style="padding:28px;border:1px solid #e8e0d6;border-radius:14px;background:#f8f5f0;">
+        <div style="font-size:2rem;margin-bottom:12px;">✍️</div>
+        <h3 style="font-size:1rem;font-weight:700;margin-bottom:8px;">Rédaction d'annonce IA</h3>
+        <p style="font-size:0.88rem;color:#666;line-height:1.6;">Entrez vos infos, l'IA rédige une description percutante prête à publier sur LeBonCoin ou PAP en 10 secondes.</p>
+      </div>
+      <div style="padding:28px;border:2px solid #3D5A47;border-radius:14px;background:#f0f7f2;position:relative;">
+        <div style="position:absolute;top:-12px;left:50%;transform:translateX(-50%);background:#3D5A47;color:#fff;font-size:0.72rem;font-weight:700;padding:3px 14px;border-radius:20px;text-transform:uppercase;letter-spacing:0.06em;">Populaire</div>
+        <div style="font-size:2rem;margin-bottom:12px;">🎯</div>
+        <h3 style="font-size:1rem;font-weight:700;margin-bottom:8px;">Coach de vente Alex</h3>
+        <p style="font-size:0.88rem;color:#666;line-height:1.6;">Questions sur les visites, la négociation, les diagnostics ? Alex répond 24h/24, adapté à votre bien et votre marché local.</p>
+      </div>
+      <div style="padding:28px;border:1px solid #e8e0d6;border-radius:14px;background:#f8f5f0;">
+        <div style="font-size:2rem;margin-bottom:12px;">🎭</div>
+        <h3 style="font-size:1rem;font-weight:700;margin-bottom:8px;">Simulations acheteur</h3>
+        <p style="font-size:0.88rem;color:#666;line-height:1.6;">Entraînez-vous aux vraies questions des acheteurs : prix, négociation, diagnostics, délais. Préparez chaque réponse à l'avance.</p>
+      </div>
+    </div>
+    <div style="margin-top:32px;padding:24px 32px;background:linear-gradient(135deg,#3D5A47,#2a4030);border-radius:14px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px;">
+      <div>
+        <div style="color:#D4E4D8;font-size:0.82rem;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;">Inclus dans tous les packs</div>
+        <div style="color:#fff;font-size:1.1rem;font-weight:600;margin-top:4px;">Coach IA Alex · Formation vidéo · Scripts · Checklists · Fiche acheteur automatique</div>
+      </div>
+      <a href="#offres" style="background:#C4785A;color:#fff;padding:12px 24px;border-radius:8px;font-weight:700;font-size:0.9rem;text-decoration:none;white-space:nowrap;">Voir les offres →</a>
     </div>
   </div>
 </section>
@@ -180,14 +334,10 @@
 <!-- OFFRES -->
 <section class="section-offres" id="offres">
   <div class="container">
-    <div class="section-header">
+    <div class="section-header centered">
       <p class="section-overline">Nos offres</p>
       <h2>Choisissez votre formule</h2>
-      <div class="comparatif-reminder">
-        <span>Agence classique : ~10 000 €</span>
-        <span class="arrow">→</span>
-        <span><strong>Serenis : dès 99 €</strong></span>
-      </div>
+      <p class="section-sub">Agence classique : ~10 000 € · Serenis : <strong>dès 99 €</strong></p>
     </div>
     <div class="offres-grid">
       <!-- Pack Autonome -->
@@ -215,10 +365,9 @@
 
       <!-- Pack Sérénité -->
       <div class="offre-card offre-serenite featured">
-        <div class="offre-badge">⭐ Offre principale</div>
-        <div class="offre-badge-economie">10x moins cher qu'une agence</div>
+        <div class="offre-tag">Le plus populaire</div>
         <div class="offre-header">
-          <p class="offre-overline">Le plus populaire</p>
+          <p class="offre-overline">Tout inclus</p>
           <h3>Pack Sérénité</h3>
           <div class="offre-price">
             <span class="price-amount">999 €</span>
@@ -228,18 +377,18 @@
         </div>
         <ul class="offre-features">
           <li><span class="check check-gold">✓</span> <strong>Tout le Pack Autonome</strong></li>
-          <li><span class="check check-gold">✓</span> Photos professionnelles HD (photographe partenaire)</li>
+          <li><span class="check check-gold">✓</span> Photos professionnelles HD</li>
           <li><span class="check check-gold">✓</span> Visite virtuelle 360°</li>
-          <li><span class="check check-gold">✓</span> Dossier numérique généré automatiquement</li>
-          <li><span class="check check-gold">✓</span> Numéro 09 dédié (protège votre numéro personnel)</li>
-          <li><span class="check check-gold">✓</span> Envoi automatique du dossier à chaque acheteur</li>
-          <li><span class="check check-gold">✓</span> Agenda en ligne — réservation directe par les acheteurs</li>
+          <li><span class="check check-gold">✓</span> Dossier numérique automatique</li>
+          <li><span class="check check-gold">✓</span> Numéro 09 dédié (vie privée protégée)</li>
+          <li><span class="check check-gold">✓</span> Envoi automatique aux acheteurs</li>
+          <li><span class="check check-gold">✓</span> Agenda en ligne — réservation directe</li>
           <li><span class="check check-gold">✓</span> Confirmations et rappels automatiques</li>
-          <li><span class="check check-gold">✓</span> Notifications vendeur en temps réel</li>
-          <li><span class="check check-gold">✓</span> Garantie satisfaction — dossier corrigé sans limite</li>
+          <li><span class="check check-gold">✓</span> Notifications vendeur temps réel</li>
+          <li><span class="check check-gold">✓</span> Garantie satisfaction illimitée</li>
         </ul>
         <a href="#" class="btn-offre btn-offre-primary" data-pack="serenite">Choisir le Pack Sérénité</a>
-        <p class="offre-note">Économie moyenne : <strong>9 001 €</strong> vs agence classique</p>
+        <p class="offre-note">Économie moyenne : <strong>9 001 €</strong> vs agence</p>
       </div>
     </div>
   </div>
@@ -248,7 +397,7 @@
 <!-- COMPARATIF -->
 <section class="section-comparatif">
   <div class="container">
-    <div class="section-header">
+    <div class="section-header centered">
       <p class="section-overline">Transparence</p>
       <h2>Agence classique vs Serenis</h2>
     </div>
@@ -289,12 +438,12 @@
           </tr>
           <tr>
             <td>Vous êtes décisionnaire</td>
-            <td><span class="cross-table">✗</span> (agence décide)</td>
+            <td><span class="cross-table">✗</span> agence décide</td>
             <td class="td-serenis"><span class="check-table">✓</span> Toujours vous</td>
           </tr>
           <tr>
             <td>Commission sur la vente</td>
-            <td class="highlight-bad">~10 000 € (3-5%)</td>
+            <td class="highlight-bad">~10 000 € (3–5%)</td>
             <td class="td-serenis highlight-good">0 €</td>
           </tr>
           <tr class="total-row">
@@ -308,18 +457,13 @@
   </div>
 </section>
 
-<!-- GARANTIE -->
+<!-- GARANTIE — CTA dark full-bleed -->
 <section class="section-garantie">
-  <div class="container">
-    <div class="garantie-box">
-      <div class="garantie-icon">🛡️</div>
-      <h2>Garantie satisfaction</h2>
-      <p class="garantie-text">
-        Dossier non conforme à vos attentes ?<br>
-        <strong>Nous le corrigeons sans limite, sans délai, jusqu'à votre entière satisfaction.</strong>
-      </p>
-      <p class="garantie-sub">Vous ne payez jamais de commission sur la vente. Votre investissement est fixe et connu à l'avance.</p>
-    </div>
+  <div class="garantie-inner">
+    <div class="garantie-icon-wrap">🛡️</div>
+    <h2>Garantie satisfaction</h2>
+    <p>Dossier non conforme ? Nous le corrigeons <strong>sans limite</strong>, jusqu'à votre entière satisfaction.<br>Vous ne payez jamais de commission. Votre investissement est fixe.</p>
+    <a href="#offres" class="btn-primary btn-large">Démarrer maintenant</a>
   </div>
 </section>
 
@@ -327,22 +471,22 @@
 <section class="section-legal">
   <div class="container">
     <div class="legal-grid">
-      <div class="legal-col">
-        <h3 class="legal-title legal-yes">Ce que Serenis est</h3>
+      <div class="legal-col legal-yes-col">
+        <h3 class="legal-title">Ce que Serenis <em>est</em></h3>
         <ul class="legal-list">
-          <li>✓ Une plateforme numérique d'aide à la vente</li>
-          <li>✓ Un fournisseur d'outils et de formation</li>
-          <li>✓ Un système d'automatisation et d'organisation</li>
-          <li>✓ Vous restez seul décisionnaire à chaque étape</li>
+          <li>Une plateforme numérique d'aide à la vente</li>
+          <li>Un fournisseur d'outils et de formation</li>
+          <li>Un système d'automatisation et d'organisation</li>
+          <li>Vous restez seul décisionnaire à chaque étape</li>
         </ul>
       </div>
-      <div class="legal-col">
-        <h3 class="legal-title legal-no">Ce que Serenis n'est pas</h3>
+      <div class="legal-col legal-no-col">
+        <h3 class="legal-title">Ce que Serenis <em>n'est pas</em></h3>
         <ul class="legal-list">
-          <li>✗ Une agence immobilière</li>
-          <li>✗ Un mandataire ou intermédiaire</li>
-          <li>✗ Un négociateur entre les parties</li>
-          <li>✗ Un rédacteur de compromis</li>
+          <li>Une agence immobilière</li>
+          <li>Un mandataire ou intermédiaire</li>
+          <li>Un négociateur entre les parties</li>
+          <li>Un rédacteur de compromis</li>
         </ul>
       </div>
     </div>
@@ -352,66 +496,34 @@
 <!-- FAQ -->
 <section class="section-faq" id="faq">
   <div class="container">
-    <div class="section-header">
+    <div class="section-header centered">
       <p class="section-overline">Questions fréquentes</p>
       <h2>Tout ce que vous voulez savoir</h2>
     </div>
     <div class="faq-list">
       <div class="faq-item">
-        <button class="faq-question">
-          Est-ce légal de vendre ainsi sur LeBonCoin ?
-          <span class="faq-arrow">▼</span>
-        </button>
-        <div class="faq-answer">
-          <p>Oui, totalement légal. Vous publiez votre annonce en votre nom propre — comme des millions de particuliers le font chaque jour. Serenis est une plateforme d'outils numériques et de formation, validée par l'Autorité de la Concurrence en juin 2023 (avis n°23-A-07).</p>
-        </div>
+        <button class="faq-question">Est-ce légal de vendre ainsi sur LeBonCoin ?<span class="faq-arrow">+</span></button>
+        <div class="faq-answer"><p>Oui, totalement légal. Vous publiez votre annonce en votre nom propre — comme des millions de particuliers le font chaque jour. Serenis est une plateforme d'outils numériques et de formation, validée par l'Autorité de la Concurrence en juin 2023 (avis n°23-A-07).</p></div>
       </div>
       <div class="faq-item">
-        <button class="faq-question">
-          Qui fait les visites et négocie ?
-          <span class="faq-arrow">▼</span>
-        </button>
-        <div class="faq-answer">
-          <p>Vous. Serenis vous donne les outils, la méthode et l'organisation. Les visites, les échanges avec les acheteurs et les décisions vous appartiennent entièrement. C'est votre vente, du début à la fin.</p>
-        </div>
+        <button class="faq-question">Qui fait les visites et négocie ?<span class="faq-arrow">+</span></button>
+        <div class="faq-answer"><p>Vous. Serenis vous donne les outils, la méthode et l'organisation. Les visites, les échanges avec les acheteurs et les décisions vous appartiennent entièrement. C'est votre vente, du début à la fin.</p></div>
       </div>
       <div class="faq-item">
-        <button class="faq-question">
-          Quelle différence entre Pack Autonome et Pack Sérénité ?
-          <span class="faq-arrow">▼</span>
-        </button>
-        <div class="faq-answer">
-          <p><strong>Pack Autonome (99 €)</strong> : vous gérez tout vous-même avec nos outils — guide complet, mails types, checklists, méthode photo.</p>
-          <p><strong>Pack Sérénité (999 €)</strong> : tout est automatisé. Photographe en 48h, numéro 09 dédié, envoi automatique du dossier aux acheteurs, agenda de réservation en ligne, confirmations et rappels automatiques. Vous n'avez qu'à ouvrir votre porte le jour J.</p>
-        </div>
+        <button class="faq-question">Quelle différence entre Pack Autonome et Pack Sérénité ?<span class="faq-arrow">+</span></button>
+        <div class="faq-answer"><p><strong>Pack Autonome (99 €)</strong> : vous gérez tout vous-même avec nos outils — guide complet, mails types, checklists, méthode photo.</p><p><strong>Pack Sérénité (999 €)</strong> : tout est automatisé. Photographe en 48h, numéro 09 dédié, envoi automatique du dossier, agenda de réservation, confirmations et rappels automatiques.</p></div>
       </div>
       <div class="faq-item">
-        <button class="faq-question">
-          Combien de temps pour avoir accès ?
-          <span class="faq-arrow">▼</span>
-        </button>
-        <div class="faq-answer">
-          <p>Accès immédiat après paiement pour le Pack Autonome — vous recevez vos identifiants par email en moins de 5 minutes.</p>
-          <p>Pour le Pack Sérénité : accès immédiat à la plateforme, photographe partenaire contacté dans les 48h, dossier complet livré sous 5 jours ouvrés.</p>
-        </div>
+        <button class="faq-question">Combien de temps pour avoir accès ?<span class="faq-arrow">+</span></button>
+        <div class="faq-answer"><p>Accès immédiat après paiement pour le Pack Autonome — identifiants par email en moins de 5 minutes. Pour le Pack Sérénité : accès immédiat à la plateforme, photographe contacté dans les 48h, dossier livré sous 5 jours ouvrés.</p></div>
       </div>
       <div class="faq-item">
-        <button class="faq-question">
-          Que se passe-t-il si le bien ne se vend pas ?
-          <span class="faq-arrow">▼</span>
-        </button>
-        <div class="faq-answer">
-          <p>Le forfait couvre les outils et la formation. Nous ne promettons pas de vente — ce serait contraire à notre positionnement de fournisseur d'outils. Vous ne payez jamais de commission : votre investissement est fixe, connu à l'avance, et ne dépend pas du résultat de la vente.</p>
-        </div>
+        <button class="faq-question">Que se passe-t-il si le bien ne se vend pas ?<span class="faq-arrow">+</span></button>
+        <div class="faq-answer"><p>Le forfait couvre les outils et la formation. Vous ne payez jamais de commission : votre investissement est fixe, connu à l'avance, et ne dépend pas du résultat de la vente.</p></div>
       </div>
       <div class="faq-item">
-        <button class="faq-question">
-          Pourquoi 999 € au lieu de 10 000 € ?
-          <span class="faq-arrow">▼</span>
-        </button>
-        <div class="faq-answer">
-          <p>Une agence immobilière classique prend entre 3% et 5% du prix de vente — soit en moyenne 10 000 € sur une maison à 200 000 €. Serenis ne prend aucune commission. Vous payez 999 € pour accéder aux outils, à la méthode et à l'automatisation. Votre vente vous appartient entièrement — et vos 9 001 € aussi.</p>
-        </div>
+        <button class="faq-question">Pourquoi 999 € au lieu de 10 000 € ?<span class="faq-arrow">+</span></button>
+        <div class="faq-answer"><p>Une agence classique prend entre 3% et 5% du prix de vente — soit en moyenne 10 000 € sur une maison à 200 000 €. Serenis ne prend aucune commission. Vous payez 999 € pour les outils, la méthode et l'automatisation. Vos 9 001 € vous appartiennent.</p></div>
       </div>
     </div>
   </div>
@@ -420,33 +532,24 @@
 <!-- CONTACT -->
 <section class="section-contact" id="contact">
   <div class="container">
-    <div class="section-header">
+    <div class="section-header centered">
       <p class="section-overline">Une question ?</p>
       <h2>Contactez Matthias directement</h2>
-      <p class="section-sub">Matthias Brieux — 06 95 44 36 54 — Douai (59)</p>
+      <p class="section-sub">Matthias Brieux · 06 95 44 36 54 · Douai (59)</p>
     </div>
     <div class="contact-grid">
       <div class="contact-info">
         <div class="contact-item">
           <div class="contact-icon">📞</div>
-          <div>
-            <strong>Téléphone</strong>
-            <p>06 95 44 36 54</p>
-          </div>
+          <div><strong>Téléphone</strong><p>06 95 44 36 54</p></div>
         </div>
         <div class="contact-item">
           <div class="contact-icon">📍</div>
-          <div>
-            <strong>Zone d'activité</strong>
-            <p>Douai (59) et alentours</p>
-          </div>
+          <div><strong>Zone d'activité</strong><p>Douai (59) et alentours</p></div>
         </div>
         <div class="contact-item">
           <div class="contact-icon">⏰</div>
-          <div>
-            <strong>Disponibilité</strong>
-            <p>Lun–Sam, 9h–19h</p>
-          </div>
+          <div><strong>Disponibilité</strong><p>Lun–Sam, 9h–19h</p></div>
         </div>
       </div>
       <form class="contact-form" id="contactForm">
@@ -498,12 +601,11 @@
         <a href="/" class="logo logo-white">
           <svg width="28" height="28" viewBox="0 0 32 32" fill="none">
             <path d="M16 2L3 13v17h8v-8h10v8h8V13L16 2z" fill="#D4E4D8"/>
-            <path d="M16 2L3 13v17h8v-8h10v8h8V13L16 2z" fill="none" stroke="#D4E4D8" stroke-width="1.5" stroke-linejoin="round"/>
           </svg>
           <span class="logo-text" style="color:#FDFCF8">Sere<em style="color:#C4785A">nis</em></span>
         </a>
         <p class="footer-tagline">Vendez votre bien. Sereinement.</p>
-        <p class="footer-contact">Matthias Brieux — 06 95 44 36 54 — Douai (59)</p>
+        <p class="footer-contact">Matthias Brieux · 06 95 44 36 54 · Douai (59)</p>
       </div>
       <div class="footer-links-col">
         <h4>Navigation</h4>
@@ -520,6 +622,7 @@
         <ul>
           <li><a href="#offres">Pack Autonome — 99 €</a></li>
           <li><a href="#offres">Pack Sérénité — 999 €</a></li>
+          <li><a href="/cgv">CGV & Mentions légales</a></li>
         </ul>
       </div>
     </div>

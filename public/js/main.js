@@ -2,7 +2,121 @@
 // SERENIS — Main JS (marketing + auth pages)
 // =============================================
 
-// Nav scroll effect
+// ── Smooth scroll avec easing sur tous les liens ancres ──
+function easeInOutCubic(t) {
+  return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+}
+function smoothScrollTo(target, duration = 900) {
+  const startY = window.scrollY;
+  const el = document.querySelector(target);
+  if (!el) return;
+  const navH = document.getElementById('mainNav')?.offsetHeight || 72;
+  const targetY = el.getBoundingClientRect().top + startY - navH - 16;
+  const startTime = performance.now();
+  function step(now) {
+    const elapsed = now - startTime;
+    const progress = Math.min(elapsed / duration, 1);
+    window.scrollTo(0, startY + (targetY - startY) * easeInOutCubic(progress));
+    if (progress < 1) requestAnimationFrame(step);
+  }
+  requestAnimationFrame(step);
+}
+document.addEventListener('click', (e) => {
+  const link = e.target.closest('a[href^="#"]');
+  if (!link) return;
+  const href = link.getAttribute('href');
+  if (!href || href === '#') return;
+  e.preventDefault();
+  smoothScrollTo(href);
+});
+
+// ── Animations scroll — révélations variées ──
+function initScrollAnimations() {
+  // Chaque type d'élément a son propre effet
+  const effects = {
+    '.section-impact .impact-number': { from: 'translateY(20px)', opacity: 0, duration: 1400 },
+    '.problem-card':     { from: 'translateY(28px)', opacity: 0, duration: 900, stagger: 110 },
+    '.step-item':        { from: 'translateX(-18px)', opacity: 0, duration: 950, stagger: 130 },
+    '.offre-card':       { from: 'translateY(24px)', opacity: 0, duration: 1000, stagger: 140 },
+    '.section-header':   { from: 'translateY(18px)', opacity: 0, duration: 900 },
+    '.impact-inner':     { from: 'translateY(30px)', opacity: 0, duration: 1100 },
+    '.comparatif-table-wrapper': { from: 'translateY(20px)', opacity: 0, duration: 900 },
+    '.legal-col':        { from: 'translateY(18px)', opacity: 0, duration: 900, stagger: 160 },
+    '.faq-item':         { from: 'translateY(14px)', opacity: 0, duration: 800, stagger: 70 },
+    '.contact-item':     { from: 'translateX(-14px)', opacity: 0, duration: 850, stagger: 130 },
+    '.garantie-inner':   { from: 'translateY(20px)', opacity: 0, duration: 1000 },
+  };
+
+  const obs = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (!entry.isIntersecting) return;
+      const el = entry.target;
+      const delay = parseFloat(el.dataset.animDelay || 0);
+      const dur = el.dataset.animDuration || 900;
+      setTimeout(() => {
+        el.style.transition = `opacity ${dur}ms cubic-bezier(0.16,1,0.3,1), transform ${dur}ms cubic-bezier(0.16,1,0.3,1)`;
+        el.style.opacity = '1';
+        el.style.transform = 'none';
+      }, delay);
+      obs.unobserve(el);
+    });
+  }, { threshold: 0.07, rootMargin: '0px 0px -30px 0px' });
+
+  Object.entries(effects).forEach(([selector, cfg]) => {
+    document.querySelectorAll(selector).forEach((el, i) => {
+      el.style.opacity = String(cfg.opacity ?? 0);
+      el.style.transform = selector.includes('scale') || (cfg.from && cfg.from.includes('scale'))
+        ? cfg.from : `${cfg.from || 'translateY(20px)'}`;
+      el.dataset.animDelay = String((cfg.stagger || 0) * i);
+      el.dataset.animDuration = String(cfg.duration || 600);
+      obs.observe(el);
+    });
+  });
+
+  // Compteur animé sur le chiffre impact
+  const impactNum = document.querySelector('.impact-number');
+  if (impactNum) {
+    const numObs = new IntersectionObserver((entries) => {
+      if (!entries[0].isIntersecting) return;
+      countUp(impactNum, 9001, '€', 1600);
+      numObs.unobserve(impactNum);
+    }, { threshold: 0.5 });
+    numObs.observe(impactNum);
+  }
+}
+
+function countUp(el, target, suffix, duration) {
+  const easeOut = t => 1 - Math.pow(1 - t, 3);
+  const start = performance.now();
+  const originalHTML = el.innerHTML;
+  const euroEl = el.querySelector('.impact-euro');
+
+  function step(now) {
+    const p = Math.min((now - start) / duration, 1);
+    const val = Math.round(target * easeOut(p));
+    const formatted = val.toLocaleString('fr-FR');
+    el.innerHTML = `${formatted}<span class="impact-euro">${suffix}</span>`;
+    if (p < 1) requestAnimationFrame(step);
+  }
+  requestAnimationFrame(step);
+}
+
+// Parallax subtil sur le hero
+function initHeroParallax() {
+  const heroBg = document.querySelector('.hero-bg');
+  const heroGrid = document.querySelector('.hero-grid');
+  if (!heroBg) return;
+  window.addEventListener('scroll', () => {
+    const y = window.scrollY;
+    heroBg.style.transform = `translateY(${y * 0.3}px)`;
+    if (heroGrid) heroGrid.style.transform = `translateY(${y * 0.15}px)`;
+  }, { passive: true });
+}
+
+initScrollAnimations();
+initHeroParallax();
+
+// ── Nav scroll effect ──
 const nav = document.getElementById('mainNav');
 if (nav) {
   window.addEventListener('scroll', () => {
@@ -174,3 +288,22 @@ window.showToast = function(msg, type = 'success') {
   toast.classList.add('show');
   setTimeout(() => toast.classList.remove('show'), 3500);
 };
+
+// ── Calculateur d'économies interactif ──────────────────────────
+function fmt(n) { return Math.round(n).toLocaleString('fr-FR') + ' €'; }
+function updateCalc() {
+  const price = parseInt(document.getElementById('calcPrice')?.value) || 250000;
+  const agence = price * 0.045;
+  const eco = agence - 999;
+  const agenceEl = document.getElementById('calcAgence');
+  const ecoEl = document.getElementById('calcEco');
+  if (agenceEl) agenceEl.textContent = fmt(agence);
+  if (ecoEl) ecoEl.textContent = fmt(Math.max(eco, 0));
+}
+const calcPrice = document.getElementById('calcPrice');
+const calcSlider = document.getElementById('calcSlider');
+if (calcPrice) {
+  calcPrice.addEventListener('input', () => { if (calcSlider) calcSlider.value = calcPrice.value; updateCalc(); });
+  calcSlider?.addEventListener('input', () => { calcPrice.value = calcSlider.value; updateCalc(); });
+  updateCalc();
+}

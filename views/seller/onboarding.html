@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bienvenue — Serenis</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css">
+  <style>
+    body { background: #f8f5f0; min-height: 100vh; display: flex; flex-direction: column; }
+    .ob-wrap { max-width: 680px; margin: 0 auto; padding: 40px 24px 80px; flex: 1; }
+
+    /* Progress bar */
+    .ob-progress { display: flex; align-items: center; gap: 0; margin-bottom: 48px; }
+    .ob-step-dot {
+      width: 32px; height: 32px; border-radius: 50%; border: 2px solid #ddd;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.8rem; font-weight: 700; color: #bbb; background: #fff;
+      transition: all 0.3s; flex-shrink: 0; position: relative; z-index: 1;
+    }
+    .ob-step-dot.active { border-color: #3D5A47; color: #3D5A47; background: #f0f7f2; }
+    .ob-step-dot.done { border-color: #3D5A47; background: #3D5A47; color: #fff; }
+    .ob-step-line { flex: 1; height: 2px; background: #ddd; transition: background 0.3s; }
+    .ob-step-line.done { background: #3D5A47; }
+
+    /* Step content */
+    .ob-step { display: none; }
+    .ob-step.active { display: block; animation: fadeUp 0.4s cubic-bezier(0.16,1,0.3,1); }
+    @keyframes fadeUp { from { opacity:0; transform:translateY(18px); } to { opacity:1; transform:none; } }
+
+    .ob-header { margin-bottom: 32px; }
+    .ob-overline { font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.08em; color: #C4785A; font-weight: 700; margin-bottom: 8px; }
+    .ob-title { font-family: 'Cormorant Garamond', serif; font-size: 2rem; color: #2a4030; line-height: 1.2; margin-bottom: 10px; }
+    .ob-subtitle { font-size: 0.92rem; color: #666; line-height: 1.6; }
+
+    /* Cards choix */
+    .ob-choices { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin: 24px 0; }
+    .ob-choice {
+      padding: 20px; border: 2px solid #e0d8cc; border-radius: 12px;
+      cursor: pointer; transition: all 0.18s; background: #fff; text-align: center;
+    }
+    .ob-choice:hover { border-color: #3D5A47; }
+    .ob-choice.selected { border-color: #3D5A47; background: #f0f7f2; }
+    .ob-choice-icon { font-size: 2rem; margin-bottom: 8px; }
+    .ob-choice-label { font-weight: 600; font-size: 0.9rem; color: #333; }
+
+    /* Tip card */
+    .ob-tip {
+      padding: 16px 20px; background: #fff; border-radius: 10px;
+      border-left: 3px solid #3D5A47; margin: 20px 0; font-size: 0.88rem; color: #444; line-height: 1.6;
+    }
+    .ob-tip strong { color: #3D5A47; }
+
+    /* Navigation */
+    .ob-nav { display: flex; align-items: center; justify-content: space-between; margin-top: 36px; }
+    .ob-nav-back { background: none; border: none; color: #888; font-size: 0.9rem; cursor: pointer; padding: 10px 0; }
+    .ob-nav-back:hover { color: #333; }
+
+    /* Success step */
+    .ob-success { text-align: center; padding: 40px 0; }
+    .ob-success-icon { font-size: 4rem; margin-bottom: 16px; }
+    .ob-success-title { font-family: 'Cormorant Garamond', serif; font-size: 2.2rem; color: #2a4030; margin-bottom: 12px; }
+    .ob-success-sub { font-size: 0.95rem; color: #666; line-height: 1.6; margin-bottom: 32px; }
+    .ob-links { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+
+    /* Form fields */
+    .ob-form-group { margin-bottom: 18px; }
+    .ob-form-group label { display: block; font-size: 0.85rem; font-weight: 600; color: #444; margin-bottom: 6px; }
+    .ob-form-group input, .ob-form-group select {
+      width: 100%; padding: 11px 14px; border: 1px solid #ddd; border-radius: 8px;
+      font-family: 'DM Sans', sans-serif; font-size: 0.92rem; background: #fff;
+      box-sizing: border-box;
+    }
+    .ob-form-group input:focus, .ob-form-group select:focus { outline: none; border-color: #3D5A47; }
+    .ob-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+
+    /* Logo */
+    .ob-logo {
+      text-align: center; padding: 28px 0 0;
+    }
+    .ob-logo a { display: inline-flex; align-items: center; gap: 8px; text-decoration: none; }
+  </style>
+</head>
+<body>
+
+<div class="ob-logo">
+  <a href="/">
+    <svg width="26" height="26" viewBox="0 0 32 32"><path d="M16 2L3 13v17h8v-8h10v8h8V13L16 2z" fill="#3D5A47"/></svg>
+    <span style="font-family:'Cormorant Garamond',serif;font-size:1.3rem;color:#2a4030;">Sere<em style="color:#C4785A">nis</em></span>
+  </a>
+</div>
+
+<div class="ob-wrap">
+
+  <!-- Barre de progression -->
+  <div class="ob-progress" id="obProgress">
+    <div class="ob-step-dot active" id="dot-1">1</div>
+    <div class="ob-step-line" id="line-1"></div>
+    <div class="ob-step-dot" id="dot-2">2</div>
+    <div class="ob-step-line" id="line-2"></div>
+    <div class="ob-step-dot" id="dot-3">3</div>
+    <div class="ob-step-line" id="line-3"></div>
+    <div class="ob-step-dot" id="dot-4">4</div>
+    <div class="ob-step-line" id="line-4"></div>
+    <div class="ob-step-dot" id="dot-5">5</div>
+  </div>
+
+  <!-- ÉTAPE 1 : Profil -->
+  <div class="ob-step active" id="step-1">
+    <div class="ob-header">
+      <div class="ob-overline">Étape 1 sur 5</div>
+      <h1 class="ob-title">Bienvenue 👋<br>Parlons de vous d'abord</h1>
+      <p class="ob-subtitle">Ces infos apparaîtront sur votre fiche acheteur et dans vos communications.</p>
+    </div>
+    <div class="ob-grid-2">
+      <div class="ob-form-group">
+        <label>Prénom *</label>
+        <input type="text" id="ob-firstname" placeholder="Jean">
+      </div>
+      <div class="ob-form-group">
+        <label>Nom *</label>
+        <input type="text" id="ob-lastname" placeholder="Martin">
+      </div>
+    </div>
+    <div class="ob-form-group">
+      <label>Téléphone</label>
+      <input type="tel" id="ob-phone" placeholder="06 12 34 56 78">
+    </div>
+    <div class="ob-tip">
+      <strong>Conseil :</strong> Votre téléphone ne sera pas affiché publiquement si vous avez le Pack Sérénité — le numéro dédié Serenis protège votre vie privée.
+    </div>
+    <div class="ob-nav">
+      <span></span>
+      <button class="btn-primary" onclick="nextStep(1)">Continuer →</button>
+    </div>
+  </div>
+
+  <!-- ÉTAPE 2 : Type de bien -->
+  <div class="ob-step" id="step-2">
+    <div class="ob-header">
+      <div class="ob-overline">Étape 2 sur 5</div>
+      <h1 class="ob-title">Votre bien</h1>
+      <p class="ob-subtitle">Quel type de bien vendez-vous ? Vous pourrez tout détailler ensuite.</p>
+    </div>
+    <div class="ob-choices" id="ob-type-choices">
+      <div class="ob-choice" data-value="Maison" onclick="selectChoice('ob-type', this)">
+        <div class="ob-choice-icon">🏠</div>
+        <div class="ob-choice-label">Maison</div>
+      </div>
+      <div class="ob-choice" data-value="Appartement" onclick="selectChoice('ob-type', this)">
+        <div class="ob-choice-icon">🏢</div>
+        <div class="ob-choice-label">Appartement</div>
+      </div>
+      <div class="ob-choice" data-value="Villa" onclick="selectChoice('ob-type', this)">
+        <div class="ob-choice-icon">🌴</div>
+        <div class="ob-choice-label">Villa</div>
+      </div>
+      <div class="ob-choice" data-value="Terrain" onclick="selectChoice('ob-type', this)">
+        <div class="ob-choice-icon">🌿</div>
+        <div class="ob-choice-label">Terrain</div>
+      </div>
+    </div>
+    <div class="ob-grid-2">
+      <div class="ob-form-group">
+        <label>Ville *</label>
+        <input type="text" id="ob-city" placeholder="Douai">
+      </div>
+      <div class="ob-form-group">
+        <label>Prix estimé (€)</label>
+        <input type="number" id="ob-price" placeholder="185 000">
+      </div>
+    </div>
+    <div class="ob-tip">
+      <strong>Astuce prix :</strong> Un bien au juste prix se vend 3× plus vite. Si vous hésitez, misez légèrement bas au départ — les offres multiples font monter le prix naturellement.
+    </div>
+    <div class="ob-nav">
+      <button class="ob-nav-back" onclick="prevStep(2)">← Retour</button>
+      <button class="btn-primary" onclick="nextStep(2)">Continuer →</button>
+    </div>
+  </div>
+
+  <!-- ÉTAPE 3 : Photos -->
+  <div class="ob-step" id="step-3">
+    <div class="ob-header">
+      <div class="ob-overline">Étape 3 sur 5</div>
+      <h1 class="ob-title">Les photos : votre premier argument</h1>
+      <p class="ob-subtitle">Elles décident du clic sur LeBonCoin. Voici comment les préparer.</p>
+    </div>
+    <div style="display:grid;gap:12px;margin-bottom:24px;">
+      <div style="display:flex;gap:14px;align-items:flex-start;padding:16px;background:#fff;border-radius:10px;border:1px solid #e0d8cc;">
+        <div style="font-size:1.4rem;flex-shrink:0;">1️⃣</div>
+        <div>
+          <div style="font-weight:600;font-size:0.9rem;margin-bottom:3px;">Façade en premier</div>
+          <div style="font-size:0.83rem;color:#666;">Par beau temps, propre, voitures écartées. Cette photo = 60% des clics.</div>
+        </div>
+      </div>
+      <div style="display:flex;gap:14px;align-items:flex-start;padding:16px;background:#fff;border-radius:10px;border:1px solid #e0d8cc;">
+        <div style="font-size:1.4rem;flex-shrink:0;">2️⃣</div>
+        <div>
+          <div style="font-weight:600;font-size:0.9rem;margin-bottom:3px;">Chaque pièce depuis le coin le plus large</div>
+          <div style="font-size:0.83rem;color:#666;">Salon, cuisine, chambres, salle de bain, jardin. Minimum 8 photos.</div>
+        </div>
+      </div>
+      <div style="display:flex;gap:14px;align-items:flex-start;padding:16px;background:#fff;border-radius:10px;border:1px solid #e0d8cc;">
+        <div style="font-size:1.4rem;flex-shrink:0;">3️⃣</div>
+        <div>
+          <div style="font-weight:600;font-size:0.9rem;margin-bottom:3px;">Lumière naturelle maximum</div>
+          <div style="font-size:0.83rem;color:#666;">Ouvrez tous les volets, éteignez les lampes, prenez en journée.</div>
+        </div>
+      </div>
+    </div>
+    <div style="padding:16px 20px;background:#f0f7f2;border-radius:10px;border-left:3px solid #3D5A47;">
+      <strong style="font-size:0.88rem;color:#3D5A47;">Vous avez déjà vos photos ?</strong>
+      <p style="font-size:0.83rem;color:#555;margin:6px 0 0;">Vous les uploadez directement dans votre espace "Mon bien" à l'étape suivante.</p>
+    </div>
+    <div class="ob-nav">
+      <button class="ob-nav-back" onclick="prevStep(3)">← Retour</button>
+      <button class="btn-primary" onclick="nextStep(3)">J'ai compris →</button>
+    </div>
+  </div>
+
+  <!-- ÉTAPE 4 : Documents -->
+  <div class="ob-step" id="step-4">
+    <div class="ob-header">
+      <div class="ob-overline">Étape 4 sur 5</div>
+      <h1 class="ob-title">Vos diagnostics immobiliers</h1>
+      <p class="ob-subtitle">Ils rassurent les acheteurs et évitent les négociations surprises.</p>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px;">
+      <div id="ob-doc-dpe" style="padding:12px 14px;background:#fff;border:1px solid #e0d8cc;border-radius:8px;font-size:0.85rem;cursor:pointer;" onclick="toggleDoc('dpe')">
+        🏷 DPE <span id="check-dpe" style="float:right;color:#3D5A47;font-weight:700;display:none;">✓</span>
+      </div>
+      <div id="ob-doc-amiante" style="padding:12px 14px;background:#fff;border:1px solid #e0d8cc;border-radius:8px;font-size:0.85rem;cursor:pointer;" onclick="toggleDoc('amiante')">
+        ⚗️ Amiante <span id="check-amiante" style="float:right;color:#3D5A47;font-weight:700;display:none;">✓</span>
+      </div>
+      <div id="ob-doc-plomb" style="padding:12px 14px;background:#fff;border:1px solid #e0d8cc;border-radius:8px;font-size:0.85rem;cursor:pointer;" onclick="toggleDoc('plomb')">
+        🔩 Plomb <span id="check-plomb" style="float:right;color:#3D5A47;font-weight:700;display:none;">✓</span>
+      </div>
+      <div id="ob-doc-electricite" style="padding:12px 14px;background:#fff;border:1px solid #e0d8cc;border-radius:8px;font-size:0.85rem;cursor:pointer;" onclick="toggleDoc('electricite')">
+        ⚡ Électricité <span id="check-electricite" style="float:right;color:#3D5A47;font-weight:700;display:none;">✓</span>
+      </div>
+      <div id="ob-doc-erp" style="padding:12px 14px;background:#fff;border:1px solid #e0d8cc;border-radius:8px;font-size:0.85rem;cursor:pointer;" onclick="toggleDoc('erp')">
+        ⚠️ ERP <span id="check-erp" style="float:right;color:#3D5A47;font-weight:700;display:none;">✓</span>
+      </div>
+      <div id="ob-doc-assainissement" style="padding:12px 14px;background:#fff;border:1px solid #e0d8cc;border-radius:8px;font-size:0.85rem;cursor:pointer;" onclick="toggleDoc('assainissement')">
+        💧 Assainissement <span id="check-assainissement" style="float:right;color:#3D5A47;font-weight:700;display:none;">✓</span>
+      </div>
+    </div>
+    <p style="font-size:0.8rem;color:#888;margin-bottom:16px;">Cochez ceux que vous possédez déjà. Vous uploadez les PDF dans votre espace "Documents".</p>
+    <div class="ob-tip">
+      <strong>Important :</strong> Sans DPE vous ne pouvez pas publier légalement votre annonce. Si vous ne l'avez pas, commandez-le auprès d'un diagnostiqueur certifié (150 à 250 €). Demandez à votre coach Alex si vous avez des questions.
+    </div>
+    <div class="ob-nav">
+      <button class="ob-nav-back" onclick="prevStep(4)">← Retour</button>
+      <button class="btn-primary" onclick="nextStep(4)">Continuer →</button>
+    </div>
+  </div>
+
+  <!-- ÉTAPE 5 : Prêt à publier -->
+  <div class="ob-step" id="step-5">
+    <div class="ob-header">
+      <div class="ob-overline">Étape 5 sur 5</div>
+      <h1 class="ob-title">Votre plan d'action</h1>
+      <p class="ob-subtitle">Voici exactement ce qui vous attend. Tout est dans votre espace.</p>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:12px;margin-bottom:28px;">
+      <div style="display:flex;gap:14px;align-items:center;padding:16px 18px;background:#f0f7f2;border-radius:10px;border:1px solid #c8ddd0;">
+        <div style="width:32px;height:32px;background:#3D5A47;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-size:0.85rem;font-weight:700;flex-shrink:0;">1</div>
+        <div><div style="font-weight:600;font-size:0.9rem;">Compléter votre fiche bien</div><div style="font-size:0.82rem;color:#666;margin-top:2px;">15 min — toutes les infos acheteur</div></div>
+        <a href="/mon-bien" style="margin-left:auto;font-size:0.82rem;color:#3D5A47;font-weight:600;">Aller →</a>
+      </div>
+      <div style="display:flex;gap:14px;align-items:center;padding:16px 18px;background:#fff;border-radius:10px;border:1px solid #e0d8cc;">
+        <div style="width:32px;height:32px;background:#3D5A47;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-size:0.85rem;font-weight:700;flex-shrink:0;">2</div>
+        <div><div style="font-weight:600;font-size:0.9rem;">Uploader vos photos</div><div style="font-size:0.82rem;color:#666;margin-top:2px;">Min 8 photos · Façade en premier</div></div>
+      </div>
+      <div style="display:flex;gap:14px;align-items:center;padding:16px 18px;background:#fff;border-radius:10px;border:1px solid #e0d8cc;">
+        <div style="width:32px;height:32px;background:#3D5A47;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-size:0.85rem;font-weight:700;flex-shrink:0;">3</div>
+        <div><div style="font-weight:600;font-size:0.9rem;">Ajouter vos diagnostics PDF</div><div style="font-size:0.82rem;color:#666;margin-top:2px;">DPE obligatoire · Les autres recommandés</div></div>
+      </div>
+      <div style="display:flex;gap:14px;align-items:center;padding:16px 18px;background:#fff;border-radius:10px;border:1px solid #e0d8cc;">
+        <div style="width:32px;height:32px;background:#3D5A47;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-size:0.85rem;font-weight:700;flex-shrink:0;">4</div>
+        <div><div style="font-weight:600;font-size:0.9rem;">Configurer votre agenda de visites</div><div style="font-size:0.82rem;color:#666;margin-top:2px;">Vos créneaux disponibles · 2 min</div></div>
+      </div>
+      <div style="display:flex;gap:14px;align-items:center;padding:16px 18px;background:#fff;border-radius:10px;border:1px solid #e0d8cc;">
+        <div style="width:32px;height:32px;background:#C4785A;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-size:0.85rem;font-weight:700;flex-shrink:0;">5</div>
+        <div><div style="font-weight:600;font-size:0.9rem;">Publier et coller votre lien partout</div><div style="font-size:0.82rem;color:#666;margin-top:2px;">LeBonCoin · PAP · Facebook · WhatsApp</div></div>
+      </div>
+    </div>
+    <div style="padding:20px 24px;background:linear-gradient(135deg,#3D5A47,#2a4030);border-radius:12px;text-align:center;margin-bottom:24px;">
+      <div style="color:#D4E4D8;font-size:0.82rem;margin-bottom:6px;">Votre coach IA Alex est disponible maintenant</div>
+      <div style="color:#fff;font-size:0.95rem;font-weight:600;">Posez-lui n'importe quelle question dans votre espace Formation →</div>
+    </div>
+    <div class="ob-nav" style="justify-content:center;">
+      <a href="/dashboard" class="btn-primary btn-large" onclick="finishOnboarding()">Accéder à mon espace →</a>
+    </div>
+  </div>
+
+</div>
+
+<script>
+let currentStep = 1;
+const totalSteps = 5;
+const obData = { type: null, docs: new Set() };
+
+function selectChoice(group, el) {
+  el.closest('.ob-choices').querySelectorAll('.ob-choice').forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+  obData[group] = el.dataset.value;
+}
+
+function toggleDoc(name) {
+  const el = document.getElementById('ob-doc-' + name);
+  const check = document.getElementById('check-' + name);
+  if (obData.docs.has(name)) {
+    obData.docs.delete(name);
+    el.style.borderColor = '#e0d8cc';
+    el.style.background = '#fff';
+    check.style.display = 'none';
+  } else {
+    obData.docs.add(name);
+    el.style.borderColor = '#3D5A47';
+    el.style.background = '#f0f7f2';
+    check.style.display = 'inline';
+  }
+}
+
+function nextStep(from) {
+  if (from === 1) {
+    const fn = document.getElementById('ob-firstname').value.trim();
+    if (!fn) { alert('Entrez votre prénom pour continuer.'); return; }
+    saveProfile();
+  }
+  if (from === 2) {
+    const city = document.getElementById('ob-city').value.trim();
+    if (!city) { alert('Entrez la ville de votre bien pour continuer.'); return; }
+  }
+  goToStep(from + 1);
+}
+
+function prevStep(current) { goToStep(current - 1); }
+
+function goToStep(n) {
+  document.getElementById('step-' + currentStep).classList.remove('active');
+  document.getElementById('dot-' + currentStep).classList.remove('active');
+  document.getElementById('dot-' + currentStep).classList.add('done');
+  if (currentStep < totalSteps && document.getElementById('line-' + currentStep)) {
+    document.getElementById('line-' + currentStep).classList.add('done');
+  }
+
+  currentStep = n;
+  document.getElementById('step-' + currentStep).classList.add('active');
+  document.getElementById('dot-' + currentStep).classList.remove('done');
+  document.getElementById('dot-' + currentStep).classList.add('active');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+async function saveProfile() {
+  const body = {
+    first_name: document.getElementById('ob-firstname').value.trim(),
+    last_name: document.getElementById('ob-lastname').value.trim(),
+    phone: document.getElementById('ob-phone').value.trim(),
+  };
+  try {
+    await fetch('/api/profile', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+    });
+  } catch(e) {}
+}
+
+function finishOnboarding() {
+  localStorage.setItem('vpm_onboarded', '1');
+}
+</script>
+</body>
+</html>
