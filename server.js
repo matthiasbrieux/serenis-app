@@ -107,8 +107,28 @@ app.use((err, req, res, next) => {
   res.status(500).json({ error: 'Erreur serveur. Réessayez dans un instant.' });
 });
 
+// Seed compte vendeur de démo au démarrage si aucun compte n'existe
+async function seedSellerAccount() {
+  try {
+    const email = process.env.SELLER_EMAIL;
+    const password = process.env.SELLER_PASSWORD;
+    if (!email || !password) return;
+    const db = require('./database');
+    const bcrypt = require('bcryptjs');
+    const { v4: uuidv4 } = require('uuid');
+    const existing = db.prepare('SELECT id FROM sellers WHERE email = ?').get(email.toLowerCase());
+    if (!existing) {
+      const hashed = await bcrypt.hash(password, 12);
+      db.prepare('INSERT INTO sellers (uuid, email, password, pack, paid_at) VALUES (?,?,?,?,CURRENT_TIMESTAMP)')
+        .run(uuidv4(), email.toLowerCase(), hashed, 'serenite');
+      console.log(`✓ Compte vendeur créé : ${email}`);
+    }
+  } catch(e) { console.error('Seed error:', e.message); }
+}
+
 app.listen(PORT, () => {
   console.log(`✓ Serenis démarré — http://localhost:${PORT}`);
+  seedSellerAccount();
 
   // Rappels visites — tourne chaque jour à 18h
   const { sendVisitReminders } = require('./services/reminders');
