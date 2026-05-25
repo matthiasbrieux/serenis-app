@@ -132,9 +132,9 @@
       background: #fff; position: relative;
     }
     .search-wrap { position: relative; flex: 1; min-width: 160px; }
-    .search-wrap::before {
-      content: '🔍'; position: absolute; left: 10px; top: 50%; transform: translateY(-50%);
-      font-size: 0.8rem; pointer-events: none;
+    .search-icon {
+      position: absolute; left: 10px; top: 50%; transform: translateY(-50%);
+      pointer-events: none; color: #aaa;
     }
     .filter-select {
       padding: 9px 12px; border: 1.5px solid #e8e0d6; border-radius: 8px;
@@ -237,8 +237,41 @@
       text-align: center; padding: 48px 24px; color: #bbb;
       border: 2px dashed #e8e0d6; border-radius: 14px;
     }
-    .empty-state-icon { font-size: 2.5rem; margin-bottom: 10px; }
+    .empty-state-icon { margin-bottom: 12px; display: flex; justify-content: center; }
+    .empty-state-icon svg { width: 36px; height: 36px; stroke: #ccc; }
     .empty-state p { font-size: 0.9rem; line-height: 1.5; }
+
+    /* ── Availability month ──────────────────────────── */
+    .avail-month-header {
+      display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px;
+    }
+    .avail-month-label { font-family: 'Cormorant Garamond', serif; font-size: 1.3rem; font-weight: 600; color: #1A1A16; }
+    .avail-slot-list { display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; }
+    .avail-slot-item {
+      display: flex; align-items: center; gap: 14px; padding: 14px 16px;
+      background: #fff; border: 1px solid #e8e0d6; border-radius: 10px;
+    }
+    .avail-slot-date { font-weight: 600; font-size: 0.9rem; color: #1A1A16; flex: 1; }
+    .avail-slot-time { font-size: 0.84rem; color: #666; background: #f5f0e8; padding: 4px 10px; border-radius: 6px; }
+    .avail-slot-del {
+      width: 30px; height: 30px; border-radius: 6px; border: 1.5px solid #ffd5d5;
+      background: #fff0f0; color: #e74c3c; display: flex; align-items: center; justify-content: center;
+      cursor: pointer; flex-shrink: 0; transition: 0.15s;
+    }
+    .avail-slot-del:hover { background: #e74c3c; color: #fff; border-color: #e74c3c; }
+    .avail-slot-del svg { width: 14px; height: 14px; stroke: currentColor; }
+    .avail-add-form {
+      background: #fff; border: 1.5px dashed #D4E4D8; border-radius: 12px; padding: 18px;
+    }
+    .avail-add-form h4 { font-size: 0.88rem; font-weight: 600; color: #1A1A16; margin-bottom: 14px; }
+    .avail-form-row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-bottom: 10px; }
+    .avail-input {
+      border: 1.5px solid #e8e0d6; border-radius: 8px; padding: 8px 10px;
+      font-size: 0.87rem; font-family: 'DM Sans', sans-serif; background: #fff; color: #1A1A16;
+    }
+    .avail-input:focus { outline: none; border-color: #3D5A47; }
+    .avail-input[type=date] { flex: 1; min-width: 140px; }
+    .avail-input[type=time] { width: 110px; }
   </style>
 </head>
 <body>
@@ -288,36 +321,53 @@
           <div class="stat-val" id="statTotal">0</div>
           <div class="stat-lbl">Total visites</div>
         </div>
-        <div class="stat-icon" style="background:#f0f5f1;">📅</div>
+        <div class="stat-icon" style="background:#f0f5f1;">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#3D5A47" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        </div>
       </div>
       <div class="stat-card-agenda">
         <div>
           <div class="stat-val" id="statPending">0</div>
           <div class="stat-lbl">En attente</div>
         </div>
-        <div class="stat-icon" style="background:#fff8e1;">⏳</div>
+        <div class="stat-icon" style="background:#fff8e1;">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#f57f17" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        </div>
       </div>
       <div class="stat-card-agenda">
         <div>
           <div class="stat-val" id="statConfirmed">0</div>
           <div class="stat-lbl">Confirmées</div>
         </div>
-        <div class="stat-icon" style="background:#e8f5e9;">✓</div>
+        <div class="stat-icon" style="background:#e8f5e9;">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#2e7d32" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+        </div>
       </div>
       <div class="stat-card-agenda">
         <div>
           <div class="stat-val" id="statToday">0</div>
           <div class="stat-lbl">Aujourd'hui</div>
         </div>
-        <div class="stat-icon" style="background:#e3f2fd;">📍</div>
+        <div class="stat-icon" style="background:#e3f2fd;">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1565c0" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><line x1="12" y1="14" x2="12" y2="18"/><line x1="10" y1="16" x2="14" y2="16"/></svg>
+        </div>
       </div>
     </div>
 
     <!-- Tabs -->
     <div class="agenda-tabs">
-      <button class="agenda-tab active" data-panel="visits">🗓 Visites</button>
-      <button class="agenda-tab" data-panel="calendar">📆 Calendrier</button>
-      <button class="agenda-tab" data-panel="availability">⚙️ Disponibilités</button>
+      <button class="agenda-tab active" data-panel="visits" style="display:flex;align-items:center;gap:7px;">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+        Visites
+      </button>
+      <button class="agenda-tab" data-panel="calendar" style="display:flex;align-items:center;gap:7px;">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        Calendrier
+      </button>
+      <button class="agenda-tab" data-panel="availability" style="display:flex;align-items:center;gap:7px;">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        Mes disponibilités
+      </button>
     </div>
 
     <!-- ── Panel: Visites ──────────────────────────────── -->
@@ -325,6 +375,7 @@
 
       <div class="filter-bar">
         <div class="search-wrap">
+          <svg class="search-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
           <input class="filter-search" type="text" id="searchVisits" placeholder="Rechercher un acheteur…">
         </div>
         <select class="filter-select" id="filterStatus">
@@ -338,6 +389,7 @@
 
       <div class="visits-grid" id="visitsList"></div>
     </div>
+    <!-- SVG defs for visit cards (injected via JS) -->
 
     <!-- ── Panel: Calendrier ──────────────────────────── -->
     <div class="agenda-panel" id="panel-calendar">
@@ -366,7 +418,7 @@
           <div class="day-detail-title" id="dayDetailTitle">Sélectionnez un jour</div>
           <div id="dayDetailContent">
             <div class="empty-state" style="padding:24px 12px;border:none;">
-              <div class="empty-state-icon">📅</div>
+              <div class="empty-state-icon"><svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#ccc" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div>
               <p>Cliquez sur un jour pour voir les visites</p>
             </div>
           </div>
@@ -374,32 +426,60 @@
       </div>
     </div>
 
-    <!-- ── Panel: Disponibilités ──────────────────────── -->
+    <!-- ── Panel: Mes disponibilités ─────────────────── -->
     <div class="agenda-panel" id="panel-availability">
       <div style="display:grid;grid-template-columns:1.3fr 1fr;gap:20px;align-items:start;">
+
         <div class="form-section">
-          <h3 style="margin-bottom:4px;">Disponibilités hebdomadaires</h3>
-          <p style="color:#888;font-size:0.84rem;margin-bottom:20px;">Activez les jours où vous êtes disponible. Ces créneaux se répètent chaque semaine.</p>
-          <div class="week-schedule" id="weekSchedule"></div>
-          <div style="margin-top:20px;display:flex;align-items:center;gap:12px;">
-            <button id="saveAgenda" class="btn-primary" style="flex:1;">Sauvegarder</button>
-            <span id="agendaSuccess" class="form-success hidden">✓ Sauvegardé</span>
+          <div class="avail-month-header">
+            <div>
+              <h3 style="margin-bottom:2px;">Mes disponibilités</h3>
+              <p style="color:#888;font-size:0.82rem;">Renseignez vos créneaux une seule fois. Vous pouvez en ajouter à tout moment.</p>
+            </div>
+            <div style="display:flex;gap:6px;">
+              <button class="cal-nav" id="availPrev">‹</button>
+              <span class="avail-month-label" id="availMonthLabel" style="padding:0 8px;display:flex;align-items:center;"></span>
+              <button class="cal-nav" id="availNext">›</button>
+            </div>
+          </div>
+
+          <div class="avail-slot-list" id="availSlotList">
+            <div style="text-align:center;padding:24px;color:#bbb;font-size:0.85rem;">Aucun créneau pour ce mois</div>
+          </div>
+
+          <div class="avail-add-form">
+            <h4>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#3D5A47" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:5px;"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              Ajouter un créneau
+            </h4>
+            <div class="avail-form-row">
+              <input type="date" class="avail-input" id="availDate">
+              <span style="color:#aaa;font-size:0.85rem;">de</span>
+              <input type="time" class="avail-input" id="availStart" value="09:00">
+              <span style="color:#aaa;font-size:0.85rem;">à</span>
+              <input type="time" class="avail-input" id="availEnd" value="18:00">
+            </div>
+            <button id="addAvailSlot" class="btn-primary" style="font-size:0.85rem;padding:9px 20px;">Ajouter ce créneau</button>
+          </div>
+
+          <div style="margin-top:16px;display:flex;align-items:center;gap:12px;">
+            <button id="saveAgenda" class="btn-primary" style="flex:1;">Enregistrer mes disponibilités</button>
+            <span id="agendaSuccess" class="form-success hidden">Sauvegardé</span>
           </div>
         </div>
 
-        <div style="display:flex;flex-direction:column;gap:16px;">
-          <div class="form-section">
-            <h3 style="margin-bottom:8px;">Lien de réservation</h3>
-            <p style="color:#666;font-size:0.84rem;margin-bottom:12px;">Partagez ce lien avec vos acheteurs pour qu'ils réservent directement.</p>
-            <div id="bookingLinkBox" style="display:none;">
-              <div style="display:flex;gap:8px;align-items:center;">
-                <input type="text" id="bookingLink" readonly style="flex:1;background:#F5F0E8;font-size:0.8rem;padding:9px 12px;border:1.5px solid #e8e0d6;border-radius:8px;">
-                <button onclick="copyBookingLink()" class="btn-primary" style="white-space:nowrap;padding:10px 16px;font-size:0.83rem;">Copier</button>
-              </div>
+        <div class="form-section">
+          <h3 style="margin-bottom:8px;">Lien de réservation</h3>
+          <p style="color:#666;font-size:0.84rem;margin-bottom:12px;">Partagez ce lien avec vos acheteurs pour qu'ils réservent directement un créneau.</p>
+          <div id="bookingLinkBox" style="display:none;">
+            <div style="display:flex;gap:8px;align-items:center;">
+              <input type="text" id="bookingLink" readonly style="flex:1;background:#F5F0E8;font-size:0.8rem;padding:9px 12px;border:1.5px solid #e8e0d6;border-radius:8px;">
+              <button onclick="copyBookingLink()" class="btn-primary" style="white-space:nowrap;padding:10px 16px;font-size:0.83rem;">Copier</button>
             </div>
-            <p id="noLinkMsg" style="color:#bbb;font-size:0.84rem;">Publiez votre bien pour obtenir votre lien.</p>
           </div>
+          <p id="noLinkMsg" style="color:#bbb;font-size:0.84rem;">Publiez votre bien pour obtenir votre lien.</p>
         </div>
+
       </div>
     </div>
 
@@ -461,12 +541,15 @@ function renderVisits() {
   const list = document.getElementById('visitsList');
   if (!filtered.length) {
     list.innerHTML = `<div class="empty-state" style="grid-column:1/-1;">
-      <div class="empty-state-icon">🗓</div>
+      <div class="empty-state-icon"><svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#ccc" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div>
       <p>Aucune visite trouvée.<br>Les acheteurs réservent via votre lien de réservation.</p>
     </div>`;
     return;
   }
 
+  const svgCal = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>`;
+  const svgClock = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>`;
+  const svgPhone = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.41a2 2 0 0 1 2-2.18h3a2 2 0 0 1 2 1.72 12.13 12.13 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.13 12.13 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>`;
   list.innerHTML = filtered.map(v => `
     <div class="visit-card" id="vcard-${v.id}">
       <div class="visit-card-header">
@@ -480,14 +563,14 @@ function renderVisits() {
         ${badgeHtml(v.status)}
       </div>
       <div class="visit-details">
-        <div class="visit-detail-row"><span class="visit-detail-icon">📅</span>${formatDate(v.visit_date)}</div>
-        <div class="visit-detail-row"><span class="visit-detail-icon">🕐</span>${v.visit_time || '—'}</div>
-        ${v.buyer_phone ? `<div class="visit-detail-row"><span class="visit-detail-icon">📞</span>${v.buyer_phone}</div>` : ''}
+        <div class="visit-detail-row"><span class="visit-detail-icon">${svgCal}</span>${formatDate(v.visit_date)}</div>
+        <div class="visit-detail-row"><span class="visit-detail-icon">${svgClock}</span>${v.visit_time || '—'}</div>
+        ${v.buyer_phone ? `<div class="visit-detail-row"><span class="visit-detail-icon">${svgPhone}</span>${v.buyer_phone}</div>` : ''}
       </div>
       ${v.status === 'pending' ? `
       <div class="visit-actions">
-        <button class="btn-confirm" onclick="changeVisitStatus(${v.id},'confirmed')">✓ Confirmer</button>
-        <button class="btn-refuse" onclick="changeVisitStatus(${v.id},'cancelled')">✕ Refuser</button>
+        <button class="btn-confirm" onclick="changeVisitStatus(${v.id},'confirmed')">Confirmer</button>
+        <button class="btn-refuse" onclick="changeVisitStatus(${v.id},'cancelled')">Refuser</button>
       </div>` : ''}
     </div>
   `).join('');
@@ -506,7 +589,7 @@ async function changeVisitStatus(id, status) {
       renderVisits();
       updateStats(allVisits);
       renderCalendar();
-      showToast(status === 'confirmed' ? 'Visite confirmée ✓' : 'Visite annulée');
+      showToast(status === 'confirmed' ? 'Visite confirmée' : 'Visite annulée');
     }
   } catch(e) { showToast('Erreur', 'error'); }
 }
@@ -597,112 +680,103 @@ document.getElementById('calNext').addEventListener('click', () => {
   renderCalendar();
 });
 
-// ── Availability editor ───────────────────────────────
-const DAYS = [
-  { idx: 1, label: 'Lundi' }, { idx: 2, label: 'Mardi' }, { idx: 3, label: 'Mercredi' },
-  { idx: 4, label: 'Jeudi' }, { idx: 5, label: 'Vendredi' }, { idx: 6, label: 'Samedi' }, { idx: 0, label: 'Dimanche' },
-];
-const schedule = {};
-DAYS.forEach(d => { schedule[d.idx] = { enabled: false, ranges: [{ start: '09:00', end: '18:00' }] }; });
+// ── Disponibilités mensuelles ─────────────────────────
+let availSlots = []; // { date: 'YYYY-MM-DD', start: 'HH:MM', end: 'HH:MM' }
+let availMonth = new Date();
+availMonth.setDate(1);
 
-function renderSchedule() {
-  const container = document.getElementById('weekSchedule');
-  container.innerHTML = '';
-  DAYS.forEach(({ idx, label }) => {
-    const day = schedule[idx];
-    const row = document.createElement('div');
-    row.className = 'day-row' + (day.enabled ? '' : ' day-off');
-
-    const labelEl = document.createElement('div');
-    labelEl.className = 'day-label';
-
-    const toggleWrap = document.createElement('label');
-    toggleWrap.className = 'toggle-wrap';
-    const toggleInput = document.createElement('input');
-    toggleInput.type = 'checkbox';
-    toggleInput.className = 'toggle-input';
-    toggleInput.checked = day.enabled;
-    toggleInput.addEventListener('change', () => toggleDay(idx, toggleInput.checked));
-    const toggleTrack = document.createElement('span');
-    toggleTrack.className = 'toggle-track';
-    toggleWrap.appendChild(toggleInput);
-    toggleWrap.appendChild(toggleTrack);
-
-    const nameEl = document.createElement('span');
-    nameEl.className = 'day-name';
-    nameEl.textContent = label;
-    labelEl.appendChild(toggleWrap);
-    labelEl.appendChild(nameEl);
-
-    const rangesEl = document.createElement('div');
-    rangesEl.className = 'day-ranges';
-
-    if (!day.enabled) {
-      const offLabel = document.createElement('span');
-      offLabel.className = 'day-off-label';
-      offLabel.textContent = 'Indisponible';
-      rangesEl.appendChild(offLabel);
-    } else {
-      day.ranges.forEach((range, ri) => {
-        const rangeRow = document.createElement('div');
-        rangeRow.className = 'range-row';
-        const s = document.createElement('input'); s.type='time'; s.className='range-time'; s.value=range.start;
-        s.addEventListener('change', () => { schedule[idx].ranges[ri].start = s.value; });
-        const sep = document.createElement('span'); sep.className='range-sep'; sep.textContent='→';
-        const e = document.createElement('input'); e.type='time'; e.className='range-time'; e.value=range.end;
-        e.addEventListener('change', () => { schedule[idx].ranges[ri].end = e.value; });
-        rangeRow.appendChild(s); rangeRow.appendChild(sep); rangeRow.appendChild(e);
-        if (day.ranges.length > 1) {
-          const del = document.createElement('button'); del.className='range-delete'; del.textContent='✕';
-          del.addEventListener('click', () => { schedule[idx].ranges.splice(ri,1); renderSchedule(); });
-          rangeRow.appendChild(del);
-        }
-        rangesEl.appendChild(rangeRow);
-      });
-      const addBtn = document.createElement('button');
-      addBtn.className = 'add-range-btn';
-      addBtn.textContent = '+ Ajouter une plage';
-      addBtn.addEventListener('click', () => { schedule[idx].ranges.push({start:'09:00',end:'18:00'}); renderSchedule(); });
-      rangesEl.appendChild(addBtn);
-    }
-    row.appendChild(labelEl);
-    row.appendChild(rangesEl);
-    container.appendChild(row);
-  });
+function availMonthKey(d) {
+  return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0');
 }
 
-function toggleDay(idx, enabled) {
-  schedule[idx].enabled = enabled;
-  if (enabled && schedule[idx].ranges.length === 0) schedule[idx].ranges = [{start:'09:00',end:'18:00'}];
-  renderSchedule();
+function renderAvailMonth() {
+  document.getElementById('availMonthLabel').textContent = MONTHS_FR[availMonth.getMonth()] + ' ' + availMonth.getFullYear();
+  const key = availMonthKey(availMonth);
+  const monthSlots = availSlots.filter(s => s.date.startsWith(key)).sort((a, b) => a.date.localeCompare(b.date) || a.start.localeCompare(b.start));
+  const list = document.getElementById('availSlotList');
+  if (!monthSlots.length) {
+    list.innerHTML = `<div style="text-align:center;padding:28px;color:#bbb;font-size:0.85rem;border:1.5px dashed #e8e0d6;border-radius:10px;">Aucun créneau pour ce mois</div>`;
+    return;
+  }
+  const svgX = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>`;
+  list.innerHTML = monthSlots.map((s, i) => {
+    const d = new Date(s.date + 'T00:00:00');
+    const label = d.toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' });
+    const globalIdx = availSlots.indexOf(s);
+    return `<div class="avail-slot-item">
+      <div class="avail-slot-date">${label}</div>
+      <div class="avail-slot-time">${s.start} – ${s.end}</div>
+      <button class="avail-slot-del" onclick="deleteAvailSlot(${globalIdx})" title="Supprimer">${svgX}</button>
+    </div>`;
+  }).join('');
 }
+
+function deleteAvailSlot(idx) {
+  availSlots.splice(idx, 1);
+  renderAvailMonth();
+}
+window.deleteAvailSlot = deleteAvailSlot;
+
+document.getElementById('availPrev').addEventListener('click', () => {
+  availMonth = new Date(availMonth.getFullYear(), availMonth.getMonth() - 1, 1);
+  renderAvailMonth();
+});
+document.getElementById('availNext').addEventListener('click', () => {
+  availMonth = new Date(availMonth.getFullYear(), availMonth.getMonth() + 1, 1);
+  renderAvailMonth();
+});
+
+// Set default date to today
+document.getElementById('availDate').value = new Date().toISOString().split('T')[0];
+
+document.getElementById('addAvailSlot').addEventListener('click', () => {
+  const date = document.getElementById('availDate').value;
+  const start = document.getElementById('availStart').value;
+  const end = document.getElementById('availEnd').value;
+  if (!date) { showToast('Choisissez une date', 'error'); return; }
+  if (start >= end) { showToast('L\'heure de fin doit être après le début', 'error'); return; }
+  availSlots.push({ date, start, end });
+  // Navigate to the month of the added slot
+  const d = new Date(date + 'T00:00:00');
+  availMonth = new Date(d.getFullYear(), d.getMonth(), 1);
+  renderAvailMonth();
+  showToast('Créneau ajouté');
+});
 
 function scheduleToSlots() {
-  const slots = [];
-  DAYS.forEach(({ idx }) => {
-    if (schedule[idx].enabled) schedule[idx].ranges.forEach(r => slots.push({ day: idx, start: r.start, end: r.end }));
+  // Convert availSlots to the format the API expects (day_of_week based)
+  // We keep the new monthly format in localStorage and map to weekly for API compat
+  return availSlots.map(s => {
+    const d = new Date(s.date + 'T00:00:00');
+    return { day: d.getDay(), start: s.start, end: s.end };
   });
-  return slots;
 }
 
 function slotsToSchedule(slots) {
-  DAYS.forEach(({ idx }) => { schedule[idx] = { enabled: false, ranges: [] }; });
-  slots.forEach(s => {
-    const idx = s.day_of_week;
-    if (schedule[idx] !== undefined) {
-      schedule[idx].enabled = true;
-      schedule[idx].ranges.push({ start: s.start_time, end: s.end_time });
-    }
-  });
-  DAYS.forEach(({ idx }) => {
-    if (!schedule[idx].enabled) schedule[idx].ranges = [{start:'09:00',end:'18:00'}];
-    else if (schedule[idx].ranges.length === 0) schedule[idx].ranges = [{start:'09:00',end:'18:00'}];
-  });
+  // Convert API slots (day_of_week) back — stored in localStorage for monthly view
+  const saved = JSON.parse(localStorage.getItem('avail_slots_v2') || '[]');
+  if (saved.length) { availSlots = saved; } else {
+    // Fallback: convert weekly slots to approximate monthly (current month)
+    const now = new Date();
+    availSlots = [];
+    slots.forEach(s => {
+      const dow = s.day_of_week;
+      // Find next occurrence of this day in current month
+      for (let dd = 1; dd <= 31; dd++) {
+        const dt = new Date(now.getFullYear(), now.getMonth(), dd);
+        if (dt.getMonth() !== now.getMonth()) break;
+        if (dt.getDay() === dow) {
+          availSlots.push({ date: dt.toISOString().split('T')[0], start: s.start_time, end: s.end_time });
+        }
+      }
+    });
+  }
 }
 
 document.getElementById('saveAgenda').addEventListener('click', async () => {
   const btn = document.getElementById('saveAgenda');
-  btn.textContent = 'Sauvegarde…'; btn.disabled = true;
+  btn.textContent = 'Enregistrement…'; btn.disabled = true;
+  localStorage.setItem('avail_slots_v2', JSON.stringify(availSlots));
   try {
     const res = await fetch('/api/agenda', {
       method: 'POST', headers: {'Content-Type':'application/json'},
@@ -710,13 +784,13 @@ document.getElementById('saveAgenda').addEventListener('click', async () => {
     });
     const data = await res.json();
     if (data.success) {
-      showToast('Agenda sauvegardé ✓');
+      showToast('Disponibilités enregistrées');
       const ok = document.getElementById('agendaSuccess');
       ok.classList.remove('hidden');
       setTimeout(() => ok.classList.add('hidden'), 3000);
     }
   } catch(e) { showToast('Erreur lors de la sauvegarde', 'error'); }
-  btn.textContent = 'Sauvegarder'; btn.disabled = false;
+  btn.textContent = 'Enregistrer mes disponibilités'; btn.disabled = false;
 });
 
 // ── Load data ─────────────────────────────────────────
@@ -735,9 +809,11 @@ async function loadAgenda() {
     const res = await fetch('/api/agenda');
     const data = await res.json();
     if (data.slots?.length) slotsToSchedule(data.slots);
-    else DAYS.forEach(({ idx }) => { schedule[idx] = { enabled: false, ranges: [{start:'09:00',end:'18:00'}] }; });
-  } catch(e) {}
-  renderSchedule();
+  } catch(e) {
+    const saved = JSON.parse(localStorage.getItem('avail_slots_v2') || '[]');
+    if (saved.length) availSlots = saved;
+  }
+  renderAvailMonth();
 }
 
 async function loadBookingLink() {
@@ -763,7 +839,7 @@ function showToast(msg, type = 'success') {
   let t = document.querySelector('.toast');
   if (!t) { t = document.createElement('div'); t.className = 'toast'; document.body.appendChild(t); }
   t.textContent = msg;
-  t.className = `toast${type === 'error' ? ' error' : ''}`;
+  t.className = 'toast' + (type === 'error' ? ' error' : '');
   t.classList.add('show');
   setTimeout(() => t.classList.remove('show'), 3000);
 }
