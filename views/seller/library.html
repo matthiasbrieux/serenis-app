@@ -203,92 +203,124 @@ const MODULES = [
   {
     num:'01', title:'Estimer son bien', subtitle:'Trouver le prix juste pour vendre vite et bien',
     steps:[
-      { title:'Comprendre le marché local', meta:'5 min · Fondamentaux',
-        explication:`Le prix de votre bien se fixe en comparant les ventes récentes dans votre secteur — pas les annonces actuelles. Une annonce n'est pas une vente. <strong>Regardez ce qui s'est réellement vendu dans les 6 derniers mois.</strong>`,
-        schema:['DVF.fr','MeilleursAgents','Notaires.fr','Prix/m²','Prix final'],
-        tableau:{ headers:['Source','Ce qu\'elle donne','Fiabilité'], rows:[['DVF.fr (gouvernement)','Prix réels des ventes notariées','⭐⭐⭐⭐⭐'],['MeilleursAgents','Estimation automatique','⭐⭐⭐⭐'],['Annonces voisins','Prix demandés (pas vendus)','⭐⭐'],['Agences locales','Estimation commerciale','⭐⭐⭐']] },
-        tips:['Cherchez au moins 5 ventes comparables dans un rayon de 500m','Privilégiez les ventes de moins de 6 mois','Filtrez par type de bien et surface (±15%)'],
-        warnings:['Ne regardez PAS les prix des annonces actuelles — elles gonflent votre référentiel']
+      { title:'Les outils pour estimer', meta:'5 min · Fondamentaux',
+        explication:`En règle générale, une maison se revend au même prix qu'elle a été achetée, plus ou moins les travaux réalisés. Mais pour fixer un prix précis, <strong>trois outils gratuits et fiables</strong> existent — utilisez-les tous les trois.`,
+        tableau:{ headers:['Outil','Ce qu\'il donne','Fiabilité'], rows:[['MeilleursAgents.com','Estimation automatique gratuite et anonyme','⭐⭐⭐⭐'],['2 agences immobilières','Estimation gratuite, sans engagement — obtenez deux avis pour comparer','⭐⭐⭐⭐⭐'],['DVF.fr (gouvernement)','Prix réels des ventes notariées dans votre rue','⭐⭐⭐⭐⭐'],['Annonces concurrentes','Prix demandés (pas vendus) — référence indicative seulement','⭐⭐']] },
+        tips:['Faites estimer par 2 agences différentes : c\'est gratuit, sans engagement, et vous obtenez deux avis professionnels','MeilleursAgents est idéal si vous ne voulez pas recevoir d\'agents chez vous','Sur DVF.fr, filtrez par type de bien et surface similaire (±15%)'],
+        warnings:['Ne fixez jamais votre prix uniquement sur des annonces en ligne — elles reflètent les prix demandés, pas les prix obtenus']
       },
       { title:'Calculer le prix au m²', meta:'8 min · Méthode',
         explication:`La méthode comparative est la plus fiable. Calculez un prix au m² de référence à partir des ventes récentes, puis <strong>ajustez selon les caractéristiques de votre bien</strong>.`,
-        schema:['Prix ventes réf.','÷ m²','Prix/m² moyen','× vos m²','Prix de base','+ ajustements','Prix final'],
-        tableau:{ headers:['Caractéristique','Impact sur le prix'], rows:[['Dernier étage avec vue','+5% à +12%'],['Rez-de-chaussée','-5% à -10%'],['Travaux à prévoir','-10% à -25%'],['Double exposition','+3% à +8%'],['Parking inclus','+5 000€ à +20 000€'],['DPE F ou G','-5% à -20%']] },
-        tips:['Appliquez les ajustements avec modération','Votre bien ne peut pas valoir 30% de plus que la médiane locale'],
-        warnings:['L\'erreur classique : surestimer de 10-15% "pour négocier". Résultat : 0 visite pendant 2 mois.']
+        schema:['Ventes récentes similaires','Prix / m² moyen','× votre surface','Prix de base','Ajustements','= Prix de vente'],
+        tableau:{ headers:['Caractéristique','Impact sur le prix'], rows:[['Dernier étage avec vue','+5% à +12%'],['Rez-de-chaussée','-5% à -10%'],['Travaux importants à prévoir','-10% à -25%'],['Double exposition','+3% à +8%'],['Parking ou garage inclus','+5 000€ à +20 000€'],['DPE F ou G','-5% à -20%'],['Jardin privatif','+5% à +15%']] },
+        tips:['Appliquez les ajustements avec modération — ne cumulez pas tous les bonus','Votre bien ne peut pas raisonnablement valoir 30% de plus que la médiane locale'],
+        warnings:['L\'erreur classique : surestimer de 10-15% "pour négocier". Résultat : zéro visite pendant 2 mois.']
       },
-      { title:'Définir sa stratégie de prix', meta:'5 min · Stratégie',
-        explication:`Deux stratégies existent. <strong>Prix juste dès le départ</strong> : urgence, plusieurs offres, vente rapide. <strong>Prix haut puis baisse</strong> : tue l'intérêt initial — un bien "vieux" sur le marché inquiète les acheteurs.`,
-        schema:['Prix juste','→ Visites dès J+3','→ Offres J+15','→ Vente rapide'],
-        script:[{speaker:'vendeur',line:'Je mets à 295 000€ alors que le marché est �� 270 000€.'},{speaker:'acheteur',line:'(3 semaines plus tard) Pourquoi c\'est encore là ? Il y a un problème ?'},{speaker:'vendeur',line:'(Baisse à 275 000€) — L\'annonce perd toute crédibilité.'}],
-        tips:['Une annonce > 45 jours sans offre doit être réévaluée','Le bon prix = maximum de visites dans les 15 premiers jours','Tolérance de négociation : +2% à +4% maximum'],
-        warnings:[]
+      { title:'Stratégie de prix : prix juste ou prix haut ?', meta:'5 min · Stratégie',
+        explication:`<strong>Prix juste dès le départ</strong> : génère de l'urgence, plusieurs offres simultanées, vente en 15 jours. <strong>Prix haut puis baisses</strong> : tue l'intérêt initial. Un bien "vieux" sur le marché inquiète les acheteurs — ils pensent qu'il y a un problème.`,
+        schema:['Prix juste', 'Visites dès J+3', 'Offres J+15', 'Vente rapide'],
+        tips:['Une annonce de plus de 45 jours sans offre doit être réévaluée','Le bon prix = le maximum de visites dans les 15 premiers jours','Marge de négociation raisonnable : +2% à +4% maximum au-dessus de votre prix cible'],
+        warnings:['Baisser son prix après 2 mois sur le marché envoie un signal négatif très fort aux acheteurs']
       }
     ]
   },
   {
-    num:'02', title:'Préparer son bien', subtitle:'Home staging et mise en valeur',
+    num:'02', title:'Préparer sa vente', subtitle:'Documents, dossier acheteur et fiche bien',
     steps:[
-      { title:'Le home staging en 1 heure', meta:'6 min · Pratique',
-        explication:`Le home staging ne coûte rien et peut faire gagner 5 à 10% sur le prix. L'objectif : <strong>dépersonnaliser, désencombrer, nettoyer et illuminer</strong>. Un acheteur doit se projeter dans le bien — pas dans votre vie.`,
-        schema:['Désencombrer','Dépersonnaliser','Réparer','Nettoyer','Illuminer','= Coup de cœur'],
-        tableau:{ headers:['Priorité','Action','Coût','Impact'], rows:[['1 — Urgent','Ranger et désencombrer','0€','Très élevé'],['2 — Urgent','Nettoyer joints, vitres, sol','< 30€','Élevé'],['3 — Important','Changer ampoules (blanc chaud)','< 20€','Élevé'],['4 — Important','Peindre les murs en blanc cassé','< 100€','Élevé'],['5 — Optionnel','Fleurs fraîches le jour J','< 15€','Moyen']] },
-        tips:['Enlevez les photos de famille','Ouvrez rideaux et allumez TOUTES les lumières pour les photos','Une odeur neutre est indispensable'],
-        warnings:['N\'investissez pas dans une rénovation complète avant de vendre']
+      { title:'Documents administratifs à réunir en amont', meta:'6 min · Administratif',
+        explication:`<strong>La grande erreur des vendeurs particuliers</strong> : trouver un acheteur et réaliser trop tard qu'il manque des documents. Vérifiez tout avant de publier votre annonce.`,
+        tableau:{ headers:['Document','Pourquoi c\'est important'], rows:[['Titre de propriété','Pièce obligatoire pour le notaire — souvent oubliée'],['Déclarations de travaux en mairie','Tout travail extérieur doit avoir une déclaration (extension, véranda, abri, clôture). Sans ça, l\'acheteur peut se retourner contre vous.'],['Factures de travaux','L\'acheteur peut les réclamer. Elles rassurent et peuvent justifier le prix.'],['Factures énergétiques','Gaz, électricité — utiles pour informer l\'acheteur sur les charges réelles'],['Dernier avis de taxe foncière','L\'acheteur le demandera systématiquement']] },
+        tips:['Rassemblez ces documents AVANT de publier votre annonce','Un dossier complet dès le départ inspire confiance et accélère la vente'],
+        warnings:['Un travail non déclaré en mairie peut bloquer la vente ou engager votre responsabilité légale']
       },
-      { title:'Photos qui convertissent', meta:'7 min · Technique',
-        explication:`Les photos sont votre seul argument de vente en ligne. <strong>90% des acheteurs décident de visiter en 8 secondes</strong> sur les photos. Avec le Pack Sérénité, vos photos sont prises par un photographe professionnel.`,
-        schema:['Préparation','Lumière naturelle','Grand-angle','HDR + retouche','Publication'],
-        tableau:{ headers:['Photo','Priorité','Conseil'], rows:[['Façade / entrée','⭐⭐⭐⭐⭐','Journée ensoleillée, voiture absente'],['Salon / séjour','⭐⭐⭐⭐⭐','Depuis le coin opposé à la fenêtre'],['Cuisine','⭐⭐⭐⭐⭐','Plan de travail dégagé'],['Chambre principale','⭐⭐⭐⭐','Lit fait, rideaux ouverts'],['Salle de bain','⭐⭐⭐⭐','Abattant fermé, tout rangé'],['Jardin','⭐⭐⭐⭐','Tondu, salon de jardin en place']] },
-        tips:['Minimum 10 photos — idéalement 15 à 20','La première photo doit être la MEILLEURE','Visite virtuelle 360° : multiplie le taux de contact par 3'],
-        warnings:['Photo de salle de bain avec abattant ouvert = impression négative immédiate']
-      }
-    ]
-  },
-  {
-    num:'03', title:'Rédiger l\'annonce', subtitle:'Accroche, texte et multi-diffusion',
-    steps:[
-      { title:'Structure d\'une annonce parfaite', meta:'5 min · Copywriting',
-        explication:`Une bonne annonce répond en 10 secondes à : <strong>Pourquoi ce bien ? Pourquoi ce prix ?</strong> Le titre contient les informations clés. La description suit le plan AIDA.`,
-        schema:['Titre accrocheur','Mise en valeur','Description','Points forts','Infos pratiques','Contact'],
-        tableau:{ headers:['Section','Contenu','Longueur'], rows:[['Titre','Type + surface + ville + prix + 1 atout','< 60 caractères'],['1er paragraphe','Situation, type, surface, état','3-4 lignes'],['Points forts','Liste des atouts (3-5 max)','5-7 items'],['Infos pratiques','DPE, charges, taxe foncière','2-3 lignes'],['CTA','Disponibilité, mode de contact','1 ligne']] },
-        script:[{speaker:'vendeur',line:'✅ BON : "Appartement 68m² lumineux — Paris 11e — 2ch — 520 000€ — Cachet ancien"'},{speaker:'acheteur',line:'❌ MAUVAIS : "Bel appartement à vendre, très bien situé, à saisir"'}],
-        tips:['Évitez les superlatifs vides : "magnifique", "exceptionnel"','Mentionnez le DPE — les acheteurs le cherchent systématiquement','Indiquez les transports proches avec la distance exacte'],
-        warnings:['Ne mentez pas sur la surface ou l\'état — c\'est illégal et détruit la confiance en visite']
-      }
-    ]
-  },
-  {
-    num:'04', title:'Gérer les visites', subtitle:'Qualifier, accueillir et convaincre',
-    steps:[
-      { title:'Qualifier les prospects', meta:'4 min · Organisation',
-        explication:`Avant de donner votre adresse à n'importe qui, <strong>qualifiez l'acheteur</strong>. 3 questions suffisent pour savoir si la visite vaut votre temps.`,
-        schema:['Contact entrant','3 questions','Décision','RDV ou refus poli'],
-        tableau:{ headers:['Question','Ce que vous cherchez'], rows:[['"Votre budget ?"','Alignement avec votre prix'],['"Êtes-vous en contact avec votre banque ?"','Capacité de financement réelle'],['"Dans quel délai souhaitez-vous acheter ?"','< 3 mois = acheteur chaud']] },
-        script:[{speaker:'vendeur',line:'Avant de fixer un rendez-vous, permettez-moi de vous poser 2-3 questions pour m\'assurer que le bien correspond à vos critères.'},{speaker:'acheteur',line:'Bien sûr, je vous écoute.'},{speaker:'vendeur',line:'Votre budget global est de combien ? Et avez-vous déjà un accord de principe de votre banque ?'}],
-        tips:['Créneaux de 45 min minimum','Horaires idéaux : semaine après 18h ou samedi matin','Confirmez par SMS la veille avec l\'adresse exacte'],
-        warnings:['Ne laissez jamais entrer quelqu\'un que vous n\'avez pas qualifié']
+      { title:'Préparer le dossier acheteur', meta:'5 min · Organisation',
+        explication:`Avant même qu'un acheteur franchisse votre porte, il doit avoir reçu toutes les informations nécessaires pour se décider sérieusement. <strong>Envoyez un dossier complet par email avant chaque visite</strong> — vous trouverez un mail type dans la section Mails ci-dessous.`,
+        schema:['Contact entrant', 'Envoyer le dossier', 'Qualifier par téléphone', 'Confirmer la visite'],
+        tips:['Le dossier à envoyer contient : photos HD, surface, DPE, taxe foncière, charges, diagnostics principaux','Joignez également la fiche caractéristiques complète (voir étape suivante)'],
+        warnings:['Ne donnez votre adresse exacte qu\'après avoir qualifié l\'acheteur par téléphone']
       },
-      { title:'Script de visite', meta:'8 min · Technique',
-        explication:`Une visite dure 20 à 45 minutes : <strong>accueil → visite guidée → temps libre → questions → congé</strong>. Votre rôle : valoriser sans survendre, répondre sans mentir, déceler les signaux d'intérêt.`,
-        schema:['Accueil chaleureux','Visite guidée','Temps libre','Questions','Prise de congé'],
-        script:[{speaker:'vendeur',line:'Bienvenue ! Je commence par le salon qui est la pièce maîtresse. Vous pouvez voir que...'},{speaker:'vendeur',line:'Je vous laisse quelques minutes pour voir à votre rythme. N\'hésitez pas à ouvrir les placards...'},{speaker:'acheteur',line:'On a une question sur le voisinage...'},{speaker:'vendeur',line:'[Réponse honnête] Souhaitez-vous organiser une seconde visite ?'}],
-        tips:['Signaux d\'intérêt : questions sur les délais, les voisins, l\'école — prenez-les au sérieux','Ne suivez pas les acheteurs pas à pas — donnez-leur de l\'espace','Préparez un dossier papier (diagnostics, charges) à laisser'],
-        warnings:['Ne parlez pas trop. Silence = l\'acheteur se projette. C\'est bon signe.'],
-        tableau:{ headers:['Signal d\'intérêt','Signification'], rows:[['Questions sur les délais de vente','Prêt à avancer rapidement'],['Demande d\'une seconde visite','Très intéressé'],['Questions sur les charges/taxe','Calcule son budget'],['Prend des photos','Se projette dans le bien'],['Vient avec un proche','Veut un avis extérieur pour décider']] }
+      { title:'La fiche caractéristiques complète', meta:'8 min · Contenu',
+        explication:`La fiche Serenis va bien au-delà des fiches d\'agence classiques. Elle répond à toutes les questions qu\'un acheteur se pose — y compris celles qu\'il n\'ose pas poser. <strong>Remplissez-la une fois, utilisez-la pour toutes vos visites.</strong>`,
+        tableau:{ headers:['Rubrique','Ce qu\'il faut renseigner'], rows:[['Exposition','Sud, est, ouest — critère décisif pour de nombreux acheteurs'],['Vie du quartier','Boulangerie, école (nom + distance), supérette, gare (durée trajet), transports'],['Fenêtres','Simple/double vitrage, PVC/bois, oscillo-battantes, date de pose'],['Chauffage','Type (gaz, pompe à chaleur, électrique), marque, année'],['Toiture','Type, année de réfection'],['Isolation','Type et année — impact direct sur le DPE'],['Raison de la vente','Préparez une réponse courte, positive et rassurante. Cette question revient dans 100% des visites.']] },
+        tips:['Préparez votre réponse à "pourquoi vous vendez" avant le premier contact : mutation, famille, projet d\'avenir — restez positif','Une fiche bien remplie évite les questions gênantes pendant la visite']
       }
     ]
   },
   {
-    num:'05', title:'Négocier & Conclure', subtitle:'Offres, contre-offres et compromis',
+    num:'03', title:'Annonce & Photos', subtitle:'Rédiger, photographier et publier',
+    steps:[
+      { title:'Ce qu\'il ne faut jamais écrire', meta:'4 min · Copywriting',
+        explication:`Certaines formulations dans une annonce font fuir les acheteurs ou affaiblissent votre position de négociation avant même la visite.`,
+        tableau:{ headers:['À ne jamais écrire','Pourquoi c\'est dangereux'], rows:[['"Prix négociable"','Suggère que votre prix n\'est pas sérieux — invite les offres basses'],['Les raisons urgentes ou personnelles de la vente','"Divorce, mutation, besoin urgent" = l\'acheteur sait qu\'il a tout le pouvoir'],['Votre numéro personnel direct','Invitez les acheteurs à vous contacter par email ou SMS uniquement'],['Les défauts du bien','Ne signalez pas les problèmes dans l\'annonce — expliquez-les en visite si demandé']] },
+        tips:['Écrivez un titre avec : type + surface + ville + prix + 1 atout clé (moins de 60 caractères)','Mentionnez le DPE — les acheteurs le cherchent systématiquement'],
+        warnings:['Ne mentez pas sur la surface ou l\'état — c\'est illégal et détruit la confiance immédiatement en visite']
+      },
+      { title:'Préparer son bien pour les photos', meta:'6 min · Home staging',
+        explication:`La règle d\'or : <strong>l\'acheteur doit se projeter dans votre maison, pas dans votre vie</strong>. Dépersonnalisez. Les photos sont votre seul argument de vente en ligne — 90% des acheteurs décident de visiter en 8 secondes.`,
+        tableau:{ headers:['Action','Coût','Impact'], rows:[['Ranger et désencombrer chaque pièce','0€','Très élevé'],['Nettoyer joints, vitres, sol','< 30€','Élevé'],['Changer les ampoules en blanc chaud','< 20€','Élevé'],['Enlever toutes les photos personnelles','0€','Élevé'],['Ouvrir rideaux + allumer toutes les lumières','0€','Très élevé'],['Fleurs fraîches dans le salon','< 15€','Moyen']] },
+        tips:['Volets ouverts, lumières d\'ambiance allumées (pas les plafonniers), télévision éteinte','Plan de travail cuisine vide, rideau de douche ouvert, cuvette WC fermée','Sortez la voiture pour la photo de façade — engazonnez si besoin'],
+        warnings:['N\'investissez pas dans une rénovation complète avant de vendre — ce n\'est presque jamais rentable']
+      },
+      { title:'Check-list avant chaque visite', meta:'3 min · Pratique',
+        explication:`La préparation d\'une visite se fait en 20 minutes si votre bien est déjà rangé. Suivez cette check-list avant chaque rendez-vous.`,
+        tableau:{ headers:['Action','Détail'], rows:[['Tous les volets ouverts','Lumière maximale dans toutes les pièces'],['Lumières d\'ambiance allumées','Évitez les plafonniers — préférez lampes et spots'],['Télévision éteinte','L\'acheteur doit entendre le calme'],['Plan de travail cuisine dégagé','Max 2 objets dessus'],['Abattant WC fermé','Détail qui compte'],['Portemanteaux derrière les portes retirés','Vérifiez que toutes les portes s\'ouvrent à 100%'],['Température 19-20°C','Aérez 20 minutes avant, puis réchauffez'],['Poubelle sortie ou cachée','Cuisine et salle de bain']] }
+      }
+    ]
+  },
+  {
+    num:'04', title:'Les visites', subtitle:'Qualifier, accueillir et gérer les questions difficiles',
+    steps:[
+      { title:'Qualifier l\'acheteur avant la visite', meta:'4 min · Organisation',
+        explication:`Un acheteur non finançable vous fait perdre 3 à 6 mois et vous oblige à tout recommencer. <strong>Qualifiez discrètement avant d\'ouvrir votre porte.</strong>`,
+        tableau:{ headers:['Profil acheteur','Ce qu\'il doit vous fournir'], rows:[['Achat comptant','Attestation de fonds ou relevé bancaire montrant la disponibilité'],['Achat avec crédit','Étude de faisabilité par sa banque ou un courtier + montant de l\'apport + accord de principe'],['Propriétaire vendeur','Vérifiez que son bien est en vente ou déjà vendu — une vente conditionnelle à la sienne est risquée']] },
+        script:[{speaker:'vendeur',line:'Avant de fixer un rendez-vous, puis-je vous poser quelques questions rapides pour m\'assurer que le bien correspond à vos critères ?'},{speaker:'acheteur',line:'Bien sûr.'},{speaker:'vendeur',line:'Quel est votre budget global ? Avez-vous déjà rencontré votre banque ou un courtier ?'},{speaker:'vendeur',line:'Dans quel délai souhaitez-vous idéalement emménager ?'}],
+        tips:['Créneaux de 45 min minimum','Horaires idéaux : semaine après 18h, ou samedi matin','Confirmez par SMS la veille avec l\'adresse exacte'],
+        warnings:['Ne donnez jamais votre adresse avant d\'avoir qualifié l\'acheteur — même brièvement']
+      },
+      { title:'Comment se comporter pendant la visite', meta:'8 min · Technique',
+        explication:`C\'est votre maison, vous la connaissez mieux que quiconque. Votre rôle est de guider — pas de faire la visite comme un agent immobilier. <strong>Commencez par la meilleure pièce, terminez par la deuxième meilleure.</strong>`,
+        tableau:{ headers:['Comportement','Pourquoi'], rows:[['Guidez sans marcher devant','L\'acheteur doit découvrir l\'espace, pas votre dos'],['Laissez-le entrer en premier dans chaque pièce','Il doit ressentir l\'espace sans obstruction'],['Restez un pas en retrait','Disponible, pas intrusif'],['Laissez des silences','L\'acheteur s\'imagine vivre là — le silence est positif'],['Ne suivez pas pas à pas','Donnez-lui de l\'espace et de la liberté d\'explorer']] },
+        warnings:['Ne dites jamais : "On est obligés de vendre rapidement", "Le prix est négociable", "Les voisins sont un peu bruyants"','Ne commentez pas négativement une pièce ou un équipement du bien']
+      },
+      { title:'Répondre aux questions difficiles', meta:'6 min · Négociation',
+        explication:`Certaines questions sont des pièges — pas par malveillance, mais un vendeur stressé peut livrer des informations qui fragilisent sa position. <strong>Préparez vos réponses à l\'avance.</strong>`,
+        tableau:{ headers:['Question piège','Réponse recommandée'], rows:[['"Pourquoi vous vendez ?"','Réponse courte et positive : "Nouveau projet de vie / mutation / famille qui s\'agrandit"'],
+        ['"Il y a des travaux à prévoir ?"','Soyez honnête mais contextualisez le prix : "La toiture a été refaite en [année], les fenêtres ont [X] ans — c\'est intégré dans le prix"'],
+        ['"Vous êtes pressés de vendre ?"','Jamais : toujours répondre "Non, je prends le temps de trouver le bon acheteur"'],
+        ['"Vous avez eu des offres ?"','"J\'ai eu des contacts sérieux mais rien qui correspondait à mes critères"'],
+        ['"Quel est le principal défaut ?"','Transformez en opportunité : "La cuisine est à rafraîchir — c\'est d\'ailleurs intégré dans notre prix"'],
+        ['"Y a-t-il eu des problèmes d\'humidité ?"','Répondez honnêtement — mentir expose à des recours légaux après la vente']] }
+      }
+    ]
+  },
+  {
+    num:'05', title:'Négocier & Conclure', subtitle:'Offres, compromis, diagnostics et acte de vente',
     steps:[
       { title:'Recevoir et répondre à une offre', meta:'6 min · Négociation',
-        explication:`Recevoir une offre est une excellente nouvelle — même en dessous de votre prix. <strong>Ne jamais refuser sèchement</strong>. Toujours contre-proposer. L'offre ouvre une négociation, pas une décision finale.`,
-        schema:['Offre reçue','Analyse','Contre-offre','Accord verbal','Compromis notaire'],
-        tableau:{ headers:['Offre reçue','Votre réaction recommandée'], rows:[['Au prix demandé','Acceptez immédiatement'],['��2% à −5%','Contre-proposez à −1% ou tenez votre prix'],['−5% à −10%','Contre-proposez avec justificatif'],['> −10%','Déclinez poliment avec explication']] },
-        script:[{speaker:'acheteur',line:'On vous propose 260 000€ pour votre bien à 275 000€.'},{speaker:'vendeur',line:'Merci pour votre offre. Elle est en dessous de ma valorisation. J\'ai refait [travaux]. Je peux descendre à 270 000€, c\'est mon prix ferme.'},{speaker:'acheteur',line:'265 000€ ?'},{speaker:'vendeur',line:'268 000€ et je laisse [équipement], c\'est ma dernière position.'}],
-        tips:['Répondez dans les 24h — au-delà, l\'acheteur cherche ailleurs','Demandez toujours une preuve de financement avant d\'accepter','Une offre au comptant vaut souvent mieux qu\'une offre plus haute avec crédit'],
-        warnings:['Ne signez rien sans un notaire — même un accord écrit entre particuliers peut créer des obligations']
+        explication:`Recevoir une offre est une excellente nouvelle — même en dessous de votre prix. <strong>Ne jamais refuser sèchement.</strong> Toujours contre-proposer. L\'offre ouvre une négociation, pas une décision finale.`,
+        schema:['Offre reçue', 'Analyse 24h max', 'Contre-offre écrite', 'Accord verbal', 'Notaire'],
+        tableau:{ headers:['Offre reçue','Votre réaction'], rows:[['Au prix demandé','Acceptez immédiatement, par écrit'],['- 2% à - 5%','Contre-proposez à -1% ou tenez votre prix avec justificatif'],['- 5% à - 10%','Contre-proposez avec explication (travaux réalisés, marché local)'],['Plus de - 10%','Déclinez poliment en expliquant votre valorisation']] },
+        script:[{speaker:'acheteur',line:'On vous propose 260 000€ pour votre bien à 275 000€.'},{speaker:'vendeur',line:'Merci pour votre offre. Elle est en dessous de ma valorisation compte tenu des travaux réalisés. Je peux aller à 270 000€ — c\'est mon prix ferme.'},{speaker:'acheteur',line:'265 000€ ?'},{speaker:'vendeur',line:'268 000€ et je laisse [équipement inclus], c\'est ma dernière position.'}],
+        tips:['Répondez dans les 24h — au-delà, l\'acheteur cherche ailleurs','Demandez toujours une preuve de financement avant d\'accepter définitivement','Une offre au comptant vaut souvent mieux qu\'une offre plus haute avec crédit'],
+        warnings:['Ne signez aucun document sans votre notaire — même un accord manuscrit peut créer des obligations légales']
+      },
+      { title:'Les diagnostics obligatoires', meta:'5 min · Administratif',
+        explication:`Ces documents sont obligatoires et doivent être remis à l\'acheteur avant la signature du compromis. Ils sont regroupés dans le <strong>Dossier de Diagnostic Technique (DDT)</strong>.`,
+        tableau:{ headers:['Diagnostic','Condition','Validité'], rows:[['DPE — Diagnostic de Performance Énergétique','Toujours obligatoire','10 ans'],['État des risques et pollutions (ERP)','Toujours obligatoire','6 mois'],['Diagnostic amiante','Construction avant 1997','Illimitée si négatif'],['Diagnostic plomb (CREP)','Construction avant 1949','1 an si positif'],['Diagnostic électricité','Installation de plus de 15 ans','3 ans'],['Diagnostic gaz','Installation de plus de 15 ans','3 ans'],['Mesurage Loi Carrez','Appartement en copropriété uniquement','Permanent']] },
+        tips:['Commandez vos diagnostics dès la décision de vendre — comptez 1 à 2 semaines de délai','Le diagnostic assainissement varie selon votre commune — renseignez-vous en mairie'],
+        warnings:['Un DPE F ou G doit être intégré dans votre prix — il impacte fortement la négociation']
+      },
+      { title:'Le compromis et l\'acte de vente', meta:'7 min · Juridique',
+        explication:`Une fois l\'offre acceptée, le notaire prend le relais. La signature définitive intervient en moyenne <strong>3 mois après le compromis</strong> — ce délai est incompressible.`,
+        schema:['Offre acceptée', 'Compromis chez le notaire', 'Délai de rétractation 10j', 'Financement acheteur (45j)', 'Acte de vente', 'Remise des clés'],
+        tableau:{ headers:['Pièce à fournir au notaire','Détail'], rows:[['Titre de propriété','Obligatoire'],['Diagnostics techniques complets','DDT complet'],['Dernier avis de taxe foncière','Année en cours'],['Factures de travaux + garanties décennales','Si travaux de moins de 10 ans'],['Déclarations de travaux en mairie','Si extension ou modification extérieure'],['Pièce d\'identité + justificatif de domicile','Des deux vendeurs si couple'],['Livret de famille ou acte de mariage','Si vendeurs mariés']] },
+        tips:['L\'acheteur peut avoir son propre notaire — c\'est son droit. Les deux notaires se partagent les honoraires, sans surcoût pour vous.','Faites un relevé complet des compteurs (eau, gaz, électricité) le jour de la signature'],
+        warnings:['Ne coupez jamais les compteurs avant la vente — faites une bascule de contrat au nom de l\'acheteur']
+      },
+      { title:'Gérer plusieurs acheteurs simultanément', meta:'4 min · Stratégie',
+        explication:`Si plusieurs acheteurs sont intéressés simultanément, c\'est une excellente position. <strong>Gérez-la avec équité et transparence — sans monter les acheteurs les uns contre les autres.</strong>`,
+        tips:['Dites simplement : "Il y a d\'autres personnes intéressées — je dois vous demander votre position d\'ici [date]"','Fixez une date limite identique pour toutes les offres','Comparez les offres sur le prix ET sur les conditions : financement solide, délai rapide, peu de conditions suspensives'],
+        warnings:['Monter les acheteurs les uns contre les autres peut créer une guerre des enchères… mais aussi faire fuir tout le monde si ça se sait']
       }
     ]
   }
@@ -306,8 +338,9 @@ function renderModules() {
   MODULES.forEach((mod, mi) => {
     const btn = document.createElement('button');
     btn.className = 'module-btn' + (mi === activeModule ? ' active' : '');
-    btn.textContent = `${mod.num} · ${mod.title}`;
-    btn.onclick = () => { activeModule = mi; renderModules(); };
+    btn.textContent = mod.num + ' · ' + mod.title;
+    btn.type = 'button';
+    btn.addEventListener('click', function() { activeModule = mi; renderModules(); });
     nav.appendChild(btn);
 
     const div = document.createElement('div');
@@ -318,9 +351,10 @@ function renderModules() {
     mod.steps.forEach((step, si) => {
       const key = `${mi}_${si}`;
       const done = !!doneSteps[key];
-      html += `<div class="step-card${done ? ' done' : ''}" id="step-${mi}-${si}">
-        <div class="step-header" onclick="toggleStep(${mi},${si})">
-          <div class="step-check" onclick="markDone(event,${mi},${si})">✓</div>
+      const openFirst = (mi === activeModule && si === 0) ? ' open' : '';
+      html += `<div class="step-card${done ? ' done' : ''}${openFirst}" id="step-${mi}-${si}">
+        <div class="step-header" data-mi="${mi}" data-si="${si}">
+          <div class="step-check" data-check="1" data-mi="${mi}" data-si="${si}">✓</div>
           <div class="step-title-wrap"><div class="step-title">${step.title}</div><div class="step-meta">${step.meta}</div></div>
           <div class="step-arrow">▶</div>
         </div>
@@ -373,16 +407,30 @@ function renderModules() {
 }
 
 function toggleStep(mi, si) {
-  document.getElementById(`step-${mi}-${si}`).classList.toggle('open');
+  document.getElementById('step-' + mi + '-' + si).classList.toggle('open');
 }
 
-function markDone(e, mi, si) {
-  e.stopPropagation();
-  const key = `${mi}_${si}`;
+function markDone(mi, si) {
+  const key = mi + '_' + si;
   doneSteps[key] = !doneSteps[key];
   localStorage.setItem('vpm_done_steps', JSON.stringify(doneSteps));
-  renderModules();
+  const card = document.getElementById('step-' + mi + '-' + si);
+  if (card) card.classList.toggle('done', !!doneSteps[key]);
+  updateProgress();
 }
+
+document.addEventListener('click', function(e) {
+  const check = e.target.closest('[data-check]');
+  if (check) {
+    e.stopPropagation();
+    markDone(+check.dataset.mi, +check.dataset.si);
+    return;
+  }
+  const header = e.target.closest('.step-header[data-mi]');
+  if (header) {
+    toggleStep(+header.dataset.mi, +header.dataset.si);
+  }
+});
 
 function updateProgress() {
   const total = MODULES.reduce((s, m) => s + m.steps.length, 0);
