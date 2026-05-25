@@ -3216,6 +3216,20 @@ document.head.insertAdjacentHTML('beforeend', `<style>
 .tab-btn:hover:not(.active) { border-color:var(--vert-moyen); }
 </style>`);
 
+// ── Fix: event delegation pour type-cards et mito-cards ──
+// (remplace les onclick inline qui peuvent être bloqués)
+document.querySelectorAll('.type-card').forEach(function(card) {
+  card.addEventListener('click', function() { selectType(card.dataset.type); });
+  card.style.cursor = 'pointer';
+});
+document.querySelectorAll('.mito-card').forEach(function(card) {
+  card.addEventListener('click', function() { selectMito(card.dataset.mito); });
+  card.style.cursor = 'pointer';
+});
+document.querySelectorAll('.dpe-bar-row').forEach(function(row) {
+  row.addEventListener('click', function() { selectDpe(row.dataset.value); });
+});
+
 loadProperty();
 </script>
 <!-- ── Bento lightbox ─────────────────────────────────── -->
