@@ -316,4 +316,12 @@ const newCols = [
 ];
 newCols.forEach(sql => { try { db.exec(sql); } catch(e) {} });
 
+// Colonnes réservation photo client
+const bookingCols = [
+  "ALTER TABLE sellers ADD COLUMN client_availability TEXT",
+  "ALTER TABLE sellers ADD COLUMN booking_confirmed_at DATETIME",
+  "ALTER TABLE sellers ADD COLUMN booking_step INTEGER DEFAULT 0",
+];
+bookingCols.forEach(sql => { try { db.exec(sql); } catch(e) {} });
+
 module.exports = db;

@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Réserver ma séance photo — Serenis</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; }
+    body { font-family: 'DM Sans', sans-serif; background: #F5F0E8; margin: 0; min-height: 100vh; }
+
+    /* Header */
+    .top-bar { background: #1C1C1A; padding: 16px 32px; display: flex; align-items: center; justify-content: space-between; }
+    .logo { font-family: 'Cormorant Garamond', serif; font-size: 1.4rem; font-weight: 600; color: #F5F0E8; text-decoration: none; }
+    .logo em { color: #C4603A; font-style: normal; }
+    .top-bar a { color: rgba(245,240,232,0.5); font-size: 0.82rem; text-decoration: none; }
+
+    /* Layout */
+    .page { max-width: 680px; margin: 0 auto; padding: 48px 24px 80px; }
+
+    /* Progress stepper */
+    .stepper { display: flex; align-items: center; gap: 0; margin-bottom: 48px; }
+    .step-item { display: flex; align-items: center; gap: 8px; }
+    .step-circle { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.82rem; font-weight: 600; flex-shrink: 0; transition: all 0.3s; }
+    .step-circle.active { background: #1C1C1A; color: #F5F0E8; }
+    .step-circle.done { background: #059669; color: #fff; }
+    .step-circle.inactive { background: rgba(0,0,0,0.1); color: #8C8880; }
+    .step-label { font-size: 0.82rem; font-weight: 500; color: #1C1C1A; white-space: nowrap; }
+    .step-label.inactive { color: #8C8880; }
+    .step-line { flex: 1; height: 1px; background: rgba(0,0,0,0.15); margin: 0 12px; min-width: 24px; }
+
+    /* Cards */
+    .card { background: #fff; border-radius: 12px; border: 1px solid rgba(0,0,0,0.07); padding: 36px; margin-bottom: 20px; }
+    .card-title { font-family: 'Cormorant Garamond', serif; font-size: 1.5rem; font-weight: 600; color: #1C1C1A; margin: 0 0 6px; }
+    .card-sub { font-size: 0.88rem; color: #8C8880; margin: 0 0 28px; }
+
+    /* Form */
+    .field { margin-bottom: 20px; }
+    .field:last-child { margin-bottom: 0; }
+    label { display: block; font-size: 0.75rem; font-weight: 500; text-transform: uppercase; letter-spacing: 0.05em; color: #6b6965; margin-bottom: 7px; }
+    input, select, textarea { width: 100%; padding: 11px 14px; border: 1.5px solid rgba(0,0,0,0.1); border-radius: 8px; font-family: inherit; font-size: 0.92rem; color: #1C1C1A; background: #fff; transition: border-color 0.2s; }
+    input:focus, select:focus, textarea:focus { outline: none; border-color: #C4603A; }
+    textarea { resize: vertical; min-height: 80px; }
+    .row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+
+    /* Chip selector */
+    .chip-group { display: flex; flex-wrap: wrap; gap: 8px; }
+    .chip { padding: 8px 16px; border-radius: 20px; border: 1.5px solid rgba(0,0,0,0.12); background: transparent; font-family: inherit; font-size: 0.85rem; cursor: pointer; color: #3a3836; transition: all 0.15s; }
+    .chip.selected { background: #1C1C1A; color: #F5F0E8; border-color: #1C1C1A; }
+
+    /* Availability slots */
+    .dispo-list { display: flex; flex-direction: column; gap: 12px; }
+    .dispo-item { display: grid; grid-template-columns: 1fr 1fr auto; gap: 10px; align-items: center; background: #faf9f7; border-radius: 8px; padding: 12px 14px; }
+    .dispo-item input { background: #fff; }
+    .dispo-remove { background: none; border: none; color: #dc2626; cursor: pointer; font-size: 1.1rem; padding: 0 4px; flex-shrink: 0; }
+    .add-dispo-btn { display: flex; align-items: center; gap: 8px; padding: 10px 16px; border: 1.5px dashed rgba(0,0,0,0.2); border-radius: 8px; background: transparent; font-family: inherit; font-size: 0.85rem; color: #8C8880; cursor: pointer; width: 100%; justify-content: center; transition: all 0.15s; margin-top: 8px; }
+    .add-dispo-btn:hover { border-color: #C4603A; color: #C4603A; }
+
+    /* Buttons */
+    .btn-row { display: flex; gap: 12px; justify-content: flex-end; margin-top: 28px; }
+    .btn { padding: 12px 28px; border-radius: 8px; border: none; font-family: inherit; font-size: 0.92rem; font-weight: 500; cursor: pointer; transition: all 0.15s; }
+    .btn-primary { background: #1C1C1A; color: #F5F0E8; }
+    .btn-primary:hover { background: #333; }
+    .btn-primary:disabled { opacity: 0.45; cursor: not-allowed; }
+    .btn-back { background: transparent; color: #8C8880; border: 1.5px solid rgba(0,0,0,0.12); }
+    .btn-back:hover { color: #1C1C1A; }
+
+    /* Success */
+    .success-card { text-align: center; padding: 48px 36px; }
+    .success-icon { font-size: 3rem; margin-bottom: 16px; }
+    .success-card h2 { font-family: 'Cormorant Garamond', serif; font-size: 2rem; font-weight: 600; margin: 0 0 12px; }
+    .success-card p { color: #6b6965; line-height: 1.7; margin: 0 0 28px; }
+    .success-card a { display: inline-block; background: #1C1C1A; color: #F5F0E8; padding: 13px 32px; border-radius: 8px; text-decoration: none; font-weight: 500; font-size: 0.92rem; }
+
+    .hint { font-size: 0.78rem; color: #8C8880; margin-top: 6px; }
+  </style>
+</head>
+<body>
+  <div class="top-bar">
+    <a href="/" class="logo">Sere<em>nis</em></a>
+    <a href="/dashboard">Mon espace →</a>
+  </div>
+
+  <div class="page">
+
+    <!-- Stepper -->
+    <div class="stepper" id="stepper">
+      <div class="step-item">
+        <div class="step-circle active" id="sc1">1</div>
+        <span class="step-label" id="sl1">Votre bien</span>
+      </div>
+      <div class="step-line"></div>
+      <div class="step-item">
+        <div class="step-circle inactive" id="sc2">2</div>
+        <span class="step-label inactive" id="sl2">Vos disponibilités</span>
+      </div>
+      <div class="step-line"></div>
+      <div class="step-item">
+        <div class="step-circle inactive" id="sc3">✓</div>
+        <span class="step-label inactive" id="sl3">Confirmation</span>
+      </div>
+    </div>
+
+    <!-- Step 1: bien -->
+    <div id="step1">
+      <div class="card">
+        <h2 class="card-title">Votre bien immobilier</h2>
+        <p class="card-sub">Ces informations permettront au photographe de préparer sa venue.</p>
+
+        <div class="field">
+          <label>Type de bien *</label>
+          <div class="chip-group" id="type-chips">
+            <button type="button" class="chip" data-val="maison">Maison</button>
+            <button type="button" class="chip" data-val="appartement">Appartement</button>
+            <button type="button" class="chip" data-val="immeuble">Immeuble</button>
+            <button type="button" class="chip" data-val="terrain">Terrain</button>
+            <button type="button" class="chip" data-val="local">Local commercial</button>
+          </div>
+          <input type="hidden" id="property_type">
+        </div>
+
+        <div class="field">
+          <label>Adresse complète *</label>
+          <input type="text" id="address" placeholder="12 rue des Lilas">
+        </div>
+
+        <div class="row-2">
+          <div class="field">
+            <label>Ville *</label>
+            <input type="text" id="city" placeholder="Lyon">
+          </div>
+          <div class="field">
+            <label>Code postal *</label>
+            <input type="text" id="postal_code" placeholder="69001" maxlength="5">
+          </div>
+        </div>
+
+        <div class="row-2">
+          <div class="field">
+            <label>Surface habitable (m²)</label>
+            <input type="number" id="surface" placeholder="85" min="1">
+          </div>
+          <div class="field">
+            <label>Nombre de pièces</label>
+            <input type="number" id="rooms" placeholder="4" min="1">
+          </div>
+        </div>
+
+        <div class="row-2">
+          <div class="field">
+            <label>Étage (si appartement)</label>
+            <input type="number" id="floor" placeholder="2" min="0">
+          </div>
+          <div class="field">
+            <label>État du logement</label>
+            <div class="chip-group" id="furnished-chips" style="margin-top:4px;">
+              <button type="button" class="chip" data-val="0">Vide</button>
+              <button type="button" class="chip" data-val="1">Meublé</button>
+            </div>
+            <input type="hidden" id="furnished" value="0">
+          </div>
+        </div>
+
+        <div class="field">
+          <label>Informations d'accès <span style="text-transform:none;font-weight:400;color:#aaa;">(code, gardien, clé chez voisin…)</span></label>
+          <textarea id="access_notes" placeholder="Ex : digicode 1234A, clé sous le paillasson, chien présent…"></textarea>
+        </div>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn btn-primary" id="next1-btn">Suivant →</button>
+      </div>
+    </div>
+
+    <!-- Step 2: disponibilités -->
+    <div id="step2" style="display:none;">
+      <div class="card">
+        <h2 class="card-title">Vos disponibilités</h2>
+        <p class="card-sub">Proposez 2 à 4 créneaux où vous pouvez être présent(e) pour la séance. Notre équipe confirmera l'un d'eux après réservation chez notre partenaire photo.</p>
+
+        <div class="field">
+          <label>Créneaux proposés *</label>
+          <div class="dispo-list" id="dispo-list"></div>
+          <button type="button" class="add-dispo-btn" id="add-dispo">+ Ajouter un créneau</button>
+          <p class="hint">Minimum 2 créneaux pour maximiser les chances de disponibilité.</p>
+        </div>
+
+        <div class="field" style="margin-top:24px;">
+          <label>Commentaire complémentaire <span style="text-transform:none;font-weight:400;color:#aaa;">(optionnel)</span></label>
+          <textarea id="availability_note" placeholder="Ex : disponible uniquement le matin, semaine de vacances à éviter du 10 au 17 juin…"></textarea>
+        </div>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn btn-back" id="back-btn">← Retour</button>
+        <button class="btn btn-primary" id="submit-btn">Confirmer ma demande →</button>
+      </div>
+    </div>
+
+    <!-- Step 3: confirmation -->
+    <div id="step3" style="display:none;">
+      <div class="card success-card">
+        <div class="success-icon">📅</div>
+        <h2>Demande enregistrée !</h2>
+        <p>Votre demande de séance photo a bien été reçue. Notre équipe va contacter notre partenaire Meero pour réserver votre créneau et vous confirmera la date par email sous <strong>24-48h ouvrées</strong>.</p>
+        <a href="/dashboard">Accéder à mon espace →</a>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+  // ── Chip selectors ───────────────────────────────────────────────
+  function initChips(groupId, inputId) {
+    document.getElementById(groupId).querySelectorAll('.chip').forEach(chip => {
+      chip.addEventListener('click', () => {
+        document.getElementById(groupId).querySelectorAll('.chip').forEach(c => c.classList.remove('selected'));
+        chip.classList.add('selected');
+        document.getElementById(inputId).value = chip.dataset.val;
+      });
+    });
+  }
+  initChips('type-chips', 'property_type');
+  initChips('furnished-chips', 'furnished');
+
+  // ── Pre-fill from existing property data ─────────────────────────
+  fetch('/api/property').then(r => r.json()).then(({ property: p }) => {
+    if (!p) return;
+    if (p.type) {
+      const chip = document.querySelector(`#type-chips [data-val="${p.type}"]`);
+      if (chip) { chip.classList.add('selected'); document.getElementById('property_type').value = p.type; }
+    }
+    if (p.address) document.getElementById('address').value = p.address;
+    if (p.city) document.getElementById('city').value = p.city;
+    if (p.postal_code) document.getElementById('postal_code').value = p.postal_code;
+    if (p.surface_habitable) document.getElementById('surface').value = p.surface_habitable;
+    if (p.rooms) document.getElementById('rooms').value = p.rooms;
+    if (p.floor !== null && p.floor !== undefined) document.getElementById('floor').value = p.floor;
+    if (p.furnished !== null) {
+      const fchip = document.querySelector(`#furnished-chips [data-val="${p.furnished ? '1' : '0'}"]`);
+      if (fchip) { fchip.classList.add('selected'); document.getElementById('furnished').value = p.furnished ? '1' : '0'; }
+    }
+  }).catch(() => {});
+
+  // ── Availability slots ────────────────────────────────────────────
+  let dispoCount = 0;
+  function addDispo(date = '', time = '') {
+    dispoCount++;
+    const id = dispoCount;
+    const div = document.createElement('div');
+    div.className = 'dispo-item';
+    div.id = `dispo-${id}`;
+    div.innerHTML = `
+      <div><label style="font-size:0.72rem;text-transform:uppercase;letter-spacing:0.05em;color:#8C8880;margin-bottom:4px;display:block;">Date</label>
+        <input type="date" class="dispo-date" value="${date}" min="${new Date().toISOString().split('T')[0]}">
+      </div>
+      <div><label style="font-size:0.72rem;text-transform:uppercase;letter-spacing:0.05em;color:#8C8880;margin-bottom:4px;display:block;">Plage horaire</label>
+        <select class="dispo-time">
+          <option value="matin" ${time==='matin'?'selected':''}>Matin (8h–12h)</option>
+          <option value="apres-midi" ${time==='apres-midi'?'selected':''}>Après-midi (13h–18h)</option>
+          <option value="journee">Journée entière</option>
+          <option value="flexible">Flexible</option>
+        </select>
+      </div>
+      <button class="dispo-remove" onclick="document.getElementById('dispo-${id}').remove()">✕</button>`;
+    document.getElementById('dispo-list').appendChild(div);
+  }
+  addDispo(); addDispo(); // Start with 2 slots
+
+  document.getElementById('add-dispo').addEventListener('click', () => addDispo());
+
+  // ── Navigation ────────────────────────────────────────────────────
+  function setStep(n) {
+    [1,2,3].forEach(i => {
+      document.getElementById(`step${i}`).style.display = i === n ? 'block' : 'none';
+      const sc = document.getElementById(`sc${i}`);
+      const sl = document.getElementById(`sl${i}`);
+      if (!sc) return;
+      if (i < n) { sc.className = 'step-circle done'; sc.textContent = '✓'; }
+      else if (i === n) { sc.className = 'step-circle active'; sc.textContent = i === 3 ? '✓' : i; if (sl) sl.className = 'step-label'; }
+      else { sc.className = 'step-circle inactive'; sc.textContent = i === 3 ? '✓' : i; if (sl) sl.className = 'step-label inactive'; }
+    });
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  document.getElementById('next1-btn').addEventListener('click', () => {
+    if (!document.getElementById('property_type').value) { alert('Sélectionnez un type de bien.'); return; }
+    if (!document.getElementById('address').value.trim()) { alert('Renseignez l\'adresse.'); return; }
+    if (!document.getElementById('city').value.trim() || !document.getElementById('postal_code').value.trim()) { alert('Renseignez la ville et le code postal.'); return; }
+    setStep(2);
+  });
+
+  document.getElementById('back-btn').addEventListener('click', () => setStep(1));
+
+  document.getElementById('submit-btn').addEventListener('click', async () => {
+    const slots = [...document.querySelectorAll('.dispo-item')].map(el => ({
+      date: el.querySelector('.dispo-date').value,
+      time: el.querySelector('.dispo-time').value
+    })).filter(s => s.date);
+    if (slots.length < 1) { alert('Ajoutez au moins un créneau de disponibilité.'); return; }
+
+    const btn = document.getElementById('submit-btn');
+    btn.disabled = true; btn.textContent = 'Envoi…';
+
+    const payload = {
+      property_type: document.getElementById('property_type').value,
+      address: document.getElementById('address').value.trim(),
+      city: document.getElementById('city').value.trim(),
+      postal_code: document.getElementById('postal_code').value.trim(),
+      surface: document.getElementById('surface').value || null,
+      rooms: document.getElementById('rooms').value || null,
+      floor: document.getElementById('floor').value || null,
+      furnished: document.getElementById('furnished').value === '1',
+      access_notes: document.getElementById('access_notes').value.trim(),
+      availability_slots: slots,
+      availability_note: document.getElementById('availability_note').value.trim(),
+    };
+
+    try {
+      const r = await fetch('/api/booking', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+      const d = await r.json();
+      if (d.success) { setStep(3); }
+      else { alert(d.error || 'Erreur. Réessayez.'); btn.disabled = false; btn.textContent = 'Confirmer ma demande →'; }
+    } catch { alert('Erreur réseau.'); btn.disabled = false; btn.textContent = 'Confirmer ma demande →'; }
+  });
+  </script>
+</body>
+</html>

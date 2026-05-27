@@ -523,6 +523,18 @@
       </div>
     </div>
 
+    <!-- ══ Séance photo — barre de progression ══ -->
+    <div class="card one-col" id="photo-progress-card" style="margin-bottom:24px;padding:24px 28px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;flex-wrap:wrap;gap:12px;">
+        <div>
+          <h3 style="margin:0 0 4px;font-family:'Cormorant Garamond',serif;font-size:1.2rem;">📷 Votre séance photo</h3>
+          <p style="margin:0;font-size:0.82rem;color:#8C8880;">Reportage HD + visite virtuelle par notre partenaire Meero</p>
+        </div>
+        <div id="photo-booking-cta"></div>
+      </div>
+      <div id="photo-steps" style="display:flex;align-items:flex-start;gap:0;overflow-x:auto;padding-bottom:4px;"></div>
+    </div>
+
     <!-- Score & Actions + Profil rapide -->
     <div class="two-col">
 
@@ -833,6 +845,55 @@ function copyLink() {
 }
 
 /* ——— Load all data ——— */
+// ── Barre de progression séance photo ────────────────────────────────────────
+function renderPhotoProgress(seller) {
+  const STEPS = [
+    { key: 'paid',       label: 'Paiement',         icon: '💳', done: !!seller.paid_at },
+    { key: 'booking',    label: 'Demande envoyée',   icon: '📋', done: !!(seller.client_availability || seller.booking_step >= 1) },
+    { key: 'rdv',        label: 'RDV confirmé',      icon: '📅', done: !!seller.photographer_scheduled, detail: seller.photographer_date ? `Le ${seller.photographer_date}` + (seller.photographer_name ? ` · ${seller.photographer_name}` : '') : null },
+    { key: 'done',       label: 'Séance réalisée',   icon: '📸', done: !!seller.photographer_done },
+    { key: 'delivered',  label: 'Photos livrées',    icon: '🖼️', done: !!seller.photo_report_url, link: seller.photo_report_url || null },
+  ];
+
+  const firstIncomplete = STEPS.findIndex(s => !s.done);
+  const allDone = firstIncomplete === -1;
+
+  // CTA
+  const cta = document.getElementById('photo-booking-cta');
+  if (cta) {
+    if (!seller.paid_at) {
+      cta.innerHTML = '';
+    } else if (!seller.client_availability && !seller.booking_step) {
+      cta.innerHTML = `<a href="/booking" style="display:inline-block;background:#C4603A;color:#fff;padding:9px 20px;border-radius:6px;text-decoration:none;font-size:0.85rem;font-weight:500;">Réserver ma séance →</a>`;
+    } else if (seller.photo_report_url) {
+      cta.innerHTML = `<a href="${seller.photo_report_url}" target="_blank" style="display:inline-block;background:#059669;color:#fff;padding:9px 20px;border-radius:6px;text-decoration:none;font-size:0.85rem;font-weight:500;">📁 Voir mes photos →</a>`;
+    } else {
+      cta.innerHTML = `<span style="font-size:0.8rem;color:#8C8880;">Notre équipe vous contacte sous 24-48h</span>`;
+    }
+  }
+
+  const container = document.getElementById('photo-steps');
+  if (!container) return;
+  container.innerHTML = STEPS.map((s, i) => {
+    const isActive = !s.done && i === firstIncomplete;
+    const lineColor = s.done ? '#059669' : 'rgba(0,0,0,0.1)';
+    return `
+      <div style="display:flex;align-items:flex-start;flex:1;min-width:0;">
+        <div style="display:flex;flex-direction:column;align-items:center;min-width:0;flex:1;">
+          <div style="width:36px;height:36px;border-radius:50%;background:${s.done ? '#059669' : isActive ? '#1C1C1A' : '#f0ece6'};border:2px solid ${s.done ? '#059669' : isActive ? '#1C1C1A' : 'rgba(0,0,0,0.1)'};display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:${s.done ? '0.9rem' : '1rem'};">
+            ${s.done ? '<svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 7l3.5 3.5L12 3.5" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>' : `<span style="font-size:0.95rem;">${s.icon}</span>`}
+          </div>
+          <div style="margin-top:8px;text-align:center;padding:0 4px;">
+            <div style="font-size:0.75rem;font-weight:${s.done||isActive?'600':'400'};color:${s.done ? '#059669' : isActive ? '#1C1C1A' : '#8C8880'};line-height:1.3;">${s.label}</div>
+            ${s.detail ? `<div style="font-size:0.68rem;color:#8C8880;margin-top:2px;">${s.detail}</div>` : ''}
+            ${s.link && s.done ? `<a href="${s.link}" target="_blank" style="font-size:0.68rem;color:#C4603A;">Voir →</a>` : ''}
+          </div>
+        </div>
+        ${i < STEPS.length - 1 ? `<div style="flex:1;height:2px;background:${s.done ? '#059669' : 'rgba(0,0,0,0.08)'};margin-top:17px;min-width:16px;"></div>` : ''}
+      </div>`;
+  }).join('');
+}
+
 async function loadData() {
   try {
     const [meRes, propRes, visitsRes, scoreRes, pubsRes] = await Promise.all([
@@ -893,6 +954,9 @@ async function loadData() {
 
     /* — Progression bar — */
     renderProgressionBar(seller, property, photos, publications, stats);
+
+    /* — Photo progress — */
+    renderPhotoProgress(seller);
 
     /* — Score section — */
     renderScore(scoreData);

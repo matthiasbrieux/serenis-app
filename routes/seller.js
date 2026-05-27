@@ -554,6 +554,40 @@ router.post('/api/connect/ai-insight', requireAuth, async (req, res) => {
   }
 });
 
+// ── Page & API réservation séance photo ──────────────────────────────────────
+router.get('/booking', requireAuth, (req, res) => res.sendFile('booking.html', { root: './views/seller' }));
+
+router.post('/api/booking', requireAuth, (req, res) => {
+  const { property_type, address, city, postal_code, surface, rooms, floor, furnished, access_notes, availability_slots, availability_note } = req.body;
+  if (!address || !city || !postal_code) return res.json({ error: 'Adresse incomplète' });
+  if (!availability_slots || !availability_slots.length) return res.json({ error: 'Créneaux requis' });
+
+  // Upsert property
+  let property = db.prepare('SELECT * FROM properties WHERE seller_id=?').get(req.seller.id);
+  if (property) {
+    db.prepare(`UPDATE properties SET type=COALESCE(?,type), address=?, city=?, postal_code=?,
+      surface_habitable=COALESCE(?,surface_habitable), rooms=COALESCE(?,rooms),
+      floor=COALESCE(?,floor), furnished=?, updated_at=CURRENT_TIMESTAMP WHERE seller_id=?`
+    ).run(property_type || null, address, city, postal_code,
+      surface ? parseFloat(surface) : null, rooms ? parseInt(rooms) : null,
+      floor !== null && floor !== '' ? parseInt(floor) : null,
+      furnished ? 1 : 0, req.seller.id);
+  } else {
+    const { v4: uuidv4 } = require('uuid');
+    db.prepare(`INSERT INTO properties (uuid, seller_id, type, address, city, postal_code, surface_habitable, rooms, floor, furnished)
+      VALUES (?,?,?,?,?,?,?,?,?,?)`
+    ).run(uuidv4(), req.seller.id, property_type || null, address, city, postal_code,
+      surface ? parseFloat(surface) : null, rooms ? parseInt(rooms) : null,
+      floor !== null && floor !== '' ? parseInt(floor) : null, furnished ? 1 : 0);
+  }
+
+  // Save availability + notes
+  const clientAvailability = JSON.stringify({ slots: availability_slots, note: availability_note || '' });
+  db.prepare(`UPDATE sellers SET client_availability=?, booking_step=1 WHERE id=?`).run(clientAvailability, req.seller.id);
+
+  res.json({ success: true });
+});
+
 // ── Mise en relation photographe ─────────────────────────────────────────────
 
 // Statut de la mission photo du vendeur
