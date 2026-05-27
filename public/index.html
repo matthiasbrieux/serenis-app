@@ -3,1116 +3,911 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Serenis — Vendez votre bien. Sereinement.</title>
-  <meta name="description" content="Les outils des professionnels pour vendre votre bien entre particuliers. Pack Sérénité : 999€ au lieu de 10 000€ de commission agence.">
+  <title>Serenis — Vendez votre bien sans agence</title>
+  <meta name="description" content="La troisième voie entre particulier seul et agence classique. Photos pro, dossier automatique, numéro dédié, agenda — 999€ tout compris, zéro commission.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400;1,600&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/css/style.css">
   <style>
-    /* ── Floating shapes — hero landing ──────────────────── */
-    @keyframes hsIn {
-      from { opacity: 0; transform: translateY(-150px) rotate(var(--r-start)); }
-      to   { opacity: 1; transform: translateY(0px) rotate(var(--rot)); }
-    }
-    @keyframes hsFloat {
-      0%, 100% { transform: translateY(0px)  rotate(var(--rot)); }
-      50%       { transform: translateY(15px) rotate(var(--rot)); }
-    }
-    .hero-shapes {
-      position: absolute; inset: 0; overflow: hidden; pointer-events: none; z-index: 0;
-    }
-    .hs {
-      position: absolute;
-      border-radius: 9999px;
-      border: 2px solid rgba(255,255,255,0.15);
-      backdrop-filter: blur(2px);
-      -webkit-backdrop-filter: blur(2px);
-      background: var(--hs-grad);
-      box-shadow: 0 8px 32px 0 rgba(0,0,0,0.12), inset 0 0 0 1px rgba(255,255,255,0.06);
-      opacity: 0;
-      animation:
-        hsIn    2.4s cubic-bezier(0.23, 0.86, 0.39, 0.96) var(--delay) both,
-        hsFloat  12s ease-in-out calc(var(--delay) + 2.4s) infinite;
-    }
-    /* Shape 1 — grande barre verte, haut gauche */
-    .hs-1 {
-      --rot: 12deg; --r-start: -3deg; --delay: 0.3s;
-      --hs-grad: linear-gradient(90deg, rgba(212,228,216,0.18) 0%, transparent 100%);
-      width: 600px; height: 140px;
-      left: -8%; top: 18%;
-    }
-    /* Shape 2 — barre terracotta, bas droite */
-    .hs-2 {
-      --rot: -15deg; --r-start: -30deg; --delay: 0.5s;
-      --hs-grad: linear-gradient(90deg, rgba(196,120,90,0.2) 0%, transparent 100%);
-      width: 520px; height: 120px;
-      right: -3%; top: 62%;
-    }
-    /* Shape 3 — petite barre vert moyen, bas gauche */
-    .hs-3 {
-      --rot: -8deg; --r-start: -23deg; --delay: 0.4s;
-      --hs-grad: linear-gradient(90deg, rgba(92,122,101,0.22) 0%, transparent 100%);
-      width: 300px; height: 80px;
-      left: 6%; bottom: 10%;
-    }
-    /* Shape 4 — petite barre crème, haut droite */
-    .hs-4 {
-      --rot: 20deg; --r-start: 5deg; --delay: 0.6s;
-      --hs-grad: linear-gradient(90deg, rgba(245,240,232,0.14) 0%, transparent 100%);
-      width: 210px; height: 58px;
-      right: 16%; top: 12%;
-    }
-    /* Shape 5 — mini barre, haut milieu */
-    .hs-5 {
-      --rot: -25deg; --r-start: -40deg; --delay: 0.7s;
-      --hs-grad: linear-gradient(90deg, rgba(212,228,216,0.12) 0%, transparent 100%);
-      width: 150px; height: 40px;
-      left: 22%; top: 7%;
-    }
-    /* Respect des préférences d'accessibilité */
-    @media (prefers-reduced-motion: reduce) {
-      .hs { animation: none !important; opacity: 0.7; }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --brun:  #12100D;
+      --brun2: #1C1914;
+      --brun3: #2A2520;
+      --terra: #C4785A;
+      --terra2:#D9896C;
+      --creme: #F7F3EC;
+      --creme2:#EDE7DC;
+      --blanc: #FDFCF8;
+      --gris:  #7A746C;
+      --gris2: #4A4540;
+      --or:    #D4A96A;
     }
 
-    /* ── Section Notre histoire ──────────────────────────── */
-    .section-histoire {
-      background: var(--blanc);
-      padding: 100px 0;
-      border-top: 1px solid var(--gris-c);
+    body { font-family: 'DM Sans', sans-serif; background: var(--blanc); color: var(--brun); line-height: 1.7; }
+
+    /* ── NAV ── */
+    .nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
+      padding: 0 40px;
+      display: flex; align-items: center; justify-content: space-between;
+      height: 68px;
+      transition: background 0.3s, backdrop-filter 0.3s;
     }
-    .histoire-inner {
-      max-width: 1140px;
-      margin: 0 auto;
-      padding: 0 6rem;
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 80px;
-      align-items: start;
+    .nav.scrolled {
+      background: rgba(18,16,13,0.92);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+    }
+    .nav-logo {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.5rem; font-weight: 600;
+      color: var(--blanc); text-decoration: none; letter-spacing: 0.02em;
+    }
+    .nav-logo em { font-style: italic; color: var(--terra2); }
+    .nav-links {
+      display: flex; align-items: center; gap: 32px; list-style: none;
+    }
+    .nav-links a {
+      font-size: 0.85rem; font-weight: 500; color: rgba(255,255,255,0.55);
+      text-decoration: none; transition: color 0.2s;
+    }
+    .nav-links a:hover { color: var(--blanc); }
+    .nav-right { display: flex; align-items: center; gap: 12px; }
+    .btn-nav-ghost {
+      font-size: 0.82rem; font-weight: 500; color: rgba(255,255,255,0.5);
+      text-decoration: none; padding: 8px 16px;
+      border: 1px solid rgba(255,255,255,0.12); border-radius: 6px;
+      transition: all 0.2s;
+    }
+    .btn-nav-ghost:hover { color: var(--blanc); border-color: rgba(255,255,255,0.3); }
+    .btn-nav-cta {
+      font-size: 0.82rem; font-weight: 600; color: var(--brun);
+      text-decoration: none; padding: 9px 20px;
+      background: var(--terra); border-radius: 6px;
+      transition: background 0.2s; cursor: pointer; border: none;
+    }
+    .btn-nav-cta:hover { background: var(--terra2); }
+    .menu-toggle {
+      display: none; flex-direction: column; gap: 5px;
+      background: none; border: none; cursor: pointer; padding: 4px;
+    }
+    .menu-toggle span {
+      display: block; width: 22px; height: 2px; background: var(--blanc); border-radius: 2px;
+    }
+    @media (max-width: 768px) {
+      .nav { padding: 0 20px; }
+      .nav-links { display: none; }
+      .nav-links.open {
+        display: flex; flex-direction: column; position: absolute;
+        top: 68px; left: 0; right: 0;
+        background: var(--brun2); padding: 20px 24px;
+        border-bottom: 1px solid rgba(255,255,255,0.08); z-index: 999;
+      }
+      .menu-toggle { display: flex; }
+    }
+
+    /* ── HERO ── */
+    .hero {
+      position: relative; min-height: 100vh;
+      background: var(--brun2);
+      display: flex; align-items: center;
+      overflow: hidden;
+    }
+    .hero-photo {
+      position: absolute; inset: 0;
+      background:
+        linear-gradient(135deg, rgba(18,16,13,0.82) 0%, rgba(18,16,13,0.55) 50%, rgba(18,16,13,0.80) 100%),
+        url('https://images.unsplash.com/photo-1560185007-cde436f6a4d0?w=1600&q=80') center/cover no-repeat;
+    }
+    .hero-inner {
+      position: relative; z-index: 1;
+      display: grid; grid-template-columns: 1fr 420px;
+      gap: 60px; align-items: center;
+      max-width: 1200px; margin: 0 auto;
+      padding: 100px 40px 80px;
+      width: 100%;
+    }
+    .hero-label {
+      font-size: 0.68rem; letter-spacing: 0.2em; text-transform: uppercase;
+      color: var(--terra2); margin-bottom: 24px; font-weight: 600;
+    }
+    .hero h1 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(3.5rem, 7vw, 6.5rem);
+      font-weight: 300; color: var(--blanc);
+      line-height: 1.0; letter-spacing: -0.02em;
+      margin-bottom: 8px;
+    }
+    .hero-tagline {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(1.6rem, 3.5vw, 3rem);
+      font-style: italic; color: var(--terra2);
+      margin-bottom: 28px; font-weight: 300;
+    }
+    .hero-sub {
+      font-size: 1rem; color: rgba(255,255,255,0.55);
+      max-width: 480px; line-height: 1.8; margin-bottom: 36px;
+    }
+    .hero-cta-row { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 48px; }
+    .btn-terra {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: var(--terra); color: var(--blanc);
+      font-size: 0.92rem; font-weight: 600; font-family: 'DM Sans', sans-serif;
+      padding: 14px 28px; border-radius: 8px; text-decoration: none;
+      border: none; cursor: pointer; transition: background 0.2s;
+    }
+    .btn-terra:hover { background: var(--terra2); }
+    .btn-ghost-white {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: transparent; color: rgba(255,255,255,0.6);
+      font-size: 0.88rem; font-weight: 500; font-family: 'DM Sans', sans-serif;
+      padding: 14px 24px; border-radius: 8px; text-decoration: none;
+      border: 1px solid rgba(255,255,255,0.15); cursor: pointer; transition: all 0.2s;
+    }
+    .btn-ghost-white:hover { color: var(--blanc); border-color: rgba(255,255,255,0.35); }
+    .hero-stats {
+      display: flex; gap: 0; border-top: 1px solid rgba(255,255,255,0.08);
+      padding-top: 32px;
+    }
+    .hero-stat {
+      padding: 0 32px 0 0; margin-right: 32px;
+      border-right: 1px solid rgba(255,255,255,0.08);
+    }
+    .hero-stat:last-child { border-right: none; }
+    .hero-stat-num {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 2.2rem; font-weight: 700; color: var(--terra2); line-height: 1;
+    }
+    .hero-stat-lbl {
+      font-size: 0.72rem; color: rgba(255,255,255,0.35);
+      text-transform: uppercase; letter-spacing: 0.06em; margin-top: 4px;
+    }
+
+    /* Hero right card */
+    .hero-card-wrap {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.09);
+      border-radius: 16px; padding: 32px;
+      backdrop-filter: blur(12px);
+    }
+    .hero-card-title {
+      font-size: 0.68rem; letter-spacing: 0.14em; text-transform: uppercase;
+      color: rgba(255,255,255,0.3); margin-bottom: 24px; font-weight: 600;
+    }
+    .hero-card-row { display: flex; gap: 12px; margin-bottom: 12px; }
+    .hero-card-col {
+      flex: 1; background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.07);
+      border-radius: 10px; padding: 16px;
+    }
+    .hero-card-col-label { font-size: 0.7rem; color: rgba(255,255,255,0.3); margin-bottom: 6px; }
+    .hero-card-col-val {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.8rem; font-weight: 700; line-height: 1;
+    }
+    .val-strike { color: rgba(255,255,255,0.3); text-decoration: line-through; }
+    .val-terra { color: var(--terra2); }
+    .hero-eco {
+      background: linear-gradient(135deg, rgba(196,120,90,0.15) 0%, rgba(196,120,90,0.05) 100%);
+      border: 1px solid rgba(196,120,90,0.2);
+      border-radius: 10px; padding: 20px;
+      text-align: center; margin-bottom: 16px;
+    }
+    .hero-eco-label {
+      font-size: 0.7rem; color: rgba(255,255,255,0.35); text-transform: uppercase;
+      letter-spacing: 0.08em; margin-bottom: 6px;
+    }
+    .hero-eco-val {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 2.6rem; font-weight: 700; color: var(--blanc);
+    }
+    .hero-eco-sub { font-size: 0.72rem; color: rgba(255,255,255,0.3); margin-top: 4px; }
+    .hero-card-cta {
+      display: block; text-align: center;
+      background: var(--terra); color: var(--blanc);
+      font-size: 0.88rem; font-weight: 600; font-family: 'DM Sans', sans-serif;
+      padding: 13px; border-radius: 8px; text-decoration: none;
+      cursor: pointer; transition: background 0.2s;
+    }
+    .hero-card-cta:hover { background: var(--terra2); }
+    .hero-card-mention {
+      font-size: 0.68rem; color: rgba(255,255,255,0.2);
+      text-align: center; margin-top: 12px;
     }
     @media (max-width: 900px) {
-      .histoire-inner { grid-template-columns: 1fr; gap: 40px; padding: 0 1.5rem; }
+      .hero-inner { grid-template-columns: 1fr; padding: 100px 20px 60px; }
+      .hero-card-wrap { display: none; }
+      .hero-stats { gap: 0; }
+      .hero-stat { padding: 0 16px 0 0; margin-right: 16px; }
     }
-    .histoire-texte .section-overline {
-      font-size: 0.68rem;
-      letter-spacing: 0.18em;
-      text-transform: uppercase;
-      color: var(--terra);
-      margin-bottom: 1rem;
-      display: flex;
-      align-items: center;
-      gap: 0.8rem;
-      font-weight: 600;
-    }
-    .histoire-texte .section-overline::before {
-      content: '';
-      width: 24px;
-      height: 1px;
-      background: var(--terra);
-      flex-shrink: 0;
-    }
-    .histoire-texte h2 {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: clamp(1.9rem, 3vw, 2.8rem);
-      font-weight: 400;
-      line-height: 1.18;
-      letter-spacing: -0.02em;
-      margin-bottom: 1.8rem;
-      color: var(--noir);
-    }
-    .histoire-texte h2 em { font-style: italic; color: var(--terra); }
-    .histoire-texte p {
-      font-size: 1rem;
-      color: var(--gris);
-      line-height: 1.9;
-      margin-bottom: 1.2rem;
-    }
-    .histoire-texte p strong { color: var(--noir); font-weight: 600; }
-    .histoire-texte p:last-child { margin-bottom: 0; }
-    .histoire-aside { padding-top: 0.5rem; display: flex; flex-direction: column; gap: 1.2rem; }
-    .histoire-quote {
-      border-left: 3px solid var(--terra);
-      padding: 1.4rem 1.8rem;
-      background: var(--creme);
-      border-radius: 0 4px 4px 0;
-      position: relative;
-    }
-    .histoire-quote::before {
-      content: '\201C';
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 3.5rem;
-      color: var(--terra-c);
-      line-height: 1;
-      position: absolute;
-      top: -6px;
-      left: 12px;
-      opacity: 0.6;
-    }
-    .histoire-quote p {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 1.15rem;
-      font-weight: 400;
-      font-style: italic;
-      color: var(--vert);
-      line-height: 1.7;
-      margin: 0;
-      padding-top: 0.8rem;
-    }
-    .histoire-signature {
-      margin-top: 1.5rem;
-      display: flex;
-      align-items: center;
-      gap: 14px;
-      padding: 16px 20px;
-      background: var(--creme-f);
-      border-radius: 4px;
-    }
-    .histoire-signature-avatar {
-      width: 44px;
-      height: 44px;
-      border-radius: 50%;
-      background: var(--vert);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 1.1rem;
-      color: var(--blanc);
-      font-weight: 600;
-      flex-shrink: 0;
-    }
-    .histoire-signature-name { font-size: 0.88rem; font-weight: 600; color: var(--noir); }
-    .histoire-signature-role { font-size: 0.78rem; color: var(--gris); margin-top: 1px; }
 
-    /* ── Section Chiffres clés ───────────────────────────── */
-    .section-chiffres {
-      background: var(--noir);
-      padding: 80px 0;
-      position: relative;
-      overflow: hidden;
+    /* ── SECTION: Ni agence ── */
+    .s-middle {
+      background: var(--creme);
+      padding: 100px 40px;
     }
-    .section-chiffres::before {
-      content: '';
-      position: absolute;
-      top: -30%;
-      right: -5%;
-      width: 500px;
-      height: 500px;
-      background: radial-gradient(circle, rgba(61,90,71,0.25) 0%, transparent 65%);
-      pointer-events: none;
+    .s-middle-inner {
+      max-width: 1100px; margin: 0 auto;
+      display: grid; grid-template-columns: 1fr 380px;
+      gap: 80px; align-items: start;
     }
-    .chiffres-inner {
-      max-width: 1140px;
-      margin: 0 auto;
-      padding: 0 6rem;
+    .s-overline {
+      font-size: 0.66rem; letter-spacing: 0.2em; text-transform: uppercase;
+      color: var(--terra); margin-bottom: 16px; font-weight: 600;
+      display: flex; align-items: center; gap: 10px;
     }
-    @media (max-width: 900px) { .chiffres-inner { padding: 0 1.5rem; } }
-    .chiffres-header { margin-bottom: 48px; }
-    .chiffres-header .section-overline { color: var(--terra-c); }
-    .chiffres-header h2 { color: var(--blanc); font-family: 'Cormorant Garamond', serif; font-size: clamp(1.9rem,3vw,2.8rem); font-weight:400; margin-top:0.6rem; }
-    .chiffres-header h2 em { color: var(--terra-c); font-style: italic; }
-    .chiffres-grid {
+    .s-overline::before {
+      content: ''; width: 24px; height: 1px; background: var(--terra); flex-shrink: 0;
+    }
+    .s-middle h2 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(2rem, 3.5vw, 3rem); font-weight: 400;
+      line-height: 1.15; letter-spacing: -0.02em; margin-bottom: 20px;
+    }
+    .s-middle h2 em { font-style: italic; color: var(--terra); }
+    .s-middle-lead {
+      font-size: 1rem; color: var(--gris); line-height: 1.85; margin-bottom: 36px;
+      max-width: 500px;
+    }
+    .features-list { list-style: none; margin-bottom: 36px; }
+    .features-list li {
+      display: flex; align-items: flex-start; gap: 14px;
+      padding: 14px 0; border-bottom: 1px solid var(--creme2);
+      font-size: 0.95rem; line-height: 1.6; color: var(--brun);
+    }
+    .features-list li:last-child { border-bottom: none; }
+    .feat-check {
+      width: 20px; height: 20px; border-radius: 50%;
+      background: var(--terra); flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      margin-top: 2px;
+    }
+    .feat-check::after { content: '✓'; color: white; font-size: 0.65rem; font-weight: 700; }
+    .feat-body strong { color: var(--brun); font-weight: 600; }
+    .feat-body small { display: block; font-size: 0.82rem; color: var(--gris); margin-top: 2px; }
+
+    /* Right: comparison box */
+    .comp-box {
+      background: var(--blanc); border: 1px solid var(--creme2);
+      border-radius: 16px; padding: 32px; position: sticky; top: 90px;
+    }
+    .comp-label {
+      font-size: 0.65rem; letter-spacing: 0.16em; text-transform: uppercase;
+      color: var(--gris); margin-bottom: 20px; font-weight: 600;
+    }
+    .comp-row {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 14px 0; border-bottom: 1px solid var(--creme2);
+    }
+    .comp-row:last-of-type { border-bottom: none; }
+    .comp-row-label { font-size: 0.85rem; color: var(--brun); font-weight: 500; }
+    .comp-row-val { font-family: 'Cormorant Garamond', serif; font-size: 1.6rem; font-weight: 700; }
+    .val-rouge { color: #B03A2E; }
+    .val-vert { color: #3D7A4F; }
+    .comp-eco-box {
+      background: linear-gradient(135deg, var(--brun), var(--brun3));
+      border-radius: 12px; padding: 20px; text-align: center; margin-top: 20px;
+    }
+    .comp-eco-label {
+      font-size: 0.68rem; color: rgba(255,255,255,0.4);
+      text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 6px;
+    }
+    .comp-eco-val {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 2.4rem; font-weight: 700; color: var(--terra2);
+    }
+    .comp-eco-sub { font-size: 0.72rem; color: rgba(255,255,255,0.3); margin-top: 4px; }
+    .comp-cta {
+      display: block; text-align: center; margin-top: 20px;
+      background: var(--terra); color: white;
+      font-size: 0.88rem; font-weight: 600; font-family: 'DM Sans', sans-serif;
+      padding: 13px; border-radius: 8px; text-decoration: none;
+      cursor: pointer; transition: background 0.2s;
+    }
+    .comp-cta:hover { background: var(--terra2); }
+    .comp-legal { font-size: 0.68rem; color: var(--gris); text-align: center; margin-top: 10px; }
+
+    @media (max-width: 900px) {
+      .s-middle { padding: 70px 20px; }
+      .s-middle-inner { grid-template-columns: 1fr; gap: 40px; }
+      .comp-box { position: static; }
+    }
+
+    /* ── SECTION 9 ÉTAPES ── */
+    .s-etapes {
+      background: var(--brun2);
+      padding: 100px 40px;
+    }
+    .s-etapes-inner { max-width: 1100px; margin: 0 auto; }
+    .s-etapes .s-overline { color: rgba(255,255,255,0.3); }
+    .s-etapes .s-overline::before { background: rgba(255,255,255,0.2); }
+    .s-etapes h2 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(2rem, 3.5vw, 3rem); font-weight: 400;
+      color: var(--blanc); letter-spacing: -0.02em;
+      line-height: 1.15; margin-bottom: 12px;
+    }
+    .s-etapes h2 em { font-style: italic; color: var(--terra2); }
+    .s-etapes-sub {
+      font-size: 0.95rem; color: rgba(255,255,255,0.35);
+      margin-bottom: 56px; max-width: 520px; line-height: 1.7;
+    }
+    .etapes-grid {
       display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      border: 1px solid rgba(255,255,255,0.07);
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1px;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.06);
     }
-    @media (max-width: 700px) { .chiffres-grid { grid-template-columns: 1fr 1fr; } }
-    .chiffre-box {
-      padding: 40px 28px;
-      text-align: center;
-      border-right: 1px solid rgba(255,255,255,0.07);
+    .etape-card {
+      background: var(--brun2);
+      padding: 28px 24px;
+      border-right: 1px solid rgba(255,255,255,0.06);
       transition: background 0.2s;
     }
-    .chiffre-box:last-child { border-right: none; }
-    .chiffre-box:hover { background: rgba(255,255,255,0.03); }
-    .chiffre-num {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 3.2rem;
-      font-weight: 700;
-      color: var(--terra-c);
-      line-height: 1;
-      margin-bottom: 0.5rem;
+    .etape-card:hover { background: rgba(255,255,255,0.03); }
+    .etape-card.highlight {
+      background: linear-gradient(135deg, rgba(196,120,90,0.12) 0%, rgba(196,120,90,0.04) 100%);
+      border-color: rgba(196,120,90,0.2);
     }
-    .chiffre-lbl {
-      font-size: 0.78rem;
-      color: rgba(255,255,255,0.3);
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      line-height: 1.55;
+    .etape-num {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 3rem; font-weight: 700;
+      color: rgba(255,255,255,0.06); line-height: 1;
+      margin-bottom: 12px;
+    }
+    .etape-card.highlight .etape-num { color: rgba(196,120,90,0.2); }
+    .etape-title {
+      font-size: 0.88rem; font-weight: 600; color: rgba(255,255,255,0.7);
+      margin-bottom: 8px;
+    }
+    .etape-card.highlight .etape-title { color: var(--terra2); }
+    .etape-desc { font-size: 0.8rem; color: rgba(255,255,255,0.28); line-height: 1.65; }
+    .etape-card.highlight .etape-desc { color: rgba(255,255,255,0.45); }
+    @media (max-width: 768px) {
+      .s-etapes { padding: 70px 20px; }
+      .etapes-grid { grid-template-columns: 1fr 1fr; }
+    }
+    @media (max-width: 480px) {
+      .etapes-grid { grid-template-columns: 1fr; }
     }
 
-    /* ── Section Services détaillés ─────────────────────── */
-    .section-services {
+    /* ── SECTION PREUVES ── */
+    .s-preuves {
       background: var(--creme);
-      padding: 100px 0;
+      padding: 100px 40px;
     }
-    .services-inner {
-      max-width: 1140px;
-      margin: 0 auto;
-      padding: 0 6rem;
-    }
-    @media (max-width: 900px) { .services-inner { padding: 0 1.5rem; } }
-    .services-grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 20px;
-      margin-top: 48px;
-    }
-    @media (max-width: 700px) { .services-grid { grid-template-columns: 1fr; } }
-    .service-card {
-      background: var(--blanc);
-      border: 1px solid var(--gris-c);
-      padding: 36px 32px;
-      position: relative;
-      transition: transform 0.25s, box-shadow 0.25s;
-    }
-    .service-card:hover { transform: translateY(-4px); box-shadow: 0 12px 40px rgba(61,90,71,0.08); }
-    .service-card::before {
-      content: '';
-      position: absolute;
-      top: 0; left: 0;
-      width: 3px; height: 100%;
-      background: var(--terra);
-    }
-    .service-num {
+    .s-preuves-inner { max-width: 1100px; margin: 0 auto; }
+    .s-preuves h2 {
       font-family: 'Cormorant Garamond', serif;
-      font-size: 3.5rem;
-      font-weight: 700;
-      color: var(--vert-c);
-      line-height: 1;
-      margin-bottom: 1rem;
+      font-size: clamp(2rem, 3.5vw, 3rem); font-weight: 400;
+      letter-spacing: -0.02em; line-height: 1.15; margin-bottom: 12px;
     }
-    .service-card h3 {
+    .s-preuves h2 em { font-style: italic; color: var(--terra); }
+    .s-preuves-sub {
+      font-size: 0.95rem; color: var(--gris);
+      margin-bottom: 56px; max-width: 520px; line-height: 1.7;
+    }
+    .preuves-grid {
+      display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px;
+    }
+    .preuve-card {
+      background: var(--blanc); border: 1px solid var(--creme2);
+      border-radius: 12px; padding: 28px;
+    }
+    .preuve-num {
       font-family: 'Cormorant Garamond', serif;
-      font-size: 1.25rem;
-      font-weight: 600;
-      color: var(--vert);
-      margin-bottom: 0.8rem;
+      font-size: 3rem; font-weight: 700; color: var(--terra);
+      line-height: 1; margin-bottom: 10px;
     }
-    .service-card p {
-      font-size: 0.92rem;
-      color: var(--gris);
-      line-height: 1.8;
+    .preuve-lbl { font-size: 0.82rem; color: var(--gris); line-height: 1.5; }
+    .histoire-block {
+      margin-top: 60px;
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 60px; align-items: start;
+      border-top: 1px solid var(--creme2); padding-top: 60px;
+    }
+    .histoire-texte p {
+      font-size: 0.95rem; color: var(--gris); line-height: 1.9; margin-bottom: 16px;
+    }
+    .histoire-texte p strong { color: var(--brun); font-weight: 600; }
+    .histoire-texte p:last-child { margin-bottom: 0; }
+    .histoire-quotes { display: flex; flex-direction: column; gap: 16px; }
+    .quote-card {
+      border-left: 3px solid var(--terra); padding: 16px 20px;
+      background: var(--blanc); border-radius: 0 8px 8px 0;
+    }
+    .quote-card p {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.1rem; font-style: italic; color: var(--brun2);
+      line-height: 1.65;
+    }
+    .quote-sig {
+      margin-top: 40px; display: flex; align-items: center; gap: 14px;
+    }
+    .quote-sig-avatar {
+      width: 44px; height: 44px; border-radius: 50%;
+      background: var(--terra); display: flex; align-items: center; justify-content: center;
+      font-weight: 700; color: white; font-size: 1rem;
+    }
+    .quote-sig-name { font-size: 0.9rem; font-weight: 600; color: var(--brun); }
+    .quote-sig-role { font-size: 0.78rem; color: var(--gris); margin-top: 2px; }
+    @media (max-width: 900px) {
+      .s-preuves { padding: 70px 20px; }
+      .preuves-grid { grid-template-columns: 1fr 1fr; }
+      .histoire-block { grid-template-columns: 1fr; gap: 32px; }
     }
 
-    /* ── Section Comparaison ─────────────────────────── */
-    .section-comparaison {
+    /* ── LEGAL ── */
+    .s-legal {
       background: var(--blanc);
-      padding: 100px 0;
-      border-top: 1px solid var(--gris-c);
+      padding: 60px 40px;
     }
-    .comparaison-inner {
-      max-width: 960px;
-      margin: 0 auto;
-      padding: 0 6rem;
+    .s-legal-inner {
+      max-width: 1100px; margin: 0 auto;
+      display: grid; grid-template-columns: 1fr 1fr; gap: 60px;
     }
-    @media (max-width: 900px) { .comparaison-inner { padding: 0 1.5rem; } }
-    .comparaison-header {
+    .legal-col h4 {
+      font-size: 0.65rem; letter-spacing: 0.15em; text-transform: uppercase;
+      margin-bottom: 16px; font-weight: 600;
+    }
+    .legal-col.yes h4 { color: var(--terra); }
+    .legal-col.no  h4 { color: var(--gris); }
+    .legal-item {
+      display: flex; align-items: flex-start; gap: 10px;
+      font-size: 0.87rem; color: var(--gris);
+      padding: 8px 0; border-bottom: 1px solid var(--creme2);
+    }
+    .legal-item:last-child { border-bottom: none; }
+    .legal-item span { flex-shrink: 0; font-weight: 600; }
+    .legal-col.yes .legal-item span { color: var(--terra); }
+    @media (max-width: 768px) {
+      .s-legal { padding: 50px 20px; }
+      .s-legal-inner { grid-template-columns: 1fr; gap: 32px; }
+    }
+
+    /* ── FAQ ── */
+    .s-faq {
+      background: var(--brun);
+      padding: 100px 40px;
+    }
+    .s-faq-inner { max-width: 800px; margin: 0 auto; }
+    .s-faq .s-overline { color: rgba(255,255,255,0.25); }
+    .s-faq .s-overline::before { background: rgba(255,255,255,0.15); }
+    .s-faq h2 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(2rem, 3.5vw, 3rem); font-weight: 400;
+      color: var(--blanc); letter-spacing: -0.02em;
+      line-height: 1.15; margin-bottom: 48px;
+    }
+    .s-faq h2 em { font-style: italic; color: var(--terra2); }
+    .faq-list { list-style: none; }
+    .faq-item {
+      border-bottom: 1px solid rgba(255,255,255,0.07);
+    }
+    .faq-question {
+      width: 100%; display: flex; justify-content: space-between; align-items: center;
+      gap: 16px; padding: 22px 0;
+      background: none; border: none; cursor: pointer;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.95rem; font-weight: 500; color: rgba(255,255,255,0.75);
+      text-align: left; transition: color 0.2s;
+    }
+    .faq-question:hover, .faq-question.active { color: var(--blanc); }
+    .faq-arrow {
+      font-size: 1.2rem; font-weight: 300; color: var(--terra2);
+      flex-shrink: 0; transition: transform 0.25s;
+    }
+    .faq-question.active .faq-arrow { transform: rotate(45deg); }
+    .faq-answer {
+      max-height: 0; overflow: hidden;
+      transition: max-height 0.35s cubic-bezier(0.4,0,0.2,1);
+    }
+    .faq-answer.open { max-height: 300px; }
+    .faq-answer p {
+      font-size: 0.9rem; color: rgba(255,255,255,0.4);
+      line-height: 1.85; padding: 0 0 22px 0;
+    }
+    @media (max-width: 768px) {
+      .s-faq { padding: 70px 20px; }
+    }
+
+    /* ── CTA BOTTOM ── */
+    .s-cta {
+      background: var(--terra);
+      padding: 80px 40px;
       text-align: center;
-      margin-bottom: 56px;
     }
-    .comparaison-header h2 {
+    .s-cta-price {
       font-family: 'Cormorant Garamond', serif;
-      font-size: clamp(1.9rem, 3vw, 2.7rem);
-      font-weight: 400;
-      color: var(--noir);
-      margin-top: 0.6rem;
-      line-height: 1.2;
+      font-size: clamp(3rem, 6vw, 5rem); font-weight: 700;
+      color: var(--blanc); line-height: 1; margin-bottom: 8px;
     }
-    .comparaison-header h2 em { font-style: italic; color: var(--terra); }
-    .comparaison-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      border-radius: 16px;
-      overflow: hidden;
-      box-shadow: 0 2px 40px rgba(61,90,71,0.09);
+    .s-cta-sub {
+      font-size: 1rem; color: rgba(255,255,255,0.65);
+      margin-bottom: 36px; line-height: 1.7;
     }
-    @media (max-width: 700px) { .comparaison-grid { grid-template-columns: 1fr; border-radius: 12px; } }
-    .comp-col {
-      display: flex;
-      flex-direction: column;
+    .btn-cta-white {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: var(--blanc); color: var(--terra);
+      font-size: 1rem; font-weight: 600; font-family: 'DM Sans', sans-serif;
+      padding: 16px 36px; border-radius: 8px; text-decoration: none;
+      border: none; cursor: pointer; transition: opacity 0.2s;
     }
-    .comp-col-header {
-      padding: 28px 32px 24px;
-      border-bottom: 1px solid rgba(0,0,0,0.06);
+    .btn-cta-white:hover { opacity: 0.88; }
+    .s-cta-legal {
+      margin-top: 20px; font-size: 0.72rem;
+      color: rgba(255,255,255,0.4);
     }
-    .comp-col--trad .comp-col-header { background: #f7f6f4; }
-    .comp-col--serenis .comp-col-header { background: linear-gradient(135deg, #3D5A47, #2a4030); }
-    .comp-col-label {
-      font-size: 0.65rem;
-      text-transform: uppercase;
-      letter-spacing: 0.14em;
-      font-weight: 700;
-      margin-bottom: 6px;
+
+    /* ── FOOTER ── */
+    footer {
+      background: var(--brun);
+      padding: 40px;
+      display: flex; justify-content: space-between; align-items: center;
+      flex-wrap: wrap; gap: 16px;
+      border-top: 1px solid rgba(255,255,255,0.06);
     }
-    .comp-col--trad .comp-col-label { color: #aaa; }
-    .comp-col--serenis .comp-col-label { color: rgba(255,255,255,0.5); }
-    .comp-col-title {
+    .footer-logo {
       font-family: 'Cormorant Garamond', serif;
-      font-size: 1.5rem;
-      font-weight: 600;
-      line-height: 1.2;
+      font-size: 1.3rem; font-weight: 600; color: var(--blanc);
     }
-    .comp-col--trad .comp-col-title { color: #555; }
-    .comp-col--serenis .comp-col-title { color: #fff; }
-    .comp-rows { display: flex; flex-direction: column; }
-    .comp-row {
-      display: flex;
-      align-items: flex-start;
-      gap: 12px;
-      padding: 16px 32px;
-      border-bottom: 1px solid rgba(0,0,0,0.05);
-      font-size: 0.88rem;
-      line-height: 1.5;
+    .footer-logo em { font-style: italic; color: var(--terra2); }
+    .footer-links { display: flex; gap: 24px; }
+    .footer-links a {
+      font-size: 0.8rem; color: rgba(255,255,255,0.3);
+      text-decoration: none; transition: color 0.2s;
     }
-    .comp-col--trad .comp-row { background: #fafaf8; color: #777; }
-    .comp-col--trad .comp-row:nth-child(even) { background: #f5f4f1; }
-    .comp-col--serenis .comp-row { background: #f0f5f1; color: #2a4030; }
-    .comp-col--serenis .comp-row:nth-child(even) { background: #e8f2ec; }
-    .comp-icon {
-      flex-shrink: 0;
-      width: 22px;
-      height: 22px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 0.7rem;
-      font-weight: 700;
-      margin-top: 1px;
+    .footer-links a:hover { color: rgba(255,255,255,0.6); }
+    .footer-legal-text {
+      width: 100%; font-size: 0.68rem; color: rgba(255,255,255,0.18);
+      border-top: 1px solid rgba(255,255,255,0.05); padding-top: 20px;
+      line-height: 1.7;
     }
-    .comp-icon--no  { background: #fde8e8; color: #c0392b; }
-    .comp-icon--yes { background: #d4eddd; color: #1e7e34; }
-    .comp-col--serenis .comp-row:last-child,
-    .comp-col--trad .comp-row:last-child { border-bottom: none; }
+    @media (max-width: 768px) {
+      footer { padding: 32px 20px; flex-direction: column; text-align: center; }
+      .footer-links { flex-wrap: wrap; justify-content: center; }
+    }
   </style>
 </head>
 <body>
 
-<!-- NAVIGATION -->
+<!-- ── NAV ── -->
 <nav class="nav" id="mainNav">
-  <div class="nav-container">
-    <a href="/" class="logo">
-      <svg width="30" height="30" viewBox="0 0 32 32" fill="none">
-        <path d="M16 2L3 13v17h8v-8h10v8h8V13L16 2z" fill="#3D5A47"/>
-        <path d="M16 2L3 13v17h8v-8h10v8h8V13L16 2z" fill="none" stroke="#FDFCF8" stroke-width="1.5" stroke-linejoin="round"/>
-      </svg>
-      <span class="logo-text">Sere<em>nis</em></span>
-    </a>
-    <ul class="nav-links">
-      <li><a href="#histoire">Notre histoire</a></li>
-      <li><a href="#comment">Comment ça marche</a></li>
-      <li><a href="#offres">Nos offres</a></li>
-      <li><a href="#faq">FAQ</a></li>
-      <li><a href="#contact">Contact</a></li>
-    </ul>
-    <div class="nav-cta">
-      <a href="/login" class="btn-ghost">Connexion</a>
-      <a href="#" class="btn-primary" data-pack="serenite">Démarrer</a>
-    </div>
-    <button class="menu-toggle" id="menuToggle" aria-label="Menu">
-      <span></span><span></span><span></span>
-    </button>
+  <a href="/" class="nav-logo">Sere<em>nis</em></a>
+  <ul class="nav-links" id="navLinks">
+    <li><a href="#avantages">Avantages</a></li>
+    <li><a href="#etapes">Comment ça marche</a></li>
+    <li><a href="#faq">FAQ</a></li>
+  </ul>
+  <div class="nav-right">
+    <a href="/login" class="btn-nav-ghost">Connexion</a>
+    <a href="#" class="btn-nav-cta" data-pack="serenite">Démarrer →</a>
   </div>
+  <button class="menu-toggle" id="menuToggle" aria-label="Menu">
+    <span></span><span></span><span></span>
+  </button>
 </nav>
 
-<!-- HERO -->
+<!-- ── HERO ── -->
 <section class="hero">
-  <div class="hero-bg"></div>
-  <div class="hero-grid"></div>
-
-  <!-- Formes géométriques flottantes — inspirées de Shape Landing Hero (kokonutd) -->
-  <div class="hero-shapes" aria-hidden="true">
-    <div class="hs hs-1"></div>
-    <div class="hs hs-2"></div>
-    <div class="hs hs-3"></div>
-    <div class="hs hs-4"></div>
-    <div class="hs hs-5"></div>
-  </div>
-
-  <div class="hero-container">
+  <div class="hero-photo"></div>
+  <div class="hero-inner">
     <div class="hero-left">
-      <div class="hero-badge">Plateforme d'outils et de formation</div>
-      <h1 class="hero-title">
-        Vendez votre bien.<br><em>Sereinement.</em>
-      </h1>
-      <p class="hero-sub">La seule plateforme numérique conçue pour les vendeurs particuliers qui veulent vendre vite, bien — et sans payer 10 000 € de commission.</p>
-      <div class="hero-cta">
-        <a href="#" class="btn-primary btn-large" data-pack="serenite">Choisir mon offre</a>
-        <a href="#comment" class="btn-hero-ghost">Comment ça marche →</a>
+      <p class="hero-label">Outil d'accompagnement à la vente immobilière</p>
+      <h1>Votre bien.<br>Vendu.</h1>
+      <p class="hero-tagline">La troisième voie.</p>
+      <p class="hero-sub">Ni les risques d'un particulier seul. Ni les 10 000 € d'une agence. Serenis vous donne les outils d'un professionnel — photos HD, dossier automatique, numéro dédié, agenda — pour un forfait fixe de 999 €.</p>
+      <div class="hero-cta-row">
+        <a href="#" class="btn-terra" data-pack="serenite">Démarrer ma vente →</a>
+        <a href="#etapes" class="btn-ghost-white">Comment ça marche</a>
       </div>
-      <div class="hero-trust">
-        <div class="hero-trust-item"><span class="hero-trust-num">−60%</span><span>de visites inutiles</span></div>
-        <div class="hero-trust-sep"></div>
-        <div class="hero-trust-item"><span class="hero-trust-num">+40%</span><span>d'acheteurs qualifiés</span></div>
-        <div class="hero-trust-sep"></div>
-        <div class="hero-trust-item"><span class="hero-trust-num">9 001 €</span><span>économisés en moyenne</span></div>
+      <div class="hero-stats">
+        <div class="hero-stat">
+          <div class="hero-stat-num">−60%</div>
+          <div class="hero-stat-lbl">de visites inutiles</div>
+        </div>
+        <div class="hero-stat">
+          <div class="hero-stat-num">+40%</div>
+          <div class="hero-stat-lbl">d'acheteurs qualifiés</div>
+        </div>
+        <div class="hero-stat">
+          <div class="hero-stat-num">9 001€</div>
+          <div class="hero-stat-lbl">économisés en moyenne</div>
+        </div>
       </div>
     </div>
     <div class="hero-right">
-      <div class="hero-card" id="calcCard">
-        <div class="hero-card-label">Calculez votre économie</div>
-        <div style="margin:12px 0 0;">
-          <!-- Prix du bien -->
-          <label style="font-size:0.72rem;color:#aaa;font-weight:600;text-transform:uppercase;letter-spacing:0.07em;">Prix de votre bien</label>
-          <div style="position:relative;margin-top:6px;">
-            <input type="number" id="calcPrice" value="250000" min="50000" max="1000000" step="5000"
-              style="width:100%;padding:11px 40px 11px 16px;border:2px solid #e0d8cc;border-radius:10px;font-size:1.25rem;font-weight:700;font-family:'DM Sans',sans-serif;color:#2a4030;background:#fff8f2;outline:none;box-sizing:border-box;transition:border-color 0.15s;">
-            <span style="position:absolute;right:14px;top:50%;transform:translateY(-50%);font-size:1rem;color:#aaa;font-weight:600;">€</span>
-          </div>
-          <input type="range" id="calcSlider" min="50000" max="1000000" step="5000" value="250000"
-            style="width:100%;margin-top:8px;accent-color:#C4785A;">
-          <div style="display:flex;justify-content:space-between;font-size:0.68rem;color:#ccc;margin-top:2px;">
-            <span>50 000 €</span><span>1 000 000 €</span>
-          </div>
-
-          <!-- Taux commission -->
-          <div style="margin-top:14px;padding:10px 14px;background:#faf8f5;border-radius:9px;border:1px solid #ede8e0;">
-            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
-              <label style="font-size:0.72rem;color:#aaa;font-weight:600;text-transform:uppercase;letter-spacing:0.07em;">Taux d'agence estimé</label>
-              <span id="calcTauxLabel" style="font-size:0.88rem;font-weight:700;color:#C4785A;">5,0 %</span>
-            </div>
-            <input type="range" id="calcTaux" min="3" max="8" step="0.5" value="5"
-              style="width:100%;accent-color:#C4785A;">
-            <div style="display:flex;justify-content:space-between;font-size:0.68rem;color:#ccc;margin-top:2px;">
-              <span>3 % (négo)</span><span>5 % (moy.)</span><span>8 % (max)</span>
-            </div>
-          </div>
-        </div>
-
-        <div class="hero-card-divider" style="margin:14px 0;"></div>
-
+      <div class="hero-card-wrap">
+        <div class="hero-card-title">Comparez le coût pour 200 000 €</div>
         <div class="hero-card-row">
           <div class="hero-card-col">
-            <div class="hero-card-col-label" id="calcAgenceLabel">Agence (5,0 %)</div>
-            <div class="hero-card-col-price hero-card-col-strike" id="calcAgence">12 500 €</div>
+            <div class="hero-card-col-label">Agence (5%)</div>
+            <div class="hero-card-col-val val-strike">10 000 €</div>
           </div>
-          <div class="hero-card-vs">VS</div>
-          <div class="hero-card-col hero-card-col-highlight">
+          <div class="hero-card-col">
             <div class="hero-card-col-label">Serenis</div>
-            <div class="hero-card-col-price">999 €</div>
+            <div class="hero-card-col-val val-terra">999 €</div>
           </div>
         </div>
-
-        <div style="background:linear-gradient(135deg,#3D5A47,#2a4030);border-radius:10px;padding:14px 18px;margin-top:12px;text-align:center;">
-          <div style="font-size:0.72rem;color:rgba(212,228,216,0.7);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:4px;">Vous économisez</div>
-          <div id="calcEco" style="font-size:2.1rem;font-weight:700;color:#fff;font-family:'Cormorant Garamond',serif;transition:opacity 0.15s;">11 501 €</div>
-          <div id="calcEcoPct" style="font-size:0.72rem;color:rgba(212,228,216,0.6);margin-top:2px;"></div>
+        <div class="hero-eco">
+          <div class="hero-eco-label">Vous économisez</div>
+          <div class="hero-eco-val">9 001 €</div>
+          <div class="hero-eco-sub">forfait fixe · zéro commission · zéro surprise</div>
         </div>
-        <a href="#" class="hero-card-cta" data-pack="serenite" style="margin-top:14px;">Commencer maintenant →</a>
-      </div>
-      <div class="hero-card-mention">Activité validée · Autorité de la Concurrence 2023</div>
-    </div>
-  </div>
-  <div class="hero-scroll">
-    <div class="hero-scroll-line"></div>
-    <span>Découvrir</span>
-  </div>
-</section>
-
-<!-- IMPACT STATEMENT — Apple style full-bleed -->
-<section class="section-impact">
-  <div class="impact-inner">
-    <p class="impact-overline">L'économie que vous faites</p>
-    <div class="impact-number">9 001<span class="impact-euro">€</span></div>
-    <p class="impact-sub">économisés en moyenne par rapport à une agence immobilière classique</p>
-    <div class="impact-compare">
-      <div class="impact-col impact-col-agency">
-        <span class="impact-col-label">Agence</span>
-        <span class="impact-col-price">~10 000 €</span>
-      </div>
-      <div class="impact-arrow">→</div>
-      <div class="impact-col impact-col-serenis">
-        <span class="impact-col-label">Serenis</span>
-        <span class="impact-col-price">999 €</span>
+        <a href="#" class="hero-card-cta" data-pack="serenite">Commencer maintenant →</a>
+        <div class="hero-card-mention">Activité validée · Autorité de la Concurrence 2023</div>
       </div>
     </div>
   </div>
 </section>
 
-<!-- NOTRE HISTOIRE -->
-<section class="section-histoire" id="histoire">
-  <div class="histoire-inner">
+<!-- ── AVANTAGES ── -->
+<section class="s-middle" id="avantages">
+  <div class="s-middle-inner">
+    <div>
+      <p class="s-overline">Ce que nous proposons</p>
+      <h2>Ni agence. Ni petites annonces.<br><em>La troisième voie.</em></h2>
+      <p class="s-middle-lead">Serenis est le seul outil numérique conçu pour les vendeurs particuliers qui veulent vendre vite, bien — et sans jamais payer une commission. Vous gardez le contrôle. Nous vous donnons la méthode.</p>
 
-    <div class="histoire-texte">
-      <p class="section-overline">Comment on en est arrivé là</p>
-      <h2>L'idée est née<br>d'une <em>frustration</em><br>très concrète.</h2>
-
-      <p>Comme beaucoup de Français, nous sommes profondément attachés à la pierre. Acheter, vendre — c'est l'une des décisions les plus importantes d'une vie.</p>
-
-      <p>Matthias a passé <strong>7 ans comme agent immobilier</strong> dans le secteur de Douai. Et pendant ces 7 ans, il a vu des centaines de vendeurs particuliers commettre les mêmes erreurs. Des photos prises depuis le couloir. Des annonces sans structure. Des acheteurs qui arrivent sans avoir lu quoi que ce soit. Des négociations bâclées parce que le vendeur ne savait pas quoi répondre.</p>
-
-      <p>Des biens parfaits vendus <strong>20 000 € en dessous de leur valeur réelle.</strong> Non pas parce que le marché était difficile. Mais parce que le vendeur n'avait pas les bons outils.</p>
-
-      <p>En parallèle, il a vu des vendeurs payer <strong>10 000 € de commission</strong> à des agences pour un service qu'ils auraient pu rendre eux-mêmes — avec la bonne méthode.</p>
-
-      <p>Serenis, c'est la réponse à ces deux constats. <strong>Les outils des professionnels. La méthode des professionnels. Sans leur commission.</strong></p>
-    </div>
-
-    <div class="histoire-aside">
-      <div class="histoire-quote">
-        <p>J'ai vu trop de vendeurs particuliers perdre des milliers d'euros — non pas parce que leur bien avait un défaut, mais parce qu'ils n'avaient pas la méthode.</p>
-      </div>
-      <div class="histoire-quote">
-        <p>Une agence vous prend en moyenne 10 000 €. Avec Serenis, vous gardez cet argent — et vous vendez au bon prix parce que vous avez les mêmes outils qu'eux.</p>
-      </div>
-      <div class="histoire-quote">
-        <p>Un acheteur qui a reçu le dossier complet avant de venir, qui a vu les photos professionnelles — c'est un acheteur qui vient pour acheter. Pas pour regarder.</p>
-      </div>
-      <div class="histoire-signature">
-        <div class="histoire-signature-avatar">M</div>
-        <div>
-          <div class="histoire-signature-name">Matthias Brieux</div>
-          <div class="histoire-signature-role">Fondateur Serenis · 7 ans agent immobilier · Douai (59)</div>
-        </div>
-      </div>
-    </div>
-
-  </div>
-</section>
-
-<!-- CHIFFRES CLÉS -->
-<section class="section-chiffres">
-  <div class="chiffres-inner">
-    <div class="chiffres-header">
-      <p class="section-overline" style="font-size:0.68rem;letter-spacing:0.18em;text-transform:uppercase;color:var(--terra-c);display:flex;align-items:center;gap:0.8rem;font-weight:600;">
-        <span style="width:24px;height:1px;background:var(--terra-c);display:inline-block;flex-shrink:0;"></span>L'impact concret
-      </p>
-      <h2>Des résultats <em>mesurables.</em></h2>
-    </div>
-    <div class="chiffres-grid">
-      <div class="chiffre-box">
-        <div class="chiffre-num">−60%</div>
-        <div class="chiffre-lbl">de visites<br>inutiles</div>
-      </div>
-      <div class="chiffre-box">
-        <div class="chiffre-num">+40%</div>
-        <div class="chiffre-lbl">d'acheteurs<br>qualifiés captés</div>
-      </div>
-      <div class="chiffre-box">
-        <div class="chiffre-num">3×</div>
-        <div class="chiffre-lbl">plus rapide<br>qu'une vente classique</div>
-      </div>
-      <div class="chiffre-box">
-        <div class="chiffre-num">9 001€</div>
-        <div class="chiffre-lbl">économisés<br>vs agence classique</div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- NOS SERVICES DÉTAILLÉS -->
-<section class="section-services">
-  <div class="services-inner">
-    <div class="section-header centered">
-      <p class="section-overline">Ce que nous proposons</p>
-      <h2>Serenis, c'est quoi <em>exactement ?</em></h2>
-      <p class="section-sub">Le seul outil pensé pour les vendeurs particuliers qui veulent organiser une vente professionnelle — sans agence, sans commission.</p>
-    </div>
-    <div class="services-grid">
-      <div class="service-card">
-        <div class="service-num">01</div>
-        <h3>Votre dossier généré automatiquement</h3>
-        <p>Renseignez votre bien une seule fois. Serenis génère un dossier numérique complet — photos HD, fiche technique, diagnostics, caractéristiques du quartier — prêt à envoyer à chaque acheteur. Vous ne faites le travail qu'une fois.</p>
-      </div>
-      <div class="service-card">
-        <div class="service-num">02</div>
-        <h3>Un numéro dédié qui filtre les curieux</h3>
-        <p>Chaque acheteur appelle votre numéro 09 dédié. Il reçoit automatiquement le dossier complet par email. Résultat : seuls les acheteurs informés et motivés franchissent votre porte. Fini les visites inutiles le vendredi soir.</p>
-      </div>
-      <div class="service-card">
-        <div class="service-num">03</div>
-        <h3>La méthode complète pour bien vendre</h3>
-        <p>Guide vendeur 14 chapitres, 7 mails types prêts à copier, conseils négociation, questions difficiles des acheteurs avec les réponses qui tiennent. Tout ce qu'un agent expérimenté sait faire — mis à votre portée.</p>
-      </div>
-      <div class="service-card">
-        <div class="service-num">04</div>
-        <h3>Votre agenda, vos règles</h3>
-        <p>Les acheteurs réservent directement selon vos disponibilités. Vous configurez vos créneaux une seule fois. Les confirmations et rappels partent automatiquement. Vous n'avez plus à gérer les allers-retours pour fixer un rendez-vous.</p>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- SECTION COMPARAISON -->
-<section class="section-comparaison" id="comparaison">
-  <div class="comparaison-inner">
-    <div class="comparaison-header">
-      <p class="section-overline" style="display:flex;align-items:center;justify-content:center;gap:0.8rem;font-size:0.68rem;letter-spacing:0.18em;text-transform:uppercase;color:var(--terra);font-weight:600;">
-        <span style="width:24px;height:1px;background:var(--terra);display:inline-block;"></span>Deux façons de vendre<span style="width:24px;height:1px;background:var(--terra);display:inline-block;"></span>
-      </p>
-      <h2>Vente traditionnelle<br>ou <em>Serenis ?</em></h2>
-      <p class="section-sub" style="max-width:520px;margin:1rem auto 0;font-size:0.92rem;color:var(--gris);line-height:1.7;">Comparez objectivement les deux approches pour vendre votre bien immobilier.</p>
-    </div>
-
-    <div class="comparaison-grid">
-
-      <!-- Colonne gauche : vente traditionnelle -->
-      <div class="comp-col comp-col--trad">
-        <div class="comp-col-header">
-          <div class="comp-col-label">Option classique</div>
-          <div class="comp-col-title">Vente<br>traditionnelle</div>
-        </div>
-        <div class="comp-rows">
-          <div class="comp-row"><span class="comp-icon comp-icon--no">✕</span><span>Commission entre <strong>5% et 8%</strong> du prix de vente reversée à l'intermédiaire</span></div>
-          <div class="comp-row"><span class="comp-icon comp-icon--no">✕</span><span>Peu ou pas de formation — vous gérez les visites sans méthode</span></div>
-          <div class="comp-row"><span class="comp-icon comp-icon--no">✕</span><span>Tous les curieux appellent, les visites inutiles s'accumulent</span></div>
-          <div class="comp-row"><span class="comp-icon comp-icon--no">✕</span><span>Le dossier acheteur est géré par un tiers, vous n'avez pas la main</span></div>
-          <div class="comp-row"><span class="comp-icon comp-icon--no">✕</span><span>Agenda des visites imposé, difficile à maîtriser</span></div>
-          <div class="comp-row"><span class="comp-icon comp-icon--no">✕</span><span>Contrat d'exclusivité, souvent 3 mois minimum</span></div>
-        </div>
-      </div>
-
-      <!-- Colonne droite : Serenis -->
-      <div class="comp-col comp-col--serenis">
-        <div class="comp-col-header">
-          <div class="comp-col-label">Notre approche</div>
-          <div class="comp-col-title" style="font-family:'Cormorant Garamond',serif;">Serenis</div>
-        </div>
-        <div class="comp-rows">
-          <div class="comp-row"><span class="comp-icon comp-icon--yes">✓</span><span><strong>Forfait fixe</strong>, tout compris — vous conservez l'intégralité de votre plus-value</span></div>
-          <div class="comp-row"><span class="comp-icon comp-icon--yes">✓</span><span>Formation complète 14 chapitres + méthode vendeur structurée de A à Z</span></div>
-          <div class="comp-row"><span class="comp-icon comp-icon--yes">✓</span><span>Numéro dédié — seuls les acheteurs informés et qualifiés franchissent votre porte</span></div>
-          <div class="comp-row"><span class="comp-icon comp-icon--yes">✓</span><span>Votre dossier acheteur généré automatiquement, envoyé en un clic</span></div>
-          <div class="comp-row"><span class="comp-icon comp-icon--yes">✓</span><span>Vos créneaux, vos règles — agenda automatisé selon vos disponibilités</span></div>
-          <div class="comp-row"><span class="comp-icon comp-icon--yes">✓</span><span>Aucun engagement, aucune exclusivité — vous restez libre à tout moment</span></div>
-        </div>
-      </div>
-
-    </div>
-  </div>
-</section>
-
-<!-- SECTION PROBLÈME -->
-<section class="section-probleme" id="probleme">
-  <div class="container">
-    <div class="section-header centered">
-      <p class="section-overline">Le constat</p>
-      <h2>Vendre entre particuliers<br>est souvent épuisant</h2>
-      <p class="section-sub">Pas faute de vouloir — faute d'outils adaptés.</p>
-    </div>
-    <div class="problems-grid">
-      <div class="problem-card">
-        <div class="problem-num">01</div>
-        <h3>Appels de curieux</h3>
-        <p>Votre numéro personnel diffusé partout. Appels en soirée, de gens non qualifiés.</p>
-      </div>
-      <div class="problem-card">
-        <div class="problem-num">02</div>
-        <h3>Documents manquants</h3>
-        <p>L'acheteur sérieux pose des questions auxquelles vous ne savez pas répondre. Il repart.</p>
-      </div>
-      <div class="problem-card">
-        <div class="problem-num">03</div>
-        <h3>Présentation insuffisante</h3>
-        <p>Photos floues, description incomplète — votre annonce se noie dans les résultats.</p>
-      </div>
-      <div class="problem-card">
-        <div class="problem-num">04</div>
-        <h3>Négociation sans méthode</h3>
-        <p>Faire face à une offre basse sans préparation. La pression dans le salon.</p>
-      </div>
-      <div class="problem-card">
-        <div class="problem-num">05</div>
-        <h3>Organisation chronophage</h3>
-        <p>Coordonner les visites par SMS, oublier des confirmations, gérer les annulations.</p>
-      </div>
-      <div class="problem-card problem-card-highlight">
-        <div class="problem-num">06</div>
-        <h3>10 000 € de commission</h3>
-        <p>La "solution" traditionnelle — payer une agence — coûte en moyenne 10 000 € sur une maison à 200 000 €.</p>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- COMMENT ÇA MARCHE -->
-<section class="section-comment" id="comment">
-  <div class="container">
-    <div class="section-header centered">
-      <p class="section-overline">La méthode</p>
-      <h2>Comment Serenis fonctionne</h2>
-      <p class="section-sub">6 étapes. Tout automatisé. Vous décidez.</p>
-    </div>
-    <div class="steps-list">
-      <div class="step-item">
-        <div class="step-num">01</div>
-        <div class="step-body">
-          <h3>Accédez à votre espace Serenis</h3>
-          <p>Pack Sérénité à 999 €. Accès immédiat à la plateforme après paiement sécurisé. Votre photographe est contacté dans les 48h.</p>
-        </div>
-      </div>
-      <div class="step-item">
-        <div class="step-num">02</div>
-        <div class="step-body">
-          <h3>Créez votre profil et renseignez votre bien</h3>
-          <p>Caractéristiques, description, taxe foncière, DPE, équipements — tout ce qu'un acheteur sérieux veut savoir.</p>
-        </div>
-      </div>
-      <div class="step-item">
-        <div class="step-num">03</div>
-        <div class="step-body">
-          <h3>Uploadez vos photos</h3>
-          <p>Le dossier numérique complet est généré automatiquement. Votre photographe partenaire livre les photos en 48h.</p>
-        </div>
-      </div>
-      <div class="step-item">
-        <div class="step-num">04</div>
-        <div class="step-body">
-          <h3>Publiez votre annonce</h3>
-          <p>Sur LeBonCoin, PAP, SeLoger — en votre nom propre. Votre numéro 09 dédié protège votre vie privée.</p>
-        </div>
-      </div>
-      <div class="step-item">
-        <div class="step-num">05</div>
-        <div class="step-body">
-          <h3>Les acheteurs reçoivent le dossier automatiquement</h3>
-          <p>Ils appellent le 09, le dossier complet leur est envoyé instantanément. Vous êtes notifié en temps réel.</p>
-        </div>
-      </div>
-      <div class="step-item">
-        <div class="step-num">06</div>
-        <div class="step-body">
-          <h3>Gérez vos visites selon vos disponibilités</h3>
-          <p>Agenda en ligne, réservation directe par les acheteurs. Confirmations automatiques. Rappels 24h avant.</p>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- SECTION IA -->
-<section style="padding:80px 0;background:#fff;">
-  <div class="container">
-    <div class="section-header centered">
-      <p class="section-overline">Intelligence artificielle</p>
-      <h2>Votre coach IA inclus<br>dans chaque pack</h2>
-      <p class="section-sub">Pas besoin d'être expert. Alex vous guide à chaque étape.</p>
-    </div>
-    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:24px;margin-top:40px;">
-      <div style="padding:28px;border:1px solid #e8e0d6;border-radius:14px;background:#f8f5f0;">
-        <div style="font-size:2rem;margin-bottom:12px;">✍️</div>
-        <h3 style="font-size:1rem;font-weight:700;margin-bottom:8px;">Rédaction d'annonce IA</h3>
-        <p style="font-size:0.88rem;color:#666;line-height:1.6;">Entrez vos infos, l'IA rédige une description percutante prête à publier sur LeBonCoin ou PAP en 10 secondes.</p>
-      </div>
-      <div style="padding:28px;border:2px solid #3D5A47;border-radius:14px;background:#f0f7f2;position:relative;">
-        <div style="position:absolute;top:-12px;left:50%;transform:translateX(-50%);background:#3D5A47;color:#fff;font-size:0.72rem;font-weight:700;padding:3px 14px;border-radius:20px;text-transform:uppercase;letter-spacing:0.06em;">Populaire</div>
-        <div style="font-size:2rem;margin-bottom:12px;">🎯</div>
-        <h3 style="font-size:1rem;font-weight:700;margin-bottom:8px;">Coach de vente Alex</h3>
-        <p style="font-size:0.88rem;color:#666;line-height:1.6;">Questions sur les visites, la négociation, les diagnostics ? Alex répond 24h/24, adapté à votre bien et votre marché local.</p>
-      </div>
-      <div style="padding:28px;border:1px solid #e8e0d6;border-radius:14px;background:#f8f5f0;">
-        <div style="font-size:2rem;margin-bottom:12px;">🎭</div>
-        <h3 style="font-size:1rem;font-weight:700;margin-bottom:8px;">Simulations acheteur</h3>
-        <p style="font-size:0.88rem;color:#666;line-height:1.6;">Entraînez-vous aux vraies questions des acheteurs : prix, négociation, diagnostics, délais. Préparez chaque réponse à l'avance.</p>
-      </div>
-    </div>
-    <div style="margin-top:32px;padding:24px 32px;background:linear-gradient(135deg,#3D5A47,#2a4030);border-radius:14px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px;">
-      <div>
-        <div style="color:#D4E4D8;font-size:0.82rem;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;">Inclus dans tous les packs</div>
-        <div style="color:#fff;font-size:1.1rem;font-weight:600;margin-top:4px;">Coach IA Alex · Formation vidéo · Scripts · Checklists · Dossier d'envoi automatique client</div>
-      </div>
-      <a href="#offres" style="background:#C4785A;color:#fff;padding:12px 24px;border-radius:8px;font-weight:700;font-size:0.9rem;text-decoration:none;white-space:nowrap;">Voir les offres →</a>
-    </div>
-  </div>
-</section>
-
-<!-- OFFRES -->
-<section class="section-offres" id="offres">
-  <div class="container">
-    <div class="section-header centered">
-      <p class="section-overline">Notre offre</p>
-      <h2>La formule <em>tout inclus.</em></h2>
-      <p class="section-sub">Agence classique : ~10 000 € · Serenis : <strong>999 € tout compris</strong></p>
-    </div>
-    <div style="display:flex;justify-content:center;margin-top:32px;">
-      <div class="offre-card offre-serenite featured" style="max-width:640px;width:100%;">
-        <div class="offre-tag">Les outils d'une agence. Sans la commission.</div>
-        <div class="offre-header">
-          <p class="offre-overline">Tout inclus · Rien à ajouter</p>
-          <h3>Pack Sérénité</h3>
-          <div class="offre-price">
-            <span class="price-amount">999 €</span>
-            <span class="price-ttc">TTC · forfait fixe · zéro commission</span>
+      <ul class="features-list">
+        <li>
+          <span class="feat-check"></span>
+          <div class="feat-body">
+            <strong>Vos décisions, vos choix, vos négociations — sans intermédiaire</strong>
+            <small>Vous restez seul décisionnaire à chaque étape. Serenis organise, vous décidez.</small>
           </div>
-          <p class="offre-tagline">Vendez comme un professionnel. Sans l'être.</p>
+        </li>
+        <li>
+          <span class="feat-check"></span>
+          <div class="feat-body">
+            <strong>Un photographe professionnel et votre bien sous son meilleur angle</strong>
+            <small>Photos HD Meero livrées en 48h. Visite virtuelle 360° incluse.</small>
+          </div>
+        </li>
+        <li>
+          <span class="feat-check"></span>
+          <div class="feat-body">
+            <strong>Formation complète : guide vendeur 14 chapitres, 7 mails types, conseils négociation</strong>
+            <small>Tout ce qu'un agent expérimenté sait faire — mis à votre portée en quelques clics.</small>
+          </div>
+        </li>
+        <li>
+          <span class="feat-check"></span>
+          <div class="feat-body">
+            <strong>Dossier numérique généré automatiquement — envoyé à chaque acheteur</strong>
+            <small>Renseignez votre bien une seule fois. Serenis s'occupe du reste. Fini les visites pour rien.</small>
+          </div>
+        </li>
+      </ul>
+
+      <a href="#" class="btn-terra" data-pack="serenite">Démarrer avec Serenis →</a>
+    </div>
+
+    <div>
+      <div class="comp-box">
+        <div class="comp-label">Comparez le coût</div>
+        <div class="comp-row">
+          <span class="comp-row-label">Commission agence classique</span>
+          <span class="comp-row-val val-rouge">3 % – 7 %</span>
         </div>
-        <ul class="offre-features">
-          <li><span class="check check-gold">✓</span> Accès plateforme immédiat</li>
-          <li><span class="check check-gold">✓</span> Guide vendeur complet 14 chapitres</li>
-          <li><span class="check check-gold">✓</span> 7 mails types prêts à copier-coller</li>
-          <li><span class="check check-gold">✓</span> Conseils négociation + réponses aux questions difficiles des acheteurs</li>
-          <li><span class="check check-gold">✓</span> Photos professionnelles HD (photographe partenaire en 48h)</li>
-          <li><span class="check check-gold">✓</span> Visite virtuelle 360°</li>
-          <li><span class="check check-gold">✓</span> Dossier numérique généré automatiquement</li>
-          <li><span class="check check-gold">✓</span> Numéro 09 dédié — votre vie privée protégée</li>
-          <li><span class="check check-gold">✓</span> Envoi automatique du dossier à chaque acheteur qui appelle</li>
-          <li><span class="check check-gold">✓</span> Agenda en ligne — les acheteurs réservent selon vos créneaux</li>
-          <li><span class="check check-gold">✓</span> Coach IA Alex inclus (disponible 24h/24)</li>
-          <li><span class="check check-gold">✓</span> Confirmations et rappels automatiques</li>
-          <li><span class="check check-gold">✓</span> Garantie satisfaction — dossier corrigé sans limite</li>
-        </ul>
-        <a href="#" class="btn-offre btn-offre-primary" data-pack="serenite">Démarrer avec Serenis →</a>
-        <p class="offre-note">Économie moyenne : <strong>9 001 €</strong> par rapport à une agence classique</p>
+        <div class="comp-row">
+          <span class="comp-row-label">Serenis — forfait tout inclus</span>
+          <span class="comp-row-val val-vert">999 €</span>
+        </div>
+        <div class="comp-eco-box">
+          <div class="comp-eco-label">Économie moyenne</div>
+          <div class="comp-eco-val">9 001 €</div>
+          <div class="comp-eco-sub">vs une agence immobilière classique</div>
+        </div>
+        <a href="#" class="comp-cta" data-pack="serenite">Choisir Sérénité — 999 € →</a>
+        <p class="comp-legal">Paiement sécurisé · Accès immédiat · Garantie satisfaction</p>
       </div>
     </div>
   </div>
 </section>
 
-<!-- COMPARATIF -->
-<section class="section-comparatif">
-  <div class="container">
-    <div class="section-header centered">
-      <p class="section-overline">Transparence</p>
-      <h2>Agence classique vs Serenis</h2>
-    </div>
-    <div class="comparatif-table-wrapper">
-      <table class="comparatif-table">
-        <thead>
-          <tr>
-            <th>Ce que vous obtenez</th>
-            <th>Agence classique</th>
-            <th class="th-serenis">Serenis Pack Sérénité</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>Photos professionnelles</td>
-            <td><span class="check-table">✓</span></td>
-            <td class="td-serenis"><span class="check-table">✓</span></td>
-          </tr>
-          <tr>
-            <td>Visite virtuelle 360°</td>
-            <td><span class="check-table">✓</span></td>
-            <td class="td-serenis"><span class="check-table">✓</span></td>
-          </tr>
-          <tr>
-            <td>Dossier complet d'envoi automatique client</td>
-            <td><span class="check-table">✓</span></td>
-            <td class="td-serenis"><span class="check-table">✓</span></td>
-          </tr>
-          <tr>
-            <td>Numéro dédié (protection vie privée)</td>
-            <td><span class="check-table">✓</span></td>
-            <td class="td-serenis"><span class="check-table">✓</span></td>
-          </tr>
-          <tr>
-            <td>Gestion agenda &amp; visites</td>
-            <td><span class="check-table">✓</span></td>
-            <td class="td-serenis"><span class="check-table">✓</span></td>
-          </tr>
-          <tr>
-            <td>Vous êtes décisionnaire</td>
-            <td><span class="cross-table">✗</span> agence décide</td>
-            <td class="td-serenis"><span class="check-table">✓</span> Toujours vous</td>
-          </tr>
-          <tr>
-            <td>Commission sur la vente</td>
-            <td class="highlight-bad">~10 000 € (3–5%)</td>
-            <td class="td-serenis highlight-good">0 €</td>
-          </tr>
-          <tr class="total-row">
-            <td><strong>Coût total</strong></td>
-            <td><strong>~10 000 €</strong></td>
-            <td class="td-serenis"><strong>999 €</strong></td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-  </div>
-</section>
+<!-- ── 9 ÉTAPES ── -->
+<section class="s-etapes" id="etapes">
+  <div class="s-etapes-inner">
+    <p class="s-overline">Comme au bras d'un pro</p>
+    <h2>9 étapes balisées.<br><em>De A jusqu'à vendu.</em></h2>
+    <p class="s-etapes-sub">Serenis vous guide pas à pas, de la préparation à la signature. Chaque étape est automatisée au maximum — vous n'avez qu'à décider.</p>
 
-<!-- GARANTIE — CTA dark full-bleed -->
-<section class="section-garantie">
-  <div class="garantie-inner">
-    <div class="garantie-icon-wrap">🛡️</div>
-    <h2>Garantie satisfaction</h2>
-    <p>Dossier non conforme ? Nous le corrigeons <strong>sans limite</strong>, jusqu'à votre entière satisfaction.<br>Vous ne payez jamais de commission. Votre investissement est fixe.</p>
-    <a href="#" class="btn-primary btn-large" data-pack="serenite">Démarrer maintenant</a>
-  </div>
-</section>
-
-<!-- SECTION LÉGALE -->
-<section class="section-legal">
-  <div class="container">
-    <div class="legal-grid">
-      <div class="legal-col legal-yes-col">
-        <h3 class="legal-title">Ce que Serenis <em>est</em></h3>
-        <ul class="legal-list">
-          <li>Une plateforme numérique d'aide à la vente</li>
-          <li>Un fournisseur d'outils et de formation</li>
-          <li>Un système d'automatisation et d'organisation</li>
-          <li>Vous restez seul décisionnaire à chaque étape</li>
-        </ul>
+    <div class="etapes-grid">
+      <div class="etape-card">
+        <div class="etape-num">01</div>
+        <div class="etape-title">Administratif</div>
+        <div class="etape-desc">Checklist des documents à réunir. Diagnostics, titre de propriété, taxe foncière — rien n'est oublié.</div>
       </div>
-      <div class="legal-col legal-no-col">
-        <h3 class="legal-title">Ce que Serenis <em>n'est pas</em></h3>
-        <ul class="legal-list">
-          <li>Une agence immobilière</li>
-          <li>Un mandataire ou intermédiaire</li>
-          <li>Un négociateur entre les parties</li>
-          <li>Un rédacteur de compromis</li>
-        </ul>
+      <div class="etape-card">
+        <div class="etape-num">02</div>
+        <div class="etape-title">Préparation</div>
+        <div class="etape-desc">Votre fiche bien complète en 15 minutes. Surface, DPE, équipements, quartier — tout ce qu'un acheteur sérieux veut savoir.</div>
+      </div>
+      <div class="etape-card">
+        <div class="etape-num">03</div>
+        <div class="etape-title">Photos</div>
+        <div class="etape-desc">Photographe partenaire contacté sous 48h. Photos HD et visite virtuelle 360° livrées sous 5 jours ouvrés.</div>
+      </div>
+      <div class="etape-card">
+        <div class="etape-num">04</div>
+        <div class="etape-title">Annonce</div>
+        <div class="etape-desc">Guide rédaction annonce inclus. Vous publiez sur LeBonCoin, PAP, SeLoger — en votre nom propre, sans intermédiaire.</div>
+      </div>
+      <div class="etape-card">
+        <div class="etape-num">05</div>
+        <div class="etape-title">Publications</div>
+        <div class="etape-desc">Votre numéro 09 dédié protège votre numéro personnel. Les acheteurs appellent — vous n'êtes jamais directement exposé.</div>
+      </div>
+      <div class="etape-card">
+        <div class="etape-num">06</div>
+        <div class="etape-title">Acheteurs</div>
+        <div class="etape-desc">Chaque acheteur reçoit automatiquement le dossier complet par email. Seuls les acheteurs informés et motivés franchissent votre porte.</div>
+      </div>
+      <div class="etape-card">
+        <div class="etape-num">07</div>
+        <div class="etape-title">Visites</div>
+        <div class="etape-desc">Les acheteurs réservent selon vos créneaux. Confirmations et rappels automatiques. Vous n'avez plus à gérer les allers-retours.</div>
+      </div>
+      <div class="etape-card">
+        <div class="etape-num">08</div>
+        <div class="etape-title">Négociation</div>
+        <div class="etape-desc">7 mails types prêts à copier. Réponses aux questions difficiles. Conseils pour tenir face à une offre basse. Vous négociez — bien préparé.</div>
+      </div>
+      <div class="etape-card highlight">
+        <div class="etape-num">09</div>
+        <div class="etape-title">Votre résultat</div>
+        <div class="etape-desc">Votre bien vendu au bon prix. Sans commission. Avec les mêmes outils qu'un professionnel — mais l'argent qui reste dans votre poche.</div>
       </div>
     </div>
   </div>
 </section>
 
-<!-- FAQ -->
-<section class="section-faq" id="faq">
-  <div class="container">
-    <div class="section-header centered">
-      <p class="section-overline">Questions fréquentes</p>
-      <h2>Tout ce que vous voulez savoir</h2>
+<!-- ── PREUVES ── -->
+<section class="s-preuves" id="preuves">
+  <div class="s-preuves-inner">
+    <p class="s-overline">L'impact concret</p>
+    <h2>Des vraies ventes.<br><em>Des vraies économies.</em></h2>
+    <p class="s-preuves-sub">Ce ne sont pas des promesses — ce sont les effets directs d'une vente organisée avec méthode et les bons outils.</p>
+
+    <div class="preuves-grid">
+      <div class="preuve-card">
+        <div class="preuve-num">−60%</div>
+        <div class="preuve-lbl">de visites inutiles grâce au dossier envoyé automatiquement</div>
+      </div>
+      <div class="preuve-card">
+        <div class="preuve-num">+40%</div>
+        <div class="preuve-lbl">d'acheteurs qualifiés captés par le numéro 09 dédié</div>
+      </div>
+      <div class="preuve-card">
+        <div class="preuve-num">3×</div>
+        <div class="preuve-lbl">plus rapide qu'une vente classique entre particuliers</div>
+      </div>
+      <div class="preuve-card">
+        <div class="preuve-num">9 001€</div>
+        <div class="preuve-lbl">économisés en moyenne par rapport à une agence classique</div>
+      </div>
     </div>
+
+    <div class="histoire-block">
+      <div class="histoire-texte">
+        <p>Matthias a passé <strong>7 ans comme agent immobilier</strong> dans le secteur de Douai. Et pendant ces 7 ans, il a vu des centaines de vendeurs particuliers commettre les mêmes erreurs. Des photos prises depuis le couloir. Des annonces sans structure. Des acheteurs qui arrivent sans avoir lu quoi que ce soit.</p>
+        <p>Des biens parfaits vendus <strong>20 000 € en dessous de leur valeur réelle.</strong> Non pas parce que le marché était difficile. Mais parce que le vendeur n'avait pas les bons outils.</p>
+        <p>En parallèle, il a vu des vendeurs payer <strong>10 000 € de commission</strong> à des agences pour un service qu'ils auraient pu rendre eux-mêmes — avec la bonne méthode.</p>
+        <p>Serenis, c'est la réponse à ces deux constats. <strong>Les outils des professionnels. La méthode des professionnels. Sans leur commission.</strong></p>
+      </div>
+      <div class="histoire-quotes">
+        <div class="quote-card">
+          <p>"J'ai vu trop de vendeurs particuliers perdre des milliers d'euros — non pas parce que leur bien avait un défaut, mais parce qu'ils n'avaient pas la méthode."</p>
+        </div>
+        <div class="quote-card">
+          <p>"Une agence vous prend en moyenne 10 000 €. Avec Serenis, vous gardez cet argent — et vous vendez au bon prix parce que vous avez les mêmes outils qu'eux."</p>
+        </div>
+        <div class="quote-card">
+          <p>"Un acheteur qui a reçu le dossier complet avant de venir — c'est un acheteur qui vient pour acheter. Pas pour regarder."</p>
+        </div>
+        <div class="quote-sig">
+          <div class="quote-sig-avatar">M</div>
+          <div>
+            <div class="quote-sig-name">Matthias Brieux</div>
+            <div class="quote-sig-role">Fondateur Serenis · 7 ans agent immobilier · Douai (59)</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── LÉGAL ── -->
+<section class="s-legal">
+  <div class="s-legal-inner">
+    <div class="legal-col yes">
+      <h4>Ce que Serenis est</h4>
+      <div class="legal-item"><span>✓</span> Une plateforme numérique d'outils et de formation</div>
+      <div class="legal-item"><span>✓</span> Un système d'organisation de la vente entre particuliers</div>
+      <div class="legal-item"><span>✓</span> Un fournisseur d'automatisation et de méthode</div>
+      <div class="legal-item"><span>✓</span> Vous restez seul décisionnaire à chaque étape</div>
+    </div>
+    <div class="legal-col no">
+      <h4>Ce que Serenis n'est pas</h4>
+      <div class="legal-item"><span>✗</span> Une agence immobilière</div>
+      <div class="legal-item"><span>✗</span> Un mandataire ou intermédiaire dans la transaction</div>
+      <div class="legal-item"><span>✗</span> Un négociateur entre vendeur et acheteur</div>
+      <div class="legal-item"><span>✗</span> Un rédacteur de compromis ou de documents contractuels</div>
+    </div>
+  </div>
+</section>
+
+<!-- ── FAQ ── -->
+<section class="s-faq" id="faq">
+  <div class="s-faq-inner">
+    <p class="s-overline">Questions fréquentes</p>
+    <h2>Tout ce que vous<br>voulez <em>savoir.</em></h2>
+
     <div class="faq-list">
       <div class="faq-item">
-        <button class="faq-question">Est-ce légal de vendre ainsi sur LeBonCoin ?<span class="faq-arrow">+</span></button>
-        <div class="faq-answer"><p>Oui, totalement légal. Vous publiez votre annonce en votre nom propre — comme des millions de particuliers le font chaque jour. Serenis est une plateforme d'outils numériques et de formation, validée par l'Autorité de la Concurrence en juin 2023 (avis n°23-A-07).</p></div>
+        <button class="faq-question">Quelle est la différence entre Serenis et une agence immobilière ?<span class="faq-arrow">+</span></button>
+        <div class="faq-answer"><p>Une agence vous prend entre 3% et 7% du prix de vente — soit en moyenne 10 000 € sur 200 000 €. Serenis est une plateforme d'outils numériques à 999 € forfait fixe. Vous bénéficiez des mêmes outils (photos pro, dossier, agenda), mais vous restez seul décisionnaire et vous ne payez aucune commission.</p></div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-question">Comment fonctionne le numéro 09 Serenis ?<span class="faq-arrow">+</span></button>
+        <div class="faq-answer"><p>Chaque acheteur qui appelle votre numéro 09 dédié reçoit automatiquement le dossier complet de votre bien par email. Résultat : seuls les acheteurs informés et motivés franchissent votre porte. Fini les visites pour rien le vendredi soir. Votre numéro personnel reste complètement protégé.</p></div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-question">Serenis publie-t-il mon annonce à ma place ?<span class="faq-arrow">+</span></button>
+        <div class="faq-answer"><p>Non. Vous publiez votre annonce en votre nom propre sur LeBonCoin, PAP, SeLoger — comme des millions de particuliers le font chaque jour. Serenis vous fournit le guide de rédaction, les photos et le dossier. La publication est totalement légale et validée par l'Autorité de la Concurrence (avis n°23-A-07, juin 2023).</p></div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-question">Est-ce que Serenis s'occupe du dossier de vente ?<span class="faq-arrow">+</span></button>
+        <div class="faq-answer"><p>Serenis génère automatiquement un dossier numérique complet — photos HD, fiche technique, caractéristiques du bien et du quartier — prêt à envoyer à chaque acheteur. Vous renseignez votre bien une seule fois, Serenis s'occupe du reste. Le dossier est envoyé automatiquement à chaque appel entrant.</p></div>
       </div>
       <div class="faq-item">
         <button class="faq-question">Qui fait les visites et négocie ?<span class="faq-arrow">+</span></button>
-        <div class="faq-answer"><p>Vous. Serenis vous donne les outils, la méthode et l'organisation. Les visites, les échanges avec les acheteurs et les décisions vous appartiennent entièrement. C'est votre vente, du début à la fin.</p></div>
+        <div class="faq-answer"><p>Vous. Serenis vous donne les outils, la méthode et les réponses aux questions difficiles. Les visites, les échanges avec les acheteurs et les décisions vous appartiennent entièrement. C'est votre vente, du début à la fin. Serenis n'intervient jamais dans vos échanges.</p></div>
       </div>
       <div class="faq-item">
-        <button class="faq-question">Qu'est-ce qui est inclus dans le Pack Sérénité ?<span class="faq-arrow">+</span></button>
-        <div class="faq-answer"><p>Tout ce dont vous avez besoin pour vendre comme un professionnel : guide vendeur 14 chapitres, mails types, méthode photo, photos professionnelles HD (photographe partenaire), visite virtuelle 360°, dossier numérique généré automatiquement, numéro 09 dédié (votre vie privée protégée), envoi automatique du dossier à chaque acheteur, agenda en ligne avec réservation directe, confirmations et rappels automatiques, coach IA disponible 24h/24. Garantie satisfaction sans limite incluse.</p></div>
-      </div>
-      <div class="faq-item">
-        <button class="faq-question">Combien de temps pour avoir accès ?<span class="faq-arrow">+</span></button>
-        <div class="faq-answer"><p>Accès immédiat à la plateforme après paiement — identifiants par email en moins de 5 minutes. Le photographe est contacté dans les 48h et le dossier complet est livré sous 5 jours ouvrés.</p></div>
-      </div>
-      <div class="faq-item">
-        <button class="faq-question">À quel besoin répond concrètement Serenis ?<span class="faq-arrow">+</span></button>
-        <div class="faq-answer"><p>La vente d'un bien entre particuliers est chronophage et stressante sans méthode : visites pour rien, documents manquants, acheteurs non qualifiés, négociation improvisée. Serenis vous donne tous les outils pour anticiper, organiser et réussir votre vente — sans commission, sans intermédiaire, sans attendre personne d'autre que vous.</p></div>
+        <button class="faq-question">Depuis combien de temps existe Serenis ?<span class="faq-arrow">+</span></button>
+        <div class="faq-answer"><p>Serenis est né de 7 ans d'expérience terrain dans l'immobilier dans le secteur de Douai. La plateforme a été conçue par Matthias Brieux, ancien agent immobilier professionnel — pas par un développeur qui n'a jamais vendu une maison. Chaque contenu, chaque conseil, chaque mail type vient du terrain réel.</p></div>
       </div>
       <div class="faq-item">
         <button class="faq-question">À qui s'adresse Serenis ?<span class="faq-arrow">+</span></button>
         <div class="faq-answer"><p>À tous les propriétaires qui veulent vendre leur bien sans payer une commission d'agence, mais qui veulent le faire avec méthode et professionnalisme. Maison, appartement, résidence principale ou secondaire — pour toute vente entre particuliers en France.</p></div>
       </div>
       <div class="faq-item">
-        <button class="faq-question">Depuis combien de temps existe Serenis ?<span class="faq-arrow">+</span></button>
-        <div class="faq-answer"><p>Serenis est né de 7 ans d'expérience terrain dans l'immobilier dans le secteur de Douai. La plateforme a été conçue par Matthias Brieux, professionnel de l'immobilier — pas par un développeur qui n'a jamais vendu une maison. Chaque contenu, chaque conseil, chaque mail type vient du terrain réel.</p></div>
-      </div>
-      <div class="faq-item">
-        <button class="faq-question">Quels sont les concurrents de Serenis ?<span class="faq-arrow">+</span></button>
-        <div class="faq-answer"><p>Les agences classiques et les plateformes comme PAP Coaching. La différence : ils envoient des humains chez vous — c'est coûteux et vous dépendez de leur agenda. Serenis est 100 % digital, 100 % automatisé. Tout est disponible immédiatement, à toute heure, sans attendre personne.</p></div>
-      </div>
-      <div class="faq-item">
-        <button class="faq-question">Que se passe-t-il si le bien ne se vend pas ?<span class="faq-arrow">+</span></button>
-        <div class="faq-answer"><p>Le forfait couvre les outils et la formation. Vous ne payez jamais de commission : votre investissement est fixe, connu à l'avance, et ne dépend pas du résultat de la vente.</p></div>
-      </div>
-      <div class="faq-item">
-        <button class="faq-question">Pourquoi 999 € au lieu de 10 000 € ?<span class="faq-arrow">+</span></button>
-        <div class="faq-answer"><p>Une agence classique prend entre 3% et 5% du prix de vente — soit en moyenne 10 000 € sur une maison à 200 000 €. Serenis ne prend aucune commission. Vous payez 999 € pour les outils, la méthode et l'automatisation. Vos 9 001 € vous appartiennent.</p></div>
+        <button class="faq-question">Est-il trop tard pour s'inscrire ?<span class="faq-arrow">+</span></button>
+        <div class="faq-answer"><p>Non. L'accès à la plateforme est immédiat après paiement — identifiants par email en moins de 5 minutes. Le photographe est contacté dans les 48h. L'ensemble du dossier est livré sous 5 jours ouvrés. Votre bien peut être en ligne dans la semaine.</p></div>
       </div>
     </div>
   </div>
 </section>
 
-<!-- CONTACT -->
-<section class="section-contact" id="contact">
-  <div class="container">
-    <div class="section-header centered">
-      <p class="section-overline">Une question ?</p>
-      <h2>Contactez Matthias directement</h2>
-      <p class="section-sub">Matthias Brieux · 06 95 44 36 54 · Douai (59)</p>
-    </div>
-    <div class="contact-grid">
-      <div class="contact-info">
-        <div class="contact-item">
-          <div class="contact-icon">📞</div>
-          <div><strong>Téléphone</strong><p>06 95 44 36 54</p></div>
-        </div>
-        <div class="contact-item">
-          <div class="contact-icon">📍</div>
-          <div><strong>Zone d'activité</strong><p>Douai (59) et alentours</p></div>
-        </div>
-        <div class="contact-item">
-          <div class="contact-icon">⏰</div>
-          <div><strong>Disponibilité</strong><p>Lun–Sam, 9h–19h</p></div>
-        </div>
-      </div>
-      <form class="contact-form" id="contactForm">
-        <div class="form-row">
-          <div class="form-group">
-            <label>Nom *</label>
-            <input type="text" name="name" required placeholder="Votre nom">
-          </div>
-          <div class="form-group">
-            <label>Téléphone *</label>
-            <input type="tel" name="phone" required placeholder="06 xx xx xx xx">
-          </div>
-        </div>
-        <div class="form-group">
-          <label>Email *</label>
-          <input type="email" name="email" required placeholder="votre@email.fr">
-        </div>
-        <div class="form-row">
-          <div class="form-group">
-            <label>Offre souhaitée</label>
-            <select name="offer">
-              <option value="">Pas encore décidé</option>
-              <option value="serenite">Pack Sérénité — 999 €</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label>Ville du bien</label>
-            <input type="text" name="city" placeholder="Ex: Douai">
-          </div>
-        </div>
-        <div class="form-group">
-          <label>Message (optionnel)</label>
-          <textarea name="message" rows="3" placeholder="Votre question..."></textarea>
-        </div>
-        <button type="submit" class="btn-primary btn-full">Envoyer ma demande</button>
-        <div id="contactSuccess" class="form-success hidden">✓ Message envoyé ! Matthias vous contacte sous 24h.</div>
-        <div id="contactError" class="form-error hidden"></div>
-      </form>
-    </div>
-  </div>
+<!-- ── CTA FINAL ── -->
+<section class="s-cta">
+  <p class="s-cta-price">999€. Six mois. Votre bien vendu.</p>
+  <p class="s-cta-sub">Photos professionnelles · Dossier automatique · Numéro dédié · Agenda · Coach IA<br>Zéro commission · Garantie satisfaction · Accès immédiat</p>
+  <a href="#" class="btn-cta-white" data-pack="serenite">Démarrer ma vente →</a>
+  <p class="s-cta-legal">Activité validée par l'Autorité de la Concurrence — avis n°23-A-07, juin 2023</p>
 </section>
 
-<!-- FOOTER -->
-<footer class="footer">
-  <div class="footer-container">
-    <div class="footer-top">
-      <div class="footer-brand">
-        <a href="/" class="logo logo-white">
-          <svg width="28" height="28" viewBox="0 0 32 32" fill="none">
-            <path d="M16 2L3 13v17h8v-8h10v8h8V13L16 2z" fill="#D4E4D8"/>
-          </svg>
-          <span class="logo-text" style="color:#FDFCF8">Sere<em style="color:#C4785A">nis</em></span>
-        </a>
-        <p class="footer-tagline">Vendez votre bien. Sereinement.</p>
-        <p class="footer-contact">Matthias Brieux · 06 95 44 36 54 · Douai (59)</p>
-      </div>
-      <div class="footer-links-col">
-        <h4>Navigation</h4>
-        <ul>
-          <li><a href="#comment">Comment ça marche</a></li>
-          <li><a href="#offres">Nos offres</a></li>
-          <li><a href="#faq">FAQ</a></li>
-          <li><a href="#contact">Contact</a></li>
-          <li><a href="/login">Espace vendeur</a></li>
-        </ul>
-      </div>
-      <div class="footer-links-col">
-        <h4>Offre</h4>
-        <ul>
-          <li><a href="#offres">Pack Sérénité — 999 €</a></li>
-          <li><a href="/cgv">CGV &amp; Mentions légales</a></li>
-        </ul>
-      </div>
-    </div>
-    <div class="footer-legal">
-      <p>Serenis fournit des outils numériques, des automatisations et des contenus d'accompagnement destinés aux particuliers. Le vendeur conserve l'entière maîtrise de sa vente, de ses échanges, de ses visites, de ses négociations et de ses décisions. Le modèle s'inscrit dans l'évolution du marché de l'entremise immobilière évoquée par l'Autorité de la concurrence dans son avis n°23-A-07 du 2 juin 2023.</p>
-      <p class="footer-copy">© 2024 Serenis — Tous droits réservés</p>
-    </div>
+<!-- ── FOOTER ── -->
+<footer>
+  <div class="footer-logo">Sere<em>nis</em></div>
+  <div class="footer-links">
+    <a href="/cgv.html">CGV</a>
+    <a href="/contrat-prestation.html">Contrat</a>
+    <a href="/login">Espace vendeur</a>
+    <a href="/admin">Admin</a>
   </div>
+  <p class="footer-legal-text">
+    Serenis fournit des outils numériques, des automatisations et des contenus d'accompagnement destinés aux particuliers. Le vendeur conserve l'entière maîtrise de sa vente, de ses échanges, de ses visites, de ses négociations et de ses décisions. Le modèle s'inscrit dans l'évolution du marché de l'entremise immobilière évoquée par l'Autorité de la concurrence dans son avis n°23-A-07 du 2 juin 2023. · Matthias Brieux · 06 95 44 36 54 · Douai (59) · © 2024 Serenis
+  </p>
 </footer>
 
-<!-- MODAL PAIEMENT -->
+<!-- ── MODAL PAIEMENT ── -->
 <div class="modal-overlay" id="paymentModal">
   <div class="modal">
     <button class="modal-close" id="modalClose">✕</button>
