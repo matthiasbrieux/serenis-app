@@ -1,5 +1,5 @@
 const db = require('../database');
-const { sendVisitConfirmation } = require('./email');
+const { sendVisitConfirmation, sendMissionReminderJ1 } = require('./email');
 const { sendSmsNotification } = require('./twilio');
 
 async function sendVisitReminders() {
@@ -39,4 +39,27 @@ async function sendVisitReminders() {
   }
 }
 
-module.exports = { sendVisitReminders };
+async function sendMissionReminders() {
+  const tomorrow = new Date();
+  tomorrow.setDate(tomorrow.getDate() + 1);
+  const tomorrowStr = tomorrow.toISOString().split('T')[0];
+
+  const missions = db.prepare(`
+    SELECT m.*, p.first_name as phot_first, p.last_name as phot_last, p.email as phot_email
+    FROM missions m
+    JOIN photographers p ON p.id = m.photographer_id
+    WHERE m.scheduled_date = ? AND m.status = 'confirmed'
+  `).all(tomorrowStr);
+
+  for (const m of missions) {
+    try {
+      const photographer = { first_name: m.phot_first, last_name: m.phot_last, email: m.phot_email };
+      await sendMissionReminderJ1(m.client_email, m.client_name, m, photographer);
+      console.log(`Mission reminder J-1 sent for mission ${m.uuid}`);
+    } catch(e) {
+      console.error(`Mission reminder error for ${m.uuid}:`, e.message);
+    }
+  }
+}
+
+module.exports = { sendVisitReminders, sendMissionReminders };

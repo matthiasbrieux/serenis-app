@@ -443,4 +443,61 @@ router.get('/api/crm', requireAdmin, (req, res) => {
   res.json({ crm });
 });
 
+// ── Pages photographes & missions ────────────────────────────────────────────
+router.get('/photographers', requireAdmin, (req, res) => {
+  res.sendFile('photographers.html', { root: './views/admin' });
+});
+
+router.get('/missions', requireAdmin, (req, res) => {
+  res.sendFile('missions.html', { root: './views/admin' });
+});
+
+// ── API photographes (admin) ──────────────────────────────────────────────────
+router.get('/api/photographers', requireAdmin, (req, res) => {
+  const photographers = db.prepare(`
+    SELECT * FROM photographers ORDER BY created_at DESC
+  `).all();
+  res.json({ photographers });
+});
+
+router.get('/api/photographers/:id/missions', requireAdmin, (req, res) => {
+  const missions = db.prepare(`
+    SELECT * FROM missions WHERE photographer_id=? ORDER BY scheduled_date DESC LIMIT 20
+  `).all(req.params.id);
+  res.json({ missions });
+});
+
+router.post('/api/photographers/:id/verify', requireAdmin, express.json(), (req, res) => {
+  const { verified } = req.body;
+  db.prepare('UPDATE photographers SET verified=? WHERE id=?').run(verified ? 1 : 0, req.params.id);
+  res.json({ success: true });
+});
+
+router.post('/api/photographers/:id/active', requireAdmin, express.json(), (req, res) => {
+  const { active } = req.body;
+  db.prepare('UPDATE photographers SET active=? WHERE id=?').run(active ? 1 : 0, req.params.id);
+  res.json({ success: true });
+});
+
+// ── API missions (admin) ──────────────────────────────────────────────────────
+router.get('/api/missions', requireAdmin, (req, res) => {
+  const missions = db.prepare(`
+    SELECT m.*,
+      p.first_name as photographer_first_name, p.last_name as photographer_last_name
+    FROM missions m
+    LEFT JOIN photographers p ON p.id = m.photographer_id
+    ORDER BY m.scheduled_date ASC, m.scheduled_time ASC
+  `).all();
+  res.json({ missions });
+});
+
+router.post('/api/missions/:id/assign', requireAdmin, express.json(), (req, res) => {
+  const { photographer_id } = req.body;
+  if (!photographer_id) return res.json({ error: 'Photographe requis' });
+  const p = db.prepare('SELECT * FROM photographers WHERE id=? AND active=1').get(photographer_id);
+  if (!p) return res.json({ error: 'Photographe introuvable' });
+  db.prepare(`UPDATE missions SET photographer_id=?, status='assigned' WHERE id=?`).run(photographer_id, req.params.id);
+  res.json({ success: true });
+});
+
 module.exports = router;

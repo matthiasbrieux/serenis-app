@@ -153,13 +153,16 @@ router.get('/api/partner/mission/:uuid', requirePartner, (req, res) => {
 });
 
 // Accepter / Refuser une mission
-router.post('/api/partner/mission/:uuid/accept', requirePartner, (req, res) => {
+router.post('/api/partner/mission/:uuid/accept', requirePartner, async (req, res) => {
   const m = db.prepare("SELECT * FROM missions WHERE uuid=? AND photographer_id=? AND status='assigned'").get(req.params.uuid, req.partner.id);
   if (!m) return res.json({ error: 'Mission introuvable ou déjà traitée' });
   db.prepare("UPDATE missions SET status='confirmed', photographer_accepted_at=CURRENT_TIMESTAMP, confirmed_at=CURRENT_TIMESTAMP WHERE id=?").run(m.id);
-  // Verrouille le créneau dans le calendrier
   db.prepare("UPDATE photographer_availability SET is_blocked=1 WHERE photographer_id=? AND date=? AND start_time=?").run(req.partner.id, m.scheduled_date, m.scheduled_time);
-  // TODO: email de confirmation client
+  // Email de confirmation au client
+  try {
+    const photographer = db.prepare('SELECT * FROM photographers WHERE id=?').get(req.partner.id);
+    await require('../services/email').sendMissionConfirmed(m.client_email, m.client_name, m, photographer);
+  } catch(e) { console.error('Email confirmation error:', e.message); }
   res.json({ success: true });
 });
 

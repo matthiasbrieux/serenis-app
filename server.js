@@ -139,7 +139,7 @@ app.listen(PORT, () => {
   seedSellerAccount();
 
   // Rappels visites — tourne chaque jour à 18h
-  const { sendVisitReminders } = require('./services/reminders');
+  const { sendVisitReminders, sendMissionReminders } = require('./services/reminders');
   function scheduleReminders() {
     const now = new Date();
     const next18h = new Date();
@@ -148,8 +148,10 @@ app.listen(PORT, () => {
     const msUntil18h = next18h - now;
     setTimeout(() => {
       sendVisitReminders().catch(e => console.error('Reminder job error:', e.message));
+      sendMissionReminders().catch(e => console.error('Mission reminder job error:', e.message));
       setInterval(() => {
         sendVisitReminders().catch(e => console.error('Reminder job error:', e.message));
+        sendMissionReminders().catch(e => console.error('Mission reminder job error:', e.message));
       }, 24 * 60 * 60 * 1000);
     }, msUntil18h);
   }

@@ -167,4 +167,105 @@ async function sendContactNotification(data) {
   await sgMail.send(msg);
 }
 
-module.exports = { sendWelcomeEmail, sendDossierEmail, sendVisitConfirmation, sendContactNotification };
+// ── Notification mission au photographe ───────────────────────────────────────
+async function sendMissionAssigned(photographer, mission) {
+  const msg = {
+    to: photographer.email,
+    from: FROM,
+    subject: `Nouvelle mission Serenis — ${mission.scheduled_date} à ${mission.city}`,
+    html: `
+<!DOCTYPE html><html lang="fr"><body style="margin:0;padding:0;background:#F5F0E8;font-family:Arial,sans-serif;">
+<table width="100%" cellpadding="0" cellspacing="0" style="background:#F5F0E8;padding:32px 0;">
+<tr><td align="center"><table width="600" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%;">
+  <tr><td style="background:#1C1C1A;border-radius:12px 12px 0 0;padding:32px 40px;text-align:center;">
+    <h1 style="color:#F5F0E8;font-family:Georgia,serif;font-size:24px;margin:0 0 4px;">Serenis · Partenaires</h1>
+    <p style="color:rgba(245,240,232,0.5);font-size:13px;margin:0;">Nouvelle mission photo</p>
+  </td></tr>
+  <tr><td style="background:#fff;padding:36px 40px;">
+    <h2 style="color:#1C1C1A;font-family:Georgia,serif;font-size:20px;margin:0 0 8px;">Bonjour ${photographer.first_name},</h2>
+    <p style="color:#444;line-height:1.7;margin:0 0 24px;">Une nouvelle mission vous a été assignée. Connectez-vous à votre espace partenaire pour l'accepter ou la refuser.</p>
+    <table width="100%" cellpadding="12" cellspacing="0" style="background:#F5F0E8;border-radius:8px;margin-bottom:24px;">
+      <tr><td style="font-size:12px;text-transform:uppercase;letter-spacing:0.06em;color:#8C8880;width:120px;">Date</td><td style="font-weight:600;font-size:14px;">${mission.scheduled_date} à ${mission.scheduled_time}</td></tr>
+      <tr><td style="font-size:12px;text-transform:uppercase;letter-spacing:0.06em;color:#8C8880;">Adresse</td><td style="font-weight:600;font-size:14px;">${mission.address}, ${mission.postal_code} ${mission.city}</td></tr>
+      <tr><td style="font-size:12px;text-transform:uppercase;letter-spacing:0.06em;color:#8C8880;">Type</td><td style="font-size:14px;">${mission.property_type || '—'} · ${mission.surface ? mission.surface + ' m²' : '?'} · ${mission.rooms || '?'} pièces</td></tr>
+      <tr><td style="font-size:12px;text-transform:uppercase;letter-spacing:0.06em;color:#8C8880;">Rémunération</td><td style="font-weight:600;font-size:14px;color:#059669;">${mission.photographer_fee || 150} €</td></tr>
+      ${mission.access_notes ? `<tr><td style="font-size:12px;text-transform:uppercase;letter-spacing:0.06em;color:#8C8880;">Accès</td><td style="font-size:14px;">${mission.access_notes}</td></tr>` : ''}
+    </table>
+    <div style="text-align:center;">
+      <a href="${BASE}/partner/mission/${mission.uuid}" style="display:inline-block;background:#C4603A;color:#fff;padding:14px 32px;border-radius:6px;text-decoration:none;font-weight:600;font-size:14px;">Voir la mission →</a>
+    </div>
+    <p style="color:#8C8880;font-size:12px;margin:24px 0 0;text-align:center;">Répondez dans les 24h. Sans réponse, la mission sera réassignée.</p>
+  </td></tr>
+  <tr><td style="padding:20px;text-align:center;font-size:12px;color:#8C8880;">Serenis · Espace Partenaires</td></tr>
+</table></td></tr></table>
+</body></html>`
+  };
+  if (!process.env.SENDGRID_API_KEY) { console.log('[EMAIL SKIPPED] Mission assigned to:', photographer.email); return; }
+  await sgMail.send(msg);
+}
+
+// ── Confirmation mission au client ────────────────────────────────────────────
+async function sendMissionConfirmed(clientEmail, clientName, mission, photographer) {
+  const msg = {
+    to: clientEmail,
+    from: FROM,
+    subject: `Votre séance photo est confirmée — ${mission.scheduled_date}`,
+    html: `
+<!DOCTYPE html><html lang="fr"><body style="margin:0;padding:0;background:#F5F0E8;font-family:Arial,sans-serif;">
+<table width="100%" cellpadding="0" cellspacing="0" style="background:#F5F0E8;padding:32px 0;">
+<tr><td align="center"><table width="600" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%;">
+  <tr><td style="background:#059669;border-radius:12px 12px 0 0;padding:32px 40px;text-align:center;">
+    <h1 style="color:#fff;font-family:Georgia,serif;font-size:24px;margin:0 0 4px;">Serenis</h1>
+    <p style="color:rgba(255,255,255,0.7);font-size:13px;margin:0;">Séance photo confirmée ✓</p>
+  </td></tr>
+  <tr><td style="background:#fff;padding:36px 40px;">
+    <h2 style="color:#1C1C1A;font-family:Georgia,serif;font-size:20px;margin:0 0 8px;">Bonjour ${clientName || 'Madame, Monsieur'},</h2>
+    <p style="color:#444;line-height:1.7;margin:0 0 24px;">Votre photographe partenaire a confirmé votre rendez-vous. Voici les informations de votre séance :</p>
+    <table width="100%" cellpadding="12" cellspacing="0" style="background:#F5F0E8;border-radius:8px;margin-bottom:24px;">
+      <tr><td style="font-size:12px;text-transform:uppercase;letter-spacing:0.06em;color:#8C8880;width:140px;">Date & heure</td><td style="font-weight:600;font-size:15px;color:#1C1C1A;">${mission.scheduled_date} à ${mission.scheduled_time}</td></tr>
+      <tr><td style="font-size:12px;text-transform:uppercase;letter-spacing:0.06em;color:#8C8880;">Adresse</td><td style="font-size:14px;">${mission.address}, ${mission.postal_code} ${mission.city}</td></tr>
+      <tr><td style="font-size:12px;text-transform:uppercase;letter-spacing:0.06em;color:#8C8880;">Photographe</td><td style="font-size:14px;font-weight:500;">${photographer.first_name} ${photographer.last_name}</td></tr>
+    </table>
+    <p style="color:#444;font-size:14px;line-height:1.7;margin:0 0 20px;">Veillez à être présent(e) ou à laisser un accès au bien. Le photographe vous contactera si nécessaire avant le rendez-vous.</p>
+    <div style="text-align:center;">
+      <a href="${BASE}/dashboard" style="display:inline-block;background:#1C1C1A;color:#F5F0E8;padding:14px 32px;border-radius:6px;text-decoration:none;font-weight:600;font-size:14px;">Mon espace Serenis →</a>
+    </div>
+  </td></tr>
+  <tr><td style="padding:20px;text-align:center;font-size:12px;color:#8C8880;">Serenis — Vendez votre bien. Sereinement.</td></tr>
+</table></td></tr></table>
+</body></html>`
+  };
+  if (!process.env.SENDGRID_API_KEY) { console.log('[EMAIL SKIPPED] Mission confirmed to:', clientEmail); return; }
+  await sgMail.send(msg);
+}
+
+// ── Rappel J-1 mission ────────────────────────────────────────────────────────
+async function sendMissionReminderJ1(clientEmail, clientName, mission, photographer) {
+  const msg = {
+    to: [clientEmail, photographer.email],
+    from: FROM,
+    subject: `Rappel — Séance photo demain à ${mission.scheduled_time} · ${mission.city}`,
+    html: `
+<!DOCTYPE html><html lang="fr"><body style="margin:0;padding:0;background:#F5F0E8;font-family:Arial,sans-serif;">
+<table width="100%" cellpadding="0" cellspacing="0" style="background:#F5F0E8;padding:32px 0;">
+<tr><td align="center"><table width="600" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%;">
+  <tr><td style="background:#1C1C1A;border-radius:12px 12px 0 0;padding:28px 40px;text-align:center;">
+    <h1 style="color:#F5F0E8;font-family:Georgia,serif;font-size:22px;margin:0;">Rappel · Séance photo demain</h1>
+  </td></tr>
+  <tr><td style="background:#fff;padding:36px 40px;">
+    <p style="color:#444;line-height:1.7;margin:0 0 20px;">Votre séance photo est prévue <strong>demain</strong> :</p>
+    <table width="100%" cellpadding="12" cellspacing="0" style="background:#F5F0E8;border-radius:8px;margin-bottom:24px;">
+      <tr><td style="font-size:12px;text-transform:uppercase;letter-spacing:0.06em;color:#8C8880;width:140px;">Date & heure</td><td style="font-weight:700;font-size:16px;color:#C4603A;">${mission.scheduled_date} à ${mission.scheduled_time}</td></tr>
+      <tr><td style="font-size:12px;text-transform:uppercase;letter-spacing:0.06em;color:#8C8880;">Adresse</td><td style="font-size:14px;font-weight:500;">${mission.address}, ${mission.postal_code} ${mission.city}</td></tr>
+      <tr><td style="font-size:12px;text-transform:uppercase;letter-spacing:0.06em;color:#8C8880;">Photographe</td><td style="font-size:14px;">${photographer.first_name} ${photographer.last_name}</td></tr>
+    </table>
+  </td></tr>
+  <tr><td style="padding:20px;text-align:center;font-size:12px;color:#8C8880;">Serenis</td></tr>
+</table></td></tr></table>
+</body></html>`
+  };
+  if (!process.env.SENDGRID_API_KEY) { console.log('[EMAIL SKIPPED] Reminder J-1 for mission:', mission.uuid); return; }
+  await sgMail.send(msg);
+}
+
+module.exports = { sendWelcomeEmail, sendDossierEmail, sendVisitConfirmation, sendContactNotification, sendMissionAssigned, sendMissionConfirmed, sendMissionReminderJ1 };

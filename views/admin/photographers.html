@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Photographes — Admin Serenis</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css">
+  <style>
+    body { background: #f0f0ed; font-family: 'DM Sans', sans-serif; margin: 0; }
+    .admin-layout { display: grid; grid-template-columns: 220px 1fr; min-height: 100vh; }
+    .admin-sidebar { background: #1A1A16; padding: 24px 0; }
+    .admin-sidebar a { display: block; padding: 12px 24px; color: rgba(255,255,255,0.6); font-size: 0.88rem; text-decoration: none; }
+    .admin-sidebar a:hover, .admin-sidebar a.active { color: #fff; background: rgba(255,255,255,0.08); }
+    .admin-sidebar .logo { color: #FDFCF8; padding: 0 24px 24px; font-family: 'Cormorant Garamond', serif; font-size: 1.4rem; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 16px; }
+    .admin-main { padding: 32px; }
+    h1 { font-family: 'Cormorant Garamond', serif; color: #1A1A16; font-size: 2rem; margin: 0 0 8px; }
+
+    /* Stats */
+    .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px,1fr)); gap: 16px; margin-bottom: 32px; }
+    .stat { background: #fff; border-radius: 10px; padding: 20px; border: 1px solid rgba(0,0,0,0.06); }
+    .stat-val { font-family: 'Cormorant Garamond', serif; font-size: 2rem; font-weight: 600; line-height: 1; margin-bottom: 4px; }
+    .stat-lbl { font-size: 0.75rem; color: #8C8880; text-transform: uppercase; letter-spacing: 0.05em; }
+
+    /* Tabs */
+    .tabs { display: flex; gap: 8px; margin-bottom: 20px; }
+    .tab-btn { padding: 8px 20px; border-radius: 20px; border: 1.5px solid rgba(0,0,0,0.12); background: transparent; font-family: inherit; font-size: 0.82rem; cursor: pointer; color: #6b6965; transition: all 0.15s; }
+    .tab-btn.active { background: #1A1A16; color: #F5F0E8; border-color: #1A1A16; }
+
+    /* Table */
+    .card { background: #fff; border-radius: 10px; border: 1px solid rgba(0,0,0,0.06); overflow: hidden; margin-bottom: 28px; }
+    .card-header { padding: 16px 20px; border-bottom: 1px solid rgba(0,0,0,0.06); display: flex; justify-content: space-between; align-items: center; }
+    .card-header h2 { font-family: 'Cormorant Garamond', serif; font-size: 1.1rem; font-weight: 600; margin: 0; }
+    table { width: 100%; border-collapse: collapse; }
+    th { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.07em; color: #8C8880; font-weight: 500; padding: 10px 16px; text-align: left; background: #faf9f7; border-bottom: 1px solid rgba(0,0,0,0.06); }
+    td { padding: 13px 16px; border-bottom: 1px solid rgba(0,0,0,0.04); font-size: 0.87rem; vertical-align: middle; }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: #faf9f7; }
+    .badge { padding: 3px 10px; border-radius: 20px; font-size: 0.72rem; font-weight: 500; display: inline-block; }
+    .badge-verified { background: #d1fae5; color: #065f46; }
+    .badge-pending { background: #fef3c7; color: #92400e; }
+    .badge-assigned { background: #fef3c7; color: #92400e; }
+    .badge-confirmed { background: #d1fae5; color: #065f46; }
+    .badge-completed { background: #dbeafe; color: #1e40af; }
+    .btn-sm { padding: 5px 12px; border-radius: 6px; border: none; font-family: inherit; font-size: 0.78rem; font-weight: 500; cursor: pointer; transition: all 0.15s; }
+    .btn-verify { background: #d1fae5; color: #065f46; }
+    .btn-verify:hover { background: #a7f3d0; }
+    .btn-unverify { background: #fee2e2; color: #dc2626; }
+    .btn-unverify:hover { background: #fca5a5; }
+    .btn-toggle-active { background: #f3f4f6; color: #374151; }
+    .btn-toggle-active:hover { background: #e5e7eb; }
+    .empty { padding: 48px; text-align: center; color: #8C8880; font-size: 0.9rem; }
+    .zone-pill { background: #F5F0E8; border-radius: 4px; padding: 2px 8px; font-size: 0.75rem; color: #3a3836; }
+    .toast { position: fixed; bottom: 24px; right: 24px; background: #1A1A16; color: #F5F0E8; padding: 12px 20px; border-radius: 8px; font-size: 0.88rem; opacity: 0; transition: opacity 0.3s; pointer-events: none; z-index: 999; }
+    .toast.show { opacity: 1; }
+
+    /* Modal */
+    .overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 200; display: none; align-items: center; justify-content: center; }
+    .overlay.show { display: flex; }
+    .modal { background: #fff; border-radius: 12px; padding: 32px; max-width: 520px; width: 100%; margin: 16px; max-height: 80vh; overflow-y: auto; }
+    .modal h3 { font-family: 'Cormorant Garamond', serif; font-size: 1.4rem; margin: 0 0 20px; }
+    .modal-close { float: right; background: none; border: none; font-size: 1.2rem; cursor: pointer; color: #8C8880; }
+    .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px; }
+    .info-item label { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.06em; color: #8C8880; display: block; margin-bottom: 3px; }
+    .info-item span { font-size: 0.9rem; font-weight: 500; }
+    .mission-mini { padding: 10px 12px; border: 1px solid rgba(0,0,0,0.08); border-radius: 6px; margin-bottom: 8px; font-size: 0.83rem; }
+    .mission-mini strong { display: block; margin-bottom: 2px; }
+    .mission-mini span { color: #8C8880; }
+  </style>
+</head>
+<body>
+<div class="admin-layout">
+  <aside class="admin-sidebar">
+    <div class="logo">Sere<em style="color:#C4785A">nis</em> Admin</div>
+    <a href="/admin">📊 Dashboard</a>
+    <a href="/admin/crm">🎯 CRM Vendeurs</a>
+    <a href="/admin/photographers" class="active">📷 Photographes</a>
+    <a href="/admin/missions">📋 Missions</a>
+    <a href="/admin/numbers">📱 Numéros IA</a>
+    <a href="/admin/logout">← Déconnexion</a>
+  </aside>
+
+  <main class="admin-main">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;flex-wrap:wrap;gap:12px;">
+      <div>
+        <h1>Photographes partenaires</h1>
+        <p style="color:#8C8880;font-size:0.88rem;margin:0;">Gestion du réseau et des missions photo.</p>
+      </div>
+    </div>
+
+    <div class="stats" id="stats">
+      <div class="stat"><div class="stat-val" id="s-total">—</div><div class="stat-lbl">Inscrits</div></div>
+      <div class="stat"><div class="stat-val" id="s-verified" style="color:#059669;">—</div><div class="stat-lbl">Vérifiés</div></div>
+      <div class="stat"><div class="stat-val" id="s-pending" style="color:#C4603A;">—</div><div class="stat-lbl">En attente</div></div>
+      <div class="stat"><div class="stat-val" id="s-missions" style="color:#2563eb;">—</div><div class="stat-lbl">Missions actives</div></div>
+    </div>
+
+    <div class="tabs">
+      <button class="tab-btn active" data-filter="all">Tous</button>
+      <button class="tab-btn" data-filter="pending">En attente de vérification</button>
+      <button class="tab-btn" data-filter="verified">Vérifiés</button>
+    </div>
+
+    <div class="card">
+      <div class="card-header"><h2>Liste des photographes</h2></div>
+      <table>
+        <thead>
+          <tr>
+            <th>Photographe</th>
+            <th>Zone</th>
+            <th>Rayon</th>
+            <th>Missions</th>
+            <th>Note</th>
+            <th>Statut</th>
+            <th>Inscrit</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="photographers-list">
+          <tr><td colspan="8" class="empty">Chargement…</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </main>
+</div>
+
+<!-- Detail modal -->
+<div class="overlay" id="detail-overlay">
+  <div class="modal">
+    <button class="modal-close" onclick="document.getElementById('detail-overlay').classList.remove('show')">✕</button>
+    <h3 id="modal-name">—</h3>
+    <div class="info-grid" id="modal-info"></div>
+    <div id="modal-missions-title" style="font-size:0.78rem;text-transform:uppercase;letter-spacing:0.06em;color:#8C8880;margin-bottom:10px;"></div>
+    <div id="modal-missions"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  const STATUS_LABEL = { assigned:'À traiter', confirmed:'Confirmée', completed:'Réalisée', pending:'En attente' };
+  const STATUS_BADGE = { assigned:'badge-assigned', confirmed:'badge-confirmed', completed:'badge-completed', pending:'badge-pending' };
+  const MONTHS = ['jan','fév','mar','avr','mai','juin','juil','aoû','sep','oct','nov','déc'];
+
+  let allPhotographers = [];
+  let currentFilter = 'all';
+
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg; t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 2800);
+  }
+
+  function render() {
+    const list = document.getElementById('photographers-list');
+    let data = allPhotographers;
+    if (currentFilter === 'pending') data = data.filter(p => !p.verified);
+    if (currentFilter === 'verified') data = data.filter(p => p.verified);
+    if (!data.length) { list.innerHTML = '<tr><td colspan="8" class="empty">Aucun photographe dans cette catégorie.</td></tr>'; return; }
+    list.innerHTML = data.map(p => {
+      const date = p.created_at ? new Date(p.created_at) : null;
+      const dateStr = date ? `${date.getDate()} ${MONTHS[date.getMonth()]} ${date.getFullYear()}` : '—';
+      return `<tr>
+        <td>
+          <div style="font-weight:500;">${p.first_name} ${p.last_name}</div>
+          <div style="font-size:0.78rem;color:#8C8880;">${p.email}</div>
+          ${p.phone ? `<div style="font-size:0.78rem;color:#8C8880;">${p.phone}</div>` : ''}
+        </td>
+        <td><span class="zone-pill">${p.base_postal_code || '—'} ${p.base_city || ''}</span></td>
+        <td>${p.intervention_radius || 50} km</td>
+        <td style="font-weight:600;">${p.missions_done || 0}</td>
+        <td>${p.rating ? '★ ' + Number(p.rating).toFixed(1) : '—'}</td>
+        <td>
+          <span class="badge ${p.verified ? 'badge-verified' : 'badge-pending'}">${p.verified ? 'Vérifié' : 'En attente'}</span>
+          ${!p.active ? '<span class="badge" style="background:#f3f4f6;color:#6b7280;margin-left:4px;">Inactif</span>' : ''}
+        </td>
+        <td style="font-size:0.8rem;color:#8C8880;">${dateStr}</td>
+        <td style="display:flex;gap:6px;flex-wrap:wrap;">
+          <button class="btn-sm ${p.verified ? 'btn-unverify' : 'btn-verify'}" onclick="toggleVerify(${p.id}, ${p.verified ? 0 : 1})">
+            ${p.verified ? 'Retirer vérifié' : '✓ Vérifier'}
+          </button>
+          <button class="btn-sm btn-toggle-active" onclick="toggleActive(${p.id}, ${p.active ? 0 : 1})">
+            ${p.active ? 'Désactiver' : 'Activer'}
+          </button>
+          <button class="btn-sm" style="background:#F5F0E8;color:#1C1C1A;" onclick="showDetail(${p.id})">Détail</button>
+        </td>
+      </tr>`;
+    }).join('');
+  }
+
+  async function load() {
+    try {
+      const r = await fetch('/admin/api/photographers');
+      const d = await r.json();
+      allPhotographers = d.photographers || [];
+      document.getElementById('s-total').textContent = allPhotographers.length;
+      document.getElementById('s-verified').textContent = allPhotographers.filter(p => p.verified).length;
+      document.getElementById('s-pending').textContent = allPhotographers.filter(p => !p.verified).length;
+
+      const mr = await fetch('/admin/api/missions');
+      const md = await mr.json();
+      const active = (md.missions || []).filter(m => m.status === 'assigned' || m.status === 'confirmed').length;
+      document.getElementById('s-missions').textContent = active;
+
+      render();
+    } catch(e) { console.error(e); }
+  }
+
+  async function toggleVerify(id, val) {
+    await fetch(`/admin/api/photographers/${id}/verify`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ verified: val }) });
+    showToast(val ? 'Compte vérifié ✓' : 'Vérification retirée');
+    await load();
+  }
+
+  async function toggleActive(id, val) {
+    await fetch(`/admin/api/photographers/${id}/active`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ active: val }) });
+    showToast(val ? 'Compte activé' : 'Compte désactivé');
+    await load();
+  }
+
+  async function showDetail(id) {
+    const p = allPhotographers.find(x => x.id === id);
+    if (!p) return;
+    document.getElementById('modal-name').textContent = p.first_name + ' ' + p.last_name;
+    document.getElementById('modal-info').innerHTML = `
+      <div class="info-item"><label>Email</label><span>${p.email}</span></div>
+      <div class="info-item"><label>Téléphone</label><span>${p.phone || '—'}</span></div>
+      <div class="info-item"><label>Zone</label><span>${p.base_postal_code || '—'} ${p.base_city || ''}</span></div>
+      <div class="info-item"><label>Rayon</label><span>${p.intervention_radius || 50} km</span></div>
+      <div class="info-item"><label>Missions réalisées</label><span>${p.missions_done || 0}</span></div>
+      <div class="info-item"><label>Note</label><span>${p.rating ? '★ ' + Number(p.rating).toFixed(1) : '—'}</span></div>
+      ${p.iban ? `<div class="info-item" style="grid-column:1/-1"><label>IBAN</label><span style="font-size:0.82rem;">${p.iban}</span></div>` : ''}
+      ${p.bio ? `<div class="info-item" style="grid-column:1/-1"><label>Bio</label><span style="font-size:0.82rem;font-weight:400;">${p.bio}</span></div>` : ''}
+    `;
+    try {
+      const r = await fetch(`/admin/api/photographers/${id}/missions`);
+      const { missions } = await r.json();
+      document.getElementById('modal-missions-title').textContent = `Missions (${missions.length})`;
+      document.getElementById('modal-missions').innerHTML = missions.length
+        ? missions.slice(0,10).map(m => `
+          <div class="mission-mini">
+            <strong>${m.address}, ${m.city}</strong>
+            <span>${m.scheduled_date || '?'} ${m.scheduled_time || ''} · <span class="badge ${STATUS_BADGE[m.status]||''}">${STATUS_LABEL[m.status]||m.status}</span></span>
+          </div>`).join('')
+        : '<div style="color:#8C8880;font-size:0.85rem;">Aucune mission.</div>';
+    } catch {}
+    document.getElementById('detail-overlay').classList.add('show');
+  }
+
+  document.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      currentFilter = btn.dataset.filter;
+      render();
+    });
+  });
+
+  load();
+</script>
+</body>
+</html>

@@ -648,6 +648,13 @@ router.post('/api/seller/book-photography', requireAuth, (req, res) => {
     access_notes || ''
   );
 
+  // Email notification au photographe
+  try {
+    const photographer = db.prepare('SELECT * FROM photographers WHERE id=?').get(slot.photographer_id);
+    const mission = db.prepare('SELECT * FROM missions WHERE uuid=?').get(uuid);
+    await require('../services/email').sendMissionAssigned(photographer, mission);
+  } catch(e) { console.error('Email mission assigned error:', e.message); }
+
   res.json({ success: true, uuid });
 });
 

@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Missions — Admin Serenis</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css">
+  <style>
+    body { background: #f0f0ed; font-family: 'DM Sans', sans-serif; margin: 0; }
+    .admin-layout { display: grid; grid-template-columns: 220px 1fr; min-height: 100vh; }
+    .admin-sidebar { background: #1A1A16; padding: 24px 0; }
+    .admin-sidebar a { display: block; padding: 12px 24px; color: rgba(255,255,255,0.6); font-size: 0.88rem; text-decoration: none; }
+    .admin-sidebar a:hover, .admin-sidebar a.active { color: #fff; background: rgba(255,255,255,0.08); }
+    .admin-sidebar .logo { color: #FDFCF8; padding: 0 24px 24px; font-family: 'Cormorant Garamond', serif; font-size: 1.4rem; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 16px; }
+    .admin-main { padding: 32px; }
+    h1 { font-family: 'Cormorant Garamond', serif; color: #1A1A16; font-size: 2rem; margin: 0 0 8px; }
+    .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px,1fr)); gap: 16px; margin-bottom: 28px; }
+    .stat { background: #fff; border-radius: 10px; padding: 18px; border: 1px solid rgba(0,0,0,0.06); }
+    .stat-val { font-family: 'Cormorant Garamond', serif; font-size: 1.9rem; font-weight: 600; line-height: 1; margin-bottom: 4px; }
+    .stat-lbl { font-size: 0.72rem; color: #8C8880; text-transform: uppercase; letter-spacing: 0.05em; }
+    .tabs { display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; }
+    .tab-btn { padding: 8px 18px; border-radius: 20px; border: 1.5px solid rgba(0,0,0,0.12); background: transparent; font-family: inherit; font-size: 0.82rem; cursor: pointer; color: #6b6965; transition: all 0.15s; }
+    .tab-btn.active { background: #1A1A16; color: #F5F0E8; border-color: #1A1A16; }
+    .card { background: #fff; border-radius: 10px; border: 1px solid rgba(0,0,0,0.06); overflow: hidden; }
+    table { width: 100%; border-collapse: collapse; }
+    th { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.07em; color: #8C8880; font-weight: 500; padding: 10px 16px; text-align: left; background: #faf9f7; border-bottom: 1px solid rgba(0,0,0,0.06); }
+    td { padding: 12px 16px; border-bottom: 1px solid rgba(0,0,0,0.04); font-size: 0.85rem; vertical-align: middle; }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: #faf9f7; }
+    .badge { padding: 3px 10px; border-radius: 20px; font-size: 0.72rem; font-weight: 500; display: inline-block; }
+    .badge-assigned { background: #fef3c7; color: #92400e; }
+    .badge-confirmed { background: #d1fae5; color: #065f46; }
+    .badge-completed { background: #dbeafe; color: #1e40af; }
+    .badge-pending { background: #f3f4f6; color: #6b7280; }
+    .empty { padding: 48px; text-align: center; color: #8C8880; font-size: 0.9rem; }
+    .btn-sm { padding: 5px 12px; border-radius: 6px; border: none; font-family: inherit; font-size: 0.78rem; font-weight: 500; cursor: pointer; background: #F5F0E8; color: #1C1C1A; transition: all 0.15s; }
+    .btn-sm:hover { background: #e8e2d8; }
+    .overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 200; display: none; align-items: center; justify-content: center; }
+    .overlay.show { display: flex; }
+    .modal { background: #fff; border-radius: 12px; padding: 32px; max-width: 560px; width: 100%; margin: 16px; max-height: 85vh; overflow-y: auto; }
+    .modal h3 { font-family: 'Cormorant Garamond', serif; font-size: 1.4rem; margin: 0 0 20px; }
+    .modal-close { float: right; background: none; border: none; font-size: 1.2rem; cursor: pointer; color: #8C8880; }
+    .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px; }
+    .info-item label { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.06em; color: #8C8880; display: block; margin-bottom: 3px; }
+    .info-item span { font-size: 0.88rem; font-weight: 500; }
+    select { padding: 8px 12px; border: 1.5px solid rgba(0,0,0,0.1); border-radius: 6px; font-family: inherit; font-size: 0.88rem; width: 100%; margin-bottom: 10px; }
+    .toast { position: fixed; bottom: 24px; right: 24px; background: #1A1A16; color: #F5F0E8; padding: 12px 20px; border-radius: 8px; font-size: 0.88rem; opacity: 0; transition: opacity 0.3s; pointer-events: none; z-index: 999; }
+    .toast.show { opacity: 1; }
+  </style>
+</head>
+<body>
+<div class="admin-layout">
+  <aside class="admin-sidebar">
+    <div class="logo">Sere<em style="color:#C4785A">nis</em> Admin</div>
+    <a href="/admin">📊 Dashboard</a>
+    <a href="/admin/crm">🎯 CRM Vendeurs</a>
+    <a href="/admin/photographers">📷 Photographes</a>
+    <a href="/admin/missions" class="active">📋 Missions</a>
+    <a href="/admin/numbers">📱 Numéros IA</a>
+    <a href="/admin/logout">← Déconnexion</a>
+  </aside>
+
+  <main class="admin-main">
+    <div style="margin-bottom:24px;">
+      <h1>Missions photo</h1>
+      <p style="color:#8C8880;font-size:0.88rem;margin:0;">Planning global de toutes les missions.</p>
+    </div>
+
+    <div class="stats">
+      <div class="stat"><div class="stat-val" id="s-total">—</div><div class="stat-lbl">Total</div></div>
+      <div class="stat"><div class="stat-val" id="s-pending" style="color:#92400e;">—</div><div class="stat-lbl">En attente</div></div>
+      <div class="stat"><div class="stat-val" id="s-assigned" style="color:#C4603A;">—</div><div class="stat-lbl">Assignées</div></div>
+      <div class="stat"><div class="stat-val" id="s-confirmed" style="color:#059669;">—</div><div class="stat-lbl">Confirmées</div></div>
+      <div class="stat"><div class="stat-val" id="s-completed" style="color:#2563eb;">—</div><div class="stat-lbl">Réalisées</div></div>
+    </div>
+
+    <div class="tabs">
+      <button class="tab-btn active" data-filter="all">Toutes</button>
+      <button class="tab-btn" data-filter="pending">En attente</button>
+      <button class="tab-btn" data-filter="assigned">Assignées</button>
+      <button class="tab-btn" data-filter="confirmed">Confirmées</button>
+      <button class="tab-btn" data-filter="completed">Réalisées</button>
+    </div>
+
+    <div class="card">
+      <table>
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Client</th>
+            <th>Adresse</th>
+            <th>Bien</th>
+            <th>Photographe</th>
+            <th>Statut</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody id="missions-list">
+          <tr><td colspan="7" class="empty">Chargement…</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </main>
+</div>
+
+<!-- Detail modal -->
+<div class="overlay" id="detail-overlay">
+  <div class="modal">
+    <button class="modal-close" onclick="document.getElementById('detail-overlay').classList.remove('show')">✕</button>
+    <h3 id="modal-title">Mission</h3>
+    <div class="info-grid" id="modal-info"></div>
+    <div id="modal-assign" style="margin-top:16px;border-top:1px solid rgba(0,0,0,0.06);padding-top:16px;"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  const STATUS_LABEL = { assigned:'À traiter', confirmed:'Confirmée', completed:'Réalisée', pending:'En attente' };
+  const STATUS_BADGE = { assigned:'badge-assigned', confirmed:'badge-confirmed', completed:'badge-completed', pending:'badge-pending' };
+  const MONTHS = ['jan','fév','mar','avr','mai','juin','juil','aoû','sep','oct','nov','déc'];
+  let allMissions = [], allPhotographers = [], currentFilter = 'all', selectedMission = null;
+
+  function showToast(msg) {
+    const t = document.getElementById('toast'); t.textContent = msg; t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 2800);
+  }
+
+  function render() {
+    const list = document.getElementById('missions-list');
+    let data = allMissions;
+    if (currentFilter !== 'all') data = data.filter(m => m.status === currentFilter);
+    if (!data.length) { list.innerHTML = `<tr><td colspan="7" class="empty">Aucune mission.</td></tr>`; return; }
+    list.innerHTML = data.map(m => {
+      const d = m.scheduled_date ? new Date(m.scheduled_date) : null;
+      const dateStr = d ? `${d.getDate()} ${MONTHS[d.getMonth()]}` : '—';
+      return `<tr>
+        <td><div style="font-weight:500;">${dateStr}</div><div style="font-size:0.75rem;color:#8C8880;">${m.scheduled_time||'?'}</div></td>
+        <td><div style="font-weight:500;">${m.client_name||'—'}</div><div style="font-size:0.75rem;color:#8C8880;">${m.client_email}</div></td>
+        <td><div>${m.address}</div><div style="font-size:0.75rem;color:#8C8880;">${m.postal_code} ${m.city}</div></td>
+        <td style="font-size:0.82rem;">${m.property_type||'—'} · ${m.surface?m.surface+'m²':'?'}</td>
+        <td style="font-size:0.82rem;">${m.photographer_name||'<span style="color:#8C8880">Non assigné</span>'}</td>
+        <td><span class="badge ${STATUS_BADGE[m.status]||''}">${STATUS_LABEL[m.status]||m.status}</span></td>
+        <td><button class="btn-sm" onclick="showDetail(${m.id})">Voir</button></td>
+      </tr>`;
+    }).join('');
+  }
+
+  async function load() {
+    const [mr, pr] = await Promise.all([
+      fetch('/admin/api/missions').then(r => r.json()),
+      fetch('/admin/api/photographers').then(r => r.json())
+    ]);
+    allMissions = (mr.missions || []).map(m => ({
+      ...m,
+      photographer_name: m.photographer_first_name ? m.photographer_first_name + ' ' + m.photographer_last_name : null
+    }));
+    allPhotographers = pr.photographers || [];
+
+    document.getElementById('s-total').textContent = allMissions.length;
+    document.getElementById('s-pending').textContent = allMissions.filter(m=>m.status==='pending').length;
+    document.getElementById('s-assigned').textContent = allMissions.filter(m=>m.status==='assigned').length;
+    document.getElementById('s-confirmed').textContent = allMissions.filter(m=>m.status==='confirmed').length;
+    document.getElementById('s-completed').textContent = allMissions.filter(m=>m.status==='completed').length;
+    render();
+  }
+
+  function showDetail(id) {
+    const m = allMissions.find(x => x.id === id);
+    if (!m) return;
+    selectedMission = m;
+    document.getElementById('modal-title').textContent = m.address + ', ' + m.city;
+    document.getElementById('modal-info').innerHTML = `
+      <div class="info-item"><label>Statut</label><span class="badge ${STATUS_BADGE[m.status]||''}">${STATUS_LABEL[m.status]||m.status}</span></div>
+      <div class="info-item"><label>Date</label><span>${m.scheduled_date||'—'} ${m.scheduled_time||''}</span></div>
+      <div class="info-item"><label>Client</label><span>${m.client_name||'—'}</span></div>
+      <div class="info-item"><label>Email client</label><span>${m.client_email}</span></div>
+      <div class="info-item"><label>Téléphone</label><span>${m.client_phone||'—'}</span></div>
+      <div class="info-item"><label>Type</label><span>${m.property_type||'—'} · ${m.surface?m.surface+'m²':'?'} · ${m.rooms||'?'} pièces</span></div>
+      <div class="info-item" style="grid-column:1/-1"><label>Adresse</label><span>${m.address}, ${m.postal_code} ${m.city}</span></div>
+      ${m.access_notes ? `<div class="info-item" style="grid-column:1/-1"><label>Accès</label><span style="font-weight:400;">${m.access_notes}</span></div>` : ''}
+      ${m.photos_url ? `<div class="info-item" style="grid-column:1/-1"><label>Photos</label><a href="${m.photos_url}" target="_blank" style="color:#C4603A;">Voir les photos →</a></div>` : ''}
+    `;
+    const verifiedPhotographers = allPhotographers.filter(p => p.verified && p.active);
+    document.getElementById('modal-assign').innerHTML = `
+      <div style="font-size:0.78rem;text-transform:uppercase;letter-spacing:0.06em;color:#8C8880;margin-bottom:10px;">Photographe assigné</div>
+      <div style="font-weight:500;margin-bottom:16px;">${m.photographer_name || 'Aucun'}</div>
+      ${m.status !== 'completed' ? `
+      <div style="font-size:0.78rem;text-transform:uppercase;letter-spacing:0.06em;color:#8C8880;margin-bottom:8px;">Réassigner manuellement</div>
+      <select id="reassign-select">
+        <option value="">— Choisir un photographe —</option>
+        ${verifiedPhotographers.map(p => `<option value="${p.id}">${p.first_name} ${p.last_name} (${p.base_city||p.base_postal_code||'?'})</option>`).join('')}
+      </select>
+      <button onclick="reassign(${m.id})" style="padding:9px 20px;background:#1C1C1A;color:#F5F0E8;border:none;border-radius:6px;font-family:inherit;font-size:0.85rem;font-weight:500;cursor:pointer;">Assigner</button>
+      ` : ''}
+    `;
+    document.getElementById('detail-overlay').classList.add('show');
+  }
+
+  async function reassign(missionId) {
+    const photographerId = document.getElementById('reassign-select').value;
+    if (!photographerId) return;
+    const r = await fetch(`/admin/api/missions/${missionId}/assign`, {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ photographer_id: photographerId })
+    });
+    const d = await r.json();
+    if (d.success) { showToast('Photographe assigné ✓'); document.getElementById('detail-overlay').classList.remove('show'); await load(); }
+    else showToast('Erreur : ' + d.error);
+  }
+
+  document.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active'); currentFilter = btn.dataset.filter; render();
+    });
+  });
+
+  load();
+</script>
+</body>
+</html>
