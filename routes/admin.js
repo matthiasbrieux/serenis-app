@@ -14,6 +14,10 @@ router.get('/numbers', requireAdmin, (req, res) => {
   res.sendFile('numbers.html', { root: './views/admin' });
 });
 
+router.get('/crm', requireAdmin, (req, res) => {
+  res.sendFile('crm.html', { root: './views/admin' });
+});
+
 router.get('/create-seller', async (req, res) => {
   const { email, password } = req.query;
   if (!email || !password) return res.status(400).send('Paramètres manquants');
@@ -194,7 +198,11 @@ router.delete('/api/numbers/:id', requireAdmin, (req, res) => {
 
 // ── CRM VENDEURS ──────────────────────────────────────────
 router.put('/api/crm/:id/flags', requireAdmin, express.json(), (req, res) => {
-  const allowed = ['contrat_signe', 'rdv_photographe', 'admin_notes'];
+  const allowed = [
+    'contrat_signe', 'rdv_photographe', 'admin_notes',
+    'photographer_scheduled', 'photographer_name', 'photographer_date',
+    'photographer_done', 'photo_report_url', 'virtual_tour_done',
+  ];
   const updates = [], params = [];
   for (const key of allowed) {
     if (req.body[key] !== undefined) {
@@ -214,7 +222,9 @@ router.get('/api/crm', requireAdmin, (req, res) => {
       s.id, s.first_name, s.last_name, s.email, s.phone, s.pack,
       s.twilio_number, s.created_at, s.paid_at,
       s.contrat_signe, s.rdv_photographe, s.admin_notes,
-      p.status as property_status, p.published, p.price, p.city,
+      s.photographer_scheduled, s.photographer_name, s.photographer_date,
+      s.photographer_done, s.photo_report_url, s.virtual_tour_done,
+      p.status as property_status, p.published, p.published_at, p.price, p.city,
       p.description, p.surface_habitable,
       COALESCE(photos.cnt, 0)    as photos_count,
       COALESCE(docs.cnt, 0)      as docs_count,

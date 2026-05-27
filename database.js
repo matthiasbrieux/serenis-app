@@ -216,6 +216,12 @@ const newCols = [
   "ALTER TABLE sellers ADD COLUMN contrat_signe BOOLEAN DEFAULT 0",
   "ALTER TABLE sellers ADD COLUMN rdv_photographe BOOLEAN DEFAULT 0",
   "ALTER TABLE sellers ADD COLUMN admin_notes TEXT",
+  "ALTER TABLE sellers ADD COLUMN photographer_scheduled BOOLEAN DEFAULT 0",
+  "ALTER TABLE sellers ADD COLUMN photographer_name TEXT",
+  "ALTER TABLE sellers ADD COLUMN photographer_date TEXT",
+  "ALTER TABLE sellers ADD COLUMN photographer_done BOOLEAN DEFAULT 0",
+  "ALTER TABLE sellers ADD COLUMN photo_report_url TEXT",
+  "ALTER TABLE sellers ADD COLUMN virtual_tour_done BOOLEAN DEFAULT 0",
 ];
 newCols.forEach(sql => { try { db.exec(sql); } catch(e) {} });
 
