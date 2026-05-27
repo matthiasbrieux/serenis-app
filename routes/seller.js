@@ -101,7 +101,14 @@ router.post('/api/property/photos', requireAuth, uploadPhoto.array('photos', 20)
       .run(property.id, cid, url, thumb, existing.count + i, category);
     inserted.push({ url, cloudinary_id: cid, category });
   });
-  res.json({ success: true, photos: inserted });
+
+  // Auto-CRM hook: ≥5 photos → photographer_done = 1
+  const totalPhotos = db.prepare('SELECT COUNT(*) as count FROM property_photos WHERE property_id=?').get(property.id);
+  if (totalPhotos.count >= 5) {
+    db.prepare('UPDATE sellers SET photographer_done=1 WHERE id=? AND photographer_done=0').run(req.seller.id);
+  }
+
+  res.json({ success: true, photos: inserted, total: totalPhotos.count });
 });
 
 router.delete('/api/property/photos/:cloudinary_id', requireAuth, async (req, res) => {

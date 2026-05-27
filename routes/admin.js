@@ -386,10 +386,35 @@ router.get('/api/crm', requireAdmin, (req, res) => {
       s.id, s.first_name, s.last_name, s.email, s.phone, s.pack,
       s.twilio_number, s.created_at, s.paid_at,
       s.contrat_signe, s.rdv_photographe, s.admin_notes,
-      s.photographer_scheduled, s.photographer_name, s.photographer_date,
-      s.photographer_done, s.photo_report_url, s.virtual_tour_done,
+      s.photographer_name, s.photographer_date,
+      s.photo_report_url, s.virtual_tour_done,
+      -- photographer_done: auto si ≥5 photos, sinon flag manuel
+      CASE WHEN COALESCE(photos.cnt, 0) >= 5 THEN 1 ELSE s.photographer_done END as photographer_done,
+      -- photographer_scheduled: auto si date saisie, sinon flag manuel
+      CASE WHEN s.photographer_date IS NOT NULL AND s.photographer_date != '' THEN 1 ELSE s.photographer_scheduled END as photographer_scheduled,
+      -- was it auto-detected (for badge display)
+      CASE WHEN COALESCE(photos.cnt, 0) >= 5 AND s.photographer_done = 0 THEN 1 ELSE 0 END as photographer_done_auto,
+      -- property completion % (10 critical fields × 10%)
+      COALESCE((
+        CASE WHEN p.type IS NOT NULL AND p.type != '' THEN 10 ELSE 0 END +
+        CASE WHEN p.address IS NOT NULL AND p.address != '' THEN 10 ELSE 0 END +
+        CASE WHEN p.city IS NOT NULL AND p.city != '' THEN 10 ELSE 0 END +
+        CASE WHEN p.price IS NOT NULL AND p.price > 0 THEN 10 ELSE 0 END +
+        CASE WHEN p.surface_habitable IS NOT NULL THEN 10 ELSE 0 END +
+        CASE WHEN p.rooms IS NOT NULL THEN 10 ELSE 0 END +
+        CASE WHEN p.dpe_class IS NOT NULL AND p.dpe_class != '' THEN 10 ELSE 0 END +
+        CASE WHEN p.description IS NOT NULL AND LENGTH(p.description) > 30 THEN 10 ELSE 0 END +
+        CASE WHEN p.year_built IS NOT NULL THEN 10 ELSE 0 END +
+        CASE WHEN p.bedrooms IS NOT NULL THEN 10 ELSE 0 END
+      ), 0) as prop_completion_pct,
+      -- next upcoming visit
+      (SELECT visit_date FROM visits WHERE seller_id = s.id AND status != 'cancelled' AND visit_date >= date('now') ORDER BY visit_date ASC, visit_time ASC LIMIT 1) as next_visit_date,
+      (SELECT visit_time FROM visits WHERE seller_id = s.id AND status != 'cancelled' AND visit_date >= date('now') ORDER BY visit_date ASC, visit_time ASC LIMIT 1) as next_visit_time,
+      (SELECT buyer_name FROM visits WHERE seller_id = s.id AND status != 'cancelled' AND visit_date >= date('now') ORDER BY visit_date ASC, visit_time ASC LIMIT 1) as next_visit_buyer,
+      -- days since subscription
+      CAST((julianday('now') - julianday(COALESCE(s.paid_at, s.created_at))) AS INTEGER) as days_since_signup,
       p.status as property_status, p.published, p.published_at, p.price, p.city,
-      p.description, p.surface_habitable,
+      p.description, p.surface_habitable, p.type as property_type, p.rooms, p.updated_at as last_prop_update,
       COALESCE(photos.cnt, 0)    as photos_count,
       COALESCE(docs.cnt, 0)      as docs_count,
       COALESCE(contacts.cnt, 0)  as buyer_contacts_count,
