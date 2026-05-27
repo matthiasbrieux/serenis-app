@@ -46,16 +46,15 @@ async function sendWelcomeEmail(to, tempPassword, pack) {
 
     <!-- Identifiants -->
     <div style="background:#F5F0E8;border-left:4px solid #C4785A;border-radius:4px;padding:20px;margin:0 0 28px;">
-      <p style="font-size:13px;font-weight:bold;color:#888;text-transform:uppercase;letter-spacing:0.05em;margin:0 0 12px;">Vos identifiants</p>
+      <p style="font-size:13px;font-weight:bold;color:#888;text-transform:uppercase;letter-spacing:0.05em;margin:0 0 12px;">Vos identifiants de connexion</p>
       <p style="margin:4px 0;font-size:14px;color:#1A1A16;"><strong>Email :</strong> ${to}</p>
-      <p style="margin:4px 0;font-size:14px;color:#1A1A16;"><strong>Mot de passe :</strong> <code style="background:#fff;border:1px solid #ddd;padding:2px 10px;border-radius:4px;font-family:monospace;">${tempPassword}</code></p>
-      <p style="font-size:12px;color:#C4785A;margin:12px 0 0;font-weight:bold;">→ Changez ce mot de passe à votre première connexion.</p>
+      <p style="margin:4px 0;font-size:14px;color:#1A1A16;"><strong>Mot de passe :</strong> celui que vous avez choisi lors de votre inscription.</p>
     </div>
 
     <!-- CTA -->
     <div style="text-align:center;margin:0 0 36px;">
-      <a href="${BASE}/onboarding" style="background:#C4785A;color:#fff;padding:16px 40px;text-decoration:none;border-radius:8px;font-weight:bold;font-size:16px;display:inline-block;letter-spacing:0.02em;">Démarrer mon onboarding →</a>
-      <p style="font-size:12px;color:#aaa;margin:10px 0 0;">5 étapes · 3 minutes · pour lancer votre vente</p>
+      <a href="${BASE}/booking" style="background:#C4785A;color:#fff;padding:16px 40px;text-decoration:none;border-radius:8px;font-weight:bold;font-size:16px;display:inline-block;letter-spacing:0.02em;">Accéder à mon espace →</a>
+      <p style="font-size:12px;color:#aaa;margin:10px 0 0;">Réservez votre séance photo · Remplissez votre fiche bien</p>
     </div>
 
     <!-- Features -->
@@ -78,7 +77,7 @@ async function sendWelcomeEmail(to, tempPassword, pack) {
 </body>
 </html>`,
   };
-  if (!process.env.SENDGRID_API_KEY) { console.log('[EMAIL SKIPPED] Welcome:', to, tempPassword); return; }
+  if (!process.env.SENDGRID_API_KEY) { console.log('[EMAIL SKIPPED] Welcome:', to); return; }
   await sgMail.send(msg);
 }
 
