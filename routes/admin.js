@@ -388,6 +388,7 @@ router.get('/api/crm', requireAdmin, (req, res) => {
       s.contrat_signe, s.rdv_photographe, s.admin_notes,
       s.photographer_name, s.photographer_date,
       s.photo_report_url, s.virtual_tour_done,
+      s.client_availability, s.booking_step, s.booking_confirmed_at,
       -- photographer_done: auto si ≥5 photos, sinon flag manuel
       CASE WHEN COALESCE(photos.cnt, 0) >= 5 THEN 1 ELSE s.photographer_done END as photographer_done,
       -- photographer_scheduled: auto si date saisie, sinon flag manuel

@@ -378,7 +378,8 @@ function getAlerts(c, score) {
   const age = c.days_since_signup || 0;
   if (!c.twilio_number && age > 2)       a.push({t:'red',   m:'Pas de numéro IA'});
   if (!c.contrat_signe && age > 3)       a.push({t:'amber', m:'Contrat non signé'});
-  if (!c.photographer_scheduled && age > 5) a.push({t:'amber', m:'RDV photo à planifier'});
+  if (c.client_availability && !c.photographer_scheduled) a.push({t:'amber', m:'Dispo reçue — réserver Meero'});
+  else if (!c.photographer_scheduled && age > 5) a.push({t:'amber', m:'RDV photo à planifier'});
   if (c.photographer_done && (c.photos_count||0) === 0) a.push({t:'red', m:'Photos non uploadées'});
   if (!c.published && score >= 70)       a.push({t:'blue',  m:'Prêt à publier !'});
   return a;
@@ -533,9 +534,12 @@ function renderTable() {
       </div>`;
 
     // Photographer scheduled (auto from date)
+    const availBadge = c.client_availability
+      ? `<div style="font-size:0.63rem;color:#059669;font-weight:600;margin-top:3px;display:flex;align-items:center;gap:3px"><span style="width:5px;height:5px;border-radius:50%;background:#059669;display:inline-block"></span>Dispo reçue</div>`
+      : '';
     const schedCell = c.photographer_scheduled
-      ? `<div class="ic-auto">${CHK}</div>${c.photographer_done_auto ? '' : ''}<div style="font-size:0.67rem;color:#0369a1;margin-top:2px">${c.photographer_date ? fd(c.photographer_date) : 'Auto'}</div>`
-      : `<div class="ic-no">${DSH}</div>`;
+      ? `<div class="ic-auto">${CHK}</div><div style="font-size:0.67rem;color:#0369a1;margin-top:2px">${c.photographer_date ? fd(c.photographer_date) : 'Auto'}</div>${availBadge}`
+      : `<div class="ic-no">${DSH}</div>${availBadge}`;
 
     // Photographer done (auto from photos_count >= 5)
     const doneCell = c.photographer_done
@@ -747,7 +751,30 @@ function renderPanel(c) {
 
     <!-- Photographe -->
     <div class="p-sec">
-      <div class="p-title">📸 Photographe</div>
+      <div class="p-title">📸 Séance photo</div>
+
+      ${(() => {
+        if (!c.client_availability && !c.booking_step) {
+          return `<div style="padding:10px 12px;background:#FFF9F5;border:1px dashed #F0CFBA;border-radius:8px;font-size:0.82rem;color:#888;margin-bottom:12px">
+            Le client n'a pas encore transmis ses disponibilités.
+          </div>`;
+        }
+        let avail = null;
+        try { avail = JSON.parse(c.client_availability); } catch(e) {}
+        const slots = avail?.slots || [];
+        const note = avail?.note || '';
+        const slotsHtml = slots.length ? slots.map(s => {
+          const d = new Date(s.date + 'T' + s.time);
+          const label = d.toLocaleDateString('fr-FR', {weekday:'short', day:'numeric', month:'long'}) + ' à ' + s.time;
+          return `<div style="display:inline-flex;align-items:center;gap:6px;padding:5px 12px;background:#F0FDF4;border:1px solid #86efac;border-radius:20px;font-size:0.78rem;color:#166534;font-weight:500">📅 ${label}</div>`;
+        }).join('') : '<span style="font-size:0.8rem;color:#aaa">Aucun créneau</span>';
+        return `<div style="margin-bottom:14px">
+          <div style="font-size:0.7rem;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:#6b7280;margin-bottom:8px">Disponibilités transmises par le client</div>
+          <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:${note?'10px':'0'}">${slotsHtml}</div>
+          ${note ? `<div style="margin-top:8px;padding:8px 12px;background:#F8F8F6;border-radius:8px;font-size:0.82rem;color:#555"><strong>Note :</strong> ${note}</div>` : ''}
+        </div>`;
+      })()}
+
       <div class="p-row">
         <div>
           <div class="p-row-lbl">RDV planifié <span class="auto-label">AUTO — dérivé de la date</span></div>
@@ -767,8 +794,8 @@ function renderPanel(c) {
         <button class="tog ${c.virtual_tour_done?'on':'off'}" data-id="${c.id}" data-field="virtual_tour_done" data-val="${c.virtual_tour_done?1:0}">${c.virtual_tour_done?CHK:DSH}</button>
       </div>
       <div class="p-grid" style="margin-top:12px">
-        <div class="p-field"><label>Photographe assigné</label><input class="p-input" type="text" data-field="photographer_name" value="${c.photographer_name||''}" placeholder="Nom du photographe"></div>
-        <div class="p-field"><label>Date du RDV</label><input class="p-input" type="date" data-field="photographer_date" value="${c.photographer_date||''}"></div>
+        <div class="p-field"><label>Photographe assigné</label><input class="p-input" type="text" data-field="photographer_name" value="${c.photographer_name||''}" placeholder="Nom du photographe (ex: Meero)"></div>
+        <div class="p-field"><label>Date du RDV confirmée</label><input class="p-input" type="date" data-field="photographer_date" value="${c.photographer_date||''}"></div>
         <div class="p-field p-full"><label>Rapport photos (URL)</label><input class="p-input" type="url" data-field="photo_report_url" value="${c.photo_report_url||''}" placeholder="https://drive.google.com/..."></div>
       </div>
       ${c.photo_report_url ? `<div class="report-box"><div style="font-size:1.3rem">🖼️</div><a href="${c.photo_report_url}" target="_blank">${c.photo_report_url}</a></div>` : ''}
