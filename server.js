@@ -25,6 +25,13 @@ app.use(helmet({
 
 app.use(rateLimit({ windowMs: 15 * 60 * 1000, max: 300, standardHeaders: true, legacyHeaders: false }));
 app.use(cookieParser());
+
+// Serve index.html with no-cache so browsers always get the latest version
+app.get('/', (req, res) => {
+  res.set('Cache-Control', 'no-store, no-cache, must-revalidate');
+  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
+
 app.use(express.static(path.join(__dirname, 'public')));
 
 // ── Stripe webhook : raw body AVANT le middleware json ──

@@ -9,14 +9,14 @@ const { sendWelcomeEmail } = require('../services/email');
 // Checkout session creation
 router.post('/create-checkout', async (req, res) => {
   const { pack, email } = req.body;
-  if (!['autonome', 'serenite'].includes(pack)) return res.json({ error: 'Pack invalide' });
+  if (pack !== 'serenite') return res.json({ error: 'Pack invalide' });
   if (!email) return res.json({ error: 'Email requis' });
 
   if (!process.env.STRIPE_SECRET_KEY) {
     return res.json({ error: 'Paiement non configuré. Contactez Matthias au 06 95 44 36 54.' });
   }
 
-  const priceId = pack === 'autonome' ? process.env.STRIPE_PRICE_AUTONOME : process.env.STRIPE_PRICE_SERENITE;
+  const priceId = process.env.STRIPE_PRICE_SERENITE;
   if (!priceId) return res.json({ error: 'Prix Stripe manquant. Contactez le support.' });
 
   try {
