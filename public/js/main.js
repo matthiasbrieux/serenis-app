@@ -170,10 +170,9 @@ document.querySelectorAll('[data-pack]').forEach(btn => {
   btn.addEventListener('click', (e) => {
     e.preventDefault();
     selectedPack = btn.dataset.pack;
-    const labels = { autonome: 'Pack Autonome — 99 € TTC', serenite: 'Pack Sérénité — 999 € TTC' };
+    const labels = { serenite: 'Pack Sérénité — 999 € TTC' };
     const descs = {
-      autonome: 'Guide vendeur, mails types, checklists, méthode complète.',
-      serenite: 'Photos pro, visite virtuelle, numéro 09, dossier automatique, agenda. Tout inclus.'
+      serenite: 'Photos pro, visite virtuelle, numéro 09, dossier automatique, agenda, coach IA. Tout inclus.'
     };
     document.getElementById('modalTitle').textContent = labels[selectedPack];
     document.getElementById('modalPackInfo').textContent = descs[selectedPack];
