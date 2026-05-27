@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Connexion Partenaire — Serenis</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; }
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: #1C1C1A;
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .card {
+      background: #F5F0E8;
+      border-radius: 12px;
+      padding: 48px 40px;
+      width: 100%;
+      max-width: 420px;
+      box-shadow: 0 24px 80px rgba(0,0,0,0.4);
+    }
+    .logo {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.6rem;
+      font-weight: 600;
+      color: #1C1C1A;
+      margin-bottom: 4px;
+    }
+    .logo span { color: #C4603A; }
+    .subtitle { font-size: 0.85rem; color: #8C8880; margin-bottom: 36px; }
+    h1 { font-family: 'Cormorant Garamond', serif; font-size: 1.8rem; font-weight: 600; color: #1C1C1A; margin: 0 0 28px; }
+    label { display: block; font-size: 0.8rem; font-weight: 500; color: #3a3836; margin-bottom: 6px; letter-spacing: 0.03em; text-transform: uppercase; }
+    input {
+      width: 100%;
+      padding: 12px 14px;
+      border: 1.5px solid rgba(0,0,0,0.12);
+      border-radius: 6px;
+      font-size: 0.95rem;
+      font-family: inherit;
+      background: #fff;
+      color: #1C1C1A;
+      transition: border-color 0.2s;
+      margin-bottom: 20px;
+    }
+    input:focus { outline: none; border-color: #C4603A; }
+    .btn {
+      width: 100%;
+      padding: 13px;
+      background: #1C1C1A;
+      color: #F5F0E8;
+      border: none;
+      border-radius: 6px;
+      font-size: 0.95rem;
+      font-weight: 500;
+      font-family: inherit;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .btn:hover { background: #333; }
+    .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+    .error { background: #fee; border: 1px solid #fcc; border-radius: 6px; padding: 12px 14px; font-size: 0.88rem; color: #c33; margin-bottom: 16px; display: none; }
+    .footer-link { text-align: center; margin-top: 20px; font-size: 0.85rem; color: #8C8880; }
+    .footer-link a { color: #C4603A; text-decoration: none; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="logo">Serenis <span>·</span> Partenaires</div>
+    <p class="subtitle">Espace réservé aux photographes partenaires</p>
+    <h1>Connexion</h1>
+    <div class="error" id="error"></div>
+    <form id="form">
+      <label>Adresse email</label>
+      <input type="email" id="email" required autocomplete="email" placeholder="vous@exemple.fr">
+      <label>Mot de passe</label>
+      <input type="password" id="password" required autocomplete="current-password" placeholder="••••••••">
+      <button type="submit" class="btn" id="btn">Se connecter</button>
+    </form>
+    <div class="footer-link">
+      Pas encore partenaire ? <a href="/partner/register">Rejoindre le réseau</a>
+    </div>
+  </div>
+  <script>
+    document.getElementById('form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const btn = document.getElementById('btn');
+      const err = document.getElementById('error');
+      err.style.display = 'none';
+      btn.disabled = true;
+      btn.textContent = 'Connexion…';
+      try {
+        const r = await fetch('/partner/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            email: document.getElementById('email').value,
+            password: document.getElementById('password').value
+          })
+        });
+        const d = await r.json();
+        if (d.error) { err.textContent = d.error; err.style.display = 'block'; btn.disabled = false; btn.textContent = 'Se connecter'; }
+        else { window.location.href = '/partner/dashboard'; }
+      } catch {
+        err.textContent = 'Erreur réseau, réessayez.';
+        err.style.display = 'block';
+        btn.disabled = false;
+        btn.textContent = 'Se connecter';
+      }
+    });
+  </script>
+</body>
+</html>

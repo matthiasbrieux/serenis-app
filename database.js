@@ -182,6 +182,76 @@ db.exec(`
   );
 `);
 
+// ── Photographes partenaires ──────────────────────────────────
+db.exec(`
+  CREATE TABLE IF NOT EXISTS photographers (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    uuid TEXT UNIQUE NOT NULL,
+    email TEXT UNIQUE NOT NULL,
+    password TEXT NOT NULL,
+    first_name TEXT NOT NULL,
+    last_name TEXT NOT NULL,
+    phone TEXT,
+    bio TEXT,
+    active BOOLEAN DEFAULT 1,
+    verified BOOLEAN DEFAULT 0,
+    base_city TEXT,
+    base_postal_code TEXT,
+    intervention_radius INTEGER DEFAULT 50,
+    iban TEXT,
+    missions_done INTEGER DEFAULT 0,
+    rating REAL DEFAULT 5.0,
+    admin_notes TEXT,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+  );
+
+  CREATE TABLE IF NOT EXISTS photographer_availability (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    photographer_id INTEGER NOT NULL REFERENCES photographers(id) ON DELETE CASCADE,
+    date TEXT NOT NULL,
+    start_time TEXT NOT NULL,
+    end_time TEXT NOT NULL,
+    is_blocked BOOLEAN DEFAULT 0,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE(photographer_id, date, start_time)
+  );
+
+  CREATE TABLE IF NOT EXISTS missions (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    uuid TEXT UNIQUE NOT NULL,
+    seller_id INTEGER REFERENCES sellers(id),
+    client_name TEXT,
+    client_email TEXT NOT NULL,
+    client_phone TEXT,
+    address TEXT NOT NULL,
+    city TEXT NOT NULL,
+    postal_code TEXT NOT NULL,
+    property_type TEXT DEFAULT 'maison',
+    surface REAL,
+    rooms INTEGER,
+    furnished BOOLEAN DEFAULT 0,
+    floor INTEGER,
+    access_notes TEXT,
+    photographer_id INTEGER REFERENCES photographers(id),
+    scheduled_date TEXT,
+    scheduled_time TEXT,
+    duration_hours INTEGER DEFAULT 2,
+    status TEXT DEFAULT 'pending',
+    stripe_session_id TEXT,
+    price INTEGER DEFAULT 999,
+    photographer_fee INTEGER DEFAULT 150,
+    photos_url TEXT,
+    virtual_tour_url TEXT,
+    notes TEXT,
+    photographer_accepted_at DATETIME,
+    photographer_refused_at DATETIME,
+    refuse_reason TEXT,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    confirmed_at DATETIME,
+    completed_at DATETIME
+  );
+`);
+
 // ── Table notifications ────────────────────────────────────────
 db.exec(`
   CREATE TABLE IF NOT EXISTS notifications (

@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mon profil — Serenis Partenaires</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; }
+    body { font-family: 'DM Sans', sans-serif; background: #F5F0E8; margin: 0; }
+    .layout { display: flex; min-height: 100vh; }
+    .sidebar { width: 230px; background: #1C1C1A; display: flex; flex-direction: column; position: fixed; top: 0; left: 0; bottom: 0; z-index: 100; }
+    .sidebar-logo { padding: 28px 24px 20px; border-bottom: 1px solid rgba(245,240,232,0.08); }
+    .sidebar-logo span { font-family: 'Cormorant Garamond', serif; font-size: 1.35rem; font-weight: 600; color: #F5F0E8; }
+    .sidebar-logo span em { color: #C4603A; font-style: normal; }
+    .sidebar-name { margin: 12px 24px; font-size: 0.82rem; color: rgba(245,240,232,0.45); }
+    .sidebar-nav { flex: 1; padding: 12px 0; display: flex; flex-direction: column; gap: 2px; }
+    .nav-item { display: flex; align-items: center; gap: 10px; padding: 10px 24px; color: rgba(245,240,232,0.55); text-decoration: none; font-size: 0.87rem; transition: all 0.15s; border-left: 3px solid transparent; }
+    .nav-item:hover { color: #F5F0E8; background: rgba(245,240,232,0.05); }
+    .nav-item.active { color: #F5F0E8; border-left-color: #C4603A; background: rgba(196,96,58,0.1); }
+    .nav-item svg { width: 16px; height: 16px; flex-shrink: 0; }
+    .sidebar-bottom { padding: 16px 24px; border-top: 1px solid rgba(245,240,232,0.08); }
+    .logout-btn { background: none; border: 1px solid rgba(245,240,232,0.2); color: rgba(245,240,232,0.55); font-family: inherit; font-size: 0.82rem; padding: 8px 14px; border-radius: 6px; cursor: pointer; width: 100%; transition: all 0.15s; }
+    .logout-btn:hover { color: #F5F0E8; border-color: rgba(245,240,232,0.4); }
+    .main { margin-left: 230px; flex: 1; padding: 40px; max-width: 800px; }
+    .page-header { margin-bottom: 32px; }
+    .page-header h1 { font-family: 'Cormorant Garamond', serif; font-size: 2rem; font-weight: 600; margin: 0 0 6px; }
+    .page-header p { color: #8C8880; font-size: 0.88rem; margin: 0; }
+
+    .card { background: #fff; border-radius: 10px; border: 1px solid rgba(0,0,0,0.06); margin-bottom: 24px; }
+    .card-header { padding: 18px 24px; border-bottom: 1px solid rgba(0,0,0,0.05); }
+    .card-header h2 { font-family: 'Cormorant Garamond', serif; font-size: 1.1rem; font-weight: 600; margin: 0; }
+    .card-body { padding: 24px; }
+    .row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    label { display: block; font-size: 0.75rem; font-weight: 500; text-transform: uppercase; letter-spacing: 0.05em; color: #6b6965; margin-bottom: 6px; }
+    input, select, textarea { width: 100%; padding: 10px 12px; border: 1.5px solid rgba(0,0,0,0.1); border-radius: 6px; font-family: inherit; font-size: 0.9rem; color: #1C1C1A; background: #fff; margin-bottom: 16px; transition: border-color 0.2s; }
+    input:focus, select:focus, textarea:focus { outline: none; border-color: #C4603A; }
+    textarea { resize: vertical; min-height: 80px; }
+    .btn { padding: 11px 24px; border-radius: 6px; border: none; font-family: inherit; font-size: 0.88rem; font-weight: 500; cursor: pointer; transition: all 0.15s; }
+    .btn-primary { background: #1C1C1A; color: #F5F0E8; }
+    .btn-primary:hover { background: #333; }
+    .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
+    .success-msg { font-size: 0.85rem; color: #059669; margin-left: 12px; display: none; }
+    .error-msg { font-size: 0.85rem; color: #dc2626; margin-left: 12px; display: none; }
+    .verified-badge { display: inline-flex; align-items: center; gap: 6px; background: #d1fae5; color: #065f46; padding: 5px 12px; border-radius: 20px; font-size: 0.78rem; font-weight: 500; }
+    .unverified-badge { display: inline-flex; align-items: center; gap: 6px; background: #fef3c7; color: #92400e; padding: 5px 12px; border-radius: 20px; font-size: 0.78rem; font-weight: 500; }
+    .profile-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; flex-wrap: wrap; gap: 12px; }
+    .profile-name { font-family: 'Cormorant Garamond', serif; font-size: 1.4rem; font-weight: 600; }
+    .form-actions { display: flex; align-items: center; }
+  </style>
+</head>
+<body>
+  <div class="layout">
+    <aside class="sidebar">
+      <div class="sidebar-logo"><span>Serenis <em>·</em> Partenaires</span></div>
+      <div class="sidebar-name" id="sidebar-name"></div>
+      <nav class="sidebar-nav">
+        <a href="/partner/dashboard" class="nav-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+          Tableau de bord
+        </a>
+        <a href="/partner/missions" class="nav-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/></svg>
+          Mes missions
+        </a>
+        <a href="/partner/availability" class="nav-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+          Disponibilités
+        </a>
+        <a href="/partner/profile" class="nav-item active">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          Mon profil
+        </a>
+      </nav>
+      <div class="sidebar-bottom">
+        <form action="/partner/logout" method="POST">
+          <button class="logout-btn" type="submit">Se déconnecter</button>
+        </form>
+      </div>
+    </aside>
+
+    <main class="main">
+      <div class="page-header">
+        <h1>Mon profil</h1>
+        <p>Vos informations professionnelles et paramètres de compte.</p>
+      </div>
+
+      <!-- Infos perso -->
+      <div class="card">
+        <div class="card-header"><h2>Informations personnelles</h2></div>
+        <div class="card-body">
+          <div class="profile-header">
+            <div class="profile-name" id="profile-name">…</div>
+            <div id="verified-badge"></div>
+          </div>
+          <div class="row">
+            <div>
+              <label>Prénom</label>
+              <input type="text" id="first_name" placeholder="Jean">
+            </div>
+            <div>
+              <label>Nom</label>
+              <input type="text" id="last_name" placeholder="Dupont">
+            </div>
+          </div>
+          <label>Téléphone</label>
+          <input type="tel" id="phone" placeholder="06 12 34 56 78">
+          <label>Bio (visible sur votre profil)</label>
+          <textarea id="bio" placeholder="Photographe immobilier professionnel depuis 5 ans, spécialisé en HDR et visite virtuelle…"></textarea>
+          <label>IBAN (pour vos virements)</label>
+          <input type="text" id="iban" placeholder="FR76 0000 0000 0000 0000 0000 000">
+          <div class="form-actions">
+            <button class="btn btn-primary" id="profile-save-btn">Enregistrer</button>
+            <span class="success-msg" id="profile-success">Profil mis à jour ✓</span>
+            <span class="error-msg" id="profile-error">Erreur</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Zone d'intervention -->
+      <div class="card">
+        <div class="card-header"><h2>Zone d'intervention</h2></div>
+        <div class="card-body">
+          <div class="row">
+            <div>
+              <label>Ville de base</label>
+              <input type="text" id="base_city" placeholder="Paris">
+            </div>
+            <div>
+              <label>Code postal</label>
+              <input type="text" id="base_postal_code" placeholder="75001" maxlength="5">
+            </div>
+          </div>
+          <label>Rayon d'intervention</label>
+          <select id="intervention_radius">
+            <option value="25">25 km</option>
+            <option value="50">50 km</option>
+            <option value="75">75 km</option>
+            <option value="100">100 km</option>
+            <option value="150">150 km</option>
+          </select>
+          <div class="form-actions">
+            <button class="btn btn-primary" id="zone-save-btn">Enregistrer la zone</button>
+            <span class="success-msg" id="zone-success">Zone mise à jour ✓</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Changer mot de passe -->
+      <div class="card">
+        <div class="card-header"><h2>Changer le mot de passe</h2></div>
+        <div class="card-body">
+          <label>Mot de passe actuel</label>
+          <input type="password" id="current_password" placeholder="••••••••">
+          <label>Nouveau mot de passe</label>
+          <input type="password" id="new_password" placeholder="8 caractères minimum" minlength="8">
+          <div class="form-actions">
+            <button class="btn btn-primary" id="pwd-save-btn">Changer le mot de passe</button>
+            <span class="success-msg" id="pwd-success">Mot de passe modifié ✓</span>
+            <span class="error-msg" id="pwd-error">Mot de passe incorrect</span>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    let photographer = null;
+
+    async function load() {
+      const r = await fetch('/api/partner/me');
+      if (r.status === 401) { window.location.href = '/partner/login'; return; }
+      const { photographer: p } = await r.json();
+      photographer = p;
+      document.getElementById('sidebar-name').textContent = p.first_name + ' ' + p.last_name;
+      document.getElementById('profile-name').textContent = p.first_name + ' ' + p.last_name;
+      document.getElementById('first_name').value = p.first_name || '';
+      document.getElementById('last_name').value = p.last_name || '';
+      document.getElementById('phone').value = p.phone || '';
+      document.getElementById('bio').value = p.bio || '';
+      document.getElementById('iban').value = p.iban || '';
+      document.getElementById('base_city').value = p.base_city || '';
+      document.getElementById('base_postal_code').value = p.base_postal_code || '';
+      document.getElementById('intervention_radius').value = String(p.intervention_radius || 50);
+      document.getElementById('verified-badge').innerHTML = p.verified
+        ? '<span class="verified-badge">✓ Profil vérifié</span>'
+        : '<span class="unverified-badge">⏳ En attente de vérification</span>';
+    }
+
+    async function saveProfile() {
+      const btn = document.getElementById('profile-save-btn');
+      btn.disabled = true;
+      const r = await fetch('/api/partner/profile', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          first_name: document.getElementById('first_name').value,
+          last_name: document.getElementById('last_name').value,
+          phone: document.getElementById('phone').value,
+          bio: document.getElementById('bio').value,
+          iban: document.getElementById('iban').value,
+          base_city: document.getElementById('base_city').value,
+          base_postal_code: document.getElementById('base_postal_code').value,
+          intervention_radius: document.getElementById('intervention_radius').value,
+        })
+      });
+      const d = await r.json();
+      btn.disabled = false;
+      if (d.success) { flash('profile-success'); }
+      else { document.getElementById('profile-error').textContent = d.error; flash('profile-error'); }
+    }
+
+    async function saveZone() {
+      const btn = document.getElementById('zone-save-btn');
+      btn.disabled = true;
+      const r = await fetch('/api/partner/profile', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          first_name: document.getElementById('first_name').value,
+          last_name: document.getElementById('last_name').value,
+          phone: document.getElementById('phone').value,
+          bio: document.getElementById('bio').value,
+          iban: document.getElementById('iban').value,
+          base_city: document.getElementById('base_city').value,
+          base_postal_code: document.getElementById('base_postal_code').value,
+          intervention_radius: document.getElementById('intervention_radius').value,
+        })
+      });
+      const d = await r.json();
+      btn.disabled = false;
+      if (d.success) flash('zone-success');
+    }
+
+    async function changePassword() {
+      const btn = document.getElementById('pwd-save-btn');
+      btn.disabled = true;
+      document.getElementById('pwd-error').style.display = 'none';
+      const r = await fetch('/api/partner/change-password', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ current_password: document.getElementById('current_password').value, new_password: document.getElementById('new_password').value })
+      });
+      const d = await r.json();
+      btn.disabled = false;
+      if (d.success) { document.getElementById('current_password').value = ''; document.getElementById('new_password').value = ''; flash('pwd-success'); }
+      else { document.getElementById('pwd-error').textContent = d.error || 'Erreur'; flash('pwd-error'); }
+    }
+
+    function flash(id) {
+      const el = document.getElementById(id);
+      el.style.display = 'inline';
+      setTimeout(() => el.style.display = 'none', 3000);
+    }
+
+    document.getElementById('profile-save-btn').addEventListener('click', saveProfile);
+    document.getElementById('zone-save-btn').addEventListener('click', saveZone);
+    document.getElementById('pwd-save-btn').addEventListener('click', changePassword);
+
+    load();
+  </script>
+</body>
+</html>

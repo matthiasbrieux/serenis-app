@@ -51,6 +51,7 @@ app.use('/', require('./routes/payment').router);
 app.use('/', require('./routes/seller'));
 app.use('/', require('./routes/buyer').router);
 app.use('/admin', require('./routes/admin'));
+app.use('/', require('./routes/partner'));
 
 // ── SEO : sitemap + robots ─────────────────────────────────────────
 app.get('/robots.txt', (req, res) => {

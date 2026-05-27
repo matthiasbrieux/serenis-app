@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Disponibilités — Serenis Partenaires</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; }
+    body { font-family: 'DM Sans', sans-serif; background: #F5F0E8; margin: 0; }
+    .layout { display: flex; min-height: 100vh; }
+    .sidebar { width: 230px; background: #1C1C1A; display: flex; flex-direction: column; position: fixed; top: 0; left: 0; bottom: 0; z-index: 100; }
+    .sidebar-logo { padding: 28px 24px 20px; border-bottom: 1px solid rgba(245,240,232,0.08); }
+    .sidebar-logo span { font-family: 'Cormorant Garamond', serif; font-size: 1.35rem; font-weight: 600; color: #F5F0E8; }
+    .sidebar-logo span em { color: #C4603A; font-style: normal; }
+    .sidebar-name { margin: 12px 24px; font-size: 0.82rem; color: rgba(245,240,232,0.45); }
+    .sidebar-nav { flex: 1; padding: 12px 0; display: flex; flex-direction: column; gap: 2px; }
+    .nav-item { display: flex; align-items: center; gap: 10px; padding: 10px 24px; color: rgba(245,240,232,0.55); text-decoration: none; font-size: 0.87rem; transition: all 0.15s; border-left: 3px solid transparent; }
+    .nav-item:hover { color: #F5F0E8; background: rgba(245,240,232,0.05); }
+    .nav-item.active { color: #F5F0E8; border-left-color: #C4603A; background: rgba(196,96,58,0.1); }
+    .nav-item svg { width: 16px; height: 16px; flex-shrink: 0; }
+    .sidebar-bottom { padding: 16px 24px; border-top: 1px solid rgba(245,240,232,0.08); }
+    .logout-btn { background: none; border: 1px solid rgba(245,240,232,0.2); color: rgba(245,240,232,0.55); font-family: inherit; font-size: 0.82rem; padding: 8px 14px; border-radius: 6px; cursor: pointer; width: 100%; transition: all 0.15s; }
+    .logout-btn:hover { color: #F5F0E8; border-color: rgba(245,240,232,0.4); }
+    .main { margin-left: 230px; flex: 1; padding: 40px; }
+    .page-header { margin-bottom: 32px; display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 16px; }
+    .page-header h1 { font-family: 'Cormorant Garamond', serif; font-size: 2rem; font-weight: 600; margin: 0 0 6px; }
+    .page-header p { color: #8C8880; font-size: 0.88rem; margin: 0; }
+
+    /* Layout 2 cols */
+    .cols { display: grid; grid-template-columns: 1fr 360px; gap: 28px; align-items: start; }
+
+    /* Calendar */
+    .card { background: #fff; border-radius: 10px; border: 1px solid rgba(0,0,0,0.06); overflow: hidden; }
+    .card-header { padding: 16px 20px; border-bottom: 1px solid rgba(0,0,0,0.06); display: flex; justify-content: space-between; align-items: center; }
+    .card-header h2 { font-family: 'Cormorant Garamond', serif; font-size: 1.15rem; font-weight: 600; margin: 0; }
+    .month-nav { display: flex; align-items: center; gap: 12px; }
+    .month-nav button { background: none; border: 1px solid rgba(0,0,0,0.1); border-radius: 6px; padding: 6px 12px; cursor: pointer; font-family: inherit; font-size: 0.85rem; transition: all 0.15s; }
+    .month-nav button:hover { background: #F5F0E8; }
+    .month-nav span { font-weight: 500; font-size: 0.9rem; min-width: 120px; text-align: center; }
+    .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); }
+    .cal-day-header { padding: 8px 0; text-align: center; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.08em; color: #8C8880; font-weight: 500; }
+    .cal-cell { min-height: 72px; border: 0.5px solid rgba(0,0,0,0.05); padding: 6px 8px; cursor: pointer; transition: background 0.1s; position: relative; }
+    .cal-cell:hover { background: #faf9f7; }
+    .cal-cell.other-month { opacity: 0.35; }
+    .cal-cell.today { background: rgba(196,96,58,0.06); }
+    .cal-cell.has-slots { background: rgba(5,150,105,0.06); }
+    .cal-cell.selected { background: rgba(196,96,58,0.12); outline: 2px solid #C4603A; outline-offset: -2px; }
+    .cal-cell .day-num { font-size: 0.82rem; font-weight: 500; color: #1C1C1A; }
+    .cal-cell .slot-dots { display: flex; flex-wrap: wrap; gap: 3px; margin-top: 4px; }
+    .slot-dot { width: 6px; height: 6px; border-radius: 50%; background: #059669; }
+    .slot-dot.blocked { background: #dc2626; }
+
+    /* Add slot form */
+    .form-group { padding: 20px; display: flex; flex-direction: column; gap: 16px; }
+    label { font-size: 0.78rem; font-weight: 500; text-transform: uppercase; letter-spacing: 0.04em; color: #3a3836; margin-bottom: 6px; display: block; }
+    input, select { width: 100%; padding: 10px 12px; border: 1.5px solid rgba(0,0,0,0.1); border-radius: 6px; font-family: inherit; font-size: 0.9rem; color: #1C1C1A; background: #fff; }
+    input:focus, select:focus { outline: none; border-color: #C4603A; }
+    .btn { padding: 11px 20px; border-radius: 6px; border: none; font-family: inherit; font-size: 0.88rem; font-weight: 500; cursor: pointer; transition: all 0.15s; }
+    .btn-primary { background: #1C1C1A; color: #F5F0E8; width: 100%; }
+    .btn-primary:hover { background: #333; }
+    .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
+    .selected-date-label { font-size: 0.85rem; color: #8C8880; padding: 12px 20px 0; }
+    .selected-date-label strong { color: #1C1C1A; }
+
+    /* Slot list */
+    .slot-item { display: flex; justify-content: space-between; align-items: center; padding: 10px 20px; border-top: 1px solid rgba(0,0,0,0.05); font-size: 0.85rem; }
+    .slot-item .time { font-weight: 500; }
+    .slot-item .blocked-badge { font-size: 0.72rem; color: #dc2626; background: #fee2e2; padding: 2px 8px; border-radius: 20px; }
+    .slot-item .del-btn { background: none; border: none; color: #dc2626; cursor: pointer; font-size: 1rem; padding: 0 4px; }
+    .slot-item .del-btn:hover { opacity: 0.7; }
+    .slots-header { padding: 12px 20px 4px; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.08em; color: #8C8880; font-weight: 500; border-top: 1px solid rgba(0,0,0,0.05); }
+    .toast { position: fixed; bottom: 24px; right: 24px; background: #1C1C1A; color: #F5F0E8; padding: 12px 20px; border-radius: 8px; font-size: 0.88rem; opacity: 0; transition: opacity 0.3s; pointer-events: none; z-index: 200; }
+    .toast.show { opacity: 1; }
+    .empty-slots { padding: 20px; font-size: 0.85rem; color: #8C8880; text-align: center; }
+  </style>
+</head>
+<body>
+  <div class="layout">
+    <aside class="sidebar">
+      <div class="sidebar-logo"><span>Serenis <em>·</em> Partenaires</span></div>
+      <div class="sidebar-name" id="sidebar-name"></div>
+      <nav class="sidebar-nav">
+        <a href="/partner/dashboard" class="nav-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+          Tableau de bord
+        </a>
+        <a href="/partner/missions" class="nav-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/></svg>
+          Mes missions
+        </a>
+        <a href="/partner/availability" class="nav-item active">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+          Disponibilités
+        </a>
+        <a href="/partner/profile" class="nav-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          Mon profil
+        </a>
+      </nav>
+      <div class="sidebar-bottom">
+        <form action="/partner/logout" method="POST">
+          <button class="logout-btn" type="submit">Se déconnecter</button>
+        </form>
+      </div>
+    </aside>
+
+    <main class="main">
+      <div class="page-header">
+        <div>
+          <h1>Mes disponibilités</h1>
+          <p>Cliquez sur un jour pour ajouter ou gérer vos créneaux.</p>
+        </div>
+      </div>
+
+      <div class="cols">
+        <!-- Calendar -->
+        <div class="card">
+          <div class="card-header">
+            <h2 id="month-label">…</h2>
+            <div class="month-nav">
+              <button id="prev-month">‹</button>
+              <button id="next-month">›</button>
+            </div>
+          </div>
+          <div class="cal-grid">
+            <div class="cal-day-header">Lun</div>
+            <div class="cal-day-header">Mar</div>
+            <div class="cal-day-header">Mer</div>
+            <div class="cal-day-header">Jeu</div>
+            <div class="cal-day-header">Ven</div>
+            <div class="cal-day-header">Sam</div>
+            <div class="cal-day-header">Dim</div>
+          </div>
+          <div class="cal-grid" id="cal-body"></div>
+        </div>
+
+        <!-- Right panel -->
+        <div>
+          <div class="card">
+            <div class="card-header">
+              <h2>Ajouter un créneau</h2>
+            </div>
+            <div class="selected-date-label">Date sélectionnée : <strong id="selected-date-label">—</strong></div>
+            <div class="form-group">
+              <div>
+                <label>Heure de début</label>
+                <select id="start-time">
+                  <option value="08:00">08h00</option><option value="09:00">09h00</option>
+                  <option value="10:00">10h00</option><option value="11:00">11h00</option>
+                  <option value="12:00">12h00</option><option value="13:00">13h00</option>
+                  <option value="14:00" selected>14h00</option><option value="15:00">15h00</option>
+                  <option value="16:00">16h00</option><option value="17:00">17h00</option>
+                </select>
+              </div>
+              <div>
+                <label>Heure de fin</label>
+                <select id="end-time">
+                  <option value="10:00">10h00</option><option value="11:00">11h00</option>
+                  <option value="12:00">12h00</option><option value="13:00">13h00</option>
+                  <option value="14:00">14h00</option><option value="15:00">15h00</option>
+                  <option value="16:00" selected>16h00</option><option value="17:00">17h00</option>
+                  <option value="18:00">18h00</option><option value="19:00">19h00</option>
+                </select>
+              </div>
+              <button class="btn btn-primary" id="add-btn" disabled>Ajouter le créneau</button>
+            </div>
+            <div class="slots-header">Créneaux du jour sélectionné</div>
+            <div id="day-slots"><div class="empty-slots">Sélectionnez un jour</div></div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script>
+    const MONTHS_FR = ['Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août','Septembre','Octobre','Novembre','Décembre'];
+    let currentDate = new Date();
+    let selectedDate = null;
+    let allSlots = {};
+
+    function getMonthKey(d) { return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`; }
+    function dateStr(d) { return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`; }
+
+    function showToast(msg) {
+      const t = document.getElementById('toast');
+      t.textContent = msg; t.classList.add('show');
+      setTimeout(() => t.classList.remove('show'), 2800);
+    }
+
+    async function loadMonth(monthKey) {
+      try {
+        const r = await fetch(`/api/partner/availability?month=${monthKey}`);
+        const { slots } = await r.json();
+        allSlots[monthKey] = slots;
+        renderCal();
+      } catch(e) { console.error(e); }
+    }
+
+    function renderCal() {
+      const monthKey = getMonthKey(currentDate);
+      document.getElementById('month-label').textContent = MONTHS_FR[currentDate.getMonth()] + ' ' + currentDate.getFullYear();
+      const slots = allSlots[monthKey] || [];
+      const slotsByDate = {};
+      slots.forEach(s => { (slotsByDate[s.date] = slotsByDate[s.date] || []).push(s); });
+
+      const first = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
+      let startDow = first.getDay(); if (startDow === 0) startDow = 7; // Mon=1
+      const daysInMonth = new Date(currentDate.getFullYear(), currentDate.getMonth()+1, 0).getDate();
+      const today = dateStr(new Date());
+
+      let html = '';
+      // blanks
+      for (let i = 1; i < startDow; i++) html += '<div class="cal-cell other-month"></div>';
+      for (let d = 1; d <= daysInMonth; d++) {
+        const ds = dateStr(new Date(currentDate.getFullYear(), currentDate.getMonth(), d));
+        const daySlots = slotsByDate[ds] || [];
+        const isToday = ds === today;
+        const isSelected = selectedDate === ds;
+        const classes = ['cal-cell', isToday?'today':'', daySlots.length?'has-slots':'', isSelected?'selected':''].filter(Boolean).join(' ');
+        const dots = daySlots.slice(0,6).map(s => `<div class="slot-dot${s.is_blocked?' blocked':''}"></div>`).join('');
+        html += `<div class="${classes}" data-date="${ds}">
+          <div class="day-num">${d}</div>
+          <div class="slot-dots">${dots}</div>
+        </div>`;
+      }
+      document.getElementById('cal-body').innerHTML = html;
+      document.querySelectorAll('.cal-cell[data-date]').forEach(el => {
+        el.addEventListener('click', () => selectDate(el.dataset.date));
+      });
+    }
+
+    function selectDate(ds) {
+      selectedDate = ds;
+      const monthKey = getMonthKey(currentDate);
+      const slots = (allSlots[monthKey] || []).filter(s => s.date === ds);
+      document.getElementById('selected-date-label').textContent = ds;
+      document.getElementById('add-btn').disabled = false;
+      renderCal();
+      renderDaySlots(slots);
+    }
+
+    function renderDaySlots(slots) {
+      const el = document.getElementById('day-slots');
+      if (!slots.length) { el.innerHTML = '<div class="empty-slots">Aucun créneau ce jour.</div>'; return; }
+      el.innerHTML = slots.map(s => `
+        <div class="slot-item">
+          <span class="time">${s.start_time} – ${s.end_time}</span>
+          ${s.is_blocked ? '<span class="blocked-badge">Bloqué</span>' : ''}
+          <button class="del-btn" data-id="${s.id}" title="Supprimer">✕</button>
+        </div>`).join('');
+      el.querySelectorAll('.del-btn').forEach(btn => btn.addEventListener('click', () => deleteSlot(btn.dataset.id)));
+    }
+
+    async function deleteSlot(id) {
+      await fetch(`/api/partner/availability/${id}`, { method: 'DELETE' });
+      const monthKey = getMonthKey(currentDate);
+      await loadMonth(monthKey);
+      if (selectedDate) {
+        const slots = (allSlots[monthKey] || []).filter(s => s.date === selectedDate);
+        renderDaySlots(slots);
+      }
+      showToast('Créneau supprimé');
+    }
+
+    document.getElementById('add-btn').addEventListener('click', async () => {
+      if (!selectedDate) return;
+      const btn = document.getElementById('add-btn');
+      btn.disabled = true;
+      try {
+        const r = await fetch('/api/partner/availability', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ date: selectedDate, start_time: document.getElementById('start-time').value, end_time: document.getElementById('end-time').value, is_blocked: false })
+        });
+        const d = await r.json();
+        if (d.error) { showToast('Erreur : ' + d.error); }
+        else {
+          const monthKey = getMonthKey(currentDate);
+          await loadMonth(monthKey);
+          const slots = (allSlots[monthKey] || []).filter(s => s.date === selectedDate);
+          renderDaySlots(slots);
+          showToast('Créneau ajouté');
+        }
+      } catch { showToast('Erreur réseau'); }
+      btn.disabled = false;
+    });
+
+    document.getElementById('prev-month').addEventListener('click', () => {
+      currentDate = new Date(currentDate.getFullYear(), currentDate.getMonth()-1, 1);
+      selectedDate = null;
+      document.getElementById('selected-date-label').textContent = '—';
+      document.getElementById('add-btn').disabled = true;
+      document.getElementById('day-slots').innerHTML = '<div class="empty-slots">Sélectionnez un jour</div>';
+      const mk = getMonthKey(currentDate);
+      if (!allSlots[mk]) loadMonth(mk); else renderCal();
+    });
+    document.getElementById('next-month').addEventListener('click', () => {
+      currentDate = new Date(currentDate.getFullYear(), currentDate.getMonth()+1, 1);
+      selectedDate = null;
+      document.getElementById('selected-date-label').textContent = '—';
+      document.getElementById('add-btn').disabled = true;
+      document.getElementById('day-slots').innerHTML = '<div class="empty-slots">Sélectionnez un jour</div>';
+      const mk = getMonthKey(currentDate);
+      if (!allSlots[mk]) loadMonth(mk); else renderCal();
+    });
+
+    // Init
+    (async () => {
+      try {
+        const r = await fetch('/api/partner/me');
+        if (r.status === 401) { window.location.href = '/partner/login'; return; }
+        const { photographer: p } = await r.json();
+        document.getElementById('sidebar-name').textContent = p.first_name + ' ' + p.last_name;
+      } catch {}
+      loadMonth(getMonthKey(currentDate));
+    })();
+  </script>
+</body>
+</html>

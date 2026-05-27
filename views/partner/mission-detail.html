@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mission — Serenis Partenaires</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; }
+    body { font-family: 'DM Sans', sans-serif; background: #F5F0E8; margin: 0; }
+    .layout { display: flex; min-height: 100vh; }
+    .sidebar { width: 230px; background: #1C1C1A; display: flex; flex-direction: column; position: fixed; top: 0; left: 0; bottom: 0; z-index: 100; }
+    .sidebar-logo { padding: 28px 24px 20px; border-bottom: 1px solid rgba(245,240,232,0.08); }
+    .sidebar-logo span { font-family: 'Cormorant Garamond', serif; font-size: 1.35rem; font-weight: 600; color: #F5F0E8; }
+    .sidebar-logo span em { color: #C4603A; font-style: normal; }
+    .sidebar-name { margin: 12px 24px; font-size: 0.82rem; color: rgba(245,240,232,0.45); }
+    .sidebar-nav { flex: 1; padding: 12px 0; display: flex; flex-direction: column; gap: 2px; }
+    .nav-item { display: flex; align-items: center; gap: 10px; padding: 10px 24px; color: rgba(245,240,232,0.55); text-decoration: none; font-size: 0.87rem; transition: all 0.15s; border-left: 3px solid transparent; }
+    .nav-item:hover { color: #F5F0E8; background: rgba(245,240,232,0.05); }
+    .nav-item.active { color: #F5F0E8; border-left-color: #C4603A; background: rgba(196,96,58,0.1); }
+    .nav-item svg { width: 16px; height: 16px; flex-shrink: 0; }
+    .sidebar-bottom { padding: 16px 24px; border-top: 1px solid rgba(245,240,232,0.08); }
+    .logout-btn { background: none; border: 1px solid rgba(245,240,232,0.2); color: rgba(245,240,232,0.55); font-family: inherit; font-size: 0.82rem; padding: 8px 14px; border-radius: 6px; cursor: pointer; width: 100%; transition: all 0.15s; }
+    .logout-btn:hover { color: #F5F0E8; border-color: rgba(245,240,232,0.4); }
+    .main { margin-left: 230px; flex: 1; padding: 40px; max-width: 900px; }
+
+    .back-link { font-size: 0.85rem; color: #8C8880; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; margin-bottom: 24px; }
+    .back-link:hover { color: #1C1C1A; }
+
+    .mission-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 32px; flex-wrap: wrap; gap: 16px; }
+    .mission-header h1 { font-family: 'Cormorant Garamond', serif; font-size: 1.8rem; font-weight: 600; margin: 0 0 8px; }
+    .mission-header .meta { font-size: 0.85rem; color: #8C8880; }
+    .badge { padding: 6px 14px; border-radius: 20px; font-size: 0.8rem; font-weight: 500; display: inline-block; }
+    .badge-assigned { background: #fef3c7; color: #92400e; }
+    .badge-confirmed { background: #d1fae5; color: #065f46; }
+    .badge-completed { background: #dbeafe; color: #1e40af; }
+    .badge-pending { background: #f3f4f6; color: #6b7280; }
+
+    .grid { display: grid; grid-template-columns: 1fr 320px; gap: 24px; align-items: start; }
+    .card { background: #fff; border-radius: 10px; border: 1px solid rgba(0,0,0,0.06); }
+    .card-section { padding: 20px 24px; border-bottom: 1px solid rgba(0,0,0,0.05); }
+    .card-section:last-child { border-bottom: none; }
+    .card-section h3 { font-family: 'Cormorant Garamond', serif; font-size: 1.05rem; font-weight: 600; margin: 0 0 14px; }
+    .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .info-item label { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.06em; color: #8C8880; display: block; margin-bottom: 3px; }
+    .info-item span { font-size: 0.9rem; font-weight: 500; color: #1C1C1A; }
+    .address-box { background: #F5F0E8; border-radius: 8px; padding: 14px 16px; font-size: 0.9rem; font-weight: 500; line-height: 1.6; }
+    .notes-box { background: #F5F0E8; border-radius: 8px; padding: 14px 16px; font-size: 0.88rem; color: #3a3836; line-height: 1.6; }
+
+    /* Actions */
+    .actions-card { background: #fff; border-radius: 10px; border: 1px solid rgba(0,0,0,0.06); }
+    .action-section { padding: 20px 24px; border-bottom: 1px solid rgba(0,0,0,0.05); }
+    .action-section:last-child { border-bottom: none; }
+    .action-section h3 { font-family: 'Cormorant Garamond', serif; font-size: 1.05rem; font-weight: 600; margin: 0 0 14px; }
+    .btn { width: 100%; padding: 11px 16px; border-radius: 8px; border: none; font-family: inherit; font-size: 0.88rem; font-weight: 500; cursor: pointer; margin-bottom: 8px; transition: all 0.15s; }
+    .btn:last-child { margin-bottom: 0; }
+    .btn-accept { background: #059669; color: #fff; }
+    .btn-accept:hover { background: #047857; }
+    .btn-refuse { background: transparent; color: #dc2626; border: 1.5px solid #dc2626; }
+    .btn-refuse:hover { background: #fee2e2; }
+    .btn-complete { background: #1C1C1A; color: #F5F0E8; }
+    .btn-complete:hover { background: #333; }
+    .btn:disabled { opacity: 0.4; cursor: not-allowed; }
+    input, textarea { width: 100%; padding: 10px 12px; border: 1.5px solid rgba(0,0,0,0.1); border-radius: 6px; font-family: inherit; font-size: 0.88rem; color: #1C1C1A; margin-bottom: 10px; }
+    input:focus, textarea:focus { outline: none; border-color: #C4603A; }
+    textarea { resize: vertical; min-height: 80px; }
+    .field-label { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; color: #6b6965; margin-bottom: 6px; display: block; }
+    .msg { font-size: 0.82rem; color: #059669; margin-top: 6px; display: none; }
+    .msg.error { color: #dc2626; }
+
+    /* Refuse modal overlay */
+    .overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 200; display: none; align-items: center; justify-content: center; }
+    .overlay.show { display: flex; }
+    .modal { background: #fff; border-radius: 12px; padding: 32px; max-width: 420px; width: 100%; margin: 16px; }
+    .modal h3 { font-family: 'Cormorant Garamond', serif; font-size: 1.3rem; margin: 0 0 16px; }
+    .modal-btns { display: flex; gap: 10px; margin-top: 16px; }
+    .modal-btns button { flex: 1; padding: 10px; border-radius: 6px; font-family: inherit; font-size: 0.88rem; font-weight: 500; cursor: pointer; border: 1.5px solid rgba(0,0,0,0.12); background: transparent; }
+    .modal-btns .confirm-refuse { background: #dc2626; color: #fff; border-color: #dc2626; }
+  </style>
+</head>
+<body>
+  <div class="layout">
+    <aside class="sidebar">
+      <div class="sidebar-logo"><span>Serenis <em>·</em> Partenaires</span></div>
+      <div class="sidebar-name" id="sidebar-name"></div>
+      <nav class="sidebar-nav">
+        <a href="/partner/dashboard" class="nav-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+          Tableau de bord
+        </a>
+        <a href="/partner/missions" class="nav-item active">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/></svg>
+          Mes missions
+        </a>
+        <a href="/partner/availability" class="nav-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+          Disponibilités
+        </a>
+        <a href="/partner/profile" class="nav-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          Mon profil
+        </a>
+      </nav>
+      <div class="sidebar-bottom">
+        <form action="/partner/logout" method="POST">
+          <button class="logout-btn" type="submit">Se déconnecter</button>
+        </form>
+      </div>
+    </aside>
+
+    <main class="main">
+      <a href="/partner/missions" class="back-link">← Retour aux missions</a>
+      <div id="content"><p style="color:#8C8880">Chargement…</p></div>
+    </main>
+  </div>
+
+  <!-- Refuse modal -->
+  <div class="overlay" id="refuse-overlay">
+    <div class="modal">
+      <h3>Refuser la mission</h3>
+      <p style="font-size:0.88rem;color:#6b6965;margin:0 0 16px">Indiquez la raison (optionnel) pour aider notre équipe.</p>
+      <textarea id="refuse-reason" placeholder="Ex: indisponible ce créneau, zone trop éloignée…"></textarea>
+      <div class="modal-btns">
+        <button onclick="document.getElementById('refuse-overlay').classList.remove('show')">Annuler</button>
+        <button class="confirm-refuse" id="confirm-refuse-btn">Confirmer le refus</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const STATUS_LABEL = { assigned:'À traiter', confirmed:'Confirmée', completed:'Réalisée', pending:'En attente' };
+    const STATUS_BADGE = { assigned:'badge-assigned', confirmed:'badge-confirmed', completed:'badge-completed', pending:'badge-pending' };
+    const uuid = window.location.pathname.split('/').pop();
+    let mission = null;
+
+    function render(m) {
+      mission = m;
+      const content = document.getElementById('content');
+      content.innerHTML = `
+        <div class="mission-header">
+          <div>
+            <h1>${m.address}</h1>
+            <div class="meta">${m.city} (${m.postal_code}) · ${m.scheduled_date || '—'} à ${m.scheduled_time || '—'}</div>
+          </div>
+          <span class="badge ${STATUS_BADGE[m.status] || ''}">${STATUS_LABEL[m.status] || m.status}</span>
+        </div>
+        <div class="grid">
+          <div>
+            <!-- Details -->
+            <div class="card" style="margin-bottom:20px">
+              <div class="card-section">
+                <h3>Détails du bien</h3>
+                <div class="info-grid">
+                  <div class="info-item"><label>Type</label><span>${m.property_type || '—'}</span></div>
+                  <div class="info-item"><label>Surface</label><span>${m.surface ? m.surface+' m²' : '—'}</span></div>
+                  <div class="info-item"><label>Pièces</label><span>${m.rooms || '—'}</span></div>
+                  <div class="info-item"><label>Meublé</label><span>${m.furnished ? 'Oui' : 'Non'}</span></div>
+                  <div class="info-item"><label>Étage</label><span>${m.floor !== null ? m.floor : '—'}</span></div>
+                  <div class="info-item"><label>Durée</label><span>${m.duration_hours || 2}h</span></div>
+                </div>
+              </div>
+              <div class="card-section">
+                <h3>Adresse</h3>
+                <div class="address-box">${m.address}<br>${m.postal_code} ${m.city}</div>
+              </div>
+              ${m.access_notes ? `<div class="card-section"><h3>Accès / consignes</h3><div class="notes-box">${m.access_notes}</div></div>` : ''}
+              <div class="card-section">
+                <h3>Contact client</h3>
+                <div class="info-grid">
+                  <div class="info-item"><label>Nom</label><span>${m.client_name || '—'}</span></div>
+                  <div class="info-item"><label>Téléphone</label><span>${m.client_phone || '—'}</span></div>
+                  <div class="info-item" style="grid-column:1/-1"><label>Email</label><span>${m.client_email}</span></div>
+                </div>
+              </div>
+              ${m.photos_url ? `<div class="card-section"><h3>Photos livrées</h3><a href="${m.photos_url}" target="_blank" style="color:#C4603A;font-size:0.88rem;">Ouvrir le lien →</a></div>` : ''}
+              ${m.virtual_tour_url ? `<div class="card-section"><h3>Visite virtuelle</h3><a href="${m.virtual_tour_url}" target="_blank" style="color:#C4603A;font-size:0.88rem;">Ouvrir le lien →</a></div>` : ''}
+            </div>
+          </div>
+          <!-- Actions -->
+          <div class="actions-card" id="actions-card">
+            ${renderActions(m)}
+          </div>
+        </div>`;
+      bindActions();
+    }
+
+    function renderActions(m) {
+      if (m.status === 'assigned') {
+        return `
+          <div class="action-section">
+            <h3>Action requise</h3>
+            <p style="font-size:0.82rem;color:#6b6965;margin:0 0 14px">Acceptez ou refusez cette mission. Le client attend votre réponse.</p>
+            <button class="btn btn-accept" id="accept-btn">✓ Accepter la mission</button>
+            <button class="btn btn-refuse" id="refuse-btn">Refuser</button>
+          </div>`;
+      }
+      if (m.status === 'confirmed') {
+        return `
+          <div class="action-section">
+            <h3>Mission confirmée</h3>
+            <p style="font-size:0.82rem;color:#059669;margin:0 0 14px">✓ Vous avez accepté cette mission.</p>
+          </div>
+          <div class="action-section">
+            <h3>Marquer comme réalisée</h3>
+            <label class="field-label">Lien des photos (WeTransfer, Drive…)</label>
+            <input type="url" id="photos-url" placeholder="https://…">
+            <label class="field-label">Lien visite virtuelle (optionnel)</label>
+            <input type="url" id="tour-url" placeholder="https://…">
+            <label class="field-label">Notes (optionnel)</label>
+            <textarea id="mission-notes" placeholder="Remarques pour l'équipe Serenis…"></textarea>
+            <button class="btn btn-complete" id="complete-btn">Marquer comme réalisée</button>
+            <div class="msg" id="complete-msg">Mission marquée comme réalisée ✓</div>
+          </div>`;
+      }
+      if (m.status === 'completed') {
+        return `<div class="action-section"><h3>Mission réalisée</h3><p style="font-size:0.88rem;color:#059669;margin:0">✓ Cette mission a été livrée. Merci !</p></div>`;
+      }
+      return `<div class="action-section"><p style="font-size:0.85rem;color:#8C8880;margin:0">Aucune action disponible.</p></div>`;
+    }
+
+    function bindActions() {
+      const acceptBtn = document.getElementById('accept-btn');
+      const refuseBtn = document.getElementById('refuse-btn');
+      const completeBtn = document.getElementById('complete-btn');
+      if (acceptBtn) {
+        acceptBtn.addEventListener('click', async () => {
+          acceptBtn.disabled = true; acceptBtn.textContent = 'Acceptation…';
+          const r = await fetch(`/api/partner/mission/${uuid}/accept`, { method: 'POST' });
+          const d = await r.json();
+          if (d.success) { mission.status = 'confirmed'; document.getElementById('actions-card').innerHTML = renderActions(mission); bindActions(); }
+          else { acceptBtn.disabled = false; acceptBtn.textContent = '✓ Accepter'; alert(d.error); }
+        });
+      }
+      if (refuseBtn) {
+        refuseBtn.addEventListener('click', () => document.getElementById('refuse-overlay').classList.add('show'));
+        document.getElementById('confirm-refuse-btn').onclick = async () => {
+          const reason = document.getElementById('refuse-reason').value;
+          const r = await fetch(`/api/partner/mission/${uuid}/refuse`, {
+            method: 'POST', headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ reason })
+          });
+          const d = await r.json();
+          if (d.success) { window.location.href = '/partner/missions'; }
+          else { alert(d.error); }
+        };
+      }
+      if (completeBtn) {
+        completeBtn.addEventListener('click', async () => {
+          completeBtn.disabled = true; completeBtn.textContent = 'Enregistrement…';
+          const r = await fetch(`/api/partner/mission/${uuid}/complete`, {
+            method: 'POST', headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              photos_url: document.getElementById('photos-url').value,
+              virtual_tour_url: document.getElementById('tour-url').value,
+              notes: document.getElementById('mission-notes').value
+            })
+          });
+          const d = await r.json();
+          if (d.success) {
+            const msg = document.getElementById('complete-msg');
+            msg.style.display = 'block';
+            completeBtn.textContent = 'Enregistré ✓';
+          } else {
+            completeBtn.disabled = false;
+            completeBtn.textContent = 'Marquer comme réalisée';
+            alert(d.error);
+          }
+        });
+      }
+    }
+
+    (async () => {
+      try {
+        const r = await fetch('/api/partner/me');
+        if (r.status === 401) { window.location.href = '/partner/login'; return; }
+        const { photographer: p } = await r.json();
+        document.getElementById('sidebar-name').textContent = p.first_name + ' ' + p.last_name;
+        const rm = await fetch(`/api/partner/mission/${uuid}`);
+        if (!rm.ok) { document.getElementById('content').innerHTML = '<p style="color:#dc2626">Mission introuvable.</p>'; return; }
+        const { mission: m } = await rm.json();
+        render(m);
+      } catch(e) { console.error(e); }
+    })();
+  </script>
+</body>
+</html>

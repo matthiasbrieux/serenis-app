@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mes missions — Serenis Partenaires</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; }
+    body { font-family: 'DM Sans', sans-serif; background: #F5F0E8; margin: 0; }
+    .layout { display: flex; min-height: 100vh; }
+    .sidebar { width: 230px; background: #1C1C1A; display: flex; flex-direction: column; position: fixed; top: 0; left: 0; bottom: 0; z-index: 100; }
+    .sidebar-logo { padding: 28px 24px 20px; border-bottom: 1px solid rgba(245,240,232,0.08); }
+    .sidebar-logo span { font-family: 'Cormorant Garamond', serif; font-size: 1.35rem; font-weight: 600; color: #F5F0E8; }
+    .sidebar-logo span em { color: #C4603A; font-style: normal; }
+    .sidebar-name { margin: 12px 24px; font-size: 0.82rem; color: rgba(245,240,232,0.45); }
+    .sidebar-nav { flex: 1; padding: 12px 0; display: flex; flex-direction: column; gap: 2px; }
+    .nav-item { display: flex; align-items: center; gap: 10px; padding: 10px 24px; color: rgba(245,240,232,0.55); text-decoration: none; font-size: 0.87rem; transition: all 0.15s; border-left: 3px solid transparent; }
+    .nav-item:hover { color: #F5F0E8; background: rgba(245,240,232,0.05); }
+    .nav-item.active { color: #F5F0E8; border-left-color: #C4603A; background: rgba(196,96,58,0.1); }
+    .nav-item svg { width: 16px; height: 16px; flex-shrink: 0; }
+    .sidebar-bottom { padding: 16px 24px; border-top: 1px solid rgba(245,240,232,0.08); }
+    .logout-btn { background: none; border: 1px solid rgba(245,240,232,0.2); color: rgba(245,240,232,0.55); font-family: inherit; font-size: 0.82rem; padding: 8px 14px; border-radius: 6px; cursor: pointer; width: 100%; transition: all 0.15s; }
+    .logout-btn:hover { color: #F5F0E8; border-color: rgba(245,240,232,0.4); }
+    .main { margin-left: 230px; flex: 1; padding: 40px; }
+    .page-header { margin-bottom: 28px; }
+    .page-header h1 { font-family: 'Cormorant Garamond', serif; font-size: 2rem; font-weight: 600; margin: 0 0 6px; }
+    .page-header p { color: #8C8880; font-size: 0.88rem; margin: 0; }
+
+    /* Filters */
+    .filters { display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; }
+    .filter-btn { padding: 7px 16px; border-radius: 20px; border: 1.5px solid rgba(0,0,0,0.12); background: transparent; font-family: inherit; font-size: 0.82rem; cursor: pointer; color: #6b6965; transition: all 0.15s; }
+    .filter-btn.active { background: #1C1C1A; color: #F5F0E8; border-color: #1C1C1A; }
+
+    /* Table / List */
+    .card { background: #fff; border-radius: 10px; border: 1px solid rgba(0,0,0,0.06); overflow: hidden; }
+    .mission-row { display: grid; grid-template-columns: 90px 1fr 120px 100px 80px; gap: 16px; align-items: center; padding: 14px 20px; border-bottom: 1px solid rgba(0,0,0,0.05); transition: background 0.1s; }
+    .mission-row:last-child { border-bottom: none; }
+    .mission-row:hover { background: #faf9f7; }
+    .table-header { background: #faf9f7; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.07em; color: #8C8880; font-weight: 500; padding: 10px 20px !important; cursor: default; }
+    .table-header:hover { background: #faf9f7 !important; }
+    .date-cell .day { font-size: 0.9rem; font-weight: 600; }
+    .date-cell .time { font-size: 0.75rem; color: #8C8880; }
+    .address-cell strong { font-size: 0.88rem; display: block; }
+    .address-cell span { font-size: 0.78rem; color: #8C8880; }
+    .badge { padding: 4px 10px; border-radius: 20px; font-size: 0.72rem; font-weight: 500; display: inline-block; }
+    .badge-assigned { background: #fef3c7; color: #92400e; }
+    .badge-confirmed { background: #d1fae5; color: #065f46; }
+    .badge-completed { background: #dbeafe; color: #1e40af; }
+    .badge-pending { background: #f3f4f6; color: #6b7280; }
+    .view-btn { color: #C4603A; text-decoration: none; font-size: 0.82rem; white-space: nowrap; }
+    .empty-state { padding: 56px 20px; text-align: center; color: #8C8880; font-size: 0.9rem; }
+  </style>
+</head>
+<body>
+  <div class="layout">
+    <aside class="sidebar">
+      <div class="sidebar-logo"><span>Serenis <em>·</em> Partenaires</span></div>
+      <div class="sidebar-name" id="sidebar-name"></div>
+      <nav class="sidebar-nav">
+        <a href="/partner/dashboard" class="nav-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+          Tableau de bord
+        </a>
+        <a href="/partner/missions" class="nav-item active">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/></svg>
+          Mes missions
+        </a>
+        <a href="/partner/availability" class="nav-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+          Disponibilités
+        </a>
+        <a href="/partner/profile" class="nav-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          Mon profil
+        </a>
+      </nav>
+      <div class="sidebar-bottom">
+        <form action="/partner/logout" method="POST">
+          <button class="logout-btn" type="submit">Se déconnecter</button>
+        </form>
+      </div>
+    </aside>
+
+    <main class="main">
+      <div class="page-header">
+        <h1>Mes missions</h1>
+        <p>Toutes vos missions assignées et réalisées.</p>
+      </div>
+
+      <div class="filters">
+        <button class="filter-btn active" data-filter="all">Toutes</button>
+        <button class="filter-btn" data-filter="assigned">À traiter</button>
+        <button class="filter-btn" data-filter="confirmed">Confirmées</button>
+        <button class="filter-btn" data-filter="completed">Réalisées</button>
+      </div>
+
+      <div class="card">
+        <div class="mission-row table-header">
+          <div>Date</div><div>Adresse</div><div>Type</div><div>Statut</div><div></div>
+        </div>
+        <div id="missions-list">
+          <div class="empty-state">Chargement…</div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    const STATUS_LABEL = { assigned:'À traiter', confirmed:'Confirmée', completed:'Réalisée', pending:'En attente' };
+    const STATUS_BADGE = { assigned:'badge-assigned', confirmed:'badge-confirmed', completed:'badge-completed', pending:'badge-pending' };
+    const MONTHS_FR = ['jan','fév','mar','avr','mai','juin','juil','aoû','sep','oct','nov','déc'];
+
+    let allMissions = [];
+    let currentFilter = 'all';
+
+    function render() {
+      const list = document.getElementById('missions-list');
+      const missions = currentFilter === 'all' ? allMissions : allMissions.filter(m => m.status === currentFilter);
+      if (!missions.length) {
+        list.innerHTML = '<div class="empty-state">Aucune mission dans cette catégorie.</div>';
+        return;
+      }
+      list.innerHTML = missions.map(m => {
+        const d = m.scheduled_date ? new Date(m.scheduled_date) : null;
+        const dateHtml = d
+          ? `<div class="date-cell"><div class="day">${d.getDate()} ${MONTHS_FR[d.getMonth()]}</div><div class="time">${m.scheduled_time || '—'}</div></div>`
+          : '<div class="date-cell"><div class="day">—</div></div>';
+        return `<div class="mission-row">
+          ${dateHtml}
+          <div class="address-cell"><strong>${m.address}</strong><span>${m.city} (${m.postal_code})</span></div>
+          <div>${m.property_type || '—'} · ${m.surface ? m.surface+'m²' : '?'}</div>
+          <div><span class="badge ${STATUS_BADGE[m.status] || ''}">${STATUS_LABEL[m.status] || m.status}</span></div>
+          <div><a href="/partner/mission/${m.uuid}" class="view-btn">Voir →</a></div>
+        </div>`;
+      }).join('');
+    }
+
+    document.querySelectorAll('.filter-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        currentFilter = btn.dataset.filter;
+        render();
+      });
+    });
+
+    (async () => {
+      try {
+        const r = await fetch('/api/partner/me');
+        if (r.status === 401) { window.location.href = '/partner/login'; return; }
+        const { photographer: p } = await r.json();
+        document.getElementById('sidebar-name').textContent = p.first_name + ' ' + p.last_name;
+        const rm = await fetch('/api/partner/missions');
+        const { missions } = await rm.json();
+        allMissions = missions;
+        render();
+      } catch(e) { console.error(e); }
+    })();
+  </script>
+</body>
+</html>
