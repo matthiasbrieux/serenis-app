@@ -182,6 +182,19 @@ db.exec(`
   );
 `);
 
+// ── Table notifications ────────────────────────────────────────
+db.exec(`
+  CREATE TABLE IF NOT EXISTS notifications (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    seller_id INTEGER NOT NULL REFERENCES sellers(id),
+    type TEXT,
+    title TEXT,
+    body TEXT,
+    read_at DATETIME,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+  );
+`);
+
 // Migrations: add columns not in original CREATE TABLE
 const newCols = [
   "ALTER TABLE properties ADD COLUMN heating_mechanism TEXT",
@@ -222,6 +235,14 @@ const newCols = [
   "ALTER TABLE sellers ADD COLUMN photographer_done BOOLEAN DEFAULT 0",
   "ALTER TABLE sellers ADD COLUMN photo_report_url TEXT",
   "ALTER TABLE sellers ADD COLUMN virtual_tour_done BOOLEAN DEFAULT 0",
+  // Colonnes manquantes — causaient des erreurs 500 silencieuses en production
+  "ALTER TABLE property_photos ADD COLUMN category TEXT DEFAULT 'pro'",
+  "ALTER TABLE buyer_contacts ADD COLUMN buyer_name TEXT",
+  "ALTER TABLE buyer_contacts ADD COLUMN notes TEXT",
+  "ALTER TABLE buyer_contacts ADD COLUMN buyer_budget INTEGER",
+  "ALTER TABLE buyer_contacts ADD COLUMN status TEXT DEFAULT 'new'",
+  "ALTER TABLE visits ADD COLUMN notes TEXT",
+  "ALTER TABLE properties ADD COLUMN rooms_detail TEXT",
 ];
 newCols.forEach(sql => { try { db.exec(sql); } catch(e) {} });
 
