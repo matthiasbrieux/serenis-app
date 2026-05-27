@@ -193,11 +193,27 @@ router.delete('/api/numbers/:id', requireAdmin, (req, res) => {
 });
 
 // ── CRM VENDEURS ──────────────────────────────────────────
+router.put('/api/crm/:id/flags', requireAdmin, express.json(), (req, res) => {
+  const allowed = ['contrat_signe', 'rdv_photographe', 'admin_notes'];
+  const updates = [], params = [];
+  for (const key of allowed) {
+    if (req.body[key] !== undefined) {
+      updates.push(`${key}=?`);
+      params.push(typeof req.body[key] === 'boolean' ? (req.body[key] ? 1 : 0) : req.body[key]);
+    }
+  }
+  if (!updates.length) return res.json({ error: 'Rien à modifier' });
+  params.push(req.params.id);
+  db.prepare(`UPDATE sellers SET ${updates.join(',')} WHERE id=?`).run(...params);
+  res.json({ success: true });
+});
+
 router.get('/api/crm', requireAdmin, (req, res) => {
   const crm = db.prepare(`
     SELECT
       s.id, s.first_name, s.last_name, s.email, s.phone, s.pack,
       s.twilio_number, s.created_at, s.paid_at,
+      s.contrat_signe, s.rdv_photographe, s.admin_notes,
       p.status as property_status, p.published, p.price, p.city,
       p.description, p.surface_habitable,
       COALESCE(photos.cnt, 0)    as photos_count,

@@ -213,6 +213,9 @@ const newCols = [
   "ALTER TABLE properties ADD COLUMN facture_electricite INTEGER",
   "ALTER TABLE properties ADD COLUMN facture_gaz INTEGER",
   "ALTER TABLE properties ADD COLUMN grenier_present BOOLEAN DEFAULT 0",
+  "ALTER TABLE sellers ADD COLUMN contrat_signe BOOLEAN DEFAULT 0",
+  "ALTER TABLE sellers ADD COLUMN rdv_photographe BOOLEAN DEFAULT 0",
+  "ALTER TABLE sellers ADD COLUMN admin_notes TEXT",
 ];
 newCols.forEach(sql => { try { db.exec(sql); } catch(e) {} });
 

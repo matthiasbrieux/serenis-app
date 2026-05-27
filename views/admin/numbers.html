@@ -5,108 +5,121 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Numéros IA — Serenis Admin</title>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/css/style.css">
   <style>
     *{box-sizing:border-box;margin:0;padding:0}
-    body{background:#F4F3F0;font-family:'DM Sans',sans-serif;color:#1A1A16}
+    body{background:#F2F1EE;font-family:'DM Sans',sans-serif;color:#1A1A16;font-size:14px}
+    a{text-decoration:none;color:inherit}
+
+    /* Layout */
     .layout{display:grid;grid-template-columns:220px 1fr;min-height:100vh}
 
     /* Sidebar */
     .sidebar{background:#1A1A16;padding:24px 0;position:sticky;top:0;height:100vh;overflow-y:auto}
     .sidebar .logo{color:#FDFCF8;padding:0 24px 24px;font-family:'Cormorant Garamond',serif;font-size:1.35rem;border-bottom:1px solid rgba(255,255,255,.1);margin-bottom:16px}
-    .sidebar a{display:flex;align-items:center;gap:10px;padding:11px 24px;color:rgba(255,255,255,.55);font-size:0.84rem;text-decoration:none;transition:all .15s}
+    .sidebar a{display:flex;align-items:center;gap:10px;padding:11px 24px;color:rgba(255,255,255,.5);font-size:0.83rem;transition:all .15s}
     .sidebar a:hover,.sidebar a.active{color:#fff;background:rgba(255,255,255,.08)}
-    .sidebar .sep{height:1px;background:rgba(255,255,255,.07);margin:12px 16px}
+    .sep{height:1px;background:rgba(255,255,255,.07);margin:10px 16px}
 
     /* Main */
-    .main{padding:32px 36px;overflow-y:auto}
-    .page-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:28px;flex-wrap:wrap;gap:12px}
-    .page-title{font-family:'Cormorant Garamond',serif;font-size:2rem;color:#1A1A16}
-    .page-sub{font-size:0.82rem;color:#888;margin-top:4px}
+    .main{padding:28px 32px;min-width:0}
+    .page-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:12px}
+    .page-title{font-family:'Cormorant Garamond',serif;font-size:1.9rem;color:#1A1A16;line-height:1}
+    .page-sub{font-size:0.8rem;color:#888;margin-top:4px}
 
-    /* Stat chips */
-    .stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:28px}
-    .stat-chip{background:#fff;border-radius:10px;padding:16px 20px;box-shadow:0 1px 4px rgba(0,0,0,.06)}
-    .stat-chip .label{font-size:0.72rem;text-transform:uppercase;letter-spacing:.07em;color:#999;margin-bottom:6px}
-    .stat-chip .val{font-family:'Cormorant Garamond',serif;font-size:2rem;font-weight:600;line-height:1}
-    .stat-chip .val.green{color:#16a34a}
-    .stat-chip .val.orange{color:#d97706}
-    .stat-chip .val.red{color:#dc2626}
-    .stat-chip .val.blue{color:#2563eb}
+    /* Stats */
+    .stats-row{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:24px}
+    .chip{background:#fff;border-radius:10px;padding:14px 18px;box-shadow:0 1px 3px rgba(0,0,0,.06)}
+    .chip .lbl{font-size:0.68rem;text-transform:uppercase;letter-spacing:.07em;color:#999;margin-bottom:5px}
+    .chip .val{font-family:'Cormorant Garamond',serif;font-size:1.9rem;font-weight:600;line-height:1}
+    .green{color:#16a34a}.blue{color:#2563eb}.orange{color:#d97706}.red{color:#dc2626}.gray{color:#6b7280}
 
     /* Tabs */
-    .tabs{display:flex;gap:4px;margin-bottom:24px;background:#E8E6E1;padding:4px;border-radius:10px;width:fit-content}
-    .tab{padding:8px 18px;border-radius:7px;font-size:0.83rem;font-weight:500;cursor:pointer;border:none;background:transparent;color:#666;transition:all .2s}
+    .tabs{display:flex;gap:4px;margin-bottom:22px;background:#E5E3DE;padding:4px;border-radius:10px;width:fit-content}
+    .tab{padding:7px 16px;border-radius:7px;font-size:0.82rem;font-weight:500;cursor:pointer;border:none;background:transparent;color:#666;transition:all .15s}
     .tab.active{background:#fff;color:#1A1A16;box-shadow:0 1px 4px rgba(0,0,0,.1)}
 
-    /* Table card */
-    .card{background:#fff;border-radius:12px;box-shadow:0 1px 6px rgba(0,0,0,.07);overflow:hidden;margin-bottom:24px}
-    .card-header{display:flex;align-items:center;justify-content:space-between;padding:18px 24px;border-bottom:1px solid #F0EDE8;flex-wrap:wrap;gap:10px}
-    .card-title{font-size:0.95rem;font-weight:600;color:#1A1A16}
+    /* Card */
+    .card{background:#fff;border-radius:12px;box-shadow:0 1px 4px rgba(0,0,0,.07);overflow:hidden;margin-bottom:20px}
+    .card-head{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid #EEECEA;flex-wrap:wrap;gap:10px}
+    .card-title{font-size:0.9rem;font-weight:600}
     .card-actions{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
 
-    table{width:100%;border-collapse:collapse;font-size:0.83rem}
-    thead th{text-align:left;padding:12px 16px;font-size:0.7rem;text-transform:uppercase;letter-spacing:.07em;color:#999;border-bottom:1px solid #F0EDE8;white-space:nowrap;font-weight:600}
-    tbody tr{transition:background .1s}
+    /* Table */
+    .tbl-wrap{overflow-x:auto}
+    table{width:100%;border-collapse:collapse;font-size:0.82rem}
+    thead th{text-align:left;padding:10px 14px;font-size:0.67rem;text-transform:uppercase;letter-spacing:.07em;color:#aaa;border-bottom:1px solid #EEECEA;white-space:nowrap;font-weight:600;background:#FAFAF8}
     tbody tr:hover{background:#FAFAF8}
-    tbody td{padding:13px 16px;border-bottom:1px solid #F5F3F0;vertical-align:middle;white-space:nowrap}
+    tbody td{padding:11px 14px;border-bottom:1px solid #F3F1EE;vertical-align:middle}
     tbody tr:last-child td{border-bottom:none}
 
     /* Badges */
-    .badge{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:20px;font-size:0.72rem;font-weight:600}
-    .badge::before{content:'';width:6px;height:6px;border-radius:50%;flex-shrink:0}
-    .badge.available{background:#dcfce7;color:#16a34a}.badge.available::before{background:#16a34a}
-    .badge.assigned{background:#dbeafe;color:#2563eb}.badge.assigned::before{background:#2563eb}
-    .badge.inactive{background:#f3f4f6;color:#6b7280}.badge.inactive::before{background:#9ca3af}
+    .badge{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:20px;font-size:0.69rem;font-weight:600;white-space:nowrap}
+    .badge.available{background:#dcfce7;color:#16a34a}
+    .badge.assigned{background:#dbeafe;color:#2563eb}
+    .badge.inactive{background:#f3f4f6;color:#6b7280}
     .badge.serenite{background:#fef3c7;color:#92400e}
-    .badge.autonome{background:#f3f4f6;color:#374151}
+    .badge.autonome{background:#f1f5f9;color:#475569}
+
+    /* Status icons (toggle) */
+    .flag-btn{background:none;border:none;cursor:pointer;font-size:1.2rem;line-height:1;padding:2px 4px;border-radius:5px;transition:background .1s;display:flex;align-items:center}
+    .flag-btn:hover{background:#f0f0f0}
+    .flag-btn.saving{opacity:.4;pointer-events:none}
+
+    /* Number cell */
+    .numcell{font-family:monospace;font-weight:700;font-size:0.88rem;color:#1A1A16;letter-spacing:.03em}
+
+    /* Seller info */
+    .s-name{font-weight:600;color:#1A1A16}
+    .s-sub{font-size:0.73rem;color:#888;margin-top:1px}
+
+    /* Progress */
+    .pbar{height:5px;background:#EEECEA;border-radius:3px;overflow:hidden;min-width:56px;margin-top:4px}
+    .pbar-fill{height:100%;border-radius:3px;transition:width .3s}
 
     /* Buttons */
-    .btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:7px;font-size:0.82rem;font-weight:600;cursor:pointer;border:none;transition:all .15s;text-decoration:none}
-    .btn-primary{background:#1A1A16;color:#fff}.btn-primary:hover{background:#333}
-    .btn-outline{background:#fff;color:#444;border:1px solid #ddd}.btn-outline:hover{border-color:#aaa;background:#f9f9f9}
-    .btn-danger{background:#fee2e2;color:#dc2626}.btn-danger:hover{background:#fecaca}
-    .btn-success{background:#dcfce7;color:#16a34a}.btn-success:hover{background:#bbf7d0}
-    .btn-sm{padding:5px 10px;font-size:0.77rem}
+    .btn{display:inline-flex;align-items:center;gap:5px;padding:7px 14px;border-radius:7px;font-size:0.8rem;font-weight:600;cursor:pointer;border:none;transition:all .12s;white-space:nowrap;font-family:'DM Sans',sans-serif}
+    .btn-primary{background:#1A1A16;color:#fff}
+    .btn-primary:hover{background:#333}
+    .btn-outline{background:#fff;color:#444;border:1.5px solid #ddd}
+    .btn-outline:hover{border-color:#999}
+    .btn-danger{background:#fee2e2;color:#dc2626}
+    .btn-danger:hover{background:#fecaca}
+    .btn-success{background:#dcfce7;color:#16a34a}
+    .btn-success:hover{background:#bbf7d0}
+    .btn-blue{background:#dbeafe;color:#2563eb}
+    .btn-blue:hover{background:#bfdbfe}
+    .btn-sm{padding:4px 9px;font-size:0.74rem}
+    .btn-full{width:100%;justify-content:center;margin-top:4px}
 
     /* Search */
-    .search-input{border:1px solid #E0DDD8;border-radius:7px;padding:8px 12px;font-size:0.83rem;width:200px;outline:none;font-family:'DM Sans',sans-serif}
-    .search-input:focus{border-color:#888}
+    .search{border:1.5px solid #E0DDD8;border-radius:7px;padding:7px 11px;font-size:0.82rem;width:190px;outline:none;font-family:'DM Sans',sans-serif}
+    .search:focus{border-color:#888}
+    select.search{width:auto;padding-right:28px;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23999'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 9px center}
 
-    /* Modal */
-    .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);display:none;align-items:center;justify-content:center;z-index:1000;padding:20px}
-    .modal-overlay.show{display:flex}
-    .modal{background:#fff;border-radius:14px;padding:28px;width:100%;max-width:480px;max-height:90vh;overflow-y:auto;position:relative}
-    .modal h3{font-family:'Cormorant Garamond',serif;font-size:1.5rem;margin-bottom:20px}
-    .modal-close{position:absolute;top:16px;right:16px;border:none;background:none;font-size:1.3rem;cursor:pointer;color:#999;width:28px;height:28px;display:flex;align-items:center;justify-content:center;border-radius:50%}
+    /* Modals */
+    .overlay{position:fixed;inset:0;background:rgba(0,0,0,.4);display:none;align-items:center;justify-content:center;z-index:9000;padding:20px}
+    .overlay.open{display:flex}
+    .modal{background:#fff;border-radius:14px;padding:28px;width:100%;max-width:500px;max-height:90vh;overflow-y:auto;position:relative}
+    .modal h3{font-family:'Cormorant Garamond',serif;font-size:1.5rem;margin-bottom:20px;color:#1A1A16}
+    .modal-close{position:absolute;top:14px;right:14px;border:none;background:none;font-size:1.2rem;cursor:pointer;color:#aaa;width:28px;height:28px;display:flex;align-items:center;justify-content:center;border-radius:50%}
     .modal-close:hover{background:#f0f0f0;color:#333}
-    .form-group{margin-bottom:16px}
-    .form-group label{display:block;font-size:0.78rem;font-weight:600;color:#555;margin-bottom:6px;text-transform:uppercase;letter-spacing:.04em}
-    .form-group input,.form-group select,.form-group textarea{width:100%;border:1px solid #E0DDD8;border-radius:7px;padding:9px 12px;font-size:0.88rem;font-family:'DM Sans',sans-serif;outline:none;transition:border .15s}
-    .form-group input:focus,.form-group select:focus,.form-group textarea:focus{border-color:#888}
-    .form-group textarea{resize:vertical;min-height:100px}
-    .msg{padding:10px 14px;border-radius:7px;font-size:0.83rem;margin-top:12px;display:none}
-    .msg.ok{background:#dcfce7;color:#166534}
-    .msg.err{background:#fee2e2;color:#991b1b}
+    .fg{margin-bottom:14px}
+    .fg label{display:block;font-size:0.73rem;font-weight:600;color:#666;margin-bottom:5px;text-transform:uppercase;letter-spacing:.04em}
+    .fg input,.fg select,.fg textarea{width:100%;border:1.5px solid #E0DDD8;border-radius:7px;padding:8px 11px;font-size:0.87rem;font-family:'DM Sans',sans-serif;outline:none;transition:border .12s;color:#1A1A16}
+    .fg input:focus,.fg select:focus,.fg textarea:focus{border-color:#555}
+    .fg textarea{resize:vertical;min-height:90px}
+    .flash{padding:9px 13px;border-radius:7px;font-size:0.81rem;margin-top:10px;display:none}
+    .flash.ok{background:#dcfce7;color:#166534}
+    .flash.err{background:#fee2e2;color:#991b1b}
 
-    /* CRM table overrides */
-    .crm-table td{white-space:normal;max-width:180px;overflow:hidden;text-overflow:ellipsis}
-    .progress-bar{height:5px;background:#E8E6E1;border-radius:3px;overflow:hidden;min-width:60px}
-    .progress-bar-fill{height:100%;border-radius:3px;background:#16a34a;transition:width .3s}
-    .progress-bar-fill.warn{background:#d97706}
-    .progress-bar-fill.danger{background:#dc2626}
+    /* Empty */
+    .empty{text-align:center;padding:48px 20px;color:#bbb}
+    .empty big{font-size:2.4rem;display:block;margin-bottom:8px}
 
-    /* Empty state */
-    .empty{text-align:center;padding:48px 24px;color:#aaa}
-    .empty p{font-size:0.9rem;margin-top:8px}
+    /* Notes tooltip */
+    .notes-cell{max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#888;font-size:0.77rem;cursor:pointer}
 
-    .number-cell{font-family:monospace;font-size:0.9rem;font-weight:600;color:#1A1A16}
-    .seller-info{display:flex;flex-direction:column;gap:2px}
-    .seller-name{font-weight:600;color:#1A1A16}
-    .seller-email{font-size:0.75rem;color:#888}
-    .actions-cell{display:flex;gap:6px;align-items:center}
-
-    @media(max-width:768px){
+    @media(max-width:900px){
       .layout{grid-template-columns:1fr}
       .sidebar{display:none}
       .stats-row{grid-template-columns:repeat(2,1fr)}
@@ -131,12 +144,13 @@
 
   <!-- Main -->
   <main class="main">
+
     <div class="page-header">
       <div>
         <h1 class="page-title">Numéros IA</h1>
-        <p class="page-sub">Gestion du pool de numéros intelligents — attribution automatique aux vendeurs</p>
+        <p class="page-sub">Attribution des numéros intelligents & suivi CRM vendeurs</p>
       </div>
-      <div style="display:flex;gap:10px;flex-wrap:wrap">
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
         <button class="btn btn-outline" onclick="openImport()">⬆ Importer</button>
         <button class="btn btn-primary" onclick="openAdd()">+ Ajouter un numéro</button>
       </div>
@@ -144,398 +158,598 @@
 
     <!-- Stats -->
     <div class="stats-row">
-      <div class="stat-chip"><div class="label">Pool total</div><div class="val" id="statTotal">—</div></div>
-      <div class="stat-chip"><div class="label">Disponibles</div><div class="val green" id="statAvail">—</div></div>
-      <div class="stat-chip"><div class="label">Attribués</div><div class="val blue" id="statAssigned">—</div></div>
-      <div class="stat-chip"><div class="label">Inactifs</div><div class="val red" id="statInactive">—</div></div>
+      <div class="chip"><div class="lbl">Pool total</div><div class="val gray" id="sTotal">—</div></div>
+      <div class="chip"><div class="lbl">Disponibles</div><div class="val green" id="sAvail">—</div></div>
+      <div class="chip"><div class="lbl">Attribués</div><div class="val blue" id="sAssigned">—</div></div>
+      <div class="chip"><div class="lbl">Inactifs</div><div class="val red" id="sInactive">—</div></div>
+      <div class="chip"><div class="lbl">Contrats signés</div><div class="val orange" id="sContrats">—</div></div>
     </div>
 
     <!-- Tabs -->
     <div class="tabs">
       <button class="tab active" onclick="showTab('pool')">📋 Pool de numéros</button>
-      <button class="tab" onclick="showTab('assigned')">🔗 Numéros attribués</button>
-      <button class="tab" onclick="showTab('crm')">👥 CRM Vendeurs</button>
+      <button class="tab" onclick="showTab('crm')">👥 Suivi vendeurs</button>
     </div>
 
-    <!-- ═══ TAB: POOL ═══ -->
+    <!-- ══════════════════════════════════════════
+         TAB POOL
+    ══════════════════════════════════════════ -->
     <div id="tab-pool">
       <div class="card">
-        <div class="card-header">
-          <span class="card-title">Tous les numéros</span>
+        <div class="card-head">
+          <span class="card-title">Tous les numéros du pool</span>
           <div class="card-actions">
-            <select id="filterStatus" onchange="renderPool()" style="border:1px solid #ddd;border-radius:7px;padding:7px 10px;font-size:0.83rem;font-family:'DM Sans',sans-serif">
+            <select class="search" id="filterStatus" onchange="renderPool()">
               <option value="">Tous les statuts</option>
               <option value="available">Disponible</option>
               <option value="assigned">Attribué</option>
               <option value="inactive">Inactif</option>
             </select>
-            <input class="search-input" type="text" id="searchPool" placeholder="Rechercher..." oninput="renderPool()">
+            <input class="search" type="text" id="searchPool" placeholder="Rechercher..." oninput="renderPool()">
           </div>
         </div>
-        <div style="overflow-x:auto">
+        <div class="tbl-wrap">
           <table>
             <thead>
               <tr>
                 <th>Numéro</th>
                 <th>Statut</th>
                 <th>Fournisseur</th>
-                <th>Ajouté le</th>
-                <th>Attribué le</th>
                 <th>Vendeur lié</th>
-                <th>Actions</th>
+                <th>Attribué le</th>
+                <th>Ajouté le</th>
+                <th style="text-align:right">Actions</th>
               </tr>
             </thead>
-            <tbody id="poolBody"><tr><td colspan="7" style="text-align:center;color:#aaa;padding:40px">Chargement...</td></tr></tbody>
+            <tbody id="poolBody">
+              <tr><td colspan="7"><div class="empty"><big>⏳</big>Chargement...</div></td></tr>
+            </tbody>
           </table>
         </div>
       </div>
     </div>
 
-    <!-- ═══ TAB: ASSIGNED ═══ -->
-    <div id="tab-assigned" style="display:none">
+    <!-- ══════════════════════════════════════════
+         TAB CRM
+    ══════════════════════════════════════════ -->
+    <div id="tab-crm" style="display:none">
       <div class="card">
-        <div class="card-header">
-          <span class="card-title">Numéros attribués aux vendeurs</span>
-          <input class="search-input" type="text" id="searchAssigned" placeholder="Rechercher..." oninput="renderAssigned()">
+        <div class="card-head">
+          <span class="card-title">Suivi individuel des vendeurs</span>
+          <div class="card-actions">
+            <select class="search" id="filterCrm" onchange="renderCrm()">
+              <option value="">Tous les packs</option>
+              <option value="serenite">Sérénité</option>
+              <option value="autonome">Autonome</option>
+            </select>
+            <input class="search" type="text" id="searchCrm" placeholder="Nom, email, numéro..." oninput="renderCrm()">
+          </div>
         </div>
-        <div style="overflow-x:auto">
+        <div class="tbl-wrap">
           <table>
             <thead>
               <tr>
-                <th>Numéro IA</th>
                 <th>Vendeur</th>
-                <th>Email</th>
                 <th>Pack</th>
-                <th>Attribué le</th>
-                <th>Fournisseur</th>
-                <th>Actions</th>
+                <th>Numéro IA (09…)</th>
+                <th title="Contrat de prestation signé">Contrat</th>
+                <th title="RDV photographe effectué">Photo ✓</th>
+                <th>Fiche</th>
+                <th>Photos</th>
+                <th>Docs</th>
+                <th>Contacts</th>
+                <th>Visites</th>
+                <th>Annonce</th>
+                <th>Inscrit le</th>
+                <th>Notes admin</th>
               </tr>
             </thead>
-            <tbody id="assignedBody"><tr><td colspan="7" style="text-align:center;color:#aaa;padding:40px">Chargement...</td></tr></tbody>
+            <tbody id="crmBody">
+              <tr><td colspan="13"><div class="empty"><big>⏳</big>Chargement...</div></td></tr>
+            </tbody>
           </table>
         </div>
       </div>
     </div>
 
-    <!-- ═══ TAB: CRM ═══ -->
-    <div id="tab-crm" style="display:none">
-      <div class="card">
-        <div class="card-header">
-          <span class="card-title">Suivi vendeurs — vue CRM</span>
-          <input class="search-input" type="text" id="searchCrm" placeholder="Rechercher..." oninput="renderCrm()">
-        </div>
-        <div style="overflow-x:auto">
-          <table class="crm-table">
-            <thead>
-              <tr>
-                <th>Vendeur</th>
-                <th>Numéro IA</th>
-                <th>Pack</th>
-                <th>Complétion dossier</th>
-                <th>Photos</th>
-                <th>Docs</th>
-                <th>Contacts acheteurs</th>
-                <th>Visites planifiées</th>
-                <th>Vues annonce</th>
-                <th>Inscrit le</th>
-                <th>Dernière activité</th>
-              </tr>
-            </thead>
-            <tbody id="crmBody"><tr><td colspan="11" style="text-align:center;color:#aaa;padding:40px">Chargement...</td></tr></tbody>
-          </table>
-        </div>
-      </div>
-    </div>
   </main>
 </div>
 
-<!-- Modal: Ajouter un numéro -->
-<div class="modal-overlay" id="modalAdd">
+<!-- ════ MODAL: Ajouter un numéro ════ -->
+<div class="overlay" id="mAdd">
   <div class="modal">
-    <button class="modal-close" onclick="closeModals()">✕</button>
+    <button class="modal-close" onclick="closeAll()">✕</button>
     <h3>Ajouter un numéro</h3>
-    <form id="formAdd">
-      <div class="form-group">
-        <label>Numéro de téléphone *</label>
+    <form id="fAdd">
+      <div class="fg">
+        <label>Numéro *</label>
         <input type="tel" name="number" placeholder="+33 9 XX XX XX XX" required>
       </div>
-      <div class="form-group">
+      <div class="fg">
         <label>Fournisseur</label>
-        <input type="text" name="provider" value="Twilio" placeholder="Twilio, Orange, etc.">
+        <input type="text" name="provider" value="Twilio">
       </div>
-      <div class="form-group">
+      <div class="fg">
         <label>Notes</label>
         <input type="text" name="notes" placeholder="Optionnel">
       </div>
       <button type="submit" class="btn btn-primary btn-full">Ajouter au pool</button>
-      <div class="msg" id="msgAdd"></div>
+      <div class="flash" id="mAddFlash"></div>
     </form>
   </div>
 </div>
 
-<!-- Modal: Import en masse -->
-<div class="modal-overlay" id="modalImport">
+<!-- ════ MODAL: Import en masse ════ -->
+<div class="overlay" id="mImport">
   <div class="modal">
-    <button class="modal-close" onclick="closeModals()">✕</button>
+    <button class="modal-close" onclick="closeAll()">✕</button>
     <h3>Importer des numéros</h3>
-    <form id="formImport">
-      <div class="form-group">
+    <form id="fImport">
+      <div class="fg">
         <label>Liste de numéros *</label>
-        <textarea name="numbers_raw" placeholder="+33 9 XX XX XX XX&#10;+33 9 XX XX XX XX&#10;+33 9 XX XX XX XX"></textarea>
-        <small style="color:#888;font-size:0.75rem;margin-top:4px;display:block">Un par ligne, ou séparés par des virgules/points-virgules.</small>
+        <textarea name="numbers_raw" placeholder="+33 9 11 22 33 44&#10;+33 9 55 66 77 88&#10;..." style="min-height:120px"></textarea>
+        <small style="color:#999;font-size:0.73rem;display:block;margin-top:4px">Un par ligne, ou séparés par virgules / points-virgules</small>
       </div>
-      <div class="form-group">
+      <div class="fg">
         <label>Fournisseur</label>
         <input type="text" name="provider" value="Twilio">
       </div>
       <button type="submit" class="btn btn-primary btn-full">Importer</button>
-      <div class="msg" id="msgImport"></div>
+      <div class="flash" id="mImportFlash"></div>
     </form>
   </div>
 </div>
 
-<!-- Modal: Réattribuer -->
-<div class="modal-overlay" id="modalAssign">
-  <div class="modal" style="max-width:400px">
-    <button class="modal-close" onclick="closeModals()">✕</button>
-    <h3>Réattribuer le numéro</h3>
-    <p style="font-size:0.85rem;color:#666;margin-bottom:20px" id="assignNumberLabel"></p>
-    <div class="form-group">
+<!-- ════ MODAL: Attribuer / Réattribuer ════ -->
+<div class="overlay" id="mAssign">
+  <div class="modal" style="max-width:420px">
+    <button class="modal-close" onclick="closeAll()">✕</button>
+    <h3 id="mAssignTitle">Attribuer le numéro</h3>
+    <p style="font-size:0.84rem;color:#666;margin-bottom:18px" id="mAssignSub"></p>
+    <div class="fg">
       <label>Vendeur cible</label>
-      <select id="assignSellerSelect" style="width:100%;border:1px solid #ddd;border-radius:7px;padding:9px 12px;font-family:'DM Sans',sans-serif;font-size:0.88rem">
-        <option value="">— Libérer (retour pool) —</option>
+      <select id="mAssignSeller" class="search" style="width:100%;padding:9px 11px">
+        <option value="">— Libérer (retour au pool) —</option>
       </select>
     </div>
-    <button class="btn btn-primary btn-full" onclick="confirmAssign()">Confirmer</button>
-    <div class="msg" id="msgAssign"></div>
+    <button class="btn btn-primary btn-full" onclick="confirmAssign()">Confirmer l'attribution</button>
+    <div class="flash" id="mAssignFlash"></div>
+  </div>
+</div>
+
+<!-- ════ MODAL: Notes admin ════ -->
+<div class="overlay" id="mNotes">
+  <div class="modal" style="max-width:420px">
+    <button class="modal-close" onclick="closeAll()">✕</button>
+    <h3>Notes admin</h3>
+    <p style="font-size:0.83rem;color:#666;margin-bottom:14px" id="mNotesSub"></p>
+    <div class="fg">
+      <label>Notes internes</label>
+      <textarea id="mNotesText" style="min-height:100px" placeholder="Notes visibles uniquement en admin..."></textarea>
+    </div>
+    <button class="btn btn-primary btn-full" onclick="saveNotes()">Sauvegarder</button>
+    <div class="flash" id="mNotesFlash"></div>
   </div>
 </div>
 
 <script>
-let allNumbers = [];
-let allCrm = [];
+/* ═══════════════════════════════════════════════════════
+   STATE
+═══════════════════════════════════════════════════════ */
+let numbers = [];
+let crm = [];
 let assignTargetId = null;
+let notesTargetId = null;
 
-// ── Chargement données ─────────────────────────────────────
+/* ═══════════════════════════════════════════════════════
+   LOAD
+═══════════════════════════════════════════════════════ */
 async function loadAll() {
-  const [nRes, cRes] = await Promise.all([
-    fetch('/admin/api/numbers').then(r=>r.json()),
-    fetch('/admin/api/crm').then(r=>r.json()),
-  ]);
-  allNumbers = nRes.numbers || [];
-  allCrm = cRes.crm || [];
-  updateStats();
-  renderPool();
-  renderAssigned();
-  renderCrm();
-  populateSellerSelect();
+  try {
+    const [nRes, cRes] = await Promise.all([
+      fetch('/admin/api/numbers').then(r => r.json()),
+      fetch('/admin/api/crm').then(r => r.json()),
+    ]);
+    numbers = nRes.numbers || [];
+    crm = cRes.crm || [];
+    updateChips();
+    renderPool();
+    renderCrm();
+    buildSellerOptions();
+  } catch(e) {
+    console.error(e);
+  }
 }
 
-function updateStats() {
-  const total = allNumbers.length;
-  const avail = allNumbers.filter(n=>n.status==='available').length;
-  const assigned = allNumbers.filter(n=>n.status==='assigned').length;
-  const inactive = allNumbers.filter(n=>n.status==='inactive').length;
-  document.getElementById('statTotal').textContent = total;
-  document.getElementById('statAvail').textContent = avail;
-  document.getElementById('statAssigned').textContent = assigned;
-  document.getElementById('statInactive').textContent = inactive;
+function updateChips() {
+  document.getElementById('sTotal').textContent    = numbers.length;
+  document.getElementById('sAvail').textContent    = numbers.filter(n => n.status === 'available').length;
+  document.getElementById('sAssigned').textContent = numbers.filter(n => n.status === 'assigned').length;
+  document.getElementById('sInactive').textContent = numbers.filter(n => n.status === 'inactive').length;
+  document.getElementById('sContrats').textContent = crm.filter(c => c.contrat_signe).length;
 }
 
-// ── Tab navigation ─────────────────────────────────────────
+/* ═══════════════════════════════════════════════════════
+   TABS
+═══════════════════════════════════════════════════════ */
 function showTab(name) {
-  ['pool','assigned','crm'].forEach(t => {
-    document.getElementById(`tab-${t}`).style.display = t===name ? 'block' : 'none';
+  ['pool','crm'].forEach(t => {
+    document.getElementById('tab-' + t).style.display = (t === name) ? 'block' : 'none';
   });
-  document.querySelectorAll('.tab').forEach((el,i) => {
-    el.classList.toggle('active', ['pool','assigned','crm'][i]===name);
+  document.querySelectorAll('.tab').forEach((el, i) => {
+    el.classList.toggle('active', ['pool','crm'][i] === name);
   });
 }
 
-// ── Pool table ─────────────────────────────────────────────
+/* ═══════════════════════════════════════════════════════
+   RENDER POOL
+═══════════════════════════════════════════════════════ */
 function renderPool() {
-  const q = (document.getElementById('searchPool').value||'').toLowerCase();
+  const q  = (document.getElementById('searchPool').value || '').toLowerCase();
   const st = document.getElementById('filterStatus').value;
-  const rows = allNumbers.filter(n => {
-    const match = !q || n.number.includes(q) || (n.seller_email||'').toLowerCase().includes(q) || (n.first_name||'').toLowerCase().includes(q) || (n.last_name||'').toLowerCase().includes(q);
-    const stMatch = !st || n.status===st;
-    return match && stMatch;
+
+  const rows = numbers.filter(n => {
+    const txt = (n.number + ' ' + (n.seller_email||'') + ' ' + (n.first_name||'') + ' ' + (n.last_name||'')).toLowerCase();
+    return (!q || txt.includes(q)) && (!st || n.status === st);
   });
 
   const tbody = document.getElementById('poolBody');
-  if (!rows.length) { tbody.innerHTML = `<tr><td colspan="7"><div class="empty"><div style="font-size:2rem">📋</div><p>Aucun numéro trouvé</p></div></td></tr>`; return; }
+  if (!rows.length) {
+    tbody.innerHTML = `<tr><td colspan="7"><div class="empty"><big>📋</big>Aucun numéro trouvé</div></td></tr>`;
+    return;
+  }
 
-  tbody.innerHTML = rows.map(n => `
-    <tr>
-      <td><span class="number-cell">${n.number}</span></td>
-      <td><span class="badge ${n.status}">${n.status==='available'?'Disponible':n.status==='assigned'?'Attribué':'Inactif'}</span></td>
-      <td style="color:#666">${n.provider||'—'}</td>
-      <td style="color:#888;font-size:0.8rem">${formatDate(n.added_at)}</td>
-      <td style="color:#888;font-size:0.8rem">${n.assigned_at ? formatDate(n.assigned_at) : '—'}</td>
-      <td>
-        ${n.seller_id ? `<div class="seller-info"><span class="seller-name">${n.first_name||''} ${n.last_name||''}</span><span class="seller-email">${n.seller_email||''}</span></div>` : '<span style="color:#ccc">—</span>'}
-      </td>
-      <td>
-        <div class="actions-cell">
-          ${n.status !== 'assigned' ? `<button class="btn btn-success btn-sm" onclick="openAssign(${n.id},'${n.number}')">Attribuer</button>` : `<button class="btn btn-outline btn-sm" onclick="openAssign(${n.id},'${n.number}')">Réattribuer</button>`}
-          ${n.status==='available' ? `<button class="btn btn-outline btn-sm" onclick="setStatus(${n.id},'inactive')">Désactiver</button>` : ''}
-          ${n.status==='inactive' ? `<button class="btn btn-outline btn-sm" onclick="setStatus(${n.id},'available')">Réactiver</button>` : ''}
-          ${n.status!=='assigned' ? `<button class="btn btn-danger btn-sm" onclick="deleteNumber(${n.id})">✕</button>` : ''}
-        </div>
-      </td>
-    </tr>
-  `).join('');
-}
+  tbody.innerHTML = rows.map(n => {
+    const seller = n.seller_id
+      ? `<div class="s-name">${n.first_name||''} ${n.last_name||''}</div><div class="s-sub">${n.seller_email||''}</div>`
+      : `<span style="color:#ccc">—</span>`;
 
-// ── Assigned table ──────────────────────────────────────────
-function renderAssigned() {
-  const q = (document.getElementById('searchAssigned').value||'').toLowerCase();
-  const rows = allNumbers.filter(n => n.status==='assigned' && (!q || n.number.includes(q) || (n.seller_email||'').toLowerCase().includes(q) || (n.first_name||'').toLowerCase().includes(q)));
-  const tbody = document.getElementById('assignedBody');
-  if (!rows.length) { tbody.innerHTML = `<tr><td colspan="7"><div class="empty"><div style="font-size:2rem">🔗</div><p>Aucun numéro attribué</p></div></td></tr>`; return; }
-  tbody.innerHTML = rows.map(n => `
-    <tr>
-      <td><span class="number-cell">${n.number}</span></td>
-      <td><div class="seller-info"><span class="seller-name">${n.first_name||''} ${n.last_name||''}</span></div></td>
-      <td style="color:#666;font-size:0.8rem">${n.seller_email||'—'}</td>
-      <td><span class="badge ${n.pack||'autonome'}">${n.pack==='serenite'?'Sérénité':'Autonome'}</span></td>
-      <td style="color:#888;font-size:0.8rem">${n.assigned_at ? formatDate(n.assigned_at) : '—'}</td>
-      <td style="color:#666">${n.provider||'—'}</td>
-      <td><button class="btn btn-outline btn-sm" onclick="releaseNumber(${n.id})">Libérer</button></td>
-    </tr>
-  `).join('');
-}
+    const actions = [
+      n.status !== 'assigned'
+        ? `<button class="btn btn-success btn-sm" onclick="openAssign(${n.id},'${esc(n.number)}')">Attribuer</button>`
+        : `<button class="btn btn-blue btn-sm" onclick="openAssign(${n.id},'${esc(n.number)}')">Réattribuer</button>`,
+      n.status === 'available'
+        ? `<button class="btn btn-outline btn-sm" onclick="setStatus(${n.id},'inactive')">Désactiver</button>` : '',
+      n.status === 'inactive'
+        ? `<button class="btn btn-outline btn-sm" onclick="setStatus(${n.id},'available')">Réactiver</button>` : '',
+      n.status !== 'assigned'
+        ? `<button class="btn btn-danger btn-sm" onclick="deleteNum(${n.id})" title="Supprimer">✕</button>` : '',
+      n.status === 'assigned'
+        ? `<button class="btn btn-outline btn-sm" onclick="releaseNum(${n.id})">Libérer</button>` : '',
+    ].filter(Boolean).join('');
 
-// ── CRM table ───────────────────────────────────────────────
-function renderCrm() {
-  const q = (document.getElementById('searchCrm').value||'').toLowerCase();
-  const rows = allCrm.filter(c => !q || (c.email||'').toLowerCase().includes(q) || (c.first_name||'').toLowerCase().includes(q) || (c.last_name||'').toLowerCase().includes(q) || (c.twilio_number||'').includes(q));
-  const tbody = document.getElementById('crmBody');
-  if (!rows.length) { tbody.innerHTML = `<tr><td colspan="11"><div class="empty"><div style="font-size:2rem">👥</div><p>Aucun vendeur trouvé</p></div></td></tr>`; return; }
-
-  tbody.innerHTML = rows.map(c => {
-    const completion = calcCompletion(c);
-    const fillClass = completion >= 70 ? '' : completion >= 40 ? 'warn' : 'danger';
     return `
-    <tr>
-      <td>
-        <div class="seller-info">
-          <span class="seller-name">${c.first_name||''} ${c.last_name||''}</span>
-          <span class="seller-email">${c.email}</span>
-          ${c.phone ? `<span class="seller-email">${c.phone}</span>` : ''}
-        </div>
-      </td>
-      <td>${c.twilio_number ? `<span class="number-cell" style="font-size:0.82rem">${c.twilio_number}</span>` : '<span style="color:#ccc;font-size:0.8rem">Non attribué</span>'}</td>
-      <td><span class="badge ${c.pack||'autonome'}">${c.pack==='serenite'?'Sérénité':'Autonome'}</span></td>
-      <td>
-        <div style="display:flex;align-items:center;gap:8px">
-          <div class="progress-bar"><div class="progress-bar-fill ${fillClass}" style="width:${completion}%"></div></div>
-          <span style="font-size:0.78rem;color:#555;min-width:28px">${completion}%</span>
-        </div>
-      </td>
-      <td style="text-align:center"><span style="font-weight:600;color:${c.photos_count>0?'#16a34a':'#dc2626'}">${c.photos_count||0}</span></td>
-      <td style="text-align:center"><span style="font-weight:600;color:${c.docs_count>0?'#16a34a':'#dc2626'}">${c.docs_count||0}</span></td>
-      <td style="text-align:center;font-weight:600;color:#2563eb">${c.buyer_contacts_count||0}</td>
-      <td style="text-align:center;font-weight:600;color:#7c3aed">${c.visits_count||0}</td>
-      <td style="text-align:center;color:#666">${c.total_views||0}</td>
-      <td style="color:#888;font-size:0.78rem">${formatDate(c.created_at)}</td>
-      <td style="color:#888;font-size:0.78rem">${c.last_activity ? formatDate(c.last_activity) : '—'}</td>
-    </tr>`;
+      <tr>
+        <td><span class="numcell">${n.number}</span></td>
+        <td><span class="badge ${n.status}">${n.status==='available'?'Disponible':n.status==='assigned'?'Attribué':'Inactif'}</span></td>
+        <td style="color:#777">${n.provider||'—'}</td>
+        <td>${seller}</td>
+        <td class="s-sub">${fd(n.assigned_at)}</td>
+        <td class="s-sub">${fd(n.added_at)}</td>
+        <td><div style="display:flex;gap:5px;justify-content:flex-end">${actions}</div></td>
+      </tr>`;
   }).join('');
 }
 
-function calcCompletion(c) {
-  let score = 0, total = 5;
-  if (c.twilio_number) score++;
-  if (c.photos_count > 0) score++;
-  if (c.docs_count > 0) score++;
-  if (c.property_status) score++;
-  if (c.published) score++;
-  return Math.round((score/total)*100);
+/* ═══════════════════════════════════════════════════════
+   RENDER CRM
+═══════════════════════════════════════════════════════ */
+function renderCrm() {
+  const q    = (document.getElementById('searchCrm').value || '').toLowerCase();
+  const pack = document.getElementById('filterCrm').value;
+
+  const rows = crm.filter(c => {
+    const txt = ((c.first_name||'') + ' ' + (c.last_name||'') + ' ' + (c.email||'') + ' ' + (c.twilio_number||'')).toLowerCase();
+    return (!q || txt.includes(q)) && (!pack || c.pack === pack);
+  });
+
+  const tbody = document.getElementById('crmBody');
+  if (!rows.length) {
+    tbody.innerHTML = `<tr><td colspan="13"><div class="empty"><big>👥</big>Aucun vendeur trouvé</div></td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML = rows.map(c => {
+    const completion = calcFiche(c);
+    const barColor = completion >= 70 ? '#16a34a' : completion >= 40 ? '#d97706' : '#dc2626';
+
+    const numCell = c.twilio_number
+      ? `<span class="numcell">${c.twilio_number}</span>
+         <div><button class="btn btn-outline btn-sm" style="margin-top:4px" onclick="openAssignCrm(${c.id},'${esc(c.first_name||'')} ${esc(c.last_name||'')}','${esc(c.twilio_number)}')">Changer</button></div>`
+      : `<span style="color:#bbb;font-size:0.78rem">Non attribué</span>
+         <div><button class="btn btn-success btn-sm" style="margin-top:4px" onclick="openAssignCrm(${c.id},'${esc(c.first_name||'')} ${esc(c.last_name||'')}',null)">Attribuer</button></div>`;
+
+    const contratBtn = `<button class="flag-btn" title="${c.contrat_signe ? 'Contrat signé — cliquer pour annuler' : 'Marquer comme signé'}" onclick="toggleFlag(${c.id},'contrat_signe',${!!c.contrat_signe})">${c.contrat_signe ? '✅' : '⬜'}</button>`;
+    const photoBtn   = `<button class="flag-btn" title="${c.rdv_photographe ? 'RDV effectué — cliquer pour annuler' : 'Marquer RDV photographe effectué'}" onclick="toggleFlag(${c.id},'rdv_photographe',${!!c.rdv_photographe})">${c.rdv_photographe ? '✅' : '⬜'}</button>`;
+
+    const ficheBar = `
+      <div style="font-size:0.73rem;color:#555;font-weight:600">${completion}%</div>
+      <div class="pbar"><div class="pbar-fill" style="width:${completion}%;background:${barColor}"></div></div>`;
+
+    const published = c.published
+      ? `<span class="badge available">En ligne</span>`
+      : `<span class="badge inactive">Hors ligne</span>`;
+
+    const notes = c.admin_notes
+      ? `<span class="notes-cell" onclick="openNotes(${c.id},'${esc(c.first_name||'')} ${esc(c.last_name||'')}','${esc2(c.admin_notes||'')}')" title="${esc2(c.admin_notes||'')}">${esc(c.admin_notes.slice(0,30))}…</span>`
+      : `<button class="btn btn-outline btn-sm" onclick="openNotes(${c.id},'${esc(c.first_name||'')} ${esc(c.last_name||'')}','')">+ Note</button>`;
+
+    return `
+      <tr>
+        <td>
+          <div class="s-name">${c.first_name||''} ${c.last_name||''}</div>
+          <div class="s-sub">${c.email}</div>
+          ${c.phone ? `<div class="s-sub">${c.phone}</div>` : ''}
+        </td>
+        <td><span class="badge ${c.pack||'autonome'}">${c.pack==='serenite'?'Sérénité':'Autonome'}</span></td>
+        <td>${numCell}</td>
+        <td style="text-align:center">${contratBtn}</td>
+        <td style="text-align:center">${photoBtn}</td>
+        <td>${ficheBar}</td>
+        <td style="text-align:center;font-weight:600;color:${c.photos_count>0?'#16a34a':'#dc2626'}">${c.photos_count||0}</td>
+        <td style="text-align:center;font-weight:600;color:${c.docs_count>0?'#16a34a':'#dc2626'}">${c.docs_count||0}</td>
+        <td style="text-align:center;font-weight:700;color:#2563eb">${c.buyer_contacts_count||0}</td>
+        <td style="text-align:center;font-weight:700;color:#7c3aed">${c.visits_count||0}</td>
+        <td>${published}</td>
+        <td class="s-sub">${fd(c.created_at)}</td>
+        <td>${notes}</td>
+      </tr>`;
+  }).join('');
 }
 
-// ── Actions numéros ─────────────────────────────────────────
+function calcFiche(c) {
+  let score = 0;
+  if (c.twilio_number)       score += 20;
+  if (c.contrat_signe)       score += 20;
+  if (c.photos_count  > 0)   score += 20;
+  if (c.docs_count    > 0)   score += 20;
+  if (c.property_status)     score += 10;
+  if (c.published)           score += 10;
+  return score;
+}
+
+/* ═══════════════════════════════════════════════════════
+   FLAG TOGGLES
+═══════════════════════════════════════════════════════ */
+async function toggleFlag(id, field, current) {
+  const newVal = !current;
+  await fetch(`/admin/api/crm/${id}/flags`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ [field]: newVal })
+  });
+  const row = crm.find(c => c.id === id);
+  if (row) row[field] = newVal ? 1 : 0;
+  updateChips();
+  renderCrm();
+}
+
+/* ═══════════════════════════════════════════════════════
+   NUMBER ACTIONS
+═══════════════════════════════════════════════════════ */
 async function setStatus(id, status) {
-  await fetch(`/admin/api/numbers/${id}/status`, { method:'PUT', headers:{'Content-Type':'application/json'}, body:JSON.stringify({status}) });
+  const r = await fetch(`/admin/api/numbers/${id}/status`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ status })
+  }).then(r => r.json());
+  if (r.error) { alert(r.error); return; }
   await loadAll();
 }
 
-async function deleteNumber(id) {
+async function deleteNum(id) {
   if (!confirm('Supprimer ce numéro du pool ?')) return;
-  const r = await fetch(`/admin/api/numbers/${id}`, { method:'DELETE' }).then(r=>r.json());
-  if (r.error) return alert(r.error);
+  const r = await fetch(`/admin/api/numbers/${id}`, { method: 'DELETE' }).then(r => r.json());
+  if (r.error) { alert(r.error); return; }
   await loadAll();
 }
 
-async function releaseNumber(id) {
+async function releaseNum(id) {
   if (!confirm('Libérer ce numéro et le remettre dans le pool ?')) return;
-  await fetch(`/admin/api/numbers/${id}/assign`, { method:'PUT', headers:{'Content-Type':'application/json'}, body:JSON.stringify({seller_id:null}) });
+  await fetch(`/admin/api/numbers/${id}/assign`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ seller_id: null })
+  });
   await loadAll();
 }
 
-function openAssign(id, number) {
-  assignTargetId = id;
-  document.getElementById('assignNumberLabel').textContent = `Numéro : ${number}`;
-  document.getElementById('msgAssign').style.display='none';
-  document.getElementById('modalAssign').classList.add('show');
-}
-
-async function confirmAssign() {
-  const sellerId = document.getElementById('assignSellerSelect').value || null;
-  const r = await fetch(`/admin/api/numbers/${assignTargetId}/assign`, { method:'PUT', headers:{'Content-Type':'application/json'}, body:JSON.stringify({seller_id:sellerId}) }).then(r=>r.json());
-  if (r.error) { showMsg('msgAssign','err',r.error); return; }
-  closeModals(); await loadAll();
-}
-
-function populateSellerSelect() {
-  const sel = document.getElementById('assignSellerSelect');
-  const current = sel.value;
-  sel.innerHTML = '<option value="">— Libérer (retour pool) —</option>';
-  allCrm.forEach(c => {
+/* ═══════════════════════════════════════════════════════
+   ASSIGN MODAL
+═══════════════════════════════════════════════════════ */
+function buildSellerOptions() {
+  const sel = document.getElementById('mAssignSeller');
+  const prev = sel.value;
+  sel.innerHTML = '<option value="">— Libérer (retour au pool) —</option>';
+  crm.forEach(c => {
     const opt = document.createElement('option');
     opt.value = c.id;
-    opt.textContent = `${c.first_name||''} ${c.last_name||''} — ${c.email}`;
-    if (String(c.id)===current) opt.selected=true;
+    opt.textContent = `${c.first_name||''} ${c.last_name||''} — ${c.email}${c.twilio_number ? ' (a déjà '+c.twilio_number+')' : ''}`;
+    if (String(c.id) === String(prev)) opt.selected = true;
     sel.appendChild(opt);
   });
 }
 
-// ── Modals ─────────────────────────────────────────────────
-function openAdd() { document.getElementById('formAdd').reset(); document.getElementById('msgAdd').style.display='none'; document.getElementById('modalAdd').classList.add('show'); }
-function openImport() { document.getElementById('formImport').reset(); document.getElementById('msgImport').style.display='none'; document.getElementById('modalImport').classList.add('show'); }
-function closeModals() { document.querySelectorAll('.modal-overlay').forEach(m=>m.classList.remove('show')); assignTargetId=null; }
-
-document.getElementById('formAdd').addEventListener('submit', async e => {
-  e.preventDefault();
-  const fd = new FormData(e.target);
-  const r = await fetch('/admin/api/numbers', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(Object.fromEntries(fd)) }).then(r=>r.json());
-  if (r.error) { showMsg('msgAdd','err',r.error); return; }
-  showMsg('msgAdd','ok','Numéro ajouté au pool ✓');
-  e.target.reset(); await loadAll();
-});
-
-document.getElementById('formImport').addEventListener('submit', async e => {
-  e.preventDefault();
-  const fd = new FormData(e.target);
-  const r = await fetch('/admin/api/numbers/import', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(Object.fromEntries(fd)) }).then(r=>r.json());
-  if (r.error) { showMsg('msgImport','err',r.error); return; }
-  showMsg('msgImport','ok',`${r.added} numéro(s) importé(s), ${r.skipped} ignoré(s) ✓`);
-  e.target.reset(); await loadAll();
-});
-
-document.querySelectorAll('.modal-overlay').forEach(m => m.addEventListener('click', e => { if(e.target===m) closeModals(); }));
-
-// ── Helpers ────────────────────────────────────────────────
-function formatDate(d) {
-  if (!d) return '—';
-  return new Date(d).toLocaleDateString('fr-FR', { day:'2-digit', month:'2-digit', year:'numeric' });
+function openAssign(numId, number) {
+  assignTargetId = numId;
+  document.getElementById('mAssignTitle').textContent = 'Attribuer le numéro';
+  document.getElementById('mAssignSub').textContent = 'Numéro : ' + number;
+  document.getElementById('mAssignFlash').style.display = 'none';
+  document.getElementById('mAssign').classList.add('open');
 }
-function showMsg(id, type, text) {
+
+function openAssignCrm(sellerId, sellerName, currentNum) {
+  // Find the number entry assigned to this seller, or open assign with seller pre-selected
+  assignTargetId = null; // will be resolved from seller
+  document.getElementById('mAssignTitle').textContent = 'Changer le numéro de ' + sellerName;
+  document.getElementById('mAssignSub').textContent = currentNum ? 'Numéro actuel : ' + currentNum : 'Aucun numéro attribué';
+
+  // Pre-select available number from pool automatically shown — set seller in select
+  // We store seller context and resolve in confirmAssign
+  document.getElementById('mAssignSeller').dataset.sellerId = sellerId;
+  document.getElementById('mAssignFlash').style.display = 'none';
+
+  // Switch modal to "pool → seller" mode: show available numbers instead of sellers
+  buildPoolOptions(sellerId);
+  document.getElementById('mAssign').classList.add('open');
+}
+
+function buildPoolOptions(preselectedSellerId) {
+  // Override selector with pool numbers when coming from CRM row
+  const sel = document.getElementById('mAssignSeller');
+  sel.innerHTML = '';
+  const avail = numbers.filter(n => n.status === 'available');
+  if (!avail.length) {
+    sel.innerHTML = '<option value="">⚠ Aucun numéro disponible dans le pool</option>';
+  } else {
+    avail.forEach(n => {
+      const opt = document.createElement('option');
+      opt.value = '__num__' + n.id;
+      opt.textContent = n.number + ' (' + (n.provider||'Twilio') + ')';
+      sel.appendChild(opt);
+    });
+  }
+  // Also allow manual: keep current pool mode flag
+  sel.dataset.mode = 'pool';
+  sel.dataset.sellerId = preselectedSellerId;
+}
+
+async function confirmAssign() {
+  const sel = document.getElementById('mAssignSeller');
+  const flash = document.getElementById('mAssignFlash');
+  flash.style.display = 'none';
+
+  if (sel.dataset.mode === 'pool') {
+    // CRM → assign pool number to seller
+    const sellerId = sel.dataset.sellerId;
+    const val = sel.value;
+    if (!val || !val.startsWith('__num__')) { showFlash('mAssignFlash','err','Sélectionnez un numéro disponible'); return; }
+    const numId = val.replace('__num__','');
+    const r = await fetch(`/admin/api/numbers/${numId}/assign`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ seller_id: sellerId })
+    }).then(r => r.json());
+    if (r.error) { showFlash('mAssignFlash','err',r.error); return; }
+    sel.dataset.mode = '';
+    closeAll();
+    await loadAll();
+  } else {
+    // Pool → assign number to seller
+    if (!assignTargetId) return;
+    const sellerId = sel.value || null;
+    const r = await fetch(`/admin/api/numbers/${assignTargetId}/assign`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ seller_id: sellerId })
+    }).then(r => r.json());
+    if (r.error) { showFlash('mAssignFlash','err',r.error); return; }
+    closeAll();
+    await loadAll();
+  }
+}
+
+/* ═══════════════════════════════════════════════════════
+   NOTES MODAL
+═══════════════════════════════════════════════════════ */
+function openNotes(id, name, current) {
+  notesTargetId = id;
+  document.getElementById('mNotesSub').textContent = name;
+  document.getElementById('mNotesText').value = current || '';
+  document.getElementById('mNotesFlash').style.display = 'none';
+  document.getElementById('mNotes').classList.add('open');
+}
+
+async function saveNotes() {
+  const text = document.getElementById('mNotesText').value;
+  const r = await fetch(`/admin/api/crm/${notesTargetId}/flags`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ admin_notes: text })
+  }).then(r => r.json());
+  if (r.error) { showFlash('mNotesFlash','err',r.error); return; }
+  const row = crm.find(c => c.id === notesTargetId);
+  if (row) row.admin_notes = text;
+  closeAll();
+  renderCrm();
+}
+
+/* ═══════════════════════════════════════════════════════
+   ADD / IMPORT FORMS
+═══════════════════════════════════════════════════════ */
+function openAdd()    { document.getElementById('fAdd').reset(); document.getElementById('mAddFlash').style.display='none'; document.getElementById('mAdd').classList.add('open'); }
+function openImport() { document.getElementById('fImport').reset(); document.getElementById('mImportFlash').style.display='none'; document.getElementById('mImport').classList.add('open'); }
+
+document.getElementById('fAdd').addEventListener('submit', async e => {
+  e.preventDefault();
+  const data = Object.fromEntries(new FormData(e.target));
+  const r = await fetch('/admin/api/numbers', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data)
+  }).then(r => r.json());
+  if (r.error) { showFlash('mAddFlash','err',r.error); return; }
+  showFlash('mAddFlash','ok','Numéro ajouté au pool ✓');
+  e.target.reset();
+  await loadAll();
+});
+
+document.getElementById('fImport').addEventListener('submit', async e => {
+  e.preventDefault();
+  const data = Object.fromEntries(new FormData(e.target));
+  const r = await fetch('/admin/api/numbers/import', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data)
+  }).then(r => r.json());
+  if (r.error) { showFlash('mImportFlash','err',r.error); return; }
+  showFlash('mImportFlash','ok',`${r.added} numéro(s) importé(s), ${r.skipped} ignoré(s) ✓`);
+  e.target.reset();
+  await loadAll();
+});
+
+/* ═══════════════════════════════════════════════════════
+   MODAL CLOSE
+═══════════════════════════════════════════════════════ */
+function closeAll() {
+  document.querySelectorAll('.overlay').forEach(m => {
+    m.classList.remove('open');
+    const sel = m.querySelector('#mAssignSeller');
+    if (sel) { sel.dataset.mode = ''; sel.dataset.sellerId = ''; }
+  });
+  assignTargetId = null;
+  notesTargetId = null;
+  // Rebuild seller options for next pool-mode usage
+  buildSellerOptions();
+}
+
+document.querySelectorAll('.overlay').forEach(m => {
+  m.addEventListener('click', e => { if (e.target === m) closeAll(); });
+});
+
+/* ═══════════════════════════════════════════════════════
+   HELPERS
+═══════════════════════════════════════════════════════ */
+function fd(d) {
+  if (!d) return '<span style="color:#ccc">—</span>';
+  return new Date(d).toLocaleDateString('fr-FR', { day:'2-digit', month:'2-digit', year:'2-digit' });
+}
+function esc(s) {
+  return String(s||'').replace(/'/g,"\\'").replace(/"/g,'&quot;');
+}
+function esc2(s) {
+  return String(s||'').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+function showFlash(id, type, text) {
   const el = document.getElementById(id);
-  el.className = `msg ${type}`; el.textContent = text; el.style.display='block';
+  el.className = 'flash ' + type;
+  el.textContent = text;
+  el.style.display = 'block';
 }
 
-// ── Init ───────────────────────────────────────────────────
+/* ═══════════════════════════════════════════════════════
+   INIT
+═══════════════════════════════════════════════════════ */
 loadAll();
 </script>
 </body>
