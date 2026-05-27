@@ -471,9 +471,26 @@
     </div>
 
     <!-- Page header -->
-    <div class="page-header">
-      <h1>Tableau de bord</h1>
-      <p id="welcomeMsg">Bienvenue sur votre espace vendeur Serenis</p>
+    <div class="page-header" style="display:flex;align-items:flex-start;justify-content:space-between;gap:16px;">
+      <div>
+        <h1>Tableau de bord</h1>
+        <p id="welcomeMsg">Bienvenue sur votre espace vendeur Serenis</p>
+      </div>
+      <!-- Cloche notifications -->
+      <div style="position:relative;flex-shrink:0;margin-top:4px;">
+        <button id="notifBtn" onclick="toggleNotifPanel()" style="position:relative;background:#fff;border:1.5px solid rgba(0,0,0,0.08);border-radius:10px;width:40px;height:40px;display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 1px 4px rgba(0,0,0,0.06);">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#3D5A47" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+          <span id="notifBadge" style="display:none;position:absolute;top:-4px;right:-4px;background:#dc2626;color:#fff;font-size:0.6rem;font-weight:700;border-radius:10px;min-width:16px;height:16px;line-height:16px;text-align:center;padding:0 4px;"></span>
+        </button>
+        <!-- Dropdown panel -->
+        <div id="notifPanel" style="display:none;position:absolute;right:0;top:48px;width:320px;background:#fff;border:1px solid rgba(0,0,0,0.08);border-radius:12px;box-shadow:0 8px 32px rgba(0,0,0,0.12);z-index:500;overflow:hidden;">
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:1px solid rgba(0,0,0,0.06);">
+            <span style="font-weight:600;font-size:0.88rem;color:#1C1C1A;">Notifications</span>
+            <button onclick="markAllRead()" style="font-size:0.72rem;color:#3D5A47;background:none;border:none;cursor:pointer;font-weight:600;">Tout marquer lu</button>
+          </div>
+          <div id="notifList" style="max-height:360px;overflow-y:auto;"></div>
+        </div>
+      </div>
     </div>
 
     <!-- Stats principales (4 cartes) -->
@@ -894,6 +911,51 @@ function renderPhotoProgress(seller) {
   }).join('');
 }
 
+/* ══ Notifications ══ */
+let notifOpen = false;
+function toggleNotifPanel() {
+  notifOpen = !notifOpen;
+  document.getElementById('notifPanel').style.display = notifOpen ? 'block' : 'none';
+}
+document.addEventListener('click', e => {
+  if (!e.target.closest('#notifBtn') && !e.target.closest('#notifPanel')) {
+    notifOpen = false;
+    const p = document.getElementById('notifPanel');
+    if (p) p.style.display = 'none';
+  }
+});
+function renderNotifications(notifications) {
+  const badge = document.getElementById('notifBadge');
+  const list  = document.getElementById('notifList');
+  const unread = notifications.filter(n => !n.read_at).length;
+  if (unread > 0) { badge.style.display = 'block'; badge.textContent = unread > 9 ? '9+' : unread; }
+  else badge.style.display = 'none';
+  if (!notifications.length) {
+    list.innerHTML = '<div style="padding:24px;text-align:center;color:#aaa;font-size:0.82rem;">Aucune notification</div>';
+    return;
+  }
+  const icons = { visit_request:'📅', visit_confirmed:'✅', new_contact:'📩', visit_cancelled:'❌' };
+  list.innerHTML = notifications.map(n => `
+    <div style="padding:12px 16px;border-bottom:1px solid rgba(0,0,0,0.05);background:${n.read_at?'#fff':'#F9FFF9'};">
+      <div style="display:flex;gap:10px;align-items:flex-start;">
+        <span style="font-size:1.1rem;flex-shrink:0">${icons[n.type]||'🔔'}</span>
+        <div style="min-width:0">
+          <div style="font-size:0.82rem;font-weight:600;color:#1C1C1A">${n.title||''}</div>
+          <div style="font-size:0.78rem;color:#666;margin-top:2px;line-height:1.4">${n.body||''}</div>
+          <div style="font-size:0.68rem;color:#bbb;margin-top:4px">${new Date(n.created_at).toLocaleDateString('fr-FR',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'})}</div>
+        </div>
+        ${!n.read_at?'<span style="width:7px;height:7px;border-radius:50%;background:#059669;flex-shrink:0;margin-top:4px"></span>':''}
+      </div>
+    </div>
+  `).join('');
+}
+async function markAllRead() {
+  await fetch(`${API}/connect/notifications/read-all`, { method: 'POST' });
+  document.getElementById('notifBadge').style.display = 'none';
+  document.querySelectorAll('#notifList [style*="F9FFF9"]').forEach(el => el.style.background = '#fff');
+  document.querySelectorAll('#notifList span[style*="059669"]').forEach(el => el.remove());
+}
+
 async function loadData() {
   try {
     const [meRes, propRes, visitsRes, scoreRes, pubsRes] = await Promise.all([
@@ -954,6 +1016,9 @@ async function loadData() {
 
     /* — Progression bar — */
     renderProgressionBar(seller, property, photos, publications, stats);
+
+    /* — Notifications — */
+    renderNotifications(meData.notifications || []);
 
     /* — Photo progress — */
     renderPhotoProgress(seller);

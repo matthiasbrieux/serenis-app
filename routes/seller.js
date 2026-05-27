@@ -17,11 +17,12 @@ router.get('/onboarding', requireAuth, (req, res) => res.sendFile('onboarding.ht
 
 // API — seller data
 router.get('/api/me', requireAuth, (req, res) => {
-  const seller = db.prepare('SELECT id, uuid, email, first_name, last_name, phone, pack, twilio_number, paid_at, created_at FROM sellers WHERE id = ?').get(req.seller.id);
+  const seller = db.prepare('SELECT id, uuid, email, first_name, last_name, phone, pack, twilio_number, paid_at, created_at, client_availability, booking_step, photographer_scheduled, photographer_name, photographer_date, photographer_done, photo_report_url FROM sellers WHERE id = ?').get(req.seller.id);
   const property = db.prepare('SELECT * FROM properties WHERE seller_id = ?').get(req.seller.id);
   const contacts = property ? db.prepare('SELECT COUNT(*) as count FROM buyer_contacts WHERE seller_id = ?').get(req.seller.id) : { count: 0 };
   const visits = property ? db.prepare('SELECT COUNT(*) as count FROM visits WHERE seller_id = ?').get(req.seller.id) : { count: 0 };
-  res.json({ seller, property, stats: { contacts: contacts.count, visits: visits.count } });
+  const notifications = db.prepare('SELECT * FROM notifications WHERE seller_id = ? ORDER BY created_at DESC LIMIT 25').all(req.seller.id);
+  res.json({ seller, property, stats: { contacts: contacts.count, visits: visits.count }, notifications });
 });
 
 // Profile setup
