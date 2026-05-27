@@ -554,4 +554,101 @@ router.post('/api/connect/ai-insight', requireAuth, async (req, res) => {
   }
 });
 
+// ── Mise en relation photographe ─────────────────────────────────────────────
+
+// Statut de la mission photo du vendeur
+router.get('/api/seller/my-mission', requireAuth, (req, res) => {
+  const mission = db.prepare(`
+    SELECT m.*, p.first_name as photographer_first_name, p.last_name as photographer_last_name, p.phone as photographer_phone
+    FROM missions m
+    LEFT JOIN photographers p ON p.id = m.photographer_id
+    WHERE m.seller_id = ?
+    ORDER BY m.created_at DESC LIMIT 1
+  `).get(req.seller.id);
+  res.json({ mission: mission || null });
+});
+
+// Récupérer les créneaux disponibles pour une zone
+router.get('/api/seller/available-slots', requireAuth, (req, res) => {
+  const { postal_code, date_from, date_to } = req.query;
+  if (!postal_code) return res.json({ error: 'Code postal requis' });
+  const prefix = postal_code.slice(0, 2);
+  const from = date_from || new Date().toISOString().split('T')[0];
+  const to = date_to || (() => { const d = new Date(); d.setDate(d.getDate() + 60); return d.toISOString().split('T')[0]; })();
+  const slots = db.prepare(`
+    SELECT pa.id, pa.date, pa.start_time, pa.end_time, p.first_name, p.last_name, p.rating, p.id as photographer_id
+    FROM photographer_availability pa
+    JOIN photographers p ON p.id = pa.photographer_id
+    WHERE p.active=1 AND p.verified=1
+    AND pa.is_blocked=0
+    AND pa.date >= ? AND pa.date <= ?
+    AND (SUBSTR(p.base_postal_code,1,2) = ? OR CAST(p.intervention_radius AS INTEGER) >= 50)
+    AND NOT EXISTS (
+      SELECT 1 FROM missions m
+      WHERE m.photographer_id = pa.photographer_id
+      AND m.scheduled_date = pa.date
+      AND m.scheduled_time = pa.start_time
+      AND m.status IN ('assigned','confirmed')
+    )
+    ORDER BY pa.date, pa.start_time
+  `).all(from, to, prefix);
+  res.json({ slots });
+});
+
+// Créer la mission et assigner un photographe
+router.post('/api/seller/book-photography', requireAuth, (req, res) => {
+  const { slot_id, access_notes, rooms_detail } = req.body;
+  if (!slot_id) return res.json({ error: 'Créneau requis' });
+
+  // Vérifier qu'il n'y a pas déjà une mission active
+  const existing = db.prepare(`SELECT id FROM missions WHERE seller_id=? AND status IN ('pending','assigned','confirmed')`).get(req.seller.id);
+  if (existing) return res.json({ error: 'Vous avez déjà une mission en cours' });
+
+  // Récupérer le créneau
+  const slot = db.prepare(`
+    SELECT pa.*, p.id as photographer_id
+    FROM photographer_availability pa
+    JOIN photographers p ON p.id = pa.photographer_id
+    WHERE pa.id=? AND pa.is_blocked=0 AND p.active=1 AND p.verified=1
+    AND NOT EXISTS (
+      SELECT 1 FROM missions m WHERE m.photographer_id=pa.photographer_id
+      AND m.scheduled_date=pa.date AND m.scheduled_time=pa.start_time
+      AND m.status IN ('assigned','confirmed')
+    )
+  `).get(slot_id);
+  if (!slot) return res.json({ error: 'Créneau indisponible ou déjà pris' });
+
+  // Récupérer les infos du vendeur + bien
+  const seller = db.prepare('SELECT * FROM sellers WHERE id=?').get(req.seller.id);
+  const property = db.prepare('SELECT * FROM properties WHERE seller_id=?').get(req.seller.id);
+  if (!property) return res.json({ error: 'Renseignez d\'abord votre fiche bien' });
+  if (!property.postal_code) return res.json({ error: 'Code postal du bien manquant dans la fiche' });
+
+  const uuid = require('uuid').v4();
+  db.prepare(`
+    INSERT INTO missions (uuid, seller_id, client_name, client_email, client_phone,
+      address, city, postal_code, property_type, surface, rooms,
+      photographer_id, scheduled_date, scheduled_time, status, access_notes, price)
+    VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,'assigned',?,999)
+  `).run(
+    uuid,
+    seller.id,
+    (seller.first_name || '') + ' ' + (seller.last_name || ''),
+    seller.email,
+    seller.phone || '',
+    property.address || '',
+    property.city || '',
+    property.postal_code,
+    property.type || 'maison',
+    property.surface_habitable || null,
+    property.rooms || null,
+    slot.photographer_id,
+    slot.date,
+    slot.start_time,
+    access_notes || ''
+  );
+
+  res.json({ success: true, uuid });
+});
+
 module.exports = router;

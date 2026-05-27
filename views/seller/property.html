@@ -828,6 +828,7 @@
       <button type="button" class="tab-btn" data-tab="documents">📁 Documents</button>
       <button type="button" class="tab-btn" data-tab="fiche">📋 Dossier envoi client</button>
       <button type="button" class="tab-btn" data-tab="publication">🚀 Publication</button>
+      <button type="button" class="tab-btn" data-tab="photo-service">📷 Séance photo</button>
     </div>
 
     <!-- ═══════════════════════════════════════════════════
@@ -2089,7 +2090,284 @@
         <div id="publishActions" style="margin-top:24px;"></div>
       </div>
     </div>
+
+    <!-- ═══════════════════════════════════════════════════
+         TAB: SÉANCE PHOTO
+    ════════════════════════════════════════════════════ -->
+    <div class="tab-content hidden" id="tab-photo-service">
+      <div id="photo-service-content" style="max-width:720px;">
+        <div style="color:#aaa;padding:32px 0;text-align:center;font-size:0.9rem;">Chargement…</div>
+      </div>
+    </div>
   </main>
+
+  <style>
+    /* ── Séance photo tab styles ── */
+    .ps-header { margin-bottom:28px; }
+    .ps-header h3 { font-family:'Cormorant Garamond',serif; font-size:1.6rem; font-weight:600; color:#1C1C1A; margin:0 0 6px; }
+    .ps-header p { font-size:0.88rem; color:#8C8880; margin:0; }
+    .ps-card { background:#fff; border:1px solid rgba(0,0,0,0.08); border-radius:10px; padding:24px 28px; margin-bottom:20px; }
+    .ps-card h4 { font-family:'Cormorant Garamond',serif; font-size:1.1rem; font-weight:600; margin:0 0 14px; color:#1C1C1A; }
+    .ps-cal-grid { display:grid; grid-template-columns:repeat(7,1fr); gap:3px; margin-bottom:16px; }
+    .ps-cal-head { text-align:center; font-size:0.68rem; text-transform:uppercase; letter-spacing:0.08em; color:#8C8880; padding:6px 0; font-weight:500; }
+    .ps-cal-cell { min-height:52px; border-radius:6px; padding:5px 6px; cursor:pointer; transition:background 0.1s; background:#faf9f7; border:1px solid transparent; }
+    .ps-cal-cell:hover { background:#f0ece6; }
+    .ps-cal-cell.has-slots { background:#f0fdf4; border-color:#a7f3d0; }
+    .ps-cal-cell.selected { background:#1C1C1A; border-color:#1C1C1A; }
+    .ps-cal-cell.selected .ps-day-num { color:#F5F0E8; }
+    .ps-cal-cell.other-month { opacity:0.3; pointer-events:none; }
+    .ps-cal-cell.past { opacity:0.3; pointer-events:none; }
+    .ps-day-num { font-size:0.8rem; font-weight:500; color:#1C1C1A; }
+    .ps-slot-count { font-size:0.65rem; color:#059669; margin-top:2px; }
+    .ps-slots-list { display:flex; flex-direction:column; gap:8px; }
+    .ps-slot-item { display:flex; justify-content:space-between; align-items:center; padding:12px 16px; border:1.5px solid rgba(0,0,0,0.1); border-radius:8px; cursor:pointer; transition:all 0.15s; }
+    .ps-slot-item:hover { border-color:#C4603A; background:#fff8f5; }
+    .ps-slot-item.selected { border-color:#1C1C1A; background:#1C1C1A; color:#F5F0E8; }
+    .ps-slot-item.selected .ps-slot-phot { color:rgba(245,240,232,0.6); }
+    .ps-slot-time { font-weight:600; font-size:0.9rem; }
+    .ps-slot-phot { font-size:0.8rem; color:#8C8880; }
+    .ps-slot-rating { font-size:0.8rem; color:#C9A84C; }
+    .ps-month-nav { display:flex; align-items:center; gap:12px; margin-bottom:16px; }
+    .ps-month-nav button { background:none; border:1px solid rgba(0,0,0,0.12); border-radius:6px; padding:5px 12px; cursor:pointer; font-size:0.85rem; }
+    .ps-month-nav button:hover { background:#f5f0e8; }
+    .ps-month-label { font-weight:500; font-size:0.9rem; min-width:130px; }
+    .ps-status-badge { display:inline-flex; align-items:center; gap:6px; padding:6px 14px; border-radius:20px; font-size:0.8rem; font-weight:500; }
+    .ps-badge-assigned { background:#fef3c7; color:#92400e; }
+    .ps-badge-confirmed { background:#d1fae5; color:#065f46; }
+    .ps-badge-completed { background:#dbeafe; color:#1e40af; }
+    .ps-info-grid { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+    .ps-info-item label { font-size:0.72rem; text-transform:uppercase; letter-spacing:0.06em; color:#8C8880; display:block; margin-bottom:3px; }
+    .ps-info-item span { font-size:0.9rem; font-weight:500; color:#1C1C1A; }
+    .ps-btn { padding:12px 28px; border:none; border-radius:8px; font-family:inherit; font-size:0.9rem; font-weight:500; cursor:pointer; transition:all 0.15s; }
+    .ps-btn-primary { background:#1C1C1A; color:#F5F0E8; }
+    .ps-btn-primary:hover { background:#333; }
+    .ps-btn-primary:disabled { opacity:0.4; cursor:not-allowed; }
+    .ps-notice { background:#fef3c7; border:1px solid #fde68a; border-radius:8px; padding:14px 16px; font-size:0.85rem; color:#92400e; margin-bottom:16px; }
+  </style>
+
+  <script>
+  // ── Séance photo tab logic ────────────────────────────────────────────────
+  (function() {
+    const MONTHS_FR = ['Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août','Septembre','Octobre','Novembre','Décembre'];
+    const MONTHS_SHORT = ['jan','fév','mar','avr','mai','juin','juil','aoû','sep','oct','nov','déc'];
+    let psCurrentDate = new Date();
+    let psSlots = [];
+    let psSlotsByDate = {};
+    let psSelectedDate = null;
+    let psSelectedSlotId = null;
+    let psLoaded = false;
+
+    function dateStr(d) { return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`; }
+    function getMonthKey(d) { return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`; }
+
+    async function loadPhotoService() {
+      if (psLoaded) return;
+      psLoaded = true;
+      const el = document.getElementById('photo-service-content');
+      try {
+        // Check existing mission
+        const mr = await fetch('/api/seller/my-mission');
+        const { mission } = await mr.json();
+        if (mission) { renderMissionStatus(el, mission); return; }
+
+        // Check property has postal code
+        const prop = _propertyData?.property;
+        if (!prop?.postal_code) {
+          el.innerHTML = `<div class="ps-notice">⚠️ Renseignez d'abord le code postal de votre bien dans l'onglet <strong>Informations</strong> avant de réserver votre séance photo.</div>`;
+          return;
+        }
+        // Load slots
+        const sr = await fetch('/api/seller/available-slots?postal_code=' + prop.postal_code);
+        const { slots } = await sr.json();
+        psSlots = slots || [];
+        psSlotsByDate = {};
+        psSlots.forEach(s => { (psSlotsByDate[s.date] = psSlotsByDate[s.date] || []).push(s); });
+        renderBookingForm(el, prop);
+      } catch(e) {
+        el.innerHTML = `<div style="color:#dc2626;font-size:0.88rem;">Erreur de chargement. Rechargez la page.</div>`;
+      }
+    }
+
+    function renderMissionStatus(el, m) {
+      const STATUS = { assigned:'En attente de confirmation photographe', confirmed:'Confirmée', completed:'Réalisée', pending:'En cours d\'assignation' };
+      const BADGE = { assigned:'ps-badge-assigned', confirmed:'ps-badge-confirmed', completed:'ps-badge-completed', pending:'ps-badge-assigned' };
+      el.innerHTML = `
+        <div class="ps-header">
+          <h3>Votre séance photo</h3>
+          <p>Suivi de votre mission photographique.</p>
+        </div>
+        <div class="ps-card">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;flex-wrap:wrap;gap:12px;">
+            <h4 style="margin:0">Mission #${m.uuid.slice(0,8).toUpperCase()}</h4>
+            <span class="ps-status-badge ${BADGE[m.status]||''}">${STATUS[m.status]||m.status}</span>
+          </div>
+          <div class="ps-info-grid">
+            <div class="ps-info-item"><label>Date</label><span>${m.scheduled_date || '—'}</span></div>
+            <div class="ps-info-item"><label>Heure</label><span>${m.scheduled_time || '—'}</span></div>
+            <div class="ps-info-item"><label>Adresse</label><span>${m.address||'—'}</span></div>
+            <div class="ps-info-item"><label>Ville</label><span>${m.city||'—'}</span></div>
+            ${m.photographer_first_name ? `
+            <div class="ps-info-item"><label>Photographe</label><span>${m.photographer_first_name} ${m.photographer_last_name}</span></div>
+            <div class="ps-info-item"><label>Contact</label><span>${m.photographer_phone||'Communiqué par email'}</span></div>` : ''}
+          </div>
+          ${m.photos_url ? `<div style="margin-top:20px;padding-top:16px;border-top:1px solid rgba(0,0,0,0.06);">
+            <div style="font-size:0.8rem;text-transform:uppercase;letter-spacing:0.06em;color:#8C8880;margin-bottom:8px;">Photos livrées</div>
+            <a href="${m.photos_url}" target="_blank" style="color:#C4603A;font-size:0.9rem;font-weight:500;">📁 Accéder à mes photos →</a>
+          </div>` : ''}
+          ${m.virtual_tour_url ? `<div style="margin-top:12px;">
+            <a href="${m.virtual_tour_url}" target="_blank" style="color:#C4603A;font-size:0.9rem;font-weight:500;">🔭 Voir la visite virtuelle →</a>
+          </div>` : ''}
+          ${m.status === 'assigned' ? `<div style="margin-top:16px;font-size:0.82rem;color:#8C8880;">Le photographe a reçu la notification et doit confirmer sous 24h.</div>` : ''}
+        </div>`;
+    }
+
+    function renderBookingForm(el, prop) {
+      const hasSlots = psSlots.length > 0;
+      el.innerHTML = `
+        <div class="ps-header">
+          <h3>Réserver votre séance photo</h3>
+          <p>Choisissez un créneau parmi les photographes disponibles dans votre zone (${prop.postal_code}).</p>
+        </div>
+        ${!hasSlots ? `<div class="ps-notice">⚠️ Aucun photographe disponible dans votre zone pour les 60 prochains jours. Notre équipe vous contactera pour planifier manuellement votre séance.</div>` : ''}
+        ${hasSlots ? `
+        <div class="ps-card">
+          <h4>1. Choisissez une date</h4>
+          <div class="ps-month-nav">
+            <button id="ps-prev">‹</button>
+            <span class="ps-month-label" id="ps-month-label"></span>
+            <button id="ps-next">›</button>
+          </div>
+          <div class="ps-cal-grid">
+            <div class="ps-cal-head">Lun</div><div class="ps-cal-head">Mar</div>
+            <div class="ps-cal-head">Mer</div><div class="ps-cal-head">Jeu</div>
+            <div class="ps-cal-head">Ven</div><div class="ps-cal-head">Sam</div>
+            <div class="ps-cal-head">Dim</div>
+          </div>
+          <div class="ps-cal-grid" id="ps-cal-body"></div>
+        </div>
+        <div class="ps-card" id="ps-slots-card" style="display:none;">
+          <h4>2. Choisissez un créneau</h4>
+          <div class="ps-slots-list" id="ps-slots-list"></div>
+        </div>
+        <div class="ps-card" id="ps-notes-card" style="display:none;">
+          <h4>3. Informations d'accès <span style="font-weight:400;font-size:0.85rem;color:#8C8880;">(optionnel)</span></h4>
+          <textarea id="ps-access-notes" rows="3" style="width:100%;padding:10px 12px;border:1.5px solid rgba(0,0,0,0.1);border-radius:6px;font-family:inherit;font-size:0.88rem;resize:vertical;" placeholder="Ex : code d'entrée, étage, présence d'un gardien, chien, clé chez le voisin…"></textarea>
+          <div style="margin-top:16px;display:flex;align-items:center;gap:16px;flex-wrap:wrap;">
+            <button class="ps-btn ps-btn-primary" id="ps-confirm-btn" disabled>Confirmer la réservation</button>
+            <span id="ps-confirm-msg" style="font-size:0.82rem;color:#059669;display:none;"></span>
+            <span id="ps-confirm-err" style="font-size:0.82rem;color:#dc2626;display:none;"></span>
+          </div>
+          <div style="margin-top:10px;font-size:0.78rem;color:#8C8880;">Le photographe recevra une notification et confirmera sous 24h. Vous serez informé par email.</div>
+        </div>` : ''}`;
+
+      if (!hasSlots) return;
+      renderPsCal();
+      document.getElementById('ps-prev').addEventListener('click', () => {
+        psCurrentDate = new Date(psCurrentDate.getFullYear(), psCurrentDate.getMonth()-1, 1);
+        renderPsCal();
+      });
+      document.getElementById('ps-next').addEventListener('click', () => {
+        psCurrentDate = new Date(psCurrentDate.getFullYear(), psCurrentDate.getMonth()+1, 1);
+        renderPsCal();
+      });
+      document.getElementById('ps-confirm-btn').addEventListener('click', confirmBooking);
+    }
+
+    function renderPsCal() {
+      const today = dateStr(new Date());
+      document.getElementById('ps-month-label').textContent = MONTHS_FR[psCurrentDate.getMonth()] + ' ' + psCurrentDate.getFullYear();
+      const first = new Date(psCurrentDate.getFullYear(), psCurrentDate.getMonth(), 1);
+      let startDow = first.getDay(); if (startDow === 0) startDow = 7;
+      const daysInMonth = new Date(psCurrentDate.getFullYear(), psCurrentDate.getMonth()+1, 0).getDate();
+      let html = '';
+      for (let i = 1; i < startDow; i++) html += '<div class="ps-cal-cell other-month"></div>';
+      for (let d = 1; d <= daysInMonth; d++) {
+        const ds = dateStr(new Date(psCurrentDate.getFullYear(), psCurrentDate.getMonth(), d));
+        const daySlots = psSlotsByDate[ds] || [];
+        const isPast = ds < today;
+        const isSelected = ds === psSelectedDate;
+        const classes = ['ps-cal-cell', daySlots.length ? 'has-slots' : '', isSelected ? 'selected' : '', isPast ? 'past' : ''].filter(Boolean).join(' ');
+        html += `<div class="${classes}" data-date="${ds}">
+          <div class="ps-day-num">${d}</div>
+          ${daySlots.length ? `<div class="ps-slot-count">${daySlots.length} créneau${daySlots.length>1?'x':''}</div>` : ''}
+        </div>`;
+      }
+      document.getElementById('ps-cal-body').innerHTML = html;
+      document.querySelectorAll('.ps-cal-cell[data-date]').forEach(el => {
+        el.addEventListener('click', () => selectPsDate(el.dataset.date));
+      });
+    }
+
+    function selectPsDate(ds) {
+      psSelectedDate = ds;
+      psSelectedSlotId = null;
+      renderPsCal();
+      const slots = psSlotsByDate[ds] || [];
+      const card = document.getElementById('ps-slots-card');
+      const notesCard = document.getElementById('ps-notes-card');
+      const confirmBtn = document.getElementById('ps-confirm-btn');
+      if (!slots.length) { card.style.display = 'none'; notesCard.style.display = 'none'; return; }
+      card.style.display = 'block';
+      notesCard.style.display = 'none';
+      if (confirmBtn) confirmBtn.disabled = true;
+      document.getElementById('ps-slots-list').innerHTML = slots.map(s => `
+        <div class="ps-slot-item" data-slot-id="${s.id}">
+          <div>
+            <div class="ps-slot-time">${s.start_time} – ${s.end_time}</div>
+            <div class="ps-slot-phot">${s.first_name} ${s.last_name}</div>
+          </div>
+          <div class="ps-slot-rating">★ ${s.rating ? s.rating.toFixed(1) : '5.0'}</div>
+        </div>`).join('');
+      document.querySelectorAll('.ps-slot-item').forEach(el => {
+        el.addEventListener('click', () => {
+          document.querySelectorAll('.ps-slot-item').forEach(x => x.classList.remove('selected'));
+          el.classList.add('selected');
+          psSelectedSlotId = parseInt(el.dataset.slotId);
+          notesCard.style.display = 'block';
+          if (confirmBtn) confirmBtn.disabled = false;
+          notesCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        });
+      });
+    }
+
+    async function confirmBooking() {
+      const btn = document.getElementById('ps-confirm-btn');
+      const msg = document.getElementById('ps-confirm-msg');
+      const err = document.getElementById('ps-confirm-err');
+      if (!psSelectedSlotId) return;
+      btn.disabled = true; btn.textContent = 'Réservation…';
+      err.style.display = 'none';
+      try {
+        const r = await fetch('/api/seller/book-photography', {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ slot_id: psSelectedSlotId, access_notes: document.getElementById('ps-access-notes').value })
+        });
+        const d = await r.json();
+        if (d.success) {
+          msg.textContent = '✓ Réservation confirmée ! Le photographe va recevoir la notification.';
+          msg.style.display = 'inline';
+          btn.textContent = 'Réservé ✓';
+          psLoaded = false;
+          setTimeout(() => { psLoaded = false; loadPhotoService(); }, 1500);
+        } else {
+          err.textContent = d.error || 'Erreur';
+          err.style.display = 'inline';
+          btn.disabled = false; btn.textContent = 'Confirmer la réservation';
+        }
+      } catch {
+        err.textContent = 'Erreur réseau';
+        err.style.display = 'inline';
+        btn.disabled = false; btn.textContent = 'Confirmer la réservation';
+      }
+    }
+
+    // Hook: load when tab is clicked
+    document.addEventListener('DOMContentLoaded', () => {
+      const tabBtn = document.querySelector('.tab-btn[data-tab="photo-service"]');
+      if (tabBtn) tabBtn.addEventListener('click', () => setTimeout(loadPhotoService, 50));
+    });
+  })();
+  </script>
 </div>
 
 <script>
