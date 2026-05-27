@@ -16,13 +16,20 @@ router.post('/create-checkout', async (req, res) => {
     return res.json({ error: 'Paiement non configuré. Contactez Matthias au 06 95 44 36 54.' });
   }
 
-  const priceId = process.env.STRIPE_PRICE_SERENITE;
-  if (!priceId) return res.json({ error: 'Prix Stripe manquant. Contactez le support.' });
-
   try {
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
-      line_items: [{ price: priceId, quantity: 1 }],
+      line_items: [{
+        price_data: {
+          currency: 'eur',
+          product_data: {
+            name: 'Pack Sérénité — Serenis',
+            description: 'Photographe pro · Visite virtuelle · Numéro Serenis · Dossiers automatisés · 6 mois d\'accompagnement',
+          },
+          unit_amount: 99900, // 999€ en centimes
+        },
+        quantity: 1,
+      }],
       mode: 'payment',
       customer_email: email,
       success_url: `${process.env.BASE_URL}/paiement-succes?session_id={CHECKOUT_SESSION_ID}`,
