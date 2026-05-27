@@ -402,7 +402,9 @@
         <h1>CRM Vendeurs</h1>
         <div class="topbar-sub">Vue centralisée de toute l'activité vendeur — mise à jour en temps réel</div>
       </div>
-      <div style="display:flex;gap:8px">
+      <div style="display:flex;gap:8px;align-items:center">
+        <span id="demoTag" style="display:none;font-size:0.7rem;font-weight:600;color:#d97706;background:#fef3c7;padding:3px 10px;border-radius:20px">MODE DÉMO</span>
+        <button id="clearDemoBtn" style="display:none;background:#fee2e2;color:#dc2626;border:none;padding:6px 12px;border-radius:7px;font-size:0.75rem;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif" onclick="clearDemo()">✕ Effacer la démo</button>
         <button class="open-btn" style="width:auto;padding:0 14px;font-size:0.78rem;font-weight:600" onclick="loadAll()">↻ Rafraîchir</button>
       </div>
     </div>
@@ -642,6 +644,10 @@ function updateStats() {
   document.getElementById('cPhotos').textContent   = sellers.filter(c => c.photographer_done).length;
   document.getElementById('cContrats').textContent = sellers.filter(c => c.contrat_signe).length;
   document.getElementById('cOnline').textContent   = sellers.filter(c => c.published).length;
+
+  const hasDemo = sellers.some(c => c.email && c.email.endsWith('@demo.serenis'));
+  document.getElementById('demoTag').style.display      = hasDemo ? 'inline' : 'none';
+  document.getElementById('clearDemoBtn').style.display = hasDemo ? 'inline-flex' : 'none';
 }
 
 /* ═══════════════════════════════════════════════
@@ -686,10 +692,24 @@ function renderTable() {
   const tbody = document.getElementById('tBody');
 
   if (!filtered.length) {
-    tbody.innerHTML = `<tr class="empty-row"><td colspan="15">
-      <div style="font-size:2rem;margin-bottom:8px">🔍</div>
-      <div style="font-size:0.88rem;font-weight:500">Aucun vendeur ne correspond aux filtres</div>
-    </td></tr>`;
+    if (sellers.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="15" style="padding:80px 20px;text-align:center">
+        <div style="font-size:3.5rem;margin-bottom:16px">📊</div>
+        <div style="font-size:1.15rem;font-weight:600;color:#1A1A16;margin-bottom:8px;font-family:'Cormorant Garamond',serif">Aucun vendeur enregistré</div>
+        <div style="font-size:0.85rem;color:#888;margin-bottom:28px;max-width:400px;margin-left:auto;margin-right:auto;line-height:1.6">
+          Chargez 6 profils de démonstration avec des états variés pour visualiser le CRM en temps réel.
+        </div>
+        <button id="seedBtn" onclick="seedDemo()" style="background:#1A1A16;color:#fff;border:none;padding:12px 28px;border-radius:9px;font-size:0.88rem;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;display:inline-flex;align-items:center;gap:8px;transition:background .15s">
+          ✦ Charger les données de démonstration
+        </button>
+        <div style="margin-top:14px;font-size:0.72rem;color:#bbb">6 vendeurs fictifs · Données supprimables à tout moment</div>
+      </td></tr>`;
+    } else {
+      tbody.innerHTML = `<tr class="empty-row"><td colspan="15">
+        <div style="font-size:2rem;margin-bottom:8px">🔍</div>
+        <div style="font-size:0.88rem;font-weight:500">Aucun vendeur ne correspond aux filtres</div>
+      </td></tr>`;
+    }
     return;
   }
 
@@ -1096,6 +1116,31 @@ function renderPanel(c) {
       });
     }
   });
+}
+
+/* ═══════════════════════════════════════════════
+   DEMO SEED
+═══════════════════════════════════════════════ */
+async function seedDemo() {
+  const btn = document.getElementById('seedBtn');
+  if (btn) { btn.disabled = true; btn.textContent = '⏳ Génération en cours...'; }
+  try {
+    const r = await fetch('/admin/api/seed-demo', { method: 'POST' }).then(r => r.json());
+    if (r.success) {
+      toast(`${r.count} vendeurs de démo créés ✓`, 'ok');
+      await loadAll();
+    }
+  } catch(e) {
+    toast('Erreur lors de la génération', 'err');
+    if (btn) { btn.disabled = false; btn.textContent = '✦ Charger les données de démonstration'; }
+  }
+}
+
+async function clearDemo() {
+  if (!confirm('Supprimer toutes les données de démonstration ?')) return;
+  const r = await fetch('/admin/api/seed-demo', { method: 'DELETE' }).then(r => r.json());
+  toast(`${r.deleted} vendeur(s) de démo supprimé(s)`, 'ok');
+  await loadAll();
 }
 
 /* ═══════════════════════════════════════════════
