@@ -168,6 +168,20 @@ db.exec(`
   );
 `);
 
+// ── Table gestion des numéros IA ──────────────────────────────
+db.exec(`
+  CREATE TABLE IF NOT EXISTS phone_numbers (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    number TEXT UNIQUE NOT NULL,
+    status TEXT NOT NULL DEFAULT 'available',
+    provider TEXT DEFAULT 'Twilio',
+    notes TEXT,
+    seller_id INTEGER REFERENCES sellers(id) ON DELETE SET NULL,
+    added_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    assigned_at DATETIME
+  );
+`);
+
 // Migrations: add columns not in original CREATE TABLE
 const newCols = [
   "ALTER TABLE properties ADD COLUMN heating_mechanism TEXT",

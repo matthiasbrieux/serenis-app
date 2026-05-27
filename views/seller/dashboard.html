@@ -499,11 +499,27 @@
         <div class="stat-value" id="statVisits">0</div>
         <div class="stat-sub">cette semaine</div>
       </div>
-      <!-- Numéro dédié -->
-      <div class="stat-card">
-        <div class="stat-label">Numéro dédié</div>
-        <div class="stat-value-small" id="statTwilio" style="margin-top:6px;">—</div>
-        <div class="stat-sub" id="twilioHint" style="display:none;">À mettre dans votre annonce</div>
+      <!-- Numéro IA -->
+      <div class="stat-card" id="twilioCard">
+        <div class="stat-label">Numéro IA</div>
+        <div class="stat-value-small" id="statTwilio" style="margin-top:6px;font-size:1.05rem;font-weight:600;color:#3D5A47;letter-spacing:0.03em;">—</div>
+        <div class="stat-sub" id="twilioHint">En cours d'attribution</div>
+      </div>
+    </div>
+
+    <!-- Numéro IA explainer -->
+    <div id="twilioExplainer" class="card one-col" style="display:none;border-left:4px solid #3D5A47;padding:20px 24px;">
+      <div style="display:flex;align-items:flex-start;gap:16px;">
+        <div style="font-size:1.8rem;line-height:1;flex-shrink:0;">📱</div>
+        <div>
+          <div style="font-weight:600;color:#3D5A47;margin-bottom:6px;">Votre numéro IA est activé</div>
+          <p style="color:#5a6e5f;font-size:0.88rem;margin:0;line-height:1.6;">
+            Utilisez ce numéro dans vos annonces immobilières pour centraliser toutes les demandes acheteurs et organiser vos visites.
+            Les appels et SMS sont automatiquement gérés par l'IA — elle qualifie les acheteurs, répond à leurs questions et planifie vos visites.
+            <strong>Vous n'avez rien à gérer.</strong>
+          </p>
+        </div>
+        <div id="twilioNumberBig" style="flex-shrink:0;font-family:'Cormorant Garamond',serif;font-size:1.5rem;font-weight:600;color:#1C1C1A;white-space:nowrap;"></div>
       </div>
     </div>
 
@@ -864,12 +880,15 @@ async function loadData() {
     document.getElementById('statContacts').textContent = stats.contacts || 0;
     document.getElementById('statVisits').textContent   = stats.visits   || 0;
 
-    // Twilio
+    // Numéro IA
     if (seller.twilio_number) {
       document.getElementById('statTwilio').textContent = seller.twilio_number;
-      document.getElementById('twilioHint').style.display = 'block';
+      document.getElementById('twilioHint').textContent = 'Actif — à mettre dans vos annonces';
+      document.getElementById('twilioExplainer').style.display = 'block';
+      document.getElementById('twilioNumberBig').textContent = seller.twilio_number;
     } else {
-      document.getElementById('statTwilio').textContent = 'Pack Autonome';
+      document.getElementById('statTwilio').textContent = 'En cours d\'attribution';
+      document.getElementById('twilioHint').textContent = 'Disponible avec le pack Sérénité';
     }
 
     /* — Progression bar — */
