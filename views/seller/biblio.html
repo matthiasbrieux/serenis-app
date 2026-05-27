@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ma Bibliothèque — Serenis</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,400&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css">
+  <style>
+    /* ── Bibliothèque ── */
+    .bib-hero { margin-bottom: 32px; }
+    .bib-hero-badge { display: inline-flex; align-items: center; gap: 6px; padding: 3px 12px; border-radius: 100px; background: #F0F5F1; border: 1px solid #C5D9CB; color: #3D5A47; font-size: 0.68rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 10px; }
+    .bib-hero-title { font-family: 'Cormorant Garamond', serif; font-size: 1.7rem; font-weight: 600; color: #1a1a1a; line-height: 1.2; margin: 0 0 8px; }
+    .bib-hero-desc { font-size: 0.85rem; color: #666; line-height: 1.65; max-width: 600px; }
+
+    .bib-tip-banner { display: flex; align-items: flex-start; gap: 12px; padding: 14px 18px; background: #F8F6F2; border-radius: 12px; border-left: 3px solid #C4785A; margin-bottom: 28px; font-size: 0.82rem; color: #555; line-height: 1.65; }
+    .bib-tip-icon { font-size: 1.1rem; flex-shrink: 0; margin-top: 1px; }
+
+    /* Search + filters */
+    .bib-search-row { display: flex; gap: 8px; margin-bottom: 16px; align-items: center; flex-wrap: wrap; }
+    .bib-search-wrap { position: relative; flex: 1; min-width: 180px; }
+    .bib-search { width: 100%; padding: 10px 14px 10px 38px; border: 1.5px solid #E8E3DB; border-radius: 100px; font-size: 0.85rem; font-family: 'DM Sans', sans-serif; outline: none; transition: border-color 0.18s; background: #fff; box-sizing: border-box; }
+    .bib-search:focus { border-color: #3D5A47; }
+    .bib-search-icon { position: absolute; left: 13px; top: 50%; transform: translateY(-50%); color: #BBB; pointer-events: none; }
+    .bib-filter-btns { display: flex; gap: 6px; flex-wrap: wrap; }
+    .bib-filter { padding: 8px 14px; border-radius: 100px; border: 1.5px solid #E8E3DB; background: #fff; font-size: 0.78rem; font-weight: 600; cursor: pointer; transition: all 0.15s; color: #555; font-family: 'DM Sans', sans-serif; white-space: nowrap; }
+    .bib-filter:hover { border-color: #3D5A47; color: #3D5A47; }
+    .bib-filter.on { background: #3D5A47; border-color: #3D5A47; color: #fff; }
+    .bib-filter.fav-on { background: #C4785A; border-color: #C4785A; color: #fff; }
+
+    /* Category pills */
+    .bib-cats { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 20px; }
+    .bib-cat { display: inline-flex; align-items: center; gap: 6px; padding: 8px 14px; border-radius: 10px; border: 1.5px solid #E8E3DB; background: #fff; cursor: pointer; transition: all 0.16s; font-size: 0.8rem; font-weight: 600; color: #555; font-family: 'DM Sans', sans-serif; }
+    .bib-cat:hover { border-color: #3D5A47; color: #3D5A47; }
+    .bib-cat.active { background: #3D5A47; border-color: #3D5A47; color: #fff; }
+    .bib-cat-count { font-size: 0.65rem; font-weight: 700; padding: 1px 6px; border-radius: 100px; background: rgba(0,0,0,0.08); }
+    .bib-cat.active .bib-cat-count { background: rgba(255,255,255,0.22); }
+
+    .bib-results-info { font-size: 0.73rem; color: #BBB; margin-bottom: 14px; }
+
+    /* Grid */
+    .bib-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 12px; }
+
+    /* Cards */
+    .tpl-card { background: #fff; border: 1.5px solid #E8E3DB; border-radius: 14px; overflow: hidden; transition: all 0.18s; display: flex; flex-direction: column; }
+    .tpl-card:hover { border-color: #C5D9CB; box-shadow: 0 4px 24px rgba(0,0,0,0.07); transform: translateY(-1px); }
+    .tpl-card-top { padding: 16px 16px 12px; flex: 1; }
+
+    .tpl-badges { display: flex; gap: 5px; margin-bottom: 9px; flex-wrap: wrap; }
+    .tpl-badge { padding: 2px 8px; border-radius: 100px; font-size: 0.63rem; font-weight: 700; letter-spacing: 0.04em; }
+    .tpl-badge.sms      { background: #ECFDF5; color: #059669; }
+    .tpl-badge.email    { background: #EEF2FF; color: #4F46E5; }
+    .tpl-badge.premium  { background: #FFFBEB; color: #B45309; }
+    .tpl-badge.amical   { background: #F0F5F1; color: #3D5A47; }
+    .tpl-badge.ferme    { background: #FEF2F2; color: #DC2626; }
+    .tpl-badge.rassurant{ background: #F0F9FF; color: #0369A1; }
+
+    .tpl-title { font-size: 0.9rem; font-weight: 700; color: #1a1a1a; margin-bottom: 7px; line-height: 1.3; }
+    .tpl-preview { font-size: 0.78rem; color: #777; line-height: 1.6; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+    .tpl-var { display: inline-block; padding: 1px 5px; border-radius: 4px; background: #FFFBEB; color: #B45309; font-size: 0.72rem; font-weight: 700; border: 1px solid #FDE68A; margin: 0 1px; white-space: nowrap; }
+
+    /* Expanded body */
+    .tpl-body-wrap { display: none; padding: 0 14px 10px; }
+    .tpl-body-wrap.open { display: block; animation: fadeInBib 0.2s; }
+    @keyframes fadeInBib { from{opacity:0;transform:translateY(4px)} to{opacity:1;transform:none} }
+    .tpl-body-text { font-size: 0.8rem; color: #333; line-height: 1.8; white-space: pre-wrap; background: #FAFAF8; border-radius: 8px; padding: 12px 14px; border: 1px solid #F0ECE6; font-family: 'DM Sans', sans-serif; }
+    .tpl-tip-bib { margin-top: 9px; font-size: 0.75rem; color: #2D4D38; padding: 7px 10px 7px 12px; background: #EDF5F0; border-left: 3px solid #3D5A47; border-radius: 0 6px 6px 0; line-height: 1.55; }
+
+    /* Actions */
+    .tpl-actions { display: flex; gap: 6px; padding: 10px 12px; border-top: 1px solid #F0ECE6; background: #FAFAF8; align-items: center; }
+    .tpl-copy-btn { flex: 1; min-width: 0; padding: 9px 12px; border-radius: 8px; background: #3D5A47; color: #fff; border: none; font-size: 0.8rem; font-weight: 600; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: all 0.18s; display: flex; align-items: center; justify-content: center; gap: 6px; }
+    .tpl-copy-btn:hover { background: #2D4237; }
+    .tpl-copy-btn.copied { background: #16A34A; }
+    .tpl-fav-btn { width: 36px; height: 36px; border-radius: 8px; border: 1.5px solid #E8E3DB; background: #fff; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 1rem; transition: all 0.15s; color: #CCC; flex-shrink: 0; line-height: 1; }
+    .tpl-fav-btn:hover { border-color: #C4785A; color: #C4785A; }
+    .tpl-fav-btn.active { border-color: #C4785A; color: #C4785A; background: #FDF8F5; }
+    .tpl-expand-btn { padding: 8px 12px; border-radius: 8px; border: 1.5px solid #E8E3DB; background: #fff; font-size: 0.75rem; font-weight: 600; cursor: pointer; font-family: 'DM Sans', sans-serif; color: #666; transition: all 0.15s; white-space: nowrap; flex-shrink: 0; }
+    .tpl-expand-btn:hover { border-color: #3D5A47; color: #3D5A47; }
+
+    .bib-empty { text-align: center; padding: 56px 20px; color: #BBB; font-size: 0.85rem; grid-column: 1 / -1; }
+    .bib-empty-icon { font-size: 2.5rem; margin-bottom: 12px; }
+    .bib-empty-msg { font-size: 0.88rem; color: #999; }
+
+    /* Toast */
+    .toast { position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(20px);background:#1a1a1a;color:#fff;padding:10px 20px;border-radius:100px;font-size:0.82rem;font-weight:500;font-family:'DM Sans',sans-serif;opacity:0;transition:all 0.28s;pointer-events:none;white-space:nowrap;z-index:9999; }
+    .toast.show { opacity:1;transform:translateX(-50%) translateY(0); }
+
+    @keyframes copyPop { 0%{transform:scale(1)} 40%{transform:scale(1.06)} 100%{transform:scale(1)} }
+
+    @media (max-width: 768px) {
+      .bib-grid { grid-template-columns: 1fr; }
+      .bib-hero-title { font-size: 1.4rem; }
+    }
+    @media (max-width: 480px) {
+      .bib-cat { padding: 6px 10px; font-size: 0.73rem; }
+      .tpl-copy-btn { font-size: 0.76rem; }
+      .bib-filter { padding: 7px 11px; }
+    }
+  </style>
+</head>
+<body>
+<div class="app-layout">
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <a href="/" class="logo">
+        <svg width="28" height="28" viewBox="0 0 32 32"><path d="M16 2L3 13v17h8v-8h10v8h8V13L16 2z" fill="#D4E4D8"/></svg>
+        <span class="logo-text">Sere<em style="color:#C4785A">nis</em></span>
+      </a>
+    </div>
+    <nav class="sidebar-nav">
+      <a href="/dashboard" class="sidebar-item">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg> Tableau de bord
+      </a>
+      <a href="/ma-formation" class="sidebar-item">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg> Ma formation
+      </a>
+      <a href="/mon-bien" class="sidebar-item">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg> Mon bien
+      </a>
+      <a href="/serenis-connect" class="sidebar-item">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.27h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 9a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg> Serenis Connect
+      </a>
+      <a href="/mon-agenda" class="sidebar-item">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg> Mon agenda
+      </a>
+      <a href="/ma-bibliotheque" class="sidebar-item active">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg> Ma bibliothèque
+      </a>
+      <a href="/mes-publications" class="sidebar-item">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.55a11 11 0 0 1 14.08 0"/><path d="M1.42 9a16 16 0 0 1 21.16 0"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><circle cx="12" cy="20" r="1"/></svg> Mes publications
+      </a>
+    </nav>
+    <div style="position:absolute;bottom:24px;left:0;right:0;padding:0 24px;">
+      <a href="/logout" style="color:rgba(61,90,71,0.45);font-size:0.8rem;">Déconnexion →</a>
+    </div>
+  </aside>
+
+  <main class="main-content">
+    <div class="page-header">
+      <h1 class="page-title">Ma bibliothèque</h1>
+      <p class="page-subtitle">Messages professionnels prêts à l'emploi</p>
+    </div>
+
+    <!-- Hero -->
+    <div class="bib-hero">
+      <div class="bib-hero-badge">✦ Communication vendeur</div>
+      <h2 class="bib-hero-title">1 clic → copier → envoyer</h2>
+      <p class="bib-hero-desc">38 modèles de messages pour chaque situation de votre vente. Sélectionnez une catégorie, lisez la preview, copiez en 1 clic et personnalisez les <span class="tpl-var">[variables]</span> surlignées avant d'envoyer.</p>
+    </div>
+
+    <!-- Tip banner -->
+    <div class="bib-tip-banner">
+      <div class="bib-tip-icon">💡</div>
+      <div>Personnalisez toujours les champs <span class="tpl-var">[NOM]</span> <span class="tpl-var">[DATE]</span> <span class="tpl-var">[HEURE]</span> avant d'envoyer. Un message personnalisé obtient 3× plus de réponses qu'un message générique.</div>
+    </div>
+
+    <!-- Recherche + filtres -->
+    <div class="bib-search-row">
+      <div class="bib-search-wrap">
+        <svg class="bib-search-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input class="bib-search" id="bibSearch" type="text" placeholder="Rechercher un modèle…" autocomplete="off">
+      </div>
+      <div class="bib-filter-btns">
+        <button class="bib-filter" id="bibFltSms">SMS</button>
+        <button class="bib-filter" id="bibFltEmail">Email</button>
+        <button class="bib-filter" id="bibFltFavs">♥ Favoris</button>
+      </div>
+    </div>
+
+    <!-- Catégories -->
+    <div class="bib-cats" id="bibCats"></div>
+
+    <!-- Compteur -->
+    <div class="bib-results-info" id="bibInfo"></div>
+
+    <!-- Grille -->
+    <div class="bib-grid" id="bibGrid"></div>
+
+    <div style="height:80px;"></div>
+  </main>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="bibToast"></div>
+
+<script src="/js/transitions.js"></script>
+<script>
+// ══════════════════════════════════════════════════════════════
+// BIBLIOTHÈQUE DE COMMUNICATION VENDEUR
+// ══════════════════════════════════════════════════════════════
+
+const BIB_CATS = [
+  { id:'all',         label:'Tout voir',             icon:'' },
+  { id:'visites',     label:'Visites',               icon:'🏡' },
+  { id:'negociation', label:'Négociation',           icon:'🤝' },
+  { id:'notaire',     label:'Notaire',               icon:'📋' },
+  { id:'financement', label:'Financement',           icon:'💳' },
+  { id:'signature',   label:'Signature',             icon:'✍️' },
+  { id:'relances',    label:'Relances',              icon:'🔔' },
+  { id:'pas-serieux', label:'Acheteurs non sérieux', icon:'🚩' },
+  { id:'silencieux',  label:'Acheteurs silencieux',  icon:'💬' },
+  { id:'offres',      label:'Offres',                icon:'💰' },
+];
+
+const BIB_TEMPLATES = [
+  // ── VISITES ──────────────────────────────────────────────────
+  { id:'vis-1', cat:'visites', title:'Confirmation de visite', type:'email', tone:'premium',
+    tip:'Envoyez 24h avant avec votre dossier complet en pièce jointe.',
+    body:`Bonjour,\n\nJe vous confirme notre rendez-vous pour la visite de mon bien le [DATE] à [HEURE].\n\nJe vous remercie de me prévenir en cas d'empêchement.\n\nCordialement\n[NOM]` },
+  { id:'vis-2', cat:'visites', title:'Rappel visite J-1 (SMS)', type:'sms', tone:'amical',
+    tip:'Un SMS la veille réduit les no-shows de 60%.',
+    body:`Bonjour [NOM], rappel visite demain à [HEURE] — [ADRESSE]. Prévenez-moi si empêchement. À demain !` },
+  { id:'vis-3', cat:'visites', title:'Qualification financière avant visite', type:'email', tone:'ferme',
+    tip:"Posez cette question avant d'organiser la visite. Filtre les curieux sans budget.",
+    body:`Bonjour,\n\nAfin d'organiser la visite dans les meilleures conditions, pouvez-vous me préciser l'état d'avancement de votre projet :\n\n- achat comptant ou financement bancaire,\n- accord bancaire obtenu ou en cours,\n- budget validé,\n- délai estimé pour votre acquisition.\n\nMerci par avance.\n\nCordialement\n[NOM]` },
+  { id:'vis-4', cat:'visites', title:'Validation projet avant visite', type:'email', tone:'ferme',
+    tip:'Assurez-vous que le budget correspond avant de bloquer un créneau.',
+    body:`Bonjour,\n\nAvant de bloquer un créneau de visite pour mon bien, pouvez-vous me confirmer que votre projet d'acquisition est bien avancé et correspond au budget indiqué dans l'annonce ?\n\nMerci à vous.\n\nCordialement\n[NOM]` },
+  { id:'vis-5', cat:'visites', title:'Modification rendez-vous', type:'email', tone:'rassurant',
+    tip:"Proposez immédiatement 2-3 créneaux alternatifs pour garder l'élan.",
+    body:`Bonjour,\n\nSuite à un imprévu, je vous propose de déplacer la visite prévue initialement le [DATE].\n\nVoici mes nouvelles disponibilités :\n[DISPONIBILITÉS]\n\nMerci de votre compréhension.\n\nCordialement\n[NOM]` },
+  { id:'vis-6', cat:'visites', title:'Annulation visite', type:'email', tone:'premium',
+    tip:"Restez professionnel et proposez une alternative pour ne pas perdre l'acquéreur.",
+    body:`Bonjour,\n\nJe suis contraint d'annuler la visite prévue le [DATE].\n\nJe reste disponible afin de convenir d'un nouveau créneau si vous le souhaitez.\n\nCordialement\n[NOM]` },
+  { id:'vis-7', cat:'visites', title:'Retard visite (SMS)', type:'sms', tone:'amical',
+    tip:'Prévenez dès que vous savez. Même 5 minutes de prévenance changent tout.',
+    body:`Bonjour [NOM], j'ai quelques minutes de retard pour notre visite. J'arrive très vite, merci de votre compréhension.` },
+  { id:'vis-8', cat:'visites', title:'Remerciement post-visite', type:'email', tone:'premium',
+    tip:"Envoyez dans les 2h après la visite — c'est le moment où l'acheteur est encore sous le charme.",
+    body:`Bonjour,\n\nJe vous remercie pour votre visite aujourd'hui concernant mon bien.\n\nJe reste disponible si vous avez des questions complémentaires.\n\nCordialement\n[NOM]` },
+  { id:'vis-9', cat:'visites', title:'Demande de retour post-visite', type:'email', tone:'amical',
+    tip:'Un feedback sincère vous aide à améliorer votre présentation.',
+    body:`Bonjour,\n\nSuite à votre visite, je serais ravi d'avoir votre retour concernant mon bien.\n\nN'hésitez pas à me faire part de vos impressions ou éventuelles questions complémentaires.\n\nCordialement\n[NOM]` },
+  { id:'vis-10', cat:'visites', title:'Demande de décision acquéreur', type:'email', tone:'ferme',
+    tip:'Après 5 jours sans retour, relancez. Vous méritez une réponse claire.',
+    body:`Bonjour,\n\nJe reviens vers vous concernant mon bien visité récemment afin de savoir si vous souhaitez donner suite à votre projet d'acquisition.\n\nJe reste disponible pour échanger.\n\nCordialement\n[NOM]` },
+
+  // ── NÉGOCIATION ──────────────────────────────────────────────
+  { id:'neg-1', cat:'negociation', title:"Refus d'offre — ferme", type:'email', tone:'ferme',
+    tip:'Soyez courtois mais sans explication. Un refus poli laisse la porte ouverte.',
+    body:`Bonjour,\n\nJe vous remercie pour votre offre et l'intérêt porté à mon bien.\n\nAprès réflexion, je ne souhaite pas donner suite à cette proposition.\n\nJe vous remercie néanmoins pour nos échanges.\n\nCordialement\n[NOM]` },
+  { id:'neg-2', cat:'negociation', title:"Acceptation d'offre", type:'email', tone:'premium',
+    tip:'Confirmez rapidement par écrit. Cela sécurise les deux parties.',
+    body:`Bonjour,\n\nJe vous confirme accepter votre offre concernant mon bien.\n\nNous pouvons désormais avancer vers les prochaines étapes administratives avec le notaire.\n\nCordialement\n[NOM]` },
+  { id:'neg-3', cat:'negociation', title:'Contre-proposition', type:'email', tone:'ferme',
+    tip:'Une contre-proposition bien rédigée montre que vous êtes ouvert mais pas pressé.',
+    body:`Bonjour,\n\nJe vous remercie pour votre offre concernant mon bien.\n\nAprès réflexion, je souhaite vous faire une contre-proposition au prix de [MONTANT].\n\nJe reste disponible afin d'en discuter avec vous.\n\nCordialement\n[NOM]` },
+  { id:'neg-4', cat:'negociation', title:'Négociation sur les délais', type:'email', tone:'rassurant',
+    tip:'Le délai est souvent aussi important que le prix. Clarifiez-le rapidement.',
+    body:`Bonjour,\n\nConcernant votre proposition, je souhaiterais échanger avec vous sur le calendrier envisagé pour la réalisation de la vente de mon bien.\n\nPouvez-vous me préciser votre délai souhaité ?\n\nCordialement\n[NOM]` },
+  { id:'neg-5', cat:'negociation', title:'Négociation mobilier inclus', type:'email', tone:'amical',
+    tip:'Le mobilier peut être un atout de négociation sans toucher au prix affiché.',
+    body:`Bonjour,\n\nConcernant certains équipements présents dans mon bien, je suis ouvert à échanger avec vous sur les éléments pouvant éventuellement rester après la vente.\n\nNous pouvons en discuter ensemble.\n\nCordialement\n[NOM]` },
+
+  // ── NOTAIRE ──────────────────────────────────────────────────
+  { id:'not-1', cat:'notaire', title:'Demande documents acquéreur', type:'email', tone:'premium',
+    tip:"Demandez ces documents dès l'acceptation de l'offre pour ne pas perdre de temps.",
+    body:`Bonjour,\n\nAfin de préparer le compromis de vente concernant mon bien, pouvez-vous me transmettre les éléments suivants :\n\n- pièce d'identité,\n- justificatif de domicile,\n- situation matrimoniale,\n- coordonnées complètes,\n- informations de financement si nécessaire.\n\nMerci par avance.\n\nCordialement\n[NOM]` },
+  { id:'not-2', cat:'notaire', title:'Coordination notaire', type:'email', tone:'premium',
+    tip:'Mettez les deux notaires en contact direct dès que possible pour accélérer.',
+    body:`Bonjour,\n\nPouvez-vous me transmettre les coordonnées de votre notaire afin que les démarches puissent être engagées dans les meilleures conditions concernant la vente de mon bien ?\n\nCordialement\n[NOM]` },
+  { id:'not-3', cat:'notaire', title:'Documents manquants', type:'email', tone:'ferme',
+    tip:'Soyez précis sur les documents manquants pour éviter des allers-retours inutiles.',
+    body:`Bonjour,\n\nIl semble manquer certains documents nécessaires à la préparation du dossier de vente de mon bien.\n\nPouvez-vous me transmettre les éléments suivants :\n[DOCUMENTS]\n\nMerci par avance.\n\nCordialement\n[NOM]` },
+
+  // ── FINANCEMENT ──────────────────────────────────────────────
+  { id:'fin-1', cat:'financement', title:'Suivi financement bancaire', type:'email', tone:'rassurant',
+    tip:"Relancez toutes les semaines jusqu'à l'obtention de l'accord. Votre vente en dépend.",
+    body:`Bonjour,\n\nJe me permets de revenir vers vous concernant l'avancement de votre financement bancaire pour l'acquisition de mon bien.\n\nPouvez-vous me tenir informé de l'évolution de votre dossier ?\n\nCordialement\n[NOM]` },
+  { id:'fin-2', cat:'financement', title:'Demande accord de principe', type:'email', tone:'ferme',
+    tip:'Ne bloquez pas votre bien trop longtemps sans preuve de financement.',
+    body:`Bonjour,\n\nAfin de sécuriser notre transaction, pouvez-vous me transmettre votre accord de principe bancaire ou tout document attestant de votre capacité de financement ?\n\nMerci de votre compréhension.\n\nCordialement\n[NOM]` },
+
+  // ── SIGNATURE ────────────────────────────────────────────────
+  { id:'sig-1', cat:'signature', title:'Rappel signature acte authentique', type:'email', tone:'premium',
+    tip:'Envoyez ce rappel 48h avant la signature définitive.',
+    body:`Bonjour,\n\nPetit rappel concernant la signature de l'acte authentique prévue le [DATE] à [HEURE] chez le notaire concernant la vente de mon bien.\n\nÀ très bientôt.\n\nCordialement\n[NOM]` },
+  { id:'sig-2', cat:'signature', title:'Rappel signature (SMS J-1)', type:'sms', tone:'amical',
+    tip:'Un SMS court la veille pour éviter les oublis.',
+    body:`Bonjour [NOM], rappel : signature chez le notaire demain [DATE] à [HEURE]. À demain !` },
+  { id:'sig-3', cat:'signature', title:'Préparation état des lieux', type:'email', tone:'rassurant',
+    tip:"Organisez l'état des lieux 48h avant la signature pour éviter les surprises.",
+    body:`Bonjour,\n\nJe vous propose d'organiser ensemble un état des lieux de mon bien avant la signature définitive afin de préparer la remise des clés dans les meilleures conditions.\n\nCordialement\n[NOM]` },
+  { id:'sig-4', cat:'signature', title:'Remise des clés', type:'email', tone:'premium',
+    tip:"Confirmez le protocole de remise à l'avance pour que tout se passe sereinement.",
+    body:`Bonjour,\n\nLa remise des clés de mon bien pourra être effectuée lors de la signature définitive chez le notaire.\n\nJe reste disponible pour toute question complémentaire.\n\nCordialement\n[NOM]` },
+  { id:'sig-5', cat:'signature', title:'Remerciement final', type:'email', tone:'amical',
+    tip:'Un message sincère après la vente clôt magnifiquement cette expérience.',
+    body:`Bonjour,\n\nJe vous remercie pour nos échanges tout au long de la vente de mon bien et vous souhaite une excellente continuation dans votre nouveau projet.\n\nCordialement\n[NOM]` },
+
+  // ── RELANCES ─────────────────────────────────────────────────
+  { id:'rel-1', cat:'relances', title:'Relance J+3 (SMS)', type:'sms', tone:'amical',
+    tip:"Un SMS court est souvent plus efficace qu'un email à ce stade.",
+    body:`Bonjour [NOM], suite à votre visite l'autre jour — avez-vous pu réfléchir ? Je reste disponible pour répondre à vos questions.` },
+  { id:'rel-2', cat:'relances', title:'Relance J+7 (email)', type:'email', tone:'rassurant',
+    tip:"Si pas de réponse au SMS, passez à l'email avec plus de contexte.",
+    body:`Bonjour,\n\nJe me permets de revenir vers vous suite à votre visite afin de savoir si mon bien correspond toujours à votre projet.\n\nJe reste disponible pour échanger à votre convenance.\n\nCordialement\n[NOM]` },
+  { id:'rel-3', cat:'relances', title:'Relance finale J+14', type:'email', tone:'ferme',
+    tip:'Après 2 semaines sans réponse, soyez direct. Vous avez besoin d\'une réponse claire.',
+    body:`Bonjour,\n\nJe reviens vers vous une dernière fois suite à votre visite de mon bien.\n\nSi votre projet a évolué ou si vous ne souhaitez pas donner suite, je comprends tout à fait — un simple mot me permettrait de passer à la suite.\n\nDans l'attente de votre retour.\n\nCordialement\n[NOM]` },
+
+  // ── ACHETEURS PAS SÉRIEUX ─────────────────────────────────────
+  { id:'pas-1', cat:'pas-serieux', title:'Refus visite sans qualification', type:'email', tone:'ferme',
+    tip:'Vous avez le droit de demander une pré-qualification avant toute visite.',
+    body:`Bonjour,\n\nJe vous remercie pour votre intérêt concernant mon bien.\n\nAvant d'organiser une visite, je souhaite m'assurer que votre projet correspond bien aux caractéristiques de mon bien et à votre capacité de financement.\n\nPouvez-vous me préciser votre situation ?\n\nCordialement\n[NOM]` },
+  { id:'pas-2', cat:'pas-serieux', title:'Offre trop basse — refus ferme', type:'email', tone:'ferme',
+    tip:'Refusez clairement et sans justification excessive. Votre prix est votre prix.',
+    body:`Bonjour,\n\nJe vous remercie pour votre offre.\n\nAprès réflexion, cette proposition est trop éloignée de mon prix de vente pour que je puisse y donner suite.\n\nMon bien reste disponible au prix affiché.\n\nCordialement\n[NOM]` },
+  { id:'pas-3', cat:'pas-serieux', title:'Clôture relation non productive', type:'email', tone:'premium',
+    tip:"Concluez proprement pour vous libérer et passer à d'autres acheteurs.",
+    body:`Bonjour,\n\nSuite à nos échanges, il semble que mon bien ne corresponde pas à votre projet actuel.\n\nJe vous souhaite bonne continuation dans vos recherches.\n\nCordialement\n[NOM]` },
+
+  // ── ACHETEURS SILENCIEUX ──────────────────────────────────────
+  { id:'sil-1', cat:'silencieux', title:'Relance acheteur silencieux (SMS)', type:'sms', tone:'amical',
+    tip:'Court, sans pression. Laissez une porte ouverte.',
+    body:`Bonjour [NOM], j'espère que vous allez bien. Avez-vous pu réfléchir à mon bien ? Je suis disponible si vous avez des questions.` },
+  { id:'sil-2', cat:'silencieux', title:'Relance après silence prolongé', type:'email', tone:'rassurant',
+    tip:"Après 10+ jours de silence, montrez que vous êtes disponible sans être intrusif.",
+    body:`Bonjour,\n\nJe prends contact avec vous car je n'ai pas eu de nouvelles depuis votre visite de mon bien.\n\nJe ne souhaite pas vous importuner — simplement m'assurer que vous disposez de toutes les informations nécessaires pour avancer dans votre réflexion.\n\nJe reste bien sûr disponible.\n\nCordialement\n[NOM]` },
+  { id:'sil-3', cat:'silencieux', title:'Urgence — autre acquéreur', type:'email', tone:'ferme',
+    tip:"Utilisez uniquement si c'est vrai. Une fausse urgence se retourne toujours contre vous.",
+    body:`Bonjour,\n\nJe me permets de vous informer qu'un autre acquéreur a manifesté un intérêt sérieux pour mon bien.\n\nSouhaitez-vous que je vous réserve un créneau pour échanger avant de prendre une décision ?\n\nCordialement\n[NOM]` },
+
+  // ── OFFRES ───────────────────────────────────────────────────
+  { id:'off-1', cat:'offres', title:"Accusé réception d'offre", type:'email', tone:'premium',
+    tip:"Prenez toujours le temps de la réflexion. Aucune obligation de répondre immédiatement.",
+    body:`Bonjour,\n\nJe vous confirme avoir bien reçu votre offre d'achat pour mon bien.\n\nJe reviendrai vers vous dans les prochains jours après l'avoir examinée avec attention.\n\nCordialement\n[NOM]` },
+  { id:'off-2', cat:'offres', title:'Acceptation offre au prix', type:'email', tone:'premium',
+    tip:"Confirmez par écrit immédiatement, même si l'accord verbal est déjà fait.",
+    body:`Bonjour,\n\nJe vous confirme accepter votre offre d'achat au prix de [MONTANT] pour mon bien situé au [ADRESSE].\n\nNous pouvons maintenant avancer avec nos notaires respectifs.\n\nCordialement\n[NOM]` },
+  { id:'off-3', cat:'offres', title:'Refus + invitation à reformuler', type:'email', tone:'amical',
+    tip:'Laisser la porte ouverte peut générer une meilleure offre dans les 48h.',
+    body:`Bonjour,\n\nJe vous remercie pour votre offre concernant mon bien.\n\nBien que je ne puisse pas l'accepter en l'état, je reste ouvert à une nouvelle proposition qui se rapprocherait de mon prix de vente.\n\nN'hésitez pas à me recontacter.\n\nCordialement\n[NOM]` },
+  { id:'off-4', cat:'offres', title:'Demande offre écrite', type:'email', tone:'ferme',
+    tip:"Une offre verbale ne vaut rien juridiquement. Demandez toujours une offre écrite.",
+    body:`Bonjour,\n\nSuite à notre échange, afin de pouvoir examiner sérieusement votre proposition, je vous invite à me transmettre votre offre d'achat par écrit (email ou courrier).\n\nDans l'attente de votre retour.\n\nCordialement\n[NOM]` },
+];
+
+// ── État ─────────────────────────────────────────────────────
+const BIB_LS_FAV    = 'comm_favs_v1';
+const BIB_LS_RECENT = 'comm_recent_v1';
+let bibCat    = 'all';
+let bibQ      = '';
+let bibFltSms = false;
+let bibFltMail= false;
+let bibFltFav = false;
+let bibFavs   = new Set(JSON.parse(localStorage.getItem(BIB_LS_FAV) || '[]'));
+
+const TONE_LABELS = { premium:'Premium', amical:'Amical', ferme:'Ferme', rassurant:'Rassurant' };
+const COPY_SVG = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>';
+const CHECK_SVG = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>';
+
+// ── Utilitaires ───────────────────────────────────────────────
+function bibVars(text) {
+  var V = ['[NOM]','[DATE]','[HEURE]','[MONTANT]','[VILLE]','[ADRESSE]','[DOCUMENTS]','[DISPONIBILITÉS]'];
+  V.forEach(function(v) { text = text.split(v).join('<span class="tpl-var">' + v + '</span>'); });
+  return text;
+}
+
+function bibToast(msg) {
+  var t = document.getElementById('bibToast');
+  if (!t) return;
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(function() { t.classList.remove('show'); }, 2800);
+}
+
+function fallbackCopy(text) {
+  var ta = document.createElement('textarea');
+  ta.value = text;
+  ta.style.cssText = 'position:fixed;opacity:0;top:0;left:0;';
+  document.body.appendChild(ta);
+  ta.focus(); ta.select();
+  try { document.execCommand('copy'); } catch(e) {}
+  document.body.removeChild(ta);
+}
+
+function bibFiltered() {
+  return BIB_TEMPLATES.filter(function(t) {
+    if (bibCat !== 'all' && t.cat !== bibCat) return false;
+    if (bibFltFav && !bibFavs.has(t.id)) return false;
+    if (bibFltSms && t.type !== 'sms') return false;
+    if (bibFltMail && t.type !== 'email') return false;
+    if (bibQ) {
+      var q = bibQ.toLowerCase();
+      if (t.title.toLowerCase().indexOf(q) === -1 && t.body.toLowerCase().indexOf(q) === -1) return false;
+    }
+    return true;
+  });
+}
+
+// ── Rendu des cartes ──────────────────────────────────────────
+function bibRender() {
+  var grid = document.getElementById('bibGrid');
+  var info = document.getElementById('bibInfo');
+  if (!grid) return;
+  var list = bibFiltered();
+  if (info) info.textContent = list.length + ' modèle' + (list.length !== 1 ? 's' : '');
+  while (grid.firstChild) grid.removeChild(grid.firstChild);
+
+  if (list.length === 0) {
+    var empty = document.createElement('div');
+    empty.className = 'bib-empty';
+    empty.innerHTML = '<div class="bib-empty-icon">🔍</div><div class="bib-empty-msg">Aucun modèle trouvé pour cette recherche.</div>';
+    grid.appendChild(empty);
+    return;
+  }
+
+  list.forEach(function(t) {
+    var card = document.createElement('div');
+    card.className = 'tpl-card';
+
+    // Top
+    var top = document.createElement('div');
+    top.className = 'tpl-card-top';
+
+    var badges = document.createElement('div');
+    badges.className = 'tpl-badges';
+    var tb = document.createElement('span');
+    tb.className = 'tpl-badge ' + t.type;
+    tb.textContent = t.type === 'sms' ? 'SMS' : 'Email';
+    var tn = document.createElement('span');
+    tn.className = 'tpl-badge ' + t.tone;
+    tn.textContent = TONE_LABELS[t.tone] || t.tone;
+    badges.appendChild(tb); badges.appendChild(tn);
+
+    var title = document.createElement('div');
+    title.className = 'tpl-title';
+    title.textContent = t.title;
+
+    var preview = document.createElement('div');
+    preview.className = 'tpl-preview';
+    preview.innerHTML = bibVars(t.body.replace(/\n+/g, ' ').substring(0, 130));
+
+    top.appendChild(badges); top.appendChild(title); top.appendChild(preview);
+
+    // Body expandable
+    var bodyWrap = document.createElement('div');
+    bodyWrap.className = 'tpl-body-wrap';
+    var bodyTxt = document.createElement('div');
+    bodyTxt.className = 'tpl-body-text';
+    bodyTxt.innerHTML = bibVars(t.body);
+    bodyWrap.appendChild(bodyTxt);
+    if (t.tip) {
+      var tipEl = document.createElement('div');
+      tipEl.className = 'tpl-tip-bib';
+      tipEl.textContent = '💡 ' + t.tip;
+      bodyWrap.appendChild(tipEl);
+    }
+
+    // Actions
+    var actions = document.createElement('div');
+    actions.className = 'tpl-actions';
+
+    var copyBtn = document.createElement('button');
+    copyBtn.className = 'tpl-copy-btn';
+    copyBtn.innerHTML = COPY_SVG + ' Copier';
+    copyBtn.addEventListener('click', (function(tpl, btn) {
+      return function() {
+        var doCopy = function() {
+          var rec = JSON.parse(localStorage.getItem(BIB_LS_RECENT) || '[]');
+          localStorage.setItem(BIB_LS_RECENT, JSON.stringify([tpl.id].concat(rec.filter(function(id){ return id !== tpl.id; })).slice(0, 10)));
+          btn.classList.add('copied');
+          btn.innerHTML = CHECK_SVG + ' Copié !';
+          btn.style.animation = 'copyPop 0.3s ease';
+          bibToast('Message copié — collez-le directement dans votre appli !');
+          setTimeout(function() {
+            btn.classList.remove('copied');
+            btn.innerHTML = COPY_SVG + ' Copier';
+            btn.style.animation = '';
+          }, 2200);
+        };
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(tpl.body).then(doCopy).catch(function() { fallbackCopy(tpl.body); doCopy(); });
+        } else { fallbackCopy(tpl.body); doCopy(); }
+      };
+    })(t, copyBtn));
+
+    var favBtn = document.createElement('button');
+    favBtn.className = 'tpl-fav-btn' + (bibFavs.has(t.id) ? ' active' : '');
+    favBtn.innerHTML = bibFavs.has(t.id) ? '♥' : '♡';
+    favBtn.title = 'Ajouter aux favoris';
+    favBtn.addEventListener('click', (function(tpl, btn) {
+      return function() {
+        if (bibFavs.has(tpl.id)) { bibFavs.delete(tpl.id); } else { bibFavs.add(tpl.id); }
+        localStorage.setItem(BIB_LS_FAV, JSON.stringify(Array.from(bibFavs)));
+        btn.classList.toggle('active', bibFavs.has(tpl.id));
+        btn.innerHTML = bibFavs.has(tpl.id) ? '♥' : '♡';
+        if (bibFltFav) bibRender();
+      };
+    })(t, favBtn));
+
+    var expandBtn = document.createElement('button');
+    expandBtn.className = 'tpl-expand-btn';
+    expandBtn.textContent = 'Voir';
+    expandBtn.addEventListener('click', (function(wrap, btn) {
+      return function() {
+        var open = wrap.classList.toggle('open');
+        btn.textContent = open ? 'Réduire' : 'Voir';
+      };
+    })(bodyWrap, expandBtn));
+
+    actions.appendChild(copyBtn);
+    actions.appendChild(favBtn);
+    actions.appendChild(expandBtn);
+
+    card.appendChild(top);
+    card.appendChild(bodyWrap);
+    card.appendChild(actions);
+    grid.appendChild(card);
+  });
+}
+
+// ── Rendu des catégories ──────────────────────────────────────
+function bibRenderCats() {
+  var el = document.getElementById('bibCats');
+  if (!el) return;
+  while (el.firstChild) el.removeChild(el.firstChild);
+  BIB_CATS.forEach(function(cat) {
+    var count = cat.id === 'all'
+      ? BIB_TEMPLATES.length
+      : BIB_TEMPLATES.filter(function(t) { return t.cat === cat.id; }).length;
+    var btn = document.createElement('button');
+    btn.className = 'bib-cat' + (bibCat === cat.id ? ' active' : '');
+    btn.innerHTML = (cat.icon ? cat.icon + ' ' : '') + cat.label + ' <span class="bib-cat-count">' + count + '</span>';
+    btn.addEventListener('click', (function(id, b) {
+      return function() {
+        bibCat = id;
+        document.querySelectorAll('.bib-cat').forEach(function(x) { x.classList.remove('active'); });
+        b.classList.add('active');
+        bibRender();
+      };
+    })(cat.id, btn));
+    el.appendChild(btn);
+  });
+}
+
+// ── Filtres ───────────────────────────────────────────────────
+(function() {
+  var searchEl = document.getElementById('bibSearch');
+  var fltSms   = document.getElementById('bibFltSms');
+  var fltEmail = document.getElementById('bibFltEmail');
+  var fltFavs  = document.getElementById('bibFltFavs');
+
+  if (searchEl) {
+    searchEl.addEventListener('input', function() { bibQ = searchEl.value.trim(); bibRender(); });
+  }
+
+  function toggle(btn, setter, getter) {
+    if (!btn) return;
+    btn.addEventListener('click', function() {
+      setter(!getter());
+      var isFav = btn === fltFavs;
+      btn.classList.toggle('on', getter());
+      if (isFav) { btn.classList.toggle('fav-on', getter()); btn.classList.remove('on'); }
+      bibRender();
+    });
+  }
+  toggle(fltSms,   function(v) { bibFltSms  = v; }, function() { return bibFltSms; });
+  toggle(fltEmail, function(v) { bibFltMail = v; }, function() { return bibFltMail; });
+  toggle(fltFavs,  function(v) { bibFltFav  = v; }, function() { return bibFltFav; });
+})();
+
+// ── Init ──────────────────────────────────────────────────────
+bibRenderCats();
+bibRender();
+</script>
+</body>
+</html>

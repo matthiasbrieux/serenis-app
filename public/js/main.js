@@ -291,19 +291,38 @@ window.showToast = function(msg, type = 'success') {
 
 // ── Calculateur d'économies interactif ──────────────────────────
 function fmt(n) { return Math.round(n).toLocaleString('fr-FR') + ' €'; }
+function fmtTaux(t) { return t.toFixed(1).replace('.', ',') + ' %'; }
+
 function updateCalc() {
   const price = parseInt(document.getElementById('calcPrice')?.value) || 250000;
-  const agence = price * 0.045;
+  const taux = parseFloat(document.getElementById('calcTaux')?.value) || 5;
+  const agence = price * (taux / 100);
   const eco = agence - 999;
+
   const agenceEl = document.getElementById('calcAgence');
+  const agenceLabelEl = document.getElementById('calcAgenceLabel');
+  const tauxLabelEl = document.getElementById('calcTauxLabel');
   const ecoEl = document.getElementById('calcEco');
+  const ecoPctEl = document.getElementById('calcEcoPct');
+
   if (agenceEl) agenceEl.textContent = fmt(agence);
-  if (ecoEl) ecoEl.textContent = fmt(Math.max(eco, 0));
+  if (agenceLabelEl) agenceLabelEl.textContent = 'Agence (' + fmtTaux(taux) + ')';
+  if (tauxLabelEl) tauxLabelEl.textContent = fmtTaux(taux);
+
+  if (ecoEl) {
+    const ecoVal = Math.max(eco, 0);
+    ecoEl.style.opacity = '0';
+    setTimeout(() => { ecoEl.textContent = fmt(ecoVal); ecoEl.style.opacity = '1'; }, 100);
+    if (ecoPctEl) ecoPctEl.textContent = ecoVal > 0 ? 'soit ' + fmtTaux((ecoVal / price) * 100) + ' du prix de vente conservés' : '';
+  }
 }
+
 const calcPrice = document.getElementById('calcPrice');
 const calcSlider = document.getElementById('calcSlider');
+const calcTaux = document.getElementById('calcTaux');
 if (calcPrice) {
   calcPrice.addEventListener('input', () => { if (calcSlider) calcSlider.value = calcPrice.value; updateCalc(); });
   calcSlider?.addEventListener('input', () => { calcPrice.value = calcSlider.value; updateCalc(); });
+  calcTaux?.addEventListener('input', () => updateCalc());
   updateCalc();
 }

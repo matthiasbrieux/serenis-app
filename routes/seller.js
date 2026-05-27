@@ -12,6 +12,7 @@ router.get('/dashboard', requireAuth, (req, res) => res.sendFile('dashboard.html
 router.get('/mon-bien', requireAuth, (req, res) => res.sendFile('property.html', { root: './views/seller' }));
 router.get('/ma-formation', requireAuth, (req, res) => res.sendFile('library.html', { root: './views/seller' }));
 router.get('/mon-agenda', requireAuth, (req, res) => res.sendFile('agenda.html', { root: './views/seller' }));
+router.get('/ma-bibliotheque', requireAuth, (req, res) => res.sendFile('biblio.html', { root: './views/seller' }));
 router.get('/onboarding', requireAuth, (req, res) => res.sendFile('onboarding.html', { root: './views/seller' }));
 
 // API — seller data
@@ -61,7 +62,7 @@ router.post('/api/property', requireAuth, express.json(), (req, res) => {
     'dpe_conso_energie','dpe_ges','dpe_cout_min','dpe_cout_max',
     'facture_eau','facture_electricite','facture_gaz',
     'commerces','school_maternelle','school_primaire','school_college','school_lycee',
-    'highway','train_station','equipment','sale_reason','price','description'
+    'highway','train_station','equipment','sale_reason','price','description','rooms_detail'
   ];
   const data = {};
   fields.forEach(f => { if (req.body[f] !== undefined) data[f] = req.body[f]; });
@@ -89,11 +90,16 @@ router.post('/api/property/photos', requireAuth, uploadPhoto.array('photos', 20)
   const existing = db.prepare('SELECT COUNT(*) as count FROM property_photos WHERE property_id = ?').get(property.id);
   if (existing.count + req.files.length > 20) return res.json({ error: 'Maximum 20 photos' });
 
+  const category = req.body.category || 'pro';
+  const isLocal = !process.env.CLOUDINARY_URL;
   const inserted = [];
   req.files.forEach((file, i) => {
-    db.prepare('INSERT INTO property_photos (property_id, cloudinary_id, url, thumbnail_url, order_index) VALUES (?,?,?,?,?)')
-      .run(property.id, file.filename, file.path, file.path.replace('/upload/', '/upload/c_thumb,w_400/'), existing.count + i);
-    inserted.push({ url: file.path, cloudinary_id: file.filename });
+    const url = isLocal ? '/uploads/photos/' + file.filename : file.path;
+    const thumb = isLocal ? url : file.path.replace('/upload/', '/upload/c_thumb,w_400/');
+    const cid = file.filename;
+    db.prepare('INSERT INTO property_photos (property_id, cloudinary_id, url, thumbnail_url, order_index, category) VALUES (?,?,?,?,?,?)')
+      .run(property.id, cid, url, thumb, existing.count + i, category);
+    inserted.push({ url, cloudinary_id: cid, category });
   });
   res.json({ success: true, photos: inserted });
 });
@@ -108,13 +114,36 @@ router.delete('/api/property/photos/:cloudinary_id', requireAuth, async (req, re
 });
 
 // Document upload
-router.post('/api/property/documents', requireAuth, uploadDocument.single('document'), (req, res) => {
+router.post('/api/property/documents', requireAuth, (req, res, next) => {
+  uploadDocument.single('document')(req, res, (err) => {
+    if (err) return res.json({ error: err.message || 'Erreur lors de l\'upload du fichier' });
+    next();
+  });
+}, (req, res) => {
+  if (!req.file) return res.json({ error: 'Aucun fichier reçu' });
   const property = db.prepare('SELECT id FROM properties WHERE seller_id = ?').get(req.seller.id);
-  if (!property) return res.json({ error: 'Créez d\'abord la fiche du bien' });
+  if (!property) return res.json({ error: 'Sauvegardez d\'abord votre fiche dans l\'onglet Informations' });
   const { name, doc_type } = req.body;
-  db.prepare('INSERT INTO property_documents (property_id, name, cloudinary_id, url, doc_type) VALUES (?,?,?,?,?)')
-    .run(property.id, name || req.file.originalname, req.file.filename, req.file.path, doc_type || 'autre');
-  res.json({ success: true, url: req.file.path });
+  const isLocal = !process.env.CLOUDINARY_URL;
+  const url = isLocal ? '/uploads/documents/' + req.file.filename : req.file.path;
+  const cid = isLocal ? req.file.filename : (req.file.public_id || req.file.filename);
+  const result = db.prepare('INSERT INTO property_documents (property_id, name, cloudinary_id, url, doc_type) VALUES (?,?,?,?,?)')
+    .run(property.id, name || req.file.originalname, cid, url, doc_type || 'autre');
+  res.json({ success: true, id: result.lastInsertRowid, url, name: name || req.file.originalname, doc_type: doc_type || 'autre' });
+});
+
+// Document delete
+router.delete('/api/property/documents/:id', requireAuth, async (req, res) => {
+  const property = db.prepare('SELECT id FROM properties WHERE seller_id = ?').get(req.seller.id);
+  if (!property) return res.json({ error: 'Non autorisé' });
+  const doc = db.prepare('SELECT * FROM property_documents WHERE id = ? AND property_id = ?').get(req.params.id, property.id);
+  if (!doc) return res.json({ error: 'Document introuvable' });
+  db.prepare('DELETE FROM property_documents WHERE id = ?').run(doc.id);
+  if (process.env.CLOUDINARY_URL && doc.cloudinary_id) {
+    const { cloudinary } = require('../services/upload');
+    await cloudinary.uploader.destroy(doc.cloudinary_id).catch(() => {});
+  }
+  res.json({ success: true });
 });
 
 // Publish property
@@ -270,6 +299,35 @@ Style : direct, chaleureux, expert. Pas de jargon inutile. Réponses courtes (3-
   }
 });
 
+// ── Export dossier PDF ────────────────────────────────────────────
+router.post('/api/property/export-pdf', requireAuth, express.json({ limit: '2mb' }), async (req, res) => {
+  const { html, title } = req.body;
+  if (!html) return res.status(400).json({ error: 'Contenu manquant' });
+
+  const htmlPdf = require('html-pdf-node');
+  const fullHtml = `<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8">
+  <style>
+    * { box-sizing: border-box; }
+    body { font-family: Arial, Helvetica, sans-serif; color: #1a1a1a; margin: 0; padding: 0; background: #fff; font-size: 13px; }
+    img { max-width: 100%; display: block; }
+    .fd-label { font-size: 11px; color: #888; padding: 4px 10px 4px 0; vertical-align: top; width: 42%; }
+    .fd-value { font-size: 11px; color: #222; padding: 4px 0; font-weight: 600; vertical-align: top; }
+  </style>
+  </head><body>${html}</body></html>`;
+
+  const options = { format: 'A4', margin: { top: '10mm', bottom: '10mm', left: '10mm', right: '10mm' } };
+  try {
+    const file = { content: fullHtml };
+    const pdfBuffer = await htmlPdf.generatePdf(file, options);
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', `attachment; filename="Dossier_Envoi_Client.pdf"`);
+    res.send(pdfBuffer);
+  } catch (err) {
+    console.error('PDF error:', err.message);
+    res.status(500).json({ error: 'Génération PDF indisponible' });
+  }
+});
+
 router.get('/mes-publications', requireAuth, (req, res) => res.sendFile('publications.html', { root: './views/seller' }));
 router.get('/mes-performances', requireAuth, (req, res) => res.sendFile('performances.html', { root: './views/seller' }));
 
@@ -379,6 +437,113 @@ router.post('/api/performances/analyze', requireAuth, express.json(), async (req
     res.json({ analysis: response.content[0].text });
   } catch (err) {
     res.json({ analysis: 'Analyse indisponible pour le moment. Renseignez vos statistiques pour les suivre.' });
+  }
+});
+
+// ═══════════════════════════════════════════════════════
+// SERENIS CONNECT — Communication Hub
+// ═══════════════════════════════════════════════════════
+
+router.get('/serenis-connect', requireAuth, (req, res) => res.sendFile('communication.html', { root: './views/seller' }));
+
+router.get('/api/connect/overview', requireAuth, (req, res) => {
+  const seller = db.prepare('SELECT id, uuid, email, first_name, last_name, phone, pack, twilio_number FROM sellers WHERE id = ?').get(req.seller.id);
+  const property = db.prepare('SELECT id, type, city, postal_code, price, rooms, bedrooms, surface_habitable FROM properties WHERE seller_id = ?').get(req.seller.id);
+  const visits = property
+    ? db.prepare('SELECT * FROM visits WHERE seller_id = ? ORDER BY visit_date ASC, visit_time ASC').all(req.seller.id)
+    : [];
+  const contacts = property
+    ? db.prepare('SELECT * FROM buyer_contacts WHERE seller_id = ? ORDER BY created_at DESC').all(req.seller.id)
+    : [];
+  const notifications = db.prepare('SELECT * FROM notifications WHERE seller_id = ? ORDER BY created_at DESC LIMIT 25').all(req.seller.id);
+  const stats = {
+    contacts: contacts.length,
+    visits_total: visits.length,
+    visits_pending: visits.filter(v => v.status === 'pending').length,
+    visits_confirmed: visits.filter(v => v.status === 'confirmed').length,
+    visits_done: visits.filter(v => v.status === 'done').length,
+    unread: notifications.filter(n => !n.read_at).length,
+  };
+  res.json({ seller, property, visits, contacts, notifications, stats });
+});
+
+router.post('/api/visits', requireAuth, express.json(), (req, res) => {
+  const property = db.prepare('SELECT id FROM properties WHERE seller_id = ?').get(req.seller.id);
+  if (!property) return res.status(400).json({ error: 'Créez d\'abord votre bien' });
+  const { buyer_name, buyer_phone, buyer_email, visit_date, visit_time, notes } = req.body;
+  if (!visit_date || !visit_time) return res.status(400).json({ error: 'Date et heure requises' });
+  const result = db.prepare(
+    'INSERT INTO visits (property_id, seller_id, buyer_name, buyer_phone, buyer_email, visit_date, visit_time, status, notes) VALUES (?,?,?,?,?,?,?,\'pending\',?)'
+  ).run(property.id, req.seller.id, buyer_name || 'Acquéreur', buyer_phone || '', buyer_email || '', visit_date, visit_time, notes || '');
+  db.prepare('INSERT INTO notifications (seller_id, type, title, body) VALUES (?,\'visit_request\',?,?)')
+    .run(req.seller.id, 'Nouvelle visite programmée', `${buyer_name || 'Acquéreur'} — ${visit_date} à ${visit_time}`);
+  res.json({ success: true, id: result.lastInsertRowid });
+});
+
+router.put('/api/visits/:id/status', requireAuth, express.json(), (req, res) => {
+  const { status } = req.body;
+  if (!['pending','confirmed','cancelled','done'].includes(status)) return res.status(400).json({ error: 'Statut invalide' });
+  db.prepare('UPDATE visits SET status=? WHERE id=? AND seller_id=?').run(status, req.params.id, req.seller.id);
+  const visit = db.prepare('SELECT * FROM visits WHERE id=?').get(req.params.id);
+  if (visit && status === 'confirmed') {
+    db.prepare('INSERT INTO notifications (seller_id, type, title, body) VALUES (?,\'visit_confirmed\',?,?)')
+      .run(req.seller.id, 'Visite confirmée', `${visit.buyer_name} — ${visit.visit_date} à ${visit.visit_time}`);
+  }
+  res.json({ success: true });
+});
+
+router.delete('/api/visits/:id', requireAuth, (req, res) => {
+  db.prepare('DELETE FROM visits WHERE id=? AND seller_id=?').run(req.params.id, req.seller.id);
+  res.json({ success: true });
+});
+
+router.post('/api/connect/contacts', requireAuth, express.json(), (req, res) => {
+  const property = db.prepare('SELECT id FROM properties WHERE seller_id = ?').get(req.seller.id);
+  if (!property) return res.status(400).json({ error: 'Créez d\'abord votre bien' });
+  const { buyer_name, buyer_phone, buyer_email, notes, buyer_budget } = req.body;
+  const result = db.prepare(
+    'INSERT INTO buyer_contacts (property_id, seller_id, buyer_name, buyer_phone, buyer_email, notes, buyer_budget, source, status) VALUES (?,?,?,?,?,?,?,\'manuel\',\'new\')'
+  ).run(property.id, req.seller.id, buyer_name || '', buyer_phone || '', buyer_email || '', notes || '', buyer_budget || null);
+  db.prepare('INSERT INTO notifications (seller_id, type, title, body) VALUES (?,\'new_contact\',?,?)')
+    .run(req.seller.id, 'Nouvel acquéreur ajouté', buyer_name || buyer_phone || 'Acquéreur');
+  res.json({ success: true, id: result.lastInsertRowid });
+});
+
+router.put('/api/connect/contacts/:id/status', requireAuth, express.json(), (req, res) => {
+  const { status } = req.body;
+  if (!['new','qualified','visit_planned','not_retained'].includes(status)) return res.status(400).json({ error: 'Statut invalide' });
+  db.prepare('UPDATE buyer_contacts SET status=? WHERE id=? AND seller_id=?').run(status, req.params.id, req.seller.id);
+  res.json({ success: true });
+});
+
+router.delete('/api/connect/contacts/:id', requireAuth, (req, res) => {
+  db.prepare('DELETE FROM buyer_contacts WHERE id=? AND seller_id=?').run(req.params.id, req.seller.id);
+  res.json({ success: true });
+});
+
+router.post('/api/connect/notifications/read-all', requireAuth, (req, res) => {
+  db.prepare('UPDATE notifications SET read_at=CURRENT_TIMESTAMP WHERE seller_id=? AND read_at IS NULL').run(req.seller.id);
+  res.json({ success: true });
+});
+
+router.post('/api/connect/ai-insight', requireAuth, async (req, res) => {
+  const visits = db.prepare('SELECT * FROM visits WHERE seller_id=?').all(req.seller.id);
+  const contacts = db.prepare('SELECT * FROM buyer_contacts WHERE seller_id=?').all(req.seller.id);
+  if (visits.length === 0 && contacts.length === 0) {
+    return res.json({ insight: 'Publiez votre numéro Serenis dans vos annonces pour commencer à recevoir des contacts acquéreurs. Chaque demande sera automatiquement enregistrée ici.' });
+  }
+  const summary = `${contacts.length} acquéreur(s) au total dont ${contacts.filter(c=>c.status==='qualified').length} qualifiés. ${visits.filter(v=>v.status==='confirmed').length} visite(s) confirmée(s), ${visits.filter(v=>v.status==='pending').length} en attente, ${visits.filter(v=>v.status==='done').length} réalisée(s).`;
+  const Anthropic = require('@anthropic-ai/sdk');
+  const client = new Anthropic.default({ apiKey: process.env.ANTHROPIC_API_KEY });
+  try {
+    const response = await client.messages.create({
+      model: 'claude-haiku-4-5-20251001', max_tokens: 180,
+      system: 'Tu es un assistant immobilier pour vendeur particulier. Analyse le pipeline acquéreurs et donne 1-2 conseils courts et actionnables. Ton rassurant, professionnel. Max 70 mots.',
+      messages: [{ role: 'user', content: `Pipeline actuel : ${summary}` }]
+    });
+    res.json({ insight: response.content[0].text });
+  } catch(err) {
+    res.json({ insight: 'Continuez à suivre vos acquéreurs avec régularité. Une communication rapide et professionnelle augmente significativement vos chances de conclure.' });
   }
 });
 

@@ -228,6 +228,14 @@
       padding:3px 10px;background:#e8f5e9;border-radius:20px;
       font-size:0.75rem;color:#2e7d32;font-weight:600;
     }
+    .fd-label {
+      font-size:0.8rem;color:#888;padding:4px 10px 4px 0;vertical-align:top;
+      white-space:nowrap;width:42%;
+    }
+    .fd-value {
+      font-size:0.82rem;color:#222;padding:4px 0;font-weight:500;vertical-align:top;
+    }
+    tr:nth-child(even) .fd-label, tr:nth-child(even) .fd-value { background:#fafaf9; }
 
     /* ── AI description button ──────────────────── */
     .btn-ai {
@@ -304,48 +312,45 @@
     @keyframes spin { from { transform:rotate(0deg); } to { transform:rotate(360deg); } }
 
     /* ── Pièces par niveau ─────────────────────────────── */
-    .add-floor-btn {
-      padding:6px 14px;border-radius:50px;border:2px solid #e8e0d6;
-      background:#fff;font-size:0.8rem;font-weight:600;cursor:pointer;transition:0.15s;color:#555;
-    }
-    .add-floor-btn.active { background:#3D5A47;border-color:#3D5A47;color:#fff; }
-    .add-floor-btn:hover:not(.active) { border-color:#3D5A47;color:#3D5A47; }
     .rtype-btn {
-      display:flex;flex-direction:column;align-items:center;gap:3px;
-      padding:9px 4px 7px;border-radius:10px;border:2px solid #e8e0d6;
-      background:#fff;cursor:pointer;transition:all 0.15s;text-align:center;font-family:'DM Sans',sans-serif;
+      display:flex;flex-direction:column;align-items:center;gap:4px;
+      padding:10px 4px 8px;border-radius:10px;border:1.5px solid #e8e0d6;
+      background:#fff;cursor:pointer;transition:all 0.13s;text-align:center;font-family:'DM Sans',sans-serif;
     }
-    .rtype-btn:hover { border-color:#C4785A;background:#fff8f4; }
-    .rtype-btn.chosen { border-color:#C4785A;background:#fff8f4; }
-    .rtype-btn .rt-icon { font-size:1.3rem;line-height:1; }
-    .rtype-btn .rt-name { font-size:0.62rem;font-weight:600;color:#666;line-height:1.2; }
-    .rtype-btn.chosen .rt-name { color:#C4785A; }
-    .add-etage-btn {
-      padding:5px 12px;border-radius:50px;border:2px dashed #c8ddd0;
-      background:#f0f5f1;font-size:0.78rem;font-weight:700;cursor:pointer;transition:0.15s;color:#3D5A47;
+    .rtype-btn:hover { border-color:#C4785A;background:#fff8f4;transform:translateY(-1px);box-shadow:0 3px 10px rgba(196,120,90,0.15); }
+    .rtype-btn:active { transform:translateY(0);box-shadow:none; }
+    .rtype-btn .rt-icon { display:flex;align-items:center;justify-content:center;color:#3D5A47;line-height:1; }
+    .rtype-btn .rt-name { font-size:0.6rem;font-weight:600;color:#666;line-height:1.2; }
+    @keyframes slideInCard { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:none} }
+    .room-card {
+      background:#fff;border:1.5px solid #e8e0d6;border-radius:12px;
+      padding:14px 16px;margin-bottom:8px;animation:slideInCard 0.2s;
     }
-    .add-etage-btn:hover { background:#d4e4d8;border-color:#3D5A47; }
-    .rooms-table { width:100%;border-collapse:collapse;margin-bottom:4px; }
-    .rooms-table thead th {
-      font-size:0.7rem;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;
-      color:#aaa;padding:0 8px 6px;text-align:left;border-bottom:2px solid #e8e0d6;
+    .room-card-header { display:flex;align-items:center;justify-content:space-between;margin-bottom:10px; }
+    .room-card-title { display:flex;align-items:center;gap:8px;font-size:0.9rem;font-weight:700;color:#222; }
+    .room-card-title svg { color:#3D5A47;flex-shrink:0;width:18px !important;height:18px !important; }
+    .room-card-del {
+      width:28px;height:28px;border-radius:50%;border:none;background:#fee2e2;
+      color:#dc2626;cursor:pointer;display:flex;align-items:center;justify-content:center;
+      transition:background 0.12s;flex-shrink:0;
     }
-    .rooms-table tbody tr { border-bottom:1px solid #f0ebe3;transition:background 0.1s; }
-    .rooms-table tbody tr:hover { background:#fafaf7; }
-    .rooms-table tbody td { padding:8px 8px;font-size:0.85rem;vertical-align:middle; }
-    .rooms-table td.rt-level {
-      font-size:0.7rem;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:0.05em;white-space:nowrap;
+    .room-card-del:hover { background:#fca5a5; }
+    .room-card-del svg { pointer-events:none; }
+    .room-floor-pills { display:flex;gap:5px;flex-wrap:wrap;margin-bottom:10px; }
+    .room-floor-pill {
+      padding:4px 11px;border-radius:50px;border:1.5px solid #e8e0d6;
+      background:#fff;font-size:0.72rem;font-weight:700;cursor:pointer;
+      transition:all 0.12s;color:#666;user-select:none;
     }
-    .rooms-table td.rt-piece { font-weight:600;color:#222; }
-    .rooms-table td.rt-surface { color:#888;font-size:0.8rem;white-space:nowrap; }
-    .rooms-table td.rt-del { width:28px;text-align:center; }
-    .rt-del-btn {
-      width:22px;height:22px;border-radius:50%;border:none;background:#fee;
-      color:#c00;font-size:0.8rem;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;transition:0.12s;
+    .room-floor-pill:hover { border-color:#3D5A47;color:#3D5A47; }
+    .room-floor-pill.active { background:#3D5A47;border-color:#3D5A47;color:#fff; }
+    .room-surface-row { display:flex;align-items:center;gap:8px; }
+    .room-surface-label { font-size:0.75rem;color:#888;font-weight:600;white-space:nowrap; }
+    .room-surface-input {
+      width:80px;padding:6px 10px;border:1.5px solid #e8e0d6;border-radius:8px;
+      font-size:0.85rem;font-family:'DM Sans',sans-serif;text-align:center;transition:border-color 0.12s;
     }
-    .rt-del-btn:hover { background:#fcc; }
-    @keyframes fadeIn { from{opacity:0;transform:translateY(4px)} to{opacity:1;transform:none} }
-    .rooms-table tbody tr { animation:fadeIn 0.2s; }
+    .room-surface-input:focus { border-color:#3D5A47;outline:none; }
     .rooms-summary {
       padding:12px 18px;background:#f0f5f1;border-radius:10px;
       display:flex;gap:20px;align-items:center;flex-wrap:wrap;border:1px solid #c8ddd0;
@@ -426,6 +431,100 @@
       position:absolute;inset:0;background:rgba(0,0,0,0.45);
       display:flex;align-items:center;justify-content:center;font-size:1.6rem;
     }
+    /* ── Photo scroll gallery ─────────────────────────── */
+    .photo-scroll-outer {
+      position: relative;
+      height: 86px;
+      overflow: hidden;
+      border-radius: 10px;
+      margin-top: 4px;
+    }
+    .photo-scroll-track {
+      display: flex;
+      gap: 7px;
+      height: 86px;
+      overflow-x: auto;
+      overflow-y: hidden;
+      padding: 0 2px;
+      cursor: grab;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+      will-change: scroll-position;
+    }
+    .photo-scroll-track::-webkit-scrollbar { display: none; }
+    .photo-scroll-track.is-dragging { cursor: grabbing; user-select: none; }
+    .photo-scroll-item {
+      flex-shrink: 0;
+      height: 82px;
+      width: 124px;
+      border-radius: 9px;
+      overflow: hidden;
+      position: relative;
+      background: #f0ede8;
+      cursor: pointer;
+      scroll-snap-align: start;
+      transition: box-shadow 0.2s;
+    }
+    .photo-scroll-item:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.13); }
+    .photo-scroll-item img {
+      width: 100%; height: 100%;
+      object-fit: cover;
+      transition: transform 0.3s ease;
+      display: block;
+      pointer-events: none;
+    }
+    .photo-scroll-item:hover img { transform: scale(1.05); }
+    .photo-scroll-del {
+      position: absolute;
+      top: 6px; right: 6px;
+      width: 26px; height: 26px;
+      border-radius: 50%;
+      background: rgba(0,0,0,0.55);
+      color: #fff;
+      border: none;
+      font-size: 0.72rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      opacity: 0;
+      transition: opacity 0.15s;
+      line-height: 1;
+      z-index: 3;
+    }
+    .photo-scroll-item:hover .photo-scroll-del { opacity: 1; }
+    .photo-scroll-del:hover { background: rgba(200,30,30,0.9) !important; }
+    /* Fade-out right edge */
+    .photo-scroll-outer::after {
+      content: '';
+      position: absolute;
+      right: 0; top: 0; bottom: 0;
+      width: 36px;
+      background: linear-gradient(to left, #fff 0%, transparent 100%);
+      pointer-events: none;
+      z-index: 2;
+    }
+    /* Nav arrows — appear on outer hover */
+    .photo-scroll-nav {
+      position: absolute;
+      top: 50%; transform: translateY(-50%);
+      width: 28px; height: 28px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.93);
+      border: none;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.14);
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      color: #333;
+      z-index: 4;
+      opacity: 0;
+      transition: opacity 0.18s, background 0.15s;
+      pointer-events: none;
+    }
+    .photo-scroll-outer:hover .photo-scroll-nav { opacity: 1; pointer-events: auto; }
+    .photo-scroll-nav:hover { background: #fff; box-shadow: 0 3px 14px rgba(0,0,0,0.22); }
+    .photo-scroll-nav.prev { left: 6px; }
+    .photo-scroll-nav.next { right: 6px; }
 
     /* ── Lightbox ────────────────────────────────────── */
     .lightbox-overlay {
@@ -552,6 +651,113 @@
     .year-badge.moderne { background:#f3f8f4;color:#3D5A47; }
     .year-badge.recent { background:#e3f2fd;color:#1565c0; }
 
+    /* ── View / Edit mode system ────────────────────── */
+    @keyframes previewFadeIn { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:none} }
+    #viewModeWrapper { animation:previewFadeIn 0.3s; }
+    .preview-mode-bar {
+      display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;
+      gap:12px;margin-bottom:20px;padding:14px 20px;
+      background:#fafaf8;border-radius:12px;border:1px solid #e8e0d6;
+    }
+    .preview-status-pill {
+      display:inline-flex;align-items:center;gap:6px;
+      padding:5px 13px;border-radius:20px;font-size:0.75rem;font-weight:700;
+    }
+    .preview-status-pill.complete { background:#e8f5e9;color:#2e7d32; }
+    .preview-status-pill.partial  { background:#fff8e1;color:#f57f17; }
+    .preview-status-pill.empty    { background:#f5f5f5;color:#888; }
+    .btn-edit-mode {
+      display:inline-flex;align-items:center;gap:8px;padding:11px 22px;
+      border-radius:10px;background:#3D5A47;color:#fff;border:none;
+      font-family:'DM Sans',sans-serif;font-size:0.88rem;font-weight:600;
+      cursor:pointer;transition:all 0.2s;
+    }
+    .btn-edit-mode:hover { background:#2a4030;transform:translateY(-1px);box-shadow:0 4px 14px rgba(61,90,71,0.25); }
+    .preview-sheet {
+      background:#fff;border:1px solid #e0d8cc;border-radius:16px;
+      overflow:hidden;box-shadow:0 4px 28px rgba(0,0,0,0.07);
+    }
+    .preview-sheet > .fiche-container {
+      border:none;border-radius:0;box-shadow:none;
+    }
+    .preview-header {
+      padding:32px 36px;background:linear-gradient(135deg,#3D5A47 0%,#2a4030 100%);
+      color:#fff;position:relative;overflow:hidden;
+    }
+    .preview-header::before {
+      content:'';position:absolute;top:-50px;right:-50px;
+      width:200px;height:200px;border-radius:50%;background:rgba(255,255,255,0.04);
+    }
+    .preview-header::after {
+      content:'';position:absolute;bottom:-70px;left:-40px;
+      width:240px;height:240px;border-radius:50%;background:rgba(255,255,255,0.03);
+    }
+    .preview-type-badge {
+      display:inline-flex;align-items:center;gap:7px;
+      background:rgba(255,255,255,0.15);padding:5px 14px;
+      border-radius:20px;font-size:0.75rem;font-weight:700;
+      text-transform:uppercase;letter-spacing:0.07em;margin-bottom:16px;
+    }
+    .preview-price {
+      font-family:'Cormorant Garamond',serif;font-size:2.8rem;
+      font-weight:600;line-height:1.05;margin:0 0 10px;position:relative;z-index:1;
+    }
+    .preview-address { font-size:0.9rem;opacity:0.75;position:relative;z-index:1; }
+    .preview-last-saved {
+      position:absolute;top:18px;right:22px;
+      font-size:0.7rem;opacity:0.55;z-index:1;
+    }
+    .preview-stats {
+      display:grid;grid-template-columns:repeat(4,1fr);
+      border-bottom:1px solid #f0ebe4;
+    }
+    @media(max-width:520px){ .preview-stats { grid-template-columns:repeat(2,1fr); } }
+    .preview-stat { padding:18px 14px;text-align:center;border-right:1px solid #f0ebe4; }
+    .preview-stat:last-child { border-right:none; }
+    .preview-stat-val { font-size:1.5rem;font-weight:700;color:#3D5A47;line-height:1; }
+    .preview-stat-lbl {
+      font-size:0.67rem;color:#bbb;margin-top:4px;
+      font-weight:700;text-transform:uppercase;letter-spacing:0.05em;
+    }
+    .preview-body { padding:28px 32px; }
+    @media(max-width:520px){ .preview-header{padding:24px 20px;} .preview-body{padding:20px;} }
+    .preview-section { margin-bottom:22px; }
+    .preview-section:last-child { margin-bottom:0; }
+    .preview-section-title {
+      font-size:0.68rem;font-weight:700;text-transform:uppercase;
+      letter-spacing:0.1em;color:#ccc;margin-bottom:12px;
+      padding-bottom:7px;border-bottom:1px solid #f5f0e8;
+    }
+    .preview-desc { font-size:0.9rem;color:#444;line-height:1.7;white-space:pre-wrap; }
+    .preview-tags { display:flex;flex-wrap:wrap;gap:6px; }
+    .preview-tag { padding:5px 12px;background:#f0f5f1;border-radius:20px;font-size:0.8rem;color:#3D5A47;font-weight:500; }
+    .preview-rooms-grid { display:flex;flex-direction:column;gap:5px; }
+    .preview-room-row {
+      display:flex;align-items:center;justify-content:space-between;
+      padding:9px 13px;background:#fafaf8;border-radius:8px;
+      font-size:0.85rem;border:1px solid #f0ebe4;
+    }
+    .preview-room-name { color:#333;font-weight:600; }
+    .preview-room-meta { color:#aaa;font-size:0.78rem; }
+    .preview-photos-strip { display:flex;gap:8px;overflow-x:auto;padding:4px 0 8px;scrollbar-width:none; }
+    .preview-photos-strip::-webkit-scrollbar { display:none; }
+    .preview-photo-thumb {
+      width:120px;height:80px;border-radius:8px;
+      object-fit:cover;flex-shrink:0;border:2px solid #f0ebe4;
+    }
+    .edit-mode-bar {
+      display:flex;align-items:center;gap:10px;flex-wrap:wrap;
+      padding:12px 18px;background:#fff8f4;border-radius:10px;
+      border:1.5px solid #f0d0be;margin-bottom:20px;
+    }
+    .edit-mode-bar-label { flex:1;font-size:0.83rem;color:#C4785A;font-weight:600;min-width:160px; }
+    .btn-back-view {
+      padding:7px 16px;border-radius:8px;background:#fff;
+      border:1.5px solid #e8e0d6;font-family:'DM Sans',sans-serif;
+      font-size:0.8rem;font-weight:600;color:#666;cursor:pointer;transition:0.15s;white-space:nowrap;
+    }
+    .btn-back-view:hover { border-color:#3D5A47;color:#3D5A47; }
+
     /* ── DPE official bars ───────────────────────────── */
     .dpe-bars { display:flex;flex-direction:column;gap:5px;margin-top:8px; }
     .dpe-bar-row {
@@ -585,20 +791,23 @@
       <a href="/dashboard" class="sidebar-item">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg> Tableau de bord
       </a>
+      <a href="/ma-formation" class="sidebar-item">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg> Ma formation
+      </a>
       <a href="/mon-bien" class="sidebar-item active">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg> Mon bien
       </a>
-      <a href="/ma-formation" class="sidebar-item">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg> Ma formation
+      <a href="/serenis-connect" class="sidebar-item">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.27h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 9a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>Serenis Connect
       </a>
       <a href="/mon-agenda" class="sidebar-item">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg> Mon agenda
       </a>
+      <a href="/ma-bibliotheque" class="sidebar-item">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg> Ma bibliothèque
+      </a>
       <a href="/mes-publications" class="sidebar-item">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.55a11 11 0 0 1 14.08 0"/><path d="M1.42 9a16 16 0 0 1 21.16 0"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><circle cx="12" cy="20" r="1"/></svg> Mes publications
-      </a>
-      <a href="/mes-performances" class="sidebar-item">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg> Performances
       </a>
     </nav>
     <div style="position:absolute;bottom:24px;left:0;right:0;padding:0 24px;">
@@ -609,7 +818,7 @@
   <main class="main-content">
     <div class="page-header">
       <h1>Mon bien</h1>
-      <p>Construisez votre dossier acheteur — plus c'est complet, plus vous vendez vite</p>
+      <p>Construisez votre dossier d'envoi client — plus c'est complet, plus vous vendez vite</p>
     </div>
 
     <!-- Tabs -->
@@ -617,7 +826,7 @@
       <button type="button" class="tab-btn active" data-tab="infos">📋 Informations</button>
       <button type="button" class="tab-btn" data-tab="photos">📸 Photos</button>
       <button type="button" class="tab-btn" data-tab="documents">📁 Documents</button>
-      <button type="button" class="tab-btn" data-tab="fiche">👤 Fiche acheteur</button>
+      <button type="button" class="tab-btn" data-tab="fiche">📋 Dossier envoi client</button>
       <button type="button" class="tab-btn" data-tab="publication">🚀 Publication</button>
     </div>
 
@@ -625,6 +834,29 @@
          TAB: INFORMATIONS
     ════════════════════════════════════════════════════ -->
     <div class="tab-content" id="tab-infos">
+
+      <!-- ── VIEW MODE ───────────────────────────────── -->
+      <div id="viewModeWrapper" style="display:none;">
+        <div class="preview-mode-bar">
+          <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+            <span id="previewStatusPill" class="preview-status-pill empty">— Fiche vide</span>
+            <span id="previewLastSavedBadge" style="font-size:0.75rem;color:#bbb;"></span>
+          </div>
+          <button class="btn-edit-mode" id="btnEnterEditMode">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+            Modifier ma fiche
+          </button>
+        </div>
+        <div class="preview-sheet" id="previewSheet"></div>
+      </div>
+
+      <!-- ── EDIT MODE ────────────────────────────────── -->
+      <div id="editModeWrapper">
+        <div class="edit-mode-bar" id="editModeBar" style="display:none;">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#C4785A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+          <span class="edit-mode-bar-label">Mode modification — les changements sont sauvegardés automatiquement</span>
+          <button type="button" class="btn-back-view" id="btnBackToView">← Retour à la fiche</button>
+        </div>
 
       <!-- Barre de complétion -->
       <div class="form-completion">
@@ -793,53 +1025,14 @@
           <input type="hidden" name="bedrooms" id="field-bedrooms" value="0">
 
           <!-- Panel d'ajout -->
-          <div id="roomAddPanel" style="border:2px dashed #e8e0d6;border-radius:12px;padding:18px;margin-top:8px;background:#fafaf8;">
-            <div style="font-size:0.8rem;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:#aaa;margin-bottom:12px;">Ajouter une pièce</div>
-            <!-- Niveau -->
-            <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-bottom:14px;" id="addFloorBtns">
-              <button type="button" class="add-floor-btn active" onclick="setAddFloor('RDC',this)">🏠 RDC</button>
-              <button type="button" class="add-floor-btn" onclick="setAddFloor('Sous-sol',this)">⬇ Sous-sol</button>
-              <button type="button" class="add-etage-btn" onclick="addNextEtage()">+ Ajouter un étage</button>
-            </div>
-            <!-- Type de pièce -->
-            <div style="font-size:0.72rem;color:#aaa;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:8px;">Type de pièce</div>
-            <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(76px,1fr));gap:7px;margin-bottom:14px;">
-              <button type="button" class="rtype-btn" id="rt-buanderie"  onclick="selectRoomType('buanderie',this)"><span class="rt-icon">🧺</span><span class="rt-name">Buanderie</span></button>
-              <button type="button" class="rtype-btn" id="rt-bureau"     onclick="selectRoomType('bureau',this)"><span class="rt-icon">📚</span><span class="rt-name">Bureau</span></button>
-              <button type="button" class="rtype-btn" id="rt-cave"       onclick="selectRoomType('cave',this)"><span class="rt-icon">🍷</span><span class="rt-name">Cave</span></button>
-              <button type="button" class="rtype-btn" id="rt-cellier"    onclick="selectRoomType('cellier',this)"><span class="rt-icon">📦</span><span class="rt-name">Cellier</span></button>
-              <button type="button" class="rtype-btn" id="rt-chambre"    onclick="selectRoomType('chambre',this)"><span class="rt-icon">🛏</span><span class="rt-name">Chambre</span></button>
-              <button type="button" class="rtype-btn" id="rt-cuisine"    onclick="selectRoomType('cuisine',this)"><span class="rt-icon">🍳</span><span class="rt-name">Cuisine</span></button>
-              <button type="button" class="rtype-btn" id="rt-dressing"   onclick="selectRoomType('dressing',this)"><span class="rt-icon">👗</span><span class="rt-name">Dressing</span></button>
-              <button type="button" class="rtype-btn" id="rt-entree"     onclick="selectRoomType('entree',this)"><span class="rt-icon">🚪</span><span class="rt-name">Entrée</span></button>
-              <button type="button" class="rtype-btn" id="rt-garage"     onclick="selectRoomType('garage',this)"><span class="rt-icon">🏠</span><span class="rt-name">Garage</span></button>
-              <button type="button" class="rtype-btn" id="rt-palier"     onclick="selectRoomType('palier',this)"><span class="rt-icon">↕️</span><span class="rt-name">Palier</span></button>
-              <button type="button" class="rtype-btn" id="rt-sam"        onclick="selectRoomType('sam',this)"><span class="rt-icon">🍽</span><span class="rt-name">Salle à manger</span></button>
-              <button type="button" class="rtype-btn" id="rt-sdb"        onclick="selectRoomType('sdb',this)"><span class="rt-icon">🛁</span><span class="rt-name">Salle de bain</span></button>
-              <button type="button" class="rtype-btn" id="rt-sde"        onclick="selectRoomType('sde',this)"><span class="rt-icon">🚿</span><span class="rt-name">Salle d'eau</span></button>
-              <button type="button" class="rtype-btn" id="rt-sejour"     onclick="selectRoomType('sejour',this)"><span class="rt-icon">🛋</span><span class="rt-name">Séjour</span></button>
-              <button type="button" class="rtype-btn" id="rt-veranda"    onclick="selectRoomType('veranda',this)"><span class="rt-icon">🌿</span><span class="rt-name">Véranda</span></button>
-              <button type="button" class="rtype-btn" id="rt-wc"         onclick="selectRoomType('wc',this)"><span class="rt-icon">🚽</span><span class="rt-name">WC</span></button>
-            </div>
-            <!-- Indicateur pièce sélectionnée -->
-            <div id="rtypeIndicator" style="display:none;font-size:0.82rem;font-weight:600;color:#C4785A;margin-bottom:10px;padding:6px 12px;background:#fff8f4;border-radius:8px;border:1.5px solid #C4785A;"></div>
-            <!-- Surface + bouton -->
-            <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
-              <div style="flex:1;min-width:120px;">
-                <label style="font-size:0.75rem;color:#888;margin-bottom:4px;display:block;">Superficie (optionnel)</label>
-                <div style="display:flex;align-items:center;gap:6px;">
-                  <input type="number" id="addRoomSurface" placeholder="0" min="1" max="500" style="width:80px;padding:8px 10px;border:1px solid #ddd;border-radius:8px;font-size:0.9rem;font-family:'DM Sans',sans-serif;">
-                  <span style="font-size:0.85rem;color:#888;">m²</span>
-                </div>
-              </div>
-              <button type="button" onclick="confirmAddRoom()" style="padding:10px 20px;background:#3D5A47;color:#fff;border:none;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:0.88rem;font-weight:600;cursor:pointer;transition:0.15s;align-self:flex-end;" onmouseover="this.style.background='#2a4030'" onmouseout="this.style.background='#3D5A47'">
-                + Ajouter
-              </button>
-            </div>
+          <div id="roomAddPanel" style="border:1.5px solid #e8e0d6;border-radius:12px;padding:16px;margin-top:8px;background:#fafaf8;">
+            <div style="font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;color:#aaa;margin-bottom:10px;">Cliquer pour ajouter une pièce</div>
+            <!-- Grille générée par JS via initRoomPanel() -->
+            <div id="roomTypeGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(72px,1fr));gap:6px;"></div>
           </div>
 
-          <!-- Liste des pièces ajoutées -->
-          <div id="roomsList" style="margin-top:12px;"></div>
+          <!-- Cartes des pièces ajoutées -->
+          <div id="roomCardsContainer" style="margin-top:12px;"></div>
 
           <!-- Résumé -->
           <div class="rooms-summary" id="roomsSummary" style="margin-top:12px;">
@@ -1024,11 +1217,11 @@
         <div class="form-group" style="margin-top:12px;">
           <label style="margin-bottom:8px;display:block;">Certificat assainissement</label>
           <div class="toggle-group">
-            <button type="button" class="toggle-item" onclick="toggleSwitch('certificat_assainissement')">
+            <div class="toggle-item" data-toggle="certificat_assainissement">
               <div class="toggle-switch" id="toggle-certificat_assainissement"></div>
               <input type="hidden" name="certificat_assainissement" id="field-certificat_assainissement" value="0">
               <span class="toggle-label">Oui, je l'ai</span>
-            </button>
+            </div>
           </div>
           <label class="doc-upload-btn" style="cursor:pointer;display:inline-flex;align-items:center;gap:6px;margin-top:10px;padding:9px 14px;border:1.5px solid #ddd;border-radius:8px;font-size:0.82rem;font-weight:600;color:#555;background:#fff;transition:border-color 0.15s,color 0.15s;" onmouseover="this.style.borderColor='#3D5A47';this.style.color='#3D5A47'" onmouseout="this.style.borderColor='#ddd';this.style.color='#555'">
             <input type="file" accept=".pdf,image/*" style="display:none" onchange="uploadContextualDoc(this,'assainissement','Certificat de conformité assainissement',document.getElementById('assainissementDocStatus'))">
@@ -1125,7 +1318,7 @@
         <div class="form-group">
           <div style="display:flex;align-items:flex-start;gap:10px;padding:10px 14px;background:#fff8e1;border-radius:8px;border:1px solid #ffe082;margin-bottom:14px;">
             <span style="font-size:1rem;flex-shrink:0;">🔒</span>
-            <p style="margin:0;font-size:0.78rem;color:#795548;line-height:1.5;">Ces informations sont <strong>strictement privées</strong> — elles n'apparaissent jamais dans le dossier acheteur. Elles vous aident à répondre aux questions en visite et à anticiper les négociations.</p>
+            <p style="margin:0;font-size:0.78rem;color:#795548;line-height:1.5;">Ces informations sont <strong>strictement privées</strong> — elles n'apparaissent jamais dans le dossier d'envoi client. Elles vous aident à répondre aux questions en visite et à anticiper les négociations.</p>
           </div>
           <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px;">
             <div>
@@ -1191,11 +1384,11 @@
         <div class="section-divider" style="margin-top:32px;"><h3>Grenier</h3></div>
         <div class="form-group">
           <div class="toggle-group">
-            <button type="button" class="toggle-item" onclick="toggleSwitch('grenier_present')">
+            <div class="toggle-item" data-toggle="grenier_present">
               <div class="toggle-switch" id="toggle-grenier_present"></div>
               <input type="hidden" name="grenier_present" id="field-grenier_present" value="0">
               <span class="toggle-label">Oui, j'ai un grenier</span>
-            </button>
+            </div>
           </div>
           <div id="grenierDetail" style="display:none;margin-top:12px;">
             <label style="font-size:0.82rem;font-weight:600;color:#555;margin-bottom:8px;display:block;">État du grenier</label>
@@ -1333,12 +1526,12 @@
         <div class="form-group">
           <label style="margin-bottom:10px;display:block;">Espaces extérieurs</label>
           <div class="toggle-group">
-            <div class="toggle-item" onclick="toggleSwitch('garden')">
+            <div class="toggle-item" data-toggle="garden">
               <div class="toggle-switch" id="toggle-garden"></div>
               <input type="hidden" name="garden" id="field-garden" value="0">
               <span class="toggle-label">🌿 Jardin</span>
             </div>
-            <div class="toggle-item" onclick="toggleSwitch('terrace')">
+            <div class="toggle-item" data-toggle="terrace">
               <div class="toggle-switch" id="toggle-terrace"></div>
               <input type="hidden" name="terrace" id="field-terrace" value="0">
               <span class="toggle-label">🪴 Terrasse</span>
@@ -1481,6 +1674,10 @@
 
         <div style="display:flex;gap:12px;align-items:center;margin-top:32px;flex-wrap:wrap;">
           <button type="submit" class="btn-primary">Sauvegarder la fiche</button>
+          <button type="button" id="btnVoirFiche" style="display:none;padding:11px 20px;border-radius:8px;border:2px solid #3D5A47;background:#fff;font-family:'DM Sans',sans-serif;font-size:0.88rem;font-weight:600;color:#3D5A47;cursor:pointer;align-items:center;gap:6px;transition:0.15s;" onmouseover="this.style.background='#f0f5f1'" onmouseout="this.style.background='#fff'" onclick="(function(){var t=document.querySelector('.tab-btn[data-tab=\'fiche\']');if(t&&!t.classList.contains('active')){t.click();setTimeout(generateFiche,320);}else{generateFiche();}})();">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+            Voir la fiche
+          </button>
           <button type="button" onclick="exportJSON()" style="padding:11px 20px;border-radius:8px;border:2px solid #e8e0d6;background:#fff;font-family:'DM Sans',sans-serif;font-size:0.88rem;font-weight:600;color:#555;cursor:pointer;transition:0.15s;" onmouseover="this.style.borderColor='#3D5A47';this.style.color='#3D5A47'" onmouseout="this.style.borderColor='#e8e0d6';this.style.color='#555'">
             ↓ Export JSON
           </button>
@@ -1490,6 +1687,7 @@
           <div id="saveError" class="form-error hidden"></div>
         </div>
       </form>
+      </div><!-- /editModeWrapper -->
     </div>
 
     <!-- ═══════════════════════════════════════════════════
@@ -1499,94 +1697,107 @@
       <div class="form-section">
 
         <!-- Visite virtuelle -->
-        <div style="padding:18px 20px;background:#f0f5f1;border-radius:12px;border:1px solid #c8ddd0;margin-bottom:24px;">
-          <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">
-            <span style="font-size:1.2rem;">🥽</span>
-            <strong style="font-size:0.95rem;color:#3D5A47;">Visite virtuelle</strong>
+        <div style="display:flex;align-items:center;gap:14px;padding:14px 16px;background:#f8faf9;border-radius:10px;border:1px solid #dde9e3;margin-bottom:20px;flex-wrap:wrap;">
+          <div style="display:flex;align-items:center;gap:10px;flex:1;min-width:200px;">
+            <div style="width:34px;height:34px;border-radius:8px;background:#3D5A47;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/><path d="M2 12h20"/></svg>
+            </div>
+            <div>
+              <div style="font-weight:700;font-size:0.85rem;color:#2a4030;">Visite virtuelle 3D</div>
+              <div style="font-size:0.74rem;color:#999;">Matterport, Kuula, YouTube 360°… apparaîtra dans le dossier client</div>
+            </div>
           </div>
-          <p style="font-size:0.82rem;color:#555;margin:0 0 10px;">Collez ici le lien de votre visite 3D (Matterport, Kuula, YouTube 360°…) — il apparaîtra dans la fiche acheteur.</p>
-          <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
-            <input type="url" name="virtual_tour_url" id="field-virtual_tour_url" placeholder="https://my.matterport.com/show/..." style="flex:1;min-width:200px;padding:9px 12px;border:1px solid #c8ddd0;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:0.88rem;background:#fff;">
-            <button type="button" onclick="saveTourUrl()" style="padding:9px 18px;background:#3D5A47;color:#fff;border:none;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:0.85rem;font-weight:600;cursor:pointer;transition:0.15s;" onmouseover="this.style.background='#2a4030'" onmouseout="this.style.background='#3D5A47'">Enregistrer</button>
+          <div style="display:flex;gap:8px;align-items:center;flex:2;min-width:260px;">
+            <input type="url" name="virtual_tour_url" id="field-virtual_tour_url" placeholder="https://my.matterport.com/show/..." style="flex:1;padding:8px 12px;border:1px solid #dde9e3;border-radius:7px;font-family:'DM Sans',sans-serif;font-size:0.85rem;background:#fff;outline:none;">
+            <button type="button" onclick="saveTourUrl()" style="padding:8px 16px;background:#3D5A47;color:#fff;border:none;border-radius:7px;font-family:'DM Sans',sans-serif;font-size:0.82rem;font-weight:600;cursor:pointer;white-space:nowrap;" onmouseover="this.style.background='#2a4030'" onmouseout="this.style.background='#3D5A47'">Enregistrer</button>
           </div>
-          <div id="tourUrlStatus" style="font-size:0.78rem;color:#3D5A47;margin-top:6px;"></div>
+          <div id="tourUrlStatus" style="font-size:0.76rem;color:#3D5A47;width:100%;margin-top:-4px;padding-left:44px;"></div>
         </div>
 
-        <!-- Catégories de photos -->
-        <div style="margin-bottom:24px;">
-          <h3 style="font-family:'DM Sans',sans-serif;font-size:0.88rem;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:#888;margin:0 0 14px;">Guide par catégorie</h3>
-          <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;">
-            <div style="padding:14px 16px;border-radius:10px;border:1.5px solid #c8ddd0;background:#f0f5f1;">
-              <div style="font-size:1.2rem;margin-bottom:6px;">🏠</div>
-              <div style="font-weight:700;font-size:0.85rem;color:#3D5A47;margin-bottom:4px;">Photos découverte</div>
-              <div style="font-size:0.76rem;color:#777;line-height:1.5;">Façade, extérieur, jardin, quartier. <strong>Commence l'annonce</strong> — décide du clic.</div>
-            </div>
-            <div style="padding:14px 16px;border-radius:10px;border:1.5px solid #e8e0d6;background:#fafaf8;">
-              <div style="font-size:1.2rem;margin-bottom:6px;">📐</div>
-              <div style="font-weight:700;font-size:0.85rem;color:#555;margin-bottom:4px;">Photos détaillées</div>
-              <div style="font-size:0.76rem;color:#777;line-height:1.5;">Pièce par pièce — salon, cuisine, chambres, SDB. Angle grand depuis le coin.</div>
-            </div>
-            <div style="padding:14px 16px;border-radius:10px;border:1.5px solid #f0d0be;background:#fff8f4;">
-              <div style="font-size:1.2rem;margin-bottom:6px;">✨</div>
-              <div style="font-weight:700;font-size:0.85rem;color:#C4785A;margin-bottom:4px;">Photos professionnelles</div>
-              <div style="font-size:0.76rem;color:#777;line-height:1.5;">Prises par un photographe — valorisent significativement. Jusqu'à <strong>+15 % de contacts</strong>.</div>
-            </div>
-            <div style="padding:14px 16px;border-radius:10px;border:1.5px solid #e8e0d6;background:#fafaf8;">
-              <div style="font-size:1.2rem;margin-bottom:6px;">🛠</div>
-              <div style="font-weight:700;font-size:0.85rem;color:#555;margin-bottom:4px;">Points forts</div>
-              <div style="font-size:0.76rem;color:#777;line-height:1.5;">Rénovations récentes, vue, cheminée, terrasse... Photographiez ce qui justifie le prix.</div>
-            </div>
-          </div>
-        </div>
+        <!-- 3 dossiers photos distincts -->
+        <div style="display:flex;flex-direction:column;gap:12px;">
 
-        <!-- Upload + compteur -->
-        <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:12px;">
-          <div>
-            <h3 style="margin:0 0 2px;">Vos photos</h3>
-            <p style="font-size:0.82rem;color:#888;margin:0;">JPG, PNG, WEBP — max 20 photos</p>
+          <!-- DOSSIER 1 : Photos professionnelles -->
+          <div style="border:1px solid #e8ddd4;border-radius:12px;overflow:hidden;background:#fff;">
+            <div style="padding:12px 16px;border-bottom:1px solid #f0e8e0;display:flex;align-items:center;gap:10px;">
+              <div style="width:30px;height:30px;border-radius:7px;background:#f5ece6;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#C4785A" stroke-width="1.8"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+              </div>
+              <div style="flex:1;min-width:0;">
+                <div style="font-weight:700;font-size:0.85rem;color:#C4785A;">Photos professionnelles</div>
+                <div style="font-size:0.73rem;color:#bbb;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">Photos reçues de votre photographe par email (Meero, etc.)</div>
+              </div>
+              <span id="count-pro" style="display:none;background:#C4785A;color:#fff;border-radius:20px;padding:2px 9px;font-size:0.72rem;font-weight:700;"></span>
+            </div>
+            <div style="padding:10px 14px;">
+              <div id="uploadZone-pro" style="display:flex;align-items:center;gap:10px;padding:9px 12px;border:1.5px dashed #e8ddd4;border-radius:8px;cursor:pointer;background:#fdfaf8;margin-bottom:8px;transition:border-color 0.15s,background 0.15s;" onmouseover="this.style.borderColor='#C4785A';this.style.background='#fff8f5'" onmouseout="this.style.borderColor='#e8ddd4';this.style.background='#fdfaf8'">
+                <input type="file" id="photoInput-pro" multiple accept="image/jpeg,image/png,image/webp" style="display:none">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#C4785A" stroke-width="1.8" style="flex-shrink:0;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                <span style="font-size:0.82rem;color:#C4785A;font-weight:600;">Glissez vos photos ici</span>
+                <span style="font-size:0.76rem;color:#ccc;margin-left:auto;">JPG · PNG · WEBP</span>
+              </div>
+              <div id="progress-pro" class="hidden" style="margin-bottom:8px;">
+                <div style="background:#f0e8e0;border-radius:3px;height:3px;overflow:hidden;"><div id="progressBar-pro" style="background:#C4785A;height:100%;width:0%;transition:width 0.3s;border-radius:3px;"></div></div>
+                <p id="progressText-pro" style="font-size:0.72rem;color:#bbb;margin-top:3px;"></p>
+              </div>
+              <div id="grid-pro"></div>
+            </div>
           </div>
-          <div id="photoCountInfo" class="photo-count-info" style="display:none">
-            <span class="photo-count-pill" id="photoCountPill">0</span>
-            <span>photo(s) — <span id="photoCountMsg">ajoutez-en encore</span></span>
-          </div>
-        </div>
-        <div class="coach-tip" style="margin-bottom:16px;">
-          <span class="coach-tip-icon">📷</span>
-          <span><strong>La 1ère photo décide du clic</strong> sur LeBonCoin. Façade bien éclairée, propre. Minimum 8 photos pour un dossier crédible.</span>
-        </div>
-        <div class="upload-zone" id="uploadZone">
-          <input type="file" id="photoInput" multiple accept="image/jpeg,image/png,image/webp">
-          <div class="upload-zone-icon">📷</div>
-          <p style="font-weight:600;color:#3D5A47;">Cliquez ou glissez vos photos ici</p>
-          <p style="font-size:0.85rem;color:#888;margin-top:4px;">Jusqu'à 20 photos — max 20 Mo par photo</p>
-        </div>
-        <div id="uploadProgress" class="hidden" style="margin-top:16px;">
-          <div style="background:#e0e0e0;border-radius:4px;height:8px;overflow:hidden;">
-            <div id="progressBar" style="background:linear-gradient(90deg,#3D5A47,#5a8a6a);height:100%;width:0%;transition:width 0.3s;border-radius:4px;"></div>
-          </div>
-          <p id="progressText" style="font-size:0.85rem;color:#666;margin-top:8px;"></p>
-        </div>
-        <div class="photos-grid" id="photosGrid">
-          <div class="photos-empty-state" id="photosEmptyState">
-            <div style="font-size:2.5rem;margin-bottom:8px;">🏠</div>
-            <p>Aucune photo pour l'instant.</p>
-            <p style="font-size:0.8rem;margin-top:4px;color:#ccc;">Les photos sont le premier argument de vente.</p>
-          </div>
-        </div>
 
-        <!-- Ordre recommandé -->
-        <div style="margin-top:24px;padding:16px 20px;background:var(--creme);border-radius:10px;border-left:3px solid var(--terracotta);">
-          <strong>Ordre recommandé</strong>
-          <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:8px;margin-top:10px;">
-            <div style="font-size:0.8rem;color:#666;">1. 🏠 Façade extérieure</div>
-            <div style="font-size:0.8rem;color:#666;">2. 🛋 Salon / pièce de vie</div>
-            <div style="font-size:0.8rem;color:#666;">3. 🍳 Cuisine</div>
-            <div style="font-size:0.8rem;color:#666;">4. 🛏 Chambres</div>
-            <div style="font-size:0.8rem;color:#666;">5. 🚿 Salle de bain</div>
-            <div style="font-size:0.8rem;color:#666;">6. 🌿 Jardin / terrasse</div>
-            <div style="font-size:0.8rem;color:#666;">7. 📐 Caves / annexes</div>
-            <div style="font-size:0.8rem;color:#666;">8. 📍 Vue du quartier</div>
+          <!-- DOSSIER 2 : Photos découverte -->
+          <div style="border:1px solid #d8e8dc;border-radius:12px;overflow:hidden;background:#fff;">
+            <div style="padding:12px 16px;border-bottom:1px solid #e4ede7;display:flex;align-items:center;gap:10px;">
+              <div style="width:30px;height:30px;border-radius:7px;background:#edf4ef;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#3D5A47" stroke-width="1.8"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+              </div>
+              <div style="flex:1;min-width:0;">
+                <div style="font-weight:700;font-size:0.85rem;color:#3D5A47;">Photos découverte</div>
+                <div style="font-size:0.73rem;color:#bbb;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">Façade, extérieur, jardin, quartier — réalisées par vos soins</div>
+              </div>
+              <span id="count-decouverte" style="display:none;background:#3D5A47;color:#fff;border-radius:20px;padding:2px 9px;font-size:0.72rem;font-weight:700;"></span>
+            </div>
+            <div style="padding:10px 14px;">
+              <div id="uploadZone-decouverte" style="display:flex;align-items:center;gap:10px;padding:9px 12px;border:1.5px dashed #d8e8dc;border-radius:8px;cursor:pointer;background:#f8fcf9;margin-bottom:8px;transition:border-color 0.15s,background 0.15s;" onmouseover="this.style.borderColor='#3D5A47';this.style.background='#f0f7f2'" onmouseout="this.style.borderColor='#d8e8dc';this.style.background='#f8fcf9'">
+                <input type="file" id="photoInput-decouverte" multiple accept="image/jpeg,image/png,image/webp" style="display:none">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#3D5A47" stroke-width="1.8" style="flex-shrink:0;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                <span style="font-size:0.82rem;color:#3D5A47;font-weight:600;">Glissez vos photos ici</span>
+                <span style="font-size:0.76rem;color:#ccc;margin-left:auto;">JPG · PNG · WEBP</span>
+              </div>
+              <div id="progress-decouverte" class="hidden" style="margin-bottom:8px;">
+                <div style="background:#d8e8dc;border-radius:3px;height:3px;overflow:hidden;"><div id="progressBar-decouverte" style="background:#3D5A47;height:100%;width:0%;transition:width 0.3s;border-radius:3px;"></div></div>
+                <p id="progressText-decouverte" style="font-size:0.72rem;color:#bbb;margin-top:3px;"></p>
+              </div>
+              <div id="grid-decouverte"></div>
+            </div>
           </div>
+
+          <!-- DOSSIER 3 : Photos des détails -->
+          <div style="border:1px solid #e2e2e2;border-radius:12px;overflow:hidden;background:#fff;">
+            <div style="padding:12px 16px;border-bottom:1px solid #ebebeb;display:flex;align-items:center;gap:10px;">
+              <div style="width:30px;height:30px;border-radius:7px;background:#f4f4f4;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#666" stroke-width="1.8"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="15.65" y2="15.65"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/></svg>
+              </div>
+              <div style="flex:1;min-width:0;">
+                <div style="font-weight:700;font-size:0.85rem;color:#444;">Photos des détails</div>
+                <div style="font-size:0.73rem;color:#bbb;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">Chaudière, compteur, fissures — à connaître avant une visite</div>
+              </div>
+              <span id="count-details" style="display:none;background:#555;color:#fff;border-radius:20px;padding:2px 9px;font-size:0.72rem;font-weight:700;"></span>
+            </div>
+            <div style="padding:10px 14px;">
+              <div id="uploadZone-details" style="display:flex;align-items:center;gap:10px;padding:9px 12px;border:1.5px dashed #e2e2e2;border-radius:8px;cursor:pointer;background:#fafafa;margin-bottom:8px;transition:border-color 0.15s,background 0.15s;" onmouseover="this.style.borderColor='#666';this.style.background='#f4f4f4'" onmouseout="this.style.borderColor='#e2e2e2';this.style.background='#fafafa'">
+                <input type="file" id="photoInput-details" multiple accept="image/jpeg,image/png,image/webp" style="display:none">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#888" stroke-width="1.8" style="flex-shrink:0;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                <span style="font-size:0.82rem;color:#666;font-weight:600;">Glissez vos photos ici</span>
+                <span style="font-size:0.76rem;color:#ccc;margin-left:auto;">JPG · PNG · WEBP</span>
+              </div>
+              <div id="progress-details" class="hidden" style="margin-bottom:8px;">
+                <div style="background:#e2e2e2;border-radius:3px;height:3px;overflow:hidden;"><div id="progressBar-details" style="background:#555;height:100%;width:0%;transition:width 0.3s;border-radius:3px;"></div></div>
+                <p id="progressText-details" style="font-size:0.72rem;color:#bbb;margin-top:3px;"></p>
+              </div>
+              <div id="grid-details"></div>
+            </div>
+          </div>
+
         </div>
       </div>
     </div>
@@ -1595,114 +1806,248 @@
          TAB: DOCUMENTS
     ════════════════════════════════════════════════════ -->
     <div class="tab-content hidden" id="tab-documents">
-
-      <!-- ── Section 1 : Documents acheteurs ── -->
-      <div class="form-section" style="margin-bottom:28px;">
-        <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;">
-          <h3 style="margin:0;">📋 Documents acheteurs</h3>
-          <span style="padding:3px 10px;background:#e8f5e9;color:#2e7d32;border-radius:20px;font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:0.04em;">Visible dans la fiche</span>
-        </div>
-        <p style="font-size:0.85rem;color:#888;margin-bottom:16px;">Ces documents sont transmis aux acheteurs avant chaque visite — diagnostics, ERP, etc.</p>
-        <div class="coach-tip" style="margin-bottom:20px;">
-          <span class="coach-tip-icon">📋</span>
-          <span>Les diagnostics complets rassurent les acheteurs sérieux et évitent les négociations de dernière minute. Ayez-les tous avant la première visite.</span>
-        </div>
-
-        <!-- Upload zone diagnostics -->
-        <div style="background:#f8f5f0;border:1px solid #e8e0d6;border-radius:12px;padding:20px;margin-bottom:20px;">
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;align-items:end;margin-bottom:14px;">
-            <div class="form-group" style="margin:0">
-              <label>Nom du document</label>
-              <input type="text" id="docName" placeholder="Ex: DPE 2024">
-            </div>
-            <div class="form-group" style="margin:0">
-              <label>Type de document</label>
-              <select id="docType">
-                <option value="dpe">🏷 DPE</option>
-                <option value="amiante">⚗️ Amiante</option>
-                <option value="plomb">🔩 Plomb</option>
-                <option value="electricite">⚡ Électricité</option>
-                <option value="gaz">🔥 Gaz</option>
-                <option value="assainissement">💧 Assainissement</option>
-                <option value="erp">⚠️ État des risques (ERP)</option>
-                <option value="facture_chaudiere">🔥 Facture chaudière / poêle</option>
-                <option value="entretien_ramonage">📋 Entretien / ramonage</option>
-                <option value="autre">📁 Autre diagnostic</option>
-              </select>
-            </div>
-          </div>
-          <input type="file" id="docInput" accept=".pdf" style="display:none">
-          <button type="button" onclick="document.getElementById('docInput').click()" class="btn-primary" style="width:100%;">
-            + Ajouter un document acheteur
-          </button>
-        </div>
-
-        <!-- Liste documents acheteurs -->
-        <div id="clientDocsList" style="display:flex;flex-direction:column;gap:10px;"></div>
-
-        <!-- Checklist diagnostics obligatoires -->
-        <div style="margin-top:20px;padding:18px 20px;background:var(--creme);border-radius:10px;">
-          <strong style="font-size:0.9rem;">Diagnostics obligatoires pour la vente</strong>
-          <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:6px;margin-top:10px;" id="docChecklist">
-            <div class="doc-required-item" data-type="dpe">🏷 DPE</div>
-            <div class="doc-required-item" data-type="amiante">⚗️ Amiante</div>
-            <div class="doc-required-item" data-type="plomb">🔩 Plomb</div>
-            <div class="doc-required-item" data-type="electricite">⚡ Électricité</div>
-            <div class="doc-required-item" data-type="erp">⚠️ ERP</div>
-            <div class="doc-required-item" data-type="assainissement">💧 Assainissement</div>
-          </div>
-          <p style="font-size:0.78rem;color:#888;margin-top:10px;">Les éléments en vert sont déjà uploadés. Consultez la <a href="/ma-formation" style="color:var(--terracotta)">checklist complète</a> dans Formation.</p>
-        </div>
-      </div>
-
-      <!-- ── Section 2 : Documents confidentiels ── -->
-      <div class="form-section">
-        <div style="display:flex;align-items:flex-start;gap:12px;margin-bottom:6px;">
-          <div>
-            <div style="display:flex;align-items:center;gap:10px;margin-bottom:4px;">
-              <h3 style="margin:0;">🔒 Documents confidentiels / Notaire</h3>
-              <span style="padding:3px 10px;background:#fce4ec;color:#c62828;border-radius:20px;font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:0.04em;">Jamais transmis</span>
-            </div>
-            <p style="font-size:0.85rem;color:#888;margin:0;">Pour usage notaire uniquement — titre de propriété, taxe foncière, compromis… Ces documents ne figurent jamais dans la fiche acheteur.</p>
-          </div>
-        </div>
-
-        <!-- Upload zone confidentiel -->
-        <div style="background:#fff8f5;border:1px solid #f0d0be;border-radius:12px;padding:20px;margin:16px 0 20px;">
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;align-items:end;margin-bottom:14px;">
-            <div class="form-group" style="margin:0">
-              <label>Nom du document</label>
-              <input type="text" id="confDocName" placeholder="Ex: Titre de propriété 2018">
-            </div>
-            <div class="form-group" style="margin:0">
-              <label>Type de document</label>
-              <select id="confDocType">
-                <option value="titre">🏠 Titre de propriété</option>
-                <option value="taxe">📄 Taxe foncière</option>
-                <option value="compromis">📝 Compromis de vente</option>
-                <option value="acte">📋 Acte notarié</option>
-                <option value="identite">🪪 Pièce d'identité</option>
-                <option value="confidentiel">🔒 Autre (confidentiel)</option>
-              </select>
-            </div>
-          </div>
-          <input type="file" id="confDocInput" accept=".pdf,image/*" style="display:none">
-          <button type="button" onclick="document.getElementById('confDocInput').click()" style="width:100%;padding:11px;background:#fff;border:2px solid #C4785A;color:#C4785A;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:0.88rem;font-weight:700;cursor:pointer;transition:0.15s;" onmouseover="this.style.background='#fff5f0'" onmouseout="this.style.background='#fff'">
-            🔒 Ajouter un document confidentiel
-          </button>
-        </div>
-
-        <!-- Liste documents confidentiels -->
-        <div id="confDocsList" style="display:flex;flex-direction:column;gap:10px;"></div>
-      </div>
-
       <style>
-        .doc-required-item {
-          font-size:0.8rem;color:#888;padding:5px 10px;
-          background:#fff;border-radius:6px;border:1px solid #e0d8cc;
+        /* ── Documents premium redesign ─────────────────── */
+        @keyframes docCardIn { from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:none} }
+
+        /* Panel containers */
+        .dpanel { background:#fff;border:1px solid #e8e0d6;border-radius:16px;overflow:hidden;margin-bottom:20px;box-shadow:0 1px 6px rgba(0,0,0,0.04); }
+        .dpanel-head { display:flex;align-items:center;gap:14px;padding:20px 24px;border-bottom:1px solid #f0ebe4; }
+        .dpanel-icon { width:46px;height:46px;border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:1.3rem; }
+        .dpanel-title { font-weight:700;font-size:0.95rem;color:#1a1a1a; }
+        .dpanel-sub { font-size:0.76rem;color:#aaa;margin-top:3px;line-height:1.45; }
+        .dpanel-badge { padding:4px 12px;border-radius:20px;font-size:0.7rem;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;flex-shrink:0; }
+
+        /* Progress strip */
+        .dpanel-progress { display:flex;align-items:center;gap:12px;padding:10px 24px;background:#f8f7f5;border-bottom:1px solid #f0ebe4; }
+        .dpanel-progress-bar { flex:1;height:5px;background:#e0d8cc;border-radius:3px;overflow:hidden; }
+        .dpanel-progress-fill { height:100%;border-radius:3px;transition:width 0.5s;background:#3D5A47; }
+        .dpanel-progress-txt { font-size:0.72rem;font-weight:700;color:#3D5A47;white-space:nowrap; }
+
+        .dpanel-body { padding:22px 24px; }
+        @media(max-width:520px){ .dpanel-head{padding:16px;} .dpanel-body{padding:16px;} }
+
+        /* Diagnostic slot grid */
+        .diag-grid { display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:22px; }
+        @media(max-width:620px){ .diag-grid{grid-template-columns:1fr;} }
+
+        .diag-slot { border:1.5px solid #e8e0d6;border-radius:12px;background:#fff;overflow:hidden;transition:border-color 0.18s,background 0.18s; }
+        .diag-slot.filled { border-color:#a5d6a7;background:#fafffe; }
+        .diag-slot.drag-over { border-color:#3D5A47;background:#f0f7f2; box-shadow:0 0 0 3px rgba(61,90,71,0.12); }
+        .diag-slot.uploading { opacity:0.7;pointer-events:none; }
+
+        .diag-slot-top { display:flex;align-items:center;gap:10px;padding:12px 14px; }
+        .diag-slot-icon { width:34px;height:34px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0; }
+        .diag-slot-name { font-weight:700;font-size:0.85rem;color:#1a1a1a; }
+        .diag-slot-desc { font-size:0.68rem;color:#bbb;margin-top:1px; }
+        .diag-status { margin-left:auto;flex-shrink:0; }
+        .diag-badge { display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:20px;font-size:0.65rem;font-weight:700;text-transform:uppercase;letter-spacing:0.04em;white-space:nowrap; }
+        .diag-badge.missing { background:#f5f5f5;color:#aaa; }
+        .diag-badge.done { background:#e8f5e9;color:#2e7d32; }
+        .diag-badge.optional { background:#fff8e1;color:#f57f17; }
+
+        /* Upload target inside slot */
+        .diag-upload-area {
+          position:relative;margin:0 12px 12px;
+          border:1.5px dashed #d8e8dc;border-radius:9px;min-height:50px;
+          display:flex;align-items:center;justify-content:center;gap:8px;
+          cursor:pointer;transition:all 0.14s;overflow:hidden;background:#f8fcf9;
         }
-        .doc-required-item.done { background:#e8f5e9;color:#2e7d32;border-color:#a5d6a7; }
+        .diag-upload-area:hover { border-color:#3D5A47;background:#f0f7f2; }
+        .diag-upload-area input { position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%; }
+        .diag-upload-area-text { font-size:0.74rem;color:#888;font-weight:600;pointer-events:none; }
+        .diag-upload-area:hover .diag-upload-area-text { color:#3D5A47; }
+        .diag-slot-bar { position:absolute;bottom:0;left:0;right:0;height:2px;background:#3D5A47;transform:scaleX(0);transform-origin:left;transition:transform 0.4s; }
+        .diag-slot.uploading .diag-slot-bar { transform:scaleX(0.75);animation:diagProg 1.4s ease-in-out infinite; }
+        @keyframes diagProg { 0%{transform:scaleX(0.1);transform-origin:left} 50%{transform:scaleX(0.85);transform-origin:left} 100%{transform:scaleX(1);transform-origin:right} }
+
+        /* Filled file row inside slot */
+        .diag-file-row { display:flex;align-items:center;gap:9px;margin:0 12px 12px;padding:9px 11px;background:#f0f7f2;border-radius:9px;border:1px solid #c8ddd0;animation:docCardIn 0.22s; }
+        .diag-file-icon { font-size:1rem;flex-shrink:0; }
+        .diag-file-name { flex:1;font-size:0.78rem;font-weight:600;color:#1a1a1a;white-space:nowrap;overflow:hidden;text-overflow:ellipsis; }
+        .diag-file-open { font-size:0.74rem;color:#3D5A47;font-weight:600;text-decoration:none;padding:4px 9px;border:1px solid #c8ddd0;border-radius:6px;background:#fff;transition:0.12s;white-space:nowrap; }
+        .diag-file-open:hover { background:#3D5A47;color:#fff;border-color:#3D5A47; }
+        .diag-file-del { width:24px;height:24px;border-radius:6px;border:none;background:#fee2e2;color:#dc2626;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:0.12s;flex-shrink:0; }
+        .diag-file-del:hover { background:#fca5a5; }
+        .diag-file-del svg { pointer-events:none; }
+
+        /* Section separator */
+        .docs-sep { display:flex;align-items:center;gap:10px;margin:20px 0 16px; }
+        .docs-sep-line { flex:1;height:1px;background:#f0ebe4; }
+        .docs-sep-txt { font-size:0.68rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:#ccc;white-space:nowrap; }
+
+        /* Generic other docs area */
+        .docs-type-row { display:flex;gap:8px;align-items:center;margin-bottom:10px;flex-wrap:wrap; }
+        .docs-type-lbl { font-size:0.72rem;font-weight:700;color:#888;white-space:nowrap; }
+        .docs-type-sel {
+          flex:1;min-width:160px;padding:8px 12px;border:1.5px solid #e8e0d6;border-radius:8px;
+          font-family:'DM Sans',sans-serif;font-size:0.83rem;background:#fafaf8;
+          color:#333;outline:none;cursor:pointer;transition:border-color 0.14s;
+        }
+        .docs-type-sel:focus { border-color:#3D5A47; }
+        .docs-type-sel.conf { border-color:#f0d0be;background:#fff8f5; }
+        .docs-type-sel.conf:focus { border-color:#C4785A; }
+
+        /* Drop zone (wide, inviting) */
+        .docs-drop {
+          border:2px dashed #d8e8dc;border-radius:12px;background:#f8fcf9;
+          min-height:88px;display:flex;flex-direction:column;align-items:center;justify-content:center;
+          gap:5px;cursor:pointer;transition:all 0.18s;position:relative;overflow:hidden;
+          padding:20px;margin-bottom:14px;
+        }
+        .docs-drop.conf { border-color:#f0d0be;background:#fff8f5; }
+        .docs-drop:hover { border-color:#3D5A47;background:#f0f7f2; }
+        .docs-drop.conf:hover { border-color:#C4785A;background:#fff5f0; }
+        .docs-drop.drag-over { border-color:#3D5A47;background:#eaf4ee;transform:scale(1.01); }
+        .docs-drop.conf.drag-over { border-color:#C4785A;background:#fff0e8; }
+        .docs-drop.uploading { opacity:0.65;pointer-events:none; }
+        .docs-drop input { position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%; }
+        .docs-drop-ico { font-size:1.5rem;line-height:1;pointer-events:none; }
+        .docs-drop-ttl { font-size:0.84rem;font-weight:700;color:#555;pointer-events:none; }
+        .docs-drop:hover .docs-drop-ttl { color:#3D5A47; }
+        .docs-drop.conf:hover .docs-drop-ttl { color:#C4785A; }
+        .docs-drop-sub { font-size:0.72rem;color:#bbb;pointer-events:none; }
+        .docs-drop-bar { position:absolute;bottom:0;left:0;right:0;height:3px;background:linear-gradient(90deg,#3D5A47,#6aa882);transform:scaleX(0);transform-origin:left;transition:transform 0.4s; }
+        .docs-drop.conf .docs-drop-bar { background:linear-gradient(90deg,#C4785A,#e8a07a); }
+        .docs-drop.uploading .docs-drop-bar { transform:scaleX(0.85); }
+
+        /* Uploaded other-docs file cards */
+        .docs-card { display:flex;align-items:center;gap:12px;padding:12px 14px;background:#fff;border:1px solid #e8e0d6;border-radius:10px;transition:border-color 0.12s;animation:docCardIn 0.22s; }
+        .docs-card:hover { border-color:#c8ddd0; }
+        .docs-card-ico { width:42px;height:42px;border-radius:10px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:1.2rem; }
+        .docs-card-info { flex:1;min-width:0; }
+        .docs-card-name { font-weight:600;font-size:0.88rem;color:#1a1a1a;white-space:nowrap;overflow:hidden;text-overflow:ellipsis; }
+        .docs-card-chip { display:inline-block;margin-top:3px;padding:2px 8px;border-radius:20px;font-size:0.65rem;font-weight:700;text-transform:uppercase;letter-spacing:0.04em; }
+        .docs-card-acts { display:flex;gap:6px;flex-shrink:0; }
+        .docs-card-view { padding:6px 12px;border-radius:7px;border:1.5px solid #e8e0d6;background:#fff;font-family:'DM Sans',sans-serif;font-size:0.78rem;font-weight:600;color:#555;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:4px;transition:0.12s; }
+        .docs-card-view:hover { border-color:#3D5A47;color:#3D5A47; }
+        .docs-card-del { width:32px;height:32px;border-radius:7px;border:none;background:#fee2e2;color:#dc2626;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:0.12s;flex-shrink:0; }
+        .docs-card-del:hover { background:#fca5a5; }
+        .docs-card-del svg { pointer-events:none; }
+
+        /* Confidential quick-slots */
+        .conf-slot { display:flex;align-items:center;gap:12px;padding:14px 16px;border:1.5px solid #f0d0be;border-radius:10px;background:#fff8f5;margin-bottom:10px;position:relative;overflow:hidden;transition:all 0.15s; }
+        .conf-slot.filled { border-color:#C4785A;background:#fff3ee; }
+        .conf-slot.drag-over { border-color:#C4785A;background:#fff0e8;box-shadow:0 0 0 3px rgba(196,120,90,0.1); }
+        .conf-slot.uploading { opacity:0.65;pointer-events:none; }
+        .conf-slot-ico { font-size:1.2rem;flex-shrink:0; }
+        .conf-slot-info { flex:1;min-width:0; }
+        .conf-slot-name { font-weight:700;font-size:0.85rem;color:#333; }
+        .conf-slot-desc { font-size:0.7rem;color:#bbb;margin-top:1px;line-height:1.4; }
+        .conf-slot-acts { flex-shrink:0;display:flex;align-items:center;gap:6px; }
+        .conf-upload-lbl { padding:7px 13px;border-radius:8px;border:1.5px solid #f0d0be;background:#fff;color:#C4785A;font-family:'DM Sans',sans-serif;font-size:0.78rem;font-weight:600;cursor:pointer;transition:0.12s;white-space:nowrap;position:relative;overflow:hidden;display:inline-flex;align-items:center;gap:5px; }
+        .conf-upload-lbl:hover { border-color:#C4785A;background:#fff0e8; }
+        .conf-upload-lbl input { position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%; }
+        .conf-view-btn { font-size:0.78rem;color:#C4785A;font-weight:600;text-decoration:none;padding:6px 11px;border:1px solid #f0d0be;border-radius:7px;background:#fff;transition:0.12s;white-space:nowrap; }
+        .conf-view-btn:hover { background:#C4785A;color:#fff; }
+        .conf-check { width:22px;height:22px;border-radius:50%;background:#C4785A;color:#fff;display:flex;align-items:center;justify-content:center;font-size:0.65rem;font-weight:700;flex-shrink:0; }
+        .conf-del { width:28px;height:28px;border-radius:6px;border:none;background:#fee2e2;color:#dc2626;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:0.12s;flex-shrink:0; }
+        .conf-del:hover { background:#fca5a5; }
+        .conf-del svg { pointer-events:none; }
+        .conf-bar { position:absolute;bottom:0;left:0;right:0;height:2px;background:#C4785A;transform:scaleX(0);transform-origin:left;transition:transform 0.4s; }
+        .conf-slot.uploading .conf-bar { transform:scaleX(0.75); }
+
+        /* Score intro */
+        .docs-intro-banner { display:flex;align-items:center;gap:16px;padding:16px 20px;background:linear-gradient(135deg,#f0f7f2,#faf7f2);border:1px solid #c8ddd0;border-radius:12px;margin-bottom:20px; }
+        .docs-intro-icon { font-size:2rem;flex-shrink:0;line-height:1; }
+        .docs-intro-text { flex:1;font-size:0.85rem;color:#444;line-height:1.5; }
+        .docs-intro-text strong { color:#3D5A47; }
+
+        /* Empty list */
+        .docs-list-empty { text-align:center;padding:20px;color:#ccc;font-size:0.82rem;border:2px dashed #f0ebe4;border-radius:10px; }
+
+        /* Section sub-labels */
+        .docs-sub-label { font-size:0.7rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:#bbb;margin-bottom:12px; }
       </style>
+
+      <!-- Intro banner -->
+      <div class="docs-intro-banner">
+        <div class="docs-intro-icon">📁</div>
+        <div class="docs-intro-text" id="docIntroBannerText">
+          <strong>Organisez votre dossier documentaire</strong><br>
+          Un dossier complet inspire confiance et réduit les négociations. Commencez par les diagnostics obligatoires.
+        </div>
+      </div>
+
+      <!-- ─── SECTION 1: Documents publics ─────────────── -->
+      <div class="dpanel">
+        <div class="dpanel-head">
+          <div class="dpanel-icon" style="background:#edf4ef;">📋</div>
+          <div style="flex:1;">
+            <div class="dpanel-title">Documents acheteurs</div>
+            <div class="dpanel-sub">Transmis automatiquement aux acheteurs après demande de visite · DPE, diagnostics, plans…</div>
+          </div>
+          <span class="dpanel-badge" style="background:#e8f5e9;color:#2e7d32;">👁 Visible acheteurs</span>
+        </div>
+        <div class="dpanel-progress">
+          <div class="dpanel-progress-bar"><div class="dpanel-progress-fill" id="diagProgressFill" style="width:0%"></div></div>
+          <span class="dpanel-progress-txt" id="diagProgressTxt">0/7 diagnostics</span>
+        </div>
+        <div class="dpanel-body">
+
+          <div class="docs-sub-label">Diagnostics obligatoires &amp; recommandés — cliquez sur chaque case pour ajouter</div>
+          <div class="diag-grid" id="diagGrid"></div>
+
+          <div class="docs-sep"><div class="docs-sep-line"></div><span class="docs-sep-txt">Autres documents acheteurs</span><div class="docs-sep-line"></div></div>
+
+          <div class="docs-type-row">
+            <span class="docs-type-lbl">Type :</span>
+            <select id="docType" class="docs-type-sel">
+              <option value="plan">Plan du bien</option>
+              <option value="entretien_ramonage">Entretien / ramonage</option>
+              <option value="facture_chaudiere">Facture chaudière / poêle</option>
+              <option value="autre">Autre document</option>
+            </select>
+          </div>
+          <div class="docs-drop" id="docZone-client">
+            <div class="docs-drop-ico">☁</div>
+            <div class="docs-drop-ttl">Glisser un fichier ici — ou cliquer pour parcourir</div>
+            <div class="docs-drop-sub">PDF ou image · Max 50 Mo</div>
+            <div class="docs-drop-bar"></div>
+            <input type="file" id="docInput" accept=".pdf,.jpg,.jpeg,.png,.webp" aria-label="Sélectionner un fichier">
+          </div>
+          <div id="clientDocsList" style="display:flex;flex-direction:column;gap:8px;"></div>
+
+        </div>
+      </div>
+
+      <!-- ─── SECTION 2: Documents confidentiels ──────── -->
+      <div class="dpanel">
+        <div class="dpanel-head">
+          <div class="dpanel-icon" style="background:#fce4ec;">🔒</div>
+          <div style="flex:1;">
+            <div class="dpanel-title">Documents confidentiels</div>
+            <div class="dpanel-sub">Ces fichiers ne sont <strong style="color:#c62828;">jamais partagés</strong> avec les acheteurs — réservés au notaire et aux démarches administratives</div>
+          </div>
+          <span class="dpanel-badge" style="background:#fce4ec;color:#c62828;">🔒 Jamais transmis</span>
+        </div>
+        <div class="dpanel-body">
+
+          <div class="docs-sub-label">Documents courants — ajoutez en un clic</div>
+          <div id="confSlots"></div>
+
+          <div class="docs-sep"><div class="docs-sep-line"></div><span class="docs-sep-txt">Autres documents confidentiels</span><div class="docs-sep-line"></div></div>
+
+          <div class="docs-type-row">
+            <span class="docs-type-lbl">Type :</span>
+            <select id="confDocType" class="docs-type-sel conf">
+              <option value="acte">Acte notarié</option>
+              <option value="identite">Pièce d'identité</option>
+              <option value="confidentiel">Autre (confidentiel)</option>
+            </select>
+          </div>
+          <div class="docs-drop conf" id="docZone-conf">
+            <div class="docs-drop-ico">☁</div>
+            <div class="docs-drop-ttl">Glisser un fichier ici — ou cliquer pour parcourir</div>
+            <div class="docs-drop-sub">PDF ou image · Max 50 Mo</div>
+            <div class="docs-drop-bar"></div>
+            <input type="file" id="confDocInput" accept=".pdf,.jpg,.jpeg,.png,.webp,image/*" aria-label="Sélectionner un fichier confidentiel">
+          </div>
+          <div id="confDocsList" style="display:flex;flex-direction:column;gap:8px;"></div>
+
+        </div>
+      </div>
+
     </div>
 
     <!-- ═══════════════════════════════════════════════════
@@ -1711,18 +2056,25 @@
     <div class="tab-content hidden" id="tab-fiche">
       <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:20px;">
         <div>
-          <h3 style="margin:0 0 4px;font-family:'DM Sans',sans-serif;font-size:1rem;">Fiche de renseignements acheteur</h3>
-          <p style="font-size:0.85rem;color:#888;margin:0;">À transmettre avant chaque visite — remplace les questions répétitives</p>
+          <h3 style="margin:0 0 4px;font-family:'DM Sans',sans-serif;font-size:1rem;">Dossier complet d'envoi automatique client</h3>
+          <p style="font-size:0.85rem;color:#888;margin:0;">Généré automatiquement · Contient la fiche premium, les diagnostics publics et les photos sélectionnées · Les documents notaire restent confidentiels</p>
         </div>
-        <div class="fiche-actions" style="display:flex;gap:10px;flex-wrap:wrap;">
-          <button onclick="generateFiche()" class="btn-primary">Générer la fiche</button>
-          <button onclick="printFiche()" class="btn-secondary" id="printBtn" style="display:none">Imprimer / PDF</button>
+        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:10px;">
+          <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;">
+            <button onclick="exportDossierPDF()" class="btn-secondary" id="printBtn" style="display:none">⬇ Télécharger PDF</button>
+          </div>
+          <label id="shareAddressToggle" style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:0.82rem;color:#555;user-select:none;">
+            <div id="shareAddressSwitch" style="width:36px;height:20px;border-radius:10px;background:#ddd;position:relative;transition:0.2s;flex-shrink:0;" onclick="toggleShareAddress()">
+              <div id="shareAddressKnob" style="position:absolute;top:2px;left:2px;width:16px;height:16px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,0.2);transition:0.2s;"></div>
+            </div>
+            <span>Partager l'adresse exacte sur le dossier</span>
+          </label>
         </div>
       </div>
       <div id="ficheOutput">
         <div class="fiche-empty">
           <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
-          <p>Sauvegardez d'abord votre fiche dans l'onglet Informations,<br>puis cliquez sur "Générer la fiche".</p>
+          <p>Sauvegardez d'abord votre fiche dans l'onglet Informations,<br>puis cliquez sur "Générer le dossier".</p>
         </div>
       </div>
     </div>
@@ -1748,6 +2100,7 @@ document.querySelectorAll('.tab-btn').forEach(btn => {
     document.querySelectorAll('.tab-content').forEach(c => c.classList.add('hidden'));
     btn.classList.add('active');
     document.getElementById('tab-' + btn.dataset.tab).classList.remove('hidden');
+    if (btn.dataset.tab === 'fiche') generateFiche();
   });
 });
 
@@ -1846,6 +2199,7 @@ function toggleSwitch(name) {
   var hidden = document.getElementById('field-' + name);
   var isOn = sw.classList.toggle('on');
   hidden.value = isOn ? '1' : '0';
+  console.log('[toggle]', name, '->', isOn ? 'ON' : 'OFF');
   if (name === 'terrace') updateTerraceDetail(isOn);
   if (name === 'grenier_present') updateGrenierDetail(isOn);
   scheduleAutosave();
@@ -2015,12 +2369,18 @@ async function loadProperty() {
     syncEquipValue();
   }
 
-  // Restore room list from localStorage draft if available
-  var draft = (function() { try { return JSON.parse(localStorage.getItem(LS_DRAFT_KEY)); } catch(e){ return null; } })();
-  if (draft && draft._roomsList && draft._roomsList.length > 0) {
-    roomsList = draft._roomsList;
-    syncUnlockedEtagesFromList();
-    renderRoomsList();
+  // Restore room list — DB takes priority over localStorage draft
+  var restoredRooms = null;
+  if (p.rooms_detail) {
+    try { restoredRooms = JSON.parse(p.rooms_detail); } catch(e) {}
+  }
+  if (!restoredRooms || restoredRooms.length === 0) {
+    var draft = (function() { try { return JSON.parse(localStorage.getItem(LS_DRAFT_KEY)); } catch(e){ return null; } })();
+    if (draft && draft._roomsList && draft._roomsList.length > 0) restoredRooms = draft._roomsList;
+  }
+  if (restoredRooms && restoredRooms.length > 0) {
+    roomsList = restoredRooms;
+    renderRoomCards();
     computeRoomTotals();
   }
 
@@ -2032,11 +2392,22 @@ async function loadProperty() {
 
   // Photos and documents
   if (data.photos?.length) renderPhotos(data.photos);
-  if (data.documents?.length) renderDocuments(data.documents);
+  renderDocuments(data.documents || []);
+
+  // Keep fiche in sync when documents change
+  var ficheTab = document.getElementById('tab-fiche');
+  if (ficheTab && !ficheTab.classList.contains('hidden')) generateFiche();
 
   renderPublishTab(p);
   updatePrixCoach();
   updateCompletion();
+
+  // Switch to view mode automatically if property has basic data
+  if (p.type && p.address && p.price) {
+    var emb = document.getElementById('editModeBar');
+    if (emb) emb.style.display = 'flex';
+    enterViewMode();
+  }
 }
 
 // ── Publish tab ───────────────────────────────────────
@@ -2098,6 +2469,7 @@ async function publishProperty() {
 // ── Form save ─────────────────────────────────────────
 document.getElementById('propertyForm').addEventListener('submit', async (e) => {
   e.preventDefault();
+  console.log('[save] form submit fired');
   const formData = new FormData(e.target);
   const data = {};
   formData.forEach((v, k) => { data[k] = v; });
@@ -2112,6 +2484,8 @@ document.getElementById('propertyForm').addEventListener('submit', async (e) => 
     if (el) data[f] = el.value;
   });
 
+  data.rooms_detail = JSON.stringify(roomsList);
+
   const btn = e.target.querySelector('button[type="submit"]');
   btn.textContent = 'Sauvegarde...'; btn.disabled = true;
 
@@ -2123,7 +2497,12 @@ document.getElementById('propertyForm').addEventListener('submit', async (e) => 
   if (result.success) {
     document.getElementById('saveSuccess').classList.remove('hidden');
     setTimeout(() => document.getElementById('saveSuccess').classList.add('hidden'), 3000);
-    showToast('Fiche sauvegardée');
+    const btnFiche = document.getElementById('btnVoirFiche');
+    if (btnFiche) btnFiche.style.display = 'inline-flex';
+    showToast('Fiche sauvegardée ✓');
+    var emb = document.getElementById('editModeBar');
+    if (emb) emb.style.display = 'flex';
+    enterViewMode();
   } else {
     document.getElementById('saveError').textContent = result.error;
     document.getElementById('saveError').classList.remove('hidden');
@@ -2131,112 +2510,255 @@ document.getElementById('propertyForm').addEventListener('submit', async (e) => 
   btn.textContent = 'Sauvegarder la fiche'; btn.disabled = false;
 });
 
-// ── Photo upload ──────────────────────────────────────
-const uploadZone = document.getElementById('uploadZone');
-const photoInput = document.getElementById('photoInput');
-uploadZone.addEventListener('click', () => photoInput.click());
-uploadZone.addEventListener('dragover', (e) => { e.preventDefault(); uploadZone.classList.add('drag-over'); });
-uploadZone.addEventListener('dragleave', () => uploadZone.classList.remove('drag-over'));
-uploadZone.addEventListener('drop', (e) => { e.preventDefault(); uploadZone.classList.remove('drag-over'); uploadPhotos(e.dataTransfer.files); });
-photoInput.addEventListener('change', () => uploadPhotos(photoInput.files));
+// ── Photo upload — 3 dossiers distincts ──────────────
+const PHOTO_CATS = ['pro', 'decouverte', 'details'];
+let allPhotos = { pro: [], decouverte: [], details: [] };
 
-async function uploadPhotos(files) {
-  const progress = document.getElementById('uploadProgress');
-  const bar = document.getElementById('progressBar');
-  const text = document.getElementById('progressText');
+PHOTO_CATS.forEach(cat => {
+  const zone = document.getElementById('uploadZone-' + cat);
+  const input = document.getElementById('photoInput-' + cat);
+  if (!zone || !input) return;
+  zone.addEventListener('click', () => input.click());
+  zone.addEventListener('dragover', (e) => { e.preventDefault(); zone.classList.add('drag-over'); });
+  zone.addEventListener('dragleave', () => zone.classList.remove('drag-over'));
+  zone.addEventListener('drop', (e) => { e.preventDefault(); zone.classList.remove('drag-over'); uploadPhotos(e.dataTransfer.files, cat); });
+  input.addEventListener('change', () => { uploadPhotos(input.files, cat); });
+});
+
+async function uploadPhotos(files, category) {
+  if (!files || !files.length) return;
+  const progress = document.getElementById('progress-' + category);
+  const bar = document.getElementById('progressBar-' + category);
+  const text = document.getElementById('progressText-' + category);
   progress.classList.remove('hidden');
 
-  // Show instant local previews
   const tempIds = [];
   Array.from(files).forEach((file, i) => {
     const tempId = 'temp-' + Date.now() + i;
     tempIds.push(tempId);
-    const localUrl = URL.createObjectURL(file);
-    allPhotos.push({ url: localUrl, cloudinary_id: tempId, _temp: true });
+    allPhotos[category].push({ url: URL.createObjectURL(file), cloudinary_id: tempId, category, _temp: true });
   });
-  renderPhotosGrid();
+  renderGrid(category);
 
   for (let i = 0; i < files.length; i++) {
     text.textContent = `Upload ${i + 1}/${files.length} — ${files[i].name}`;
     bar.style.width = `${((i + 1) / files.length) * 100}%`;
     const fd = new FormData();
     fd.append('photos', files[i]);
+    fd.append('category', category);
     const res = await fetch('/api/property/photos', { method: 'POST', body: fd });
     const data = await res.json();
-    if (data.photos && data.photos[0]) {
-      // Replace temp with real
-      const idx = allPhotos.findIndex(p => p.cloudinary_id === tempIds[i]);
-      if (idx !== -1) allPhotos[idx] = data.photos[0];
-      renderPhotosGrid();
+    if (data.error) {
+      showToast(data.error, 'error');
+      allPhotos[category] = allPhotos[category].filter(p => p.cloudinary_id !== tempIds[i]);
+    } else if (data.photos && data.photos[0]) {
+      const idx = allPhotos[category].findIndex(p => p.cloudinary_id === tempIds[i]);
+      if (idx !== -1) allPhotos[category][idx] = { ...data.photos[0], category };
     }
+    renderGrid(category);
   }
-  text.textContent = 'Upload terminé !';
+  text.textContent = 'Enregistré ✓';
   setTimeout(() => progress.classList.add('hidden'), 2000);
-  photoInput.value = '';
+  document.getElementById('photoInput-' + category).value = '';
+  // Rafraîchir la fiche si elle est ouverte
+  const ficheTab = document.getElementById('tab-fiche');
+  if (ficheTab && !ficheTab.classList.contains('hidden')) generateFiche();
 }
 
-let allPhotos = [];
-function renderPhotos(photos, append = false) {
-  if (!append) allPhotos = photos;
-  else allPhotos = [...allPhotos, ...photos];
-  renderPhotosGrid();
+function renderPhotos(photos) {
+  allPhotos = { pro: [], decouverte: [], details: [] };
+  (photos || []).forEach(p => {
+    const cat = p.category || 'pro';
+    if (allPhotos[cat]) allPhotos[cat].push(p);
+    else allPhotos.pro.push(p);
+  });
+  PHOTO_CATS.forEach(cat => renderGrid(cat));
 }
 
-// Bento span pattern — cycles for large galleries
-const BENTO_SPANS = ['bento-c2 bento-r2','bento-r2','','bento-c2','','','bento-r2','','bento-c2',''];
+function renderGrid(category) {
+  const grid = document.getElementById('grid-' + category);
+  const countEl = document.getElementById('count-' + category);
+  if (!grid) return;
+  const photos = allPhotos[category] || [];
+  const realPhotos = photos.filter(p => !p._temp);
+  const tempPhotos = photos.filter(p => p._temp);
 
-function renderPhotosGrid() {
-  const grid = document.getElementById('photosGrid');
+  countEl.textContent = realPhotos.length || '';
+  countEl.style.display = realPhotos.length ? 'inline-flex' : 'none';
 
-  if (allPhotos.length === 0) {
-    grid.className = 'photos-grid';
-    grid.innerHTML = `<div class="photos-empty-state" id="photosEmptyState">
-      <div style="font-size:2.5rem;margin-bottom:8px;">🏠</div>
-      <p>Aucune photo pour l'instant.</p>
-      <p style="font-size:0.8rem;margin-top:4px;color:#ccc;">Les photos sont le premier argument de vente.</p>
-    </div>`;
-    document.getElementById('photoCountInfo').style.display = 'none';
+  const emptyTexts = { pro: 'Aucune photo professionnelle', decouverte: 'Aucune photo — façade, jardin, quartier...', details: 'Aucune photo — chaudière, compteur, fissures...' };
+
+  // Temp upload spinners (compact row, no wrapping to avoid vertical growth)
+  const tempHtml = tempPhotos.length ? `<div style="display:flex;gap:6px;height:30px;overflow:hidden;margin-bottom:4px;">
+    ${tempPhotos.map(() => `<div style="flex-shrink:0;width:40px;height:30px;border-radius:5px;background:#f0ede8;display:flex;align-items:center;justify-content:center;font-size:0.8rem;">⏳</div>`).join('')}
+  </div>` : '';
+
+  if (realPhotos.length === 0) {
+    grid.style.display = 'block';
+    grid.innerHTML = tempHtml + (tempPhotos.length === 0 ? `<div style="padding:8px 2px;font-size:0.76rem;color:#ccc;">${emptyTexts[category]}</div>` : '');
     return;
   }
 
-  grid.className = 'bento-grid';
-  grid.innerHTML = allPhotos.map((p, i) => {
-    const span = BENTO_SPANS[i % BENTO_SPANS.length] || '';
-    const imgSrc = p.url || p.thumbnail_url || '';
-    const thumbSrc = imgSrc.includes('/upload/') ? imgSrc.replace('/upload/', '/upload/w_600,c_fill,q_auto/') : imgSrc;
-    const cidSafe = (p.cloudinary_id || '').replace(/'/g, "\\'");
-    return `
-    <div class="bento-item ${span}" onclick="${p._temp ? '' : `openLightbox(${i})`}">
-      <img src="${thumbSrc}" alt="Photo ${i+1}" loading="lazy">
-      ${i === 0 ? '<div class="bento-main-badge">★ Principale</div>' : ''}
-      ${p._temp
-        ? '<div class="bento-uploading">⏳</div>'
-        : `<div class="bento-overlay">
-            <span style="color:rgba(255,255,255,0.75);font-size:0.78rem;">${i+1} / ${allPhotos.length}</span>
-            <button class="bento-delete-btn" onclick="event.stopPropagation();deletePhoto('${cidSafe}')">✕</button>
-           </div>`}
-    </div>`;
-  }).join('');
+  const svgDel = `<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>`;
+  const svgPrev = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>`;
+  const svgNext = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>`;
 
-  const countEl = document.getElementById('photoCountInfo');
-  const pill = document.getElementById('photoCountPill');
-  const msg = document.getElementById('photoCountMsg');
-  countEl.style.display = 'flex';
-  pill.textContent = allPhotos.length;
-  msg.textContent = allPhotos.length < 5 ? 'ajoutez-en encore pour un dossier solide' :
-                    allPhotos.length < 8 ? 'bien ! visez 8+ pour rassurer les acheteurs' : '✓ dossier photo complet';
-  if (allPhotos.length >= 8) pill.style.background = '#C4785A';
+  const makeItem = (p, i) => {
+    const imgSrc = p.url || p.thumbnail_url || '';
+    const thumbSrc = imgSrc.includes('/upload/') ? imgSrc.replace('/upload/', '/upload/w_500,c_fill,q_auto/') : imgSrc;
+    const cidSafe = (p.cloudinary_id || '').replace(/'/g, "\\'");
+    return `<div class="photo-scroll-item" data-photo-idx="${i}" data-photo-cat="${category}">
+      <img src="${thumbSrc}" alt="Photo ${i+1}" loading="lazy" draggable="false">
+      <button class="photo-scroll-del" data-cid="${cidSafe}" data-cat="${category}" title="Supprimer">${svgDel}</button>
+    </div>`;
+  };
+
+  const items = realPhotos.map((p, i) => makeItem(p, i)).join('');
+
+  // Stop previous carousel on this track if re-rendering
+  const existingTrack = document.getElementById('scroll-track-' + category);
+  if (existingTrack && existingTrack._stopCarousel) existingTrack._stopCarousel();
+
+  grid.style.display = 'block';
+  grid.innerHTML = tempHtml + `<div class="photo-scroll-outer">
+    <button class="photo-scroll-nav prev" data-scroll-dir="-1" data-scroll-cat="${category}">${svgPrev}</button>
+    <div class="photo-scroll-track" id="scroll-track-${category}">${items}</div>
+    <button class="photo-scroll-nav next" data-scroll-dir="1" data-scroll-cat="${category}">${svgNext}</button>
+  </div>`;
+
+  initScrollCarousel(document.getElementById('scroll-track-' + category));
 }
 
+function initScrollCarousel(track) {
+  if (!track) return;
+
+  // Duplicate items for seamless infinite loop (3+ photos only)
+  const origItems = Array.from(track.querySelectorAll('.photo-scroll-item'));
+  const canLoop = origItems.length >= 3;
+  if (canLoop) {
+    origItems.forEach(function(item) {
+      var clone = item.cloneNode(true);
+      clone.setAttribute('aria-hidden', 'true');
+      track.appendChild(clone);
+    });
+  }
+
+  var paused = false;
+  var isDragging = false;
+  var resumeTimer = null;
+  var startX = 0, scrollStart = 0, moved = false;
+  var rafId = null;
+  var speed = 0.38; // px per frame — slow, premium feel
+
+  function step() {
+    if (!track.isConnected) { cancelAnimationFrame(rafId); return; }
+    if (!paused && !isDragging) {
+      track.scrollLeft += speed;
+      if (canLoop && track.scrollLeft >= track.scrollWidth / 2) {
+        track.scrollLeft -= track.scrollWidth / 2;
+      }
+    }
+    rafId = requestAnimationFrame(step);
+  }
+
+  // Pause on hover over the whole outer container
+  var outer = track.closest('.photo-scroll-outer');
+  if (outer) {
+    outer.addEventListener('mouseenter', function() { paused = true; clearTimeout(resumeTimer); });
+    outer.addEventListener('mouseleave', function() { if (!isDragging) { resumeTimer = setTimeout(function() { paused = false; }, 400); } });
+  }
+
+  // Drag to scroll (mouse)
+  track.addEventListener('mousedown', function(e) {
+    if (e.target.closest('.photo-scroll-del')) return;
+    isDragging = true; moved = false;
+    startX = e.pageX - track.offsetLeft;
+    scrollStart = track.scrollLeft;
+    track.classList.add('is-dragging');
+    clearTimeout(resumeTimer);
+  });
+
+  function endDrag() {
+    if (!isDragging) return;
+    isDragging = false;
+    track.classList.remove('is-dragging');
+    clearTimeout(resumeTimer);
+    resumeTimer = setTimeout(function() { paused = false; }, 2200);
+  }
+
+  track.addEventListener('mouseup', endDrag);
+  track.addEventListener('mouseleave', function() { if (isDragging) endDrag(); });
+  track.addEventListener('mousemove', function(e) {
+    if (!isDragging) return;
+    e.preventDefault();
+    moved = true;
+    var x = e.pageX - track.offsetLeft;
+    track.scrollLeft = scrollStart - (x - startX) * 1.5;
+    if (canLoop) {
+      if (track.scrollLeft >= track.scrollWidth / 2) track.scrollLeft -= track.scrollWidth / 2;
+      if (track.scrollLeft < 0) track.scrollLeft = 0;
+    }
+  });
+
+  // Prevent lightbox trigger after a drag gesture
+  track.addEventListener('click', function(e) {
+    if (moved) { e.stopPropagation(); moved = false; }
+  }, true);
+
+  // Touch: pause during swipe, resume after 2.5s
+  track.addEventListener('touchstart', function() { paused = true; clearTimeout(resumeTimer); }, { passive: true });
+  track.addEventListener('touchend', function() { resumeTimer = setTimeout(function() { paused = false; }, 2500); }, { passive: true });
+
+  rafId = requestAnimationFrame(step);
+  track._stopCarousel = function() { cancelAnimationFrame(rafId); clearTimeout(resumeTimer); };
+  track._pauseCarousel = function(ms) {
+    paused = true;
+    clearTimeout(resumeTimer);
+    resumeTimer = setTimeout(function() { paused = false; }, ms || 2000);
+  };
+}
+
+// ── Photo gallery event delegation ───────────────────
+document.addEventListener('click', function(e) {
+  // Nav arrow — jump and pause carousel briefly
+  var navBtn = e.target.closest('.photo-scroll-nav');
+  if (navBtn) {
+    var cat = navBtn.dataset.scrollCat;
+    var dir = parseInt(navBtn.dataset.scrollDir, 10);
+    var track = document.getElementById('scroll-track-' + cat);
+    if (track) {
+      track.scrollLeft += dir * 140;
+      if (track._pauseCarousel) track._pauseCarousel(2000);
+    }
+    return;
+  }
+  // Delete photo
+  var delBtn = e.target.closest('.photo-scroll-del');
+  if (delBtn) {
+    e.stopPropagation();
+    deletePhoto(delBtn.dataset.cid, delBtn.dataset.cat);
+    return;
+  }
+  // Open lightbox
+  var item = e.target.closest('.photo-scroll-item');
+  if (item) {
+    var idx = parseInt(item.dataset.photoIdx, 10);
+    var cat = item.dataset.photoCat;
+    openLightbox(cat, idx);
+    return;
+  }
+});
+
 // ── Lightbox ──────────────────────────────────────────
-let _lbIdx = 0;
-function openLightbox(idx) {
-  if (!allPhotos[idx]) return;
-  _lbIdx = idx;
-  const p = allPhotos[idx];
+let _lbIdx = 0, _lbCat = 'pro';
+function openLightbox(category, idx) {
+  const photos = allPhotos[category] || [];
+  if (!photos[idx]) return;
+  _lbIdx = idx; _lbCat = category;
+  const p = photos[idx];
   document.getElementById('lightboxImg').src = p.url || p.thumbnail_url || '';
-  document.getElementById('lightboxCounter').textContent = `${idx + 1} / ${allPhotos.length}`;
-  const showArrows = allPhotos.length > 1;
+  document.getElementById('lightboxCounter').textContent = `${idx + 1} / ${photos.length}`;
+  const showArrows = photos.length > 1;
   document.getElementById('lightboxPrev').style.display = showArrows ? '' : 'none';
   document.getElementById('lightboxNext').style.display = showArrows ? '' : 'none';
   document.getElementById('lightboxOverlay').classList.add('open');
@@ -2247,8 +2769,9 @@ function closeLightbox() {
   document.body.style.overflow = '';
 }
 function lightboxGo(dir) {
-  _lbIdx = (_lbIdx + dir + allPhotos.length) % allPhotos.length;
-  openLightbox(_lbIdx);
+  const photos = allPhotos[_lbCat] || [];
+  _lbIdx = (_lbIdx + dir + photos.length) % photos.length;
+  openLightbox(_lbCat, _lbIdx);
 }
 document.addEventListener('keydown', function(e) {
   const lb = document.getElementById('lightboxOverlay');
@@ -2259,94 +2782,564 @@ document.addEventListener('keydown', function(e) {
   }
 });
 
-async function deletePhoto(cid) {
+async function deletePhoto(cid, category) {
   if (!confirm('Supprimer cette photo ?')) return;
   await fetch(`/api/property/photos/${encodeURIComponent(cid)}`, { method: 'DELETE' });
-  allPhotos = allPhotos.filter(p => p.cloudinary_id !== cid);
-  renderPhotosGrid();
+  allPhotos[category] = allPhotos[category].filter(p => p.cloudinary_id !== cid);
+  renderGrid(category);
   showToast('Photo supprimée');
 }
 
 // ── Document upload ───────────────────────────────────
+const _svgFile  = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>`;
+const _svgShield= `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>`;
+const _svgZap   = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>`;
+const _svgDrop  = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/></svg>`;
+const _svgFlame = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/></svg>`;
+const _svgHome  = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>`;
+const _svgLock  = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>`;
+const _svgId    = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M16 10h2M16 14h2M7 10h5M7 14h3"/></svg>`;
+const _svgPen   = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>`;
+
 const DOC_META = {
-  dpe:              { icon:'🏷',  color:'#e8f5e9', text:'#2e7d32', label:'DPE' },
-  amiante:          { icon:'⚗️', color:'#fce4ec', text:'#c62828', label:'Amiante' },
-  plomb:            { icon:'🔩', color:'#fce4ec', text:'#c62828', label:'Plomb' },
-  electricite:      { icon:'⚡', color:'#fff8e1', text:'#f57f17', label:'Électricité' },
-  gaz:              { icon:'🔥', color:'#fff3e0', text:'#e65100', label:'Gaz' },
-  assainissement:   { icon:'💧', color:'#e3f2fd', text:'#1565c0', label:'Assainissement' },
-  erp:              { icon:'⚠️', color:'#fff8e1', text:'#f57f17', label:'ERP' },
-  facture_chaudiere:{ icon:'🔥', color:'#fff3e0', text:'#e65100', label:'Facture chaudière' },
-  entretien_ramonage:{ icon:'📋', color:'#e3f2fd', text:'#1565c0', label:'Entretien / ramonage' },
-  cheminee:         { icon:'🔥', color:'#fff3e0', text:'#e65100', label:'Cheminée' },
-  autre:            { icon:'📁', color:'#f5f5f5', text:'#555', label:'Autre' },
-  titre:            { icon:'🏠', color:'#f0f5f1', text:'#3D5A47', label:'Titre propriété', confidentiel:true },
-  taxe:             { icon:'📄', color:'#f0f5f1', text:'#3D5A47', label:'Taxe foncière', confidentiel:true },
-  compromis:        { icon:'📝', color:'#f5f0ff', text:'#6a1b9a', label:'Compromis', confidentiel:true },
-  acte:             { icon:'📋', color:'#f5f0ff', text:'#6a1b9a', label:'Acte notarié', confidentiel:true },
-  identite:         { icon:'🪪', color:'#fce4ec', text:'#c62828', label:'Pièce d\'identité', confidentiel:true },
-  confidentiel:     { icon:'🔒', color:'#fce4ec', text:'#c62828', label:'Confidentiel', confidentiel:true },
+  dpe:              { icon:_svgShield, color:'#e8f5e9', text:'#2e7d32', label:'DPE' },
+  amiante:          { icon:_svgFile,   color:'#fce4ec', text:'#c62828', label:'Amiante' },
+  plomb:            { icon:_svgFile,   color:'#fce4ec', text:'#c62828', label:'Plomb' },
+  electricite:      { icon:_svgZap,    color:'#fff8e1', text:'#f57f17', label:'Électricité' },
+  gaz:              { icon:_svgFlame,  color:'#fff3e0', text:'#e65100', label:'Gaz' },
+  assainissement:   { icon:_svgDrop,   color:'#e3f2fd', text:'#1565c0', label:'Assainissement' },
+  erp:              { icon:_svgShield, color:'#fff8e1', text:'#f57f17', label:'ERP' },
+  facture_chaudiere:{ icon:_svgFlame,  color:'#fff3e0', text:'#e65100', label:'Facture chaudière' },
+  entretien_ramonage:{ icon:_svgFile,  color:'#e3f2fd', text:'#1565c0', label:'Entretien / ramonage' },
+  cheminee:         { icon:_svgFlame,  color:'#fff3e0', text:'#e65100', label:'Cheminée' },
+  autre:            { icon:_svgFile,   color:'#f5f5f5', text:'#555',    label:'Autre' },
+  titre:            { icon:_svgHome,   color:'#f0f5f1', text:'#3D5A47', label:'Titre propriété' },
+  taxe:             { icon:_svgFile,   color:'#f0f5f1', text:'#3D5A47', label:'Taxe foncière' },
+  compromis:        { icon:_svgPen,    color:'#f5f0ff', text:'#6a1b9a', label:'Compromis' },
+  acte:             { icon:_svgPen,    color:'#f5f0ff', text:'#6a1b9a', label:'Acte notarié' },
+  identite:         { icon:_svgId,     color:'#fce4ec', text:'#c62828', label:'Pièce d\'identité' },
+  confidentiel:     { icon:_svgLock,   color:'#fce4ec', text:'#c62828', label:'Confidentiel' },
 };
 
 const CONFIDENTIAL_TYPES = new Set(['titre','taxe','compromis','acte','identite','confidentiel']);
 
-// Upload document acheteur
-document.getElementById('docInput').addEventListener('change', async (e) => {
-  const file = e.target.files[0];
-  if (!file) return;
-  const fd = new FormData();
-  fd.append('document', file);
-  fd.append('name', document.getElementById('docName').value || file.name);
-  fd.append('doc_type', document.getElementById('docType').value);
-  const res = await fetch('/api/property/documents', { method: 'POST', body: fd });
-  const data = await res.json();
-  if (data.success) { showToast('Document ajouté au dossier'); loadProperty(); }
-  e.target.value = '';
-});
+const DIAG_SLOTS = [
+  { type:'dpe',            icon:'🛡️', label:'DPE',             desc:'Diagnostic de performance énergétique', req:true },
+  { type:'amiante',        icon:'🧪', label:'Amiante',          desc:'Obligatoire si construction avant 1997', req:true },
+  { type:'plomb',          icon:'🔬', label:'Plomb (CREP)',     desc:'Obligatoire si avant 1949',              req:false },
+  { type:'electricite',    icon:'⚡', label:'Électricité',      desc:'Si installation de plus de 15 ans',     req:false },
+  { type:'gaz',            icon:'🔥', label:'Gaz',              desc:'Si installation de plus de 15 ans',     req:false },
+  { type:'erp',            icon:'⚠️', label:'ERP',              desc:'État des risques et pollutions',        req:true },
+  { type:'assainissement', icon:'💧', label:'Assainissement',   desc:"État de l'installation",               req:false },
+];
+const DIAG_SLOT_TYPES = new Set(DIAG_SLOTS.map(function(s){ return s.type; }));
 
-// Upload document confidentiel
-document.getElementById('confDocInput').addEventListener('change', async (e) => {
-  const file = e.target.files[0];
-  if (!file) return;
-  const fd = new FormData();
+const CONF_SLOTS = [
+  { type:'titre',    icon:'🏠', label:'Titre de propriété', desc:'Atteste que vous êtes propriétaire du bien' },
+  { type:'taxe',     icon:'📄', label:'Taxe foncière',      desc:'Avis annuel — utile pour estimation des charges' },
+  { type:'compromis',icon:'✍️', label:'Compromis de vente', desc:'Si une promesse de vente est déjà signée' },
+];
+const CONF_SLOT_TYPES = new Set(CONF_SLOTS.map(function(s){ return s.type; }));
+
+// ═══════════════════════════════════════════════════════
+// DOCUMENT UPLOAD SYSTEM — slot-based premium
+// ═══════════════════════════════════════════════════════
+
+async function doDocUpload(file, docType, isConf, containerEl) {
+  var label = (DOC_META[docType] || DOC_META.autre).label;
+  var zone = containerEl || document.getElementById(isConf ? 'docZone-conf' : 'docZone-client');
+  if (zone) zone.classList.add('uploading');
+
+  var fd = new FormData();
   fd.append('document', file);
-  fd.append('name', document.getElementById('confDocName').value || file.name);
-  fd.append('doc_type', document.getElementById('confDocType').value);
-  const res = await fetch('/api/property/documents', { method: 'POST', body: fd });
-  const data = await res.json();
-  if (data.success) { showToast('Document confidentiel enregistré'); loadProperty(); }
-  e.target.value = '';
-});
+  fd.append('name', label);
+  fd.append('doc_type', docType);
+
+  try {
+    var res = await fetch('/api/property/documents', { method: 'POST', body: fd });
+    var data = await res.json();
+    if (data.error) {
+      showToast(data.error, 'error');
+    } else {
+      showToast(label + ' ajouté ✓');
+      setTimeout(function() { loadProperty(); }, 200);
+    }
+  } catch (err) {
+    showToast('Erreur réseau — réessayez', 'error');
+  } finally {
+    if (zone) zone.classList.remove('uploading');
+  }
+}
+
+function initDiagGrid() {
+  var grid = document.getElementById('diagGrid');
+  if (!grid) return;
+  while (grid.firstChild) grid.removeChild(grid.firstChild);
+
+  DIAG_SLOTS.forEach(function(slot) {
+    var m = DOC_META[slot.type] || DOC_META.autre;
+
+    var card = document.createElement('div');
+    card.className = 'diag-slot';
+    card.id = 'diag-slot-' + slot.type;
+
+    var top = document.createElement('div');
+    top.className = 'diag-slot-top';
+
+    var ico = document.createElement('div');
+    ico.className = 'diag-slot-icon';
+    ico.style.background = m.color;
+    ico.textContent = slot.icon;
+
+    var info = document.createElement('div');
+    info.style.cssText = 'flex:1;min-width:0;';
+    var nm = document.createElement('div');
+    nm.className = 'diag-slot-name';
+    nm.textContent = slot.label;
+    var dsc = document.createElement('div');
+    dsc.className = 'diag-slot-desc';
+    dsc.textContent = slot.desc;
+    info.appendChild(nm);
+    info.appendChild(dsc);
+
+    var statusDiv = document.createElement('div');
+    statusDiv.className = 'diag-status';
+    statusDiv.id = 'diag-status-' + slot.type;
+    var badge = document.createElement('span');
+    badge.className = 'diag-badge ' + (slot.req ? 'missing' : 'optional');
+    badge.textContent = slot.req ? 'Requis' : 'Facultatif';
+    statusDiv.appendChild(badge);
+
+    top.appendChild(ico);
+    top.appendChild(info);
+    top.appendChild(statusDiv);
+    card.appendChild(top);
+
+    var uploadArea = document.createElement('div');
+    uploadArea.className = 'diag-upload-area';
+    uploadArea.id = 'diag-upload-' + slot.type;
+    uploadArea.setAttribute('role', 'button');
+    uploadArea.setAttribute('tabindex', '0');
+    uploadArea.setAttribute('aria-label', 'Ajouter ' + slot.label);
+
+    var uploadTxt = document.createElement('span');
+    uploadTxt.className = 'diag-upload-area-text';
+    uploadTxt.textContent = '+ Ajouter un fichier';
+
+    var bar = document.createElement('div');
+    bar.className = 'diag-slot-bar';
+
+    var fileInput = document.createElement('input');
+    fileInput.type = 'file';
+    fileInput.accept = '.pdf,.jpg,.jpeg,.png,.webp';
+    fileInput.setAttribute('aria-hidden', 'true');
+
+    uploadArea.appendChild(uploadTxt);
+    uploadArea.appendChild(bar);
+    uploadArea.appendChild(fileInput);
+    card.appendChild(uploadArea);
+
+    var fileRow = document.createElement('div');
+    fileRow.className = 'diag-file-row';
+    fileRow.id = 'diag-filerow-' + slot.type;
+    fileRow.style.display = 'none';
+    card.appendChild(fileRow);
+
+    grid.appendChild(card);
+
+    fileInput.addEventListener('change', (function(t, c) {
+      return function() {
+        var f = this.files[0];
+        if (!f) return;
+        doDocUpload(f, t, false, c);
+        this.value = '';
+      };
+    })(slot.type, card));
+
+    uploadArea.addEventListener('keydown', (function(inp) {
+      return function(e) {
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); inp.click(); }
+      };
+    })(fileInput));
+
+    card.addEventListener('dragover', function(e) {
+      e.preventDefault(); e.stopPropagation();
+      card.classList.add('drag-over');
+    });
+    card.addEventListener('dragleave', function(e) {
+      e.stopPropagation();
+      card.classList.remove('drag-over');
+    });
+    card.addEventListener('drop', (function(t, c) {
+      return function(e) {
+        e.preventDefault(); e.stopPropagation();
+        c.classList.remove('drag-over');
+        var f = e.dataTransfer.files[0];
+        if (!f) return;
+        doDocUpload(f, t, false, c);
+      };
+    })(slot.type, card));
+  });
+}
+
+function initConfSlots() {
+  var container = document.getElementById('confSlots');
+  if (!container) return;
+  while (container.firstChild) container.removeChild(container.firstChild);
+
+  CONF_SLOTS.forEach(function(slot) {
+    var card = document.createElement('div');
+    card.className = 'conf-slot';
+    card.id = 'conf-slot-' + slot.type;
+
+    var ico = document.createElement('div');
+    ico.className = 'conf-slot-ico';
+    ico.textContent = slot.icon;
+
+    var info = document.createElement('div');
+    info.className = 'conf-slot-info';
+    var nm = document.createElement('div');
+    nm.className = 'conf-slot-name';
+    nm.textContent = slot.label;
+    var dsc = document.createElement('div');
+    dsc.className = 'conf-slot-desc';
+    dsc.textContent = slot.desc;
+    info.appendChild(nm);
+    info.appendChild(dsc);
+
+    var acts = document.createElement('div');
+    acts.className = 'conf-slot-acts';
+    acts.id = 'conf-acts-' + slot.type;
+
+    var lbl = document.createElement('label');
+    lbl.className = 'conf-upload-lbl';
+    var lblTxt = document.createTextNode('+ Ajouter');
+    var fileInput = document.createElement('input');
+    fileInput.type = 'file';
+    fileInput.accept = '.pdf,.jpg,.jpeg,.png,.webp,image/*';
+    fileInput.setAttribute('aria-hidden', 'true');
+    lbl.appendChild(lblTxt);
+    lbl.appendChild(fileInput);
+    acts.appendChild(lbl);
+
+    var cbar = document.createElement('div');
+    cbar.className = 'conf-bar';
+
+    card.appendChild(ico);
+    card.appendChild(info);
+    card.appendChild(acts);
+    card.appendChild(cbar);
+    container.appendChild(card);
+
+    fileInput.addEventListener('change', (function(t, c) {
+      return function() {
+        var f = this.files[0];
+        if (!f) return;
+        doDocUpload(f, t, true, c);
+        this.value = '';
+      };
+    })(slot.type, card));
+
+    card.addEventListener('dragover', function(e) {
+      e.preventDefault(); e.stopPropagation();
+      card.classList.add('drag-over');
+    });
+    card.addEventListener('dragleave', function(e) {
+      e.stopPropagation();
+      card.classList.remove('drag-over');
+    });
+    card.addEventListener('drop', (function(t, c) {
+      return function(e) {
+        e.preventDefault(); e.stopPropagation();
+        c.classList.remove('drag-over');
+        var f = e.dataTransfer.files[0];
+        if (!f) return;
+        doDocUpload(f, t, true, c);
+      };
+    })(slot.type, card));
+  });
+}
+
+function initDocUploadZone(inputId, zoneId, typeSelectId, isConf) {
+  var input = document.getElementById(inputId);
+  var zone = document.getElementById(zoneId);
+  if (!input || !zone) return;
+
+  input.addEventListener('change', function() {
+    var file = this.files[0];
+    if (!file) return;
+    var docType = document.getElementById(typeSelectId).value;
+    doDocUpload(file, docType, isConf);
+    this.value = '';
+  });
+
+  zone.addEventListener('dragover', function(e) {
+    e.preventDefault(); e.stopPropagation();
+    zone.classList.add('drag-over');
+  });
+  zone.addEventListener('dragleave', function(e) {
+    e.stopPropagation();
+    zone.classList.remove('drag-over');
+  });
+  zone.addEventListener('drop', function(e) {
+    e.preventDefault(); e.stopPropagation();
+    zone.classList.remove('drag-over');
+    var file = e.dataTransfer.files[0];
+    if (!file) return;
+    var docType = document.getElementById(typeSelectId).value;
+    doDocUpload(file, docType, isConf);
+  });
+
+  zone.addEventListener('keydown', function(e) {
+    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); input.click(); }
+  });
+}
+
+initDiagGrid();
+initConfSlots();
+initDocUploadZone('docInput',     'docZone-client', 'docType',     false);
+initDocUploadZone('confDocInput', 'docZone-conf',   'confDocType', true);
+
+async function deleteDocument(id) {
+  try {
+    var res = await fetch('/api/property/documents/' + id, { method: 'DELETE' });
+    var data = await res.json();
+    if (data.error) { showToast(data.error, 'error'); return; }
+    showToast('Document supprimé');
+    loadProperty();
+  } catch (err) {
+    showToast('Erreur réseau', 'error');
+  }
+}
+
+function _docsCard(d) {
+  var m = DOC_META[d.doc_type] || DOC_META.autre;
+  var div = document.createElement('div');
+  div.className = 'docs-card';
+
+  var ico = document.createElement('div');
+  ico.className = 'docs-card-ico';
+  ico.style.background = m.color;
+  ico.innerHTML = m.icon;
+
+  var info = document.createElement('div');
+  info.className = 'docs-card-info';
+  var nameEl = document.createElement('div');
+  nameEl.className = 'docs-card-name';
+  nameEl.title = d.name;
+  nameEl.textContent = d.name;
+  var chip = document.createElement('span');
+  chip.className = 'docs-card-chip';
+  chip.style.background = m.color;
+  chip.style.color = m.text;
+  chip.textContent = m.label;
+  info.appendChild(nameEl);
+  info.appendChild(chip);
+
+  var acts = document.createElement('div');
+  acts.className = 'docs-card-acts';
+
+  var view = document.createElement('a');
+  view.className = 'docs-card-view';
+  view.href = d.url;
+  view.target = '_blank';
+  view.rel = 'noopener';
+  view.textContent = 'Ouvrir';
+
+  var del = document.createElement('button');
+  del.type = 'button';
+  del.className = 'docs-card-del';
+  del.setAttribute('aria-label', 'Supprimer');
+  del.innerHTML = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>';
+  del.addEventListener('click', (function(docId) {
+    return function() { if (confirm('Supprimer ce document ?')) deleteDocument(docId); };
+  })(d.id));
+
+  acts.appendChild(view);
+  acts.appendChild(del);
+  div.appendChild(ico);
+  div.appendChild(info);
+  div.appendChild(acts);
+  return div;
+}
+
+function renderDocList(listId, items, emptyMsg) {
+  var list = document.getElementById(listId);
+  if (!list) return;
+  while (list.firstChild) list.removeChild(list.firstChild);
+  if (!items.length) {
+    var empty = document.createElement('div');
+    empty.className = 'docs-list-empty';
+    empty.textContent = emptyMsg;
+    list.appendChild(empty);
+    return;
+  }
+  items.forEach(function(d) { list.appendChild(_docsCard(d)); });
+}
 
 function renderDocuments(docs) {
-  const clientDocs = docs.filter(d => !CONFIDENTIAL_TYPES.has(d.doc_type));
-  const confDocs   = docs.filter(d => CONFIDENTIAL_TYPES.has(d.doc_type));
-
-  function docCardHtml(d) {
-    const m = DOC_META[d.doc_type] || DOC_META.autre;
-    return `<div class="doc-card">
-      <div class="doc-icon-wrap" style="background:${m.color};">${m.icon}</div>
-      <div class="doc-info">
-        <div class="doc-name-text">${d.name}</div>
-        <span class="doc-type-chip" style="background:${m.color};color:${m.text};">${m.label}</span>
-      </div>
-      <div style="display:flex;gap:8px;">
-        <a href="${d.url}" target="_blank" class="btn-ghost" style="font-size:0.82rem;padding:7px 14px;">Voir →</a>
-      </div>
-    </div>`;
-  }
-
-  const clientList = document.getElementById('clientDocsList');
-  if (clientList) clientList.innerHTML = clientDocs.length ? clientDocs.map(docCardHtml).join('') : '<p style="font-size:0.85rem;color:#bbb;text-align:center;padding:20px 0;">Aucun document acheteur pour l\'instant.</p>';
-
-  const confList = document.getElementById('confDocsList');
-  if (confList) confList.innerHTML = confDocs.length ? confDocs.map(docCardHtml).join('') : '<p style="font-size:0.85rem;color:#bbb;text-align:center;padding:20px 0;">Aucun document confidentiel pour l\'instant.</p>';
-
-  // Update checklist
-  const uploadedTypes = new Set(docs.map(d => d.doc_type));
-  document.querySelectorAll('.doc-required-item').forEach(el => {
-    el.classList.toggle('done', uploadedTypes.has(el.dataset.type));
+  var diagMap = {}, confMap = {}, clientDocs = [], otherConfDocs = [];
+  docs.forEach(function(d) {
+    if (DIAG_SLOT_TYPES.has(d.doc_type))         diagMap[d.doc_type] = d;
+    else if (CONF_SLOT_TYPES.has(d.doc_type))    confMap[d.doc_type] = d;
+    else if (CONFIDENTIAL_TYPES.has(d.doc_type)) otherConfDocs.push(d);
+    else                                          clientDocs.push(d);
   });
+
+  // ── Diagnostic slots ────────────────────────────────
+  var diagDone = 0;
+  DIAG_SLOTS.forEach(function(slot) {
+    var card       = document.getElementById('diag-slot-' + slot.type);
+    var uploadArea = document.getElementById('diag-upload-' + slot.type);
+    var fileRow    = document.getElementById('diag-filerow-' + slot.type);
+    var statusDiv  = document.getElementById('diag-status-' + slot.type);
+    if (!card) return;
+
+    var doc = diagMap[slot.type];
+    if (doc) {
+      diagDone++;
+      card.classList.add('filled');
+      if (statusDiv) {
+        while (statusDiv.firstChild) statusDiv.removeChild(statusDiv.firstChild);
+        var b = document.createElement('span');
+        b.className = 'diag-badge done';
+        b.textContent = '✓ Fourni';
+        statusDiv.appendChild(b);
+      }
+      if (uploadArea) uploadArea.style.display = 'none';
+      if (fileRow) {
+        while (fileRow.firstChild) fileRow.removeChild(fileRow.firstChild);
+        fileRow.style.display = 'flex';
+
+        var fIco = document.createElement('span');
+        fIco.className = 'diag-file-icon';
+        fIco.textContent = '📄';
+
+        var fName = document.createElement('span');
+        fName.className = 'diag-file-name';
+        fName.title = doc.name;
+        fName.textContent = doc.name;
+
+        var fOpen = document.createElement('a');
+        fOpen.className = 'diag-file-open';
+        fOpen.href = doc.url;
+        fOpen.target = '_blank';
+        fOpen.rel = 'noopener';
+        fOpen.textContent = 'Ouvrir';
+
+        var fDel = document.createElement('button');
+        fDel.type = 'button';
+        fDel.className = 'diag-file-del';
+        fDel.setAttribute('aria-label', 'Supprimer');
+        fDel.innerHTML = '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>';
+        fDel.addEventListener('click', (function(docId) {
+          return function() { if (confirm('Supprimer ce document ?')) deleteDocument(docId); };
+        })(doc.id));
+
+        fileRow.appendChild(fIco);
+        fileRow.appendChild(fName);
+        fileRow.appendChild(fOpen);
+        fileRow.appendChild(fDel);
+      }
+    } else {
+      card.classList.remove('filled');
+      if (statusDiv) {
+        while (statusDiv.firstChild) statusDiv.removeChild(statusDiv.firstChild);
+        var b2 = document.createElement('span');
+        b2.className = 'diag-badge ' + (slot.req ? 'missing' : 'optional');
+        b2.textContent = slot.req ? 'Requis' : 'Facultatif';
+        statusDiv.appendChild(b2);
+      }
+      if (uploadArea) uploadArea.style.display = '';
+      if (fileRow) fileRow.style.display = 'none';
+    }
+  });
+
+  // ── Progress bar ────────────────────────────────────
+  var pct  = Math.round((diagDone / DIAG_SLOTS.length) * 100);
+  var fill = document.getElementById('diagProgressFill');
+  var txt  = document.getElementById('diagProgressTxt');
+  if (fill) fill.style.width = pct + '%';
+  if (txt)  txt.textContent  = diagDone + '/' + DIAG_SLOTS.length + ' diagnostics';
+
+  // ── Confidential quick-slots ────────────────────────
+  CONF_SLOTS.forEach(function(slot) {
+    var card = document.getElementById('conf-slot-' + slot.type);
+    var acts = document.getElementById('conf-acts-' + slot.type);
+    if (!card || !acts) return;
+
+    var doc = confMap[slot.type];
+    if (doc) {
+      card.classList.add('filled');
+      while (acts.firstChild) acts.removeChild(acts.firstChild);
+
+      var check = document.createElement('div');
+      check.className = 'conf-check';
+      check.textContent = '✓';
+
+      var viewLink = document.createElement('a');
+      viewLink.className = 'conf-view-btn';
+      viewLink.href = doc.url;
+      viewLink.target = '_blank';
+      viewLink.rel = 'noopener';
+      viewLink.textContent = 'Ouvrir';
+
+      var delBtn = document.createElement('button');
+      delBtn.type = 'button';
+      delBtn.className = 'conf-del';
+      delBtn.setAttribute('aria-label', 'Supprimer');
+      delBtn.innerHTML = '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>';
+      delBtn.addEventListener('click', (function(docId) {
+        return function() { if (confirm('Supprimer ce document ?')) deleteDocument(docId); };
+      })(doc.id));
+
+      acts.appendChild(check);
+      acts.appendChild(viewLink);
+      acts.appendChild(delBtn);
+    } else {
+      card.classList.remove('filled');
+      if (!acts.querySelector('.conf-upload-lbl')) {
+        while (acts.firstChild) acts.removeChild(acts.firstChild);
+        var lbl = document.createElement('label');
+        lbl.className = 'conf-upload-lbl';
+        var lblTxt = document.createTextNode('+ Ajouter');
+        var inp = document.createElement('input');
+        inp.type = 'file';
+        inp.accept = '.pdf,.jpg,.jpeg,.png,.webp,image/*';
+        inp.setAttribute('aria-hidden', 'true');
+        inp.addEventListener('change', (function(t, c) {
+          return function() {
+            var f = this.files[0];
+            if (!f) return;
+            doDocUpload(f, t, true, c);
+            this.value = '';
+          };
+        })(slot.type, card));
+        lbl.appendChild(lblTxt);
+        lbl.appendChild(inp);
+        acts.appendChild(lbl);
+      }
+    }
+  });
+
+  // ── Generic lists ────────────────────────────────────
+  renderDocList('clientDocsList', clientDocs,
+    'Aucun autre document acheteur · Glissez vos fichiers ou cliquez sur la zone ci-dessus');
+  renderDocList('confDocsList', otherConfDocs,
+    "Aucun autre document confidentiel · Acte notarié, pièce d'identité…");
+
+  // ── Intro banner ─────────────────────────────────────
+  var bannerEl = document.getElementById('docIntroBannerText');
+  if (bannerEl) {
+    if (!docs.length) {
+      bannerEl.innerHTML = '<strong>Organisez votre dossier documentaire</strong><br>Un dossier complet inspire confiance et réduit les négociations. Commencez par les diagnostics obligatoires.';
+    } else if (diagDone >= DIAG_SLOTS.length) {
+      bannerEl.innerHTML = '<strong>Dossier complet ✓</strong><br>Tous vos diagnostics sont fournis. Votre dossier inspire confiance aux acheteurs.';
+    } else {
+      var missing = DIAG_SLOTS.length - diagDone;
+      bannerEl.innerHTML = '<strong>' + diagDone + '/' + DIAG_SLOTS.length + ' diagnostics fournis</strong><br>' + missing + ' diagnostic' + (missing > 1 ? 's' : '') + ' encore à ajouter pour compléter votre dossier.';
+    }
+  }
 }
 
 // ── AI Description generator ───────────────────────────
@@ -2396,11 +3389,26 @@ async function generateAIDescription() {
   status.style.display = 'none';
 }
 
-// ── Fiche acheteur ────────────────────────────────────
+// ── Dossier envoi client ──────────────────────────────
 const DPE_COLORS = {A:'#1a9e5a',B:'#4cb84c',C:'#b5d332',D:'#f5c518',E:'#f5a818',F:'#e05a1a',G:'#cc1a1a'};
 const TYPE_ICONS = {Maison:'🏠',Appartement:'🏢',Villa:'🌴',Terrain:'🌿'};
 
-function generateFiche() {
+let _shareAddress = false;
+function toggleShareAddress() {
+  _shareAddress = !_shareAddress;
+  const sw = document.getElementById('shareAddressSwitch');
+  const knob = document.getElementById('shareAddressKnob');
+  if (_shareAddress) {
+    sw.style.background = '#3D5A47';
+    knob.style.left = '18px';
+  } else {
+    sw.style.background = '#ddd';
+    knob.style.left = '2px';
+  }
+  generateFiche();
+}
+
+function buildFicheHtml() {
   const form = document.getElementById('propertyForm');
   const p = {};
   const formData = new FormData(form);
@@ -2408,143 +3416,294 @@ function generateFiche() {
   ['type','heating_type','heating_details','dpe_class','exposition','sale_reason','garden','terrace',
    'certificat_assainissement','assainissement_type','fenetres_type','toiture_couverture','volets_type','sols_dalle',
    'stationnement_type','garage_motorise','garage_sol','terrace_revetement',
-   'cheminee_type','eau_chaude_type','wc_count','cuisine_type','grenier','grenier_present'].forEach(f => {
+   'cheminee_type','eau_chaude_type','wc_count','cuisine_type','grenier','grenier_present',
+   'mitoyennete','equipment','rooms','bedrooms'].forEach(f => {
     const el = document.getElementById('field-' + f);
     if (el) p[f] = el.value;
   });
 
-  if (!p.address && !p.city) {
-    showToast('Sauvegardez d\'abord votre fiche (onglet Informations).', 'error');
-    return;
+  if (_propertyData?.property) {
+    Object.keys(_propertyData.property).forEach(k => { if (!p[k] || p[k] === '') p[k] = _propertyData.property[k]; });
   }
+  if (!p.city && !p.address && !p.type) return null;
+
+  // ── (rest identical — just returns html string) ──
 
   const icon = TYPE_ICONS[p.type] || '🏡';
-  const dpeColor = DPE_COLORS[p.dpe_class] || '#aaa';
+  const dpeColor = DPE_COLORS[p.dpe_class] || '#ccc';
   const dpeTextColor = ['C','D','E'].includes(p.dpe_class) ? '#333' : '#fff';
   const priceFormatted = p.price ? parseInt(p.price).toLocaleString('fr-FR') + ' €' : '—';
-  const surface = p.surface_habitable ? p.surface_habitable + ' m²' : '—';
-  const terrainStr = p.surface_terrain ? p.surface_terrain + ' m² terrain' : '';
+  const refNum = 'SER-' + new Date().getFullYear() + '-' + Math.random().toString(36).substr(2,5).toUpperCase();
+  const today = new Date().toLocaleDateString('fr-FR', {day:'2-digit',month:'long',year:'numeric'});
 
-  const extras = [
-    p.garden === '1' ? '🌿 Jardin' : null,
-    p.terrace === '1' ? '🪴 Terrasse' : null,
-    p.exposition ? '☀️ ' + p.exposition : null,
-    p.heating_type || null,
-    p.heating_mechanism ? p.heating_mechanism : null,
-    p.heating_year ? 'Chaudière ' + p.heating_year : null,
-    p.hauteur_plafond ? 'Hauteur plafond : ' + p.hauteur_plafond + ' m' : null,
-    p.assainissement_type ? 'Assainissement : ' + p.assainissement_type : null,
-    p.certificat_assainissement === '1' ? '✓ Certificat assainissement' : null,
-    p.toiture_couverture ? 'Toiture : ' + p.toiture_couverture : null,
-    p.volets_type ? 'Volets : ' + p.volets_type : null,
-    p.sols_dalle ? 'Dalle : ' + p.sols_dalle : null,
-    p.stationnement_type ? 'Stationnement : ' + p.stationnement_type : null,
-    p.cheminee_type ? 'Cheminée : ' + p.cheminee_type : null,
-    p.eau_chaude_type ? 'Eau chaude : ' + p.eau_chaude_type : null,
-    p.cuisine_type ? 'Cuisine : ' + p.cuisine_type : null,
-    p.wc_count ? p.wc_count + ' WC' : null,
-    p.grenier_present === '1' ? ('Grenier' + (p.grenier ? ' — ' + p.grenier : '')) : null,
-    p.fenetres_type ? 'Fenêtres : ' + p.fenetres_type : null,
-  ].filter(Boolean);
+  const proPhotos = (allPhotos.pro || []).filter(p => !p._temp);
+  const decouvertePhotos = (allPhotos.decouverte || []).filter(p => !p._temp);
+  const detailsPhotos = (allPhotos.details || []).filter(p => !p._temp);
+  const mainPhoto = proPhotos[0] || decouvertePhotos[0] || detailsPhotos[0] || null;
+  const publicDocs = (_propertyData?.documents || []).filter(d => !CONFIDENTIAL_TYPES.has(d.doc_type));
 
-  const prox = [
-    p.commerces ? { label: p.commerces } : null,
-    p.school_maternelle ? { label: 'Maternelle : ' + p.school_maternelle } : null,
-    p.school_primaire ? { label: 'Primaire : ' + p.school_primaire } : null,
-    p.school_college ? { label: 'Collège : ' + p.school_college } : null,
-    p.school_lycee ? { label: 'Lycée : ' + p.school_lycee } : null,
-    p.highway ? { label: 'Autoroute : ' + p.highway } : null,
-    p.train_station ? { label: 'Gare : ' + p.train_station } : null,
-  ].filter(Boolean);
+  const row = (label, value) => value ? `<tr><td class="fd-label">${label}</td><td class="fd-value">${value}</td></tr>` : '';
 
-  const docsSection = (_propertyData?.documents?.length)
-    ? `<div class="fiche-section">
-        <div class="fiche-section-title">Documents disponibles</div>
-        <div class="fiche-docs">${_propertyData.documents.map(d => `<span class="fiche-doc-tag">✓ ${d.name}</span>`).join('')}</div>
-      </div>` : '';
+  const surfacesRows = [
+    row('Habitable', p.surface_habitable ? p.surface_habitable + ' m²' : null),
+    row('Terrain', p.surface_terrain ? p.surface_terrain + ' m²' : null),
+    row('Séjour', p.surface_sejour ? p.surface_sejour + ' m²' : null),
+    row('Hauteur plafond', p.hauteur_plafond ? p.hauteur_plafond + ' m' : null),
+  ].join('');
 
-  document.getElementById('ficheOutput').innerHTML = `
-    <div class="fiche-container" id="ficheCard">
-      <div class="fiche-header">
-        <div class="fiche-type-badge">${icon} ${p.type || 'Bien immobilier'}</div>
-        <div class="fiche-price">${priceFormatted}</div>
-        <div class="fiche-address">${p.address || ''}${p.city ? ', ' + p.postal_code + ' ' + p.city : ''}</div>
-      </div>
-      <div class="fiche-body">
-        <div class="fiche-stats">
-          <div class="fiche-stat">
-            <div class="fiche-stat-val">${surface}</div>
-            <div class="fiche-stat-lbl">Habitable</div>
-          </div>
-          <div class="fiche-stat">
-            <div class="fiche-stat-val">${p.rooms || '—'}</div>
-            <div class="fiche-stat-lbl">Pièces</div>
-          </div>
-          <div class="fiche-stat">
-            <div class="fiche-stat-val">${p.bedrooms || '—'}</div>
-            <div class="fiche-stat-lbl">Chambres</div>
-          </div>
-          <div class="fiche-stat">
-            ${p.dpe_class
-              ? `<div class="fiche-dpe-badge" style="background:${dpeColor};color:${dpeTextColor}">${p.dpe_class}</div><div class="fiche-stat-lbl">DPE</div>`
-              : `<div class="fiche-stat-val">—</div><div class="fiche-stat-lbl">DPE</div>`}
-          </div>
-        </div>
+  const interiorRows = [
+    row('Pièces', p.rooms || null),
+    row('Chambres', p.bedrooms || null),
+    row('WC', p.wc_count || null),
+    row('Cuisine', p.cuisine_type || null),
+    row('Chauffage', [p.heating_type, p.heating_details].filter(Boolean).join(' — ') || null),
+    row('Eau chaude', p.eau_chaude_type || null),
+    row('Cheminée', p.cheminee_type || null),
+    row('Fenêtres', p.fenetres_type || null),
+    row('Volets', p.volets_type || null),
+    row('Sols', p.sols_dalle || null),
+    row('Grenier', p.grenier_present === '1' ? (p.grenier || 'Oui') : null),
+    row('Mitoyenneté', p.mitoyennete || null),
+    row('Stationnement', p.stationnement_type || null),
+  ].join('');
 
-        ${terrainStr ? `<div style="font-size:0.85rem;color:#666;margin-bottom:20px;">📐 Surface terrain : ${terrainStr}</div>` : ''}
+  const locRows = [
+    _shareAddress ? row('Adresse', p.address || null) : null,
+    row('Ville', p.city ? ((p.postal_code ? p.postal_code + ' ' : '') + p.city) : null),
+    row('Exposition', p.exposition || null),
+    row('Proximité', [p.commerces, p.school_primaire ? 'École : '+p.school_primaire : null,
+      p.school_college ? 'Collège : '+p.school_college : null,
+      p.school_lycee ? 'Lycée : '+p.school_lycee : null,
+      p.train_station ? 'Gare : '+p.train_station : null,
+      p.highway ? 'Autoroute : '+p.highway : null].filter(Boolean).join(', ') || null),
+  ].filter(v => v !== null).join('');
 
-        ${extras.length ? `
-        <div class="fiche-section">
-          <div class="fiche-section-title">Caractéristiques</div>
-          <div class="fiche-tags">${extras.map(e => `<span class="fiche-tag">${e}</span>`).join('')}</div>
-        </div>` : ''}
+  const exteriorRows = [
+    row('Jardin', p.garden === '1' ? ('Oui' + (p.surface_terrain ? ' — '+p.surface_terrain+' m²' : '')) : null),
+    row('Terrasse', p.terrace === '1' ? ('Oui' + (p.terrace_revetement ? ' — '+p.terrace_revetement : '')) : null),
+    row('Toiture', p.toiture_couverture || null),
+    row('Assainissement', [p.assainissement_type, p.certificat_assainissement === '1' ? '✓ Certifié' : null].filter(Boolean).join(' — ') || null),
+  ].join('');
 
-        ${p.year_built || p.taxe_fonciere ? `
-        <div class="fiche-section">
-          <div class="fiche-section-title">Informations pratiques</div>
-          <div class="fiche-tags">
-            ${p.year_built ? `<span class="fiche-tag">Construit en ${p.year_built}</span>` : ''}
-            ${p.taxe_fonciere ? `<span class="fiche-tag">Taxe foncière : ${parseInt(p.taxe_fonciere).toLocaleString('fr-FR')} €/an</span>` : ''}
-          </div>
-        </div>` : ''}
+  const coproRows = [
+    row('Copropriété', p.copropriete === '1' ? 'Oui' : (p.copropriete === '0' ? 'Non' : null)),
+    row('Lots', p.copro_lots || null),
+    row('Charges annuelles', p.charges_copro ? parseInt(p.charges_copro).toLocaleString('fr-FR')+' €' : null),
+  ].join('');
 
-        ${prox.length ? `
-        <div class="fiche-section">
-          <div class="fiche-section-title">À proximité</div>
-          <div class="fiche-proximity">
-            ${prox.map(item => `<div class="fiche-prox-item"><div class="fiche-prox-dot"></div><span>${item.label}</span></div>`).join('')}
-          </div>
-        </div>` : ''}
+  const finRows = [
+    row('Prix de vente', p.price ? parseInt(p.price).toLocaleString('fr-FR')+' €' : null),
+    row('Taxe foncière', p.taxe_fonciere ? parseInt(p.taxe_fonciere).toLocaleString('fr-FR')+' €/an' : null),
+    row('Année construction', p.year_built || null),
+  ].join('');
 
-        ${p.equipment ? `
-        <div class="fiche-section">
-          <div class="fiche-section-title">Équipements inclus</div>
-          <div class="fiche-desc">${p.equipment}</div>
-        </div>` : ''}
-
-        ${p.description ? `
-        <div class="fiche-section">
-          <div class="fiche-section-title">Description</div>
-          <div class="fiche-desc">${p.description.replace(/\n/g, '<br>')}</div>
-        </div>` : ''}
-
-        ${p.virtual_tour_url ? `
-        <div class="fiche-section">
-          <div class="fiche-section-title">Visite virtuelle</div>
-          <a href="${p.virtual_tour_url}" target="_blank" style="display:inline-flex;align-items:center;gap:6px;padding:8px 14px;background:#f0f5f1;border-radius:8px;color:#3D5A47;font-size:0.85rem;font-weight:600;text-decoration:none;">🥽 Accéder à la visite 3D →</a>
-        </div>` : ''}
-
-        ${docsSection}
-      </div>
-      <div class="fiche-footer">
-        <div class="fiche-contact">
-          <strong id="ficheSellerName">Chargement...</strong>
-          <span id="ficheSellerPhone"></span>
-        </div>
-        <div style="font-size:0.78rem;color:#aaa;">Document généré par Serenis — confidentiel</div>
+  const DPE_LETTERS = ['A','B','C','D','E','F','G'];
+  const DPE_WIDTHS = {A:38,B:50,C:62,D:74,E:83,F:92,G:100};
+  const dpeClass = p.dpe_class || '';
+  const dpeBars = DPE_LETTERS.map(l => {
+    const w = DPE_WIDTHS[l];
+    const active = l === dpeClass;
+    const tc = ['C','D','E'].includes(l) ? '#333' : '#fff';
+    return `<div style="display:flex;align-items:center;margin-bottom:2px;">
+      <div style="width:${w}%;height:16px;background:${DPE_COLORS[l]};border-radius:0 3px 3px 0;display:flex;align-items:center;justify-content:flex-end;padding-right:6px;${active?'box-shadow:0 0 0 2px #1a3a2a;z-index:1;position:relative;':'opacity:0.65;'}">
+        <span style="font-size:10px;font-weight:${active?800:500};color:${tc};">${l}${active?' ◄':''}</span>
       </div>
     </div>`;
+  }).join('');
 
+  const floorOrder = ['RDC','1er étage','2e étage','3e étage','4e étage','5e étage','6e étage','Sous-sol'];
+  let roomsRows = '';
+  if (typeof roomsList !== 'undefined' && roomsList.length > 0) {
+    floorOrder.forEach(fl => {
+      const fr = roomsList.filter(r => r.floor === fl);
+      if (!fr.length) return;
+      fr.forEach((r,i) => {
+        roomsRows += `<tr style="${i%2===0?'background:#fafaf9;':''}">
+          <td class="fd-label" style="font-size:0.75rem;color:#aaa;padding-left:10px;">${i===0?fl:''}</td>
+          <td class="fd-value" style="padding:5px 8px;">${r.icon} ${r.label}</td>
+          <td class="fd-value" style="text-align:right;padding:5px 10px 5px 0;color:#888;">${r.surface>0?r.surface+' m²':'—'}</td>
+        </tr>`;
+      });
+    });
+  }
+
+  const mainPhotoHtml = mainPhoto
+    ? `<img src="${mainPhoto.url || mainPhoto.file_path}" style="width:100%;height:210px;object-fit:cover;border-radius:8px;margin-bottom:14px;display:block;" alt="Photo principale">`
+    : `<div style="width:100%;height:160px;background:#f0ede8;border-radius:8px;margin-bottom:14px;display:flex;align-items:center;justify-content:center;color:#ccc;font-size:0.82rem;">Aucune photo</div>`;
+
+  const sectionTitle = label => `<div style="font-size:0.65rem;text-transform:uppercase;letter-spacing:0.1em;color:#3D5A47;font-weight:700;border-bottom:1.5px solid #3D5A47;padding-bottom:3px;margin-bottom:8px;">${label}</div>`;
+  const dataBlock = (label, rows) => rows ? `<div style="margin-bottom:16px;">${sectionTitle(label)}<table style="width:100%;border-collapse:collapse;">${rows}</table></div>` : '';
+
+  var _html = `
+  <div class="fiche-container" id="ficheCard" style="font-family:'DM Sans',sans-serif;background:#fff;">
+
+    <!-- En-tête -->
+    <div style="background:linear-gradient(135deg,#3D5A47,#2a4030);padding:18px 28px;display:flex;justify-content:space-between;align-items:center;">
+      <div>
+        <div style="font-family:'Cormorant Garamond',serif;font-size:1.8rem;color:#fff;font-weight:600;line-height:1;">Serenis</div>
+        <div style="font-size:0.68rem;color:rgba(255,255,255,0.55);letter-spacing:0.1em;text-transform:uppercase;margin-top:2px;">Vente immobilière entre particuliers</div>
+      </div>
+      <div style="text-align:right;">
+        <div style="font-size:0.68rem;color:rgba(255,255,255,0.5);text-transform:uppercase;letter-spacing:0.08em;">Référence</div>
+        <div style="font-size:0.85rem;font-weight:700;color:#fff;margin-top:1px;">${refNum}</div>
+        <div style="font-size:0.68rem;color:rgba(255,255,255,0.5);margin-top:3px;">${today}</div>
+      </div>
+    </div>
+
+    <!-- Barre titre -->
+    <div style="background:#f8f5f0;border-bottom:2.5px solid #3D5A47;padding:12px 28px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+      <span style="background:#3D5A47;color:#fff;font-size:0.68rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;padding:3px 10px;border-radius:4px;white-space:nowrap;">${icon} ${p.type || 'Bien immobilier'}</span>
+      <div style="font-size:1.0rem;font-weight:700;color:#1a1a1a;">${_shareAddress && p.address ? p.address + (p.city ? ', ' : '') : ''}${p.city ? (p.postal_code?p.postal_code+' ':'')+p.city : ''}</div>
+    </div>
+
+    <!-- Barre prix / stats -->
+    <div style="background:#fff;border-bottom:1px solid #eee;padding:12px 28px;display:flex;align-items:center;gap:0;flex-wrap:wrap;">
+      <div style="flex:1;min-width:160px;">
+        <div style="font-size:0.65rem;color:#bbb;text-transform:uppercase;letter-spacing:0.08em;">Prix de vente</div>
+        <div style="font-family:'Cormorant Garamond',serif;font-size:2.1rem;font-weight:600;color:#3D5A47;line-height:1.1;">${priceFormatted}</div>
+      </div>
+      ${p.surface_habitable ? `<div style="text-align:center;padding:0 20px;border-left:1px solid #eee;"><div style="font-size:1.25rem;font-weight:700;color:#222;">${p.surface_habitable} m²</div><div style="font-size:0.65rem;color:#bbb;text-transform:uppercase;letter-spacing:0.06em;margin-top:2px;">Habitable</div></div>` : ''}
+      ${p.rooms ? `<div style="text-align:center;padding:0 20px;border-left:1px solid #eee;"><div style="font-size:1.25rem;font-weight:700;color:#222;">${p.rooms}</div><div style="font-size:0.65rem;color:#bbb;text-transform:uppercase;letter-spacing:0.06em;margin-top:2px;">Pièces</div></div>` : ''}
+      ${p.bedrooms ? `<div style="text-align:center;padding:0 20px;border-left:1px solid #eee;"><div style="font-size:1.25rem;font-weight:700;color:#222;">${p.bedrooms}</div><div style="font-size:0.65rem;color:#bbb;text-transform:uppercase;letter-spacing:0.06em;margin-top:2px;">Chambres</div></div>` : ''}
+      ${dpeClass ? `<div style="text-align:center;padding:0 20px;border-left:1px solid #eee;"><div style="width:38px;height:38px;border-radius:7px;background:${dpeColor};display:flex;align-items:center;justify-content:center;font-weight:800;font-size:1.1rem;color:${dpeTextColor};margin:0 auto;">${dpeClass}</div><div style="font-size:0.65rem;color:#bbb;text-transform:uppercase;letter-spacing:0.06em;margin-top:3px;">DPE</div></div>` : ''}
+    </div>
+
+    <!-- Corps 2 colonnes -->
+    <div style="padding:20px 28px;display:grid;grid-template-columns:1fr 1fr;gap:24px;align-items:start;">
+
+      <!-- Colonne gauche : tableaux de données -->
+      <div>
+        ${dataBlock('Surfaces', surfacesRows)}
+        ${dataBlock('Intérieur', interiorRows)}
+        ${dataBlock('Localisation', locRows)}
+        ${coproRows ? dataBlock('Copropriété', coproRows) : ''}
+        ${dpeClass ? `<div style="margin-bottom:16px;">
+          ${sectionTitle('Diagnostics énergétiques (DPE)')}
+          <div style="margin-bottom:8px;">${dpeBars}</div>
+          <table style="width:100%;border-collapse:collapse;">
+            ${p.dpe_conso_energie ? row('Consommation', p.dpe_conso_energie+' kWh/m²/an') : ''}
+            ${p.dpe_ges ? row('Émissions GES', p.dpe_ges+' kg CO₂/m²/an') : ''}
+            ${(p.dpe_cout_min && p.dpe_cout_max) ? row('Coût estimé', parseInt(p.dpe_cout_min).toLocaleString('fr-FR')+' – '+parseInt(p.dpe_cout_max).toLocaleString('fr-FR')+' €/an') : ''}
+          </table>
+        </div>` : ''}
+        ${dataBlock('Extérieur', exteriorRows)}
+        ${dataBlock('Aspects financiers', finRows)}
+      </div>
+
+      <!-- Colonne droite : photo + description -->
+      <div>
+        ${mainPhotoHtml}
+        ${p.description
+          ? `<div style="font-size:0.86rem;color:#444;line-height:1.72;">${p.description.replace(/\n/g,'<br>')}</div>`
+          : `<div style="font-size:0.82rem;color:#ccc;font-style:italic;">Aucune description saisie.</div>`}
+        ${p.equipment ? `<div style="margin-top:14px;padding:12px 14px;background:#f8f5f0;border-radius:8px;border-left:3px solid #3D5A47;">
+          <div style="font-size:0.65rem;text-transform:uppercase;letter-spacing:0.08em;color:#3D5A47;font-weight:700;margin-bottom:5px;">Équipements inclus</div>
+          <div style="font-size:0.82rem;color:#444;line-height:1.6;">${p.equipment}</div>
+        </div>` : ''}
+      </div>
+    </div>
+
+    <!-- Tableau des pièces -->
+    ${roomsRows ? `<div style="padding:0 28px 20px;">
+      ${sectionTitle('Composition des pièces')}
+      <table style="width:100%;border-collapse:collapse;border-radius:8px;overflow:hidden;">
+        <thead>
+          <tr style="background:#f8f5f0;">
+            <th style="text-align:left;padding:7px 10px;font-size:0.68rem;text-transform:uppercase;letter-spacing:0.06em;color:#999;font-weight:700;border-bottom:1px solid #eee;">Niveau</th>
+            <th style="text-align:left;padding:7px 8px;font-size:0.68rem;text-transform:uppercase;letter-spacing:0.06em;color:#999;font-weight:700;border-bottom:1px solid #eee;">Pièce</th>
+            <th style="text-align:right;padding:7px 10px 7px 0;font-size:0.68rem;text-transform:uppercase;letter-spacing:0.06em;color:#999;font-weight:700;border-bottom:1px solid #eee;">Surface</th>
+          </tr>
+        </thead>
+        <tbody>${roomsRows}</tbody>
+      </table>
+    </div>` : ''}
+
+    <!-- Visite virtuelle bloc pleine largeur -->
+    ${p.virtual_tour_url ? `<div style="padding:0 28px 16px;">
+      ${sectionTitle('Visite virtuelle 3D')}
+      <a href="${p.virtual_tour_url}" target="_blank" style="display:flex;align-items:center;gap:10px;padding:14px 18px;background:#f0f5f1;border-radius:10px;color:#3D5A47;font-size:0.88rem;font-weight:600;text-decoration:none;border:1.5px solid #c8ddd0;">
+        <span style="font-size:1.4rem;">🥽</span>
+        <div>
+          <div style="font-weight:700;color:#3D5A47;font-size:0.9rem;">Visite 3D interactive disponible</div>
+          <div style="font-size:0.76rem;color:#888;margin-top:2px;word-break:break-all;">${p.virtual_tour_url}</div>
+        </div>
+        <span style="margin-left:auto;font-size:0.78rem;color:#3D5A47;white-space:nowrap;">Ouvrir →</span>
+      </a>
+    </div>` : ''}
+
+    <!-- Photos professionnelles -->
+    ${proPhotos.length > 0 ? `<div style="padding:0 28px 20px;">
+      ${sectionTitle('📸 Photos professionnelles')}
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;">
+        ${proPhotos.map(ph => `<div style="aspect-ratio:4/3;overflow:hidden;border-radius:6px;background:#f0ede8;">
+          <img src="${ph.url || ph.file_path}" style="width:100%;height:100%;object-fit:cover;" alt="">
+        </div>`).join('')}
+      </div>
+    </div>` : ''}
+
+    <!-- Photos découverte -->
+    ${decouvertePhotos.length > 0 ? `<div style="padding:0 28px 20px;">
+      ${sectionTitle('🏠 Photos découverte')}
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;">
+        ${decouvertePhotos.map(ph => `<div style="aspect-ratio:4/3;overflow:hidden;border-radius:6px;background:#f0ede8;">
+          <img src="${ph.url || ph.file_path}" style="width:100%;height:100%;object-fit:cover;" alt="">
+        </div>`).join('')}
+      </div>
+    </div>` : ''}
+
+    <!-- Photos des détails -->
+    ${detailsPhotos.length > 0 ? `<div style="padding:0 28px 20px;">
+      ${sectionTitle('🔍 Photos des détails')}
+      <p style="font-size:0.76rem;color:#888;margin:0 0 10px;">Informations techniques importantes à connaître avant une visite</p>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;">
+        ${detailsPhotos.map(ph => `<div style="aspect-ratio:4/3;overflow:hidden;border-radius:6px;background:#f0ede8;border:1px solid #e8e0d6;">
+          <img src="${ph.url || ph.file_path}" style="width:100%;height:100%;object-fit:cover;" alt="">
+        </div>`).join('')}
+      </div>
+    </div>` : ''}
+
+    <!-- Documents fournis acheteurs -->
+    ${publicDocs.length > 0 ? `<div style="padding:0 28px 20px;">
+      ${sectionTitle('📋 Documents fournis')}
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:8px;">
+        ${publicDocs.map(function(doc) {
+          var m = DOC_META[doc.doc_type] || DOC_META.autre;
+          return '<a href="' + doc.url + '" target="_blank" rel="noopener" style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:#f8f9fa;border:1.5px solid #e8e0d6;border-radius:8px;text-decoration:none;color:inherit;">'
+            + '<div style="width:34px;height:34px;border-radius:8px;background:' + m.color + ';display:flex;align-items:center;justify-content:center;flex-shrink:0;">📄</div>'
+            + '<div style="min-width:0;">'
+            + '<div style="font-size:0.8rem;font-weight:700;color:#1a1a1a;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" title="' + doc.name + '">' + doc.name + '</div>'
+            + '<div style="font-size:0.64rem;color:' + m.text + ';background:' + m.color + ';padding:1px 7px;border-radius:10px;display:inline-block;margin-top:3px;font-weight:700;text-transform:uppercase;letter-spacing:0.04em;">' + m.label + '</div>'
+            + '</div>'
+            + '</a>';
+        }).join('')}
+      </div>
+    </div>` : '<div style="padding:0 28px 16px;"><div style="padding:14px 16px;background:#fafaf8;border:1.5px dashed #e0d8cc;border-radius:8px;text-align:center;color:#bbb;font-size:0.8rem;">Aucun document acheteur · Ajoutez vos diagnostics dans l\'onglet Documents</div></div>'}
+
+    <!-- Pied de page -->
+    <div style="background:#f8f5f0;border-top:1px solid #e0d8cc;padding:14px 28px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
+      <div>
+        <div style="font-size:0.9rem;font-weight:700;color:#3D5A47;" class="fiche-seller-name">Chargement...</div>
+        <div style="font-size:0.8rem;color:#777;" class="fiche-seller-phone"></div>
+      </div>
+      <div style="text-align:right;">
+        <div style="font-size:0.68rem;color:#aaa;">🔒 Ce dossier ne contient aucun document confidentiel</div>
+        <div style="font-size:0.65rem;color:#ccc;margin-top:1px;">Les documents notariaux restent en dehors de ce dossier · Généré par Serenis</div>
+      </div>
+    </div>
+  </div>`;
+
+  return _html;
+}
+
+function generateFiche() {
+  var out = document.getElementById('ficheOutput');
+  if (!out) return;
+  var html = buildFicheHtml();
+  if (!html) {
+    out.innerHTML = '<div class="fiche-empty"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg><p>Complétez et sauvegardez votre fiche dans l\'onglet <strong>Informations</strong> pour voir le dossier s\'assembler ici.</p></div>';
+    return;
+  }
+  out.innerHTML = html;
   document.getElementById('printBtn').style.display = 'inline-flex';
   fetchSellerForFiche();
 }
@@ -2573,14 +3732,37 @@ async function fetchSellerForFiche() {
     if (data.seller) {
       const name = [data.seller.first_name, data.seller.last_name].filter(Boolean).join(' ') || 'Vendeur particulier';
       const phone = data.seller.phone || data.seller.twilio_number || '';
-      document.getElementById('ficheSellerName').textContent = name;
-      document.getElementById('ficheSellerPhone').textContent = phone;
+      document.querySelectorAll('.fiche-seller-name').forEach(el => { el.textContent = name; });
+      document.querySelectorAll('.fiche-seller-phone').forEach(el => { el.textContent = phone; });
     }
   } catch(e) {}
 }
 
-function printFiche() {
-  window.print();
+function printFiche() { window.print(); }
+
+async function exportDossierPDF() {
+  const btn = document.getElementById('printBtn');
+  const orig = btn.textContent;
+  btn.textContent = '⏳ Génération…'; btn.disabled = true;
+  try {
+    const html = document.getElementById('ficheCard')?.outerHTML;
+    if (!html) { showToast('Générez d\'abord le dossier.', 'error'); return; }
+    const res = await fetch('/api/property/export-pdf', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ html, title: document.querySelector('.fiche-address')?.textContent || 'Dossier' })
+    });
+    if (!res.ok) throw new Error('Erreur serveur');
+    const blob = await res.blob();
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a'); a.href = url;
+    a.download = 'Dossier_Envoi_Client.pdf'; a.click();
+    URL.revokeObjectURL(url);
+    showToast('PDF téléchargé ✓');
+  } catch(e) {
+    showToast('Erreur export PDF : ' + e.message, 'error');
+  }
+  btn.textContent = orig; btn.disabled = false;
 }
 
 // ── Toast ─────────────────────────────────────────────
@@ -2596,178 +3778,198 @@ window.showToast = function(msg, type='success') {
 // ═══════════════════════════════════════════════════════
 // PIÈCES PAR NIVEAU
 // ═══════════════════════════════════════════════════════
+var _ico = {
+  buanderie: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="2" width="18" height="20" rx="2"/><circle cx="12" cy="13" r="4"/><path d="M6 6h.01"/></svg>',
+  bureau:    '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>',
+  cave:      '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8 22h8"/><path d="M12 15v7"/><path d="M12 15a5 5 0 0 0 5-5c0-2-.5-4-2-8H7c-1.5 4-2 6-2 8a5 5 0 0 0 5 5z"/></svg>',
+  cellier:   '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="2"/><path d="M2 7h20M2 12h20M2 17h20"/></svg>',
+  chambre:   '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 4v16"/><path d="M2 8h18a2 2 0 0 1 2 2v10"/><path d="M2 17h20"/><path d="M6 8v9"/></svg>',
+  cuisine:   '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"/><path d="M7 2v20"/><path d="M21 15V2a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3zm0 0v7"/></svg>',
+  dressing:  '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20.38 18H3.62a2 2 0 0 1-1.21-3.6L12 8l9.59 6.4A2 2 0 0 1 20.38 18z"/><path d="M10.5 4a1.5 1.5 0 0 1 3 0"/><path d="M12 5.5V8"/></svg>',
+  entree:    '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M13 4h3a2 2 0 0 1 2 2v14"/><path d="M2 20h3"/><path d="M13 20h9"/><path d="M10 12v.01"/><path d="M13 4 7 20"/></svg>',
+  garage:    '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 17H3a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v9a2 2 0 0 1-2 2h-2"/><circle cx="7" cy="17" r="2"/><path d="M9 17h6"/><circle cx="17" cy="17" r="2"/></svg>',
+  palier:    '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h4v-4h4v-4h4v-4h4"/><path d="M4 20V4"/></svg>',
+  sam:       '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-6 9 6"/><path d="M3 11v9h18v-9"/><path d="M9 20v-6h6v6"/></svg>',
+  sdb:       '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6 6.5 3.5a1.5 1.5 0 0 0-2.5 1V17a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-5"/><line x1="2" y1="12" x2="22" y2="12"/></svg>',
+  sde:       '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4a4 4 0 0 1 8 0v8H4V4z"/><path d="M4 12v8"/><path d="M7 17v.01M7 20v.01M11 17v.01M11 20v.01"/></svg>',
+  sejour:    '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 9V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v3"/><path d="M2 16v-5a2 2 0 0 1 4 0v2h12v-2a2 2 0 0 1 4 0v5a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2z"/><path d="M4 18v2m16-2v2"/></svg>',
+  veranda:   '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 22L12 4l9 18"/><path d="M3 22h18"/><path d="M8 22v-5c0-2.2 1.8-4 4-4s4 1.8 4 4v5"/></svg>',
+  wc:        '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8v7a4 4 0 0 0 8 0V8"/><rect x="6" y="4" width="8" height="4" rx="2"/><path d="M18 6h2m-2 4h2"/></svg>',
+};
 var ROOM_DEFS = [
-  {key:'buanderie', label:'Buanderie',      icon:'🧺', countable:false, bedroom:false},
-  {key:'bureau',    label:'Bureau',         icon:'📚', countable:true,  bedroom:false},
-  {key:'cave',      label:'Cave',           icon:'🍷', countable:false, bedroom:false},
-  {key:'cellier',   label:'Cellier',        icon:'📦', countable:false, bedroom:false},
-  {key:'chambre',   label:'Chambre',        icon:'🛏', countable:true,  bedroom:true},
-  {key:'cuisine',   label:'Cuisine',        icon:'🍳', countable:false, bedroom:false},
-  {key:'dressing',  label:'Dressing',       icon:'👗', countable:false, bedroom:false},
-  {key:'entree',    label:'Entrée / Hall',  icon:'🚪', countable:false, bedroom:false},
-  {key:'garage',    label:'Garage',         icon:'🏠', countable:false, bedroom:false},
-  {key:'palier',    label:'Palier',         icon:'↕️', countable:false, bedroom:false},
-  {key:'sam',       label:'Salle à manger', icon:'🍽', countable:true,  bedroom:false},
-  {key:'sdb',       label:'Salle de bain',  icon:'🛁', countable:false, bedroom:false},
-  {key:'sde',       label:"Salle d'eau",    icon:'🚿', countable:false, bedroom:false},
-  {key:'sejour',    label:'Séjour',         icon:'🛋', countable:true,  bedroom:false},
-  {key:'veranda',   label:'Véranda',        icon:'🌿', countable:true,  bedroom:false},
-  {key:'wc',        label:'WC',             icon:'🚽', countable:false, bedroom:false},
+  {key:'buanderie', label:'Buanderie',      icon:_ico.buanderie, countable:false, bedroom:false},
+  {key:'bureau',    label:'Bureau',         icon:_ico.bureau,    countable:true,  bedroom:false},
+  {key:'cave',      label:'Cave',           icon:_ico.cave,      countable:false, bedroom:false},
+  {key:'cellier',   label:'Cellier',        icon:_ico.cellier,   countable:false, bedroom:false},
+  {key:'chambre',   label:'Chambre',        icon:_ico.chambre,   countable:true,  bedroom:true},
+  {key:'cuisine',   label:'Cuisine',        icon:_ico.cuisine,   countable:false, bedroom:false},
+  {key:'dressing',  label:'Dressing',       icon:_ico.dressing,  countable:false, bedroom:false},
+  {key:'entree',    label:'Entrée / Hall',  icon:_ico.entree,    countable:false, bedroom:false},
+  {key:'garage',    label:'Garage',         icon:_ico.garage,    countable:false, bedroom:false},
+  {key:'palier',    label:'Palier',         icon:_ico.palier,    countable:false, bedroom:false},
+  {key:'sam',       label:'Salle à manger', icon:_ico.sam,       countable:true,  bedroom:false},
+  {key:'sdb',       label:'Salle de bain',  icon:_ico.sdb,       countable:false, bedroom:false},
+  {key:'sde',       label:"Salle d'eau",    icon:_ico.sde,       countable:false, bedroom:false},
+  {key:'sejour',    label:'Séjour',         icon:_ico.sejour,    countable:true,  bedroom:false},
+  {key:'veranda',   label:'Véranda',        icon:_ico.veranda,   countable:true,  bedroom:false},
+  {key:'wc',        label:'WC',             icon:_ico.wc,        countable:false, bedroom:false},
 ];
 
-var ALL_ETAGES = ['1er étage','2e étage','3e étage','4e étage','5e étage','6e étage'];
-var unlockedEtages = [];
-var addingFloor = 'RDC';
-var addingType = null;
+var FLOOR_OPTIONS = ['RDC', '1er étage', '2e étage', '3e étage', '4e étage', 'Sous-sol'];
 var roomsList = [];
 
-function addNextEtage() {
-  var next = ALL_ETAGES[unlockedEtages.length];
-  if (!next) return;
-  unlockedEtages.push(next);
-  addingFloor = next;
-  // Injecter le nouveau bouton avant le bouton "Ajouter un étage"
-  var wrap = document.getElementById('addFloorBtns');
-  var addBtn = wrap ? wrap.querySelector('.add-etage-btn') : null;
-  if (wrap && addBtn) {
-    var label = next === '1er étage' ? '1er' : next.replace(' étage','');
-    var newBtn = document.createElement('button');
-    newBtn.type = 'button';
-    newBtn.className = 'add-floor-btn active';
-    newBtn.textContent = label;
-    newBtn.onclick = function() { setAddFloor(next, newBtn); };
-    wrap.insertBefore(newBtn, addBtn);
-    // Désactiver tous les autres
-    wrap.querySelectorAll('.add-floor-btn').forEach(function(b) { b.classList.remove('active'); });
-    newBtn.classList.add('active');
-    if (unlockedEtages.length >= ALL_ETAGES.length) addBtn.style.display = 'none';
-  }
-}
-
-function setAddFloor(floor, btn) {
-  addingFloor = floor;
-  document.querySelectorAll('#addFloorBtns .add-floor-btn').forEach(function(b) { b.classList.remove('active'); });
-  if (btn) btn.classList.add('active');
-}
-
-function selectRoomType(key, btn) {
-  addingType = key;
-  // Reset all buttons inline (CSS-independent)
-  document.querySelectorAll('.rtype-btn').forEach(function(b) {
-    b.style.borderColor = '#e8e0d6';
-    b.style.background = '#fff';
-    b.classList.remove('chosen');
+function initRoomPanel() {
+  var grid = document.getElementById('roomTypeGrid');
+  if (!grid) return;
+  grid.innerHTML = '';
+  ROOM_DEFS.forEach(function(def) {
+    var btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'rtype-btn';
+    btn.setAttribute('data-roomkey', def.key);
+    var iconSpan = document.createElement('span');
+    iconSpan.className = 'rt-icon';
+    iconSpan.innerHTML = (_ico && _ico[def.key]) ? _ico[def.key] : '';
+    var nameSpan = document.createElement('span');
+    nameSpan.className = 'rt-name';
+    nameSpan.textContent = def.label;
+    btn.appendChild(iconSpan);
+    btn.appendChild(nameSpan);
+    btn.addEventListener('click', function(e) {
+      e.stopPropagation();
+      addRoom(def.key, btn);
+    });
+    grid.appendChild(btn);
   });
-  // Highlight selected button inline
+}
+
+function addRoom(key, btn) {
+  var def = ROOM_DEFS.find(function(r) { return r.key === key; });
+  if (!def) return;
+  var countSameType = roomsList.filter(function(r) { return r.key === def.key; }).length;
+  var labelDisplay = def.countable && countSameType > 0 ? def.label + ' ' + (countSameType + 1) : def.label;
+  roomsList.push({
+    id: Date.now(),
+    floor: 'RDC',
+    key: def.key, label: labelDisplay,
+    icon: (_ico && _ico[def.key]) ? _ico[def.key] : '',
+    surface: 0, countable: def.countable, bedroom: def.bedroom
+  });
   if (btn) {
-    btn.style.borderColor = '#C4785A';
-    btn.style.background = '#fff8f4';
-    btn.classList.add('chosen');
+    btn.style.background = '#e8f5e9';
+    btn.style.borderColor = '#3D5A47';
+    btn.style.color = '#3D5A47';
+    setTimeout(function() {
+      btn.style.background = '';
+      btn.style.borderColor = '';
+      btn.style.color = '';
+    }, 500);
   }
-  // Show indicator
-  var ind = document.getElementById('rtypeIndicator');
-  if (ind) {
-    var def = ROOM_DEFS.find(function(r) { return r.key === key; });
-    ind.textContent = def ? '✓ ' + def.label + ' sélectionné' : '';
-    ind.style.display = 'block';
-  }
-}
-
-
-function confirmAddRoom() {
-  try {
-    if (!addingType) { showToast('Choisissez un type de pièce', 'error'); return; }
-    var def = ROOM_DEFS.find(function(r) { return r.key === addingType; });
-    if (!def) { showToast('Type de pièce inconnu', 'error'); return; }
-    var surfaceInput = document.getElementById('addRoomSurface');
-    var surface = surfaceInput ? (parseFloat((surfaceInput.value || '').replace(',','.')) || 0) : 0;
-    var countSameType = roomsList.filter(function(r) { return r.key === def.key; }).length;
-    var labelDisplay = def.countable && countSameType > 0 ? def.label + ' ' + (countSameType + 1) : def.label;
-    roomsList.push({
-      id: Date.now(),
-      floor: addingFloor,
-      key: def.key, label: labelDisplay, icon: def.icon,
-      surface: surface, countable: def.countable, bedroom: def.bedroom
-    });
-    if (surfaceInput) surfaceInput.value = '';
-    document.querySelectorAll('.rtype-btn').forEach(function(b) {
-      b.classList.remove('chosen');
-      b.style.borderColor = '#e8e0d6';
-      b.style.background = '#fff';
-    });
-    var ind = document.getElementById('rtypeIndicator');
-    if (ind) { ind.style.display = 'none'; ind.textContent = ''; }
-    addingType = null;
-    renderRoomsList();
-    computeRoomTotals();
-    scheduleAutosave();
-  } catch(err) {
-    showToast('Erreur: ' + err.message, 'error');
-  }
-}
-
-function removeRoom(id) {
-  roomsList = roomsList.filter(function(r) { return r.id !== id; });
-  renderRoomsList();
+  showToast(labelDisplay + ' ajouté(e)');
+  renderRoomCards();
   computeRoomTotals();
   scheduleAutosave();
 }
 
-function syncUnlockedEtagesFromList() {
-  var wrap = document.getElementById('addFloorBtns');
-  ALL_ETAGES.forEach(function(fl) {
-    if (roomsList.some(function(r) { return r.floor === fl; }) && unlockedEtages.indexOf(fl) === -1) {
-      unlockedEtages.push(fl);
-      if (wrap) {
-        var addBtn = wrap.querySelector('.add-etage-btn');
-        var label = fl === '1er étage' ? '1er' : fl.replace(' étage','');
-        var newBtn = document.createElement('button');
-        newBtn.type = 'button';
-        newBtn.className = 'add-floor-btn';
-        newBtn.textContent = label;
-        var flCopy = fl;
-        newBtn.onclick = function() { setAddFloor(flCopy, newBtn); };
-        if (addBtn) wrap.insertBefore(newBtn, addBtn);
-        else wrap.appendChild(newBtn);
-      }
-    }
-  });
-  var addBtn2 = wrap ? wrap.querySelector('.add-etage-btn') : null;
-  if (addBtn2 && unlockedEtages.length >= ALL_ETAGES.length) addBtn2.style.display = 'none';
+function selectRoomType(key) { addRoom(key, null); }
+
+function removeRoom(id) {
+  roomsList = roomsList.filter(function(r) { return r.id !== id; });
+  renderRoomCards();
+  computeRoomTotals();
+  scheduleAutosave();
 }
 
-function renderRoomsList() {
-  var container = document.getElementById('roomsList');
+function renderRoomCards() {
+  var container = document.getElementById('roomCardsContainer');
   if (!container) return;
-  if (roomsList.length === 0) { container.innerHTML = ''; return; }
-  var floorOrder = ['RDC','1er étage','2e étage','3e étage','4e étage','5e étage','6e étage','Sous-sol'];
-  var rows = '';
-  floorOrder.forEach(function(floor) {
-    var floorRooms = roomsList.filter(function(r) { return r.floor === floor; });
-    if (floorRooms.length === 0) return;
-    floorRooms.forEach(function(r, i) {
-      var niveauLabel = floor === 'RDC' ? 'rdc' : floor === 'Sous-sol' ? 'ss' : floor.replace(' étage','');
-      var niveauCell = i === 0
-        ? '<td class="rt-level">' + niveauLabel + '</td>'
-        : '<td class="rt-level" style="color:#ccc;">—</td>';
-      var surfTxt = r.surface > 0 ? r.surface.toString().replace('.',',') + ' m²' : '—';
-      rows += '<tr>' +
-        niveauCell +
-        '<td class="rt-piece">' + r.icon + ' ' + r.label + '</td>' +
-        '<td class="rt-surface">' + surfTxt + '</td>' +
-        '<td class="rt-del"><button type="button" class="rt-del-btn" onclick="removeRoom(' + r.id + ')">✕</button></td>' +
-      '</tr>';
+  while (container.firstChild) container.removeChild(container.firstChild);
+  if (roomsList.length === 0) return;
+
+  roomsList.forEach(function(room) {
+    var card = document.createElement('div');
+    card.className = 'room-card';
+    card.setAttribute('data-room-id', String(room.id));
+
+    // Header: icon + name + delete button
+    var header = document.createElement('div');
+    header.className = 'room-card-header';
+
+    var titleDiv = document.createElement('div');
+    titleDiv.className = 'room-card-title';
+    titleDiv.innerHTML = (room.icon || '') + '<span>' + room.label + '</span>';
+
+    var delBtn = document.createElement('button');
+    delBtn.type = 'button';
+    delBtn.className = 'room-card-del';
+    delBtn.setAttribute('aria-label', 'Supprimer');
+    delBtn.innerHTML = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>';
+    delBtn.addEventListener('click', (function(id) { return function() { removeRoom(id); }; })(room.id));
+
+    header.appendChild(titleDiv);
+    header.appendChild(delBtn);
+
+    // Floor section
+    var floorLabel = document.createElement('div');
+    floorLabel.style.cssText = 'font-size:0.68rem;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;color:#bbb;margin-bottom:5px;';
+    floorLabel.textContent = 'Niveau';
+
+    var pillsRow = document.createElement('div');
+    pillsRow.className = 'room-floor-pills';
+
+    FLOOR_OPTIONS.forEach(function(fl) {
+      var pill = document.createElement('button');
+      pill.type = 'button';
+      pill.className = 'room-floor-pill' + (room.floor === fl ? ' active' : '');
+      pill.textContent = fl;
+      pill.addEventListener('click', (function(flVal, pillEl, r, row) {
+        return function() {
+          r.floor = flVal;
+          row.querySelectorAll('.room-floor-pill').forEach(function(p) { p.classList.remove('active'); });
+          pillEl.classList.add('active');
+          scheduleAutosave();
+        };
+      })(fl, pill, room, pillsRow));
+      pillsRow.appendChild(pill);
     });
+
+    // Surface input
+    var surfaceRow = document.createElement('div');
+    surfaceRow.className = 'room-surface-row';
+
+    var surfLabel = document.createElement('label');
+    surfLabel.className = 'room-surface-label';
+    surfLabel.textContent = 'Surface :';
+
+    var surfInput = document.createElement('input');
+    surfInput.type = 'number';
+    surfInput.className = 'room-surface-input';
+    surfInput.placeholder = 'm²';
+    surfInput.min = '1';
+    surfInput.max = '500';
+    surfInput.step = '0.5';
+    if (room.surface > 0) surfInput.value = String(room.surface);
+    surfInput.addEventListener('input', (function(r) {
+      return function() {
+        r.surface = parseFloat(this.value.replace(',', '.')) || 0;
+        computeRoomTotals();
+        scheduleAutosave();
+      };
+    })(room));
+
+    surfaceRow.appendChild(surfLabel);
+    surfaceRow.appendChild(surfInput);
+
+    card.appendChild(header);
+    card.appendChild(floorLabel);
+    card.appendChild(pillsRow);
+    card.appendChild(surfaceRow);
+    container.appendChild(card);
   });
-  container.innerHTML =
-    '<table class="rooms-table">' +
-      '<thead><tr><th>NIVEAU</th><th>NOM</th><th>SURFACE</th><th></th></tr></thead>' +
-      '<tbody>' + rows + '</tbody>' +
-    '</table>';
-  // Scroll la dernière ligne dans le viewport
+
   try {
-    var lastRow = container.querySelector('tbody tr:last-child');
-    if (lastRow) lastRow.scrollIntoView({behavior:'smooth', block:'nearest'});
+    var last = container.lastElementChild;
+    if (last) last.scrollIntoView({behavior:'smooth', block:'nearest'});
   } catch(e) {}
 }
 
@@ -3029,8 +4231,7 @@ function restoreDraft(draft) {
   }
   if (draft._roomsList) {
     roomsList = draft._roomsList;
-    syncUnlockedEtagesFromList();
-    renderRoomsList();
+    renderRoomCards();
     computeRoomTotals();
   }
   if (draft._equip) {
@@ -3121,7 +4322,7 @@ const CMD_ACTIONS = [
   { section:'Navigation', icon:'📋', label:'Onglet Informations',    fn: () => switchTab('infos') },
   { section:'Navigation', icon:'📸', label:'Onglet Photos',           fn: () => switchTab('photos') },
   { section:'Navigation', icon:'📁', label:'Onglet Documents',        fn: () => switchTab('documents') },
-  { section:'Navigation', icon:'👤', label:'Fiche acheteur',          fn: () => { switchTab('fiche'); setTimeout(generateFiche, 200); } },
+  { section:'Navigation', icon:'📋', label:'Dossier envoi client',     fn: () => { switchTab('fiche'); setTimeout(generateFiche, 200); } },
   { section:'Navigation', icon:'🚀', label:'Publication',             fn: () => switchTab('publication') },
   { section:'Actions',    icon:'💾', label:'Sauvegarder le formulaire', fn: () => document.querySelector('form')?.requestSubmit() },
   { section:'Actions',    icon:'✨', label:'Générer la description IA', fn: () => { switchTab('infos'); setTimeout(generateAIDescription, 200); } },
@@ -3133,7 +4334,6 @@ const CMD_ACTIONS = [
   }},
   { section:'Pages', icon:'🏠', label:'Tableau de bord', fn: () => { window.location.href = '/seller'; } },
   { section:'Pages', icon:'📅', label:'Agenda',          fn: () => { window.location.href = '/seller/agenda'; } },
-  { section:'Pages', icon:'📊', label:'Performances',    fn: () => { window.location.href = '/seller/performances'; } },
 ];
 
 let _cmdSelected = 0;
@@ -3230,6 +4430,85 @@ document.querySelectorAll('.dpe-bar-row').forEach(function(row) {
   row.addEventListener('click', function() { selectDpe(row.dataset.value); });
 });
 
+// ── Toggle switches via event delegation ──
+document.addEventListener('click', function(e) {
+  var item = e.target.closest('[data-toggle]');
+  if (!item) return;
+  toggleSwitch(item.dataset.toggle);
+});
+
+// ═══════════════════════════════════════════════════════
+// VIEW / EDIT MODE SYSTEM
+// ═══════════════════════════════════════════════════════
+var _isEditMode = true;
+
+function _escHtml(s) {
+  return String(s == null ? '' : s)
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function enterViewMode() {
+  _isEditMode = false;
+  refreshPreview();
+  var vm = document.getElementById('viewModeWrapper');
+  var em = document.getElementById('editModeWrapper');
+  em.style.display = 'none';
+  vm.style.display = 'block';
+  // Re-trigger animation
+  vm.style.animation = 'none';
+  vm.offsetHeight;
+  vm.style.animation = '';
+}
+
+function enterEditMode() {
+  _isEditMode = true;
+  document.getElementById('viewModeWrapper').style.display = 'none';
+  var em = document.getElementById('editModeWrapper');
+  em.style.display = 'block';
+  var bar = document.getElementById('editModeBar');
+  if (bar) bar.style.display = 'flex';
+  // Focus first visible input
+  setTimeout(function() {
+    var first = em.querySelector('input:not([type=hidden]):not([style*="display:none"])');
+    if (first) first.focus();
+  }, 80);
+}
+
+function refreshPreview() {
+  var sheet = document.getElementById('previewSheet');
+  if (!sheet) return;
+
+  // Update status pill + saved badge
+  var badgeEl = document.getElementById('autosaveBadge');
+  var savedText = badgeEl ? badgeEl.textContent.replace('✓ ','').replace('● ','') : '';
+  var pillEl = document.getElementById('previewStatusPill');
+  var badgePrev = document.getElementById('previewLastSavedBadge');
+  if (badgePrev) badgePrev.textContent = savedText;
+  var pct = parseInt(document.getElementById('completionPct')?.textContent) || 0;
+  if (pillEl) {
+    if (pct >= 80) { pillEl.className = 'preview-status-pill complete'; pillEl.textContent = '✓ Dossier complet — ' + pct + '%'; }
+    else if (pct >= 40) { pillEl.className = 'preview-status-pill partial'; pillEl.textContent = '⚠ En cours — ' + pct + '%'; }
+    else { pillEl.className = 'preview-status-pill empty'; pillEl.textContent = '○ Démarré — ' + pct + '%'; }
+  }
+
+  // Render the same premium commercial sheet as the Dossier tab
+  var html = buildFicheHtml();
+  if (html) {
+    sheet.innerHTML = html;
+    fetchSellerForFiche();
+  } else {
+    sheet.innerHTML = '<div class="fiche-empty" style="padding:60px 32px;text-align:center;"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#ddd" stroke-width="1.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg><p style="color:#bbb;margin-top:16px;font-family:DM Sans,sans-serif;font-size:0.88rem;">Complétez votre fiche pour voir la prévisualisation du dossier client.</p></div>';
+  }
+}
+
+// Wire up buttons
+document.getElementById('btnEnterEditMode').addEventListener('click', enterEditMode);
+document.getElementById('btnBackToView').addEventListener('click', function() {
+  enterViewMode();
+  showToast('Fiche consultée ✓');
+});
+
+initRoomPanel();
 loadProperty();
 </script>
 <!-- ── Bento lightbox ─────────────────────────────────── -->
@@ -3253,5 +4532,9 @@ loadProperty();
 </div>
 
 <script src="/js/transitions.js"></script>
+
+<div id="ficheOverlay" style="display:none;"></div>
+
+
 </body>
 </html>

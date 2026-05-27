@@ -3,87 +3,240 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Ma Formation — Vendu Par Moi</title>
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <title>Ma Formation — Serenis</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,400&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/css/style.css">
   <style>
-    .formation-layout { display: grid; grid-template-columns: 1fr 340px; gap: 24px; align-items: start; }
-    .formation-main { min-width: 0; }
-    .formation-coach { position: sticky; top: 24px; }
-    .video-wrapper { background: #000; border-radius: 14px; overflow: hidden; aspect-ratio: 16/9; width: 100%; }
-    .video-wrapper video { width: 100%; height: 100%; object-fit: contain; }
-    .modules-nav { display: flex; gap: 8px; flex-wrap: wrap; margin: 20px 0; }
-    .module-btn { padding: 7px 16px; border-radius: 100px; border: 1.5px solid #e5e0d8; background: transparent; font-size: 0.82rem; font-family: 'DM Sans', sans-serif; cursor: pointer; color: #666; transition: all 0.2s; white-space: nowrap; }
-    .module-btn.active { background: #3D5A47; border-color: #3D5A47; color: #fff; font-weight: 500; }
-    .module-btn:hover:not(.active) { border-color: #3D5A47; color: #3D5A47; }
-    .module-content { display: none; }
-    .module-content.active { display: block; }
-    .module-header { display: flex; align-items: center; gap: 14px; margin-bottom: 24px; padding: 20px 24px; background: linear-gradient(135deg, #3D5A47, #5C7A65); border-radius: 14px; color: #fff; }
-    .module-num { width: 44px; height: 44px; border-radius: 50%; background: rgba(255,255,255,0.15); display: flex; align-items: center; justify-content: center; font-family: 'Cormorant Garamond', serif; font-size: 1.4rem; flex-shrink: 0; }
-    .module-header h2 { font-size: 1.1rem; color: #fff; border: none; padding: 0; margin: 0; }
-    .module-header p { font-size: 0.83rem; color: rgba(255,255,255,0.75); margin-top: 3px; }
-    .steps-list { display: flex; flex-direction: column; gap: 16px; margin-bottom: 24px; }
-    .step-card { border: 1.5px solid #e5e0d8; border-radius: 12px; overflow: hidden; transition: box-shadow 0.2s; }
-    .step-card:hover { box-shadow: 0 4px 20px rgba(61,90,71,0.08); }
+    /* ── 3-col hero ── */
+    .f-hero {
+      display: grid;
+      grid-template-columns: 1fr 224px 1fr;
+      gap: 36px;
+      align-items: center;
+      padding: 0 0 36px;
+    }
+    .f-hero-left, .f-hero-right { display: flex; flex-direction: column; gap: 14px; }
+
+    /* left */
+    .f-badge { display: inline-flex; align-items: center; gap: 6px; padding: 3px 12px; border-radius: 100px; background: #F0F5F1; border: 1px solid #C5D9CB; color: #3D5A47; font-size: 0.68rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; width: fit-content; }
+    .f-hero-title { font-family: 'Cormorant Garamond', serif; font-size: 1.65rem; font-weight: 600; color: #1a1a1a; line-height: 1.2; margin: 0; }
+    .f-hero-desc { font-size: 0.82rem; color: #666; line-height: 1.6; margin: 0; }
+    .f-benefits { display: flex; flex-direction: column; gap: 7px; }
+    .f-benefit { display: flex; align-items: flex-start; gap: 8px; font-size: 0.8rem; color: #333; line-height: 1.4; }
+    .f-benefit-dot { width: 16px; height: 16px; border-radius: 50%; background: #3D5A47; color: #fff; font-size: 0.55rem; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 1px; }
+    .f-stats-row { display: flex; gap: 16px; margin-top: 4px; }
+    .f-stat { text-align: center; }
+    .f-stat-n { font-family: 'Cormorant Garamond', serif; font-size: 1.6rem; font-weight: 600; color: #3D5A47; line-height: 1; }
+    .f-stat-l { font-size: 0.68rem; color: #888; margin-top: 2px; }
+
+    /* iPhone */
+    .iphone-wrap { display: flex; justify-content: center; }
+    .iphone {
+      width: 224px;
+      background: #1c1c1e;
+      border-radius: 44px;
+      border: 1.5px solid #3a3a3c;
+      box-shadow: 0 40px 80px rgba(0,0,0,0.22), 0 0 0 1px rgba(255,255,255,0.04) inset, 0 8px 16px rgba(0,0,0,0.1);
+      overflow: hidden;
+      position: relative;
+    }
+    .iphone-side-btn {
+      position: absolute; left: -2.5px; top: 100px; width: 3px; height: 28px;
+      background: #3a3a3c; border-radius: 2px 0 0 2px;
+    }
+    .iphone-side-btn.b2 { top: 136px; height: 44px; }
+    .iphone-side-btn-r {
+      position: absolute; right: -2.5px; top: 120px; width: 3px; height: 60px;
+      background: #3a3a3c; border-radius: 0 2px 2px 0;
+    }
+    .iphone-inner {
+      margin: 8px;
+      border-radius: 38px;
+      overflow: hidden;
+      background: #000;
+      position: relative;
+    }
+    .iphone-island {
+      position: absolute; top: 10px; left: 50%; transform: translateX(-50%);
+      width: 88px; height: 26px; background: #000; border-radius: 14px; z-index: 10;
+    }
+    .iphone-video { width: 100%; aspect-ratio: 9/18; object-fit: cover; display: block; }
+    .iphone-ai-bar {
+      position: absolute; bottom: 0; left: 0; right: 0;
+      padding: 10px 12px 14px;
+      background: linear-gradient(to top, rgba(0,0,0,0.85) 0%, transparent 100%);
+      display: flex; align-items: flex-end; gap: 8px;
+    }
+    .iphone-ai-avatar {
+      width: 28px; height: 28px; border-radius: 50%; background: #3D5A47;
+      display: flex; align-items: center; justify-content: center; font-size: 0.75rem; flex-shrink: 0;
+    }
+    .iphone-ai-bubble {
+      background: rgba(255,255,255,0.12); backdrop-filter: blur(8px);
+      border: 1px solid rgba(255,255,255,0.15); border-radius: 10px 10px 10px 3px;
+      padding: 6px 9px; font-size: 0.65rem; color: #fff; line-height: 1.45;
+      max-width: calc(100% - 40px);
+    }
+    .iphone-ai-typing { display: flex; gap: 3px; align-items: center; padding: 2px 0; }
+    .iphone-ai-td { width: 4px; height: 4px; border-radius: 50%; background: rgba(255,255,255,0.6); animation: bounce 1.2s infinite; }
+    .iphone-ai-td:nth-child(2) { animation-delay: 0.2s; }
+    .iphone-ai-td:nth-child(3) { animation-delay: 0.4s; }
+
+    /* ── Progress bar ── */
+    .lib-progress { display: flex; align-items: center; gap: 12px; margin-bottom: 28px; }
+    .lib-progress-bar { flex: 1; height: 6px; background: #E8E3DB; border-radius: 100px; overflow: hidden; }
+    .lib-progress-fill { height: 100%; background: #3D5A47; border-radius: 100px; transition: width 0.5s ease; }
+    .lib-progress-pct { font-size: 0.78rem; color: #3D5A47; font-weight: 600; white-space: nowrap; }
+
+    /* ── Module tabs ── */
+    .mod-tabs-wrap { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 24px; }
+    .mod-tab {
+      padding: 8px 16px; border-radius: 100px; font-size: 0.8rem; font-weight: 500;
+      border: 1.5px solid #DDD6CC; background: #fff; cursor: pointer;
+      transition: all 0.18s; color: #555; font-family: 'DM Sans', sans-serif;
+    }
+    .mod-tab:hover { border-color: #3D5A47; color: #3D5A47; }
+    .mod-tab.active { background: #3D5A47; color: #fff; border-color: #3D5A47; }
+
+    /* ── Module content ── */
+    .mod-content { display: none; }
+    .mod-content.active { display: block; }
+    .mod-hdr { display: flex; align-items: center; gap: 16px; margin-bottom: 20px; padding: 18px 20px; background: #3D5A47; border-radius: 12px; }
+    .mod-num { width: 36px; height: 36px; border-radius: 50%; background: rgba(255,255,255,0.15); color: #fff; font-weight: 700; font-size: 0.82rem; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .mod-hdr-title { color: #fff; font-weight: 600; font-size: 1rem; }
+    .mod-hdr-sub { color: rgba(255,255,255,0.7); font-size: 0.8rem; margin-top: 2px; }
+
+    /* ── Step cards ── */
+    .steps-list { display: flex; flex-direction: column; gap: 10px; }
+    .step-card { background: #fff; border: 1.5px solid #E8E3DB; border-radius: 12px; overflow: hidden; transition: border-color 0.2s; }
     .step-card.done { border-color: #3D5A47; }
-    .step-header { display: flex; align-items: center; gap: 14px; padding: 14px 18px; cursor: pointer; background: #fff; user-select: none; }
-    .step-check { width: 26px; height: 26px; border-radius: 50%; border: 2px solid #ccc; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: all 0.2s; font-size: 0.75rem; color: transparent; }
-    .step-card.done .step-check { background: #3D5A47; border-color: #3D5A47; color: #fff; }
-    .step-title-wrap { flex: 1; }
-    .step-title { font-size: 0.9rem; font-weight: 500; color: #1a1a1a; }
-    .step-meta { font-size: 0.75rem; color: #999; margin-top: 2px; }
-    .step-arrow { font-size: 0.7rem; color: #aaa; transition: transform 0.25s; }
-    .step-card.open .step-arrow { transform: rotate(90deg); }
-    .step-body { display: none; padding: 0 18px 18px; border-top: 1px solid #f0ece6; background: #fdfcf8; }
+    .step-hdr {
+      display: flex; align-items: center; gap: 12px; padding: 14px 16px; cursor: pointer;
+      user-select: none;
+    }
+    .step-chk {
+      width: 22px; height: 22px; border-radius: 50%; border: 1.5px solid #C8C0B4;
+      display: flex; align-items: center; justify-content: center; font-size: 0.65rem;
+      flex-shrink: 0; cursor: pointer; color: transparent; transition: all 0.18s;
+    }
+    .step-card.done .step-chk { background: #3D5A47; border-color: #3D5A47; color: #fff; }
+    .step-t { font-weight: 600; font-size: 0.88rem; color: #1a1a1a; }
+    .step-m { font-size: 0.72rem; color: #888; margin-top: 2px; }
+    .step-tw { flex: 1; min-width: 0; }
+    .step-arr { color: #BBB; font-size: 1.1rem; flex-shrink: 0; transition: transform 0.2s; }
+    .step-card.open .step-arr { transform: rotate(90deg); }
+    .step-body { display: none; padding: 0 16px 16px; border-top: 1px solid #F0ECE6; margin-top: 0; }
     .step-card.open .step-body { display: block; }
-    .step-section { margin-top: 18px; }
-    .step-section-title { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.08em; color: #999; margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
-    .step-section-title::after { content: ''; flex: 1; height: 1px; background: #eee; }
-    .step-text { font-size: 0.88rem; line-height: 1.75; color: #444; }
-    .tips-list { display: flex; flex-direction: column; gap: 8px; }
-    .tip-item { display: flex; gap: 10px; align-items: flex-start; background: #f0f7f3; border-left: 3px solid #3D5A47; border-radius: 0 8px 8px 0; padding: 10px 14px; font-size: 0.85rem; color: #2a4a35; }
-    .tip-icon { font-size: 1rem; flex-shrink: 0; margin-top: 1px; }
-    .warning-item { display: flex; gap: 10px; align-items: flex-start; background: #fff8f0; border-left: 3px solid #C4785A; border-radius: 0 8px 8px 0; padding: 10px 14px; font-size: 0.85rem; color: #7a3a20; margin-top: 8px; }
-    .data-table { width: 100%; border-collapse: collapse; font-size: 0.83rem; margin-top: 4px; }
-    .data-table th { background: #3D5A47; color: #fff; padding: 9px 14px; text-align: left; font-weight: 500; font-size: 0.78rem; }
-    .data-table td { padding: 9px 14px; border-bottom: 1px solid #f0ece6; color: #444; vertical-align: top; }
-    .data-table tr:nth-child(even) td { background: #faf8f4; }
-    .data-table tr:last-child td { border-bottom: none; }
-    .schema-flow { display: flex; align-items: center; gap: 0; flex-wrap: wrap; margin-top: 4px; }
-    .schema-step { background: #fff; border: 1.5px solid #3D5A47; border-radius: 8px; padding: 8px 14px; font-size: 0.78rem; color: #3D5A47; font-weight: 500; text-align: center; min-width: 80px; }
-    .schema-arrow { color: #C4785A; font-size: 1rem; padding: 0 6px; font-weight: 700; }
-    .script-block { background: #f9f7f3; border-radius: 10px; padding: 16px 18px; font-size: 0.85rem; line-height: 1.8; color: #333; }
-    .script-speaker { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.06em; font-weight: 600; margin-top: 12px; margin-bottom: 4px; }
-    .script-speaker.vendeur { color: #3D5A47; }
-    .script-speaker.acheteur { color: #C4785A; }
-    .script-line { padding-left: 12px; border-left: 2px solid #e0e0e0; color: #444; font-style: italic; }
-    .ask-coach-btn { margin-top: 16px; padding: 8px 18px; background: transparent; border: 1.5px solid #3D5A47; color: #3D5A47; border-radius: 100px; font-size: 0.82rem; font-family: 'DM Sans', sans-serif; cursor: pointer; transition: all 0.2s; }
+    .sst { margin-top: 16px; }
+    .sst-title { font-size: 0.67rem; font-weight: 700; letter-spacing: 0.09em; text-transform: uppercase; color: #999; margin-bottom: 8px; }
+    .sst-text { font-size: 0.85rem; color: #333; line-height: 1.65; }
+
+    /* Tables */
+    .data-table { width: 100%; border-collapse: collapse; font-size: 0.8rem; border-radius: 8px; overflow: hidden; }
+    .data-table thead tr { background: #3D5A47; }
+    .data-table th { padding: 8px 12px; text-align: left; color: #fff; font-weight: 600; font-size: 0.75rem; }
+    .data-table td { padding: 7px 12px; color: #333; border-bottom: 1px solid #F0ECE6; }
+    .data-table tbody tr:last-child td { border-bottom: none; }
+    .data-table tbody tr:nth-child(even) { background: #FAFAF8; }
+
+    /* Schema flow */
+    .schema-flow { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+    .schema-step { padding: 5px 10px; background: #F0F5F1; border: 1px solid #C5D9CB; border-radius: 6px; font-size: 0.75rem; color: #3D5A47; font-weight: 500; }
+    .schema-arrow { color: #9BB5A2; font-size: 0.85rem; }
+
+    /* Script */
+    .script-block { display: flex; flex-direction: column; gap: 6px; }
+    .script-speaker { font-size: 0.68rem; font-weight: 600; letter-spacing: 0.04em; margin-bottom: 1px; color: #999; }
+    .script-line { font-size: 0.82rem; color: #222; padding: 8px 12px; background: #F8F6F2; border-radius: 8px; border-left: 3px solid #E0D8CC; line-height: 1.5; }
+    .script-speaker.vendeur + .script-line { border-color: #3D5A47; background: #F0F5F1; }
+
+    /* Tips & warnings */
+    .tip-i { font-size: 0.8rem; color: #2D4D38; padding: 7px 10px 7px 12px; background: #EDF5F0; border-left: 3px solid #3D5A47; border-radius: 0 6px 6px 0; margin-bottom: 6px; line-height: 1.5; }
+    .warn-i { font-size: 0.8rem; color: #7A3A1E; padding: 7px 10px 7px 12px; background: #FDF0EB; border-left: 3px solid #C4785A; border-radius: 0 6px 6px 0; margin-bottom: 6px; line-height: 1.5; }
+    .ask-coach-btn {
+      display: inline-block; margin-top: 14px; padding: 7px 16px;
+      border: 1.5px solid #3D5A47; border-radius: 100px; background: #fff;
+      color: #3D5A47; font-size: 0.78rem; font-weight: 500; cursor: pointer;
+      transition: all 0.18s; font-family: 'DM Sans', sans-serif;
+    }
     .ask-coach-btn:hover { background: #3D5A47; color: #fff; }
-    .progress-bar-wrap { background: #eee; border-radius: 100px; height: 5px; margin-top: 12px; overflow: hidden; }
-    .progress-bar-fill { height: 100%; background: linear-gradient(90deg, #3D5A47, #7aaa8a); border-radius: 100px; transition: width 0.5s ease; }
-    .coach-card { background: #fff; border: 1.5px solid #e5e0d8; border-radius: 16px; overflow: hidden; display: flex; flex-direction: column; height: 560px; }
-    .coach-header { background: linear-gradient(135deg, #1a1a1a, #2a2a2a); padding: 16px 18px; display: flex; align-items: center; gap: 12px; }
-    .coach-avatar { width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(135deg, #3D5A47, #C4785A); display: flex; align-items: center; justify-content: center; font-size: 1.1rem; flex-shrink: 0; }
-    .coach-name { color: #fff; font-size: 0.9rem; font-weight: 500; }
-    .coach-status { color: #7aaa8a; font-size: 0.73rem; display: flex; align-items: center; gap: 5px; }
-    .coach-dot { width: 6px; height: 6px; border-radius: 50%; background: #7aaa8a; animation: pulse 2s infinite; }
-    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
-    .coach-messages { flex: 1; overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 12px; background: #fdfcf8; }
-    .msg { max-width: 85%; padding: 10px 14px; border-radius: 14px; font-size: 0.85rem; line-height: 1.6; }
-    .msg-coach { background: #fff; border: 1px solid #e5e0d8; border-bottom-left-radius: 4px; align-self: flex-start; color: #333; }
-    .msg-user { background: #3D5A47; color: #fff; border-bottom-right-radius: 4px; align-self: flex-end; }
-    .msg-typing { background: #fff; border: 1px solid #e5e0d8; border-bottom-left-radius: 4px; align-self: flex-start; color: #999; font-style: italic; display: none; }
-    .msg-typing.show { display: block; }
-    .coach-input-wrap { padding: 12px 14px; border-top: 1px solid #e5e0d8; display: flex; gap: 8px; background: #fff; }
-    .coach-input { flex: 1; border: 1.5px solid #e5e0d8; border-radius: 10px; padding: 9px 14px; font-size: 0.85rem; font-family: 'DM Sans', sans-serif; outline: none; resize: none; line-height: 1.4; max-height: 90px; overflow-y: auto; }
-    .coach-input:focus { border-color: #3D5A47; }
-    .coach-send { width: 38px; height: 38px; border-radius: 10px; background: #3D5A47; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; color: #fff; flex-shrink: 0; align-self: flex-end; transition: background 0.2s; }
-    .coach-send:hover { background: #2e4535; }
-    .coach-send:disabled { background: #ccc; cursor: not-allowed; }
-    .quick-questions { padding: 0 14px 12px; display: flex; gap: 6px; flex-wrap: wrap; background: #fff; }
-    .quick-q { font-size: 0.73rem; padding: 4px 10px; border-radius: 100px; border: 1px solid #e0dbd2; color: #666; cursor: pointer; transition: all 0.15s; white-space: nowrap; }
-    .quick-q:hover { background: #f0f7f3; border-color: #3D5A47; color: #3D5A47; }
-    @media (max-width: 900px) { .formation-layout { grid-template-columns: 1fr; } .formation-coach { position: static; } .coach-card { height: 420px; } }
+
+    /* ── Mails ── */
+    .section-hdr { font-size: 0.68rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: #888; margin: 36px 0 16px; }
+    .section-sub { font-size: 0.82rem; color: #666; margin-top: -10px; margin-bottom: 16px; }
+    .mail-item { border: 1.5px solid #E8E3DB; border-radius: 10px; margin-bottom: 8px; overflow: hidden; }
+    .mail-hdr { display: flex; align-items: center; padding: 12px 14px; cursor: pointer; gap: 10px; }
+    .mail-num { width: 22px; height: 22px; border-radius: 50%; background: #3D5A47; color: #fff; font-size: 0.68rem; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .mail-ttl { flex: 1; font-size: 0.85rem; font-weight: 500; color: #1a1a1a; }
+    .mail-ic { color: #AAA; font-size: 1.1rem; }
+    .mail-bd { display: none; padding: 12px 14px; border-top: 1px solid #F0ECE6; }
+    .mail-pre { font-size: 0.8rem; line-height: 1.7; color: #333; white-space: pre-wrap; font-family: 'DM Sans', sans-serif; margin: 0 0 10px; }
+    .mail-copy { padding: 6px 14px; border-radius: 100px; background: #3D5A47; color: #fff; font-size: 0.75rem; font-weight: 500; cursor: pointer; border: none; font-family: 'DM Sans', sans-serif; }
+
+    /* ── Checklists ── */
+    .ck-section { margin-bottom: 20px; }
+    .ck-title { font-weight: 600; font-size: 0.88rem; color: #1a1a1a; margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
+    .ck-count { font-size: 0.75rem; color: #888; font-weight: 400; }
+    .ck-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 6px; }
+    .ck-item { display: flex; align-items: flex-start; gap: 8px; padding: 8px 10px; border-radius: 8px; border: 1.5px solid #E8E3DB; cursor: pointer; transition: all 0.15s; font-size: 0.8rem; color: #333; }
+    .ck-item.checked { border-color: #3D5A47; background: #F0F5F1; }
+    .ck-item input { flex-shrink: 0; accent-color: #3D5A47; margin-top: 2px; }
+
+    /* ── AI Coach floating ── */
+    .coach-bubble {
+      position: fixed; bottom: 28px; right: 28px; z-index: 100;
+      width: 52px; height: 52px; border-radius: 50%;
+      background: #3D5A47; box-shadow: 0 4px 20px rgba(61,90,71,0.4);
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; border: none; transition: transform 0.18s, box-shadow 0.18s;
+      font-size: 1.3rem;
+    }
+    .coach-bubble:hover { transform: scale(1.08); box-shadow: 0 6px 28px rgba(61,90,71,0.5); }
+    .coach-panel {
+      position: fixed; bottom: 90px; right: 28px; z-index: 100;
+      width: 340px; max-height: 480px; background: #fff;
+      border-radius: 16px; box-shadow: 0 8px 40px rgba(0,0,0,0.14);
+      border: 1.5px solid #E8E3DB; display: none; flex-direction: column; overflow: hidden;
+    }
+    .coach-panel.open { display: flex; }
+    .coach-panel-hdr {
+      padding: 14px 16px; background: #3D5A47; display: flex; align-items: center; gap: 10px;
+    }
+    .coach-panel-hdr span { color: #fff; font-weight: 600; font-size: 0.9rem; flex: 1; }
+    .coach-close { color: rgba(255,255,255,0.6); background: none; border: none; font-size: 1.3rem; cursor: pointer; line-height: 1; }
+    .coach-msgs { flex: 1; overflow-y: auto; padding: 14px; display: flex; flex-direction: column; gap: 10px; }
+    .ai-msg-a { background: #F0F5F1; color: #1a1a1a; padding: 9px 12px; border-radius: 12px 12px 12px 4px; font-size: 0.82rem; line-height: 1.55; max-width: 90%; }
+    .ai-msg-u { background: #3D5A47; color: #fff; padding: 9px 12px; border-radius: 12px 12px 4px 12px; font-size: 0.82rem; line-height: 1.55; max-width: 90%; align-self: flex-end; }
+    .ai-typing { display: none; gap: 4px; padding: 4px 12px; }
+    .ai-typing.show { display: flex; }
+    .ai-td { width: 6px; height: 6px; border-radius: 50%; background: #AAA; animation: bounce 1.2s infinite; }
+    .ai-td:nth-child(2) { animation-delay: 0.2s; } .ai-td:nth-child(3) { animation-delay: 0.4s; }
+    @keyframes bounce { 0%,60%,100%{transform:translateY(0)} 30%{transform:translateY(-5px)} }
+    .coach-input-wrap { padding: 10px 12px; border-top: 1px solid #F0ECE6; display: flex; gap: 8px; }
+    .coach-ta { flex: 1; border: 1.5px solid #E8E3DB; border-radius: 8px; padding: 7px 10px; font-size: 0.8rem; resize: none; font-family: 'DM Sans', sans-serif; outline: none; }
+    .coach-ta:focus { border-color: #3D5A47; }
+    .coach-send { padding: 7px 12px; background: #3D5A47; color: #fff; border: none; border-radius: 8px; font-size: 0.78rem; cursor: pointer; font-family: 'DM Sans', sans-serif; font-weight: 500; }
+    .coach-chips { display: flex; flex-wrap: wrap; gap: 6px; padding: 0 12px 10px; }
+    .coach-chip { padding: 4px 10px; border-radius: 100px; border: 1px solid #C5D9CB; background: #F0F5F1; color: #3D5A47; font-size: 0.72rem; cursor: pointer; font-family: 'DM Sans', sans-serif; }
+    .coach-chip:hover { background: #3D5A47; color: #fff; }
+
+    /* ── Key points (right col) ── */
+    .kp-right-title { font-size: 0.67rem; font-weight: 700; letter-spacing: 0.09em; text-transform: uppercase; color: #999; margin-bottom: 10px; }
+    .kp-item { display: flex; align-items: flex-start; gap: 7px; font-size: 0.78rem; color: #444; line-height: 1.45; margin-bottom: 8px; }
+    .kp-dot { width: 6px; height: 6px; border-radius: 50%; background: #3D5A47; flex-shrink: 0; margin-top: 5px; }
+    .kp-divider { height: 1px; background: #E8E3DB; margin: 12px 0; }
+    .kp-legal { background: #FDF8F5; border: 1px solid #EDD8CE; border-radius: 10px; padding: 12px; font-size: 0.73rem; color: #7A3A1E; line-height: 1.55; }
+    .kp-legal-title { font-weight: 700; margin-bottom: 6px; font-size: 0.67rem; letter-spacing: 0.07em; text-transform: uppercase; color: #C4785A; }
+    .kp-legal-i { margin-bottom: 4px; }
+
+    @media (max-width: 900px) {
+      .f-hero { grid-template-columns: 1fr; gap: 28px; }
+      .f-hero-right { order: 3; }
+      .iphone-wrap { order: 2; }
+      .f-hero-left { order: 1; }
+    }
+    @media (max-width: 640px) { .coach-panel { right: 12px; left: 12px; width: auto; } }
+
   </style>
 </head>
 <body>
@@ -92,162 +245,241 @@
     <div class="sidebar-logo">
       <a href="/" class="logo">
         <svg width="28" height="28" viewBox="0 0 32 32"><path d="M16 2L3 13v17h8v-8h10v8h8V13L16 2z" fill="#D4E4D8"/></svg>
-        <span class="logo-text" style="color:#FDFCF8">Sere<em style="color:#C4785A">nis</em></span>
+        <span class="logo-text">Sere<em style="color:#C4785A">nis</em></span>
       </a>
     </div>
     <nav class="sidebar-nav">
       <a href="/dashboard" class="sidebar-item">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg> Tableau de bord
       </a>
+      <a href="/ma-formation" class="sidebar-item active">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg> Ma formation
+      </a>
       <a href="/mon-bien" class="sidebar-item">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg> Mon bien
       </a>
-      <a href="/ma-formation" class="sidebar-item active">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg> Ma formation
+      <a href="/serenis-connect" class="sidebar-item">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.27h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 9a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>Serenis Connect
       </a>
       <a href="/mon-agenda" class="sidebar-item">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg> Mon agenda
       </a>
+      <a href="/ma-bibliotheque" class="sidebar-item">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg> Ma bibliothèque
+      </a>
       <a href="/mes-publications" class="sidebar-item">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.55a11 11 0 0 1 14.08 0"/><path d="M1.42 9a16 16 0 0 1 21.16 0"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><circle cx="12" cy="20" r="1"/></svg> Mes publications
       </a>
-      <a href="/mes-performances" class="sidebar-item">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg> Performances
-      </a>
     </nav>
     <div style="position:absolute;bottom:24px;left:0;right:0;padding:0 24px;">
-      <a href="/logout" style="color:rgba(212,228,216,0.5);font-size:0.8rem;">Déconnexion →</a>
+      <a href="/logout" style="color:rgba(61,90,71,0.45);font-size:0.8rem;">Déconnexion →</a>
     </div>
   </aside>
 
   <main class="main-content">
     <div class="page-header">
-      <h1>Ma formation</h1>
-      <p id="progressLabel">0 étapes complétées · Commencez par le module 1</p>
-      <div class="progress-bar-wrap" style="max-width:300px;margin-top:10px">
-        <div class="progress-bar-fill" id="globalProgress" style="width:0%"></div>
-      </div>
+      <h1 class="page-title">Ma formation</h1>
+      <p class="page-subtitle" id="progLabel">0 étape complétée sur 17 · 0%</p>
     </div>
 
-    <div class="formation-layout">
+    <!-- Progress bar -->
+    <div class="lib-progress">
+      <div class="lib-progress-bar"><div class="lib-progress-fill" id="progFill" style="width:0%"></div></div>
+      <div class="lib-progress-pct" id="progPct">0%</div>
+    </div>
 
-      <!-- GAUCHE : contenu -->
-      <div class="formation-main">
-        <div class="video-wrapper">
-          <video id="mainVideo" controls>
-            <source src="/videos/formation-intro.mp4" type="video/mp4">
-          </video>
+    <!-- 3-col hero : left / iPhone / right -->
+    <div class="f-hero">
+
+      <!-- LEFT : présentation & avantages -->
+      <div class="f-hero-left">
+        <div class="f-badge">✦ Serenis Academy</div>
+        <h2 class="f-hero-title">Maîtrisez votre vente<br>entre particuliers</h2>
+        <p class="f-hero-desc">Une formation complète pour vendre seul, au bon prix, sans agence — avec un coach IA disponible à chaque étape.</p>
+        <div class="f-benefits">
+          <div class="f-benefit"><div class="f-benefit-dot">✓</div><span>Estimation au prix juste grâce aux données réelles</span></div>
+          <div class="f-benefit"><div class="f-benefit-dot">✓</div><span>Dossier vendeur complet prêt avant la publication</span></div>
+          <div class="f-benefit"><div class="f-benefit-dot">✓</div><span>Scripts de visite et de négociation éprouvés</span></div>
+          <div class="f-benefit"><div class="f-benefit-dot">✓</div><span>7 mails types prêts à copier-coller</span></div>
+          <div class="f-benefit"><div class="f-benefit-dot">✓</div><span>Coach IA Alex disponible 24h/24</span></div>
         </div>
-        <div class="modules-nav" id="modulesNav"></div>
-        <div id="modulesContainer"></div>
+        <div class="f-stats-row">
+          <div class="f-stat"><div class="f-stat-n">5</div><div class="f-stat-l">Modules</div></div>
+          <div class="f-stat"><div class="f-stat-n">17</div><div class="f-stat-l">Leçons</div></div>
+          <div class="f-stat"><div class="f-stat-n">40+</div><div class="f-stat-l">Conseils</div></div>
+        </div>
       </div>
 
-      <!-- DROITE : Coach IA -->
-      <div class="formation-coach">
-        <div class="coach-card">
-          <div class="coach-header">
-            <div class="coach-avatar">🧠</div>
-            <div>
-              <div class="coach-name">Alex — Coach IA</div>
-              <div class="coach-status"><span class="coach-dot"></span> En ligne · Disponible</div>
-            </div>
-          </div>
-          <div class="quick-questions">
-            <span class="quick-q" data-q="Quel prix fixer pour mon bien ?">Prix à fixer ?</span>
-            <span class="quick-q" data-q="Comment préparer ma maison pour les visites ?">Préparer les visites</span>
-            <span class="quick-q" data-q="Comment répondre à une offre trop basse ?">Offre trop basse</span>
-            <span class="quick-q" data-q="Quels documents dois-je avoir pour vendre ?">Documents requis</span>
-          </div>
-          <div class="coach-messages" id="coachMessages">
-            <div class="msg msg-coach">Bonjour ! Je suis Alex, votre coach IA. Je suis là pour répondre à toutes vos questions sur la vente de votre bien. Par quoi commençons-nous ?</div>
-          </div>
-          <div class="msg msg-typing" id="typingIndicator">Alex réfléchit…</div>
-          <div class="coach-input-wrap">
-            <textarea class="coach-input" id="coachInput" placeholder="Posez votre question…" rows="1"></textarea>
-            <button class="coach-send" id="coachSend">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+      <!-- CENTER : iPhone mockup -->
+      <div class="iphone-wrap">
+        <div class="iphone">
+          <div class="iphone-side-btn"></div>
+          <div class="iphone-side-btn b2"></div>
+          <div class="iphone-side-btn-r"></div>
+          <div class="iphone-inner">
+            <div class="iphone-island"></div>
+            <video class="iphone-video" id="tabletVideo" src="/videos/formation-intro.mp4"
+              autoplay muted loop playsinline></video>
+            <button id="soundBtn" style="
+              position:absolute; bottom:12px; right:12px; z-index:10;
+              width:34px; height:34px; border-radius:50%;
+              background:rgba(0,0,0,0.55); backdrop-filter:blur(6px);
+              border:1.5px solid rgba(255,255,255,0.3);
+              display:flex; align-items:center; justify-content:center;
+              cursor:pointer; transition:background 0.18s;
+            " title="Activer le son">
+              <svg id="soundIconOff" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/>
+              </svg>
+              <svg id="soundIconOn" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none">
+                <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/>
+              </svg>
             </button>
           </div>
         </div>
       </div>
+
+      <!-- RIGHT : points clés + rappels -->
+      <div class="f-hero-right">
+        <div class="kp-right-title">Points clés du module actif</div>
+        <div id="keyPoints"></div>
+        <div class="kp-divider"></div>
+        <div class="kp-legal">
+          <div class="kp-legal-title">⚠️ Rappels juridiques</div>
+          <div class="kp-legal-i">Ne signez aucun document sans notaire.</div>
+          <div class="kp-legal-i">Le DDT doit être remis avant le compromis.</div>
+          <div class="kp-legal-i">Tout travail non déclaré engage votre responsabilité.</div>
+        </div>
+      </div>
+
     </div>
 
-    <!-- Mails & Checklists -->
-    <div style="margin-top:40px">
-      <div class="form-section">
-        <h3>7 mails types prêts à copier</h3>
-        <p style="color:#666;font-size:0.88rem;margin-bottom:24px;">Personnalisez les champs entre <strong>[crochets]</strong> avant d'envoyer.</p>
-        <div id="mailsList"></div>
-      </div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-top:24px">
-        <div class="form-section">
-          <h3>Checklist avant photos <span id="progressPhotos" style="font-size:0.8rem;color:#888;font-weight:400"></span></h3>
-          <div id="checklist-photos" class="checklist-container"></div>
-        </div>
-        <div class="form-section">
-          <h3>Documents à réunir <span id="progressDocs" style="font-size:0.8rem;color:#888;font-weight:400"></span></h3>
-          <div id="checklist-docs" class="checklist-container"></div>
-        </div>
-        <div class="form-section" style="grid-column:span 2">
-          <h3>Checklist état des lieux <span id="progressEdl" style="font-size:0.8rem;color:#888;font-weight:400"></span></h3>
-          <div id="checklist-edl" class="checklist-container"></div>
-        </div>
-      </div>
+    <!-- Module tabs -->
+    <div class="mod-tabs-wrap" id="modTabs"></div>
+
+    <!-- Module content -->
+    <div id="modContainer"></div>
+
+    <!-- Mails -->
+    <div class="section-hdr">7 mails types prêts à copier</div>
+    <p class="section-sub">Personnalisez les champs entre [crochets] avant d'envoyer.</p>
+    <div id="mailsList"></div>
+
+    <!-- Checklists -->
+    <div class="section-hdr">Checklists</div>
+    <div class="ck-section">
+      <div class="ck-title">Photos & Home staging <span class="ck-count" id="ckCntPhotos"></span></div>
+      <div class="ck-grid" id="ck-photos"></div>
     </div>
+    <div class="ck-section">
+      <div class="ck-title">Documents à préparer <span class="ck-count" id="ckCntDocs"></span></div>
+      <div class="ck-grid" id="ck-docs"></div>
+    </div>
+    <div class="ck-section">
+      <div class="ck-title">État des lieux de sortie <span class="ck-count" id="ckCntEdl"></span></div>
+      <div class="ck-grid" id="ck-edl"></div>
+    </div>
+
+    <!-- CTA vers Mon Bien -->
+    <div style="background:#F0F5F1;border:1.5px solid #C5D9CB;border-radius:16px;padding:28px 32px;margin-top:16px;display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap;">
+      <div>
+        <div style="font-size:0.68rem;font-weight:700;letter-spacing:0.09em;text-transform:uppercase;color:#3D5A47;margin-bottom:6px;">Étape suivante</div>
+        <div style="font-size:1.05rem;font-weight:600;color:#1a1a1a;margin-bottom:4px;">Remplissez votre fiche bien</div>
+        <div style="font-size:0.82rem;color:#555;line-height:1.5;">Vous savez maintenant exactement pourquoi chaque information est demandée. Complétez votre fiche — Serenis génère automatiquement votre <strong>Dossier complet d'envoi automatique client</strong>.</div>
+      </div>
+      <a href="/mon-bien" style="display:inline-flex;align-items:center;gap:8px;padding:13px 24px;background:#3D5A47;color:#fff;border-radius:10px;font-weight:600;font-size:0.88rem;text-decoration:none;white-space:nowrap;flex-shrink:0;">
+        Compléter Mon Bien →
+      </a>
+    </div>
+
+    <div style="height:80px;"></div>
   </main>
+</div>
+
+<!-- AI Coach floating -->
+<button class="coach-bubble" id="coachToggle" title="Coach IA Alex">🧠</button>
+<div class="coach-panel" id="coachPanel">
+  <div class="coach-panel-hdr">
+    <span>Alex — Coach IA</span>
+    <button class="coach-close" id="coachClose">×</button>
+  </div>
+  <div class="coach-msgs" id="aiMsgs">
+    <div class="ai-msg-a">Bonjour ! Je suis Alex, votre coach IA. Posez-moi vos questions sur la vente entre particuliers.</div>
+  </div>
+  <div class="ai-typing" id="aiTyping">
+    <div class="ai-td"></div><div class="ai-td"></div><div class="ai-td"></div>
+  </div>
+  <div class="coach-chips">
+    <button class="coach-chip" data-q="Quel prix fixer pour mon bien ?">Prix à fixer ?</button>
+    <button class="coach-chip" data-q="Comment répondre à une offre trop basse ?">Offre trop basse</button>
+    <button class="coach-chip" data-q="Quels documents dois-je avoir pour vendre ?">Documents requis</button>
+  </div>
+  <div class="coach-input-wrap">
+    <textarea class="coach-ta" id="coachInput" placeholder="Posez votre question…" rows="2"></textarea>
+    <button class="coach-send" id="coachSend">→</button>
+  </div>
 </div>
 
 <script src="/js/transitions.js"></script>
 <script>
+// ══════════════════════════════════════════
+//  DATA
+// ══════════════════════════════════════════
 const MODULES = [
   {
     num:'01', title:'Estimer son bien', subtitle:'Trouver le prix juste pour vendre vite et bien',
+    keyPoints:['Utilisez DVF.fr + 2 agences + MeilleursAgents pour trianguler','Prix juste dès le départ = plus de visites + offres rapides','Un bien >45j sans offre doit être réévalué','DPE F/G peut impacter le prix de -10% à -20%'],
+    aiMsg:'Pour l\'estimation, commencez par DVF.fr — ce sont les prix réels des ventes notariées, pas les prix demandés. Comparez avec deux agences gratuites.',
     steps:[
       { title:'Les outils pour estimer', meta:'5 min · Fondamentaux',
         explication:`En règle générale, une maison se revend au même prix qu'elle a été achetée, plus ou moins les travaux réalisés. Mais pour fixer un prix précis, <strong>trois outils gratuits et fiables</strong> existent — utilisez-les tous les trois.`,
-        tableau:{ headers:['Outil','Ce qu\'il donne','Fiabilité'], rows:[['MeilleursAgents.com','Estimation automatique gratuite et anonyme','⭐⭐⭐⭐'],['2 agences immobilières','Estimation gratuite, sans engagement — obtenez deux avis pour comparer','⭐⭐⭐⭐⭐'],['DVF.fr (gouvernement)','Prix réels des ventes notariées dans votre rue','⭐⭐⭐⭐⭐'],['Annonces concurrentes','Prix demandés (pas vendus) — référence indicative seulement','⭐⭐']] },
-        tips:['Faites estimer par 2 agences différentes : c\'est gratuit, sans engagement, et vous obtenez deux avis professionnels','MeilleursAgents est idéal si vous ne voulez pas recevoir d\'agents chez vous','Sur DVF.fr, filtrez par type de bien et surface similaire (±15%)'],
+        tableau:{ headers:['Outil','Ce qu\'il donne','Fiabilité'], rows:[['MeilleursAgents.com','Estimation automatique gratuite','⭐⭐⭐⭐'],['2 agences immobilières','Estimation gratuite, sans engagement — deux avis','⭐⭐⭐⭐⭐'],['DVF.fr (gouvernement)','Prix réels des ventes notariées dans votre rue','⭐⭐⭐⭐⭐'],['Annonces concurrentes','Prix demandés (pas vendus) — indicatif seulement','⭐⭐']] },
+        tips:['Faites estimer par 2 agences différentes : c\'est gratuit, sans engagement, et vous obtenez deux avis professionnels','MeilleursAgents est idéal si vous ne voulez pas recevoir d\'agents','Sur DVF.fr, filtrez par type de bien et surface similaire (±15%)'],
         warnings:['Ne fixez jamais votre prix uniquement sur des annonces en ligne — elles reflètent les prix demandés, pas les prix obtenus']
       },
       { title:'Calculer le prix au m²', meta:'8 min · Méthode',
         explication:`La méthode comparative est la plus fiable. Calculez un prix au m² de référence à partir des ventes récentes, puis <strong>ajustez selon les caractéristiques de votre bien</strong>.`,
-        schema:['Ventes récentes similaires','Prix / m² moyen','× votre surface','Prix de base','Ajustements','= Prix de vente'],
+        schema:['Ventes récentes','Prix/m² moyen','× votre surface','Prix de base','Ajustements','= Prix cible'],
         tableau:{ headers:['Caractéristique','Impact sur le prix'], rows:[['Dernier étage avec vue','+5% à +12%'],['Rez-de-chaussée','-5% à -10%'],['Travaux importants à prévoir','-10% à -25%'],['Double exposition','+3% à +8%'],['Parking ou garage inclus','+5 000€ à +20 000€'],['DPE F ou G','-5% à -20%'],['Jardin privatif','+5% à +15%']] },
         tips:['Appliquez les ajustements avec modération — ne cumulez pas tous les bonus','Votre bien ne peut pas raisonnablement valoir 30% de plus que la médiane locale'],
         warnings:['L\'erreur classique : surestimer de 10-15% "pour négocier". Résultat : zéro visite pendant 2 mois.']
       },
-      { title:'Stratégie de prix : prix juste ou prix haut ?', meta:'5 min · Stratégie',
-        explication:`<strong>Prix juste dès le départ</strong> : génère de l'urgence, plusieurs offres simultanées, vente en 15 jours. <strong>Prix haut puis baisses</strong> : tue l'intérêt initial. Un bien "vieux" sur le marché inquiète les acheteurs — ils pensent qu'il y a un problème.`,
-        schema:['Prix juste', 'Visites dès J+3', 'Offres J+15', 'Vente rapide'],
-        tips:['Une annonce de plus de 45 jours sans offre doit être réévaluée','Le bon prix = le maximum de visites dans les 15 premiers jours','Marge de négociation raisonnable : +2% à +4% maximum au-dessus de votre prix cible'],
-        warnings:['Baisser son prix après 2 mois sur le marché envoie un signal négatif très fort aux acheteurs']
+      { title:'Stratégie de prix : juste ou haut ?', meta:'5 min · Stratégie',
+        explication:`<strong>Prix juste dès le départ</strong> : génère de l'urgence, plusieurs offres simultanées, vente en 15 jours. <strong>Prix haut puis baisses</strong> : tue l'intérêt initial. Un bien "vieux" sur le marché inquiète.`,
+        schema:['Prix juste','Visites dès J+3','Offres J+15','Vente rapide'],
+        tips:['Une annonce de plus de 45 jours sans offre doit être réévaluée','Le bon prix = maximum de visites dans les 15 premiers jours','Marge de négociation raisonnable : +2% à +4% au-dessus de votre prix cible'],
+        warnings:['Baisser son prix après 2 mois envoie un signal très négatif aux acheteurs']
       }
     ]
   },
   {
     num:'02', title:'Préparer sa vente', subtitle:'Documents, dossier acheteur et fiche bien',
+    keyPoints:['Rassemblez TOUS les documents AVANT de publier l\'annonce','Envoyez un dossier complet par email AVANT chaque visite','Ne donnez votre adresse exacte qu\'après qualification téléphonique','La fiche Serenis répond à toutes les questions — remplissez-la une fois'],
+    aiMsg:'Le module 2 est souvent négligé — c\'est une erreur. Un dossier incomplet peut bloquer votre vente au dernier moment. Commencez par rassembler le titre de propriété et les déclarations de travaux.',
     steps:[
       { title:'Documents administratifs à réunir en amont', meta:'6 min · Administratif',
         explication:`<strong>La grande erreur des vendeurs particuliers</strong> : trouver un acheteur et réaliser trop tard qu'il manque des documents. Vérifiez tout avant de publier votre annonce.`,
-        tableau:{ headers:['Document','Pourquoi c\'est important'], rows:[['Titre de propriété','Pièce obligatoire pour le notaire — souvent oubliée'],['Déclarations de travaux en mairie','Tout travail extérieur doit avoir une déclaration (extension, véranda, abri, clôture). Sans ça, l\'acheteur peut se retourner contre vous.'],['Factures de travaux','L\'acheteur peut les réclamer. Elles rassurent et peuvent justifier le prix.'],['Factures énergétiques','Gaz, électricité — utiles pour informer l\'acheteur sur les charges réelles'],['Dernier avis de taxe foncière','L\'acheteur le demandera systématiquement']] },
+        tableau:{ headers:['Document','Pourquoi c\'est important'], rows:[['Titre de propriété','Pièce obligatoire pour le notaire — souvent oubliée'],['Déclarations de travaux en mairie','Tout travail extérieur doit avoir une déclaration. Sans ça, l\'acheteur peut se retourner contre vous.'],['Factures de travaux','L\'acheteur peut les réclamer. Elles rassurent et justifient le prix.'],['Factures énergétiques','Gaz, électricité — utiles pour informer l\'acheteur sur les charges'],['Dernier avis de taxe foncière','L\'acheteur le demandera systématiquement']] },
         tips:['Rassemblez ces documents AVANT de publier votre annonce','Un dossier complet dès le départ inspire confiance et accélère la vente'],
         warnings:['Un travail non déclaré en mairie peut bloquer la vente ou engager votre responsabilité légale']
       },
       { title:'Préparer le dossier acheteur', meta:'5 min · Organisation',
-        explication:`Avant même qu'un acheteur franchisse votre porte, il doit avoir reçu toutes les informations nécessaires pour se décider sérieusement. <strong>Envoyez un dossier complet par email avant chaque visite</strong> — vous trouverez un mail type dans la section Mails ci-dessous.`,
-        schema:['Contact entrant', 'Envoyer le dossier', 'Qualifier par téléphone', 'Confirmer la visite'],
-        tips:['Le dossier à envoyer contient : photos HD, surface, DPE, taxe foncière, charges, diagnostics principaux','Joignez également la fiche caractéristiques complète (voir étape suivante)'],
+        explication:`Avant même qu'un acheteur franchisse votre porte, il doit avoir reçu toutes les informations nécessaires. <strong>Envoyez un dossier complet par email avant chaque visite.</strong>`,
+        schema:['Contact entrant','Envoyer le dossier','Qualifier par téléphone','Confirmer la visite'],
+        tips:['Le dossier contient : photos HD, surface, DPE, taxe foncière, charges, diagnostics principaux','Joignez également la fiche caractéristiques complète'],
         warnings:['Ne donnez votre adresse exacte qu\'après avoir qualifié l\'acheteur par téléphone']
       },
       { title:'La fiche caractéristiques complète', meta:'8 min · Contenu',
-        explication:`La fiche Serenis va bien au-delà des fiches d\'agence classiques. Elle répond à toutes les questions qu\'un acheteur se pose — y compris celles qu\'il n\'ose pas poser. <strong>Remplissez-la une fois, utilisez-la pour toutes vos visites.</strong>`,
-        tableau:{ headers:['Rubrique','Ce qu\'il faut renseigner'], rows:[['Exposition','Sud, est, ouest — critère décisif pour de nombreux acheteurs'],['Vie du quartier','Boulangerie, école (nom + distance), supérette, gare (durée trajet), transports'],['Fenêtres','Simple/double vitrage, PVC/bois, oscillo-battantes, date de pose'],['Chauffage','Type (gaz, pompe à chaleur, électrique), marque, année'],['Toiture','Type, année de réfection'],['Isolation','Type et année — impact direct sur le DPE'],['Raison de la vente','Préparez une réponse courte, positive et rassurante. Cette question revient dans 100% des visites.']] },
-        tips:['Préparez votre réponse à "pourquoi vous vendez" avant le premier contact : mutation, famille, projet d\'avenir — restez positif','Une fiche bien remplie évite les questions gênantes pendant la visite']
+        explication:`La fiche Serenis va bien au-delà des fiches d'agence classiques. Elle répond à toutes les questions qu'un acheteur se pose. <strong>Remplissez-la une fois, utilisez-la pour toutes vos visites.</strong>`,
+        tableau:{ headers:['Rubrique','Ce qu\'il faut renseigner'], rows:[['Exposition','Sud, est, ouest — critère décisif pour de nombreux acheteurs'],['Vie du quartier','Boulangerie, école (nom + distance), supérette, gare (durée trajet)'],['Fenêtres','Simple/double vitrage, PVC/bois, date de pose'],['Chauffage','Type (gaz, pompe à chaleur, électrique), marque, année'],['Toiture','Type, année de réfection'],['Raison de la vente','Préparez une réponse courte, positive et rassurante']] },
+        tips:['Préparez votre réponse à "pourquoi vous vendez" avant le premier contact','Une fiche bien remplie évite les questions gênantes pendant la visite']
       }
     ]
   },
   {
     num:'03', title:'Annonce & Photos', subtitle:'Rédiger, photographier et publier',
+    keyPoints:['90% des acheteurs décident de visiter en 8 secondes sur les photos','Ne jamais écrire "prix négociable" — invite les offres basses','Titre idéal : type + surface + ville + prix + 1 atout (< 60 car.)','Dépersonnalisez votre bien — l\'acheteur doit se projeter, pas vous voir'],
+    aiMsg:'Les photos sont votre seul argument de vente en ligne. Prenez-les après avoir dépersonnalisé — enlever toutes les photos personnelles fait une différence énorme sur le ressenti de l\'acheteur.',
     steps:[
       { title:'Ce qu\'il ne faut jamais écrire', meta:'4 min · Copywriting',
         explication:`Certaines formulations dans une annonce font fuir les acheteurs ou affaiblissent votre position de négociation avant même la visite.`,
@@ -256,342 +488,330 @@ const MODULES = [
         warnings:['Ne mentez pas sur la surface ou l\'état — c\'est illégal et détruit la confiance immédiatement en visite']
       },
       { title:'Préparer son bien pour les photos', meta:'6 min · Home staging',
-        explication:`La règle d\'or : <strong>l\'acheteur doit se projeter dans votre maison, pas dans votre vie</strong>. Dépersonnalisez. Les photos sont votre seul argument de vente en ligne — 90% des acheteurs décident de visiter en 8 secondes.`,
+        explication:`La règle d\'or : <strong>l\'acheteur doit se projeter dans votre maison, pas dans votre vie</strong>. Dépersonnalisez. Les photos sont votre seul argument de vente en ligne.`,
         tableau:{ headers:['Action','Coût','Impact'], rows:[['Ranger et désencombrer chaque pièce','0€','Très élevé'],['Nettoyer joints, vitres, sol','< 30€','Élevé'],['Changer les ampoules en blanc chaud','< 20€','Élevé'],['Enlever toutes les photos personnelles','0€','Élevé'],['Ouvrir rideaux + allumer toutes les lumières','0€','Très élevé'],['Fleurs fraîches dans le salon','< 15€','Moyen']] },
-        tips:['Volets ouverts, lumières d\'ambiance allumées (pas les plafonniers), télévision éteinte','Plan de travail cuisine vide, rideau de douche ouvert, cuvette WC fermée','Sortez la voiture pour la photo de façade — engazonnez si besoin'],
+        tips:['Volets ouverts, lumières d\'ambiance allumées (pas les plafonniers), télévision éteinte','Plan de travail cuisine vide, rideau de douche ouvert, cuvette WC fermée','Sortez la voiture pour la photo de façade'],
         warnings:['N\'investissez pas dans une rénovation complète avant de vendre — ce n\'est presque jamais rentable']
       },
       { title:'Check-list avant chaque visite', meta:'3 min · Pratique',
         explication:`La préparation d\'une visite se fait en 20 minutes si votre bien est déjà rangé. Suivez cette check-list avant chaque rendez-vous.`,
-        tableau:{ headers:['Action','Détail'], rows:[['Tous les volets ouverts','Lumière maximale dans toutes les pièces'],['Lumières d\'ambiance allumées','Évitez les plafonniers — préférez lampes et spots'],['Télévision éteinte','L\'acheteur doit entendre le calme'],['Plan de travail cuisine dégagé','Max 2 objets dessus'],['Abattant WC fermé','Détail qui compte'],['Portemanteaux derrière les portes retirés','Vérifiez que toutes les portes s\'ouvrent à 100%'],['Température 19-20°C','Aérez 20 minutes avant, puis réchauffez'],['Poubelle sortie ou cachée','Cuisine et salle de bain']] }
+        tableau:{ headers:['Action','Détail'], rows:[['Tous les volets ouverts','Lumière maximale dans toutes les pièces'],['Lumières d\'ambiance allumées','Évitez les plafonniers'],['Télévision éteinte','L\'acheteur doit entendre le calme'],['Plan de travail cuisine dégagé','Max 2 objets dessus'],['Abattant WC fermé','Détail qui compte'],['Température 19-20°C','Aérez 20 min avant, puis réchauffez'],['Poubelle sortie ou cachée','Cuisine et salle de bain']] }
       }
     ]
   },
   {
     num:'04', title:'Les visites', subtitle:'Qualifier, accueillir et gérer les questions difficiles',
+    keyPoints:['Qualifiez l\'acheteur AVANT d\'ouvrir votre porte (financement !)','Commencez par la meilleure pièce, terminez par la deuxième meilleure','Restez un pas en retrait — laissez l\'acheteur explorer librement','Préparez des réponses à l\'avance pour les questions pièges'],
+    aiMsg:'La qualification avant visite est cruciale. Posez discrètement la question du financement — un acheteur non finançable peut vous faire perdre 3 à 6 mois.',
     steps:[
       { title:'Qualifier l\'acheteur avant la visite', meta:'4 min · Organisation',
         explication:`Un acheteur non finançable vous fait perdre 3 à 6 mois et vous oblige à tout recommencer. <strong>Qualifiez discrètement avant d\'ouvrir votre porte.</strong>`,
-        tableau:{ headers:['Profil acheteur','Ce qu\'il doit vous fournir'], rows:[['Achat comptant','Attestation de fonds ou relevé bancaire montrant la disponibilité'],['Achat avec crédit','Étude de faisabilité par sa banque ou un courtier + montant de l\'apport + accord de principe'],['Propriétaire vendeur','Vérifiez que son bien est en vente ou déjà vendu — une vente conditionnelle à la sienne est risquée']] },
-        script:[{speaker:'vendeur',line:'Avant de fixer un rendez-vous, puis-je vous poser quelques questions rapides pour m\'assurer que le bien correspond à vos critères ?'},{speaker:'acheteur',line:'Bien sûr.'},{speaker:'vendeur',line:'Quel est votre budget global ? Avez-vous déjà rencontré votre banque ou un courtier ?'},{speaker:'vendeur',line:'Dans quel délai souhaitez-vous idéalement emménager ?'}],
+        tableau:{ headers:['Profil acheteur','Ce qu\'il doit vous fournir'], rows:[['Achat comptant','Attestation de fonds ou relevé bancaire'],['Achat avec crédit','Étude de faisabilité banque/courtier + montant apport + accord de principe'],['Propriétaire vendeur','Vérifiez que son bien est en vente ou déjà vendu']] },
+        script:[{speaker:'vendeur',line:'Avant de fixer un rendez-vous, puis-je vous poser quelques questions rapides ?'},{speaker:'acheteur',line:'Bien sûr.'},{speaker:'vendeur',line:'Quel est votre budget global ? Avez-vous déjà rencontré votre banque ou un courtier ?'},{speaker:'vendeur',line:'Dans quel délai souhaitez-vous idéalement emménager ?'}],
         tips:['Créneaux de 45 min minimum','Horaires idéaux : semaine après 18h, ou samedi matin','Confirmez par SMS la veille avec l\'adresse exacte'],
-        warnings:['Ne donnez jamais votre adresse avant d\'avoir qualifié l\'acheteur — même brièvement']
+        warnings:['Ne donnez jamais votre adresse avant d\'avoir qualifié l\'acheteur']
       },
       { title:'Comment se comporter pendant la visite', meta:'8 min · Technique',
-        explication:`C\'est votre maison, vous la connaissez mieux que quiconque. Votre rôle est de guider — pas de faire la visite comme un agent immobilier. <strong>Commencez par la meilleure pièce, terminez par la deuxième meilleure.</strong>`,
-        tableau:{ headers:['Comportement','Pourquoi'], rows:[['Guidez sans marcher devant','L\'acheteur doit découvrir l\'espace, pas votre dos'],['Laissez-le entrer en premier dans chaque pièce','Il doit ressentir l\'espace sans obstruction'],['Restez un pas en retrait','Disponible, pas intrusif'],['Laissez des silences','L\'acheteur s\'imagine vivre là — le silence est positif'],['Ne suivez pas pas à pas','Donnez-lui de l\'espace et de la liberté d\'explorer']] },
-        warnings:['Ne dites jamais : "On est obligés de vendre rapidement", "Le prix est négociable", "Les voisins sont un peu bruyants"','Ne commentez pas négativement une pièce ou un équipement du bien']
+        explication:`C\'est votre maison, vous la connaissez mieux que quiconque. Votre rôle est de guider — pas de faire la visite comme un agent. <strong>Commencez par la meilleure pièce, terminez par la deuxième meilleure.</strong>`,
+        tableau:{ headers:['Comportement','Pourquoi'], rows:[['Guidez sans marcher devant','L\'acheteur doit découvrir l\'espace, pas votre dos'],['Laissez-le entrer en premier dans chaque pièce','Il doit ressentir l\'espace sans obstruction'],['Restez un pas en retrait','Disponible, pas intrusif'],['Laissez des silences','L\'acheteur s\'imagine vivre là — le silence est positif']] },
+        warnings:['Ne dites jamais : "On est obligés de vendre rapidement", "Le prix est négociable", "Les voisins sont un peu bruyants"']
       },
       { title:'Répondre aux questions difficiles', meta:'6 min · Négociation',
-        explication:`Certaines questions sont des pièges — pas par malveillance, mais un vendeur stressé peut livrer des informations qui fragilisent sa position. <strong>Préparez vos réponses à l\'avance.</strong>`,
-        tableau:{ headers:['Question piège','Réponse recommandée'], rows:[['"Pourquoi vous vendez ?"','Réponse courte et positive : "Nouveau projet de vie / mutation / famille qui s\'agrandit"'],
-        ['"Il y a des travaux à prévoir ?"','Soyez honnête mais contextualisez le prix : "La toiture a été refaite en [année], les fenêtres ont [X] ans — c\'est intégré dans le prix"'],
-        ['"Vous êtes pressés de vendre ?"','Jamais : toujours répondre "Non, je prends le temps de trouver le bon acheteur"'],
-        ['"Vous avez eu des offres ?"','"J\'ai eu des contacts sérieux mais rien qui correspondait à mes critères"'],
-        ['"Quel est le principal défaut ?"','Transformez en opportunité : "La cuisine est à rafraîchir — c\'est d\'ailleurs intégré dans notre prix"'],
-        ['"Y a-t-il eu des problèmes d\'humidité ?"','Répondez honnêtement — mentir expose à des recours légaux après la vente']] }
+        explication:`Certaines questions sont des pièges. <strong>Préparez vos réponses à l\'avance.</strong>`,
+        tableau:{ headers:['Question piège','Réponse recommandée'], rows:[['"Pourquoi vous vendez ?"','Réponse courte et positive : "Nouveau projet de vie / mutation / agrandissement"'],['"Il y a des travaux à prévoir ?"','Soyez honnête mais contextualisez : "C\'est intégré dans le prix"'],['"Vous êtes pressés de vendre ?"','Jamais : "Non, je prends le temps de trouver le bon acheteur"'],['"Vous avez eu des offres ?"','"J\'ai eu des contacts sérieux mais rien qui correspondait à mes critères"'],['"Quel est le principal défaut ?"','Transformez : "La cuisine est à rafraîchir — c\'est intégré dans notre prix"']] }
       }
     ]
   },
   {
     num:'05', title:'Négocier & Conclure', subtitle:'Offres, compromis, diagnostics et acte de vente',
+    keyPoints:['Ne jamais refuser sèchement une offre — toujours contre-proposer','Répondez dans les 24h — au-delà, l\'acheteur cherche ailleurs','Le DDT complet doit être remis avant le compromis','Comptez ~3 mois entre compromis et acte de vente'],
+    aiMsg:'Recevoir une offre est une excellente nouvelle, même en dessous de votre prix. C\'est le début d\'une négociation. Voici comment contre-proposer de façon ferme et professionnelle.',
     steps:[
       { title:'Recevoir et répondre à une offre', meta:'6 min · Négociation',
-        explication:`Recevoir une offre est une excellente nouvelle — même en dessous de votre prix. <strong>Ne jamais refuser sèchement.</strong> Toujours contre-proposer. L\'offre ouvre une négociation, pas une décision finale.`,
-        schema:['Offre reçue', 'Analyse 24h max', 'Contre-offre écrite', 'Accord verbal', 'Notaire'],
+        explication:`Recevoir une offre est une excellente nouvelle — même en dessous de votre prix. <strong>Ne jamais refuser sèchement.</strong> Toujours contre-proposer.`,
+        schema:['Offre reçue','Analyse 24h max','Contre-offre écrite','Accord verbal','Notaire'],
         tableau:{ headers:['Offre reçue','Votre réaction'], rows:[['Au prix demandé','Acceptez immédiatement, par écrit'],['- 2% à - 5%','Contre-proposez à -1% ou tenez votre prix avec justificatif'],['- 5% à - 10%','Contre-proposez avec explication (travaux réalisés, marché local)'],['Plus de - 10%','Déclinez poliment en expliquant votre valorisation']] },
-        script:[{speaker:'acheteur',line:'On vous propose 260 000€ pour votre bien à 275 000€.'},{speaker:'vendeur',line:'Merci pour votre offre. Elle est en dessous de ma valorisation compte tenu des travaux réalisés. Je peux aller à 270 000€ — c\'est mon prix ferme.'},{speaker:'acheteur',line:'265 000€ ?'},{speaker:'vendeur',line:'268 000€ et je laisse [équipement inclus], c\'est ma dernière position.'}],
-        tips:['Répondez dans les 24h — au-delà, l\'acheteur cherche ailleurs','Demandez toujours une preuve de financement avant d\'accepter définitivement','Une offre au comptant vaut souvent mieux qu\'une offre plus haute avec crédit'],
+        script:[{speaker:'acheteur',line:'On vous propose 260 000€ pour votre bien à 275 000€.'},{speaker:'vendeur',line:'Merci pour votre offre. Elle est en dessous de ma valorisation. Je peux aller à 270 000€ — c\'est mon prix ferme.'},{speaker:'acheteur',line:'265 000€ ?'},{speaker:'vendeur',line:'268 000€ et je laisse [équipement inclus], c\'est ma dernière position.'}],
+        tips:['Répondez dans les 24h — au-delà, l\'acheteur cherche ailleurs','Demandez toujours une preuve de financement avant d\'accepter','Une offre au comptant vaut souvent mieux qu\'une offre plus haute avec crédit'],
         warnings:['Ne signez aucun document sans votre notaire — même un accord manuscrit peut créer des obligations légales']
       },
       { title:'Les diagnostics obligatoires', meta:'5 min · Administratif',
-        explication:`Ces documents sont obligatoires et doivent être remis à l\'acheteur avant la signature du compromis. Ils sont regroupés dans le <strong>Dossier de Diagnostic Technique (DDT)</strong>.`,
-        tableau:{ headers:['Diagnostic','Condition','Validité'], rows:[['DPE — Diagnostic de Performance Énergétique','Toujours obligatoire','10 ans'],['État des risques et pollutions (ERP)','Toujours obligatoire','6 mois'],['Diagnostic amiante','Construction avant 1997','Illimitée si négatif'],['Diagnostic plomb (CREP)','Construction avant 1949','1 an si positif'],['Diagnostic électricité','Installation de plus de 15 ans','3 ans'],['Diagnostic gaz','Installation de plus de 15 ans','3 ans'],['Mesurage Loi Carrez','Appartement en copropriété uniquement','Permanent']] },
-        tips:['Commandez vos diagnostics dès la décision de vendre — comptez 1 à 2 semaines de délai','Le diagnostic assainissement varie selon votre commune — renseignez-vous en mairie'],
+        explication:`Ces documents sont obligatoires et doivent être remis à l\'acheteur avant la signature du compromis. Regroupés dans le <strong>Dossier de Diagnostic Technique (DDT)</strong>.`,
+        tableau:{ headers:['Diagnostic','Condition','Validité'], rows:[['DPE — Diagnostic de Performance Énergétique','Toujours obligatoire','10 ans'],['État des risques et pollutions (ERP)','Toujours obligatoire','6 mois'],['Diagnostic amiante','Construction avant 1997','Illimitée si négatif'],['Diagnostic plomb (CREP)','Construction avant 1949','1 an si positif'],['Diagnostic électricité','Installation > 15 ans','3 ans'],['Diagnostic gaz','Installation > 15 ans','3 ans'],['Mesurage Loi Carrez','Appartement en copropriété uniquement','Permanent']] },
+        tips:['Commandez vos diagnostics dès la décision de vendre — comptez 1 à 2 semaines de délai'],
         warnings:['Un DPE F ou G doit être intégré dans votre prix — il impacte fortement la négociation']
       },
       { title:'Le compromis et l\'acte de vente', meta:'7 min · Juridique',
-        explication:`Une fois l\'offre acceptée, le notaire prend le relais. La signature définitive intervient en moyenne <strong>3 mois après le compromis</strong> — ce délai est incompressible.`,
-        schema:['Offre acceptée', 'Compromis chez le notaire', 'Délai de rétractation 10j', 'Financement acheteur (45j)', 'Acte de vente', 'Remise des clés'],
-        tableau:{ headers:['Pièce à fournir au notaire','Détail'], rows:[['Titre de propriété','Obligatoire'],['Diagnostics techniques complets','DDT complet'],['Dernier avis de taxe foncière','Année en cours'],['Factures de travaux + garanties décennales','Si travaux de moins de 10 ans'],['Déclarations de travaux en mairie','Si extension ou modification extérieure'],['Pièce d\'identité + justificatif de domicile','Des deux vendeurs si couple'],['Livret de famille ou acte de mariage','Si vendeurs mariés']] },
-        tips:['L\'acheteur peut avoir son propre notaire — c\'est son droit. Les deux notaires se partagent les honoraires, sans surcoût pour vous.','Faites un relevé complet des compteurs (eau, gaz, électricité) le jour de la signature'],
-        warnings:['Ne coupez jamais les compteurs avant la vente — faites une bascule de contrat au nom de l\'acheteur']
+        explication:`Une fois l\'offre acceptée, le notaire prend le relais. La signature définitive intervient en moyenne <strong>3 mois après le compromis</strong>.`,
+        schema:['Offre acceptée','Compromis chez le notaire','Rétractation 10j','Financement acheteur (45j)','Acte de vente','Remise des clés'],
+        tableau:{ headers:['Pièce à fournir au notaire','Détail'], rows:[['Titre de propriété','Obligatoire'],['Diagnostics techniques complets','DDT complet'],['Dernier avis de taxe foncière','Année en cours'],['Factures de travaux + garanties décennales','Si travaux < 10 ans'],['Déclarations de travaux en mairie','Si extension ou modification extérieure'],['Pièce d\'identité + justificatif de domicile','Des deux vendeurs si couple']] },
+        tips:['L\'acheteur peut avoir son propre notaire — les deux se partagent les honoraires, sans surcoût pour vous','Faites un relevé complet des compteurs le jour de la signature'],
+        warnings:['Ne coupez jamais les compteurs avant la vente']
       },
       { title:'Gérer plusieurs acheteurs simultanément', meta:'4 min · Stratégie',
-        explication:`Si plusieurs acheteurs sont intéressés simultanément, c\'est une excellente position. <strong>Gérez-la avec équité et transparence — sans monter les acheteurs les uns contre les autres.</strong>`,
-        tips:['Dites simplement : "Il y a d\'autres personnes intéressées — je dois vous demander votre position d\'ici [date]"','Fixez une date limite identique pour toutes les offres','Comparez les offres sur le prix ET sur les conditions : financement solide, délai rapide, peu de conditions suspensives'],
-        warnings:['Monter les acheteurs les uns contre les autres peut créer une guerre des enchères… mais aussi faire fuir tout le monde si ça se sait']
+        explication:`Si plusieurs acheteurs sont intéressés simultanément, c\'est une excellente position. <strong>Gérez-la avec équité et transparence.</strong>`,
+        tips:['Dites simplement : "Il y a d\'autres personnes intéressées — je dois vous demander votre position d\'ici [date]"','Fixez une date limite identique pour toutes les offres','Comparez les offres sur le prix ET les conditions : financement solide, délai rapide, peu de conditions suspensives'],
+        warnings:['Monter les acheteurs les uns contre les autres peut faire fuir tout le monde']
       }
     ]
   }
 ];
 
+const MAILS = [
+  { title:'Confirmation de rendez-vous', body:`Bonjour [Prénom],\n\nJe confirme notre rendez-vous pour la visite du bien situé au [Adresse], le [Date] à [Heure].\n\nDurée estimée : 30 à 45 minutes. Sonnez au nom : [Votre nom].\n\nN'hésitez pas à me contacter si vous avez des questions.\n\nCordialement,\n[Votre prénom]` },
+  { title:'Relance après visite sans retour', body:`Bonjour [Prénom],\n\nJe me permets de vous recontacter suite à votre visite du [Date].\n\nAvez-vous eu le temps de réfléchir ? Je serais ravi(e) de répondre à vos questions ou d'organiser une seconde visite.\n\nMon bien est toujours disponible.\n\nCordialement,\n[Votre prénom]` },
+  { title:'Réponse à une offre trop basse', body:`Bonjour [Prénom],\n\nMerci pour votre offre de [Montant]€.\n\nAprès réflexion, je ne peux pas accepter ce prix compte tenu de [valorisation/travaux/marché]. Je serais prêt(e) à descendre à [Contre-offre]€.\n\nJe reste disponible si vous souhaitez en discuter.\n\nCordialement,\n[Votre prénom]` },
+  { title:'Acceptation d\'une offre', body:`Bonjour [Prénom],\n\nJ'ai le plaisir d'accepter votre offre de [Montant]€ pour le bien au [Adresse].\n\nLa prochaine étape est la signature du compromis chez le notaire. Mon notaire : [Nom et coordonnées].\n\nMerci de me confirmer votre notaire afin de fixer une date.\n\nCordialement,\n[Votre prénom]` },
+  { title:'Demande de documents à l\'acheteur', body:`Bonjour [Prénom],\n\nPour préparer le compromis, pourriez-vous me transmettre :\n\n✓ Pièce d'identité valide\n✓ Justificatif de domicile récent\n✓ Attestation de financement (accord banque ou attestation de fonds)\n\nCes documents sont nécessaires pour que le notaire puisse avancer rapidement.\n\nMerci,\n[Votre prénom]` },
+  { title:'Alerte offre concurrente', body:`Bonjour [Prénom],\n\nJe vous contacte car j'ai reçu une offre sérieuse sur le bien que vous avez visité le [Date].\n\nSi votre projet est toujours d'actualité, je vous invite à me faire part de votre position dans les 48 heures.\n\nCordialement,\n[Votre prénom]` },
+  { title:'Premier contact acheteur', body:`Bonjour [Prénom],\n\nMerci pour votre intérêt pour mon bien au [Adresse].\n\nRésumé :\n- Surface : [X] m²\n- Pièces : [N]\n- DPE : [Lettre]\n- Taxe foncière : [X]€/an\n- Charges : [X]€/mois\n\nJe suis disponible [jours et horaires]. Merci de m'indiquer votre budget et situation de financement.\n\n[Votre prénom] — [Téléphone]` },
+];
+
+const CHECKLISTS = {
+  photos:['Ranger et désencombrer chaque pièce','Faire les vitres','Nettoyer les joints de salle de bain','Sortir la poubelle','Enlever les tapis si possible','Allumer toutes les lumières','Ouvrir rideaux et volets','Enlever les photos personnelles','Plan de travail cuisine dégagé','Abattant WC fermé','Salon de jardin sorti (si extérieur)','Voiture sortie (pour la façade)'],
+  docs:['Titre de propriété','Diagnostics techniques (DPE, amiante, plomb...)','Taxe foncière dernière année','Charges de copropriété (si applicable)','Plans du bien','Factures travaux récents','Garanties décennales (si travaux < 10 ans)'],
+  edl:['Relevé compteur électricité','Relevé compteur gaz','Relevé compteur eau','Codes boîte aux lettres','Codes digicode/interphone','Emplacement des compteurs expliqué','Clés remises en totalité','Notice chaudière transmise'],
+};
+
+// ── State ──
 let activeModule = 0;
 const doneSteps = JSON.parse(localStorage.getItem('vpm_done_steps') || '{}');
 
+// ── Progress ──
+function updateProgress() {
+  const total = MODULES.reduce((s, m) => s + m.steps.length, 0);
+  const done = Object.values(doneSteps).filter(Boolean).length;
+  const pct = Math.round((done / total) * 100);
+  document.getElementById('progPct').textContent = pct + '%';
+  document.getElementById('progFill').style.width = pct + '%';
+  document.getElementById('progLabel').textContent = `${done} étape${done > 1 ? 's' : ''} complétée${done > 1 ? 's' : ''} sur ${total} · ${pct}%`;
+}
+
+// ── Key points ──
+function updateKeyPoints() {
+  const mod = MODULES[activeModule];
+  document.getElementById('keyPoints').innerHTML = mod.keyPoints.map(p =>
+    `<div class="kp-item"><div class="kp-dot"></div><span>${p}</span></div>`).join('');
+}
+
+// ── Render modules ──
 function renderModules() {
-  const nav = document.getElementById('modulesNav');
-  const container = document.getElementById('modulesContainer');
-  nav.innerHTML = '';
-  container.innerHTML = '';
+  const tabs = document.getElementById('modTabs');
+  const container = document.getElementById('modContainer');
+  tabs.innerHTML = ''; container.innerHTML = '';
 
   MODULES.forEach((mod, mi) => {
     const btn = document.createElement('button');
-    btn.className = 'module-btn' + (mi === activeModule ? ' active' : '');
+    btn.className = 'mod-tab' + (mi === activeModule ? ' active' : '');
     btn.textContent = mod.num + ' · ' + mod.title;
     btn.type = 'button';
-    btn.addEventListener('click', function() { activeModule = mi; renderModules(); });
-    nav.appendChild(btn);
+    btn.addEventListener('click', () => { activeModule = mi; renderModules(); updateKeyPoints(); triggerAiModuleMsg(mi); });
+    tabs.appendChild(btn);
 
     const div = document.createElement('div');
-    div.className = 'module-content' + (mi === activeModule ? ' active' : '');
+    div.className = 'mod-content' + (mi === activeModule ? ' active' : '');
 
-    let html = `<div class="module-header"><div class="module-num">${mod.num}</div><div><h2>${mod.title}</h2><p>${mod.subtitle}</p></div></div><div class="steps-list">`;
+    let html = `<div class="mod-hdr"><div class="mod-num">${mod.num}</div><div><div class="mod-hdr-title">${mod.title}</div><div class="mod-hdr-sub">${mod.subtitle}</div></div></div><div class="steps-list">`;
 
     mod.steps.forEach((step, si) => {
       const key = `${mi}_${si}`;
       const done = !!doneSteps[key];
       const openFirst = (mi === activeModule && si === 0) ? ' open' : '';
       html += `<div class="step-card${done ? ' done' : ''}${openFirst}" id="step-${mi}-${si}">
-        <div class="step-header" data-mi="${mi}" data-si="${si}">
-          <div class="step-check" data-check="1" data-mi="${mi}" data-si="${si}">✓</div>
-          <div class="step-title-wrap"><div class="step-title">${step.title}</div><div class="step-meta">${step.meta}</div></div>
-          <div class="step-arrow">▶</div>
+        <div class="step-hdr" data-mi="${mi}" data-si="${si}">
+          <div class="step-chk" data-chk="1" data-mi="${mi}" data-si="${si}">✓</div>
+          <div class="step-tw"><div class="step-t">${step.title}</div><div class="step-m">${step.meta}</div></div>
+          <div class="step-arr">›</div>
         </div>
         <div class="step-body">
-          <div class="step-section"><div class="step-section-title">Explication</div><div class="step-text">${step.explication}</div></div>`;
+          <div class="sst"><div class="sst-title">Explication</div><div class="sst-text">${step.explication}</div></div>`;
 
       if (step.schema) {
-        html += `<div class="step-section"><div class="step-section-title">Schéma</div><div class="schema-flow">`;
-        step.schema.forEach((s, i) => {
-          html += `<div class="schema-step">${s}</div>`;
-          if (i < step.schema.length - 1) html += `<div class="schema-arrow">→</div>`;
-        });
+        html += `<div class="sst"><div class="sst-title">Schéma</div><div class="schema-flow">`;
+        step.schema.forEach((s, i) => { html += `<div class="schema-step">${s}</div>${i < step.schema.length - 1 ? '<div class="schema-arrow">→</div>' : ''}`; });
         html += `</div></div>`;
       }
-
       if (step.tableau) {
-        html += `<div class="step-section"><div class="step-section-title">Tableau</div><table class="data-table"><thead><tr>`;
+        html += `<div class="sst"><div class="sst-title">Tableau</div><table class="data-table"><thead><tr>`;
         step.tableau.headers.forEach(h => { html += `<th>${h}</th>`; });
         html += `</tr></thead><tbody>`;
         step.tableau.rows.forEach(row => { html += `<tr>`; row.forEach(c => { html += `<td>${c}</td>`; }); html += `</tr>`; });
         html += `</tbody></table></div>`;
       }
-
       if (step.script) {
-        html += `<div class="step-section"><div class="step-section-title">Script</div><div class="script-block">`;
-        step.script.forEach(line => {
-          html += `<div class="script-speaker ${line.speaker}">${line.speaker === 'vendeur' ? '🟢 Vous' : '🟠 Acheteur'}</div><div class="script-line">"${line.line}"</div>`;
-        });
+        html += `<div class="sst"><div class="sst-title">Script</div><div class="script-block">`;
+        step.script.forEach(line => { html += `<div class="script-speaker ${line.speaker}">${line.speaker === 'vendeur' ? '🟢 Vous' : '🟠 Acheteur'}</div><div class="script-line">"${line.line}"</div>`; });
         html += `</div></div>`;
       }
-
-      if (step.tips && step.tips.length) {
-        html += `<div class="step-section"><div class="step-section-title">Tips</div><div class="tips-list">`;
-        step.tips.forEach(tip => { html += `<div class="tip-item"><span class="tip-icon">💡</span><span>${tip}</span></div>`; });
-        html += `</div></div>`;
+      if (step.tips?.length) {
+        html += `<div class="sst"><div class="sst-title">Conseils</div>`;
+        step.tips.forEach(t => { html += `<div class="tip-i">💡 ${t}</div>`; });
+        html += `</div>`;
       }
-
-      if (step.warnings && step.warnings.length) {
-        step.warnings.forEach(w => { html += `<div class="warning-item"><span class="tip-icon">⚠️</span><span>${w}</span></div>`; });
+      if (step.warnings?.length) {
+        step.warnings.forEach(w => { html += `<div class="warn-i">⚠️ ${w}</div>`; });
       }
-
-      html += `<button class="ask-coach-btn" onclick="askCoach('${step.title.replace(/'/g,"\\'")}')">Demander à Alex sur cette étape →</button></div></div>`;
+      html += `<button class="ask-coach-btn" data-step="${step.title.replace(/'/g,"\\'")}">Demander à Alex sur cette étape →</button></div></div>`;
     });
-
     html += `</div>`;
     div.innerHTML = html;
     container.appendChild(div);
   });
+
   updateProgress();
 }
-
-function toggleStep(mi, si) {
-  document.getElementById('step-' + mi + '-' + si).classList.toggle('open');
-}
-
-function markDone(mi, si) {
-  const key = mi + '_' + si;
-  doneSteps[key] = !doneSteps[key];
-  localStorage.setItem('vpm_done_steps', JSON.stringify(doneSteps));
-  const card = document.getElementById('step-' + mi + '-' + si);
-  if (card) card.classList.toggle('done', !!doneSteps[key]);
-  updateProgress();
-}
-
-document.addEventListener('click', function(e) {
-  const check = e.target.closest('[data-check]');
-  if (check) {
-    e.stopPropagation();
-    markDone(+check.dataset.mi, +check.dataset.si);
-    return;
-  }
-  const header = e.target.closest('.step-header[data-mi]');
-  if (header) {
-    toggleStep(+header.dataset.mi, +header.dataset.si);
-  }
-});
-
-function updateProgress() {
-  const total = MODULES.reduce((s, m) => s + m.steps.length, 0);
-  const done = Object.values(doneSteps).filter(Boolean).length;
-  const pct = Math.round((done / total) * 100);
-  document.getElementById('globalProgress').style.width = pct + '%';
-  document.getElementById('progressLabel').textContent = `${done} étape${done>1?'s':''} complétée${done>1?'s':''} sur ${total} · ${pct}%`;
-}
-
-// ── Coach IA ──
-let chatHistory = [];
-
-function askCoach(stepTitle) {
-  const input = document.getElementById('coachInput');
-  input.value = `J'ai une question sur "${stepTitle}" — `;
-  input.focus();
-  document.querySelector('.formation-coach').scrollIntoView({ behavior: 'smooth' });
-}
-
-async function sendCoachMessage(text) {
-  if (!text.trim()) return;
-  const messages = document.getElementById('coachMessages');
-  const typing = document.getElementById('typingIndicator');
-  const btn = document.getElementById('coachSend');
-
-  const userMsg = document.createElement('div');
-  userMsg.className = 'msg msg-user';
-  userMsg.textContent = text;
-  messages.appendChild(userMsg);
-  messages.scrollTop = messages.scrollHeight;
-
-  chatHistory.push({ role: 'user', content: text });
-  btn.disabled = true;
-  typing.classList.add('show');
-  messages.scrollTop = messages.scrollHeight;
-
-  try {
-    const res = await fetch('/api/formation/chat', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ message: text, module: MODULES[activeModule]?.title, history: chatHistory.slice(-6) })
-    });
-    const data = await res.json();
-    typing.classList.remove('show');
-    const coachMsg = document.createElement('div');
-    coachMsg.className = 'msg msg-coach';
-    coachMsg.innerHTML = (data.reply || data.error || 'Erreur.').replace(/\n/g, '<br>');
-    messages.appendChild(coachMsg);
-    chatHistory.push({ role: 'assistant', content: data.reply || '' });
-  } catch {
-    typing.classList.remove('show');
-    const err = document.createElement('div');
-    err.className = 'msg msg-coach';
-    err.textContent = 'Erreur de connexion. Réessayez.';
-    messages.appendChild(err);
-  }
-
-  btn.disabled = false;
-  messages.scrollTop = messages.scrollHeight;
-}
-
-document.getElementById('coachSend').addEventListener('click', () => {
-  const input = document.getElementById('coachInput');
-  const text = input.value.trim();
-  input.value = '';
-  input.style.height = 'auto';
-  sendCoachMessage(text);
-});
-
-document.getElementById('coachInput').addEventListener('keydown', e => {
-  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); document.getElementById('coachSend').click(); }
-});
-
-document.getElementById('coachInput').addEventListener('input', function() {
-  this.style.height = 'auto';
-  this.style.height = Math.min(this.scrollHeight, 90) + 'px';
-});
-
-document.querySelectorAll('.quick-q').forEach(btn => {
-  btn.addEventListener('click', () => sendCoachMessage(btn.dataset.q));
-});
 
 // ── Mails ──
-const MAILS = [
-  { title:'1. Confirmation de rendez-vous', body:`Bonjour [Prénom],\n\nJe confirme notre rendez-vous pour la visite du bien situé au [Adresse], le [Date] à [Heure].\n\nDurée estimée : 30 à 45 minutes. Sonnez au nom : [Votre nom].\n\nN'hésitez pas à me contacter si vous avez des questions.\n\nCordialement,\n[Votre prénom]` },
-  { title:'2. Relance après visite sans retour', body:`Bonjour [Prénom],\n\nJe me permets de vous recontacter suite à votre visite du [Date].\n\nAvez-vous eu le temps de réfléchir ? Je serais ravi(e) de répondre à vos questions ou d'organiser une seconde visite.\n\nMon bien est toujours disponible.\n\nCordialement,\n[Votre prénom]` },
-  { title:'3. Réponse à une offre trop basse', body:`Bonjour [Prénom],\n\nMerci pour votre offre de [Montant]€.\n\nAprès réflexion, je ne peux pas accepter ce prix compte tenu de [valorisation/travaux/marché]. Je serais prêt(e) à descendre à [Contre-offre]€.\n\nJe reste disponible si vous souhaitez en discuter.\n\nCordialement,\n[Votre prénom]` },
-  { title:'4. Acceptation d\'une offre', body:`Bonjour [Prénom],\n\nJ'ai le plaisir d'accepter votre offre de [Montant]€ pour le bien au [Adresse].\n\nLa prochaine étape est la signature du compromis chez le notaire. Mon notaire : [Nom et coordonnées].\n\nMerci de me confirmer votre notaire afin de fixer une date.\n\nCordialement,\n[Votre prénom]` },
-  { title:'5. Demande de documents à l\'acheteur', body:`Bonjour [Prénom],\n\nPour préparer le compromis, pourriez-vous me transmettre :\n\n✓ Pièce d'identité valide\n✓ Justificatif de domicile récent\n✓ Attestation de financement (accord banque ou attestation de fonds)\n\nCes documents sont nécessaires pour que le notaire puisse avancer rapidement.\n\nMerci,\n[Votre prénom]` },
-  { title:'6. Alerte offre concurrente', body:`Bonjour [Prénom],\n\nJe vous contacte car j'ai reçu une offre sérieuse sur le bien que vous avez visité le [Date].\n\nSi votre projet est toujours d'actualité, je vous invite à me faire part de votre position dans les 48 heures.\n\nCordialement,\n[Votre prénom]` },
-  { title:'7. Premier contact acheteur', body:`Bonjour [Prénom],\n\nMerci pour votre intérêt pour mon bien au [Adresse].\n\nRésumé :\n- Surface : [X] m²\n- Pièces : [N]\n- DPE : [Lettre]\n- Taxe foncière : [X]€/an\n- Charges : [X]€/mois\n\nJe suis disponible [jours et horaires]. Merci de m'indiquer votre budget et situation de financement.\n\n[Votre prénom] — [Téléphone]` },
-];
-
 function renderMails() {
-  const container = document.getElementById('mailsList');
-  container.innerHTML = MAILS.map((m, i) => `
-    <div class="mail-item" id="mail-item-${i}">
-      <div id="mail-header-${i}" style="display:flex;align-items:center;justify-content:space-between;padding:14px 0;cursor:pointer;border-bottom:1px solid #f0ece6;gap:12px">
-        <div style="pointer-events:none;display:flex;align-items:center;gap:12px">
-          <span style="background:#3D5A47;color:#fff;width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:0.78rem;font-weight:600;flex-shrink:0">${i+1}</span>
-          <span style="font-size:0.9rem;font-weight:500">${m.title.replace(/^\d+\.\s*/,'')}</span>
-        </div>
-        <span class="mail-toggle-icon" style="pointer-events:none;color:#aaa;font-size:1.1rem;width:20px;text-align:center">+</span>
+  document.getElementById('mailsList').innerHTML = MAILS.map((m, i) => `
+    <div class="mail-item">
+      <div class="mail-hdr" id="mh${i}">
+        <div class="mail-num">${i+1}</div>
+        <span class="mail-ttl">${m.title}</span>
+        <span class="mail-ic">+</span>
       </div>
-      <div id="mail-body-${i}" style="display:none;padding:16px 0">
-        <pre style="white-space:pre-wrap;font-family:inherit;font-size:0.85rem;line-height:1.7;color:#444;background:#f9f7f3;border-radius:8px;padding:14px 16px;border:1px solid #eee">${m.body}</pre>
-        <button id="btn-copy-${i}" style="margin-top:10px;padding:8px 18px;background:transparent;border:1.5px solid #3D5A47;color:#3D5A47;border-radius:100px;font-size:0.82rem;font-family:inherit;cursor:pointer">Copier ce mail</button>
+      <div class="mail-bd" id="mb${i}">
+        <pre class="mail-pre">${m.body}</pre>
+        <button class="mail-copy" id="mc${i}">Copier ce mail</button>
       </div>
     </div>`).join('');
 
   MAILS.forEach((m, i) => {
-    document.getElementById(`mail-header-${i}`).addEventListener('click', () => {
-      const body = document.getElementById(`mail-body-${i}`);
-      const icon = document.querySelector(`#mail-header-${i} .mail-toggle-icon`);
-      const isOpen = body.style.display !== 'none';
-      body.style.display = isOpen ? 'none' : 'block';
-      icon.textContent = isOpen ? '+' : '−';
+    document.getElementById(`mh${i}`).addEventListener('click', () => {
+      const bd = document.getElementById(`mb${i}`), ic = document.querySelector(`#mh${i} .mail-ic`);
+      const open = bd.style.display === 'block';
+      bd.style.display = open ? 'none' : 'block';
+      ic.textContent = open ? '+' : '−';
     });
-    document.getElementById(`btn-copy-${i}`).addEventListener('click', () => {
+    document.getElementById(`mc${i}`).addEventListener('click', () => {
       navigator.clipboard.writeText(m.body);
-      const btn = document.getElementById(`btn-copy-${i}`);
+      const btn = document.getElementById(`mc${i}`);
       btn.textContent = '✓ Copié !';
       setTimeout(() => btn.textContent = 'Copier ce mail', 2000);
     });
   });
 }
 
-const CHECKLISTS = {
-  photos:['Ranger et désencombrer chaque pièce','Faire les vitres','Nettoyer les joints de salle de bain','Sortir la poubelle','Enlever les tapis si possible','Allumer toutes les lumières','Ouvrir rideaux et volets','Enlever les photos personnelles','Plan de travail cuisine dégagé','Abattant WC fermé','Salon de jardin sorti (si extérieur)','Voiture sortie (pour la façade)'],
-  docs:['Titre de propriété','Diagnostics techniques (DPE, amiante, plomb...)','Taxe foncière dernière année','Charges de copropriété (si applicable)','Règlement de copropriété (si applicable)','Plans du bien','Factures travaux récents','Garanties décennales (si travaux < 10 ans)'],
-  edl:['Relevé compteur électricité','Relevé compteur gaz','Relevé compteur eau froide','Relevé compteur eau chaude','Numéro PDL électricité (sur compteur Linky)','Codes boîte aux lettres','Codes digicode/interphone','Emplacement des compteurs expliqué','Clés remises en totalité','Notice chaudière transmise'],
-};
-
-function renderChecklist(type, containerId, progressId) {
-  const saved = JSON.parse(localStorage.getItem(`checklist_${type}`) || '{}');
-  const container = document.getElementById(containerId);
-  container.innerHTML = CHECKLISTS[type].map((item, i) => `
-    <label style="display:flex;align-items:flex-start;gap:10px;padding:8px 0;border-bottom:1px solid #f5f0e8;cursor:pointer;font-size:0.87rem;color:#444">
-      <input type="checkbox" ${saved[i]?'checked':''} data-index="${i}" data-type="${type}" style="margin-top:3px;accent-color:#3D5A47">
+// ── Checklists ──
+function renderChecklist(type, containerId, countId) {
+  const saved = JSON.parse(localStorage.getItem(`ck_${type}`) || '{}');
+  const el = document.getElementById(containerId);
+  el.innerHTML = CHECKLISTS[type].map((item, i) => `
+    <label class="ck-item${saved[i] ? ' checked' : ''}">
+      <input type="checkbox" ${saved[i] ? 'checked' : ''} data-t="${type}" data-i="${i}">
       <span>${item}</span>
     </label>`).join('');
-
-  const updateP = () => {
-    const checked = container.querySelectorAll('input:checked').length;
-    document.getElementById(progressId).textContent = `(${checked}/${CHECKLISTS[type].length})`;
+  const updateCount = () => {
+    const checked = el.querySelectorAll('input:checked').length;
+    document.getElementById(countId).textContent = `(${checked}/${CHECKLISTS[type].length})`;
   };
-  container.querySelectorAll('input').forEach(input => {
-    input.addEventListener('change', () => {
-      saved[input.dataset.index] = input.checked;
-      localStorage.setItem(`checklist_${type}`, JSON.stringify(saved));
-      updateP();
+  el.querySelectorAll('input').forEach(inp => {
+    inp.addEventListener('change', () => {
+      saved[inp.dataset.i] = inp.checked;
+      inp.closest('.ck-item').classList.toggle('checked', inp.checked);
+      localStorage.setItem(`ck_${type}`, JSON.stringify(saved));
+      updateCount();
     });
   });
-  updateP();
+  updateCount();
 }
 
+// ── AI Chat ──
+let chatHistory = [];
+let lastAiModule = -1;
+
+function addMsg(text, role) {
+  const msgs = document.getElementById('aiMsgs');
+  const el = document.createElement('div');
+  el.className = role === 'alex' ? 'ai-msg-a' : 'ai-msg-u';
+  el.innerHTML = text.replace(/\n/g, '<br>');
+  msgs.appendChild(el);
+  msgs.scrollTop = msgs.scrollHeight;
+}
+
+function triggerAiModuleMsg(mi) {
+  if (mi === lastAiModule) return;
+  lastAiModule = mi;
+  const msg = MODULES[mi]?.aiMsg;
+  if (msg) setTimeout(() => addMsg(msg, 'alex'), 400);
+}
+
+async function sendMsg(text) {
+  if (!text?.trim()) return;
+  const send = document.getElementById('coachSend');
+  const typing = document.getElementById('aiTyping');
+  const ta = document.getElementById('coachInput');
+  ta.value = ''; ta.style.height = 'auto';
+  addMsg(text, 'user');
+  chatHistory.push({ role: 'user', content: text });
+  send.disabled = true; typing.classList.add('show');
+  document.getElementById('aiMsgs').scrollTop = 99999;
+  document.getElementById('coachPanel').classList.add('open');
+
+  try {
+    const res = await fetch('/api/formation/chat', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ message: text, module: MODULES[activeModule]?.title, history: chatHistory.slice(-6) })
+    });
+    const data = await res.json();
+    typing.classList.remove('show');
+    const reply = data.reply || data.error || 'Erreur de connexion.';
+    addMsg(reply, 'alex');
+    chatHistory.push({ role: 'assistant', content: reply });
+  } catch {
+    typing.classList.remove('show');
+    addMsg('Erreur de connexion. Réessayez.', 'alex');
+  }
+  send.disabled = false;
+}
+
+// ── Events ──
+document.addEventListener('click', function(e) {
+  const chk = e.target.closest('[data-chk]');
+  if (chk) {
+    e.stopPropagation();
+    const mi = +chk.dataset.mi, si = +chk.dataset.si, key = `${mi}_${si}`;
+    doneSteps[key] = !doneSteps[key];
+    localStorage.setItem('vpm_done_steps', JSON.stringify(doneSteps));
+    document.getElementById(`step-${mi}-${si}`)?.classList.toggle('done', !!doneSteps[key]);
+    updateProgress(); return;
+  }
+  const hdr = e.target.closest('.step-hdr[data-mi]');
+  if (hdr) { document.getElementById(`step-${hdr.dataset.mi}-${hdr.dataset.si}`)?.classList.toggle('open'); return; }
+  const ab = e.target.closest('.ask-coach-btn');
+  if (ab) { document.getElementById('coachInput').value = `J'ai une question sur "${ab.dataset.step}" — `; document.getElementById('coachInput').focus(); document.getElementById('coachPanel').classList.add('open'); }
+  const chip = e.target.closest('.coach-chip');
+  if (chip) sendMsg(chip.dataset.q);
+});
+
+document.getElementById('coachToggle').addEventListener('click', () => document.getElementById('coachPanel').classList.toggle('open'));
+document.getElementById('coachClose').addEventListener('click', () => document.getElementById('coachPanel').classList.remove('open'));
+document.getElementById('coachSend').addEventListener('click', () => sendMsg(document.getElementById('coachInput').value));
+document.getElementById('coachInput').addEventListener('keydown', e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMsg(e.target.value); } });
+
+
+// ── Son vidéo iPhone ──
+(function() {
+  const vid = document.getElementById('tabletVideo');
+  const btn = document.getElementById('soundBtn');
+  const iconOff = document.getElementById('soundIconOff');
+  const iconOn = document.getElementById('soundIconOn');
+  if (!vid || !btn) return;
+  btn.addEventListener('click', () => {
+    vid.muted = !vid.muted;
+    iconOff.style.display = vid.muted ? 'block' : 'none';
+    iconOn.style.display  = vid.muted ? 'none'  : 'block';
+  });
+})();
+
+// ── Init ──
 renderModules();
 renderMails();
-renderChecklist('photos','checklist-photos','progressPhotos');
-renderChecklist('docs','checklist-docs','progressDocs');
-renderChecklist('edl','checklist-edl','progressEdl');
+renderChecklist('photos', 'ck-photos', 'ckCntPhotos');
+renderChecklist('docs', 'ck-docs', 'ckCntDocs');
+renderChecklist('edl', 'ck-edl', 'ckCntEdl');
+updateKeyPoints();
+setTimeout(() => triggerAiModuleMsg(0), 2000);
 </script>
 </body>
 </html>

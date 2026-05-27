@@ -1,0 +1,1001 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Serenis Connect — Centre de communication</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; }
+    body { font-family: 'DM Sans', sans-serif; background: #F5F0E8; margin: 0; }
+    .app-layout { display: flex; min-height: 100vh; }
+
+    /* ── Sidebar ──────────────────────── */
+    .sidebar { width:240px;min-height:100vh;background:#3D5A47;display:flex;flex-direction:column;position:fixed;top:0;left:0;bottom:0;z-index:100; }
+    .sidebar-logo { padding:28px 24px 20px;border-bottom:1px solid rgba(212,228,216,0.15); }
+    .sidebar-logo a { display:flex;align-items:center;gap:10px;text-decoration:none; }
+    .logo-text { font-family:'Cormorant Garamond',serif;font-size:1.4rem;font-weight:600;color:#FDFCF8;letter-spacing:0.02em; }
+    .sidebar-pack { margin:12px 24px;padding:10px 14px;background:rgba(212,228,216,0.12);border-radius:8px;display:flex;flex-direction:column;gap:2px; }
+    .sidebar-pack strong { color:#D4E4D8;font-size:0.82rem;font-weight:600; }
+    .sidebar-pack span { color:rgba(212,228,216,0.6);font-size:0.73rem; }
+    .sidebar-nav { flex:1;padding:16px 0;display:flex;flex-direction:column;gap:2px; }
+    .sidebar-item { display:flex;align-items:center;gap:11px;padding:10px 24px;color:rgba(212,228,216,0.7);text-decoration:none;font-size:0.88rem;font-weight:400;transition:all 0.2s; }
+    .sidebar-item:hover { color:#FDFCF8;background:rgba(212,228,216,0.08); }
+    .sidebar-item.active { color:#FDFCF8;background:rgba(212,228,216,0.14);font-weight:500;border-left:3px solid #C4785A; }
+    .sidebar-footer { padding:20px 24px;border-top:1px solid rgba(212,228,216,0.12); }
+    .sidebar-footer a { color:rgba(212,228,216,0.4);font-size:0.78rem;text-decoration:none; }
+    .sidebar-footer a:hover { color:rgba(212,228,216,0.7); }
+
+    /* ── Main layout ──────────────────── */
+    .main-content { margin-left:240px;flex:1;padding:32px 36px 60px;max-width:1100px; }
+    @media(max-width:900px) { .main-content { margin-left:0;padding:20px 16px 60px; } }
+
+    /* ── Page header ──────────────────── */
+    .page-header { margin-bottom:28px; }
+    .page-header h1 { font-family:'DM Sans',sans-serif;font-size:1.45rem;font-weight:600;color:#1a1a1a;margin:0 0 4px; }
+    .page-header-sub { font-size:0.87rem;color:#888; }
+
+    /* ── Hero: number + account ───────── */
+    .connect-hero { display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:24px; }
+    @media(max-width:700px) { .connect-hero { grid-template-columns:1fr; } }
+
+    .number-card {
+      background:linear-gradient(135deg,#3D5A47 0%,#2a4030 100%);
+      border-radius:16px;padding:28px 28px 24px;color:#fff;position:relative;overflow:hidden;
+    }
+    .number-card::before {
+      content:'';position:absolute;top:-40px;right:-40px;width:180px;height:180px;
+      background:rgba(255,255,255,0.04);border-radius:50%;
+    }
+    .number-card-badge {
+      display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,0.12);
+      padding:4px 12px;border-radius:20px;font-size:0.72rem;font-weight:700;
+      letter-spacing:0.08em;text-transform:uppercase;margin-bottom:14px;
+    }
+    .number-display {
+      font-family:'Cormorant Garamond',serif;font-size:2.2rem;font-weight:600;
+      letter-spacing:0.04em;margin-bottom:6px;line-height:1.1;
+    }
+    .number-display.no-number { font-size:1rem;font-style:italic;opacity:0.6;font-family:'DM Sans',sans-serif; }
+    .number-actions { display:flex;gap:10px;align-items:center;margin-bottom:16px;flex-wrap:wrap; }
+    .btn-copy {
+      padding:7px 16px;background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.2);
+      border-radius:8px;color:#fff;font-size:0.82rem;font-weight:600;cursor:pointer;
+      font-family:'DM Sans',sans-serif;transition:0.15s;
+    }
+    .btn-copy:hover { background:rgba(255,255,255,0.22); }
+    .btn-copy.copied { background:rgba(76,184,76,0.3);border-color:rgba(76,184,76,0.4); }
+    .number-desc { font-size:0.8rem;opacity:0.65;line-height:1.55; }
+    .number-no-number-hint {
+      margin-top:14px;padding:10px 14px;background:rgba(196,120,90,0.2);border-radius:8px;
+      font-size:0.78rem;color:rgba(255,255,255,0.85);line-height:1.5;
+    }
+
+    .account-card {
+      background:#fff;border-radius:16px;padding:24px 28px;
+      border:1px solid #e8e0d6;display:flex;flex-direction:column;justify-content:space-between;
+    }
+    .account-card-title { font-size:0.72rem;text-transform:uppercase;letter-spacing:0.1em;color:#aaa;font-weight:700;margin-bottom:16px; }
+    .account-row { display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid #f5f0e8; }
+    .account-row:last-child { border-bottom:none; }
+    .account-row-label { font-size:0.82rem;color:#888; }
+    .account-row-value { font-size:0.88rem;font-weight:600;color:#222;text-align:right; }
+    .account-row-value.number { color:#3D5A47;font-family:'Cormorant Garamond',serif;font-size:1.1rem; }
+    .account-row-value.missing { color:#bbb;font-style:italic;font-weight:400; }
+
+    /* ── Stats row ────────────────────── */
+    .stats-row { display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:24px; }
+    @media(max-width:700px) { .stats-row { grid-template-columns:repeat(2,1fr); } }
+    .stat-card {
+      background:#fff;border-radius:12px;padding:18px 20px;border:1px solid #e8e0d6;
+      display:flex;flex-direction:column;gap:4px;transition:0.2s;
+    }
+    .stat-card:hover { box-shadow:0 4px 16px rgba(0,0,0,0.07);transform:translateY(-1px); }
+    .stat-num { font-size:2rem;font-weight:700;color:#1a1a1a;line-height:1; }
+    .stat-lbl { font-size:0.75rem;color:#aaa;font-weight:500; }
+    .stat-icon { margin-bottom:6px;display:flex;align-items:center; }
+    .stat-card.highlight .stat-num { color:#3D5A47; }
+    .stat-card.warn .stat-num { color:#C4785A; }
+
+    /* ── Two columns ──────────────────── */
+    .two-col { display:grid;grid-template-columns:1.1fr 0.9fr;gap:20px;margin-bottom:24px; }
+    @media(max-width:900px) { .two-col { grid-template-columns:1fr; } }
+
+    /* ── Panel cards ──────────────────── */
+    .panel-card { background:#fff;border-radius:16px;border:1px solid #e8e0d6;overflow:hidden; }
+    .panel-header {
+      padding:16px 20px;border-bottom:1px solid #f0ede8;
+      display:flex;justify-content:space-between;align-items:center;
+    }
+    .panel-title { font-size:0.88rem;font-weight:700;color:#1a1a1a; }
+    .panel-count {
+      background:#f0f5f1;color:#3D5A47;font-size:0.72rem;font-weight:700;
+      padding:3px 8px;border-radius:20px;
+    }
+    .panel-body { padding:0; }
+
+    /* ── Visit cards ──────────────────── */
+    .visit-item {
+      padding:14px 20px;border-bottom:1px solid #f5f0e8;
+      display:flex;gap:14px;align-items:flex-start;transition:0.15s;
+    }
+    .visit-item:last-child { border-bottom:none; }
+    .visit-item:hover { background:#fafaf9; }
+    .visit-avatar {
+      width:38px;height:38px;border-radius:50%;background:#f0f5f1;
+      display:flex;align-items:center;justify-content:center;
+      font-size:1rem;font-weight:700;color:#3D5A47;flex-shrink:0;
+    }
+    .visit-info { flex:1;min-width:0; }
+    .visit-name { font-size:0.9rem;font-weight:600;color:#1a1a1a;margin-bottom:2px; }
+    .visit-phone { font-size:0.78rem;color:#888; }
+    .visit-datetime { font-size:0.78rem;color:#555;margin-top:4px;display:flex;align-items:center;gap:4px; }
+    .visit-actions { display:flex;gap:6px;margin-top:8px;flex-wrap:wrap; }
+    .visit-actions button {
+      padding:4px 10px;border-radius:6px;border:none;font-size:0.72rem;font-weight:600;
+      cursor:pointer;font-family:'DM Sans',sans-serif;transition:0.15s;
+    }
+    .btn-confirm { background:#f0f5f1;color:#3D5A47; }
+    .btn-confirm:hover { background:#3D5A47;color:#fff; }
+    .btn-done { background:#e8f0e9;color:#2e7d32; }
+    .btn-done:hover { background:#2e7d32;color:#fff; }
+    .btn-cancel { background:#fef0f0;color:#c62828; }
+    .btn-cancel:hover { background:#c62828;color:#fff; }
+    .btn-del { background:#f5f0e8;color:#aaa; }
+    .btn-del:hover { background:#ddd;color:#666; }
+
+    .status-badge {
+      display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:20px;
+      font-size:0.68rem;font-weight:700;letter-spacing:0.04em;
+    }
+    .status-pending { background:#fff3e0;color:#e65100; }
+    .status-confirmed { background:#e8f5e9;color:#2e7d32; }
+    .status-cancelled { background:#fce4ec;color:#c62828; }
+    .status-done { background:#f5f5f5;color:#757575; }
+
+    /* ── Notification feed ────────────── */
+    .notif-item {
+      padding:12px 20px;border-bottom:1px solid #f5f0e8;
+      display:flex;gap:12px;align-items:flex-start;
+    }
+    .notif-item:last-child { border-bottom:none; }
+    .notif-item.unread { background:#fffbf5; }
+    .notif-dot {
+      width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:6px;
+    }
+    .notif-dot.visit_request { background:#C4785A; }
+    .notif-dot.visit_confirmed { background:#3D5A47; }
+    .notif-dot.new_contact { background:#4cb84c; }
+    .notif-dot.reminder { background:#f5c518; }
+    .notif-dot.message { background:#6e99db; }
+    .notif-content { flex:1;min-width:0; }
+    .notif-title { font-size:0.83rem;font-weight:600;color:#1a1a1a; }
+    .notif-body { font-size:0.78rem;color:#888;margin-top:1px; }
+    .notif-time { font-size:0.7rem;color:#bbb;margin-top:3px; }
+
+    /* ── AI Insight ───────────────────── */
+    .ai-card {
+      background:linear-gradient(135deg,#f8f5f0,#fdfcf8);
+      border:1px solid #e8e0d6;border-radius:16px;padding:22px 24px;margin-bottom:24px;
+      position:relative;overflow:hidden;
+    }
+    .ai-card::before {
+      content:'';position:absolute;top:0;left:0;right:0;height:3px;
+      background:linear-gradient(90deg,#3D5A47,#C4785A,#3D5A47);
+    }
+    .ai-card-header { display:flex;align-items:center;gap:10px;margin-bottom:12px; }
+    .ai-card-icon { font-size:1.3rem; }
+    .ai-card-title { font-size:0.88rem;font-weight:700;color:#1a1a1a; }
+    .ai-card-body { font-size:0.87rem;color:#444;line-height:1.7;min-height:48px; }
+    .ai-card-body.loading { color:#bbb;font-style:italic; }
+    .ai-refresh { margin-top:12px;padding:6px 14px;background:#fff;border:1.5px solid #e8e0d6;border-radius:8px;font-size:0.78rem;font-weight:600;color:#555;cursor:pointer;font-family:'DM Sans',sans-serif;transition:0.15s; }
+    .ai-refresh:hover { border-color:#3D5A47;color:#3D5A47; }
+
+    /* ── Contacts table ───────────────── */
+    .contacts-section { background:#fff;border-radius:16px;border:1px solid #e8e0d6;overflow:hidden;margin-bottom:24px; }
+    .contacts-table { width:100%;border-collapse:collapse; }
+    .contacts-table thead th {
+      padding:11px 16px;font-size:0.7rem;text-transform:uppercase;letter-spacing:0.08em;
+      color:#aaa;font-weight:700;text-align:left;border-bottom:1px solid #f0ede8;background:#fafaf8;
+    }
+    .contacts-table tbody tr { border-bottom:1px solid #f5f0e8;transition:0.12s; }
+    .contacts-table tbody tr:last-child { border-bottom:none; }
+    .contacts-table tbody tr:hover { background:#fafaf9; }
+    .contacts-table td { padding:12px 16px;font-size:0.85rem;vertical-align:middle; }
+    .contact-name { font-weight:600;color:#1a1a1a; }
+    .contact-phone { font-size:0.78rem;color:#888;margin-top:1px; }
+    .contact-source { font-size:0.72rem;padding:2px 8px;border-radius:20px;font-weight:600; }
+    .source-serenis { background:#f0f5f1;color:#3D5A47; }
+    .source-manuel { background:#f5f0e8;color:#C4785A; }
+    .contact-status-select {
+      padding:3px 8px;border-radius:6px;border:1.5px solid #e8e0d6;font-size:0.75rem;
+      font-family:'DM Sans',sans-serif;cursor:pointer;background:#fff;color:#333;
+      font-weight:600;
+    }
+    .contact-status-select.status-new { border-color:#3D5A47;color:#3D5A47; }
+    .contact-status-select.status-qualified { border-color:#4cb84c;color:#2e7d32; }
+    .contact-status-select.status-visit_planned { border-color:#f5a818;color:#e65100; }
+    .contact-status-select.status-not_retained { border-color:#ccc;color:#999; }
+    .contact-actions { display:flex;gap:6px; }
+    .btn-icon {
+      width:30px;height:30px;border-radius:8px;border:1.5px solid #e8e0d6;background:#fff;
+      display:flex;align-items:center;justify-content:center;cursor:pointer;transition:0.15s;
+      font-size:0.85rem;
+    }
+    .btn-icon:hover { border-color:#3D5A47;background:#f0f5f1; }
+    .btn-icon.danger:hover { border-color:#c62828;background:#fce4ec; }
+
+    /* ── Modal ────────────────────────── */
+    .modal-overlay {
+      position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:500;
+      display:flex;align-items:center;justify-content:center;padding:20px;
+      opacity:0;pointer-events:none;transition:opacity 0.2s;
+    }
+    .modal-overlay.open { opacity:1;pointer-events:all; }
+    .modal {
+      background:#fff;border-radius:20px;padding:28px 32px;width:100%;max-width:480px;
+      transform:translateY(12px);transition:transform 0.2s;
+      max-height:90vh;overflow-y:auto;
+    }
+    .modal-overlay.open .modal { transform:translateY(0); }
+    .modal-header { display:flex;justify-content:space-between;align-items:center;margin-bottom:24px; }
+    .modal-title { font-size:1.1rem;font-weight:700;color:#1a1a1a; }
+    .modal-close { width:32px;height:32px;border-radius:50%;border:none;background:#f5f0e8;cursor:pointer;font-size:1rem;display:flex;align-items:center;justify-content:center;color:#666; }
+    .modal-close:hover { background:#e8e0d6; }
+    .modal-field { margin-bottom:16px; }
+    .modal-field label { display:block;font-size:0.8rem;font-weight:600;color:#555;margin-bottom:6px; }
+    .modal-field input, .modal-field select, .modal-field textarea {
+      width:100%;padding:10px 14px;border:1.5px solid #e8e0d6;border-radius:10px;
+      font-family:'DM Sans',sans-serif;font-size:0.9rem;color:#222;background:#fff;
+      transition:0.15s;
+    }
+    .modal-field input:focus, .modal-field select:focus, .modal-field textarea:focus {
+      outline:none;border-color:#3D5A47;box-shadow:0 0 0 3px rgba(61,90,71,0.1);
+    }
+    .modal-field textarea { resize:vertical;min-height:80px; }
+    .modal-row { display:grid;grid-template-columns:1fr 1fr;gap:12px; }
+    .modal-actions { display:flex;gap:10px;margin-top:24px; }
+    .btn-primary-modal {
+      flex:1;padding:11px;background:#3D5A47;color:#fff;border:none;border-radius:10px;
+      font-family:'DM Sans',sans-serif;font-size:0.9rem;font-weight:600;cursor:pointer;transition:0.15s;
+    }
+    .btn-primary-modal:hover { background:#2a4030; }
+    .btn-secondary-modal {
+      padding:11px 20px;background:#f5f0e8;color:#666;border:none;border-radius:10px;
+      font-family:'DM Sans',sans-serif;font-size:0.9rem;font-weight:600;cursor:pointer;
+    }
+    .btn-secondary-modal:hover { background:#e8e0d6; }
+
+    /* ── Empty states ─────────────────── */
+    .empty-state { padding:40px 24px;text-align:center;color:#bbb; }
+    .empty-state-icon { font-size:2.5rem;margin-bottom:10px;opacity:0.4; }
+    .empty-state-text { font-size:0.87rem;line-height:1.5; }
+
+    /* ── Toast ────────────────────────── */
+    .toast {
+      position:fixed;bottom:28px;right:28px;z-index:9999;
+      padding:12px 20px;border-radius:10px;background:#3D5A47;color:#fff;
+      font-size:0.88rem;font-weight:500;box-shadow:0 8px 24px rgba(0,0,0,0.18);
+      transform:translateY(8px);opacity:0;transition:all 0.25s;pointer-events:none;
+    }
+    .toast.show { transform:translateY(0);opacity:1; }
+    .toast.error { background:#c62828; }
+
+    /* ── Section add-btn ──────────────── */
+    .add-btn {
+      display:inline-flex;align-items:center;gap:6px;
+      padding:7px 14px;background:#3D5A47;color:#fff;border:none;border-radius:8px;
+      font-family:'DM Sans',sans-serif;font-size:0.8rem;font-weight:600;cursor:pointer;transition:0.15s;
+    }
+    .add-btn:hover { background:#2a4030; }
+    .add-btn-sec {
+      display:inline-flex;align-items:center;gap:6px;
+      padding:7px 14px;background:#fff;color:#3D5A47;border:1.5px solid #3D5A47;border-radius:8px;
+      font-family:'DM Sans',sans-serif;font-size:0.8rem;font-weight:600;cursor:pointer;transition:0.15s;
+    }
+    .add-btn-sec:hover { background:#f0f5f1; }
+
+    /* ── Scrollable panel body ────────── */
+    .panel-body-scroll { max-height:360px;overflow-y:auto; }
+
+    /* ── Date pill ────────────────────── */
+    .date-group-label {
+      padding:6px 20px;background:#f8f5f0;font-size:0.68rem;text-transform:uppercase;
+      letter-spacing:0.08em;color:#aaa;font-weight:700;border-bottom:1px solid #f0ede8;
+    }
+
+    /* ── Pulse animation ──────────────── */
+    @keyframes pulse-dot { 0%,100%{opacity:1} 50%{opacity:0.4} }
+    .live-dot { display:inline-block;width:7px;height:7px;border-radius:50%;background:#4cb84c;margin-right:4px;animation:pulse-dot 2s infinite; }
+  </style>
+</head>
+<body>
+<div class="app-layout">
+
+  <!-- ── Sidebar ── -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <a href="/dashboard">
+        <div class="logo-text">Serenis</div>
+      </a>
+    </div>
+    <div class="sidebar-pack" id="sidebarPack">
+      <strong>—</strong><span>Espace vendeur</span>
+    </div>
+    <nav class="sidebar-nav">
+      <a href="/dashboard" class="sidebar-item">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>Tableau de bord
+      </a>
+      <a href="/ma-formation" class="sidebar-item">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>Ma formation
+      </a>
+      <a href="/mon-bien" class="sidebar-item">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>Mon bien
+      </a>
+      <a href="/serenis-connect" class="sidebar-item active">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.27h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 9a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>Serenis Connect
+      </a>
+      <a href="/mon-agenda" class="sidebar-item">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>Mon agenda
+      </a>
+      <a href="/ma-bibliotheque" class="sidebar-item">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg> Ma bibliothèque
+      </a>
+      <a href="/mes-publications" class="sidebar-item">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.55a11 11 0 0 1 14.08 0"/><path d="M1.42 9a16 16 0 0 1 21.16 0"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><circle cx="12" cy="20" r="1"/></svg>Mes publications
+      </a>
+    </nav>
+    <div class="sidebar-footer">
+      <a href="/logout">Déconnexion →</a>
+    </div>
+  </aside>
+
+  <!-- ── Main Content ── -->
+  <main class="main-content">
+
+    <!-- Header -->
+    <div class="page-header">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:12px;">
+        <div>
+          <h1>Serenis Connect</h1>
+          <div class="page-header-sub"><span class="live-dot"></span>Centre de gestion des acquéreurs et des visites</div>
+        </div>
+        <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
+          <button class="add-btn-sec" onclick="openAddContact()">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Acquéreur
+          </button>
+          <button class="add-btn" onclick="openAddVisit()">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Programmer une visite
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Hero: Number + Account -->
+    <div class="connect-hero">
+      <div class="number-card">
+        <div class="number-card-badge">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.27h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 9a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+          Votre numéro dédié Serenis
+        </div>
+        <div class="number-display" id="serenisNumberDisplay">—</div>
+        <div class="number-actions">
+          <button class="btn-copy" id="copyBtn" onclick="copyNumber()">Copier le numéro</button>
+        </div>
+        <div class="number-desc">Publiez ce numéro dans toutes vos annonces immobilières. Il centralise automatiquement les appels, SMS et demandes de visites de vos acquéreurs.</div>
+        <div class="number-no-number-hint" id="noNumberHint" style="display:none;">
+          Votre numéro Serenis sera attribué automatiquement lors de la publication de votre bien.
+        </div>
+      </div>
+
+      <div class="account-card">
+        <div>
+          <div class="account-card-title">Votre compte</div>
+          <div class="account-row">
+            <span class="account-row-label">Email</span>
+            <span class="account-row-value" id="sellerEmail">—</span>
+          </div>
+          <div class="account-row">
+            <span class="account-row-label">Téléphone personnel</span>
+            <span class="account-row-value" id="sellerPhone">—</span>
+          </div>
+          <div class="account-row">
+            <span class="account-row-label">Numéro Serenis</span>
+            <span class="account-row-value number" id="sellerNumber">—</span>
+          </div>
+          <div class="account-row">
+            <span class="account-row-label">Bien</span>
+            <span class="account-row-value" id="sellerProperty">—</span>
+          </div>
+        </div>
+        <div style="margin-top:14px;padding-top:14px;border-top:1px solid #f5f0e8;font-size:0.75rem;color:#bbb;line-height:1.5;">
+          Les appels entrants sur votre numéro Serenis sont filtrés et centralisés ici automatiquement.
+        </div>
+      </div>
+    </div>
+
+    <!-- Stats -->
+    <div class="stats-row">
+      <div class="stat-card highlight">
+        <div class="stat-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#3D5A47" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
+        <div class="stat-num" id="statContacts">0</div>
+        <div class="stat-lbl">Acquéreurs</div>
+      </div>
+      <div class="stat-card warn">
+        <div class="stat-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#C4785A" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
+        <div class="stat-num" id="statPending">0</div>
+        <div class="stat-lbl">Visites en attente</div>
+      </div>
+      <div class="stat-card highlight">
+        <div class="stat-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#3D5A47" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></div>
+        <div class="stat-num" id="statConfirmed">0</div>
+        <div class="stat-lbl">Visites confirmées</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#555" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></div>
+        <div class="stat-num" id="statDone">0</div>
+        <div class="stat-lbl">Visites réalisées</div>
+      </div>
+    </div>
+
+    <!-- AI Insight -->
+    <div class="ai-card">
+      <div class="ai-card-header">
+        <div class="ai-card-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#3D5A47" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></div>
+        <div class="ai-card-title">Analyse IA — Pipeline acquéreurs</div>
+      </div>
+      <div class="ai-card-body loading" id="aiInsightBody">Chargement de l'analyse…</div>
+      <button class="ai-refresh" onclick="loadAiInsight()">↺ Actualiser l'analyse</button>
+    </div>
+
+    <!-- Two columns: Visits + Notifications -->
+    <div class="two-col">
+
+      <!-- Visits panel -->
+      <div class="panel-card">
+        <div class="panel-header">
+          <span class="panel-title">Visites programmées</span>
+          <div style="display:flex;gap:8px;align-items:center;">
+            <span class="panel-count" id="visitCount">0</span>
+            <button class="add-btn" onclick="openAddVisit()" style="padding:5px 10px;font-size:0.75rem;">+ Ajouter</button>
+          </div>
+        </div>
+        <div class="panel-body-scroll" id="visitsPanel">
+          <div class="empty-state">
+            <div class="empty-state-icon"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="opacity:0.35"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div>
+            <div class="empty-state-text">Aucune visite programmée<br>Cliquez sur "+ Ajouter" pour en créer une</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Notifications panel -->
+      <div class="panel-card">
+        <div class="panel-header">
+          <span class="panel-title">Activité récente</span>
+          <div style="display:flex;gap:8px;align-items:center;">
+            <span class="panel-count" id="unreadCount" style="background:#fff3e0;color:#e65100;">0</span>
+            <button class="add-btn-sec" onclick="markAllRead()" style="padding:5px 10px;font-size:0.72rem;">Tout lire</button>
+          </div>
+        </div>
+        <div class="panel-body-scroll" id="notifPanel">
+          <div class="empty-state">
+            <div class="empty-state-icon"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="opacity:0.35"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg></div>
+            <div class="empty-state-text">Aucune activité récente</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Contacts table -->
+    <div class="contacts-section">
+      <div class="panel-header" style="padding:16px 20px;">
+        <span class="panel-title">Acquéreurs</span>
+        <button class="add-btn-sec" onclick="openAddContact()" style="padding:6px 12px;font-size:0.78rem;">+ Ajouter un acquéreur</button>
+      </div>
+      <div id="contactsTableWrap">
+        <div class="empty-state">
+          <div class="empty-state-icon"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="opacity:0.35"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>
+          <div class="empty-state-text">Aucun acquéreur enregistré<br>Publiez votre numéro Serenis dans vos annonces pour recevoir des contacts</div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- ── Modal: Add Visit ── -->
+<div class="modal-overlay" id="addVisitOverlay">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">Programmer une visite</div>
+      <button class="modal-close" onclick="closeModal('addVisitOverlay')">×</button>
+    </div>
+    <div class="modal-field">
+      <label>Nom de l'acquéreur</label>
+      <input type="text" id="vBuyerName" placeholder="Marie Dupont">
+    </div>
+    <div class="modal-row">
+      <div class="modal-field">
+        <label>Téléphone</label>
+        <input type="tel" id="vBuyerPhone" placeholder="06 XX XX XX XX">
+      </div>
+      <div class="modal-field">
+        <label>Email (optionnel)</label>
+        <input type="email" id="vBuyerEmail" placeholder="email@exemple.fr">
+      </div>
+    </div>
+    <div class="modal-row">
+      <div class="modal-field">
+        <label>Date de visite *</label>
+        <input type="date" id="vDate">
+      </div>
+      <div class="modal-field">
+        <label>Heure *</label>
+        <input type="time" id="vTime">
+      </div>
+    </div>
+    <div class="modal-field">
+      <label>Notes (optionnel)</label>
+      <textarea id="vNotes" placeholder="Précisions sur la visite, besoins de l'acquéreur…"></textarea>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-secondary-modal" onclick="closeModal('addVisitOverlay')">Annuler</button>
+      <button class="btn-primary-modal" onclick="submitAddVisit()">Programmer la visite</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── Modal: Add Contact ── -->
+<div class="modal-overlay" id="addContactOverlay">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">Ajouter un acquéreur</div>
+      <button class="modal-close" onclick="closeModal('addContactOverlay')">×</button>
+    </div>
+    <div class="modal-field">
+      <label>Nom</label>
+      <input type="text" id="cBuyerName" placeholder="Jean Martin">
+    </div>
+    <div class="modal-row">
+      <div class="modal-field">
+        <label>Téléphone</label>
+        <input type="tel" id="cBuyerPhone" placeholder="06 XX XX XX XX">
+      </div>
+      <div class="modal-field">
+        <label>Email (optionnel)</label>
+        <input type="email" id="cBuyerEmail" placeholder="email@exemple.fr">
+      </div>
+    </div>
+    <div class="modal-field">
+      <label>Budget estimé (€)</label>
+      <input type="number" id="cBuyerBudget" placeholder="350000">
+    </div>
+    <div class="modal-field">
+      <label>Notes</label>
+      <textarea id="cNotes" placeholder="Motivations, besoins particuliers, financement…"></textarea>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-secondary-modal" onclick="closeModal('addContactOverlay')">Annuler</button>
+      <button class="btn-primary-modal" onclick="submitAddContact()">Ajouter l'acquéreur</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ── State ──────────────────────────────────────────────
+let _data = null;
+
+// ── Boot ───────────────────────────────────────────────
+async function loadData() {
+  try {
+    const res = await fetch('/api/connect/overview');
+    _data = await res.json();
+    renderAll();
+    loadAiInsight();
+  } catch(e) {
+    showToast('Erreur de chargement', 'error');
+  }
+}
+
+function renderAll() {
+  if (!_data) return;
+  renderHeader();
+  renderStats();
+  renderVisits();
+  renderNotifications();
+  renderContacts();
+}
+
+// ── Header / Account card ──────────────────────────────
+function renderHeader() {
+  const { seller, property } = _data;
+  if (!seller) return;
+
+  const num = seller.twilio_number;
+  const numEl = document.getElementById('serenisNumberDisplay');
+  const hintEl = document.getElementById('noNumberHint');
+
+  if (num) {
+    numEl.textContent = num;
+    numEl.classList.remove('no-number');
+    hintEl.style.display = 'none';
+  } else {
+    numEl.textContent = 'Numéro en attente d\'attribution';
+    numEl.classList.add('no-number');
+    hintEl.style.display = 'block';
+  }
+
+  document.getElementById('sellerEmail').textContent = seller.email || '—';
+  document.getElementById('sellerPhone').textContent = seller.phone || '—';
+  const numSmall = document.getElementById('sellerNumber');
+  numSmall.textContent = num || '—';
+  numSmall.className = 'account-row-value ' + (num ? 'number' : 'missing');
+
+  if (property) {
+    const parts = [property.type, property.rooms ? property.rooms + 'P' : null, property.surface_habitable ? property.surface_habitable + 'm²' : null, property.city].filter(Boolean);
+    document.getElementById('sellerProperty').textContent = parts.join(' · ') || '—';
+  } else {
+    document.getElementById('sellerProperty').textContent = 'Non renseigné';
+    document.getElementById('sellerProperty').classList.add('missing');
+  }
+
+  const packEl = document.getElementById('sidebarPack');
+  if (packEl) packEl.innerHTML = `<strong>${seller.pack || 'Autonome'}</strong><span>Espace vendeur</span>`;
+}
+
+// ── Stats ──────────────────────────────────────────────
+function renderStats() {
+  const s = _data.stats;
+  document.getElementById('statContacts').textContent = s.contacts;
+  document.getElementById('statPending').textContent = s.visits_pending;
+  document.getElementById('statConfirmed').textContent = s.visits_confirmed;
+  document.getElementById('statDone').textContent = s.visits_done;
+  document.getElementById('visitCount').textContent = s.visits_total;
+  document.getElementById('unreadCount').textContent = s.unread;
+}
+
+// ── Visits ─────────────────────────────────────────────
+function renderVisits() {
+  const container = document.getElementById('visitsPanel');
+  const visits = _data.visits || [];
+
+  if (visits.length === 0) {
+    container.innerHTML = `<div class="empty-state"><div class="empty-state-icon"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="opacity:0.35"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div><div class="empty-state-text">Aucune visite programmée<br>Cliquez sur "+ Ajouter" pour en créer une</div></div>`;
+    return;
+  }
+
+  // Sort: upcoming first (pending/confirmed), then done/cancelled
+  const active = visits.filter(v => ['pending','confirmed'].includes(v.status)).sort((a,b) => (a.visit_date+a.visit_time).localeCompare(b.visit_date+b.visit_time));
+  const past = visits.filter(v => ['done','cancelled'].includes(v.status)).sort((a,b) => b.visit_date.localeCompare(a.visit_date));
+  const sorted = [...active, ...past];
+
+  const STATUS_LABELS = { pending:'En attente', confirmed:'Confirmée', cancelled:'Annulée', done:'Réalisée' };
+
+  let html = '';
+  sorted.forEach(v => {
+    const initials = (v.buyer_name || 'A').split(' ').map(w=>w[0]).slice(0,2).join('').toUpperCase();
+    const dateStr = v.visit_date ? new Date(v.visit_date + 'T12:00:00').toLocaleDateString('fr-FR', {weekday:'short',day:'numeric',month:'long'}) : '—';
+    const timeStr = v.visit_time ? v.visit_time.slice(0,5) : '—';
+
+    const actionButtons = v.status === 'pending' ? `
+      <button class="visit-actions btn-confirm" data-vid="${v.id}" data-vstatus="confirmed">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg> Confirmer
+      </button>
+      <button class="visit-actions btn-cancel" data-vid="${v.id}" data-vstatus="cancelled">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg> Annuler
+      </button>
+    ` : v.status === 'confirmed' ? `
+      <button class="visit-actions btn-done" data-vid="${v.id}" data-vstatus="done">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg> Visite réalisée
+      </button>
+      <button class="visit-actions btn-cancel" data-vid="${v.id}" data-vstatus="cancelled">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg> Annuler
+      </button>
+    ` : '';
+
+    html += `
+    <div class="visit-item">
+      <div class="visit-avatar">${initials}</div>
+      <div class="visit-info">
+        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+          <div class="visit-name">${v.buyer_name || 'Acquéreur'}</div>
+          <span class="status-badge status-${v.status}">${STATUS_LABELS[v.status] || v.status}</span>
+        </div>
+        ${v.buyer_phone ? `<div class="visit-phone" style="display:flex;align-items:center;gap:4px;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.27h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 9a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg> ${v.buyer_phone}</div>` : ''}
+        <div class="visit-datetime"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg> ${dateStr} à ${timeStr}</div>
+        ${v.notes ? `<div style="font-size:0.77rem;color:#888;margin-top:4px;font-style:italic;">${v.notes}</div>` : ''}
+        <div class="visit-actions">
+          ${actionButtons}
+          <button class="visit-actions btn-del" data-vid="${v.id}" data-vdelete="true" title="Supprimer la visite"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg></button>
+        </div>
+      </div>
+    </div>`;
+  });
+
+  container.innerHTML = html;
+}
+
+// ── Notifications ──────────────────────────────────────
+function renderNotifications() {
+  const container = document.getElementById('notifPanel');
+  const notifs = _data.notifications || [];
+
+  if (notifs.length === 0) {
+    container.innerHTML = `<div class="empty-state"><div class="empty-state-icon"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="opacity:0.35"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg></div><div class="empty-state-text">Aucune activité récente</div></div>`;
+    return;
+  }
+
+  function timeAgo(dateStr) {
+    const diff = Date.now() - new Date(dateStr).getTime();
+    const m = Math.floor(diff/60000), h = Math.floor(m/60), d = Math.floor(h/24);
+    if (d > 0) return 'il y a ' + d + 'j';
+    if (h > 0) return 'il y a ' + h + 'h';
+    if (m > 0) return 'il y a ' + m + 'min';
+    return 'à l\'instant';
+  }
+
+  let html = notifs.map(n => `
+    <div class="notif-item ${n.read_at ? '' : 'unread'}">
+      <div class="notif-dot ${n.type}"></div>
+      <div class="notif-content">
+        <div class="notif-title">${n.title}</div>
+        ${n.body ? `<div class="notif-body">${n.body}</div>` : ''}
+        <div class="notif-time">${timeAgo(n.created_at)}</div>
+      </div>
+    </div>`).join('');
+
+  container.innerHTML = html;
+}
+
+// ── Contacts table ─────────────────────────────────────
+function renderContacts() {
+  const wrap = document.getElementById('contactsTableWrap');
+  const contacts = _data.contacts || [];
+
+  if (contacts.length === 0) {
+    wrap.innerHTML = `<div class="empty-state"><div class="empty-state-icon"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="opacity:0.35"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div><div class="empty-state-text">Aucun acquéreur enregistré<br>Publiez votre numéro Serenis dans vos annonces pour recevoir des contacts</div></div>`;
+    return;
+  }
+
+  const STATUS_OPTS = [
+    {val:'new', label:'Nouveau'},
+    {val:'qualified', label:'Qualifié'},
+    {val:'visit_planned', label:'Visite planifiée'},
+    {val:'not_retained', label:'Non retenu'},
+  ];
+
+  let rows = contacts.map(c => {
+    const date = c.created_at ? new Date(c.created_at).toLocaleDateString('fr-FR', {day:'2-digit',month:'short'}) : '—';
+    const statusOpts = STATUS_OPTS.map(o => `<option value="${o.val}" ${c.status === o.val ? 'selected' : ''}>${o.label}</option>`).join('');
+    const budget = c.buyer_budget ? parseInt(c.buyer_budget).toLocaleString('fr-FR') + ' €' : '—';
+
+    return `<tr>
+      <td>
+        <div class="contact-name">${c.buyer_name || '—'}</div>
+        <div class="contact-phone">${c.buyer_phone || ''}</div>
+      </td>
+      <td style="color:#666;font-size:0.83rem;">${c.buyer_email || '—'}</td>
+      <td style="font-size:0.83rem;color:#555;">${budget}</td>
+      <td>
+        <span class="contact-source ${c.source === 'serenis' ? 'source-serenis' : 'source-manuel'}">
+          ${c.source === 'serenis' ? 'Serenis' : 'Manuel'}
+        </span>
+      </td>
+      <td>
+        <select class="contact-status-select status-${c.status}" onchange="updateContactStatus(${c.id}, this)">
+          ${statusOpts}
+        </select>
+      </td>
+      <td style="color:#aaa;font-size:0.8rem;">${date}</td>
+      <td>
+        <div class="contact-actions">
+          <button class="btn-icon" title="Programmer une visite" data-cid="${c.id}" data-cprefill="true"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></button>
+          <button class="btn-icon danger" title="Supprimer" data-cid="${c.id}" data-cdelete="true"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg></button>
+        </div>
+      </td>
+    </tr>`;
+  }).join('');
+
+  wrap.innerHTML = `
+    <div style="overflow-x:auto;">
+      <table class="contacts-table">
+        <thead>
+          <tr>
+            <th>Acquéreur</th>
+            <th>Email</th>
+            <th>Budget</th>
+            <th>Source</th>
+            <th>Statut</th>
+            <th>Ajouté</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>${rows}</tbody>
+      </table>
+    </div>`;
+}
+
+// ── Visit actions ──────────────────────────────────────
+async function updateVisit(id, status) {
+  try {
+    await fetch(`/api/visits/${id}/status`, { method:'PUT', headers:{'Content-Type':'application/json'}, body: JSON.stringify({status}) });
+    showToast(status === 'confirmed' ? 'Visite confirmée ✓' : status === 'done' ? 'Visite marquée réalisée ✓' : 'Statut mis à jour');
+    await loadData();
+  } catch(e) { showToast('Erreur', 'error'); }
+}
+
+async function deleteVisit(id) {
+  if (!confirm('Supprimer cette visite ?')) return;
+  await fetch(`/api/visits/${id}`, { method:'DELETE' });
+  showToast('Visite supprimée');
+  await loadData();
+}
+
+// ── Contact actions ────────────────────────────────────
+async function updateContactStatus(id, select) {
+  const status = select.value;
+  select.className = 'contact-status-select status-' + status;
+  try {
+    await fetch(`/api/connect/contacts/${id}/status`, { method:'PUT', headers:{'Content-Type':'application/json'}, body: JSON.stringify({status}) });
+  } catch(e) { showToast('Erreur', 'error'); }
+}
+
+async function deleteContact(id) {
+  if (!confirm('Supprimer cet acquéreur ?')) return;
+  await fetch(`/api/connect/contacts/${id}`, { method:'DELETE' });
+  showToast('Acquéreur supprimé');
+  await loadData();
+}
+
+function prefillVisit(contactId) {
+  var c = (_data.contacts || []).find(function(x) { return x.id === contactId; });
+  if (!c) return;
+  document.getElementById('vBuyerName').value = c.buyer_name || '';
+  document.getElementById('vBuyerPhone').value = c.buyer_phone || '';
+  document.getElementById('vBuyerEmail').value = c.buyer_email || '';
+  openAddVisit();
+}
+
+// ── Add Visit modal ────────────────────────────────────
+function openAddVisit() {
+  const today = new Date().toISOString().split('T')[0];
+  document.getElementById('vDate').value = today;
+  document.getElementById('vTime').value = '14:00';
+  openModal('addVisitOverlay');
+}
+
+async function submitAddVisit() {
+  const body = {
+    buyer_name: document.getElementById('vBuyerName').value.trim(),
+    buyer_phone: document.getElementById('vBuyerPhone').value.trim(),
+    buyer_email: document.getElementById('vBuyerEmail').value.trim(),
+    visit_date: document.getElementById('vDate').value,
+    visit_time: document.getElementById('vTime').value,
+    notes: document.getElementById('vNotes').value.trim(),
+  };
+  if (!body.visit_date || !body.visit_time) { showToast('Date et heure requises', 'error'); return; }
+  try {
+    const res = await fetch('/api/visits', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(body) });
+    const data = await res.json();
+    if (data.error) { showToast(data.error, 'error'); return; }
+    closeModal('addVisitOverlay');
+    // Clear form
+    ['vBuyerName','vBuyerPhone','vBuyerEmail','vNotes'].forEach(id => document.getElementById(id).value = '');
+    showToast('Visite programmée ✓');
+    await loadData();
+  } catch(e) { showToast('Erreur réseau', 'error'); }
+}
+
+// ── Add Contact modal ──────────────────────────────────
+function openAddContact() { openModal('addContactOverlay'); }
+
+async function submitAddContact() {
+  const body = {
+    buyer_name: document.getElementById('cBuyerName').value.trim(),
+    buyer_phone: document.getElementById('cBuyerPhone').value.trim(),
+    buyer_email: document.getElementById('cBuyerEmail').value.trim(),
+    buyer_budget: document.getElementById('cBuyerBudget').value.trim(),
+    notes: document.getElementById('cNotes').value.trim(),
+  };
+  try {
+    const res = await fetch('/api/connect/contacts', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(body) });
+    const data = await res.json();
+    if (data.error) { showToast(data.error, 'error'); return; }
+    closeModal('addContactOverlay');
+    ['cBuyerName','cBuyerPhone','cBuyerEmail','cBuyerBudget','cNotes'].forEach(id => document.getElementById(id).value = '');
+    showToast('Acquéreur ajouté ✓');
+    await loadData();
+  } catch(e) { showToast('Erreur réseau', 'error'); }
+}
+
+// ── Mark all notifications read ────────────────────────
+async function markAllRead() {
+  await fetch('/api/connect/notifications/read-all', { method:'POST' });
+  showToast('Notifications lues ✓');
+  await loadData();
+}
+
+// ── Copy number ────────────────────────────────────────
+function copyNumber() {
+  const num = _data?.seller?.twilio_number;
+  if (!num) { showToast('Aucun numéro attribué', 'error'); return; }
+  navigator.clipboard.writeText(num).then(() => {
+    const btn = document.getElementById('copyBtn');
+    btn.textContent = '✓ Copié !';
+    btn.classList.add('copied');
+    showToast('Numéro copié ✓');
+    setTimeout(() => { btn.textContent = 'Copier le numéro'; btn.classList.remove('copied'); }, 2000);
+  });
+}
+
+// ── AI Insight ─────────────────────────────────────────
+async function loadAiInsight() {
+  const body = document.getElementById('aiInsightBody');
+  body.textContent = 'Analyse en cours…';
+  body.className = 'ai-card-body loading';
+  try {
+    const res = await fetch('/api/connect/ai-insight', { method:'POST' });
+    const data = await res.json();
+    body.textContent = data.insight || 'Analyse indisponible.';
+    body.className = 'ai-card-body';
+  } catch(e) {
+    body.textContent = 'Analyse indisponible pour le moment.';
+    body.className = 'ai-card-body';
+  }
+}
+
+// ── Modal helpers ──────────────────────────────────────
+function openModal(id) {
+  document.getElementById(id).classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeModal(id) {
+  document.getElementById(id).classList.remove('open');
+  document.body.style.overflow = '';
+}
+document.querySelectorAll('.modal-overlay').forEach(o => {
+  o.addEventListener('click', e => { if (e.target === o) closeModal(o.id); });
+});
+
+// ── Toast ──────────────────────────────────────────────
+function showToast(msg, type) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast' + (type === 'error' ? ' error' : '') + ' show';
+  clearTimeout(t._timer);
+  t._timer = setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+// ── Event delegation ───────────────────────────────────
+document.getElementById('visitsPanel').addEventListener('click', function(e) {
+  var btn = e.target.closest('[data-vid]');
+  if (!btn) return;
+  var id = parseInt(btn.dataset.vid, 10);
+  if (btn.dataset.vdelete) {
+    deleteVisit(id);
+  } else if (btn.dataset.vstatus) {
+    updateVisit(id, btn.dataset.vstatus);
+  }
+});
+
+document.getElementById('contactsTableWrap').addEventListener('click', function(e) {
+  var btn = e.target.closest('[data-cid]');
+  if (!btn) return;
+  var id = parseInt(btn.dataset.cid, 10);
+  if (btn.dataset.cprefill) {
+    prefillVisit(id);
+  } else if (btn.dataset.cdelete) {
+    deleteContact(id);
+  }
+});
+
+// ── Init ───────────────────────────────────────────────
+loadData();
+</script>
+</body>
+</html>
