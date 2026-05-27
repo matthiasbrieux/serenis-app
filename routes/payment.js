@@ -9,7 +9,7 @@ const { sendWelcomeEmail } = require('../services/email');
 
 // Checkout session creation
 router.post('/create-checkout', async (req, res) => {
-  const { pack, email, password } = req.body;
+  const { pack, email, password, plan } = req.body;
   if (pack !== 'serenite') return res.json({ error: 'Pack invalide' });
   if (!email) return res.json({ error: 'Email requis' });
   if (!password || password.length < 8) return res.json({ error: 'Mot de passe trop court (8 caractères minimum).' });
@@ -18,8 +18,16 @@ router.post('/create-checkout', async (req, res) => {
     return res.json({ error: 'Paiement non configuré. Contactez Matthias au 06 95 44 36 54.' });
   }
 
+  const is4x = plan === '4x';
+  const amount = is4x ? 24900 : 99900; // 249€ ou 999€ en centimes
+  const productName = is4x
+    ? 'Pack Sérénité — Serenis (1er paiement sur 4)'
+    : 'Pack Sérénité — Serenis';
+  const productDesc = is4x
+    ? '1er versement sur 4 · 249€ × 4 = 996€ · sans frais ni intérêts'
+    : 'Photographe pro · Visite virtuelle · Numéro Serenis · Dossiers automatisés';
+
   try {
-    // Pré-créer ou mettre à jour le compte vendeur (paid_at NULL = pas encore payé)
     const hashed = await bcrypt.hash(password, 12);
     const uuid = uuidv4();
     const existing = db.prepare('SELECT id FROM sellers WHERE email = ?').get(email.toLowerCase());
@@ -35,11 +43,8 @@ router.post('/create-checkout', async (req, res) => {
       line_items: [{
         price_data: {
           currency: 'eur',
-          product_data: {
-            name: 'Pack Sérénité — Serenis',
-            description: 'Photographe pro · Visite virtuelle · Numéro Serenis · Dossiers automatisés · 6 mois d\'accompagnement',
-          },
-          unit_amount: 99900,
+          product_data: { name: productName, description: productDesc },
+          unit_amount: amount,
         },
         quantity: 1,
       }],
@@ -47,7 +52,7 @@ router.post('/create-checkout', async (req, res) => {
       customer_email: email,
       success_url: `${process.env.BASE_URL}/paiement-succes?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${process.env.BASE_URL}/#offres`,
-      metadata: { pack, email, seller_id: String(seller.id) },
+      metadata: { pack, email, seller_id: String(seller.id), plan: plan || 'unique', installment: is4x ? '1' : '1', total_installments: is4x ? '4' : '1' },
       locale: 'fr',
     });
     res.json({ url: session.url });
