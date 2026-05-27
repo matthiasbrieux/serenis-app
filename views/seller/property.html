@@ -824,11 +824,11 @@
     <!-- Tabs -->
     <div style="display:flex;gap:8px;margin-bottom:28px;flex-wrap:wrap;">
       <button type="button" class="tab-btn active" data-tab="infos">📋 Informations</button>
+      <button type="button" class="tab-btn" data-tab="photo-service">📷 Séance photo</button>
       <button type="button" class="tab-btn" data-tab="photos">📸 Photos</button>
       <button type="button" class="tab-btn" data-tab="documents">📁 Documents</button>
       <button type="button" class="tab-btn" data-tab="fiche">📋 Dossier envoi client</button>
       <button type="button" class="tab-btn" data-tab="publication">🚀 Publication</button>
-      <button type="button" class="tab-btn" data-tab="photo-service">📷 Séance photo</button>
     </div>
 
     <!-- ═══════════════════════════════════════════════════
@@ -2160,6 +2160,15 @@
     function dateStr(d) { return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`; }
     function getMonthKey(d) { return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`; }
 
+    async function waitForPropertyData() {
+      // Poll until _propertyData is populated (loaded by the main script)
+      for (let i = 0; i < 30; i++) {
+        if (typeof _propertyData !== 'undefined' && _propertyData !== null) return true;
+        await new Promise(r => setTimeout(r, 200));
+      }
+      return false;
+    }
+
     async function loadPhotoService() {
       if (psLoaded) return;
       psLoaded = true;
@@ -2167,24 +2176,29 @@
       try {
         // Check existing mission
         const mr = await fetch('/api/seller/my-mission');
-        const { mission } = await mr.json();
-        if (mission) { renderMissionStatus(el, mission); return; }
+        if (mr.status === 401) { window.location.href = '/login'; return; }
+        const mData = await mr.json();
+        if (mData.mission) { renderMissionStatus(el, mData.mission); return; }
 
-        // Check property has postal code
-        const prop = _propertyData?.property;
+        // Wait for property data to be loaded by the main script
+        const ready = await waitForPropertyData();
+        const prop = ready ? _propertyData?.property : null;
+
         if (!prop?.postal_code) {
           el.innerHTML = `<div class="ps-notice">⚠️ Renseignez d'abord le code postal de votre bien dans l'onglet <strong>Informations</strong> avant de réserver votre séance photo.</div>`;
           return;
         }
         // Load slots
-        const sr = await fetch('/api/seller/available-slots?postal_code=' + prop.postal_code);
-        const { slots } = await sr.json();
-        psSlots = slots || [];
+        const sr = await fetch('/api/seller/available-slots?postal_code=' + encodeURIComponent(prop.postal_code));
+        const sData = await sr.json();
+        if (sData.error) throw new Error(sData.error);
+        psSlots = sData.slots || [];
         psSlotsByDate = {};
         psSlots.forEach(s => { (psSlotsByDate[s.date] = psSlotsByDate[s.date] || []).push(s); });
         renderBookingForm(el, prop);
       } catch(e) {
-        el.innerHTML = `<div style="color:#dc2626;font-size:0.88rem;">Erreur de chargement. Rechargez la page.</div>`;
+        console.error('Photo service error:', e);
+        el.innerHTML = `<div style="color:#dc2626;font-size:0.88rem;">Erreur : ${e.message || 'rechargez la page.'}</div>`;
       }
     }
 
@@ -2361,11 +2375,13 @@
       }
     }
 
-    // Hook: load when tab is clicked
-    document.addEventListener('DOMContentLoaded', () => {
+    // Hook: load when tab is clicked (works whether DOM is ready or not)
+    function bindPhotoTab() {
       const tabBtn = document.querySelector('.tab-btn[data-tab="photo-service"]');
-      if (tabBtn) tabBtn.addEventListener('click', () => setTimeout(loadPhotoService, 50));
-    });
+      if (tabBtn) tabBtn.addEventListener('click', () => setTimeout(loadPhotoService, 80));
+    }
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', bindPhotoTab);
+    else bindPhotoTab();
   })();
   </script>
 </div>
