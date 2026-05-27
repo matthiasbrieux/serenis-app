@@ -630,7 +630,7 @@ router.get('/api/seller/available-slots', requireAuth, (req, res) => {
 });
 
 // Créer la mission et assigner un photographe
-router.post('/api/seller/book-photography', requireAuth, (req, res) => {
+router.post('/api/seller/book-photography', requireAuth, async (req, res) => {
   const { slot_id, access_notes, rooms_detail } = req.body;
   if (!slot_id) return res.json({ error: 'Créneau requis' });
 
