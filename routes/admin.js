@@ -18,6 +18,10 @@ router.get('/crm', requireAdmin, (req, res) => {
   res.sendFile('crm.html', { root: './views/admin' });
 });
 
+router.get('/marketing', requireAdmin, (req, res) => {
+  res.sendFile('marketing.html', { root: './views/admin' });
+});
+
 // ── Seed de démonstration ─────────────────────────────────
 router.post('/api/seed-demo', requireAdmin, (req, res) => {
   function ago(days) {
