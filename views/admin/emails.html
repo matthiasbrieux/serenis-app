@@ -210,13 +210,13 @@
         <div id="previewTitle" style="font-weight:700;color:#fff;font-size:1rem;"></div>
       </div>
       <div style="display:flex;gap:8px;align-items:center;">
-        <button id="previewToggleBtn" onclick="togglePreviewMode()" style="background:#2a2a24;border:none;color:#ccc;padding:7px 14px;border-radius:8px;cursor:pointer;font-size:0.82rem;">👁 Visuel</button>
+        <button id="previewToggleBtn" onclick="togglePreviewMode()" style="background:#2a2a24;border:none;color:#ccc;padding:7px 14px;border-radius:8px;cursor:pointer;font-size:0.82rem;">< > Source</button>
         <button onclick="closePreview()" style="background:#2a2a24;border:none;color:#ccc;padding:7px 14px;border-radius:8px;cursor:pointer;font-size:0.82rem;">✕ Fermer</button>
       </div>
     </div>
-    <div style="flex:1;overflow:hidden;position:relative;">
-      <iframe id="previewIframe" style="width:100%;height:100%;border:none;background:#fff;"></iframe>
-      <textarea id="previewSource" style="display:none;width:100%;height:100%;border:none;padding:16px;font-family:monospace;font-size:0.78rem;background:#0f0f0d;color:#a8d4b8;resize:none;box-sizing:border-box;"></textarea>
+    <div style="flex:1;overflow:hidden;position:relative;background:#fff;min-height:0;">
+      <iframe id="previewIframe" style="position:absolute;inset:0;width:100%;height:100%;border:none;" allowfullscreen></iframe>
+      <textarea id="previewSource" style="display:none;position:absolute;inset:0;width:100%;height:100%;border:none;padding:16px;font-family:monospace;font-size:0.78rem;background:#0f0f0d;color:#a8d4b8;resize:none;box-sizing:border-box;"></textarea>
     </div>
     <div style="padding:12px 20px;border-top:1px solid #2a2a24;display:flex;gap:8px;flex-shrink:0;">
       <button onclick="copyHtml()" style="background:#2a2a24;border:none;color:#ccc;padding:8px 16px;border-radius:8px;cursor:pointer;font-size:0.82rem;">📋 Copier le HTML</button>
@@ -230,29 +230,35 @@
 <script>
 let previewMode = 'visual'; // 'visual' | 'source'
 let currentPreviewHtml = '';
+let currentPreviewId = '';
 
 async function openPreview(id, label) {
+  currentPreviewId = id;
+  currentPreviewHtml = '';
+  previewMode = 'visual';
   document.getElementById('previewModal').style.display = 'flex';
   document.getElementById('previewTitle').textContent = label;
-  document.getElementById('previewIframe').srcdoc = '<div style="font-family:Arial;padding:40px;color:#999;text-align:center;">Chargement…</div>';
-  document.getElementById('previewSource').value = '';
-  previewMode = 'visual';
   document.getElementById('previewToggleBtn').textContent = '< > Source';
-  document.getElementById('previewIframe').style.display = '';
+  document.getElementById('previewIframe').style.display = 'block';
   document.getElementById('previewSource').style.display = 'none';
+  document.getElementById('previewSource').value = '';
+  // Load email HTML in iframe via src — browser sends auth cookie automatically
+  document.getElementById('previewIframe').src = `/admin/api/emails/preview/${id}`;
+  // Also fetch source text for the textarea view
   try {
     const r = await fetch(`/admin/api/emails/preview/${id}`);
     currentPreviewHtml = await r.text();
-    document.getElementById('previewIframe').srcdoc = currentPreviewHtml;
     document.getElementById('previewSource').value = currentPreviewHtml;
   } catch(e) {
-    document.getElementById('previewIframe').srcdoc = `<p style="font-family:Arial;padding:32px;color:red;">Erreur : ${e.message}</p>`;
+    document.getElementById('previewSource').value = `Erreur : ${e.message}`;
   }
 }
 
 function closePreview() {
   document.getElementById('previewModal').style.display = 'none';
-  document.getElementById('previewIframe').srcdoc = '';
+  document.getElementById('previewIframe').src = 'about:blank';
+  currentPreviewHtml = '';
+  currentPreviewId = '';
 }
 
 function togglePreviewMode() {
@@ -268,15 +274,13 @@ function togglePreviewMode() {
     previewMode = 'visual';
     source.style.display = 'none';
     iframe.style.display = 'block';
-    // Sync any edits from source back to iframe
-    currentPreviewHtml = source.value;
-    iframe.srcdoc = currentPreviewHtml;
     btn.textContent = '< > Source';
   }
 }
 
 function copyHtml() {
-  const html = previewMode === 'source' ? document.getElementById('previewSource').value : currentPreviewHtml;
+  const html = currentPreviewHtml || document.getElementById('previewSource').value;
+  if (!html) { showToast('Aucun contenu à copier', true); return; }
   navigator.clipboard.writeText(html).then(() => showToast('HTML copié !')).catch(() => showToast('Erreur copie', true));
 }
 

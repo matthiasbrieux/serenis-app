@@ -1346,7 +1346,7 @@ async function sendWelcomeImproved({ to, firstName, pack, tempPassword }) {
 async function sendDossierToNotaire({ notaireEmail, notaireName, sellerName, property, dossierUrl }) {
   const msg = {
     to: notaireEmail,
-    from: { email: FROM_EMAIL, name: 'Serenis Immobilier' },
+    from: { email: FROM.email, name: 'Serenis Immobilier' },
     subject: `Dossier complet — ${property.type ? property.type.charAt(0).toUpperCase()+property.type.slice(1) : 'Bien'} ${property.city || ''}`,
     html: `<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8"></head><body style="margin:0;padding:0;background:#f4f4f0;font-family:'Helvetica Neue',Arial,sans-serif;">
 <table width="100%" cellpadding="0" cellspacing="0"><tr><td align="center" style="padding:32px 16px;">
