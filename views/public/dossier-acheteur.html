@@ -454,10 +454,13 @@ function render(p, ph, docs) {
         <div class="bform-recap" id="bformRecap"></div>
         <div class="booking-form-grid">
           <div class="bform-row">
-            <div class="bform-field"><label>Prénom et nom *</label><input type="text" id="bfName" placeholder="Marie Dupont"></div>
-            <div class="bform-field"><label>Email *</label><input type="email" id="bfEmail" placeholder="marie@exemple.fr"></div>
+            <div class="bform-field"><label>Prénom *</label><input type="text" id="bfFirstName" placeholder="Marie"></div>
+            <div class="bform-field"><label>Nom *</label><input type="text" id="bfLastName" placeholder="Dupont"></div>
           </div>
-          <div class="bform-field"><label>Téléphone</label><input type="tel" id="bfPhone" placeholder="06 00 00 00 00"></div>
+          <div class="bform-row">
+            <div class="bform-field"><label>Email *</label><input type="email" id="bfEmail" placeholder="marie@exemple.fr"></div>
+            <div class="bform-field"><label>Téléphone *</label><input type="tel" id="bfPhone" placeholder="06 00 00 00 00"></div>
+          </div>
           <button class="bform-submit" id="bfSubmit" onclick="submitBooking()">Confirmer ma visite</button>
         </div>
       </div>
@@ -602,10 +605,12 @@ function showStep(id) {
 }
 
 async function submitBooking() {
-  const name = document.getElementById('bfName').value.trim();
+  const firstName = document.getElementById('bfFirstName').value.trim();
+  const lastName = document.getElementById('bfLastName').value.trim();
   const email = document.getElementById('bfEmail').value.trim();
   const phone = document.getElementById('bfPhone').value.trim();
-  if (!name || !email) { alert('Prénom/nom et email requis.'); return; }
+  if (!firstName || !lastName || !email || !phone) { alert('Tous les champs sont obligatoires.'); return; }
+  const name = firstName + ' ' + lastName;
 
   const btn = document.getElementById('bfSubmit');
   btn.disabled = true; btn.textContent = 'Envoi en cours...';
