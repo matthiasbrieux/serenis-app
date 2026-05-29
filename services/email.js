@@ -1343,4 +1343,55 @@ async function sendWelcomeImproved({ to, firstName, pack, tempPassword }) {
   } catch(e) { console.error('[EMAIL ERROR] sendWelcomeImproved:', e.message); return false; }
 }
 
-module.exports = { sendWelcomeEmail, sendDossierEmail, sendVisitConfirmation, sendContactNotification, sendMissionAssigned, sendMissionConfirmed, sendMissionReminderJ1, sendProspectNudge, sendNoPropertyNudge, sendNoPhotosNudge, sendNotPublishedNudge, sendNewVisitRequest, sendVisitReminderSeller, sendMissingDocNudge, sendPublishedConfirmation, sendContractRenewal, sendReviewRequest, sendAdminDirectEmail, sendInvoiceEmail, sendOfferNotification, sendPostVisitBuyerNudge, sendWeeklyAdminReport, sendPhotographerAvailabilityRequest, sendPostFirstVisitFeedbackSeller, sendCheckInNoOffer, sendInfoNeededEmail, sendBuyerContactedSeller, sendVisitFeedbackRequest, sendSoldCongrats, sendWelcomeImproved };
+async function sendDossierToNotaire({ notaireEmail, notaireName, sellerName, property, dossierUrl }) {
+  const msg = {
+    to: notaireEmail,
+    from: { email: FROM_EMAIL, name: 'Serenis Immobilier' },
+    subject: `Dossier complet — ${property.type ? property.type.charAt(0).toUpperCase()+property.type.slice(1) : 'Bien'} ${property.city || ''}`,
+    html: `<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8"></head><body style="margin:0;padding:0;background:#f4f4f0;font-family:'Helvetica Neue',Arial,sans-serif;">
+<table width="100%" cellpadding="0" cellspacing="0"><tr><td align="center" style="padding:32px 16px;">
+<table width="600" cellpadding="0" cellspacing="0" style="border-radius:12px;overflow:hidden;box-shadow:0 2px 16px rgba(0,0,0,0.08);">
+
+  <tr><td style="background:#1A1A16;padding:28px 40px;">
+    <p style="color:#C4785A;font-family:Georgia,serif;font-size:22px;margin:0;">Sere<em style="color:#C4785A;">nis</em></p>
+    <p style="color:rgba(196,120,90,0.7);font-size:12px;margin:4px 0 0;">Dossier notaire · Document confidentiel</p>
+  </td></tr>
+
+  <tr><td style="background:#FDFCF8;padding:40px;">
+    <p style="color:#888;font-size:13px;margin:0 0 8px;">Bonjour${notaireName ? ' ' + notaireName : ''},</p>
+    <h2 style="color:#1A1A16;font-family:Georgia,serif;font-size:22px;margin:0 0 16px;">Votre client ${sellerName} vous transmet son dossier de vente</h2>
+    <p style="color:#555;line-height:1.7;margin:0 0 24px;">Ce dossier contient l'ensemble des documents et informations nécessaires à la rédaction des actes : diagnostics techniques, titre de propriété, informations sur le bien et les éventuelles offres reçues.</p>
+
+    <div style="background:#f5f0e8;border-radius:10px;padding:20px 24px;margin:0 0 28px;">
+      <p style="font-size:12px;font-weight:bold;color:#888;text-transform:uppercase;letter-spacing:0.05em;margin:0 0 10px;">Bien concerné</p>
+      <p style="margin:4px 0;font-size:15px;color:#1A1A16;"><strong>${property.address || '—'}</strong></p>
+      <p style="margin:4px 0;font-size:14px;color:#555;">${property.city || ''} ${property.postal_code || ''}</p>
+      ${property.price ? `<p style="margin:8px 0 0;font-size:15px;color:#C4785A;font-weight:bold;">Prix de vente : ${Number(property.price).toLocaleString('fr-FR')} €</p>` : ''}
+    </div>
+
+    <div style="text-align:center;margin:0 0 32px;">
+      <a href="${dossierUrl}" style="background:#1A1A16;color:#fff;padding:16px 40px;text-decoration:none;border-radius:8px;font-weight:bold;font-size:15px;display:inline-block;">⚖️ Accéder au dossier complet →</a>
+      <p style="font-size:12px;color:#aaa;margin:10px 0 0;">${dossierUrl}</p>
+    </div>
+
+    <div style="background:#fef3cd;border:1px solid #ffc107;border-radius:8px;padding:14px 18px;">
+      <p style="font-size:13px;color:#856404;margin:0;">🔒 <strong>Document confidentiel</strong> — Ce lien est réservé à votre usage exclusif en tant que notaire en charge de la transaction. Ne pas diffuser.</p>
+    </div>
+  </td></tr>
+
+  <tr><td style="background:#3D5A47;padding:22px 40px;text-align:center;">
+    <p style="color:#D4E4D8;font-size:13px;margin:0 0 4px;">Serenis · Plateforme de vente immobilière entre particuliers</p>
+    <p style="color:#5C7A65;font-size:12px;margin:0;">contact@serenis.fr</p>
+  </td></tr>
+
+</table></td></tr></table>
+</body></html>`,
+  };
+  try {
+    if (!process.env.SENDGRID_API_KEY) { console.log('[EMAIL SKIPPED] sendDossierToNotaire:', notaireEmail); return true; }
+    await sgMail.send(msg);
+    return true;
+  } catch(e) { console.error('[EMAIL ERROR] sendDossierToNotaire:', e.message); return false; }
+}
+
+module.exports = { sendWelcomeEmail, sendDossierEmail, sendVisitConfirmation, sendContactNotification, sendMissionAssigned, sendMissionConfirmed, sendMissionReminderJ1, sendProspectNudge, sendNoPropertyNudge, sendNoPhotosNudge, sendNotPublishedNudge, sendNewVisitRequest, sendVisitReminderSeller, sendMissingDocNudge, sendPublishedConfirmation, sendContractRenewal, sendReviewRequest, sendAdminDirectEmail, sendInvoiceEmail, sendOfferNotification, sendPostVisitBuyerNudge, sendWeeklyAdminReport, sendPhotographerAvailabilityRequest, sendPostFirstVisitFeedbackSeller, sendCheckInNoOffer, sendInfoNeededEmail, sendBuyerContactedSeller, sendVisitFeedbackRequest, sendSoldCongrats, sendWelcomeImproved, sendDossierToNotaire };

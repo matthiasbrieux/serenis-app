@@ -116,10 +116,16 @@ const token = location.pathname.split('/').pop();
 
 const DPE_COLORS = { A:'#00a651', B:'#57b947', C:'#8dc63f', D:'#f7ec13', E:'#fbaf3f', F:'#f15a24', G:'#ed1c24' };
 
-const FOLDER_META = {
-  diagnostics:      { label: 'Diagnostics techniques',     icon: '📋', color: '#e8f4ec', iconBg: '#3D5A47' },
-  acheteur_serieux: { label: 'Documents acheteur sérieux', icon: '🔑', color: '#e8f0fe', iconBg: '#1a73e8' },
-  notaire:          { label: 'Documents notaire',           icon: '⚖️', color: '#fce4ec', iconBg: '#6a1b9a' },
+const DIAG_TYPES = {
+  dpe:            { icon: '🛡️', label: 'DPE',               desc: 'Diagnostic de performance énergétique' },
+  amiante:        { icon: '🧪', label: 'Amiante',            desc: 'Diagnostic amiante' },
+  plomb:          { icon: '🔬', label: 'Plomb (CREP)',       desc: "Constat de risque d'exposition au plomb" },
+  electricite:    { icon: '⚡', label: 'Électricité',        desc: 'Diagnostic installation électrique' },
+  gaz:            { icon: '🔥', label: 'Gaz',                desc: 'Diagnostic installation gaz' },
+  erp:            { icon: '⚠️', label: 'ERP',                desc: 'État des risques et pollutions' },
+  assainissement: { icon: '💧', label: 'Assainissement',     desc: "État de l'installation d'assainissement" },
+  termites:       { icon: '🪲', label: 'Termites',           desc: 'Diagnostic termites' },
+  loi_carrez:     { icon: '📐', label: 'Loi Carrez',         desc: 'Mesurage Loi Carrez' },
 };
 
 async function load() {
@@ -141,38 +147,74 @@ function render({ property: p, photos, documents: docs, offers }) {
   const price = p.price ? Number(p.price).toLocaleString('fr-FR') + ' €' : 'N/A';
   const initials = ((p.first_name||'')[0]||'') + ((p.last_name||'')[0]||'');
 
-  // Group docs by folder
-  const folderMap = {};
-  for (const doc of docs) {
-    const folder = doc.folder || 'diagnostics';
-    if (!folderMap[folder]) folderMap[folder] = [];
-    folderMap[folder].push(doc);
-  }
-
-  function docHtml(doc) {
+  function docHtml(doc, diagMeta) {
     const ext = (doc.name || '').split('.').pop().toLowerCase();
     const isPdf = ext === 'pdf';
     return `<a href="${doc.url}" target="_blank" class="doc-item">
       <div class="doc-icon ${isPdf?'':'img'}">${isPdf?'📄':'🖼️'}</div>
       <div style="flex:1;">
-        <div class="doc-name">${doc.name || doc.doc_type || 'Document'}</div>
-        ${doc.doc_type ? `<div class="doc-type">${doc.doc_type}</div>` : ''}
+        <div class="doc-name">${doc.name || (diagMeta ? diagMeta.label : doc.doc_type) || 'Document'}</div>
+        ${diagMeta ? `<div class="doc-type">${diagMeta.desc}</div>` : doc.doc_type ? `<div class="doc-type">${doc.doc_type}</div>` : ''}
       </div>
       <div class="doc-dl">Télécharger →</div>
     </a>`;
   }
 
-  function folderSection(folderId) {
-    const meta = FOLDER_META[folderId] || { label: folderId, icon: '📂', iconBg: '#999' };
-    const fdocs = folderMap[folderId] || [];
+  // ── Diagnostics : affichage par type ──
+  const diagDocs = docs.filter(d => !d.folder || d.folder === 'diagnostics');
+  const acheteurDocs = docs.filter(d => d.folder === 'acheteur_serieux');
+  const notaireDocs = docs.filter(d => d.folder === 'notaire');
+  const entretienDocs = docs.filter(d => d.folder === 'entretien');
+  const autreDocs = docs.filter(d => d.folder && !['diagnostics','acheteur_serieux','notaire','entretien'].includes(d.folder));
+
+  // Groupe les diags par type connu, puis "autres"
+  const diagKnownOrder = ['dpe','amiante','plomb','electricite','gaz','erp','assainissement','termites','loi_carrez'];
+  const diagByType = {};
+  diagDocs.forEach(d => {
+    const t = d.doc_type || 'autre';
+    if (!diagByType[t]) diagByType[t] = [];
+    diagByType[t].push(d);
+  });
+
+  function diagRowHtml(type) {
+    const meta = DIAG_TYPES[type];
+    const typeDocs = diagByType[type] || [];
+    const found = typeDocs.length > 0;
+    return `<div style="display:flex;align-items:center;gap:12px;padding:12px 16px;border:1px solid ${found?'#ece8e0':'#f0f0ed'};border-radius:10px;background:${found?'#fff':'#fafaf8'};">
+      <div style="width:40px;height:40px;border-radius:9px;background:${found?'#e8f4ec':'#f5f5f2'};display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0;">${meta.icon}</div>
+      <div style="flex:1;">
+        <div style="font-weight:600;font-size:0.9rem;color:${found?'#1A1A16':'#bbb'};">${meta.label}</div>
+        <div style="font-size:0.75rem;color:#aaa;">${meta.desc}</div>
+      </div>
+      ${found
+        ? typeDocs.map(d => `<a href="${d.url}" target="_blank" style="font-size:0.8rem;color:#C4785A;font-weight:600;white-space:nowrap;text-decoration:none;">📥 Télécharger</a>`).join('')
+        : `<span style="font-size:0.75rem;color:#ccc;">Non fourni</span>`}
+    </div>`;
+  }
+
+  const otherDiagDocs = diagDocs.filter(d => d.doc_type && !diagKnownOrder.includes(d.doc_type));
+
+  const diagSection = `<div class="doc-section">
+    <div class="folder-header">
+      <div class="folder-icon" style="background:#3D5A4720;">📋</div>
+      <div class="folder-title">Diagnostics techniques</div>
+      <div class="folder-count">${diagDocs.length} fichier${diagDocs.length>1?'s':''}</div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:8px;">
+      ${diagKnownOrder.map(diagRowHtml).join('')}
+      ${otherDiagDocs.length ? `<div style="margin-top:4px;">${otherDiagDocs.map(d=>docHtml(d,null)).join('')}</div>` : ''}
+    </div>
+  </div>`;
+
+  function simpleSection(icon, label, fdocs, iconBg) {
     return `<div class="doc-section">
       <div class="folder-header">
-        <div class="folder-icon" style="background:${meta.iconBg}20;">${meta.icon}</div>
-        <div class="folder-title">${meta.label}</div>
+        <div class="folder-icon" style="background:${iconBg}20;">${icon}</div>
+        <div class="folder-title">${label}</div>
         <div class="folder-count">${fdocs.length} fichier${fdocs.length>1?'s':''}</div>
       </div>
       ${fdocs.length
-        ? `<div class="doc-list">${fdocs.map(docHtml).join('')}</div>`
+        ? `<div class="doc-list">${fdocs.map(d=>docHtml(d,null)).join('')}</div>`
         : `<div class="empty-folder">Aucun document dans ce dossier</div>`}
     </div>`;
   }
@@ -216,6 +258,8 @@ function render({ property: p, photos, documents: docs, offers }) {
         <div class="info-row"><span class="info-label">Prix de vente</span><span class="info-value" style="color:#C4785A;font-weight:700;font-size:1.05rem;">${price}</span></div>
         ${p.taxe_fonciere ? `<div class="info-row"><span class="info-label">Taxe foncière</span><span class="info-value">${Number(p.taxe_fonciere).toLocaleString('fr-FR')} €/an</span></div>` : ''}
         ${p.charges_copro ? `<div class="info-row"><span class="info-label">Charges copro</span><span class="info-value">${Number(p.charges_copro).toLocaleString('fr-FR')} €/an</span></div>` : ''}
+        ${p.assainissement_type ? `<div class="info-row"><span class="info-label">Assainissement</span><span class="info-value">${p.assainissement_type}</span></div>` : ''}
+        ${p.heating_type ? `<div class="info-row"><span class="info-label">Chauffage</span><span class="info-value">${p.heating_type}</span></div>` : ''}
       </div>
 
       <div class="card">
@@ -230,13 +274,17 @@ function render({ property: p, photos, documents: docs, offers }) {
         ${p.seller_email ? `<div class="info-row"><span class="info-label">Email</span><span class="info-value"><a href="mailto:${p.seller_email}" class="contact-link">${p.seller_email}</a></span></div>` : ''}
         ${p.seller_phone ? `<div class="info-row"><span class="info-label">Téléphone</span><span class="info-value"><a href="tel:${p.seller_phone}" class="contact-link">${p.seller_phone}</a></span></div>` : ''}
         ${p.contrat_signe_at ? `<div class="info-row"><span class="info-label">Contrat signé le</span><span class="info-value">${new Date(p.contrat_signe_at).toLocaleDateString('fr-FR')}</span></div>` : ''}
-        ${photos.length ? `<div style="margin-top:14px;"><div style="font-size:0.72rem;color:#aaa;text-transform:uppercase;letter-spacing:0.04em;margin-bottom:8px;">${photos.length} photo${photos.length>1?'s':''}</div><div style="display:flex;gap:6px;flex-wrap:wrap;">${photos.slice(0,4).map(ph=>`<img src="${ph.thumbnail_url||ph.url}" style="width:64px;height:48px;object-fit:cover;border-radius:6px;">`).join('')}</div></div>` : ''}
+        ${photos.length ? `<div style="margin-top:14px;"><div style="font-size:0.72rem;color:#aaa;text-transform:uppercase;letter-spacing:0.04em;margin-bottom:8px;">${photos.length} photo${photos.length>1?'s':''}</div><div style="display:flex;gap:6px;flex-wrap:wrap;">${photos.slice(0,6).map(ph=>`<img src="${ph.thumbnail_url||ph.url}" style="width:64px;height:48px;object-fit:cover;border-radius:6px;">`).join('')}</div></div>` : ''}
       </div>
     </div>
 
     ${offersHtml}
 
-    ${['diagnostics','acheteur_serieux','notaire'].map(folderSection).join('')}
+    ${diagSection}
+    ${simpleSection('🔑', 'Dossier Acheteur — Documents transmis', acheteurDocs, '#1a73e8')}
+    ${notaireDocs.length ? simpleSection('⚖️', 'Documents Notaire', notaireDocs, '#6a1b9a') : ''}
+    ${entretienDocs.length ? simpleSection('🔧', 'Entretien & Maintenance', entretienDocs, '#e65100') : ''}
+    ${autreDocs.length ? simpleSection('📂', 'Autres documents', autreDocs, '#999') : ''}
   `;
 }
 

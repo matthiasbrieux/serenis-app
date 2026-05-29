@@ -119,6 +119,33 @@ router.post('/api/property/regenerate-tokens', requireAuth, (req, res) => {
   res.json({ success: true, acheteur_token: updated.acheteur_token, notaire_token: updated.notaire_token });
 });
 
+// ── Envoi du dossier notaire par email ───────────────────────
+router.post('/api/dossier/notaire/send-email', requireAuth, async (req, res) => {
+  try {
+    const { notaire_email, notaire_name } = req.body;
+    if (!notaire_email) return res.status(400).json({ error: 'Email du notaire requis' });
+
+    const prop = db.prepare(`
+      SELECT p.*, s.first_name, s.last_name
+      FROM properties p JOIN sellers s ON s.id = p.seller_id
+      WHERE p.seller_id = ?
+    `).get(req.seller.id);
+    if (!prop || !prop.notaire_token) return res.status(404).json({ error: 'Bien ou token introuvable' });
+
+    const base = process.env.BASE_URL || 'https://venduparmo.fr';
+    const dossierUrl = `${base}/dossier/notaire/${prop.notaire_token}`;
+    const sellerName = [prop.first_name, prop.last_name].filter(Boolean).join(' ') || 'Votre client';
+
+    const { sendDossierToNotaire } = require('../services/email');
+    await sendDossierToNotaire({ notaireEmail: notaire_email, notaireName: notaire_name || '', sellerName, property: prop, dossierUrl });
+
+    res.json({ success: true, url: dossierUrl });
+  } catch(e) {
+    console.error('Send notaire email error:', e.message);
+    res.status(500).json({ error: 'Erreur serveur' });
+  }
+});
+
 // ── Pages HTML publiques ──────────────────────────────────────
 router.get('/dossier/acheteur/:token', (req, res) => {
   res.sendFile('dossier-acheteur.html', { root: './views/public' });

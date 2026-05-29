@@ -2174,6 +2174,25 @@
         </div>
 
         <div style="font-size:0.76rem;color:#bbb;text-align:center;margin-top:8px;">Le lien donne accès permanent aux documents — vous pouvez le révoquer en cliquant sur "Nouveau lien".</div>
+
+        <!-- ── Envoi dossier notaire par email ── -->
+        <div style="background:#1A1A16;border-radius:16px;padding:24px;margin-top:20px;">
+          <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;">
+            <div style="width:42px;height:42px;border-radius:10px;background:rgba(196,120,90,0.2);display:flex;align-items:center;justify-content:center;font-size:1.2rem;flex-shrink:0;">📧</div>
+            <div>
+              <div style="font-weight:700;font-size:0.97rem;color:#fff;">Envoyer le dossier à mon notaire</div>
+              <div style="font-size:0.76rem;color:#888;margin-top:2px;">Votre notaire reçoit un email avec le lien confidentiel du dossier complet</div>
+            </div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:10px;">
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+              <input id="notaireEmailName" type="text" placeholder="Nom du notaire (optionnel)" style="padding:11px 14px;border:1.5px solid #333;border-radius:9px;font-size:0.88rem;font-family:inherit;background:#111;color:#fff;width:100%;">
+              <input id="notaireEmailAddr" type="email" placeholder="Email du notaire *" style="padding:11px 14px;border:1.5px solid #333;border-radius:9px;font-size:0.88rem;font-family:inherit;background:#111;color:#fff;width:100%;">
+            </div>
+            <button id="sendNotaireDossierBtn" onclick="sendDossierToNotaire()" style="background:#C4785A;color:#fff;border:none;padding:13px;border-radius:9px;font-size:0.92rem;font-weight:700;cursor:pointer;font-family:inherit;transition:background 0.2s;">📨 Envoyer le dossier par email</button>
+            <div id="sendNotaireStatus" style="font-size:0.8rem;text-align:center;color:#aaa;min-height:18px;"></div>
+          </div>
+        </div>
       </div>
 
       <script>
@@ -2207,6 +2226,25 @@
           } else {
             window.open('mailto:?subject=' + encodeURIComponent(type === 'acheteur' ? 'Votre dossier acheteur' : 'Dossier notaire') + '&body=' + encodeURIComponent('Bonjour,\n\nVoici le lien pour accéder au dossier :\n' + url + '\n\nCordialement'), '_blank');
           }
+        };
+        window.sendDossierToNotaire = async function() {
+          const email = document.getElementById('notaireEmailAddr').value.trim();
+          const name = document.getElementById('notaireEmailName').value.trim();
+          const status = document.getElementById('sendNotaireStatus');
+          const btn = document.getElementById('sendNotaireDossierBtn');
+          if (!email) { status.textContent = '⚠️ Renseignez l\'email du notaire.'; status.style.color = '#e65100'; return; }
+          btn.disabled = true; btn.textContent = 'Envoi en cours...';
+          status.textContent = ''; status.style.color = '#aaa';
+          try {
+            const r = await fetch('/api/dossier/notaire/send-email', {
+              method: 'POST', headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ notaire_email: email, notaire_name: name })
+            });
+            const data = await r.json();
+            if (data.error) { status.textContent = '❌ ' + data.error; status.style.color = '#e53935'; }
+            else { status.textContent = '✅ Dossier envoyé à ' + email; status.style.color = '#4caf50'; document.getElementById('notaireEmailAddr').value = ''; }
+          } catch(e) { status.textContent = '❌ Erreur réseau, réessayez.'; status.style.color = '#e53935'; }
+          btn.disabled = false; btn.textContent = '📨 Envoyer le dossier par email';
         };
         document.addEventListener('DOMContentLoaded', loadDossierLinks);
         loadDossierLinks();
