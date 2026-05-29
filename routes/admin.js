@@ -395,9 +395,7 @@ router.delete('/api/clients/:id', requireAdmin, (req, res) => {
 
 router.get('/api/contacts', requireAdmin, (req, res) => {
   const contacts = db.prepare(`
-    SELECT c.*, p.city, p.slug, s.email as seller_email
-    FROM contact_requests c
-    ORDER BY c.created_at DESC LIMIT 100
+    SELECT * FROM contact_requests ORDER BY created_at DESC LIMIT 100
   `).all();
   res.json({ contacts });
 });
@@ -1035,7 +1033,7 @@ router.get('/api/emails/sellers-list', requireAdmin, (req, res) => {
     const sellers = db.prepare(`
       SELECT id, first_name, last_name, email, pack, paid_at,
              (SELECT published_at FROM properties WHERE seller_id = sellers.id LIMIT 1) as published_at,
-             (SELECT COUNT(*) FROM photos WHERE seller_id = sellers.id) as photo_count,
+             (SELECT COUNT(*) FROM property_photos pp JOIN properties pr ON pr.id = pp.property_id WHERE pr.seller_id = sellers.id) as photo_count,
              (SELECT COUNT(*) FROM visits WHERE seller_id = sellers.id AND status='confirmed') as visit_count,
              (SELECT COUNT(*) FROM offers WHERE seller_id = sellers.id) as offer_count
       FROM sellers WHERE archived IS NULL OR archived = 0
@@ -1061,9 +1059,9 @@ router.post('/api/emails/send', requireAdmin, async (req, res) => {
     } else if (email_type === 'photographer_request') {
       ok = await sendPhotographerAvailabilityRequest({ email: seller.email, firstName: seller.first_name });
     } else if (email_type === 'missing_doc') {
-      ok = await sendMissingDocNudge({ email: seller.email, firstName: seller.first_name });
+      ok = await sendMissingDocNudge({ email: seller.email, missingDocs: [] });
     } else if (email_type === 'not_published') {
-      ok = await sendNotPublishedNudge({ email: seller.email, firstName: seller.first_name });
+      ok = await sendNotPublishedNudge({ email: seller.email });
     } else if (email_type === 'post_first_visit') {
       ok = await sendPostFirstVisitFeedbackSeller({ email: seller.email, firstName: seller.first_name });
     } else if (email_type === 'check_in_no_offer') {
@@ -1075,7 +1073,7 @@ router.post('/api/emails/send', requireAdmin, async (req, res) => {
     } else if (email_type === 'review_request') {
       ok = await sendReviewRequest({ email: seller.email, firstName: seller.first_name });
     } else if (email_type === 'prospect_nudge') {
-      ok = await sendProspectNudge({ email: seller.email, firstName: seller.first_name });
+      ok = await sendProspectNudge({ name: seller.first_name, email: seller.email });
     } else if (email_type === 'custom') {
       if (!custom_message) return res.status(400).json({ error: 'custom_message requis' });
       ok = await sendAdminDirectEmail({ to: seller.email, subject: 'Message de Serenis', body: custom_message });

@@ -370,6 +370,11 @@ contratCols.forEach(sql => { try { db.exec(sql); } catch(e) {} });
 try { db.exec("ALTER TABLE property_photos ADD COLUMN room TEXT"); } catch(e) {}
 try { db.exec("ALTER TABLE property_photos ADD COLUMN angle_label TEXT"); } catch(e) {}
 
+// ── Colonnes manquantes détectées lors de l'audit ─────────────
+try { db.exec("ALTER TABLE properties ADD COLUMN floor INTEGER"); } catch(e) {}
+try { db.exec("ALTER TABLE properties ADD COLUMN furnished BOOLEAN DEFAULT 0"); } catch(e) {}
+try { db.exec("ALTER TABLE property_publications ADD COLUMN updated_at DATETIME"); } catch(e) {}
+
 // ── Offres d'achat ────────────────────────────────────────────
 db.exec(`
   CREATE TABLE IF NOT EXISTS offers (

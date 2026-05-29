@@ -1,4 +1,8 @@
 const jwt = require('jsonwebtoken');
+const db = require('../database');
+
+// Routes exemptées du check contrat (contrat lui-même + son API)
+const CONTRAT_EXEMPT = ['/contrat', '/api/contrat/sign', '/api/me'];
 
 function requireAuth(req, res, next) {
   const token = req.cookies?.token || req.headers.authorization?.replace('Bearer ', '');
@@ -9,6 +13,17 @@ function requireAuth(req, res, next) {
   }
   try {
     req.seller = jwt.verify(token, process.env.JWT_SECRET);
+
+    // Vérifier signature contrat (sauf routes exemptées)
+    const exempt = CONTRAT_EXEMPT.some(p => req.path === p || req.path.startsWith(p));
+    if (!exempt) {
+      const row = db.prepare('SELECT contrat_signe FROM sellers WHERE id = ?').get(req.seller.id);
+      if (row && !row.contrat_signe) {
+        if (isApi) return res.status(403).json({ error: 'Contrat non signé', redirect: '/contrat' });
+        return res.redirect('/contrat');
+      }
+    }
+
     next();
   } catch {
     res.clearCookie('token');
