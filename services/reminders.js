@@ -265,7 +265,7 @@ async function sendWeeklyAdminReportEmail() {
     const newVisits  = db.prepare(`SELECT COUNT(*) as c FROM visits WHERE created_at >= date('now', '-7 days')`).get()?.c || 0;
     const publishedProps = db.prepare(`SELECT COUNT(*) as c FROM properties WHERE published_at >= date('now', '-7 days')`).get()?.c || 0;
     const totalActive = db.prepare(`SELECT COUNT(*) as c FROM sellers WHERE paid_at IS NOT NULL AND (archived IS NULL OR archived=0)`).get()?.c || 0;
-    const revenueRow = db.prepare(`SELECT SUM(CASE WHEN pack='serenite' THEN 990 ELSE 290 END) as t FROM sellers WHERE paid_at >= date('now', '-7 days')`).get();
+    const revenueRow = db.prepare(`SELECT SUM(CASE WHEN pack='serenite' THEN 999 ELSE 499 END) as t FROM sellers WHERE paid_at >= date('now', '-7 days')`).get();
     const totalRevenue = revenueRow?.t || 0;
 
     await sendWeeklyAdminReport({
@@ -282,7 +282,7 @@ async function sendPhotographerAvailabilityNudges() {
     SELECT s.email, s.first_name, s.id
     FROM sellers s
     LEFT JOIN properties p ON p.seller_id = s.id
-    LEFT JOIN (SELECT seller_id, COUNT(*) as cnt FROM photos GROUP BY seller_id) ph ON ph.seller_id = s.id
+    LEFT JOIN (SELECT pr.seller_id, COUNT(*) as cnt FROM property_photos ph2 JOIN properties pr ON pr.id = ph2.property_id GROUP BY pr.seller_id) ph ON ph.seller_id = s.id
     WHERE s.paid_at IS NOT NULL
       AND (s.archived IS NULL OR s.archived = 0)
       AND (ph.cnt IS NULL OR ph.cnt = 0)
