@@ -2135,6 +2135,83 @@
           <p>Sauvegardez d'abord votre fiche dans l'onglet Informations,<br>puis cliquez sur "Générer le dossier".</p>
         </div>
       </div>
+
+      <!-- ── Partage du dossier ──────────────────────────────── -->
+      <div style="margin-top:28px;">
+        <div style="font-family:'Cormorant Garamond',serif;font-size:1.3rem;color:#1a1a1a;margin-bottom:6px;">🔗 Partager le dossier</div>
+        <p style="font-size:0.85rem;color:#888;margin-bottom:20px;">Envoyez un lien direct à vos acheteurs ou notaire — aucun compte requis pour accéder aux documents.</p>
+
+        <!-- Lien acheteur -->
+        <div style="background:#fff;border:1px solid #e8e0d6;border-radius:14px;padding:20px 22px;margin-bottom:14px;box-shadow:0 1px 4px rgba(0,0,0,0.04);">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
+            <div style="width:36px;height:36px;border-radius:9px;background:#e8f4ec;display:flex;align-items:center;justify-content:center;font-size:1.1rem;">🔑</div>
+            <div>
+              <div style="font-weight:700;font-size:0.92rem;">Dossier Acheteur Sérieux</div>
+              <div style="font-size:0.76rem;color:#aaa;">Diagnostics + documents acheteur · Sans compte requis</div>
+            </div>
+          </div>
+          <div style="display:flex;gap:8px;align-items:center;">
+            <input id="acheteurLink" type="text" readonly style="flex:1;padding:10px 14px;border:1px solid #ddd;border-radius:8px;font-size:0.82rem;color:#555;background:#f8f8f5;" placeholder="Chargement...">
+            <button onclick="copyLink('acheteurLink')" style="padding:10px 16px;background:#3D5A47;color:#fff;border:none;border-radius:8px;font-size:0.82rem;cursor:pointer;white-space:nowrap;font-weight:600;">Copier</button>
+            <button onclick="shareLink('acheteur')" style="padding:10px 14px;background:#f0f0ed;color:#333;border:1px solid #ddd;border-radius:8px;font-size:0.82rem;cursor:pointer;" title="Envoyer par SMS/Email">📤</button>
+          </div>
+        </div>
+
+        <!-- Lien notaire -->
+        <div style="background:#fff;border:1px solid #e8e0d6;border-radius:14px;padding:20px 22px;margin-bottom:14px;box-shadow:0 1px 4px rgba(0,0,0,0.04);">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
+            <div style="width:36px;height:36px;border-radius:9px;background:#fce4ec;display:flex;align-items:center;justify-content:center;font-size:1.1rem;">⚖️</div>
+            <div>
+              <div style="font-weight:700;font-size:0.92rem;">Dossier Notaire</div>
+              <div style="font-size:0.76rem;color:#aaa;">Tous les documents + infos vendeur · Confidentiel</div>
+            </div>
+          </div>
+          <div style="display:flex;gap:8px;align-items:center;">
+            <input id="notaireLink" type="text" readonly style="flex:1;padding:10px 14px;border:1px solid #ddd;border-radius:8px;font-size:0.82rem;color:#555;background:#f8f8f5;" placeholder="Chargement...">
+            <button onclick="copyLink('notaireLink')" style="padding:10px 16px;background:#6a1b9a;color:#fff;border:none;border-radius:8px;font-size:0.82rem;cursor:pointer;white-space:nowrap;font-weight:600;">Copier</button>
+            <button onclick="shareLink('notaire')" style="padding:10px 14px;background:#f0f0ed;color:#333;border:1px solid #ddd;border-radius:8px;font-size:0.82rem;cursor:pointer;" title="Envoyer par SMS/Email">📤</button>
+          </div>
+        </div>
+
+        <div style="font-size:0.76rem;color:#bbb;text-align:center;margin-top:8px;">Le lien donne accès permanent aux documents — vous pouvez le révoquer en cliquant sur "Nouveau lien".</div>
+      </div>
+
+      <script>
+      (function() {
+        function loadDossierLinks() {
+          fetch('/api/property').then(r => r.json()).then(({ property }) => {
+            if (!property) return;
+            const base = window.location.origin;
+            const al = document.getElementById('acheteurLink');
+            const nl = document.getElementById('notaireLink');
+            if (al && property.acheteur_token) al.value = base + '/dossier/acheteur/' + property.acheteur_token;
+            if (nl && property.notaire_token)  nl.value = base + '/dossier/notaire/'  + property.notaire_token;
+          }).catch(() => {});
+        }
+        window.copyLink = function(inputId) {
+          const input = document.getElementById(inputId);
+          if (!input || !input.value) return;
+          navigator.clipboard.writeText(input.value).then(() => {
+            const btn = input.nextElementSibling;
+            const orig = btn.textContent;
+            btn.textContent = '✓ Copié !';
+            setTimeout(() => { btn.textContent = orig; }, 2000);
+          });
+        };
+        window.shareLink = function(type) {
+          const inputId = type === 'acheteur' ? 'acheteurLink' : 'notaireLink';
+          const url = document.getElementById(inputId)?.value;
+          if (!url) return;
+          if (navigator.share) {
+            navigator.share({ title: type === 'acheteur' ? 'Dossier Acheteur' : 'Dossier Notaire', url });
+          } else {
+            window.open('mailto:?subject=' + encodeURIComponent(type === 'acheteur' ? 'Votre dossier acheteur' : 'Dossier notaire') + '&body=' + encodeURIComponent('Bonjour,\n\nVoici le lien pour accéder au dossier :\n' + url + '\n\nCordialement'), '_blank');
+          }
+        };
+        document.addEventListener('DOMContentLoaded', loadDossierLinks);
+        loadDossierLinks();
+      })();
+      </script>
     </div>
 
     <!-- ═══════════════════════════════════════════════════

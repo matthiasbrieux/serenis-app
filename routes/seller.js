@@ -148,8 +148,8 @@ router.post('/api/property', requireAuth, express.json(), (req, res) => {
     res.json({ success: true, id: existing.id });
   } else {
     const uuid = uuidv4();
-    const cols = ['uuid', 'seller_id', 'slug', ...Object.keys(data)];
-    const vals = [uuid, req.seller.id, slug, ...Object.values(data)];
+    const cols = ['uuid', 'seller_id', 'slug', 'acheteur_token', 'notaire_token', ...Object.keys(data)];
+    const vals = [uuid, req.seller.id, slug, uuidv4(), uuidv4(), ...Object.values(data)];
     const result = db.prepare(`INSERT INTO properties (${cols.join(',')}) VALUES (${cols.map(() => '?').join(',')})`)
       .run(...vals);
     res.json({ success: true, id: result.lastInsertRowid });

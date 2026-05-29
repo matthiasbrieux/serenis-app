@@ -14,9 +14,10 @@ app.use(helmet({
     directives: {
       defaultSrc: ["'self'"],
       scriptSrc: ["'self'", "'unsafe-inline'", "js.stripe.com", "fonts.googleapis.com"],
+      scriptSrcAttr: ["'unsafe-inline'"],
       styleSrc: ["'self'", "'unsafe-inline'", "fonts.googleapis.com", "fonts.gstatic.com"],
       fontSrc: ["'self'", "fonts.gstatic.com"],
-      imgSrc: ["'self'", "data:", "*.cloudinary.com", "res.cloudinary.com", "images.unsplash.com"],
+      imgSrc: ["'self'", "data:", "*.cloudinary.com", "res.cloudinary.com", "images.unsplash.com", "api.qrserver.com"],
       connectSrc: ["'self'", "api.stripe.com"],
       frameSrc: ["js.stripe.com"],
     }
@@ -51,6 +52,7 @@ app.use('/', require('./routes/payment').router);
 app.use('/', require('./routes/seller'));
 app.use('/', require('./routes/buyer').router);
 app.use('/admin', require('./routes/admin'));
+app.use('/', require('./routes/dossier'));
 app.use('/', require('./routes/partner'));
 
 // ── SEO : sitemap + robots ─────────────────────────────────────────
@@ -104,6 +106,17 @@ app.get('/download/guide-vendeur', require('./middleware/auth').requireAuth, (re
   res.download(path.join(__dirname, 'content', 'guide_vendeur_final.docx'), 'Guide_Vendeur_Serenis.docx');
 });
 
+// ── Healthcheck ──────────────────────────────────────────────
+app.get('/health', (req, res) => {
+  try {
+    const db = require('./database');
+    db.prepare('SELECT 1').get();
+    res.json({ status: 'ok', ts: new Date().toISOString(), uptime: Math.round(process.uptime()) });
+  } catch(e) {
+    res.status(503).json({ status: 'error', message: e.message });
+  }
+});
+
 // 404
 app.use((req, res) => {
   res.status(404).sendFile('404.html', { root: './public' });
@@ -127,9 +140,12 @@ async function seedSellerAccount() {
     const existing = db.prepare('SELECT id FROM sellers WHERE email = ?').get(email.toLowerCase());
     if (!existing) {
       const hashed = await bcrypt.hash(password, 12);
-      db.prepare('INSERT INTO sellers (uuid, email, password, pack, paid_at) VALUES (?,?,?,?,CURRENT_TIMESTAMP)')
+      db.prepare('INSERT INTO sellers (uuid, email, password, pack, paid_at, contrat_signe, contrat_signe_at) VALUES (?,?,?,?,CURRENT_TIMESTAMP,1,CURRENT_TIMESTAMP)')
         .run(uuidv4(), email.toLowerCase(), hashed, 'serenite');
       console.log(`✓ Compte vendeur créé : ${email}`);
+    } else {
+      // S'assurer que le compte démo a le contrat signé
+      db.prepare('UPDATE sellers SET contrat_signe=1 WHERE id=? AND contrat_signe=0').run(existing.id);
     }
   } catch(e) { console.error('Seed error:', e.message); }
 }
@@ -138,8 +154,12 @@ app.listen(PORT, () => {
   console.log(`✓ Serenis démarré — http://localhost:${PORT}`);
   seedSellerAccount();
 
-  // Rappels visites — tourne chaque jour à 18h
-  const { sendVisitReminders, sendMissionReminders } = require('./services/reminders');
+  // Rappels visites + nudges automatiques — tourne chaque jour à 18h
+  const { backupDatabase } = require('./services/backup');
+  backupDatabase(); // premier backup au démarrage
+  setInterval(() => backupDatabase(), 24 * 60 * 60 * 1000); // backup quotidien
+
+  const { sendVisitReminders, sendMissionReminders, sendAutomatedNudges, sendContractExpiryReminders, sendPostVisitBuyerNudges, sendWeeklyAdminReportEmail } = require('./services/reminders');
   function scheduleReminders() {
     const now = new Date();
     const next18h = new Date();
@@ -149,11 +169,36 @@ app.listen(PORT, () => {
     setTimeout(() => {
       sendVisitReminders().catch(e => console.error('Reminder job error:', e.message));
       sendMissionReminders().catch(e => console.error('Mission reminder job error:', e.message));
+      sendAutomatedNudges().catch(e => console.error('Automated nudges job error:', e.message));
+      sendContractExpiryReminders().catch(e => console.error('Contract expiry job error:', e.message));
+        sendPostVisitBuyerNudges().catch(e => console.error('Post-visit nudge job error:', e.message));
       setInterval(() => {
         sendVisitReminders().catch(e => console.error('Reminder job error:', e.message));
         sendMissionReminders().catch(e => console.error('Mission reminder job error:', e.message));
+        sendAutomatedNudges().catch(e => console.error('Automated nudges job error:', e.message));
+        sendContractExpiryReminders().catch(e => console.error('Contract expiry job error:', e.message));
+        sendPostVisitBuyerNudges().catch(e => console.error('Post-visit nudge job error:', e.message));
       }, 24 * 60 * 60 * 1000);
     }, msUntil18h);
   }
   scheduleReminders();
+
+  // Rapport hebdomadaire admin — chaque lundi à 8h00
+  function scheduleWeeklyReport() {
+    const now = new Date();
+    const next = new Date();
+    const dayOfWeek = now.getDay(); // 0=Sun, 1=Mon
+    const daysUntilMonday = dayOfWeek === 1 ? (now.getHours() >= 8 ? 7 : 0) : (8 - dayOfWeek) % 7 || 7;
+    next.setDate(now.getDate() + daysUntilMonday);
+    next.setHours(8, 0, 0, 0);
+    const ms = next - now;
+    setTimeout(() => {
+      sendWeeklyAdminReportEmail().catch(e => console.error('Weekly report error:', e.message));
+      setInterval(() => {
+        sendWeeklyAdminReportEmail().catch(e => console.error('Weekly report error:', e.message));
+      }, 7 * 24 * 60 * 60 * 1000);
+    }, ms);
+    console.log(`✓ Rapport hebdo planifié dans ${Math.round(ms / 3600000)}h`);
+  }
+  scheduleWeeklyReport();
 });

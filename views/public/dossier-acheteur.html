@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dossier Acheteur — Serenis</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: #F5F0E8; font-family: 'DM Sans', Arial, sans-serif; color: #1A1A16; min-height: 100vh; }
+
+    .header { background: #3D5A47; padding: 20px 32px; display: flex; align-items: center; justify-content: space-between; }
+    .logo { font-family: 'Cormorant Garamond', serif; font-size: 1.5rem; color: #fff; }
+    .logo em { color: #C4785A; font-style: normal; }
+    .header-badge { background: rgba(255,255,255,0.15); color: #D4E4D8; font-size: 0.78rem; padding: 6px 14px; border-radius: 20px; }
+
+    .container { max-width: 900px; margin: 0 auto; padding: 32px 20px 60px; }
+
+    .hero { background: #fff; border-radius: 16px; overflow: hidden; margin-bottom: 24px; box-shadow: 0 2px 12px rgba(0,0,0,0.08); }
+    .hero-photos { position: relative; height: 340px; background: #e0e0d8; overflow: hidden; }
+    .hero-photos img { width: 100%; height: 100%; object-fit: cover; }
+    .hero-photos .photo-count { position: absolute; bottom: 12px; right: 16px; background: rgba(0,0,0,0.55); color: #fff; font-size: 0.78rem; padding: 4px 10px; border-radius: 12px; }
+    .photos-strip { display: flex; gap: 6px; padding: 10px; overflow-x: auto; background: #f5f5f0; }
+    .photos-strip img { width: 72px; height: 54px; object-fit: cover; border-radius: 6px; cursor: pointer; opacity: 0.7; transition: opacity 0.2s; flex-shrink: 0; }
+    .photos-strip img.active, .photos-strip img:hover { opacity: 1; }
+
+    .hero-info { padding: 24px 28px 20px; }
+    .prop-type-badge { display: inline-block; background: #e8f4ec; color: #2e7d32; font-size: 0.72rem; font-weight: 600; padding: 3px 10px; border-radius: 20px; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.05em; }
+    .prop-title { font-family: 'Cormorant Garamond', serif; font-size: 1.8rem; margin-bottom: 6px; }
+    .prop-location { color: #666; font-size: 0.95rem; margin-bottom: 16px; }
+    .prop-stats { display: flex; gap: 24px; flex-wrap: wrap; }
+    .stat { text-align: center; }
+    .stat-val { font-family: 'Cormorant Garamond', serif; font-size: 1.4rem; font-weight: 600; color: #3D5A47; }
+    .stat-lbl { font-size: 0.72rem; color: #999; text-transform: uppercase; letter-spacing: 0.04em; }
+    .prop-price { font-family: 'Cormorant Garamond', serif; font-size: 2rem; color: #C4785A; margin-left: auto; }
+
+    .section { background: #fff; border-radius: 16px; padding: 24px 28px; margin-bottom: 20px; box-shadow: 0 1px 6px rgba(0,0,0,0.06); }
+    .section-title { font-family: 'Cormorant Garamond', serif; font-size: 1.2rem; color: #1A1A16; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
+    .section-title span { font-size: 1.1rem; }
+
+    .dpe-row { display: flex; gap: 16px; align-items: center; flex-wrap: wrap; }
+    .dpe-badge { display: flex; align-items: center; gap: 10px; background: #f0f7f2; border-radius: 10px; padding: 12px 18px; }
+    .dpe-letter { width: 44px; height: 44px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 1.3rem; font-weight: 700; color: #fff; }
+    .dpe-info { font-size: 0.82rem; color: #555; }
+    .dpe-info strong { display: block; font-size: 1rem; color: #1A1A16; }
+
+    .details-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 12px; }
+    .detail-item { background: #f8f8f5; border-radius: 10px; padding: 12px 16px; }
+    .detail-label { font-size: 0.72rem; color: #999; text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 4px; }
+    .detail-value { font-size: 0.95rem; font-weight: 500; color: #1A1A16; }
+
+    .doc-list { display: flex; flex-direction: column; gap: 10px; }
+    .doc-item { display: flex; align-items: center; gap: 14px; padding: 14px 18px; border: 1px solid #ece8e0; border-radius: 10px; text-decoration: none; color: inherit; transition: background 0.15s, border-color 0.15s; }
+    .doc-item:hover { background: #f8f5f0; border-color: #C4785A; }
+    .doc-icon { width: 40px; height: 40px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; flex-shrink: 0; }
+    .doc-icon.pdf { background: #fde8e4; }
+    .doc-icon.img { background: #e8f4ec; }
+    .doc-name { font-size: 0.92rem; font-weight: 500; flex: 1; }
+    .doc-folder { font-size: 0.72rem; color: #999; }
+    .doc-dl { font-size: 0.8rem; color: #C4785A; font-weight: 600; white-space: nowrap; }
+
+    .folder-label { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.06em; font-weight: 600; color: #888; margin: 16px 0 8px; }
+    .folder-label:first-child { margin-top: 0; }
+
+    .contact-box { background: linear-gradient(135deg, #3D5A47, #4d6e5a); border-radius: 16px; padding: 28px; color: #fff; text-align: center; }
+    .contact-box h3 { font-family: 'Cormorant Garamond', serif; font-size: 1.4rem; margin-bottom: 8px; }
+    .contact-box p { color: rgba(255,255,255,0.75); font-size: 0.9rem; margin-bottom: 20px; }
+    .contact-btn { display: inline-block; background: #C4785A; color: #fff; padding: 13px 28px; border-radius: 10px; text-decoration: none; font-weight: 600; font-size: 0.95rem; margin: 4px; }
+    .contact-btn.outline { background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.3); }
+
+    .empty-docs { text-align: center; padding: 32px; color: #aaa; font-size: 0.9rem; }
+
+    .loading { text-align: center; padding: 80px 20px; }
+    .loading-spinner { width: 40px; height: 40px; border: 3px solid #e0e0d8; border-top-color: #3D5A47; border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 16px; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .error-box { text-align: center; padding: 80px 20px; }
+    .error-box h2 { font-family: 'Cormorant Garamond', serif; font-size: 1.6rem; color: #3D5A47; margin-bottom: 12px; }
+    .error-box p { color: #888; }
+
+    .footer { text-align: center; padding: 32px 20px; font-size: 0.78rem; color: #aaa; }
+
+    @media (max-width: 600px) {
+      .header { padding: 16px 20px; }
+      .container { padding: 20px 12px 48px; }
+      .hero-photos { height: 220px; }
+      .hero-info { padding: 18px 20px 16px; }
+      .prop-title { font-size: 1.4rem; }
+      .prop-stats { gap: 16px; }
+      .section { padding: 18px 18px; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="header">
+  <div class="logo">Sere<em>nis</em></div>
+  <div class="header-badge">📁 Dossier Acheteur</div>
+</div>
+
+<div class="container">
+  <div id="loading" class="loading">
+    <div class="loading-spinner"></div>
+    <p style="color:#888;">Chargement du dossier...</p>
+  </div>
+  <div id="content" style="display:none;"></div>
+  <div id="error" class="error-box" style="display:none;">
+    <h2>Dossier introuvable</h2>
+    <p>Ce lien est invalide ou l'annonce n'est plus disponible.</p>
+  </div>
+</div>
+
+<div class="footer">Serenis · Vente immobilière entre particuliers · contact@serenis.fr</div>
+
+<script>
+const token = location.pathname.split('/').pop();
+let currentPhotoIdx = 0;
+let photos = [];
+
+const DPE_COLORS = { A:'#00a651', B:'#57b947', C:'#8dc63f', D:'#f7ec13', E:'#fbaf3f', F:'#f15a24', G:'#ed1c24' };
+const FOLDER_LABELS = { diagnostics: '📋 Diagnostics', acheteur_serieux: '🔒 Documents acheteur sérieux' };
+const DOC_ICONS = { pdf: '📄', jpg:'🖼️', jpeg:'🖼️', png:'🖼️', default: '📎' };
+
+async function load() {
+  try {
+    const r = await fetch(`/api/dossier/acheteur/${token}`);
+    if (!r.ok) throw new Error();
+    const { property: p, photos: ph, documents: docs } = await r.json();
+    photos = ph;
+    document.getElementById('loading').style.display = 'none';
+    document.getElementById('content').style.display = 'block';
+    render(p, ph, docs);
+  } catch(e) {
+    document.getElementById('loading').style.display = 'none';
+    document.getElementById('error').style.display = 'block';
+  }
+}
+
+function render(p, ph, docs) {
+  const typeLabels = { maison:'Maison', appartement:'Appartement', terrain:'Terrain', immeuble:'Immeuble', local:'Local commercial' };
+  const typeLabel = typeLabels[p.type] || p.type || 'Bien';
+  const price = p.price ? Number(p.price).toLocaleString('fr-FR') + ' €' : 'Prix sur demande';
+
+  const diagDocs = docs.filter(d => !d.folder || d.folder === 'diagnostics');
+  const acheteurDocs = docs.filter(d => d.folder === 'acheteur_serieux');
+
+  const mainPhoto = ph.length ? `<img id="mainPhoto" src="${ph[0].url}" alt="Photo principale">` : `<div style="display:flex;align-items:center;justify-content:center;height:100%;color:#aaa;">Aucune photo</div>`;
+  const photoStrip = ph.length > 1 ? `<div class="photos-strip">${ph.map((img, i) => `<img src="${img.thumbnail_url || img.url}" class="${i===0?'active':''}" onclick="setPhoto(${i})" alt="">`).join('')}</div>` : '';
+
+  const dpeHtml = p.dpe_class ? `
+    <div class="dpe-row">
+      <div class="dpe-badge">
+        <div class="dpe-letter" style="background:${DPE_COLORS[p.dpe_class]||'#999'}">${p.dpe_class}</div>
+        <div class="dpe-info"><strong>DPE ${p.dpe_class}</strong>${p.dpe_conso_energie ? p.dpe_conso_energie + ' kWh/m²/an' : ''}</div>
+      </div>
+      ${p.ges_class ? `<div class="dpe-badge"><div class="dpe-letter" style="background:${DPE_COLORS[p.ges_class]||'#555'};font-size:0.9rem;">GES ${p.ges_class}</div><div class="dpe-info"><strong>Émissions GES</strong>${p.dpe_ges ? p.dpe_ges + ' kg CO₂/m²/an' : ''}</div></div>` : ''}
+      ${p.dpe_cout_min && p.dpe_cout_max ? `<div style="font-size:0.88rem;color:#555;">Coût énergétique estimé : <strong>${p.dpe_cout_min}–${p.dpe_cout_max} €/an</strong></div>` : ''}
+    </div>` : '<p style="color:#aaa;font-size:0.9rem;">DPE non renseigné</p>';
+
+  const detailItems = [
+    p.surface_habitable && { label: 'Surface habitable', value: p.surface_habitable + ' m²' },
+    p.surface_terrain && { label: 'Terrain', value: p.surface_terrain + ' m²' },
+    p.rooms && { label: 'Pièces', value: p.rooms },
+    p.bedrooms && { label: 'Chambres', value: p.bedrooms },
+    p.year_built && { label: 'Année', value: p.year_built },
+    p.heating_type && { label: 'Chauffage', value: p.heating_type },
+    p.taxe_fonciere && { label: 'Taxe foncière', value: Number(p.taxe_fonciere).toLocaleString('fr-FR') + ' €/an' },
+    p.charges_copro && { label: 'Charges copro', value: Number(p.charges_copro).toLocaleString('fr-FR') + ' €/an' },
+  ].filter(Boolean);
+
+  function docHtml(doc) {
+    const ext = doc.name?.split('.').pop()?.toLowerCase() || '';
+    const isPdf = ext === 'pdf';
+    return `<a href="${doc.url}" target="_blank" class="doc-item">
+      <div class="doc-icon ${isPdf ? 'pdf' : 'img'}">${isPdf ? '📄' : '🖼️'}</div>
+      <div>
+        <div class="doc-name">${doc.name || doc.doc_type || 'Document'}</div>
+      </div>
+      <div class="doc-dl">Télécharger →</div>
+    </a>`;
+  }
+
+  const diagHtml = diagDocs.length
+    ? `<div class="folder-label">📋 Diagnostics</div><div class="doc-list">${diagDocs.map(docHtml).join('')}</div>`
+    : '';
+  const acheteurHtml = acheteurDocs.length
+    ? `<div class="folder-label" style="margin-top:${diagDocs.length?'20px':'0'}">🔑 Documents acheteur sérieux</div><div class="doc-list">${acheteurDocs.map(docHtml).join('')}</div>`
+    : '';
+  const allDocsHtml = diagHtml + acheteurHtml || '<div class="empty-docs">Aucun document disponible pour le moment.</div>';
+
+  document.getElementById('content').innerHTML = `
+    <div class="hero">
+      <div class="hero-photos" id="heroPhotos">${mainPhoto}<div class="photo-count">${ph.length} photo${ph.length>1?'s':''}</div></div>
+      ${photoStrip}
+      <div class="hero-info">
+        <div class="prop-type-badge">${typeLabel}</div>
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap;">
+          <div>
+            <div class="prop-title">${p.address || ''}</div>
+            <div class="prop-location">📍 ${[p.city, p.postal_code].filter(Boolean).join(' ')}</div>
+            <div class="prop-stats">
+              ${p.surface_habitable ? `<div class="stat"><div class="stat-val">${p.surface_habitable}</div><div class="stat-lbl">m²</div></div>` : ''}
+              ${p.rooms ? `<div class="stat"><div class="stat-val">${p.rooms}</div><div class="stat-lbl">Pièces</div></div>` : ''}
+              ${p.bedrooms ? `<div class="stat"><div class="stat-val">${p.bedrooms}</div><div class="stat-lbl">Chambres</div></div>` : ''}
+              ${p.dpe_class ? `<div class="stat"><div class="stat-val" style="color:${DPE_COLORS[p.dpe_class]||'#999'}">${p.dpe_class}</div><div class="stat-lbl">DPE</div></div>` : ''}
+            </div>
+          </div>
+          <div class="prop-price">${price}</div>
+        </div>
+      </div>
+    </div>
+
+    ${p.description ? `<div class="section">
+      <div class="section-title"><span>📝</span> Description</div>
+      <p style="color:#444;line-height:1.75;white-space:pre-line;">${p.description}</p>
+    </div>` : ''}
+
+    <div class="section">
+      <div class="section-title"><span>⚡</span> Performance énergétique</div>
+      ${dpeHtml}
+    </div>
+
+    ${detailItems.length ? `<div class="section">
+      <div class="section-title"><span>🏠</span> Caractéristiques</div>
+      <div class="details-grid">${detailItems.map(d => `<div class="detail-item"><div class="detail-label">${d.label}</div><div class="detail-value">${d.value}</div></div>`).join('')}</div>
+    </div>` : ''}
+
+    <div class="section">
+      <div class="section-title"><span>📂</span> Documents</div>
+      ${allDocsHtml}
+    </div>
+
+    <div class="contact-box">
+      <h3>Une question ? Planifier une visite ?</h3>
+      <p>Contactez directement ${p.first_name} ${p.last_name} pour organiser une visite ou poser vos questions.</p>
+      ${p.seller_phone ? `<a href="tel:${p.seller_phone}" class="contact-btn">📞 Appeler ${p.first_name}</a>` : ''}
+      ${p.slug ? `<a href="/bien/${p.slug}" class="contact-btn outline">Voir l'annonce complète</a>` : ''}
+    </div>
+  `;
+}
+
+function setPhoto(idx) {
+  currentPhotoIdx = idx;
+  const main = document.getElementById('mainPhoto');
+  if (main && photos[idx]) main.src = photos[idx].url;
+  document.querySelectorAll('.photos-strip img').forEach((img, i) => {
+    img.classList.toggle('active', i === idx);
+  });
+}
+
+load();
+</script>
+</body>
+</html>

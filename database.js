@@ -265,8 +265,19 @@ db.exec(`
   );
 `);
 
+// ── Table email_log (déduplication des emails automatiques) ───
+db.exec(`
+  CREATE TABLE IF NOT EXISTS email_log (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    recipient_email TEXT NOT NULL,
+    trigger_type TEXT NOT NULL,
+    sent_at DATETIME DEFAULT CURRENT_TIMESTAMP
+  );
+`);
+
 // Migrations: add columns not in original CREATE TABLE
 const newCols = [
+  "ALTER TABLE property_documents ADD COLUMN folder TEXT DEFAULT 'diagnostics'",
   "ALTER TABLE properties ADD COLUMN heating_mechanism TEXT",
   "ALTER TABLE properties ADD COLUMN hauteur_plafond REAL",
   "ALTER TABLE properties ADD COLUMN assainissement_type TEXT",
@@ -313,8 +324,27 @@ const newCols = [
   "ALTER TABLE buyer_contacts ADD COLUMN status TEXT DEFAULT 'new'",
   "ALTER TABLE visits ADD COLUMN notes TEXT",
   "ALTER TABLE properties ADD COLUMN rooms_detail TEXT",
+  "ALTER TABLE properties ADD COLUMN acheteur_token TEXT",
+  "ALTER TABLE properties ADD COLUMN notaire_token TEXT",
 ];
 newCols.forEach(sql => { try { db.exec(sql); } catch(e) {} });
+
+// Auto-generate tokens for properties that don't have them yet
+try {
+  const { v4: uuidv4 } = require('uuid');
+  const propsWithoutTokens = db.prepare('SELECT id FROM properties WHERE acheteur_token IS NULL OR notaire_token IS NULL').all();
+  for (const p of propsWithoutTokens) {
+    db.prepare('UPDATE properties SET acheteur_token=?, notaire_token=? WHERE id=?')
+      .run(uuidv4(), uuidv4(), p.id);
+  }
+} catch(e) { console.error('[DB] Token generation error:', e.message); }
+
+// Archivage vendeurs + coach IA history
+const archiveCols = [
+  "ALTER TABLE sellers ADD COLUMN archived BOOLEAN DEFAULT 0",
+  "ALTER TABLE sellers ADD COLUMN archived_at DATETIME",
+];
+archiveCols.forEach(sql => { try { db.exec(sql); } catch(e) {} });
 
 // Colonnes réservation photo client
 const bookingCols = [
@@ -323,5 +353,75 @@ const bookingCols = [
   "ALTER TABLE sellers ADD COLUMN booking_step INTEGER DEFAULT 0",
 ];
 bookingCols.forEach(sql => { try { db.exec(sql); } catch(e) {} });
+
+// Colonnes signature contrat
+const contratCols = [
+  "ALTER TABLE sellers ADD COLUMN contrat_signe_at DATETIME",
+  "ALTER TABLE sellers ADD COLUMN contrat_ip TEXT",
+  "ALTER TABLE sellers ADD COLUMN vente_realisee BOOLEAN DEFAULT 0",
+  "ALTER TABLE sellers ADD COLUMN vente_date DATE",
+  "ALTER TABLE sellers ADD COLUMN avis_demande_at DATETIME",
+  "ALTER TABLE sellers ADD COLUMN avis_recu BOOLEAN DEFAULT 0",
+  "ALTER TABLE sellers ADD COLUMN relance_extension_at DATETIME",
+];
+contratCols.forEach(sql => { try { db.exec(sql); } catch(e) {} });
+
+// ── Offres d'achat ────────────────────────────────────────────
+db.exec(`
+  CREATE TABLE IF NOT EXISTS offers (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    uuid TEXT UNIQUE NOT NULL,
+    property_id INTEGER NOT NULL REFERENCES properties(id),
+    seller_id INTEGER NOT NULL REFERENCES sellers(id),
+    buyer_name TEXT NOT NULL,
+    buyer_email TEXT NOT NULL,
+    buyer_phone TEXT,
+    amount INTEGER NOT NULL,
+    conditions TEXT,
+    validity_days INTEGER DEFAULT 10,
+    status TEXT DEFAULT 'pending',
+    seller_response TEXT,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    responded_at DATETIME
+  );
+`);
+
+// ── Vues pages bien publiques ─────────────────────────────────
+db.exec(`
+  CREATE TABLE IF NOT EXISTS property_page_views (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    property_id INTEGER NOT NULL REFERENCES properties(id),
+    ip_hash TEXT,
+    viewed_at DATETIME DEFAULT CURRENT_TIMESTAMP
+  );
+`);
+
+// ── Historique des prix ───────────────────────────────────────
+db.exec(`
+  CREATE TABLE IF NOT EXISTS property_price_history (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    property_id INTEGER NOT NULL REFERENCES properties(id),
+    price INTEGER NOT NULL,
+    note TEXT,
+    changed_at DATETIME DEFAULT CURRENT_TIMESTAMP
+  );
+`);
+
+// ── Journal d'activité admin ──────────────────────────────
+db.exec(`
+  CREATE TABLE IF NOT EXISTS admin_activity_log (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    seller_id INTEGER NOT NULL REFERENCES sellers(id) ON DELETE CASCADE,
+    type TEXT NOT NULL,
+    description TEXT NOT NULL,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+  );
+`);
+
+// Grandfathering : les comptes existants ayant déjà payé sont considérés comme ayant signé
+// (évite de bloquer des clients réels lors du déploiement de cette nouvelle contrainte)
+try {
+  db.exec(`UPDATE sellers SET contrat_signe=1, contrat_signe_at=paid_at WHERE paid_at IS NOT NULL AND (contrat_signe IS NULL OR contrat_signe=0)`);
+} catch(e) {}
 
 module.exports = db;
