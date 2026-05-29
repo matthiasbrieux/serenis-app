@@ -6,6 +6,7 @@ const db = require('../database');
 const { requireAuth } = require('../middleware/auth');
 const { uploadPhoto, uploadDocument } = require('../services/upload');
 const { assignTwilioNumber } = require('../services/twilio');
+const { sendSoldCongrats, sendPropertySoldToBuyer } = require('../services/email');
 
 // Pages vendeur (toutes protégées)
 router.get('/dashboard', requireAuth, (req, res) => res.sendFile('dashboard.html', { root: './views/seller' }));
@@ -317,11 +318,24 @@ router.get('/api/checklist/:type', requireAuth, (req, res) => {
 });
 
 // Status update
-router.post('/api/property/status', requireAuth, express.json(), (req, res) => {
+router.post('/api/property/status', requireAuth, express.json(), async (req, res) => {
   const { status } = req.body;
   const valid = ['preparation','en-ligne','visites','offre','compromis','vendu'];
   if (!valid.includes(status)) return res.json({ error: 'Statut invalide' });
+  const prev = db.prepare('SELECT status FROM properties WHERE seller_id=?').get(req.seller.id);
   db.prepare('UPDATE properties SET status=? WHERE seller_id=?').run(status, req.seller.id);
+
+  if (status === 'vendu' && prev?.status !== 'vendu') {
+    const property = db.prepare('SELECT * FROM properties WHERE seller_id=?').get(req.seller.id);
+    const seller = db.prepare('SELECT email, first_name FROM sellers WHERE id=?').get(req.seller.id);
+    sendSoldCongrats({ email: seller.email, firstName: seller.first_name, address: property?.address, price: property?.price }).catch(() => {});
+    if (property) {
+      const visitors = db.prepare("SELECT DISTINCT buyer_email, buyer_name FROM visits WHERE property_id=? AND buyer_email IS NOT NULL AND buyer_email != '' AND status != 'cancelled'").all(property.id);
+      for (const v of visitors) {
+        sendPropertySoldToBuyer({ buyerEmail: v.buyer_email, buyerName: v.buyer_name, propertyType: property.type, propertyCity: property.city }).catch(() => {});
+      }
+    }
+  }
   res.json({ success: true });
 });
 
@@ -972,6 +986,31 @@ router.delete('/api/guide-photos/:cloudinary_id', requireAuth, async (req, res) 
     await cloudinary.uploader.destroy(req.params.cloudinary_id).catch(() => {});
   }
   res.json({ success: true });
+});
+
+// ── Export CSV contacts acheteurs ────────────────────────────
+router.get('/api/connect/contacts/export.csv', requireAuth, (req, res) => {
+  const property = db.prepare('SELECT id FROM properties WHERE seller_id=?').get(req.seller.id);
+  if (!property) return res.status(404).end();
+  const contacts = db.prepare('SELECT buyer_name, buyer_phone, buyer_email, source, status, notes, created_at FROM buyer_contacts WHERE seller_id=? ORDER BY created_at DESC').all(req.seller.id);
+  const visits = db.prepare("SELECT buyer_name, buyer_email, visit_date, visit_time, status FROM visits WHERE seller_id=? AND status != 'cancelled' ORDER BY visit_date").all(req.seller.id);
+  const visitMap = {};
+  for (const v of visits) {
+    const key = v.buyer_email || v.buyer_name;
+    if (!visitMap[key]) visitMap[key] = [];
+    visitMap[key].push(`${v.visit_date} ${v.visit_time}`);
+  }
+  const header = 'Nom,Téléphone,Email,Source,Statut,Visites,Notes,Date contact';
+  const rows = contacts.map(c => {
+    const key = c.buyer_email || c.buyer_name;
+    const vDates = (visitMap[key] || []).join(' | ');
+    const esc = s => `"${(s||'').replace(/"/g, '""')}"`;
+    return [esc(c.buyer_name), esc(c.buyer_phone), esc(c.buyer_email), esc(c.source), esc(c.status), esc(vDates), esc(c.notes), esc((c.created_at||'').slice(0,10))].join(',');
+  });
+  const csv = '﻿' + [header, ...rows].join('\r\n');
+  res.setHeader('Content-Type', 'text/csv; charset=utf-8');
+  res.setHeader('Content-Disposition', `attachment; filename="contacts-acheteurs-${new Date().toISOString().slice(0,10)}.csv"`);
+  res.send(csv);
 });
 
 // ── RGPD ─────────────────────────────────────────────────────

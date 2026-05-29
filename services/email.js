@@ -1444,4 +1444,33 @@ async function previewEmail(type) {
   return capturedHtml || `<p style="font-family:Arial;padding:32px;color:#888;">Aucun contenu généré pour "${type}".</p>`;
 }
 
-module.exports = { sendWelcomeEmail, sendDossierEmail, sendVisitConfirmation, sendContactNotification, sendMissionAssigned, sendMissionConfirmed, sendMissionReminderJ1, sendProspectNudge, sendNoPropertyNudge, sendNoPhotosNudge, sendNotPublishedNudge, sendNewVisitRequest, sendVisitReminderSeller, sendMissingDocNudge, sendPublishedConfirmation, sendContractRenewal, sendReviewRequest, sendAdminDirectEmail, sendInvoiceEmail, sendOfferNotification, sendPostVisitBuyerNudge, sendWeeklyAdminReport, sendPhotographerAvailabilityRequest, sendPostFirstVisitFeedbackSeller, sendCheckInNoOffer, sendInfoNeededEmail, sendBuyerContactedSeller, sendVisitFeedbackRequest, sendSoldCongrats, sendWelcomeImproved, sendDossierToNotaire, previewEmail };
+async function sendPropertySoldToBuyer({ buyerEmail, buyerName, propertyType, propertyCity }) {
+  const name = buyerName || 'Bonjour';
+  const msg = {
+    to: buyerEmail, from: FROM,
+    subject: `Le bien que vous avez visité est vendu — ${propertyType || 'Bien'} ${propertyCity || ''}`,
+    html: `
+<!DOCTYPE html><html lang="fr"><body style="margin:0;padding:0;background:#F5F0E8;font-family:Arial,sans-serif;">
+<table width="100%" cellpadding="0" cellspacing="0" style="background:#F5F0E8;padding:32px 0;">
+<tr><td align="center">
+<table width="600" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%;background:#FDFCF8;border-radius:12px;overflow:hidden;">
+  <tr><td style="background:#3D5A47;padding:28px 40px;text-align:center;">
+    <h1 style="color:#FDFCF8;font-family:Georgia,serif;font-size:24px;margin:0;">Serenis</h1>
+  </td></tr>
+  <tr><td style="padding:36px 40px;">
+    <h2 style="color:#2a4030;font-family:Georgia,serif;font-size:20px;margin:0 0 16px;">Bonjour ${name},</h2>
+    <p style="color:#555;line-height:1.7;margin:0 0 16px;">Le <strong>${propertyType || 'bien'} à ${propertyCity || ''}</strong> que vous avez visité via Serenis vient d'être vendu.</p>
+    <p style="color:#555;line-height:1.7;margin:0 0 24px;">Si vous êtes toujours à la recherche d'un bien, n'hésitez pas à consulter d'autres annonces de particuliers sur Serenis.</p>
+    <p style="color:#aaa;font-size:12px;text-align:center;margin:0;">Serenis · Plateforme de vente entre particuliers · contact@serenis.fr</p>
+  </td></tr>
+</table></td></tr></table>
+</body></html>`,
+  };
+  try {
+    if (!process.env.SENDGRID_API_KEY) { console.log('[EMAIL SKIPPED] PropertySoldToBuyer:', buyerEmail); return true; }
+    await sgMail.send(msg);
+    return true;
+  } catch(e) { console.error('[EMAIL ERROR] sendPropertySoldToBuyer:', e.message); return false; }
+}
+
+module.exports = { sendWelcomeEmail, sendDossierEmail, sendVisitConfirmation, sendContactNotification, sendMissionAssigned, sendMissionConfirmed, sendMissionReminderJ1, sendProspectNudge, sendNoPropertyNudge, sendNoPhotosNudge, sendNotPublishedNudge, sendNewVisitRequest, sendVisitReminderSeller, sendMissingDocNudge, sendPublishedConfirmation, sendContractRenewal, sendReviewRequest, sendAdminDirectEmail, sendInvoiceEmail, sendOfferNotification, sendPostVisitBuyerNudge, sendWeeklyAdminReport, sendPhotographerAvailabilityRequest, sendPostFirstVisitFeedbackSeller, sendCheckInNoOffer, sendInfoNeededEmail, sendBuyerContactedSeller, sendVisitFeedbackRequest, sendSoldCongrats, sendPropertySoldToBuyer, sendWelcomeImproved, sendDossierToNotaire, previewEmail };
