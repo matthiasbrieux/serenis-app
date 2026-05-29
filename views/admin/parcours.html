@@ -219,7 +219,7 @@ body { background: #0f0f0d; font-family: 'DM Sans', sans-serif; color: #fff; hei
           <div class="browser-dots"><span></span><span></span><span></span></div>
           <div class="browser-url">venduparmo.fr</div>
         </div>
-        <div class="browser-body"><iframe src="/" loading="lazy"></iframe></div>
+        <div class="browser-body"><iframe data-src="/" loading="lazy"></iframe></div>
       </div>
     </div>
 
@@ -230,7 +230,7 @@ body { background: #0f0f0d; font-family: 'DM Sans', sans-serif; color: #fff; hei
           <div class="browser-dots"><span></span><span></span><span></span></div>
           <div class="browser-url">venduparmo.fr/tarifs</div>
         </div>
-        <div class="browser-body"><iframe src="/tarifs" loading="lazy"></iframe></div>
+        <div class="browser-body"><iframe data-src="/tarifs" loading="lazy"></iframe></div>
       </div>
     </div>
 
@@ -932,9 +932,13 @@ function updateSlide() {
   document.getElementById('btnPrev').disabled = currentIdx === 0;
   document.getElementById('btnNext').disabled = currentIdx === steps.length - 1;
 
-  // Show correct slide
+  // Show correct slide + lazy-load iframes
   document.querySelectorAll('.slide').forEach(s => {
-    s.classList.toggle('active', s.dataset.journey === currentJourney && parseInt(s.dataset.idx) === currentIdx);
+    const isActive = s.dataset.journey === currentJourney && parseInt(s.dataset.idx) === currentIdx;
+    s.classList.toggle('active', isActive);
+    if (isActive) {
+      s.querySelectorAll('iframe[data-src]').forEach(f => { f.src = f.dataset.src; delete f.dataset.src; });
+    }
   });
 
   // Dots

@@ -19,7 +19,7 @@ app.use(helmet({
       fontSrc: ["'self'", "fonts.gstatic.com"],
       imgSrc: ["'self'", "data:", "*.cloudinary.com", "res.cloudinary.com", "images.unsplash.com", "api.qrserver.com"],
       connectSrc: ["'self'", "api.stripe.com"],
-      frameSrc: ["js.stripe.com"],
+      frameSrc: ["'self'", "js.stripe.com"],
     }
   }
 }));
