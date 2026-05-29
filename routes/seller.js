@@ -855,7 +855,8 @@ router.get('/api/notifications/counts', requireAuth, (req, res) => {
   const property = db.prepare('SELECT id FROM properties WHERE seller_id=?').get(req.seller.id);
   let pendingOffers = 0, upcomingVisits = 0;
   if (property) {
-    try { pendingOffers = db.prepare("SELECT COUNT(*) as n FROM offers WHERE property_id=? AND status='pending'").get(property.id)?.n || 0; } catch(e) {}
+    // Nouveaux contacts acheteurs des 7 derniers jours (remplace offres — Loi Hoguet)
+    try { pendingOffers = db.prepare("SELECT COUNT(*) as n FROM buyer_contacts WHERE seller_id=? AND created_at >= date('now','-7 days')").get(req.seller.id)?.n || 0; } catch(e) {}
     try { upcomingVisits = db.prepare("SELECT COUNT(*) as n FROM visits WHERE property_id=? AND status='confirmed' AND visit_date >= date('now') AND visit_date <= date('now','+7 days')").get(property.id)?.n || 0; } catch(e) {}
   }
   const unreadNotifs = db.prepare("SELECT COUNT(*) as n FROM notifications WHERE seller_id=? AND read_at IS NULL").get(req.seller.id)?.n || 0;
