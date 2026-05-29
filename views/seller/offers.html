@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mes contacts acheteurs — Serenis</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="manifest" href="/manifest.json">
+  <link rel="stylesheet" href="/css/style.css">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; }
+    body { font-family: 'DM Sans', sans-serif; background: #F5F0E8; margin: 0; }
+    .app-layout { display: flex; min-height: 100vh; }
+
+    .sidebar { width:240px;min-height:100vh;background:#3D5A47;display:flex;flex-direction:column;position:fixed;top:0;left:0;bottom:0;z-index:100; }
+    .sidebar-logo { padding:28px 24px 20px;border-bottom:1px solid rgba(212,228,216,0.15); }
+    .sidebar-logo a { display:flex;align-items:center;gap:10px;text-decoration:none; }
+    .logo-text { font-family:'Cormorant Garamond',serif;font-size:1.4rem;font-weight:600;color:#FDFCF8; }
+    .sidebar-nav { flex:1;padding:16px 0;display:flex;flex-direction:column;gap:2px;overflow-y:auto; }
+    .sidebar-item { display:flex;align-items:center;gap:11px;padding:10px 24px;color:rgba(212,228,216,0.7);text-decoration:none;font-size:0.88rem;font-weight:400;transition:all 0.2s; }
+    .sidebar-item:hover { color:#FDFCF8;background:rgba(212,228,216,0.08); }
+    .sidebar-item.active { color:#FDFCF8;background:rgba(212,228,216,0.14);font-weight:500;border-left:3px solid #C4785A; }
+    .sidebar-footer { padding:20px 24px;border-top:1px solid rgba(212,228,216,0.12); }
+    .sidebar-footer a { color:rgba(212,228,216,0.4);font-size:0.78rem;text-decoration:none; }
+
+    .main { margin-left:240px; padding:32px 36px 60px; max-width:1100px; }
+    @media(max-width:900px) { .main { margin-left:0; padding:20px 16px 60px; } }
+
+    .page-hdr { margin-bottom:28px; }
+    .page-hdr h1 { font-size:1.4rem;font-weight:600;color:#1a1a1a;margin:0 0 4px; }
+    .page-hdr-sub { font-size:0.85rem;color:#888; }
+
+    /* Stats row */
+    .stats-row { display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:14px;margin-bottom:28px; }
+    .stat-card { background:#fff;border-radius:12px;padding:18px 20px;box-shadow:0 1px 4px rgba(0,0,0,0.06); }
+    .stat-n { font-family:'Cormorant Garamond',serif;font-size:2rem;font-weight:600;color:#3D5A47;line-height:1; }
+    .stat-l { font-size:0.75rem;color:#888;margin-top:4px; }
+
+    /* Filters */
+    .filters { display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap;align-items:center; }
+    .filter-btn { padding:7px 16px;border-radius:20px;border:1.5px solid #e8e3db;background:#fff;font-size:0.8rem;font-weight:600;cursor:pointer;color:#555;font-family:'DM Sans',sans-serif;transition:all 0.15s; }
+    .filter-btn:hover { border-color:#3D5A47;color:#3D5A47; }
+    .filter-btn.active { background:#3D5A47;border-color:#3D5A47;color:#fff; }
+    .search-input { flex:1;min-width:160px;padding:8px 14px;border:1.5px solid #e8e3db;border-radius:20px;font-size:0.85rem;font-family:'DM Sans',sans-serif;background:#fff;outline:none; }
+    .search-input:focus { border-color:#3D5A47; }
+
+    /* Contact cards */
+    .contacts-list { display:flex;flex-direction:column;gap:12px; }
+    .contact-card { background:#fff;border:1.5px solid #e8e3db;border-radius:14px;padding:20px 24px;transition:all 0.18s;position:relative; }
+    .contact-card:hover { border-color:#c5d9cb;box-shadow:0 4px 20px rgba(0,0,0,0.07); }
+    .contact-card.new-contact { border-left:4px solid #C4785A; }
+    .contact-card.qualified { border-left:4px solid #3D5A47; }
+    .contact-card.visited { border-left:4px solid #059669; }
+    .contact-card.not_interested { border-left:4px solid #aaa;opacity:0.7; }
+
+    .contact-top { display:flex;align-items:flex-start;gap:16px;margin-bottom:14px; }
+    .contact-avatar { width:44px;height:44px;border-radius:50%;background:#3D5A47;color:#fff;display:flex;align-items:center;justify-content:center;font-size:1.1rem;font-weight:700;flex-shrink:0;font-family:'DM Sans',sans-serif; }
+    .contact-main { flex:1;min-width:0; }
+    .contact-name { font-size:0.97rem;font-weight:700;color:#1a1a1a;margin-bottom:2px; }
+    .contact-meta { font-size:0.78rem;color:#888;display:flex;gap:12px;flex-wrap:wrap; }
+    .contact-meta a { color:#C4785A;text-decoration:none; }
+    .contact-meta a:hover { text-decoration:underline; }
+
+    .contact-badges { display:flex;gap:6px;align-items:center;flex-shrink:0;flex-wrap:wrap; }
+    .badge { display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:20px;font-size:0.72rem;font-weight:700; }
+    .badge-new { background:#fff3e0;color:#e65100; }
+    .badge-qualified { background:#e8f4ec;color:#2e7d32; }
+    .badge-visited { background:#e8f0fe;color:#1a73e8; }
+    .badge-not_interested { background:#f5f5f5;color:#888; }
+    .badge-source { background:#f0f0ed;color:#666; }
+
+    /* Visit info */
+    .visit-tag { display:inline-flex;align-items:center;gap:6px;padding:5px 12px;border-radius:8px;background:#f0f5f1;font-size:0.78rem;color:#3D5A47;font-weight:500;margin-top:8px; }
+
+    /* Notes */
+    .notes-row { margin-top:12px;display:flex;gap:8px;align-items:flex-start; }
+    .notes-input { flex:1;border:1.5px solid #e8e3db;border-radius:8px;padding:8px 12px;font-size:0.82rem;font-family:'DM Sans',sans-serif;resize:none;outline:none;min-height:36px;color:#333; }
+    .notes-input:focus { border-color:#3D5A47; }
+    .btn-save-note { background:#3D5A47;border:none;border-radius:8px;padding:8px 14px;color:#fff;font-size:0.78rem;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;white-space:nowrap;transition:all 0.15s; }
+    .btn-save-note:hover { background:#2e4435; }
+
+    /* Status actions */
+    .contact-actions { display:flex;gap:6px;margin-top:10px;flex-wrap:wrap; }
+    .action-btn { padding:5px 12px;border-radius:6px;border:1.5px solid #e8e3db;background:#fff;font-size:0.75rem;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;color:#555;transition:all 0.15s; }
+    .action-btn:hover { border-color:#3D5A47;color:#3D5A47; }
+    .action-btn.active { background:#3D5A47;border-color:#3D5A47;color:#fff; }
+    .action-btn.danger { color:#dc2626; }
+    .action-btn.danger:hover { border-color:#dc2626; }
+
+    /* Empty state */
+    .empty { text-align:center;padding:80px 20px;color:#aaa; }
+    .empty-icon { font-size:3rem;margin-bottom:16px; }
+    .empty-title { font-size:1rem;font-weight:600;color:#888;margin-bottom:8px; }
+    .empty-sub { font-size:0.85rem;line-height:1.6;max-width:360px;margin:0 auto; }
+
+    /* Toast */
+    .toast { position:fixed;bottom:24px;right:24px;background:#1a1a16;color:#fff;padding:12px 20px;border-radius:10px;font-size:0.88rem;z-index:9999;opacity:0;transform:translateY(8px);transition:all 0.3s;pointer-events:none; }
+    .toast.show { opacity:1;transform:none; }
+    .toast.success { background:#059669; }
+  </style>
+</head>
+<body>
+<div class="app-layout">
+
+  <nav class="sidebar">
+    <div class="sidebar-logo">
+      <a href="/dashboard"><span class="logo-text">Sere<em style="color:#C4785A">nis</em></span></a>
+    </div>
+    <div class="sidebar-nav">
+      <a href="/dashboard" class="sidebar-item">🏠 Dashboard</a>
+      <a href="/ma-formation" class="sidebar-item">🎓 Ma formation</a>
+      <a href="/mon-bien" class="sidebar-item">🏡 Mon bien</a>
+      <a href="/mon-guide-photos" class="sidebar-item">📸 Guide photos</a>
+      <a href="/serenis-connect" class="sidebar-item">📱 Serenis Connect</a>
+      <a href="/mon-agenda" class="sidebar-item">📅 Mon agenda</a>
+      <a href="/ma-bibliotheque" class="sidebar-item">📚 Bibliothèque</a>
+      <a href="/mes-publications" class="sidebar-item">📡 Publications</a>
+      <a href="/mes-offres" class="sidebar-item active">👥 Mes contacts</a>
+      <a href="/coach-ia" class="sidebar-item">🤖 Coach IA</a>
+      <a href="/mes-notifications" class="sidebar-item">🔔 Notifications</a>
+    </div>
+    <div class="sidebar-footer"><a href="/logout">Déconnexion →</a></div>
+  </nav>
+
+  <div class="main">
+    <div class="page-hdr">
+      <h1>👥 Mes contacts acheteurs</h1>
+      <div class="page-hdr-sub">Tous les acheteurs ayant demandé votre dossier — à contacter directement pour organiser visites et négociation</div>
+    </div>
+
+    <div class="stats-row" id="statsRow">
+      <div class="stat-card"><div class="stat-n" id="st-total">—</div><div class="stat-l">Contacts total</div></div>
+      <div class="stat-card"><div class="stat-n" id="st-new" style="color:#C4785A;">—</div><div class="stat-l">Nouveaux</div></div>
+      <div class="stat-card"><div class="stat-n" id="st-qualified" style="color:#3D5A47;">—</div><div class="stat-l">Qualifiés</div></div>
+      <div class="stat-card"><div class="stat-n" id="st-visited" style="color:#1a73e8;">—</div><div class="stat-l">Visites réalisées</div></div>
+    </div>
+
+    <!-- Rappel Loi Hoguet -->
+    <div style="background:#fff3e0;border:1px solid #ffe0b2;border-radius:10px;padding:12px 16px;margin-bottom:20px;font-size:0.82rem;color:#e65100;display:flex;gap:10px;align-items:flex-start;">
+      <span style="flex-shrink:0;font-size:1rem;">ℹ️</span>
+      <span>Ces contacts vous ont demandé votre dossier via le numéro Serenis ou l'espace acheteur. <strong>Prenez contact directement avec eux</strong> pour organiser visites, négociation et compromis. Serenis est votre outil d'organisation — pas un intermédiaire.</span>
+    </div>
+
+    <div class="filters">
+      <input type="text" class="search-input" id="searchInput" placeholder="Rechercher un contact…" oninput="filterContacts()">
+      <button class="filter-btn active" onclick="setFilter('all', this)">Tous</button>
+      <button class="filter-btn" onclick="setFilter('new', this)">Nouveaux</button>
+      <button class="filter-btn" onclick="setFilter('qualified', this)">Qualifiés</button>
+      <button class="filter-btn" onclick="setFilter('visited', this)">Visités</button>
+      <button class="filter-btn" onclick="setFilter('not_interested', this)">Non retenus</button>
+    </div>
+
+    <div class="contacts-list" id="contactsList">
+      <div class="empty">
+        <div class="loading-spinner" style="width:32px;height:32px;border:3px solid #e0e0d8;border-top-color:#3D5A47;border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 16px;"></div>
+        <div style="color:#888;">Chargement…</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<style>
+@keyframes spin { to { transform: rotate(360deg); } }
+.loading-spinner { animation: spin 0.8s linear infinite; }
+</style>
+
+<script src="/js/seller-nav.js"></script>
+<script>
+let allContacts = [];
+let allVisits = [];
+let activeFilter = 'all';
+
+const STATUS_BADGE = {
+  new: '<span class="badge badge-new">🔔 Nouveau</span>',
+  qualified: '<span class="badge badge-qualified">✓ Qualifié</span>',
+  visited: '<span class="badge badge-visited">🏠 Visité</span>',
+  not_interested: '<span class="badge badge-not_interested">✗ Non retenu</span>',
+};
+const SOURCE_LABEL = { sms: '📱 SMS', email: '✉️ Email', manuel: '✋ Manuel', form: '📝 Formulaire' };
+
+async function load() {
+  try {
+    const r = await fetch('/api/connect/overview');
+    const data = await r.json();
+    allContacts = data.contacts || [];
+    allVisits = data.visits || [];
+
+    document.getElementById('st-total').textContent = allContacts.length;
+    document.getElementById('st-new').textContent = allContacts.filter(c => c.status === 'new' || !c.status).length;
+    document.getElementById('st-qualified').textContent = allContacts.filter(c => c.status === 'qualified').length;
+    document.getElementById('st-visited').textContent = allVisits.filter(v => v.status === 'done').length;
+
+    renderContacts();
+  } catch(e) {
+    document.getElementById('contactsList').innerHTML = `<div class="empty"><div class="empty-icon">⚠️</div><div class="empty-title">Erreur de chargement</div></div>`;
+  }
+}
+
+function getContactVisits(contact) {
+  if (!contact.buyer_phone && !contact.buyer_email) return [];
+  return allVisits.filter(v =>
+    (contact.buyer_phone && v.buyer_phone === contact.buyer_phone) ||
+    (contact.buyer_email && v.buyer_email === contact.buyer_email)
+  );
+}
+
+function setFilter(f, btn) {
+  activeFilter = f;
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderContacts();
+}
+
+function filterContacts() { renderContacts(); }
+
+function renderContacts() {
+  const search = (document.getElementById('searchInput')?.value || '').toLowerCase();
+  let filtered = allContacts.filter(c => {
+    if (activeFilter !== 'all' && (c.status || 'new') !== activeFilter) return false;
+    if (search) {
+      const hay = [c.buyer_name, c.buyer_phone, c.buyer_email, c.notes].filter(Boolean).join(' ').toLowerCase();
+      if (!hay.includes(search)) return false;
+    }
+    return true;
+  });
+  // Sort: newest first
+  filtered.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+
+  const list = document.getElementById('contactsList');
+  if (!filtered.length) {
+    const isEmpty = !allContacts.length;
+    list.innerHTML = `<div class="empty">
+      <div class="empty-icon">${isEmpty ? '📭' : '🔍'}</div>
+      <div class="empty-title">${isEmpty ? 'Aucun contact pour l\'instant' : 'Aucun contact ne correspond'}</div>
+      <div class="empty-sub">${isEmpty ? 'Dès qu\'un acheteur enverra un SMS à votre numéro Serenis ou accèdera à votre dossier, son contact apparaîtra ici.' : 'Essayez un autre filtre ou terme de recherche.'}</div>
+    </div>`;
+    return;
+  }
+
+  list.innerHTML = filtered.map(c => buildCard(c)).join('');
+}
+
+function buildCard(c) {
+  const status = c.status || 'new';
+  const date = new Date(c.created_at).toLocaleDateString('fr-FR', { day:'2-digit', month:'short', year:'numeric' });
+  const initials = (c.buyer_name || '?').split(' ').map(w => w[0]).slice(0,2).join('').toUpperCase();
+  const visits = getContactVisits(c);
+  const visitTags = visits.map(v => {
+    const vDate = new Date(v.visit_date).toLocaleDateString('fr-FR', { day:'2-digit', month:'short' });
+    const statusEmoji = { confirmed:'✅', pending:'⏳', cancelled:'❌', done:'🏠' };
+    return `<span class="visit-tag">${statusEmoji[v.status] || '📅'} Visite ${vDate} à ${v.visit_time} — ${v.status}</span>`;
+  }).join('');
+
+  return `
+  <div class="contact-card ${status}" id="card-${c.id}">
+    <div class="contact-top">
+      <div class="contact-avatar">${initials}</div>
+      <div class="contact-main">
+        <div class="contact-name">${c.buyer_name || 'Contact anonyme'}</div>
+        <div class="contact-meta">
+          ${c.buyer_phone ? `<span>📞 <a href="tel:${c.buyer_phone}">${c.buyer_phone}</a></span>` : ''}
+          ${c.buyer_email ? `<span>✉️ <a href="mailto:${c.buyer_email}">${c.buyer_email}</a></span>` : ''}
+          <span>📅 ${date}</span>
+          ${c.source ? `<span>${SOURCE_LABEL[c.source] || c.source}</span>` : ''}
+        </div>
+      </div>
+      <div class="contact-badges">
+        ${STATUS_BADGE[status] || STATUS_BADGE.new}
+      </div>
+    </div>
+
+    ${visitTags ? `<div style="display:flex;gap:6px;flex-wrap:wrap;">${visitTags}</div>` : ''}
+
+    <div class="notes-row">
+      <textarea class="notes-input" id="notes-${c.id}" placeholder="Notes personnelles (budget, situation, retour visite…)" rows="2">${c.notes || ''}</textarea>
+      <button class="btn-save-note" onclick="saveNote(${c.id})">Sauver</button>
+    </div>
+
+    <div class="contact-actions">
+      <button class="action-btn ${status==='new'?'active':''}" onclick="setStatus(${c.id},'new')">🔔 Nouveau</button>
+      <button class="action-btn ${status==='qualified'?'active':''}" onclick="setStatus(${c.id},'qualified')">✓ Qualifié</button>
+      <button class="action-btn ${status==='visited'?'active':''}" onclick="setStatus(${c.id},'visited')">🏠 Visité</button>
+      <button class="action-btn ${status==='not_interested'?'active':''}" onclick="setStatus(${c.id},'not_interested')">✗ Non retenu</button>
+      <button class="action-btn danger" style="margin-left:auto;" onclick="deleteContact(${c.id})">🗑️</button>
+    </div>
+  </div>`;
+}
+
+async function saveNote(id) {
+  const notes = document.getElementById(`notes-${id}`)?.value || '';
+  await fetch(`/api/connect/contacts/${id}/notes`, {
+    method:'PUT', headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({ notes })
+  });
+  showToast('Note sauvegardée');
+}
+
+async function setStatus(id, status) {
+  await fetch(`/api/connect/contacts/${id}/status`, {
+    method:'PUT', headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({ status })
+  });
+  const c = allContacts.find(x => x.id === id);
+  if (c) { c.status = status; renderContacts(); }
+}
+
+async function deleteContact(id) {
+  if (!confirm('Supprimer ce contact ?')) return;
+  await fetch(`/api/connect/contacts/${id}`, { method:'DELETE' });
+  allContacts = allContacts.filter(c => c.id !== id);
+  renderContacts();
+  showToast('Contact supprimé');
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.className = 'toast show success';
+  clearTimeout(t._t); t._t = setTimeout(() => { t.className = 'toast'; }, 2500);
+}
+
+load();
+</script>
+</body>
+</html>

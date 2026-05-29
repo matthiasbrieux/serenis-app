@@ -648,6 +648,12 @@ router.put('/api/connect/contacts/:id/status', requireAuth, express.json(), (req
   res.json({ success: true });
 });
 
+router.put('/api/connect/contacts/:id/notes', requireAuth, express.json(), (req, res) => {
+  const { notes } = req.body;
+  db.prepare('UPDATE buyer_contacts SET notes=? WHERE id=? AND seller_id=?').run(notes || null, req.params.id, req.seller.id);
+  res.json({ success: true });
+});
+
 router.delete('/api/connect/contacts/:id', requireAuth, (req, res) => {
   db.prepare('DELETE FROM buyer_contacts WHERE id=? AND seller_id=?').run(req.params.id, req.seller.id);
   res.json({ success: true });

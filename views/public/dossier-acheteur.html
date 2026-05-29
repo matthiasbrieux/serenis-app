@@ -376,7 +376,38 @@ function render(p, ph, docs) {
     } catch(e) {}
   }
 
+  // ── Score dossier ──────────────────────────────────────────────
+  const scoreItems = [];
+  const proPhotos = ph.filter(p2 => p2.category === 'pro' || !p2.category).length;
+  const immersivePhotos = ph.filter(p2 => p2.category === 'decouverte').length;
+  if (proPhotos >= 5) scoreItems.push({ ok:true, label:`${proPhotos} photos professionnelles` });
+  else if (proPhotos > 0) scoreItems.push({ ok:false, label:`${proPhotos} photo${proPhotos>1?'s':''} pro (min. 5 recommandées)` });
+  if (immersivePhotos > 0) scoreItems.push({ ok:true, label:`${immersivePhotos} photo${immersivePhotos>1?'s':''} immersives` });
+  if (docs.length >= 3) scoreItems.push({ ok:true, label:`${docs.length} documents disponibles` });
+  else if (docs.length > 0) scoreItems.push({ ok:true, label:`${docs.length} document${docs.length>1?'s':''}` });
+  if (p.description && p.description.length > 80) scoreItems.push({ ok:true, label:'Description détaillée' });
+  if (p.dpe_class) scoreItems.push({ ok:true, label:`DPE ${p.dpe_class}` });
+  if (p.surface_habitable) scoreItems.push({ ok:true, label:`Surface ${p.surface_habitable} m²` });
+  const okCount = scoreItems.filter(s => s.ok).length;
+  const totalItems = scoreItems.length;
+  const isComplete = okCount >= 5 && proPhotos >= 5;
+
+  const scoreHtml = scoreItems.length ? `
+  <div style="background:${isComplete ? 'linear-gradient(135deg,#3D5A47,#2a4030)' : 'linear-gradient(135deg,#4a5568,#2d3748)'};border-radius:14px;padding:16px 20px;margin-bottom:20px;display:flex;align-items:center;gap:16px;flex-wrap:wrap;">
+    <div style="display:flex;align-items:center;gap:10px;flex-shrink:0;">
+      <div style="width:44px;height:44px;border-radius:50%;background:rgba(255,255,255,0.15);display:flex;align-items:center;justify-content:center;font-size:1.4rem;">${isComplete ? '✓' : '📋'}</div>
+      <div>
+        <div style="color:#fff;font-weight:700;font-size:0.92rem;">${isComplete ? 'Dossier Serenis complet' : 'Dossier Serenis'}</div>
+        <div style="color:rgba(255,255,255,0.6);font-size:0.72rem;">${isComplete ? 'Toutes les informations essentielles sont disponibles' : okCount + ' / ' + totalItems + ' éléments renseignés'}</div>
+      </div>
+    </div>
+    <div style="display:flex;flex-wrap:wrap;gap:7px;flex:1;justify-content:flex-end;">
+      ${scoreItems.map(s => `<span style="display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:20px;font-size:0.72rem;font-weight:600;background:${s.ok ? 'rgba(255,255,255,0.18)' : 'rgba(220,38,38,0.2)'};color:${s.ok ? '#fff' : '#fca5a5'};">${s.ok ? '✓' : '⚠'} ${s.label}</span>`).join('')}
+    </div>
+  </div>` : '';
+
   document.getElementById('content').innerHTML = `
+    ${scoreHtml}
     <div class="hero">
       <div class="hero-photos" id="heroPhotos">${mainPhoto}<div class="photo-count">${ph.length} photo${ph.length>1?'s':''}</div></div>
       ${photoStrip}
