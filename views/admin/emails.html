@@ -228,37 +228,50 @@ async function init() {
 }
 
 async function loadCatalog() {
-  const r = await fetch('/admin/api/emails/catalog');
-  const { catalog } = await r.json();
-  allCatalog = catalog;
-  renderCatalog(catalog);
-
-  const autoCount = catalog.filter(e => e.auto).length;
-  document.getElementById('statAuto').textContent = autoCount;
-  document.getElementById('statManual').textContent = catalog.length - autoCount;
+  try {
+    const r = await fetch('/admin/api/emails/catalog');
+    const data = await r.json();
+    if (data.error) throw new Error(data.error);
+    const catalog = data.catalog || [];
+    allCatalog = catalog;
+    renderCatalog(catalog);
+    const autoCount = catalog.filter(e => e.auto).length;
+    document.getElementById('statAuto').textContent = autoCount;
+    document.getElementById('statManual').textContent = catalog.length - autoCount;
+  } catch(e) {
+    document.getElementById('catalogBody').innerHTML = `<tr><td colspan="6" style="text-align:center;color:#c62828;padding:32px;">Erreur chargement catalogue : ${e.message}</td></tr>`;
+  }
 }
 
 async function loadLog(page) {
-  logPage = page;
-  const r = await fetch(`/admin/api/emails/log?page=${page}`);
-  const { logs, total } = await r.json();
-  allLogs = logs;
-  renderLog(logs, total, page);
-  document.getElementById('statTotal').textContent = total.toLocaleString('fr-FR');
+  try {
+    logPage = page;
+    const r = await fetch(`/admin/api/emails/log?page=${page}`);
+    const data = await r.json();
+    const logs = data.logs || [];
+    const total = data.total || 0;
+    allLogs = logs;
+    renderLog(logs, total, page);
+    document.getElementById('statTotal').textContent = total.toLocaleString('fr-FR');
+  } catch(e) {
+    document.getElementById('logBody').innerHTML = `<tr><td colspan="4" style="text-align:center;color:#c62828;padding:32px;">Erreur : ${e.message}</td></tr>`;
+  }
 }
 
 async function loadSellers() {
-  const r = await fetch('/admin/api/emails/sellers-list');
-  const data = await r.json();
-  sellers = data.sellers || [];
-  const sel = document.getElementById('modalSeller');
-  sel.innerHTML = '<option value="">Choisir un vendeur...</option>' +
-    sellers.map(s => `<option value="${s.id}">${s.first_name} ${s.last_name} — ${s.email}</option>`).join('');
-
-  // Week count from logs
-  const weekAgo = new Date(Date.now() - 7*86400000).toISOString();
-  const weekCount = allLogs.filter(l => l.sent_at >= weekAgo).length;
-  document.getElementById('statWeek').textContent = weekCount;
+  try {
+    const r = await fetch('/admin/api/emails/sellers-list');
+    const data = await r.json();
+    sellers = data.sellers || [];
+    const sel = document.getElementById('modalSeller');
+    sel.innerHTML = '<option value="">Choisir un vendeur...</option>' +
+      sellers.map(s => `<option value="${s.id}">${s.first_name} ${s.last_name} — ${s.email}</option>`).join('');
+    const weekAgo = new Date(Date.now() - 7*86400000).toISOString();
+    const weekCount = allLogs.filter(l => l.sent_at >= weekAgo).length;
+    document.getElementById('statWeek').textContent = weekCount;
+  } catch(e) {
+    document.getElementById('modalSeller').innerHTML = `<option>Erreur : ${e.message}</option>`;
+  }
 }
 
 function renderCatalog(list) {

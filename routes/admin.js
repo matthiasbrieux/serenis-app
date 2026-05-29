@@ -984,46 +984,51 @@ const EMAIL_CATALOG = [
 ];
 
 router.get('/api/emails/catalog', requireAdmin, (req, res) => {
-  const logRows = db.prepare(`
-    SELECT trigger_type, recipient_email, sent_at
-    FROM email_log ORDER BY sent_at DESC LIMIT 500
-  `).all();
-
-  const lastSentMap = {};
-  for (const row of logRows) {
-    const base = row.trigger_type.split(':')[0];
-    if (!lastSentMap[base]) lastSentMap[base] = row.sent_at;
-  }
-
-  const catalog = EMAIL_CATALOG.map(e => ({ ...e, last_sent: lastSentMap[e.id] || null }));
-  res.json({ catalog });
+  try {
+    let lastSentMap = {};
+    try {
+      const logRows = db.prepare(`SELECT trigger_type, sent_at FROM email_log ORDER BY sent_at DESC LIMIT 500`).all();
+      for (const row of logRows) {
+        const base = row.trigger_type.split(':')[0];
+        if (!lastSentMap[base]) lastSentMap[base] = row.sent_at;
+      }
+    } catch(e) { /* email_log might not exist yet */ }
+    const catalog = EMAIL_CATALOG.map(e => ({ ...e, last_sent: lastSentMap[e.id] || null }));
+    res.json({ catalog });
+  } catch(e) { res.status(500).json({ error: e.message }); }
 });
 
 router.get('/api/emails/log', requireAdmin, (req, res) => {
-  const page = parseInt(req.query.page) || 0;
-  const limit = 50;
-  const logs = db.prepare(`
-    SELECT el.*, s.first_name, s.last_name
-    FROM email_log el
-    LEFT JOIN sellers s ON s.email = el.recipient_email
-    ORDER BY el.sent_at DESC
-    LIMIT ? OFFSET ?
-  `).all(limit, page * limit);
-  const total = db.prepare(`SELECT COUNT(*) as c FROM email_log`).get()?.c || 0;
-  res.json({ logs, total, page });
+  try {
+    const page = parseInt(req.query.page) || 0;
+    const limit = 50;
+    let logs = [], total = 0;
+    try {
+      logs = db.prepare(`
+        SELECT el.*, s.first_name, s.last_name
+        FROM email_log el
+        LEFT JOIN sellers s ON s.email = el.recipient_email
+        ORDER BY el.sent_at DESC LIMIT ? OFFSET ?
+      `).all(limit, page * limit);
+      total = db.prepare(`SELECT COUNT(*) as c FROM email_log`).get()?.c || 0;
+    } catch(e) { /* email_log might not exist yet */ }
+    res.json({ logs, total, page });
+  } catch(e) { res.status(500).json({ error: e.message }); }
 });
 
 router.get('/api/emails/sellers-list', requireAdmin, (req, res) => {
-  const sellers = db.prepare(`
-    SELECT id, first_name, last_name, email, pack, paid_at,
-           (SELECT published_at FROM properties WHERE seller_id = sellers.id LIMIT 1) as published_at,
-           (SELECT COUNT(*) FROM photos WHERE seller_id = sellers.id) as photo_count,
-           (SELECT COUNT(*) FROM visits WHERE seller_id = sellers.id AND status='confirmed') as visit_count,
-           (SELECT COUNT(*) FROM offers WHERE seller_id = sellers.id) as offer_count
-    FROM sellers WHERE archived IS NULL OR archived = 0
-    ORDER BY created_at DESC LIMIT 200
-  `).all();
-  res.json({ sellers });
+  try {
+    const sellers = db.prepare(`
+      SELECT id, first_name, last_name, email, pack, paid_at,
+             (SELECT published_at FROM properties WHERE seller_id = sellers.id LIMIT 1) as published_at,
+             (SELECT COUNT(*) FROM photos WHERE seller_id = sellers.id) as photo_count,
+             (SELECT COUNT(*) FROM visits WHERE seller_id = sellers.id AND status='confirmed') as visit_count,
+             (SELECT COUNT(*) FROM offers WHERE seller_id = sellers.id) as offer_count
+      FROM sellers WHERE archived IS NULL OR archived = 0
+      ORDER BY created_at DESC LIMIT 200
+    `).all();
+    res.json({ sellers });
+  } catch(e) { res.status(500).json({ error: e.message }); }
 });
 
 router.post('/api/emails/send', requireAdmin, async (req, res) => {
