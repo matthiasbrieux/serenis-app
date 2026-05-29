@@ -36,7 +36,12 @@ app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(path.join(__dirname, 'public'), {
+  maxAge: '7d',
+  setHeaders: (res, filePath) => {
+    if (filePath.endsWith('.html')) res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate');
+  },
+}));
 
 // ── Stripe webhook : raw body AVANT le middleware json ──
 app.post('/webhook/stripe', express.raw({ type: 'application/json' }), require('./routes/payment').stripeWebhook);
@@ -69,7 +74,17 @@ app.get('/robots.txt', (req, res) => {
     'Disallow: /mon-bien',
     'Disallow: /ma-formation',
     'Disallow: /mon-agenda',
+    'Disallow: /mes-offres',
+    'Disallow: /mes-notifications',
+    'Disallow: /mes-publications',
+    'Disallow: /mes-performances',
+    'Disallow: /mon-coach',
+    'Disallow: /coach-ia',
+    'Disallow: /booking',
+    'Disallow: /onboarding',
+    'Disallow: /contrat',
     'Disallow: /admin',
+    'Disallow: /api/',
     `Sitemap: ${base}/sitemap.xml`,
   ].join('\n'));
 });
@@ -79,7 +94,7 @@ app.get('/sitemap.xml', (req, res) => {
   const base = process.env.BASE_URL || 'https://venduparmo.fr';
   const properties = db.prepare('SELECT slug, updated_at FROM properties WHERE published=1').all();
   const today = new Date().toISOString().split('T')[0];
-  const staticUrls = ['/', '/tarifs', '/faq'].map(p =>
+  const staticUrls = ['/', '/tarifs', '/faq', '/cgv'].map(p =>
     `  <url><loc>${base}${p}</loc><lastmod>${today}</lastmod><changefreq>weekly</changefreq><priority>${p === '/' ? '1.0' : '0.7'}</priority></url>`
   );
   const propUrls = properties.map(p =>
@@ -88,6 +103,9 @@ app.get('/sitemap.xml', (req, res) => {
   res.type('application/xml');
   res.send(`<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${[...staticUrls,...propUrls].join('\n')}\n</urlset>`);
 });
+
+// Redirect mentions légales → section dans CGV
+app.get('/mentions-legales', (req, res) => res.redirect(301, '/cgv#mentions-legales'));
 
 // Contact form
 app.post('/api/contact', async (req, res) => {
