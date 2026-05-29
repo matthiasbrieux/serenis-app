@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Notifications — Serenis</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="manifest" href="/manifest.json">
+  <link rel="stylesheet" href="/css/style.css">
+  <style>
+    * { box-sizing: border-box; }
+    body { background: #F5F0E8; color: #1C1C1A; font-family: 'DM Sans', sans-serif; margin: 0; min-height: 100vh; }
+    .hdr { background: #fff; padding: 16px 32px; display: flex; align-items: center; gap: 16px; border-bottom: 1px solid #e8e0d6; }
+    .hdr a { color: #9a9087; text-decoration: none; font-size: .85rem; transition: color .15s; }
+    .hdr a:hover { color: #3D5A47; }
+    .hdr h1 { font-family: 'Cormorant Garamond', serif; font-size: 1.5rem; color: #1C1C1A; margin: 0; }
+    .hdr-actions { margin-left: auto; display: flex; gap: 10px; align-items: center; }
+    .btn-readall { padding: 7px 16px; border-radius: 8px; border: 1.5px solid #e8e0d6; background: #fff; color: #666; font-size: .8rem; font-weight: 600; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: .15s; }
+    .btn-readall:hover { border-color: #3D5A47; color: #3D5A47; }
+
+    .page { max-width: 760px; margin: 0 auto; padding: 32px 24px 60px; }
+
+    .tabs { display: flex; gap: 6px; margin-bottom: 28px; flex-wrap: wrap; }
+    .tab { padding: 8px 18px; border-radius: 50px; border: 1.5px solid #e8e0d6; background: #fff; color: #666; font-size: .84rem; font-weight: 600; cursor: pointer; transition: .15s; font-family: 'DM Sans', sans-serif; }
+    .tab.active { background: #3D5A47; color: #fff; border-color: #3D5A47; }
+    .tab:hover:not(.active) { border-color: #3D5A47; color: #3D5A47; }
+
+    .notif-group { margin-bottom: 32px; }
+    .notif-group-title { font-size: .72rem; text-transform: uppercase; letter-spacing: .07em; color: #aaa; font-weight: 600; margin-bottom: 12px; }
+
+    .notif-card {
+      background: #fff; border: 1px solid #e8e0d6; border-radius: 12px;
+      padding: 14px 18px; margin-bottom: 8px;
+      display: flex; align-items: flex-start; gap: 14px;
+      transition: box-shadow .15s;
+    }
+    .notif-card:hover { box-shadow: 0 3px 14px rgba(0,0,0,.06); }
+    .notif-card.unread { border-left: 3px solid #C4785A; background: #fffcf9; }
+    .notif-icon { width: 38px; height: 38px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; flex-shrink: 0; }
+    .ni-visit   { background: #e8f4ec; }
+    .ni-offer   { background: #fef3c7; }
+    .ni-contact { background: #dbeafe; }
+    .ni-system  { background: #ede9fe; }
+    .notif-body { flex: 1; min-width: 0; }
+    .notif-title { font-weight: 600; font-size: .88rem; color: #1C1C1A; margin-bottom: 2px; }
+    .notif-sub   { font-size: .8rem; color: #888; }
+    .notif-time  { font-size: .72rem; color: #bbb; flex-shrink: 0; margin-top: 2px; white-space: nowrap; }
+
+    .empty-state { text-align: center; padding: 60px 24px; color: #aaa; }
+    .empty-state .icon { font-size: 2.5rem; margin-bottom: 12px; }
+    .empty-state p { font-size: .9rem; }
+
+    .unread-dot { display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: #C4785A; margin-left: 5px; vertical-align: middle; }
+  </style>
+</head>
+<body>
+
+<div class="hdr">
+  <a href="/dashboard">← Dashboard</a>
+  <h1>Notifications</h1>
+  <div class="hdr-actions">
+    <button class="btn-readall" onclick="markAllRead()">Tout marquer comme lu</button>
+  </div>
+</div>
+
+<div class="page">
+  <div class="tabs">
+    <button class="tab active" onclick="switchTab('all', this)">Tout</button>
+    <button class="tab" onclick="switchTab('visits', this)">Visites</button>
+    <button class="tab" onclick="switchTab('offers', this)">Offres</button>
+    <button class="tab" onclick="switchTab('contacts', this)">Contacts</button>
+    <button class="tab" onclick="switchTab('system', this)">Système</button>
+  </div>
+
+  <div id="content">
+    <div style="text-align:center;padding:60px;color:#aaa;">Chargement…</div>
+  </div>
+</div>
+
+<script src="/js/seller-nav.js"></script>
+<script>
+let data = null;
+let activeTab = 'all';
+
+function timeAgo(dateStr) {
+  if (!dateStr) return '';
+  const d = new Date(dateStr);
+  const diff = Math.floor((Date.now() - d.getTime()) / 1000);
+  if (diff < 60)   return 'À l\'instant';
+  if (diff < 3600) return Math.floor(diff/60) + ' min';
+  if (diff < 86400) return Math.floor(diff/3600) + 'h';
+  if (diff < 604800) return Math.floor(diff/86400) + 'j';
+  return d.toLocaleDateString('fr-FR');
+}
+
+function switchTab(tab, btn) {
+  activeTab = tab;
+  document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t === btn));
+  render();
+}
+
+function render() {
+  if (!data) return;
+  const content = document.getElementById('content');
+
+  const allItems = buildItems();
+  const filtered = activeTab === 'all' ? allItems : allItems.filter(i => i.tab === activeTab);
+
+  if (!filtered.length) {
+    content.innerHTML = `<div class="empty-state"><div class="icon">🔔</div><p>Aucune notification ici pour le moment.</p></div>`;
+    return;
+  }
+
+  // Group by date
+  const groups = {};
+  filtered.forEach(item => {
+    const d = item.date ? new Date(item.date) : null;
+    const key = d ? d.toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' }) : 'Date inconnue';
+    if (!groups[key]) groups[key] = [];
+    groups[key].push(item);
+  });
+
+  content.innerHTML = Object.entries(groups).map(([label, items]) => `
+    <div class="notif-group">
+      <div class="notif-group-title">${label}</div>
+      ${items.map(i => `
+        <div class="notif-card ${i.unread ? 'unread' : ''}">
+          <div class="notif-icon ${i.iconCls}">${i.icon}</div>
+          <div class="notif-body">
+            <div class="notif-title">${i.title}${i.unread ? '<span class="unread-dot"></span>' : ''}</div>
+            <div class="notif-sub">${i.sub || ''}</div>
+          </div>
+          <div class="notif-time">${timeAgo(i.date)}</div>
+        </div>
+      `).join('')}
+    </div>
+  `).join('');
+}
+
+function buildItems() {
+  const items = [];
+
+  // System notifications from DB
+  (data.notifications || []).forEach(n => {
+    const typeMap = {
+      visit_request:   { icon: '📅', cls: 'ni-visit',   tab: 'visits'   },
+      visit_confirmed: { icon: '✅', cls: 'ni-visit',   tab: 'visits'   },
+      new_contact:     { icon: '👤', cls: 'ni-contact', tab: 'contacts' },
+      new_offer:       { icon: '💰', cls: 'ni-offer',   tab: 'offers'   },
+    };
+    const t = typeMap[n.type] || { icon: '🔔', cls: 'ni-system', tab: 'system' };
+    items.push({
+      tab: t.tab, icon: t.icon, iconCls: t.cls,
+      title: n.title || n.type,
+      sub: n.body || '',
+      date: n.created_at,
+      unread: !n.read_at,
+    });
+  });
+
+  // Visits
+  (data.visits || []).forEach(v => {
+    const statusLabel = { confirmed: 'Confirmée', pending: 'En attente', cancelled: 'Annulée', done: 'Réalisée' }[v.status] || v.status;
+    items.push({
+      tab: 'visits', icon: '📅', iconCls: 'ni-visit',
+      title: `Visite — ${v.buyer_name}`,
+      sub: `${v.visit_date} à ${v.visit_time} · ${statusLabel}`,
+      date: v.created_at, unread: false,
+    });
+  });
+
+  // Offers
+  (data.offers || []).forEach(o => {
+    items.push({
+      tab: 'offers', icon: '💰', iconCls: 'ni-offer',
+      title: `Offre de ${o.buyer_name} — ${Number(o.amount).toLocaleString('fr-FR')} €`,
+      sub: `Reçue le ${new Date(o.created_at).toLocaleDateString('fr-FR')} · ${o.status === 'pending' ? 'En attente de réponse' : o.status}`,
+      date: o.created_at, unread: o.status === 'pending',
+    });
+  });
+
+  // Contacts
+  (data.contacts || []).forEach(c => {
+    items.push({
+      tab: 'contacts', icon: '👤', iconCls: 'ni-contact',
+      title: `Nouveau contact — ${c.buyer_name || c.buyer_email || c.buyer_phone || 'Acquéreur'}`,
+      sub: `Via ${c.source === 'sms' ? 'SMS' : c.source === 'manuel' ? 'Ajout manuel' : c.source} · Dossier ${c.dossier_sent ? 'envoyé' : 'non envoyé'}`,
+      date: c.created_at, unread: false,
+    });
+  });
+
+  // Deduplicate by removing visit/contact/offer events already covered by system notifications
+  // Sort by date desc
+  return items.sort((a, b) => new Date(b.date) - new Date(a.date));
+}
+
+async function markAllRead() {
+  await fetch('/api/notifications/read-all', { method: 'POST' });
+  if (data) data.notifications.forEach(n => n.read_at = new Date().toISOString());
+  render();
+}
+
+async function load() {
+  try {
+    const r = await fetch('/api/notifications/all');
+    data = await r.json();
+    render();
+  } catch(e) {
+    document.getElementById('content').innerHTML = '<div class="empty-state"><p>Erreur de chargement</p></div>';
+  }
+}
+
+load();
+</script>
+</body>
+</html>

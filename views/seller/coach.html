@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Coach IA — Serenis</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="manifest" href="/manifest.json">
+  <link rel="stylesheet" href="/css/style.css">
+  <style>
+    * { box-sizing: border-box; }
+    body { background: #1C1C1A; color: #FDFCF8; font-family: 'DM Sans', sans-serif; margin: 0; display: flex; flex-direction: column; height: 100dvh; }
+    .hdr { background: #111; padding: 14px 24px; display: flex; align-items: center; gap: 16px; border-bottom: 1px solid #2a2a28; flex-shrink: 0; }
+    .hdr a { color: rgba(253,252,248,.5); text-decoration: none; font-size: .85rem; }
+    .hdr a:hover { color: #C4603A; }
+    .hdr-title { font-family: 'Cormorant Garamond', serif; font-size: 1.3rem; color: #FDFCF8; }
+    .hdr-sub { font-size: .75rem; color: #9a9a8e; margin-left: 8px; }
+    .chat-wrap { flex: 1; overflow-y: auto; padding: 24px 16px; max-width: 760px; width: 100%; margin: 0 auto; }
+    .msg { display: flex; gap: 12px; margin-bottom: 20px; animation: fadeIn .2s ease; }
+    .msg.user { flex-direction: row-reverse; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+    .msg-avatar { width: 36px; height: 36px; border-radius: 50%; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 1rem; }
+    .msg-avatar.ai { background: #C4603A; }
+    .msg-avatar.user { background: #3D5A47; }
+    .msg-bubble { max-width: 78%; padding: 14px 16px; border-radius: 16px; font-size: .9rem; line-height: 1.65; }
+    .msg.ai .msg-bubble { background: #232320; border-radius: 4px 16px 16px 16px; color: #FDFCF8; }
+    .msg.user .msg-bubble { background: #3D5A47; border-radius: 16px 4px 16px 16px; color: #FDFCF8; }
+    .msg-bubble strong { color: #C4603A; }
+    .msg-bubble ul, .msg-bubble ol { padding-left: 18px; margin: 8px 0; }
+    .msg-bubble li { margin-bottom: 4px; }
+    .msg-bubble code { background: rgba(255,255,255,.1); padding: 1px 5px; border-radius: 4px; font-size: .85rem; }
+    .typing { display: flex; gap: 5px; padding: 14px 16px; }
+    .typing span { width: 8px; height: 8px; border-radius: 50%; background: #C4603A; animation: bounce .9s infinite; }
+    .typing span:nth-child(2) { animation-delay: .2s; }
+    .typing span:nth-child(3) { animation-delay: .4s; }
+    @keyframes bounce { 0%,60%,100% { transform: translateY(0); } 30% { transform: translateY(-6px); } }
+    .input-bar { background: #111; border-top: 1px solid #2a2a28; padding: 14px 16px; flex-shrink: 0; }
+    .input-row { max-width: 760px; margin: 0 auto; display: flex; gap: 10px; }
+    .input-row textarea { flex: 1; background: #1e1e1c; border: 1px solid #333; border-radius: 12px; color: #FDFCF8; padding: 12px 16px; font-size: .9rem; font-family: 'DM Sans', sans-serif; resize: none; min-height: 48px; max-height: 140px; outline: none; line-height: 1.5; }
+    .input-row textarea:focus { border-color: #C4603A; }
+    .input-row button { background: #C4603A; border: none; border-radius: 12px; color: #fff; padding: 12px 20px; cursor: pointer; font-size: 1.1rem; transition: .15s; flex-shrink: 0; }
+    .input-row button:hover { background: #b5502f; }
+    .input-row button:disabled { background: #333; cursor: default; }
+    .suggestions { display: flex; flex-wrap: wrap; gap: 8px; max-width: 760px; margin: 0 auto 12px; }
+    .sug { background: #1e1e1c; border: 1px solid #333; border-radius: 20px; padding: 6px 14px; font-size: .8rem; color: #9a9a8e; cursor: pointer; transition: .15s; white-space: nowrap; }
+    .sug:hover { border-color: #C4603A; color: #FDFCF8; }
+    .welcome { text-align: center; padding: 40px 16px; }
+    .welcome h2 { font-family: 'Cormorant Garamond', serif; font-size: 1.8rem; margin-bottom: 8px; }
+    .welcome p { color: #9a9a8e; font-size: .9rem; }
+  </style>
+</head>
+<body>
+
+<div class="hdr">
+  <a href="/dashboard">← Dashboard</a>
+  <div>
+    <span class="hdr-title">Coach IA Serenis</span>
+    <span class="hdr-sub">Expert en vente immobilière</span>
+  </div>
+</div>
+
+<div class="chat-wrap" id="chatWrap">
+  <div class="welcome" id="welcome">
+    <div style="font-size:3rem;margin-bottom:12px;">🏠</div>
+    <h2>Votre coach immobilier personnel</h2>
+    <p>Posez-moi toutes vos questions sur la vente de votre bien.</p>
+    <p style="margin-top:4px;">Prix, annonce, visites, négociation, juridique…</p>
+  </div>
+</div>
+
+<div class="input-bar">
+  <div class="suggestions" id="suggestions">
+    <div class="sug" onclick="suggest(this)">Comment fixer mon prix de vente ?</div>
+    <div class="sug" onclick="suggest(this)">Comment rédiger une bonne description ?</div>
+    <div class="sug" onclick="suggest(this)">Comment me préparer pour une visite ?</div>
+    <div class="sug" onclick="suggest(this)">Comment répondre à une offre basse ?</div>
+    <div class="sug" onclick="suggest(this)">Quels diagnostics sont obligatoires ?</div>
+  </div>
+  <div class="input-row">
+    <textarea id="input" placeholder="Posez votre question…" rows="1" onkeydown="handleKey(event)" oninput="autoResize(this)"></textarea>
+    <button id="sendBtn" onclick="send()" title="Envoyer">↑</button>
+  </div>
+</div>
+
+<script>
+const messages = [];
+
+function autoResize(el) {
+  el.style.height = 'auto';
+  el.style.height = Math.min(el.scrollHeight, 140) + 'px';
+}
+
+function handleKey(e) {
+  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(); }
+}
+
+function suggest(el) {
+  document.getElementById('input').value = el.textContent;
+  document.getElementById('suggestions').style.display = 'none';
+  send();
+}
+
+function addMsg(role, content) {
+  const wrap = document.getElementById('chatWrap');
+  document.getElementById('welcome')?.remove();
+  const div = document.createElement('div');
+  div.className = `msg ${role}`;
+  const avatar = role === 'ai' ? '🏠' : '👤';
+  const cls = role;
+  div.innerHTML = `<div class="msg-avatar ${cls}">${avatar}</div><div class="msg-bubble" id="bubble-${Date.now()}">${content}</div>`;
+  wrap.appendChild(div);
+  wrap.scrollTop = wrap.scrollHeight;
+  return div.querySelector('.msg-bubble');
+}
+
+function showTyping() {
+  const wrap = document.getElementById('chatWrap');
+  const div = document.createElement('div');
+  div.className = 'msg ai';
+  div.id = 'typing-indicator';
+  div.innerHTML = `<div class="msg-avatar ai">🏠</div><div class="msg-bubble"><div class="typing"><span></span><span></span><span></span></div></div>`;
+  wrap.appendChild(div);
+  wrap.scrollTop = wrap.scrollHeight;
+}
+
+function formatText(t) {
+  return t
+    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+    .replace(/\*(.+?)\*/g, '<em>$1</em>')
+    .replace(/`(.+?)`/g, '<code>$1</code>')
+    .replace(/^### (.+)$/gm, '<strong>$1</strong>')
+    .replace(/^## (.+)$/gm, '<strong style="font-size:1.05em">$1</strong>')
+    .replace(/^- (.+)$/gm, '• $1')
+    .replace(/\n/g, '<br>');
+}
+
+async function send() {
+  const input = document.getElementById('input');
+  const text = input.value.trim();
+  if (!text) return;
+
+  document.getElementById('suggestions').style.display = 'none';
+  input.value = ''; input.style.height = 'auto';
+  document.getElementById('sendBtn').disabled = true;
+
+  messages.push({ role: 'user', content: text });
+  addMsg('user', text.replace(/</g, '&lt;'));
+  showTyping();
+
+  try {
+    const res = await fetch('/api/coach-ia', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ messages })
+    });
+
+    document.getElementById('typing-indicator')?.remove();
+    const bubble = addMsg('ai', '');
+    let fullText = '';
+
+    const reader = res.body.getReader();
+    const decoder = new TextDecoder();
+    let buf = '';
+
+    while (true) {
+      const { value, done } = await reader.read();
+      if (done) break;
+      buf += decoder.decode(value, { stream: true });
+      const lines = buf.split('\n');
+      buf = lines.pop();
+      for (const line of lines) {
+        if (!line.startsWith('data: ')) continue;
+        const raw = line.slice(6).trim();
+        if (raw === '[DONE]') break;
+        try {
+          const d = JSON.parse(raw);
+          if (d.text) { fullText += d.text; bubble.innerHTML = formatText(fullText); document.getElementById('chatWrap').scrollTop = 999999; }
+          if (d.error) { bubble.innerHTML = `<em style="color:#dc2626">${d.error}</em>`; }
+        } catch(e) {}
+      }
+    }
+    messages.push({ role: 'assistant', content: fullText });
+  } catch(e) {
+    document.getElementById('typing-indicator')?.remove();
+    addMsg('ai', '<em style="color:#dc2626">Erreur de connexion. Réessayez.</em>');
+  }
+
+  document.getElementById('sendBtn').disabled = false;
+  document.getElementById('input').focus();
+}
+</script>
+<script src="/js/seller-nav.js"></script>
+</body>
+</html>

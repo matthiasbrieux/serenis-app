@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Finance — Serenis Admin</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: #0f0f0e; color: #FDFCF8; font-family: 'Segoe UI', Arial, sans-serif; font-size: 14px; }
+    .topbar { background: #1a1a18; border-bottom: 1px solid #2a2a28; padding: 14px 28px; display: flex; align-items: center; gap: 20px; }
+    .topbar a { color: #C4603A; text-decoration: none; font-weight: 600; font-size: .85rem; }
+    .topbar h1 { color: #FDFCF8; font-size: 1.1rem; }
+    .page { max-width: 1200px; margin: 0 auto; padding: 28px 24px; }
+    .kpi-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; margin-bottom: 28px; }
+    .kpi { background: #1a1a18; border: 1px solid #2a2a28; border-radius: 12px; padding: 20px; }
+    .kpi-val { font-size: 2rem; font-weight: 700; margin-bottom: 4px; }
+    .kpi-lbl { font-size: .78rem; color: #9a9a8e; text-transform: uppercase; letter-spacing: .05em; }
+    .card { background: #1a1a18; border: 1px solid #2a2a28; border-radius: 12px; padding: 20px; margin-bottom: 20px; }
+    .card h2 { font-size: .95rem; font-weight: 600; color: #FDFCF8; margin-bottom: 16px; }
+    .bar-chart { display: flex; align-items: flex-end; gap: 6px; height: 120px; padding-bottom: 4px; }
+    .bar-wrap { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+    .bar { width: 100%; background: #C4603A; border-radius: 4px 4px 0 0; transition: opacity .2s; min-height: 4px; }
+    .bar:hover { opacity: .8; }
+    .bar-lbl { font-size: .65rem; color: #666; }
+    .bar-val { font-size: .72rem; color: #9a9a8e; }
+    table { width: 100%; border-collapse: collapse; }
+    th { text-align: left; font-size: .72rem; color: #666; text-transform: uppercase; letter-spacing: .05em; padding: 8px; border-bottom: 1px solid #2a2a28; }
+    td { padding: 10px 8px; border-bottom: 1px solid #1e1e1c; font-size: .85rem; color: #FDFCF8; }
+    tr:hover td { background: rgba(255,255,255,.02); }
+    .badge { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: .72rem; font-weight: 600; }
+    .badge-serenite { background: rgba(196,96,58,.15); color: #C4603A; }
+    .badge-autonome { background: rgba(154,154,142,.15); color: #9a9a8e; }
+    .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    .donut-wrap { display: flex; align-items: center; gap: 24px; }
+    .legend-item { display: flex; align-items: center; gap: 8px; font-size: .85rem; margin-bottom: 8px; }
+    .legend-dot { width: 12px; height: 12px; border-radius: 50%; }
+    .views-stat { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #1e1e1c; font-size: .85rem; }
+    .views-stat a { color: #C4603A; text-decoration: none; }
+    @media (max-width: 700px) { .two-col { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+
+<div class="topbar">
+  <a href="/admin">← Admin</a>
+  <h1>💰 Vue financière</h1>
+  <span style="margin-left:auto;font-size:.78rem;color:#666;" id="lastUpdate"></span>
+</div>
+
+<div class="page">
+  <div class="kpi-row" id="kpiRow">
+    <div class="kpi"><div class="kpi-val" style="color:#059669;" id="kCA">—</div><div class="kpi-lbl">CA total estimé</div></div>
+    <div class="kpi"><div class="kpi-val" id="kClients">—</div><div class="kpi-lbl">Clients payants</div></div>
+    <div class="kpi"><div class="kpi-val" style="color:#C4603A;" id="kActifs">—</div><div class="kpi-lbl">En cours de vente</div></div>
+    <div class="kpi"><div class="kpi-val" style="color:#059669;" id="kVendus">—</div><div class="kpi-lbl">Biens vendus</div></div>
+    <div class="kpi"><div class="kpi-val" id="kOffres">—</div><div class="kpi-lbl">Offres reçues</div></div>
+  </div>
+
+  <div class="two-col">
+    <!-- Graphe mensuel -->
+    <div class="card">
+      <h2>Nouveaux clients / mois</h2>
+      <div class="bar-chart" id="barChart"></div>
+    </div>
+
+    <!-- Répartition packs -->
+    <div class="card">
+      <h2>Répartition des packs</h2>
+      <div class="donut-wrap" id="packDist"></div>
+    </div>
+  </div>
+
+  <div class="two-col">
+    <!-- Top pages vues -->
+    <div class="card">
+      <h2>Top annonces vues</h2>
+      <div id="topViewed">
+        <div style="color:#666;font-size:.85rem;">Chargement…</div>
+      </div>
+    </div>
+
+    <!-- Baisses de prix récentes -->
+    <div class="card">
+      <h2>Baisses de prix récentes</h2>
+      <div id="priceChanges">
+        <div style="color:#666;font-size:.85rem;">Chargement…</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Derniers paiements -->
+  <div class="card">
+    <h2>Derniers clients</h2>
+    <table>
+      <thead><tr>
+        <th>Client</th><th>Email</th><th>Pack</th><th>Date paiement</th>
+      </tr></thead>
+      <tbody id="recentTable"></tbody>
+    </table>
+  </div>
+</div>
+
+<script>
+function fmtDate(d) { if (!d) return '—'; return new Date(d).toLocaleDateString('fr-FR', { day:'2-digit', month:'short', year:'numeric' }); }
+function fmtNum(n) { return Number(n || 0).toLocaleString('fr-FR'); }
+
+async function load() {
+  const r = await fetch('/admin/api/finance');
+  const d = await r.json();
+  document.getElementById('lastUpdate').textContent = 'Mis à jour ' + new Date().toLocaleTimeString('fr-FR');
+
+  // KPIs
+  const pricePerClient = 999;
+  const ca = (d.totalRevenue || 0) * pricePerClient;
+  document.getElementById('kCA').textContent = fmtNum(ca) + ' €';
+  document.getElementById('kClients').textContent = fmtNum(d.totalClients);
+  document.getElementById('kActifs').textContent = fmtNum(d.activeClients);
+  document.getElementById('kVendus').textContent = fmtNum(d.soldClients);
+  document.getElementById('kOffres').textContent = fmtNum(d.offersSummary?.total) + ' (' + fmtNum(d.offersSummary?.pending) + ' en attente)';
+
+  // Bar chart
+  const monthly = d.monthly || [];
+  const maxVal = Math.max(...monthly.map(m => m.clients), 1);
+  document.getElementById('barChart').innerHTML = monthly.slice(-12).map(m => {
+    const pct = Math.round((m.clients / maxVal) * 100);
+    const [y, mo] = m.month.split('-');
+    const moStr = new Date(m.month + '-01').toLocaleDateString('fr-FR', { month: 'short' });
+    return `<div class="bar-wrap">
+      <div class="bar-val">${m.clients}</div>
+      <div class="bar" style="height:${Math.max(pct, 4)}px;" title="${m.clients} clients en ${moStr} ${y}"></div>
+      <div class="bar-lbl">${moStr}</div>
+    </div>`;
+  }).join('');
+
+  // Pack distribution
+  const total = (d.packDist || []).reduce((s, p) => s + p.n, 0);
+  const colors = { serenite: '#C4603A', autonome: '#4a6e55' };
+  const packHtml = (d.packDist || []).map(p => {
+    const pct = total ? Math.round(p.n / total * 100) : 0;
+    return `<div class="legend-item"><div class="legend-dot" style="background:${colors[p.pack]||'#888'}"></div><span>${p.pack} — <strong>${p.n}</strong> (${pct}%)</span></div>`;
+  }).join('');
+  document.getElementById('packDist').innerHTML = `<div>${packHtml}</div>`;
+
+  // Top viewed
+  const tv = d.topViewed || [];
+  document.getElementById('topViewed').innerHTML = tv.length ? tv.map(p =>
+    `<div class="views-stat"><a href="/bien/${p.slug}" target="_blank">${p.type || 'Bien'} ${p.city}</a><span style="color:#C4603A;font-weight:600;">${fmtNum(p.views)} vues</span></div>`
+  ).join('') : '<div style="color:#666;font-size:.85rem;">Aucune donnée de vues</div>';
+
+  // Price changes
+  const pc = d.priceChanges || [];
+  document.getElementById('priceChanges').innerHTML = pc.length ? pc.map(p =>
+    `<div class="views-stat"><span>${p.type || 'Bien'} ${p.city}</span><span style="color:#d97706;font-weight:600;">${fmtNum(p.price)} €<span style="font-size:.72rem;color:#666;margin-left:6px;">${fmtDate(p.changed_at)}</span></span></div>`
+  ).join('') : '<div style="color:#666;font-size:.85rem;">Aucun changement de prix</div>';
+
+  // Recent table
+  document.getElementById('recentTable').innerHTML = (d.recent || []).map(c =>
+    `<tr>
+      <td>${c.first_name || ''} ${c.last_name || ''}</td>
+      <td style="color:#9a9a8e;">${c.email}</td>
+      <td><span class="badge badge-${c.pack}">${c.pack}</span></td>
+      <td style="color:#9a9a8e;">${fmtDate(c.paid_at)}</td>
+    </tr>`
+  ).join('');
+}
+
+load();
+</script>
+</body>
+</html>
