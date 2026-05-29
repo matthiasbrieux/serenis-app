@@ -366,6 +366,10 @@ const contratCols = [
 ];
 contratCols.forEach(sql => { try { db.exec(sql); } catch(e) {} });
 
+// ── Photos immersives — colonnes room + angle ─────────────────
+try { db.exec("ALTER TABLE property_photos ADD COLUMN room TEXT"); } catch(e) {}
+try { db.exec("ALTER TABLE property_photos ADD COLUMN angle_label TEXT"); } catch(e) {}
+
 // ── Offres d'achat ────────────────────────────────────────────
 db.exec(`
   CREATE TABLE IF NOT EXISTS offers (

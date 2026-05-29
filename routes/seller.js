@@ -167,15 +167,17 @@ router.post('/api/property/photos', requireAuth, uploadPhoto.array('photos', 50)
   if (existing.count + req.files.length > MAX_PHOTOS_PER_PROPERTY) return res.json({ error: `Maximum ${MAX_PHOTOS_PER_PROPERTY} photos au total` });
 
   const category = req.body.category || 'pro';
+  const room = req.body.room || null;
+  const angle_label = req.body.angle_label || null;
   const isLocal = !process.env.CLOUDINARY_URL;
   const inserted = [];
   req.files.forEach((file, i) => {
     const url = isLocal ? '/uploads/photos/' + file.filename : file.path;
     const thumb = isLocal ? url : file.path.replace('/upload/', '/upload/c_thumb,w_400/');
     const cid = file.filename;
-    db.prepare('INSERT INTO property_photos (property_id, cloudinary_id, url, thumbnail_url, order_index, category) VALUES (?,?,?,?,?,?)')
-      .run(property.id, cid, url, thumb, existing.count + i, category);
-    inserted.push({ url, cloudinary_id: cid, category });
+    db.prepare('INSERT INTO property_photos (property_id, cloudinary_id, url, thumbnail_url, order_index, category, room, angle_label) VALUES (?,?,?,?,?,?,?,?)')
+      .run(property.id, cid, url, thumb, existing.count + i, category, room, angle_label);
+    inserted.push({ url, cloudinary_id: cid, category, room, angle_label });
   });
 
   // Auto-CRM hook: ≥5 photos → photographer_done = 1
@@ -940,6 +942,29 @@ router.put('/api/offres/:id/repondre', requireAuth, express.json(), (req, res) =
   if (!offer) return res.status(403).json({ error: 'Offre introuvable' });
   db.prepare('UPDATE offers SET status=?, seller_response=?, responded_at=CURRENT_TIMESTAMP WHERE id=?')
     .run(status, seller_response || null, offer.id);
+  res.json({ success: true });
+});
+
+// ── Guide photos immersives ───────────────────────────────────
+router.get('/mon-guide-photos', requireAuth, (req, res) => res.sendFile('guide-photos.html', { root: './views/seller' }));
+
+router.get('/api/guide-photos', requireAuth, (req, res) => {
+  const property = db.prepare('SELECT id, type, rooms_count FROM properties WHERE seller_id = ?').get(req.seller.id);
+  if (!property) return res.json({ photos: [], property: null });
+  const photos = db.prepare(
+    "SELECT cloudinary_id, url, thumbnail_url, room, angle_label FROM property_photos WHERE property_id = ? AND category = 'decouverte' ORDER BY order_index"
+  ).all(property.id);
+  res.json({ photos, property });
+});
+
+router.delete('/api/guide-photos/:cloudinary_id', requireAuth, async (req, res) => {
+  const property = db.prepare('SELECT id FROM properties WHERE seller_id = ?').get(req.seller.id);
+  if (!property) return res.json({ error: 'Non autorisé' });
+  db.prepare("DELETE FROM property_photos WHERE property_id = ? AND cloudinary_id = ? AND category = 'decouverte'").run(property.id, req.params.cloudinary_id);
+  if (process.env.CLOUDINARY_URL) {
+    const { cloudinary } = require('../services/upload');
+    await cloudinary.uploader.destroy(req.params.cloudinary_id).catch(() => {});
+  }
   res.json({ success: true });
 });
 

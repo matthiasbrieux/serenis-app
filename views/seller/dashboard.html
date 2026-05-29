@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Tableau de bord — Serenis</title>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="manifest" href="/manifest.json">
   <link rel="stylesheet" href="/css/style.css">
   <style>
     /* ——— Base ——— */
@@ -178,7 +179,7 @@
     /* ——— Stats grid ——— */
     .stats-grid {
       display: grid;
-      grid-template-columns: repeat(4, 1fr);
+      grid-template-columns: repeat(5, 1fr);
       gap: 16px;
       margin-bottom: 28px;
     }
@@ -371,6 +372,9 @@
     }
 
     /* ——— Responsive ——— */
+    @media (max-width: 1300px) {
+      .stats-grid { grid-template-columns: repeat(3, 1fr); }
+    }
     @media (max-width: 1100px) {
       .stats-grid { grid-template-columns: repeat(2, 1fr); }
     }
@@ -430,6 +434,9 @@
           <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/>
         </svg>Mon bien
       </a>
+      <a href="/mon-guide-photos" class="sidebar-item">
+        📸 Guide photos
+      </a>
       <a href="/serenis-connect" class="sidebar-item">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.27h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 9a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>Serenis Connect
       </a>
@@ -447,6 +454,15 @@
           <path d="M5 12.55a11 11 0 0 1 14.08 0"/><path d="M1.42 9a16 16 0 0 1 21.16 0"/>
           <path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><circle cx="12" cy="20" r="1"/>
         </svg>Mes publications
+      </a>
+      <a href="/mes-offres" class="sidebar-item">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>Mes offres
+      </a>
+      <a href="/coach-ia" class="sidebar-item">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/><circle cx="9" cy="10" r="1" fill="currentColor"/><circle cx="12" cy="10" r="1" fill="currentColor"/><circle cx="15" cy="10" r="1" fill="currentColor"/></svg>Coach IA
+      </a>
+      <a href="/mes-notifications" class="sidebar-item">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>Notifications
       </a>
     </nav>
     <div class="sidebar-footer">
@@ -514,7 +530,13 @@
       <div class="stat-card">
         <div class="stat-label">Visites planifiées</div>
         <div class="stat-value" id="statVisits">0</div>
-        <div class="stat-sub">cette semaine</div>
+        <div class="stat-sub">total planifiées</div>
+      </div>
+      <!-- Vues annonce -->
+      <div class="stat-card">
+        <div class="stat-label">Vues de l'annonce</div>
+        <div class="stat-value green" id="statViews">—</div>
+        <div class="stat-sub" id="statViewsSub">— aujourd'hui</div>
       </div>
       <!-- Numéro IA -->
       <div class="stat-card" id="twilioCard">
@@ -536,7 +558,11 @@
             <strong>Vous n'avez rien à gérer.</strong>
           </p>
         </div>
-        <div id="twilioNumberBig" style="flex-shrink:0;font-family:'Cormorant Garamond',serif;font-size:1.5rem;font-weight:600;color:#1C1C1A;white-space:nowrap;"></div>
+        <div style="flex-shrink:0;text-align:center;">
+          <div id="twilioNumberBig" style="font-family:'Cormorant Garamond',serif;font-size:1.5rem;font-weight:600;color:#1C1C1A;white-space:nowrap;margin-bottom:8px;"></div>
+          <img id="twilioQr" src="" alt="QR code" style="display:none;width:90px;height:90px;border-radius:6px;border:2px solid #e8e0d6;">
+          <div style="font-size:.7rem;color:#aaa;margin-top:4px;">Scanner pour appeler</div>
+        </div>
       </div>
     </div>
 
@@ -550,6 +576,30 @@
         <div id="photo-booking-cta"></div>
       </div>
       <div id="photo-steps" style="display:flex;align-items:flex-start;gap:0;overflow-x:auto;padding-bottom:4px;"></div>
+    </div>
+
+    <!-- Statut & Checklist widget -->
+    <div id="statut-widget" style="display:none; margin: 0 0 24px;">
+      <!-- Alert banners (shown conditionally) -->
+      <div id="alert-pending-visits" style="display:none; background:rgba(196,96,58,0.15); border:1px solid rgba(196,96,58,0.4); border-radius:12px; padding:14px 18px; margin-bottom:12px; align-items:center; gap:12px; cursor:pointer;" onclick="window.location.href='/mon-agenda'">
+        <span style="font-size:1.2rem;">&#x1F4C5;</span>
+        <span id="alert-visits-text" style="font-family:'DM Sans',sans-serif; font-size:0.88rem; color:#F5F0E8; font-weight:600;"></span>
+      </div>
+      <div id="alert-no-photos" style="display:none; background:rgba(255,165,0,0.1); border:1px solid rgba(255,165,0,0.3); border-radius:12px; padding:14px 18px; margin-bottom:12px; align-items:center; gap:12px;">
+        <span style="font-size:1.2rem;">&#x1F4F8;</span>
+        <span style="font-family:'DM Sans',sans-serif; font-size:0.88rem; color:#F5F0E8;">Aucune photo &#8212; <a href="/mon-bien" style="color:#C4603A; text-decoration:none; font-weight:600;">Ajoutez vos photos pour attirer les acheteurs &#x2192;</a></span>
+      </div>
+      <div id="alert-missing-docs" style="display:none; background:rgba(255,200,0,0.08); border:1px solid rgba(255,200,0,0.25); border-radius:12px; padding:14px 18px; margin-bottom:16px; align-items:center; gap:12px;">
+        <span style="font-size:1.2rem;">&#x1F4C4;</span>
+        <span id="alert-docs-text" style="font-family:'DM Sans',sans-serif; font-size:0.88rem; color:#F5F0E8;"></span>
+      </div>
+
+      <!-- Completion sections -->
+      <div style="background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08); border-radius:16px; padding:20px 24px;">
+        <div style="font-family:'DM Sans',sans-serif; font-size:0.78rem; font-weight:700; text-transform:uppercase; letter-spacing:0.08em; color:rgba(245,240,232,0.4); margin-bottom:16px;">Avancement de votre dossier</div>
+        <!-- Progress rows inserted by JS -->
+        <div id="completion-rows"></div>
+      </div>
     </div>
 
     <!-- Score & Actions + Profil rapide -->
@@ -581,11 +631,21 @@
             </div>
           </div>
           <div class="form-group">
+            <label>Adresse email</label>
+            <input type="email" id="pfEmail" disabled style="background:#f5f0e8;color:#888;cursor:default;">
+            <p class="form-hint" style="margin-top:4px;">L'adresse email ne peut pas être modifiée</p>
+          </div>
+          <div class="form-group">
             <label>Téléphone personnel</label>
             <input type="tel" name="phone" id="pfPhone" placeholder="06 xx xx xx xx">
           </div>
+          <div id="pfTwilioWrap" class="form-group" style="display:none;">
+            <label>Numéro Serenis attribué</label>
+            <input type="text" id="pfTwilio" disabled style="background:#f0f7f2;color:#3D5A47;font-weight:600;cursor:default;">
+            <p class="form-hint" style="margin-top:4px;">Numéro IA à mettre dans vos annonces</p>
+          </div>
           <div class="form-group">
-            <label>Nouveau mot de passe</label>
+            <label>Changer le mot de passe</label>
             <input type="password" name="password" placeholder="Laisser vide = inchangé" autocomplete="new-password">
             <p class="form-hint">Minimum 8 caractères</p>
           </div>
@@ -861,6 +921,73 @@ function copyLink() {
   });
 }
 
+/* ——— Statut & Checklist widget ——— */
+function renderCompletionRow(label, pct, cta) {
+  return `<div style="margin-bottom:14px;">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+      <span style="font-family:'DM Sans',sans-serif;font-size:0.85rem;color:#F5F0E8;">${label}</span>
+      <span style="font-family:'DM Sans',sans-serif;font-size:0.78rem;color:rgba(245,240,232,0.4);">${Math.round(pct)}%</span>
+    </div>
+    <div style="height:5px;background:rgba(255,255,255,0.08);border-radius:99px;overflow:hidden;">
+      <div style="height:100%;width:${pct}%;background:#C4603A;border-radius:99px;transition:width 0.6s ease;"></div>
+    </div>
+    ${cta ? '<a href="'+cta.url+'" style="font-size:0.75rem;color:#C4603A;text-decoration:none;display:inline-block;margin-top:4px;">'+cta.label+' →</a>' : ''}
+  </div>`;
+}
+
+function renderStatutWidget(meData) {
+  const widget = document.getElementById('statut-widget');
+  if (!widget) return;
+
+  const pending_visits = meData.pending_visits || 0;
+  const photo_count    = meData.photo_count    || 0;
+  const missing_docs   = meData.missing_docs   || [];
+  const completion     = meData.completion     || { fiche: 0, photos: 0, documents: 0, published: 0 };
+
+  // Show widget
+  widget.style.display = 'block';
+
+  // Alert: pending visits
+  const alertVisits = document.getElementById('alert-pending-visits');
+  if (pending_visits > 0) {
+    document.getElementById('alert-visits-text').textContent =
+      `${pending_visits} visite${pending_visits > 1 ? 's' : ''} en attente de confirmation — cliquez pour gérer votre agenda`;
+    alertVisits.style.display = 'flex';
+  } else {
+    alertVisits.style.display = 'none';
+  }
+
+  // Alert: no photos
+  const alertNoPhotos = document.getElementById('alert-no-photos');
+  if (photo_count === 0) {
+    alertNoPhotos.style.display = 'flex';
+  } else {
+    alertNoPhotos.style.display = 'none';
+  }
+
+  // Alert: missing docs
+  const alertMissingDocs = document.getElementById('alert-missing-docs');
+  if (missing_docs.length > 0) {
+    document.getElementById('alert-docs-text').innerHTML =
+      `Documents manquants : <strong>${missing_docs.join(', ')}</strong> — <a href="/mon-bien" style="color:#C4603A;text-decoration:none;font-weight:600;">Compléter votre dossier →</a>`;
+    alertMissingDocs.style.display = 'flex';
+  } else {
+    alertMissingDocs.style.display = 'none';
+  }
+
+  // Completion rows
+  const rows = [
+    { label: 'Fiche du bien',      pct: completion.fiche,     cta: completion.fiche     < 100 ? { url: '/mon-bien',  label: 'Compléter la fiche' }     : null },
+    { label: 'Photos',             pct: completion.photos,    cta: completion.photos    < 100 ? { url: '/mon-bien',  label: 'Ajouter des photos' }     : null },
+    { label: 'Documents',          pct: completion.documents, cta: completion.documents < 100 ? { url: '/mon-bien',  label: 'Ajouter les documents' }  : null },
+    { label: 'Publication',        pct: completion.published, cta: completion.published < 100 ? { url: '/mon-bien',  label: 'Publier mon annonce' }    : null },
+  ];
+
+  document.getElementById('completion-rows').innerHTML = rows.map(r =>
+    renderCompletionRow(r.label, r.pct, r.cta)
+  ).join('');
+}
+
 /* ——— Load all data ——— */
 // ── Barre de progression séance photo ────────────────────────────────────────
 function renderPhotoProgress(seller) {
@@ -950,7 +1077,7 @@ function renderNotifications(notifications) {
   `).join('');
 }
 async function markAllRead() {
-  await fetch(`${API}/connect/notifications/read-all`, { method: 'POST' });
+  await fetch(`${API}/notifications/read-all`, { method: 'POST' });
   document.getElementById('notifBadge').style.display = 'none';
   document.querySelectorAll('#notifList [style*="F9FFF9"]').forEach(el => el.style.background = '#fff');
   document.querySelectorAll('#notifList span[style*="059669"]').forEach(el => el.remove());
@@ -990,6 +1117,11 @@ async function loadData() {
     document.getElementById('pfFirstName').value = seller.first_name || '';
     document.getElementById('pfLastName').value  = seller.last_name  || '';
     document.getElementById('pfPhone').value     = seller.phone      || '';
+    document.getElementById('pfEmail').value     = seller.email      || '';
+    if (seller.twilio_number) {
+      document.getElementById('pfTwilio').value  = seller.twilio_number;
+      document.getElementById('pfTwilioWrap').style.display = 'block';
+    }
 
     /* — Stat cards — */
     // Score
@@ -1002,6 +1134,8 @@ async function loadData() {
 
     document.getElementById('statContacts').textContent = stats.contacts || 0;
     document.getElementById('statVisits').textContent   = stats.visits   || 0;
+    document.getElementById('statViews').textContent    = stats.views_total ?? '—';
+    document.getElementById('statViewsSub').textContent = (stats.views_today || 0) + ' aujourd\'hui · ' + (stats.views_week || 0) + ' cette semaine';
 
     // Numéro IA
     if (seller.twilio_number) {
@@ -1009,6 +1143,10 @@ async function loadData() {
       document.getElementById('twilioHint').textContent = 'Actif — à mettre dans vos annonces';
       document.getElementById('twilioExplainer').style.display = 'block';
       document.getElementById('twilioNumberBig').textContent = seller.twilio_number;
+      const qrImg = document.getElementById('twilioQr');
+      const qrNum = encodeURIComponent(seller.twilio_number.replace(/\s/g, ''));
+      qrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=90x90&data=${qrNum}&bgcolor=ffffff&color=1C1C1A&margin=4`;
+      qrImg.style.display = 'block';
     } else {
       document.getElementById('statTwilio').textContent = 'En cours d\'attribution';
       document.getElementById('twilioHint').textContent = 'Disponible avec le pack Sérénité';
@@ -1025,6 +1163,9 @@ async function loadData() {
 
     /* — Score section — */
     renderScore(scoreData);
+
+    /* — Statut & Checklist widget — */
+    renderStatutWidget(meData);
 
     /* — Timeline — */
     const st = property.status || 'preparation';
@@ -1061,5 +1202,6 @@ async function loadData() {
 loadData();
 </script>
 <script src="/js/transitions.js"></script>
+<script src="/js/seller-nav.js"></script>
 </body>
 </html>

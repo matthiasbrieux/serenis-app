@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Mon agenda — Serenis</title>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="manifest" href="/manifest.json">
   <link rel="stylesheet" href="/css/style.css">
   <style>
     /* ── Stats cards ─────────────────────────────────── */
@@ -105,6 +106,12 @@
       cursor: pointer; transition: 0.15s;
     }
     .btn-refuse:hover { background: #fdf2f2; border-color: #e74c3c; }
+    .btn-cancel-sm { padding: 6px 12px; border-radius: 8px; background: #fff; color: #888; border: 1px solid #e0d8ce; font-family: 'DM Sans', sans-serif; font-size: 0.8rem; font-weight: 500; cursor: pointer; transition: 0.15s; }
+    .btn-cancel-sm:hover { border-color: #e74c3c; color: #e74c3c; background: #fdf2f2; }
+    .visit-notes-wrap { margin-top: 10px; }
+    .visit-notes-input { width: 100%; border: 1px solid #e0d8ce; border-radius: 8px; padding: 8px 12px; font-family: 'DM Sans', sans-serif; font-size: 0.82rem; resize: none; outline: none; color: #333; line-height: 1.5; background: #fafaf8; }
+    .visit-notes-input:focus { border-color: #3D5A47; background: #fff; }
+    .visit-notes-saved { font-size: 0.73rem; color: #3D5A47; margin-top: 3px; display: none; }
 
     /* Status badges */
     .vbadge {
@@ -302,14 +309,29 @@
       <a href="/mon-bien" class="sidebar-item">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg> Mon bien
       </a>
+      <a href="/mon-guide-photos" class="sidebar-item">
+        📸 Guide photos
+      </a>
       <a href="/mon-agenda" class="sidebar-item active">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg> Mon agenda
       </a>
       <a href="/ma-bibliotheque" class="sidebar-item">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg> Ma bibliothèque
       </a>
+      <a href="/serenis-connect" class="sidebar-item">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.27h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 9a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>Serenis Connect
+      </a>
       <a href="/mes-publications" class="sidebar-item">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.55a11 11 0 0 1 14.08 0"/><path d="M1.42 9a16 16 0 0 1 21.16 0"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><circle cx="12" cy="20" r="1"/></svg> Mes publications
+      </a>
+      <a href="/mes-offres" class="sidebar-item">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>Mes offres
+      </a>
+      <a href="/coach-ia" class="sidebar-item">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/><circle cx="9" cy="10" r="1" fill="currentColor"/><circle cx="12" cy="10" r="1" fill="currentColor"/><circle cx="15" cy="10" r="1" fill="currentColor"/></svg>Coach IA
+      </a>
+      <a href="/mes-notifications" class="sidebar-item">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>Notifications
       </a>
     </nav>
     <div style="position:absolute;bottom:24px;left:0;right:0;padding:0 24px;">
@@ -581,6 +603,14 @@ function renderVisits() {
         <button class="btn-confirm" onclick="changeVisitStatus(${v.id},'confirmed')">Confirmer</button>
         <button class="btn-refuse" onclick="changeVisitStatus(${v.id},'cancelled')">Refuser</button>
       </div>` : ''}
+      ${v.status === 'confirmed' ? `
+      <div style="display:flex;justify-content:flex-end;margin-top:8px;">
+        <button class="btn-cancel-sm" onclick="if(confirm('Annuler cette visite ?')) changeVisitStatus(${v.id},'cancelled')">Annuler la visite</button>
+      </div>` : ''}
+      <div class="visit-notes-wrap">
+        <textarea class="visit-notes-input" rows="2" placeholder="Notes post-visite (impressions, retours acheteur…)" id="notes-${v.id}" onblur="saveNotes(${v.id})">${v.notes || ''}</textarea>
+        <div class="visit-notes-saved" id="notes-saved-${v.id}">✓ Enregistré</div>
+      </div>
     </div>
   `).join('');
 }
@@ -588,7 +618,7 @@ function renderVisits() {
 async function changeVisitStatus(id, status) {
   try {
     const res = await fetch(`/api/visits/${id}/status`, {
-      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      method: 'PUT', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ status })
     });
     const data = await res.json();
@@ -601,6 +631,23 @@ async function changeVisitStatus(id, status) {
       showToast(status === 'confirmed' ? 'Visite confirmée' : 'Visite annulée');
     }
   } catch(e) { showToast('Erreur', 'error'); }
+}
+
+async function saveNotes(id) {
+  const el = document.getElementById('notes-' + id);
+  if (!el) return;
+  const notes = el.value;
+  const v = allVisits.find(v => v.id === id);
+  if (v && v.notes === notes) return;
+  try {
+    await fetch(`/api/visits/${id}/notes`, {
+      method: 'PUT', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ notes }),
+    });
+    if (v) v.notes = notes;
+    const saved = document.getElementById('notes-saved-' + id);
+    if (saved) { saved.style.display = 'block'; setTimeout(() => saved.style.display = 'none', 2000); }
+  } catch(e) {}
 }
 
 document.getElementById('searchVisits').addEventListener('input', renderVisits);
@@ -781,33 +828,34 @@ document.getElementById('addAvailSlot').addEventListener('click', () => {
 });
 
 function scheduleToSlots() {
-  // Convert availSlots to the format the API expects (day_of_week based)
-  // We keep the new monthly format in localStorage and map to weekly for API compat
-  return availSlots.map(s => {
-    const d = new Date(s.date + 'T00:00:00');
-    return { day: d.getDay(), start: s.start, end: s.end };
-  });
+  // Send specific-date slots to the API
+  return availSlots.map(s => ({ date: s.date, start: s.start, end: s.end }));
 }
 
 function slotsToSchedule(slots) {
-  // Convert API slots (day_of_week) back — stored in localStorage for monthly view
-  const saved = JSON.parse(localStorage.getItem('avail_slots_v2') || '[]');
-  if (saved.length) { availSlots = saved; } else {
-    // Fallback: convert weekly slots to approximate monthly (current month)
-    const now = new Date();
-    availSlots = [];
-    slots.forEach(s => {
-      const dow = s.day_of_week;
-      // Find next occurrence of this day in current month
-      for (let dd = 1; dd <= 31; dd++) {
-        const dt = new Date(now.getFullYear(), now.getMonth(), dd);
-        if (dt.getMonth() !== now.getMonth()) break;
-        if (dt.getDay() === dow) {
-          availSlots.push({ date: dt.toISOString().split('T')[0], start: s.start_time, end: s.end_time });
-        }
-      }
-    });
+  // Prefer server-stored specific_date slots; fall back to localStorage
+  const specificSlots = slots.filter(s => s.specific_date);
+  if (specificSlots.length) {
+    availSlots = specificSlots.map(s => ({ date: s.specific_date, start: s.start_time, end: s.end_time }));
+    localStorage.setItem('avail_slots_v2', JSON.stringify(availSlots));
+    return;
   }
+  // Fall back to localStorage
+  const saved = JSON.parse(localStorage.getItem('avail_slots_v2') || '[]');
+  if (saved.length) { availSlots = saved; return; }
+  // Last resort: convert recurring day-of-week slots to approximate monthly dates
+  const now = new Date();
+  availSlots = [];
+  slots.forEach(s => {
+    const dow = s.day_of_week;
+    for (let dd = 1; dd <= 31; dd++) {
+      const dt = new Date(now.getFullYear(), now.getMonth(), dd);
+      if (dt.getMonth() !== now.getMonth()) break;
+      if (dt.getDay() === dow) {
+        availSlots.push({ date: dt.toISOString().split('T')[0], start: s.start_time, end: s.end_time });
+      }
+    }
+  });
 }
 
 document.getElementById('saveAgenda').addEventListener('click', async () => {
