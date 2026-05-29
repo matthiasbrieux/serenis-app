@@ -14,7 +14,7 @@ router.get('/api/dossier/acheteur/:token', (req, res) => {
   `).get(req.params.token);
   if (!prop) return res.status(404).json({ error: 'Dossier introuvable ou annonce non publiée' });
 
-  const photos = db.prepare('SELECT url, thumbnail_url, order_index FROM property_photos WHERE property_id = ? ORDER BY order_index').all(prop.id);
+  const photos = db.prepare('SELECT url, thumbnail_url, order_index, category FROM property_photos WHERE property_id = ? ORDER BY order_index').all(prop.id);
   const docs = db.prepare(`
     SELECT id, name, url, doc_type, folder, created_at
     FROM property_documents
@@ -49,6 +49,56 @@ router.get('/api/dossier/notaire/:token', (req, res) => {
   `).all(prop.id).catch?.() || db.prepare(`SELECT amount, buyer_name, buyer_email, status, created_at FROM offers WHERE property_id = ? ORDER BY created_at DESC LIMIT 5`).all(prop.id);
 
   res.json({ property: prop, photos, documents: docs, offers });
+});
+
+// ── Créneaux disponibles (par token acheteur) ────────────────
+router.get('/api/dossier/acheteur/:token/creneaux', (req, res) => {
+  const prop = db.prepare('SELECT id, seller_id FROM properties WHERE acheteur_token = ? AND published = 1').get(req.params.token);
+  if (!prop) return res.status(404).json({ error: 'Dossier introuvable' });
+
+  const slots = db.prepare('SELECT * FROM agenda_slots WHERE seller_id = ? AND active = 1').all(prop.seller_id);
+  const booked = db.prepare("SELECT visit_date, visit_time FROM visits WHERE property_id = ? AND status != 'cancelled'").all(prop.id);
+
+  res.json({ slots, booked });
+});
+
+// ── Réservation visite (par token acheteur) ───────────────────
+router.post('/api/dossier/acheteur/:token/reserver', async (req, res) => {
+  try {
+    const prop = db.prepare(`
+      SELECT p.*, s.email as seller_email, s.first_name as seller_first_name, s.phone as seller_phone
+      FROM properties p JOIN sellers s ON s.id = p.seller_id
+      WHERE p.acheteur_token = ? AND p.published = 1
+    `).get(req.params.token);
+    if (!prop) return res.status(404).json({ error: 'Dossier introuvable' });
+
+    const { buyer_name, buyer_email, buyer_phone, visit_date, visit_time } = req.body;
+    if (!buyer_name || !buyer_email || !visit_date || !visit_time) {
+      return res.status(400).json({ error: 'Informations manquantes' });
+    }
+
+    const conflict = db.prepare("SELECT id FROM visits WHERE property_id=? AND visit_date=? AND visit_time=? AND status != 'cancelled'").get(prop.id, visit_date, visit_time);
+    if (conflict) return res.status(409).json({ error: 'Ce créneau est déjà pris. Choisissez un autre horaire.' });
+
+    db.prepare('INSERT INTO visits (property_id, seller_id, buyer_name, buyer_email, buyer_phone, visit_date, visit_time) VALUES (?,?,?,?,?,?,?)')
+      .run(prop.id, prop.seller_id, buyer_name, buyer_email, buyer_phone || '', visit_date, visit_time);
+
+    db.prepare("INSERT INTO notifications (seller_id, type, title, body) VALUES (?,?,?,?)")
+      .run(prop.seller_id, 'visit_request', 'Nouvelle demande de visite', `${buyer_name} souhaite visiter le ${visit_date} à ${visit_time}`);
+
+    try {
+      const { sendVisitConfirmation } = require('../services/email');
+      await sendVisitConfirmation(buyer_email, buyer_name, prop, visit_date, visit_time, false);
+      await sendVisitConfirmation(prop.seller_email, prop.seller_first_name || 'Vendeur', prop, visit_date, visit_time, true);
+    } catch (e) {
+      console.error('Visit email error:', e.message);
+    }
+
+    res.json({ success: true });
+  } catch (e) {
+    console.error('Booking error:', e.message);
+    res.status(500).json({ error: 'Erreur serveur' });
+  }
 });
 
 // ── Régénérer les tokens (vendeur authentifié) ────────────────
