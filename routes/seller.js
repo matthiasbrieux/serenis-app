@@ -20,7 +20,8 @@ router.get('/onboarding', requireAuth, (req, res) => res.sendFile('onboarding.ht
 router.get('/contrat', requireAuth, (req, res) => res.sendFile('contrat.html', { root: './views/seller' }));
 
 // Signature électronique du contrat
-router.post('/api/contrat/sign', requireAuth, express.json(), (req, res) => {
+const contratSignLimit = require('express-rate-limit')({ windowMs: 15 * 60 * 1000, max: 5, keyGenerator: (req) => req.ip });
+router.post('/api/contrat/sign', requireAuth, contratSignLimit, express.json(), (req, res) => {
   const ip = req.headers['x-forwarded-for']?.split(',')[0]?.trim() || req.socket.remoteAddress || '';
   db.prepare('UPDATE sellers SET contrat_signe=1, contrat_signe_at=CURRENT_TIMESTAMP, contrat_ip=? WHERE id=?').run(ip, req.seller.id);
   res.json({ success: true });
@@ -882,9 +883,17 @@ router.post('/api/notifications/read-all', requireAuth, (req, res) => {
 });
 
 // ── Coach IA immobilier ───────────────────────────────────────
+const coachRateLimit = require('express-rate-limit')({
+  windowMs: 60 * 60 * 1000,
+  max: 30,
+  keyGenerator: (req) => String(req.seller?.id || req.ip),
+  handler: (req, res) => res.status(429).json({ error: 'Limite atteinte — 30 messages/heure maximum.' }),
+  skip: (req) => !req.seller,
+});
+
 router.get('/coach-ia', requireAuth, (req, res) => res.sendFile('coach.html', { root: './views/seller' }));
 
-router.post('/api/coach-ia', requireAuth, express.json(), async (req, res) => {
+router.post('/api/coach-ia', requireAuth, coachRateLimit, express.json(), async (req, res) => {
   const { messages } = req.body;
   if (!Array.isArray(messages) || !messages.length) return res.status(400).json({ error: 'Messages requis' });
   if (!process.env.ANTHROPIC_API_KEY) return res.status(503).json({ error: 'Coach IA non configuré — ajoutez ANTHROPIC_API_KEY dans les variables d\'environnement.' });

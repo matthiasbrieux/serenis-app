@@ -43,10 +43,8 @@ router.get('/api/dossier/notaire/:token', (req, res) => {
     ORDER BY folder, created_at
   `).all(prop.id);
 
-  const offers = db.prepare(`
-    SELECT amount, buyer_name, buyer_email, status, created_at
-    FROM offers WHERE property_id = ? ORDER BY created_at DESC LIMIT 5
-  `).all(prop.id).catch?.() || db.prepare(`SELECT amount, buyer_name, buyer_email, status, created_at FROM offers WHERE property_id = ? ORDER BY created_at DESC LIMIT 5`).all(prop.id);
+  let offers = [];
+  try { offers = db.prepare('SELECT amount, buyer_name, buyer_email, status, created_at FROM offers WHERE property_id = ? ORDER BY created_at DESC LIMIT 5').all(prop.id); } catch(e) {}
 
   res.json({ property: prop, photos, documents: docs, offers });
 });

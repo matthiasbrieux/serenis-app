@@ -25,6 +25,9 @@ app.use(helmet({
 }));
 
 app.use(rateLimit({ windowMs: 15 * 60 * 1000, max: 300, standardHeaders: true, legacyHeaders: false }));
+
+// Rate limit ciblé sur le webhook SMS (anti-spam)
+const smsLimit = rateLimit({ windowMs: 60 * 1000, max: 20, keyGenerator: (req) => req.body?.From || req.ip });
 app.use(cookieParser());
 
 // Serve index.html with no-cache so browsers always get the latest version
@@ -39,8 +42,8 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.post('/webhook/stripe', express.raw({ type: 'application/json' }), require('./routes/payment').stripeWebhook);
 
 // ── Twilio webhooks : urlencoded ──
-app.post('/webhook/sms', express.urlencoded({ extended: false }), require('./routes/buyer').smsWebhook);
-app.post('/webhook/voice', express.urlencoded({ extended: false }), require('./routes/buyer').voiceWebhook);
+app.post('/webhook/sms', smsLimit, express.urlencoded({ extended: false }), require('./routes/buyer').smsWebhook);
+app.post('/webhook/voice', smsLimit, express.urlencoded({ extended: false }), require('./routes/buyer').voiceWebhook);
 
 // ── Middleware corps JSON/form pour le reste ──
 app.use(express.json({ limit: '10mb' }));

@@ -198,7 +198,7 @@ async function activateSeller(session) {
 
   // Facture automatique
   try {
-    const amount = session.amount_total || (pack === 'serenite' ? 99900 : 0);
+    const amount = session.amount_total || (pack === 'serenite' ? 99900 : 49900);
     const invoiceNumber = `SER-${new Date().getFullYear()}-${String(seller.id).padStart(5, '0')}`;
     await sendInvoiceEmail({ email: seller.email, firstName: seller.first_name, amount, pack: pack || 'serenite', invoiceNumber, date: new Date() });
   } catch(e) { console.error('Invoice email error:', e.message); }
