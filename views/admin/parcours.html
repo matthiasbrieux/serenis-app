@@ -688,9 +688,10 @@ body { background: #0f0f0d; font-family: 'DM Sans', sans-serif; color: #fff; hei
             </div>
             <div class="sms-messages">
               <div class="sms-time">Aujourd'hui 10:12</div>
-              <div class="sms-bubble them">Bienvenue ! Pour recevoir le dossier complet de ce bien, répondez OUI ou tapez votre email.</div>
+              <div class="sms-bubble us">Bonjour, je suis intéressé par ce bien</div>
+              <div class="sms-bubble them">Bonjour ! Voici le dossier complet du bien (photos, caractéristiques, diagnostics) : venduparmo.fr/dossier/acheteur/f99f76…<br><br>Pour recevoir ce dossier par email et être tenu informé, répondez avec votre adresse email.</div>
               <div class="sms-bubble us">jean.dupont@gmail.com</div>
-              <div class="sms-bubble them">✅ Parfait ! Le dossier complet vient de vous être envoyé. Bonne découverte !</div>
+              <div class="sms-bubble them">✅ Parfait ! Le dossier complet vient de vous être envoyé à jean.dupont@gmail.com. Vous pouvez aussi y accéder directement ici : venduparmo.fr/dossier/acheteur/f99f76…</div>
             </div>
           </div>
         </div>
@@ -760,8 +761,12 @@ body { background: #0f0f0d; font-family: 'DM Sans', sans-serif; color: #fff; hei
               <div style="font-family:Georgia,serif;font-size:1.1rem;color:#3D5A47;margin-bottom:10px;">3. Vos coordonnées</div>
               <div style="background:#e8f4ec;border-radius:8px;padding:10px 14px;font-size:0.88rem;color:#2e7d32;font-weight:500;margin-bottom:12px;">📅 Samedi 7 juin à 10:30</div>
               <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;">
-                <div class="mock-field"><label>Prénom et nom</label><div class="val">Jean Dupont</div></div>
-                <div class="mock-field"><label>Email</label><div class="val">jean.dupont@gmail.com</div></div>
+                <div class="mock-field"><label>Prénom *</label><div class="val">Jean</div></div>
+                <div class="mock-field"><label>Nom *</label><div class="val">Dupont</div></div>
+              </div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;">
+                <div class="mock-field"><label>Email *</label><div class="val">jean.dupont@gmail.com</div></div>
+                <div class="mock-field"><label>Téléphone *</label><div class="val">06 12 34 56 78</div></div>
               </div>
               <button class="mock-btn orange" style="width:100%;padding:14px;">Confirmer ma visite</button>
             </div>
@@ -882,10 +887,10 @@ const JOURNEYS = {
   acheteur: [
     { title:'Dossier acheteur — Accueil', desc:'L\'acheteur reçoit le lien par SMS ou email. Il accède à une page complète : photos par catégorie, toutes les caractéristiques, diagnostics, pièces par niveau.', trigger:'Lien /dossier/acheteur/:token partagé par le vendeur ou envoyé auto par SMS.', tags:['📁 Dossier','Token','Public'] },
     { title:'Formulaire de contact', desc:'Depuis l\'annonce publique, l\'acheteur peut laisser ses coordonnées pour être rappelé. Le vendeur reçoit une notification email et SMS.', trigger:'POST /api/contact → email + notification vendeur.', tags:['📞 Contact','Formulaire'] },
-    { title:'SMS via le 09…', desc:'L\'acheteur appelle ou envoie un SMS au numéro Twilio du bien. Le système détecte sa demande et lui répond automatiquement avec le lien dossier.', trigger:'Webhook Twilio → bot SMS → envoie le lien dossier acheteur par SMS.', tags:['📱 SMS','Twilio','Bot'] },
+    { title:'SMS via le 09…', desc:'L\'acheteur envoie n\'importe quel SMS au numéro Twilio. Le bot répond immédiatement avec le lien dossier complet. Il invite ensuite l\'acheteur à répondre avec son email pour un suivi personnalisé.', trigger:'Webhook Twilio → bot SMS → envoie immédiatement le lien /dossier/acheteur/:token par SMS. Si l\'acheteur répond avec son email → sauvegarde contact + envoi email dossier + notification vendeur.', tags:['📱 SMS','Twilio','Bot','Lien direct'] },
     { title:'Email avec le dossier', desc:'L\'acheteur reçoit un email formaté avec un résumé du bien (surface, prix, DPE) et le bouton pour accéder au dossier complet.', trigger:'sendDossierEmail() déclenché après inscription ou demande SMS.', tags:['✉️ Email','Automatique'] },
     { title:'Dossier acheteur — Contenu', desc:'Page complète : 8 photos organisées en 3 catégories, 8 groupes de caractéristiques (surfaces, chauffage, stationnement…), descriptif des pièces par niveau, diagnostics.', trigger:'Toutes les infos saisies par le vendeur. Aucun compte requis.', tags:['📁 Dossier','Complet'] },
-    { title:'Réserver une visite', desc:'Calendrier interactif avec les jours disponibles en vert. L\'acheteur choisit un jour, un horaire (30 min d\'intervalle), saisit ses coordonnées et confirme.', trigger:'POST /api/dossier/acheteur/:token/reserver → SMS + email vendeur + email acheteur.', tags:['📅 Visite','Calendrier','Auto'] },
+    { title:'Réserver une visite', desc:'Calendrier interactif avec les jours disponibles. L\'acheteur choisit une date et un créneau (30 min), puis remplit 4 champs obligatoires : Prénom, Nom, Email, Téléphone. La confirmation est instantanée.', trigger:'POST /api/dossier/acheteur/:token/reserver → SMS + email vendeur + email acheteur.', tags:['📅 Visite','Calendrier','4 champs obligatoires'] },
     { title:'Email — Confirmation visite acheteur', desc:'Email immédiat avec la date, l\'heure, l\'adresse exacte et un rappel J-1 automatique. Il peut revoir le dossier depuis ce mail.', trigger:'sendVisitConfirmation() côté acheteur + reminder J-1.', tags:['✉️ Email','Automatique'] },
     { title:'Dossier notaire — Vue complète', desc:'Le notaire reçoit un lien confidentiel avec tous les documents organisés par type : DPE, Amiante, Plomb, Électricité, ERP, Assainissement + dossier acheteur + documents notaire.', trigger:'Lien envoyé par le vendeur via le bouton "Envoyer à mon notaire".', tags:['⚖️ Notaire','Confidentiel'] },
     { title:'Faire une offre d\'achat', desc:'Depuis l\'annonce publique, l\'acheteur soumet son montant, ses conditions et ses coordonnées. Le vendeur reçoit une notification immédiate.', trigger:'POST /api/bien/:slug/offre → notification + email vendeur.', tags:['💰 Offre'] },
