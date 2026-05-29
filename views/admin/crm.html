@@ -70,6 +70,9 @@
     .search-w svg{position:absolute;left:8px;top:50%;transform:translateY(-50%);opacity:.35;pointer-events:none}
     .count-b{background:var(--dark);color:#fff;font-size:0.65rem;font-weight:600;padding:2px 7px;border-radius:20px}
     .filter-lbl{font-size:0.69rem;color:var(--text3);white-space:nowrap}
+    .periode-wrap{display:flex;gap:3px;background:#f0ebe3;border-radius:8px;padding:3px;}
+    .periode-btn{padding:4px 11px;border:none;border-radius:6px;font-size:0.75rem;font-weight:600;cursor:pointer;background:transparent;color:#888;transition:all .15s;font-family:'DM Sans',sans-serif;}
+    .periode-btn.active{background:#1A1A16;color:#F5F0E8;}
 
     /* Table */
     .tbl-outer{flex:1;overflow:auto}
@@ -187,8 +190,102 @@
     #demoTag{display:none;font-size:0.7rem;font-weight:600;color:var(--amber);background:var(--amber-bg);padding:3px 10px;border-radius:20px}
     #clearDemoBtn{display:none;background:var(--red-bg);color:var(--red);border:none;padding:5px 11px;border-radius:7px;font-size:0.73rem;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif}
 
+    /* CRM Alert Filters */
+    #crm-filters{flex-shrink:0;display:flex;flex-wrap:wrap;gap:8px;padding:9px 28px;background:var(--bg);border-bottom:1px solid var(--border)}
+    .crm-filter{border:1.5px solid var(--border);background:var(--surface);color:var(--text2);padding:5px 14px;border-radius:20px;font-size:0.76rem;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .12s;white-space:nowrap}
+    .crm-filter:hover{border-color:#aaa;color:var(--dark)}
+    .crm-filter.active{background:#C4603A;color:#fff;border-color:#C4603A}
+
     /* Empty */
     .empty-center{text-align:center;padding:72px 20px}
+
+    /* ── Tri colonnes ── */
+    th.sortable{cursor:pointer;user-select:none}
+    th.sortable:hover{color:var(--dark)}
+    th.sortable .si{display:inline-block;width:10px;text-align:center;opacity:.25;font-size:.6rem;margin-left:2px;font-style:normal}
+    th.sort-asc .si{opacity:1;color:#C4603A}
+    th.sort-asc .si::after{content:'▲'}
+    th.sort-desc .si{opacity:1;color:#C4603A}
+    th.sort-desc .si::after{content:'▼'}
+    th .si::after{content:'⬍'}
+
+    /* ── Boutons topbar ── */
+    .btn-export{background:#16a34a;color:#fff;border:none;padding:5px 12px;border-radius:7px;font-size:.77rem;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;transition:opacity .12s}
+    .btn-export:hover{opacity:.85}
+    .view-toggle{display:flex;gap:2px;background:var(--bg);border-radius:8px;padding:3px}
+    .view-btn{padding:4px 12px;border:none;border-radius:6px;font-size:.77rem;font-weight:600;cursor:pointer;background:transparent;color:var(--text2);font-family:'DM Sans',sans-serif;transition:all .12s}
+    .view-btn.active{background:var(--dark);color:#fff}
+
+    /* ── Kanban ── */
+    .kanban-view{flex:1;overflow-x:auto;overflow-y:hidden;display:none;padding:16px 20px;gap:12px;align-items:flex-start}
+    .kanban-view.active{display:flex}
+    .k-col{flex-shrink:0;width:230px;display:flex;flex-direction:column;gap:8px}
+    .k-col-hdr{padding:9px 13px;border-radius:9px;font-size:.71rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;display:flex;align-items:center;justify-content:space-between}
+    .k-col-hdr .k-cnt{font-family:'Cormorant Garamond',serif;font-size:1.1rem;font-weight:600}
+    .k-cards{display:flex;flex-direction:column;gap:7px;overflow-y:auto;max-height:calc(100vh - 270px);padding-bottom:4px}
+    .k-card{background:var(--surface);border:1px solid var(--border);border-radius:9px;padding:11px 13px;cursor:pointer;transition:all .12s;border-left:3px solid transparent}
+    .k-card:hover{box-shadow:0 4px 14px rgba(0,0,0,.1);transform:translateY(-1px)}
+    .k-card.sg{border-left-color:var(--green)}
+    .k-card.sa{border-left-color:var(--amber)}
+    .k-card.sr{border-left-color:var(--red)}
+    .k-name{font-weight:600;font-size:.82rem;color:var(--dark)}
+    .k-sub{font-size:.69rem;color:var(--text3);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .k-score{font-size:.69rem;font-weight:700;margin-top:5px}
+    .k-tags{display:flex;flex-wrap:wrap;gap:3px;margin-top:5px}
+    .k-tag{font-size:.62rem;font-weight:600;padding:2px 6px;border-radius:4px}
+
+    /* ── Email bouton panel ── */
+    .btn-panel-email{padding:5px 12px;border-radius:7px;border:1.5px solid var(--border);background:var(--surface);font-size:.77rem;font-weight:600;cursor:pointer;color:var(--text2);font-family:'DM Sans',sans-serif;transition:all .12s}
+    .btn-panel-email:hover{background:var(--blue-bg);color:var(--blue);border-color:var(--blue)}
+    .btn-assign-num{width:100%;padding:9px;border-radius:8px;border:1.5px dashed #C4603A;background:#FFF9F5;font-size:.8rem;font-weight:600;cursor:pointer;color:#C4603A;font-family:'DM Sans',sans-serif;transition:all .12s;margin-top:8px}
+    .btn-assign-num:hover{background:#C4603A;color:#fff}
+
+    /* ── Modal email ── */
+    .em-overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:1000;display:none;align-items:center;justify-content:center}
+    .em-overlay.open{display:flex}
+    .em-modal{background:#fff;border-radius:16px;width:540px;max-width:95vw;box-shadow:0 24px 64px rgba(0,0,0,.2);display:flex;flex-direction:column;overflow:hidden}
+    .em-hdr{padding:18px 22px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px}
+    .em-hdr-info{flex:1;min-width:0}
+    .em-hdr-title{font-family:'Cormorant Garamond',serif;font-size:1.2rem;font-weight:600}
+    .em-hdr-to{font-size:.75rem;color:var(--text3);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .em-close{width:28px;height:28px;border-radius:7px;border:none;background:var(--bg);cursor:pointer;font-size:.9rem;color:var(--text2);display:flex;align-items:center;justify-content:center}
+    .em-close:hover{background:var(--red-bg);color:var(--red)}
+    .em-body-wrap{padding:18px 22px;display:flex;flex-direction:column;gap:12px}
+    .em-label{font-size:.7rem;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:var(--text3);margin-bottom:4px}
+    .em-input{width:100%;border:1.5px solid var(--border);border-radius:8px;padding:8px 12px;font-size:.88rem;font-family:'DM Sans',sans-serif;color:var(--dark);outline:none;background:var(--bg)}
+    .em-input:focus{border-color:#888;background:#fff}
+    .em-textarea{width:100%;border:1.5px solid var(--border);border-radius:8px;padding:10px 12px;font-size:.88rem;font-family:'DM Sans',sans-serif;color:var(--dark);outline:none;resize:vertical;min-height:160px;background:var(--bg);line-height:1.6}
+    .em-textarea:focus{border-color:#888;background:#fff}
+    .em-footer{padding:14px 22px;border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:9px}
+    .em-btn-cancel{padding:8px 18px;border-radius:8px;border:1.5px solid var(--border);background:var(--surface);font-size:.82rem;font-weight:600;cursor:pointer;color:var(--text2);font-family:'DM Sans',sans-serif}
+    .em-btn-send{padding:8px 22px;border-radius:8px;border:none;background:#C4603A;color:#fff;font-size:.82rem;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;transition:opacity .12s}
+    .em-btn-send:hover{opacity:.87}
+    .em-btn-send:disabled{opacity:.4;cursor:not-allowed}
+    .em-char{font-size:.7rem;color:var(--text3);text-align:right}
+
+    /* ── Timeline activité ── */
+    .tl-wrap{display:flex;flex-direction:column;gap:0}
+    .tl-item{display:flex;gap:10px;padding:8px 0;border-bottom:1px solid #f7f4ef;position:relative}
+    .tl-item:last-child{border:none}
+    .tl-icon{width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:.85rem;flex-shrink:0;margin-top:1px}
+    .tl-icon.email{background:#dbeafe}
+    .tl-icon.flag{background:#dcfce7}
+    .tl-icon.number{background:#fef3c7}
+    .tl-icon.note{background:#ede9fe}
+    .tl-icon.auto{background:#f1f5f9}
+    .tl-desc{font-size:.81rem;color:var(--dark);line-height:1.4;flex:1}
+    .tl-time{font-size:.68rem;color:var(--text3);white-space:nowrap;margin-top:2px}
+    .tl-empty{font-size:.8rem;color:var(--text3);font-style:italic;padding:12px 0}
+
+    /* ── Performance annonce ── */
+    .perf-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px}
+    .perf-stat{background:var(--bg);border-radius:9px;padding:12px;text-align:center}
+    .perf-val{font-family:'Cormorant Garamond',serif;font-size:1.8rem;font-weight:600;color:var(--dark);line-height:1}
+    .perf-lbl{font-size:.62rem;text-transform:uppercase;letter-spacing:.05em;color:var(--text3);margin-top:3px}
+    .perf-platform{display:flex;align-items:center;justify-content:space-between;padding:6px 10px;background:var(--bg);border-radius:7px;font-size:.78rem;margin-bottom:5px}
+    .perf-platform-name{font-weight:600;color:var(--dark)}
+    .perf-platform-stats{color:var(--text2);font-size:.73rem}
+    .perf-loading{color:var(--text3);font-size:.8rem;font-style:italic}
   </style>
 </head>
 <body>
@@ -202,11 +299,14 @@
       <a href="/admin/crm" class="active">🎯 CRM Vendeurs</a>
       <div class="sep"></div>
       <a href="/admin/numbers">📱 Numéros IA</a>
+      <a href="/admin/emails">📧 Emails</a>
       <a href="/admin#clients">👤 Clients</a>
       <a href="/admin#contacts">📨 Contacts</a>
-      <a href="/admin#documents">📄 Documents légaux</a>
+      <a href="/admin/documents">📝 Documents légaux</a>
+      <a href="/admin/finance">💰 Finance</a>
     </nav>
-    <div class="nav-out"><a href="/admin/logout">← Déconnexion</a></div>
+    <div class="nav-out"><a href="/admin/marketing">📣 Marketing & Docs IA</a>
+    <a href="/admin/logout">← Déconnexion</a></div>
   </aside>
 
   <!-- Main -->
@@ -223,6 +323,11 @@
         <span class="refresh-info" id="refreshInfo"></span>
         <span id="demoTag">MODE DÉMO</span>
         <button id="clearDemoBtn" onclick="clearDemo()">✕ Effacer démo</button>
+        <div class="view-toggle">
+          <button class="view-btn active" id="btnTable" onclick="setView('table')">≡ Table</button>
+          <button class="view-btn" id="btnKanban" onclick="setView('kanban')">⬛ Pipeline</button>
+        </div>
+        <button class="btn-export" onclick="exportCSV()">↓ CSV</button>
         <button class="btn-sm-outline" onclick="manualRefresh()">↻ <span id="refreshCountdown"></span></button>
       </div>
     </div>
@@ -234,7 +339,7 @@
       <div class="chip amber"><div class="c-lbl">🟡 En cours</div><div class="c-val" id="cAmber">—</div></div>
       <div class="chip green"><div class="c-lbl">🟢 Actifs</div><div class="c-val" id="cGreen">—</div></div>
       <div class="chip blue"><div class="c-lbl">📸 Photos faites</div><div class="c-val" id="cPhotos">—</div></div>
-      <div class="chip"><div class="c-lbl">📝 Contrats signés</div><div class="c-val" id="cContrats">—</div></div>
+      <div class="chip"><div class="c-lbl" id="cContratsLbl">📝 Contrats signés</div><div class="c-val" id="cContrats">—</div></div>
       <div class="chip green"><div class="c-lbl">📢 En ligne</div><div class="c-val" id="cOnline">—</div></div>
       <div class="chip purple"><div class="c-lbl">📅 Visites à venir</div><div class="c-val" id="cVisits">—</div></div>
     </div>
@@ -266,6 +371,19 @@
         <option value="online">En ligne</option>
         <option value="offline">Hors ligne</option>
       </select>
+      <span class="filter-lbl">Période contrat</span>
+      <div class="periode-wrap" id="periodeWrap">
+        <button class="periode-btn active" data-p="all" onclick="setPeriode('all',this)">Tout</button>
+        <button class="periode-btn" data-p="week" onclick="setPeriode('week',this)">Semaine</button>
+        <button class="periode-btn" data-p="month" onclick="setPeriode('month',this)">Mois</button>
+        <button class="periode-btn" data-p="year" onclick="setPeriode('year',this)">Année</button>
+        <button class="periode-btn" data-p="custom" onclick="setPeriode('custom',this)">Plage</button>
+      </div>
+      <div id="periodeCustom" style="display:none;align-items:center;gap:5px;">
+        <input type="date" class="fsel" id="fDateFrom" onchange="applyFilters()" style="padding:4px 7px;" />
+        <span style="font-size:0.75rem;color:#888">→</span>
+        <input type="date" class="fsel" id="fDateTo" onchange="applyFilters()" style="padding:4px 7px;" />
+      </div>
       <div class="search-w">
         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
         <input class="fsearch" type="text" id="fSearch" placeholder="Nom, email, ville, numéro..." oninput="applyFilters()">
@@ -273,26 +391,37 @@
       <span id="rowCount" class="count-b" style="display:none"></span>
     </div>
 
+    <!-- Alert Filters -->
+    <div id="crm-filters">
+      <button class="crm-filter active" data-filter="all">Tous</button>
+      <button class="crm-filter" data-filter="paid-no-property">Payé sans fiche</button>
+      <button class="crm-filter" data-filter="no-photos">Sans photos</button>
+      <button class="crm-filter" data-filter="ready-not-published">Prêt à publier</button>
+      <button class="crm-filter" data-filter="pending-visits">Visites en attente</button>
+      <button class="crm-filter" data-filter="missing-docs">Docs manquants</button>
+      <button class="crm-filter" data-filter="contract-not-signed">Contrat non signé</button>
+    </div>
+
     <!-- Table -->
-    <div class="tbl-outer">
+    <div class="tbl-outer" id="tableView">
       <table>
         <thead>
           <tr>
             <th>Vendeur</th>
-            <th>Score santé</th>
-            <th>Pack · Inscription</th>
+            <th class="sortable" data-sort="score" title="Trier par score">Score santé<i class="si"></i></th>
+            <th class="sortable" data-sort="days" title="Trier par ancienneté">Pack · Inscription<i class="si"></i></th>
             <th title="Contrat de prestation signé — manuel">Contrat</th>
             <th>Numéro IA</th>
-            <th class="auto-h" title="Auto — dérivé de la date RDV saisie">⚡ RDV photo</th>
-            <th class="auto-h" title="Auto — déclenché quand ≥5 photos uploadées">⚡ Photos faites</th>
-            <th class="auto-h" title="Auto — compté depuis les uploads vendeur">⚡ Nb photos</th>
+            <th class="auto-h sortable" data-sort="rdv" title="Trier par RDV photo">⚡ RDV photo<i class="si"></i></th>
+            <th class="auto-h">⚡ Photos faites</th>
+            <th class="auto-h sortable" data-sort="photos" title="Trier par nb photos">⚡ Nb photos<i class="si"></i></th>
             <th>Rapport · 360°</th>
-            <th class="auto-h" title="Auto — calculé depuis la fiche bien remplie par le vendeur">⚡ Fiche bien</th>
-            <th class="auto-h" title="Auto — depuis les docs uploadés">⚡ Docs</th>
-            <th class="auto-h" title="Auto — depuis les contacts acheteurs reçus">⚡ Contacts</th>
-            <th class="auto-h" title="Auto — depuis les visites planifiées">⚡ Visites</th>
+            <th class="auto-h sortable" data-sort="fiche" title="Trier par complétude fiche">⚡ Fiche bien<i class="si"></i></th>
+            <th class="auto-h sortable" data-sort="docs" title="Trier par nb docs">⚡ Docs<i class="si"></i></th>
+            <th class="auto-h sortable" data-sort="contacts" title="Trier par contacts">⚡ Contacts<i class="si"></i></th>
+            <th class="auto-h sortable" data-sort="visits" title="Trier par visites">⚡ Visites<i class="si"></i></th>
             <th class="auto-h" title="Auto — prochaine visite planifiée">⚡ Prochaine visite</th>
-            <th class="auto-h" title="Auto — depuis le statut de publication du bien">⚡ Annonce</th>
+            <th class="auto-h sortable" data-sort="published" title="Trier par publication">⚡ Annonce<i class="si"></i></th>
             <th>Alertes</th>
             <th></th>
           </tr>
@@ -301,6 +430,37 @@
       </table>
     </div>
 
+    <!-- Kanban pipeline -->
+    <div class="kanban-view" id="kanbanView"></div>
+
+  </div>
+</div>
+
+<!-- Modal email -->
+<div class="em-overlay" id="emOverlay">
+  <div class="em-modal">
+    <div class="em-hdr">
+      <div class="em-hdr-info">
+        <div class="em-hdr-title">Envoyer un email</div>
+        <div class="em-hdr-to" id="emTo">—</div>
+      </div>
+      <button class="em-close" onclick="closeEmailModal()">✕</button>
+    </div>
+    <div class="em-body-wrap">
+      <div>
+        <div class="em-label">Objet</div>
+        <input class="em-input" id="emSubject" placeholder="Ex : Mise à jour de votre dossier Serenis" />
+      </div>
+      <div>
+        <div class="em-label">Message</div>
+        <textarea class="em-textarea" id="emBodyText" placeholder="Bonjour Prénom,&#10;&#10;…" oninput="updateCharCount()"></textarea>
+        <div class="em-char"><span id="emCharCount">0</span> caractères</div>
+      </div>
+    </div>
+    <div class="em-footer">
+      <button class="em-btn-cancel" onclick="closeEmailModal()">Annuler</button>
+      <button class="em-btn-send" id="emSendBtn" onclick="sendEmail()">✉ Envoyer</button>
+    </div>
   </div>
 </div>
 
@@ -389,6 +549,7 @@ function getAlerts(c, score) {
    STATE & LOAD
 ══════════════════════════════════════════════ */
 let sellers = [], filtered = [], activeSellerId = null;
+let activeCrmFilter = 'all';
 let lastRefresh = Date.now();
 let refreshTimer = null;
 
@@ -397,8 +558,7 @@ async function loadAll(quiet = false) {
     const r = await fetch('/admin/api/crm').then(r => r.json());
     sellers = r.crm || [];
     lastRefresh = Date.now();
-    applyFilters();
-    updateStats();
+    applyFilters(); // calls updateStats + render
     updateRefreshInfo();
     if (activeSellerId) {
       const fresh = sellers.find(s => s.id === activeSellerId);
@@ -444,15 +604,24 @@ setInterval(updateRefreshInfo, 5000);
    STATS
 ══════════════════════════════════════════════ */
 function updateStats() {
+  // Base = all sellers (global totals)
   const scores = sellers.map(c => calcScore(c));
   document.getElementById('cTotal').textContent   = sellers.length;
   document.getElementById('cRed').textContent     = scores.filter(s => s < 40).length;
   document.getElementById('cAmber').textContent   = scores.filter(s => s >= 40 && s < 75).length;
   document.getElementById('cGreen').textContent   = scores.filter(s => s >= 75).length;
   document.getElementById('cPhotos').textContent  = sellers.filter(c => c.photographer_done).length;
-  document.getElementById('cContrats').textContent = sellers.filter(c => c.contrat_signe).length;
   document.getElementById('cOnline').textContent  = sellers.filter(c => c.published).length;
   document.getElementById('cVisits').textContent  = sellers.filter(c => c.next_visit_date).length;
+
+  // Contrats signés — filtrés par période active
+  const contratsInPeriode = sellers.filter(c => c.contrat_signe && matchesPeriode(c));
+  document.getElementById('cContrats').textContent = contratsInPeriode.length;
+
+  // Label période sur le chip contrats
+  const periodeLabels = { all:'', week:' · semaine', month:' · mois', year:' · année', custom:' · plage' };
+  const chipLbl = document.getElementById('cContratsLbl');
+  if (chipLbl) chipLbl.textContent = `📝 Contrats signés${periodeLabels[activePeriode]||''}`;
 
   const hasDemo = sellers.some(c => (c.email||'').endsWith('@demo.serenis'));
   document.getElementById('demoTag').style.display      = hasDemo ? 'inline' : 'none';
@@ -460,8 +629,309 @@ function updateStats() {
 }
 
 /* ══════════════════════════════════════════════
+   CRM ALERT FILTER BUTTONS
+══════════════════════════════════════════════ */
+document.getElementById('crm-filters').addEventListener('click', e => {
+  const btn = e.target.closest('.crm-filter');
+  if (!btn) return;
+  activeCrmFilter = btn.dataset.filter;
+  document.querySelectorAll('.crm-filter').forEach(b => b.classList.toggle('active', b === btn));
+  applyFilters();
+});
+
+function matchesCrmFilter(c, filter) {
+  const hasProp = !!(c.property_status || c.city || c.price);
+  switch(filter) {
+    case 'paid-no-property':
+      return !!(c.paid_at && !hasProp);
+    case 'no-photos':
+      return !!(hasProp && (c.photo_count||c.photos_count||0) === 0);
+    case 'ready-not-published':
+      return !!(c.published === 0 && (c.has_price||0) && (c.has_dpe||0) && c.description && c.description.length > 30);
+    case 'pending-visits':
+      return (c.pending_visits||0) > 0;
+    case 'missing-docs':
+      return (c.doc_count||c.docs_count||0) < 2;
+    case 'contract-not-signed':
+      return !!(c.paid_at && !c.contrat_signe);
+    default:
+      return true;
+  }
+}
+
+/* ══════════════════════════════════════════════
    FILTERS
 ══════════════════════════════════════════════ */
+/* ══════════════════════════════════════════════
+   VUE TABLE / KANBAN
+══════════════════════════════════════════════ */
+let activeView = 'table';
+function setView(v) {
+  activeView = v;
+  document.getElementById('tableView').style.display = v === 'table' ? '' : 'none';
+  document.getElementById('kanbanView').style.display = v === 'kanban' ? 'flex' : 'none';
+  document.getElementById('btnTable').classList.toggle('active', v === 'table');
+  document.getElementById('btnKanban').classList.toggle('active', v === 'kanban');
+  if (v === 'kanban') renderKanban(); else renderTable();
+}
+
+/* ══════════════════════════════════════════════
+   TRI COLONNES
+══════════════════════════════════════════════ */
+let sortKey = null, sortDir = 1;
+
+function getSortVal(c, key) {
+  switch(key) {
+    case 'score':    return calcScore(c);
+    case 'days':     return c.days_since_signup || 0;
+    case 'photos':   return c.photos_count || 0;
+    case 'docs':     return c.docs_count || 0;
+    case 'contacts': return c.buyer_contacts_count || 0;
+    case 'visits':   return c.visits_count || 0;
+    case 'fiche':    return c.prop_completion_pct || 0;
+    case 'published':return c.published ? 1 : 0;
+    case 'rdv':      return c.photographer_scheduled ? 1 : 0;
+    default: return 0;
+  }
+}
+
+document.addEventListener('click', e => {
+  const th = e.target.closest('th.sortable');
+  if (!th) return;
+  const key = th.dataset.sort;
+  if (sortKey === key) sortDir *= -1; else { sortKey = key; sortDir = -1; }
+  document.querySelectorAll('th.sortable').forEach(t => t.classList.remove('sort-asc','sort-desc'));
+  th.classList.add(sortDir === 1 ? 'sort-asc' : 'sort-desc');
+  renderTable();
+});
+
+/* ══════════════════════════════════════════════
+   EXPORT CSV
+══════════════════════════════════════════════ */
+function exportCSV() {
+  const cols = [
+    ['Nom',         c => `${c.first_name||''} ${c.last_name||''}`.trim()],
+    ['Email',       c => c.email],
+    ['Téléphone',   c => c.phone||''],
+    ['Pack',        c => c.pack],
+    ['Score',       c => calcScore(c)+'%'],
+    ['Inscrit le',  c => fd(c.paid_at||c.created_at)],
+    ['Contrat',     c => c.contrat_signe ? 'Oui' : 'Non'],
+    ['Contrat signé le', c => fd(c.contrat_signe_at)||''],
+    ['Numéro IA',   c => c.twilio_number||''],
+    ['Photos',      c => c.photos_count||0],
+    ['Docs',        c => c.docs_count||0],
+    ['Contacts',    c => c.buyer_contacts_count||0],
+    ['Visites',     c => c.visits_count||0],
+    ['Publié',      c => c.published ? 'Oui' : 'Non'],
+    ['Ville',       c => c.city||''],
+    ['Prix',        c => c.price ? c.price.toLocaleString('fr-FR')+'€' : ''],
+    ['Jours actif', c => c.days_since_signup||0],
+    ['Vente réalisée', c => c.vente_realisee ? 'Oui' : 'Non'],
+  ];
+  const esc = v => `"${String(v).replace(/"/g,'""')}"`;
+  const header = cols.map(([lbl]) => esc(lbl)).join(';');
+  const rows = filtered.map(c => cols.map(([,fn]) => esc(fn(c))).join(';'));
+  const csv = '﻿' + [header, ...rows].join('\r\n');
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8;' }));
+  a.download = `crm-serenis-${new Date().toISOString().split('T')[0]}.csv`;
+  a.click();
+  toast('Export CSV téléchargé ✓','ok');
+}
+
+/* ══════════════════════════════════════════════
+   KANBAN PIPELINE
+══════════════════════════════════════════════ */
+const STAGES = [
+  { id:'inscrit',   label:'Inscrit',         color:'#f1f5f9', textColor:'#475569', fn: c => !!c.paid_at && !c.contrat_signe },
+  { id:'contrat',   label:'Contrat signé',   color:'#fef3c7', textColor:'#92400e', fn: c => !!c.contrat_signe && !c.photographer_scheduled },
+  { id:'photo',     label:'Photo planifiée', color:'#e0f2fe', textColor:'#0369a1', fn: c => !!c.photographer_scheduled && !c.published },
+  { id:'enligne',   label:'En ligne',        color:'#dcfce7', textColor:'#166534', fn: c => !!c.published && !c.vente_realisee },
+  { id:'vendu',     label:'Vendu',           color:'#ede9fe', textColor:'#5b21b6', fn: c => !!c.vente_realisee },
+];
+
+function kanbanStage(c) {
+  for (const s of [...STAGES].reverse()) { if (s.fn(c)) return s.id; }
+  return 'inscrit';
+}
+
+function renderKanban() {
+  const kv = document.getElementById('kanbanView');
+  const data = filtered;
+  kv.innerHTML = STAGES.map(stage => {
+    const cards = data.filter(c => kanbanStage(c) === stage.id);
+    const cardsHtml = cards.map(c => {
+      const score = calcScore(c);
+      const sc = statusCls(score);
+      const clr = scoreClr(score);
+      const alerts = getAlerts(c, score);
+      const tagsHtml = alerts.slice(0,2).map(a =>
+        `<span class="k-tag" style="background:${a.t==='red'?'#fee2e2':a.t==='amber'?'#fef3c7':'#dbeafe'};color:${a.t==='red'?'#dc2626':a.t==='amber'?'#d97706':'#2563eb'}">${a.m}</span>`
+      ).join('');
+      return `<div class="k-card ${sc}" onclick="openPanel(${c.id})">
+        <div class="k-name">${c.first_name||''} ${c.last_name||''}</div>
+        <div class="k-sub">${c.email}</div>
+        ${c.city ? `<div class="k-sub">${c.city}${c.price?' · '+c.price.toLocaleString('fr-FR')+'€':''}</div>` : ''}
+        <div class="k-score" style="color:${clr}">Score ${score}%</div>
+        ${tagsHtml ? `<div class="k-tags">${tagsHtml}</div>` : ''}
+      </div>`;
+    }).join('') || `<div style="text-align:center;padding:20px;font-size:.75rem;color:#ccc">Aucun</div>`;
+
+    return `<div class="k-col">
+      <div class="k-col-hdr" style="background:${stage.color};color:${stage.textColor}">
+        <span>${stage.label}</span><span class="k-cnt">${cards.length}</span>
+      </div>
+      <div class="k-cards">${cardsHtml}</div>
+    </div>`;
+  }).join('');
+}
+
+/* ══════════════════════════════════════════════
+   EMAIL DEPUIS L'INTERFACE
+══════════════════════════════════════════════ */
+let emailTargetId = null;
+
+function emailSeller(email, name) {
+  const c = sellers.find(s => s.email === email);
+  emailTargetId = c ? c.id : null;
+  document.getElementById('emTo').textContent = `À : ${name.trim()} <${email}>`;
+  document.getElementById('emSubject').value = 'Serenis — suivi de votre dossier';
+  document.getElementById('emBodyText').value = `Bonjour ${(name.trim().split(' ')[0])||''},\n\n`;
+  document.getElementById('emSendBtn').disabled = false;
+  document.getElementById('emSendBtn').textContent = '✉ Envoyer';
+  updateCharCount();
+  document.getElementById('emOverlay').classList.add('open');
+  setTimeout(() => document.getElementById('emSubject').focus(), 100);
+}
+
+function closeEmailModal() {
+  document.getElementById('emOverlay').classList.remove('open');
+}
+document.getElementById('emOverlay').addEventListener('click', e => { if (e.target === e.currentTarget) closeEmailModal(); });
+
+function updateCharCount() {
+  document.getElementById('emCharCount').textContent = document.getElementById('emBodyText').value.length;
+}
+
+async function sendEmail() {
+  const subject = document.getElementById('emSubject').value.trim();
+  const body    = document.getElementById('emBodyText').value.trim();
+  if (!subject) { document.getElementById('emSubject').focus(); return; }
+  if (!body)    { document.getElementById('emBodyText').focus(); return; }
+  if (!emailTargetId) { toast('Vendeur introuvable','err'); return; }
+  const btn = document.getElementById('emSendBtn');
+  btn.disabled = true; btn.textContent = '⏳ Envoi…';
+  try {
+    const r = await fetch(`/admin/api/crm/${emailTargetId}/email`, {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ subject, body }),
+    });
+    const d = await r.json();
+    if (d.success) {
+      toast('Email envoyé ✓', 'ok');
+      closeEmailModal();
+      // Rafraîchir l'historique si panneau ouvert sur ce vendeur
+      if (activeSellerId === emailTargetId) loadPanelExtras(emailTargetId);
+    } else {
+      toast(d.error || 'Erreur envoi', 'err');
+      btn.disabled = false; btn.textContent = '✉ Envoyer';
+    }
+  } catch {
+    toast('Erreur réseau','err');
+    btn.disabled = false; btn.textContent = '✉ Envoyer';
+  }
+}
+
+/* ══════════════════════════════════════════════
+   ATTRIBUER NUMÉRO (depuis panneau)
+══════════════════════════════════════════════ */
+async function assignNumber(id) {
+  const btn = document.getElementById(`assignNumBtn${id}`);
+  if (btn) { btn.disabled = true; btn.textContent = '⏳ Attribution en cours…'; }
+  try {
+    const r = await fetch(`/admin/api/crm/${id}/assign-number`, { method: 'POST' });
+    const d = await r.json();
+    if (d.success) {
+      toast(`Numéro attribué : ${d.number} ✓`, 'ok');
+      const s = sellers.find(x => x.id === id);
+      if (s) s.twilio_number = d.number;
+      await loadAll(true);
+      if (activeSellerId === id) { const fresh = sellers.find(x => x.id === id); if (fresh) renderPanel(fresh); }
+    } else {
+      toast(d.error || 'Aucun numéro disponible', 'err');
+      if (btn) { btn.disabled = false; btn.textContent = '⚡ Attribuer un numéro automatiquement'; }
+    }
+  } catch(e) {
+    toast('Erreur réseau', 'err');
+    if (btn) { btn.disabled = false; btn.textContent = '⚡ Attribuer un numéro automatiquement'; }
+  }
+}
+
+/* ── Archivage vendeur ── */
+async function toggleArchive(id, currentlyArchived) {
+  const archive = !currentlyArchived;
+  if (archive && !confirm('Archiver ce vendeur ? Il n\'apparaîtra plus dans le CRM principal.')) return;
+  try {
+    const r = await fetch(`/admin/api/crm/${id}/archive`, {
+      method: 'PUT', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ archived: archive }),
+    });
+    const d = await r.json();
+    if (d.success) {
+      toast(archive ? 'Vendeur archivé' : 'Vendeur désarchivé', 'ok');
+      closePanel();
+      await loadAll(false);
+    } else {
+      toast(d.error || 'Erreur', 'err');
+    }
+  } catch { toast('Erreur réseau', 'err'); }
+}
+
+/* ── Période de signature ── */
+let activePeriode = 'all';
+
+function setPeriode(p, btn) {
+  activePeriode = p;
+  document.querySelectorAll('.periode-btn').forEach(b => b.classList.toggle('active', b === btn));
+  const customEl = document.getElementById('periodeCustom');
+  customEl.style.display = p === 'custom' ? 'flex' : 'none';
+  applyFilters();
+}
+
+function periodeStart(p) {
+  const now = new Date();
+  if (p === 'week') {
+    const d = new Date(now);
+    d.setDate(now.getDate() - now.getDay() + (now.getDay() === 0 ? -6 : 1)); // lundi
+    d.setHours(0,0,0,0); return d;
+  }
+  if (p === 'month') return new Date(now.getFullYear(), now.getMonth(), 1);
+  if (p === 'year')  return new Date(now.getFullYear(), 0, 1);
+  return null;
+}
+
+function matchesPeriode(c) {
+  if (activePeriode === 'all') return true;
+  // Use contrat_signe_at if available, otherwise paid_at or created_at
+  const raw = c.contrat_signe_at || c.paid_at || c.created_at;
+  if (!raw) return activePeriode === 'all';
+  const d = new Date(raw);
+
+  if (activePeriode === 'custom') {
+    const from = document.getElementById('fDateFrom').value;
+    const to   = document.getElementById('fDateTo').value;
+    const ds = d.toISOString().split('T')[0];
+    if (from && ds < from) return false;
+    if (to   && ds > to)   return false;
+    return true;
+  }
+
+  const start = periodeStart(activePeriode);
+  if (!start) return true;
+  return d >= start;
+}
+
 function applyFilters() {
   const q      = (document.getElementById('fSearch').value||'').toLowerCase();
   const pack   = document.getElementById('fPack').value;
@@ -479,6 +949,8 @@ function applyFilters() {
     if (photo === 'done' && !c.photographer_done) return false;
     if (ann === 'online' && !c.published) return false;
     if (ann === 'offline' && c.published) return false;
+    if (!matchesCrmFilter(c, activeCrmFilter)) return false;
+    if (!matchesPeriode(c)) return false;
     return true;
   });
 
@@ -488,7 +960,9 @@ function applyFilters() {
     cnt.textContent = filtered.length + '/' + sellers.length;
   } else cnt.style.display = 'none';
 
-  renderTable();
+  // Refresh contrats chip label + count with current period
+  updateStats();
+  if (activeView === 'kanban') renderKanban(); else renderTable();
 }
 
 /* ══════════════════════════════════════════════
@@ -517,7 +991,12 @@ function renderTable() {
     return;
   }
 
-  tbody.innerHTML = filtered.map(c => {
+  // Tri actif
+  const sorted = sortKey
+    ? [...filtered].sort((a, b) => (getSortVal(a, sortKey) - getSortVal(b, sortKey)) * sortDir)
+    : filtered;
+
+  tbody.innerHTML = sorted.map(c => {
     const score  = calcScore(c);
     const sc     = statusCls(score);
     const clr    = scoreClr(score);
@@ -585,9 +1064,9 @@ function renderTable() {
       ? `<span class="badge online">En ligne</span>${c.published_at ? `<div style="font-size:0.64rem;color:#aaa;margin-top:2px">${fd(c.published_at)}</div>` : ''}`
       : `<span class="badge offline">Hors ligne</span>`;
 
-    // Alerts (auto-generated)
+    // Alerts (auto-generated — toutes les alertes)
     const alertsCell = alerts.length
-      ? alerts.slice(0,2).map(a => `<span class="badge alert-${a.t}" style="display:block;margin-bottom:2px">${a.m}</span>`).join('')
+      ? alerts.map(a => `<span class="badge alert-${a.t}" style="display:block;margin-bottom:2px">${a.m}</span>`).join('')
       : '<span style="color:#D0CEC9;font-size:0.7rem">—</span>';
 
     // Contrat toggle (manual)
@@ -598,12 +1077,41 @@ function renderTable() {
       ? `<span class="numcell">${c.twilio_number}</span>`
       : `<span style="color:#D0CEC9;font-size:0.72rem">Non attribué</span>`;
 
-    // Pack + date + days
+    // Pack + date + contrat expiry indicator
+    const contratSignedAt = c.contrat_signe_at || c.paid_at;
+    let echeanceHtml = '';
+    if (contratSignedAt) {
+      const echeance = new Date(new Date(contratSignedAt).setFullYear(new Date(contratSignedAt).getFullYear() + 1));
+      const daysLeft = Math.round((echeance - new Date()) / (1000*3600*24));
+      const eColor = daysLeft > 60 ? '#16a34a' : daysLeft > 14 ? '#d97706' : '#dc2626';
+      const eLabel = daysLeft > 0 ? `${daysLeft}j restants` : `Expiré (${Math.abs(daysLeft)}j)`;
+      echeanceHtml = `<div style="font-size:0.62rem;color:${eColor};font-weight:600;margin-top:2px">📋 ${eLabel}</div>`;
+    }
     const packCell = `<span class="badge ${c.pack||'autonome'}">${c.pack==='serenite'?'Sérénité':'Autonome'}</span>
       <div style="font-size:0.66rem;color:#aaa;margin-top:2px">${fd(c.paid_at||c.created_at)||'—'}</div>
-      <div style="font-size:0.64rem;color:#bbb">J+${c.days_since_signup||0}</div>`;
+      <div style="font-size:0.64rem;color:#bbb">J+${c.days_since_signup||0}</div>
+      ${echeanceHtml}`;
 
-    return `<tr class="${sc}" data-sid="${c.id}">
+    // Data attributes for CRM filters
+    const hasProp = !!(c.property_status || c.city || c.price);
+    const paidNoProp = (c.paid_at && !hasProp) ? 1 : 0;
+    const noPhotosFlag = (hasProp && (c.photo_count||c.photos_count||0) === 0) ? 1 : 0;
+    const readyNotPub = (!c.published && (c.has_price||0) && (c.has_dpe||0) && c.description && c.description.length > 30) ? 1 : 0;
+    const pendingVisitsFlag = (c.pending_visits||0) > 0 ? 1 : 0;
+    const missingDocs = ((c.doc_count||c.docs_count||0) < 2) ? 1 : 0;
+    const daysSincePaid = c.days_since_paid != null ? c.days_since_paid : (c.days_since_signup||0);
+
+    return `<tr class="${sc}" data-sid="${c.id}"
+      data-paid-no-property="${paidNoProp}"
+      data-no-photos="${noPhotosFlag}"
+      data-ready-not-published="${readyNotPub}"
+      data-pending-visits="${pendingVisitsFlag}"
+      data-missing-docs="${missingDocs}"
+      data-has-price="${c.has_price||0}"
+      data-has-dpe="${c.has_dpe||0}"
+      data-published="${c.published?1:0}"
+      data-photo-count="${c.photo_count||c.photos_count||0}"
+      data-days-since-paid="${daysSincePaid}">
       <td>
         <div style="display:flex;align-items:center;gap:8px">
           <div class="panel-av" style="background:${avBg};color:${avClr};width:32px;height:32px;border-radius:8px;font-size:0.85rem;flex-shrink:0">${initials(c)}</div>
@@ -714,6 +1222,8 @@ function renderPanel(c) {
       ${alerts.map(a=>`<span class="badge alert-${a.t}" style="margin-top:4px;display:inline-flex">${a.m}</span>`).join(' ')}
     </div>
     <div class="p-ring" style="border-color:${clr};color:${clr}">${score}%</div>
+    <button class="btn-panel-email" onclick="emailSeller('${c.email}','${(c.first_name||'')+' '+(c.last_name||'')}')">✉ Email</button>
+    <button class="btn-panel-email" style="border-color:#dc2626;color:#dc2626" onclick="toggleArchive(${c.id},${c.archived?1:0})" title="${c.archived?'Désarchiver':'Archiver'}">${c.archived?'↩ Désarchiver':'🗄 Archiver'}</button>
     <button class="panel-close" onclick="closePanel()">✕</button>`;
 
   document.getElementById('panelBody').innerHTML = `
@@ -726,6 +1236,15 @@ function renderPanel(c) {
         <div class="p-field"><label>Téléphone</label><div class="p-val ${c.phone?'':'muted'}">${c.phone||'Non renseigné'}</div></div>
         <div class="p-field"><label>Pack</label><span class="badge ${c.pack||'autonome'}">${c.pack==='serenite'?'Pack Sérénité':'Pack Autonome'}</span></div>
         <div class="p-field"><label>Inscription</label><div class="p-val">${fdl(c.paid_at||c.created_at)||'—'} <span style="color:#aaa;font-size:0.72rem">(J+${c.days_since_signup||0})</span></div></div>
+        ${(()=>{
+          const sat = c.contrat_signe_at || c.paid_at;
+          if (!sat) return '';
+          const echeance = new Date(new Date(sat).setFullYear(new Date(sat).getFullYear()+1));
+          const dLeft = Math.round((echeance - new Date())/(1000*3600*24));
+          const eColor = dLeft > 60 ? '#16a34a' : dLeft > 14 ? '#d97706' : '#dc2626';
+          const eLabel = dLeft > 0 ? `expire dans ${dLeft} j (${fdl(echeance.toISOString())})` : `expiré depuis ${Math.abs(dLeft)} j`;
+          return `<div class="p-field"><label>Signé le</label><div class="p-val">${fdl(sat)} <span style="color:${eColor};font-size:0.72rem;font-weight:600">· ${eLabel}</span></div></div>`;
+        })()}
         <div class="p-field p-full">
           <div class="p-row" style="border:none;padding:8px 0 0">
             <div><div class="p-row-lbl">Contrat de prestation</div><div class="p-row-sub">${c.contrat_signe ? '✓ Signé' : 'Non signé — à régulariser'}</div></div>
@@ -745,8 +1264,9 @@ function renderPanel(c) {
            </div>
            <div style="font-size:0.75rem;color:#888;margin-top:6px">Numéro à communiquer dans les annonces</div>`
         : `<div style="padding:12px;background:#FFF9F5;border:1px dashed #F0CFBA;border-radius:8px;text-align:center;font-size:0.82rem;color:#888">
-             Aucun numéro attribué · <a href="/admin/numbers" style="color:#2563eb;font-weight:600">Attribuer depuis Numéros IA</a>
-           </div>`}
+             Aucun numéro attribué
+           </div>
+           <button class="btn-assign-num" id="assignNumBtn${c.id}" onclick="assignNumber(${c.id})">⚡ Attribuer un numéro automatiquement</button>`}
     </div>
 
     <!-- Photographe -->
@@ -860,7 +1380,28 @@ function renderPanel(c) {
       <textarea class="p-input" rows="3" data-field="admin_notes" style="resize:none" placeholder="Notes internes visibles uniquement en admin...">${c.admin_notes||''}</textarea>
     </div>
 
+    <!-- Performance annonce (chargée async) -->
+    <div class="p-sec" id="perfSection">
+      <div class="p-title">📊 Performance de l'annonce <span class="auto-label">AUTO</span></div>
+      <div class="perf-loading">Chargement…</div>
+    </div>
+
+    <!-- Offres d'achat (chargées async) -->
+    <div class="p-sec" id="offresSection">
+      <div class="p-title">💶 Offres d'achat</div>
+      <div class="perf-loading">Chargement…</div>
+    </div>
+
+    <!-- Historique activité (chargé async) -->
+    <div class="p-sec" id="activitySection">
+      <div class="p-title">🕐 Historique des actions</div>
+      <div class="perf-loading">Chargement…</div>
+    </div>
+
   `;
+
+  // Charger performance + activité de manière asynchrone
+  loadPanelExtras(c.id);
 
   // Panel toggle handlers
   document.querySelectorAll('#panelBody .tog').forEach(btn => {
@@ -875,6 +1416,138 @@ function renderPanel(c) {
       el.addEventListener('change', async () => { await saveField(c.id, el.dataset.field, el.value); });
     }
   });
+}
+
+/* ══════════════════════════════════════════════
+   PANEL EXTRAS (performance + activité, async)
+══════════════════════════════════════════════ */
+const TYPE_ICON = { email:'📧', flag:'🔔', number:'📱', note:'📝', auto:'⚙️' };
+const TYPE_CLASS = { email:'email', flag:'flag', number:'number', note:'note', auto:'auto' };
+const AUTO_LABELS = {
+  prospect_nudge: 'Nudge prospect (48h)',
+  no_property_nudge: 'Nudge fiche manquante',
+  no_photos_nudge: 'Nudge photos manquantes',
+  not_published_nudge: 'Nudge non publié',
+  missing_doc_nudge: 'Nudge docs manquants',
+  admin_direct: 'Email admin direct',
+  welcome: 'Email de bienvenue',
+};
+
+async function loadPanelExtras(id) {
+  // Performance
+  const perfSec = document.getElementById('perfSection');
+  const actSec  = document.getElementById('activitySection');
+  if (!perfSec || !actSec) return;
+
+  const offresSec = document.getElementById('offresSection');
+
+  // Fetch en parallèle
+  const [perfRes, actRes, offresRes, viewsRes, priceRes] = await Promise.all([
+    fetch(`/admin/api/crm/${id}/performance`).then(r => r.json()).catch(() => null),
+    fetch(`/admin/api/crm/${id}/activity`).then(r => r.json()).catch(() => null),
+    fetch(`/admin/api/crm/${id}/offres`).then(r => r.json()).catch(() => null),
+    fetch(`/admin/api/crm/${id}/views`).then(r => r.json()).catch(() => null),
+    fetch(`/admin/api/crm/${id}/price-history`).then(r => r.json()).catch(() => null),
+  ]);
+
+  // ── Performance ──
+  if (perfRes && perfSec) {
+    const { property, totalViews, totalFavs, totalMsgs, perf, photos } = perfRes;
+    if (!property) {
+      perfSec.querySelector('.perf-loading').textContent = 'Aucune fiche bien renseignée.';
+    } else {
+      const pubDate = property.published_at ? `Publiée le ${fdl(property.published_at)}` : 'Non publiée';
+      const pfHtml = perf.length ? perf.map(p =>
+        `<div class="perf-platform">
+          <span class="perf-platform-name">${p.platform}</span>
+          <span class="perf-platform-stats">${p.views||0} vues · ${p.favorites||0} favoris · ${p.messages||0} msgs</span>
+        </div>`
+      ).join('') : '<div style="font-size:.78rem;color:var(--text3);font-style:italic">Aucune donnée de performance enregistrée.</div>';
+
+      const pageViews = viewsRes || { total:0, today:0, week:0 };
+      const priceHistory = priceRes?.history || [];
+      const priceHtml = priceHistory.length ? `<div style="font-size:.75rem;color:var(--text3);margin-top:10px;">Baisses de prix : ${priceHistory.map(h => `${Number(h.price).toLocaleString('fr-FR')} € (${fdl(h.changed_at)})`).slice(0,3).join(' → ')}</div>` : '';
+      perfSec.innerHTML = `
+        <div class="p-title">📊 Performance de l'annonce <span class="auto-label">AUTO</span></div>
+        <div style="font-size:.75rem;color:var(--text3);margin-bottom:10px">${pubDate} · ${photos} photo${photos>1?'s':''} · ${property.surface_habitable||'—'} m²</div>
+        <div class="perf-grid">
+          <div class="perf-stat"><div class="perf-val" style="color:#2563eb">${(pageViews.total||0).toLocaleString('fr-FR')}</div><div class="perf-lbl">Vues page</div></div>
+          <div class="perf-stat"><div class="perf-val" style="color:#7c3aed">${pageViews.week||0}</div><div class="perf-lbl">Cette semaine</div></div>
+          <div class="perf-stat"><div class="perf-val" style="color:#16a34a">${pageViews.today||0}</div><div class="perf-lbl">Aujourd'hui</div></div>
+          <div class="perf-stat"><div class="perf-val" style="color:#C4603A">${totalFavs||0}</div><div class="perf-lbl">Favoris</div></div>
+          <div class="perf-stat"><div class="perf-val" style="color:#d97706">${totalMsgs||0}</div><div class="perf-lbl">Messages</div></div>
+        </div>
+        ${pfHtml}${priceHtml}`;
+    }
+  }
+
+  // ── Offres ──
+  if (offresSec) {
+    const offers = offresRes?.offers || [];
+    if (!offers.length) {
+      offresSec.innerHTML = `<div class="p-title">💶 Offres d'achat</div><div style="font-size:.8rem;color:var(--text3);font-style:italic">Aucune offre reçue.</div>`;
+    } else {
+      const STATUS_LBL = { pending:'En attente', accepted:'Acceptée', refused:'Refusée', counter:'Contre-offre' };
+      const STATUS_COL = { pending:'#d97706', accepted:'#059669', refused:'#dc2626', counter:'#7c3aed' };
+      const rows = offers.map(o => {
+        const col = STATUS_COL[o.status] || '#888';
+        const lbl = STATUS_LBL[o.status] || o.status;
+        const amt = Number(o.amount).toLocaleString('fr-FR');
+        const dt = fdl(o.created_at);
+        return `<div style="padding:10px 0;border-bottom:1px solid var(--border);">
+          <div style="display:flex;justify-content:space-between;align-items:center;">
+            <span style="font-weight:600;font-size:.95rem;">${amt} €</span>
+            <span style="font-size:.72rem;padding:2px 8px;border-radius:10px;background:${col}22;color:${col};font-weight:600;">${lbl}</span>
+          </div>
+          <div style="font-size:.78rem;color:var(--text3);margin-top:3px;">${o.buyer_name} · ${o.buyer_email}${o.buyer_phone ? ' · ' + o.buyer_phone : ''}</div>
+          <div style="font-size:.74rem;color:var(--text3);">${dt}${o.conditions ? ' — ' + o.conditions : ''}</div>
+          ${o.seller_response ? `<div style="font-size:.78rem;color:var(--text2);margin-top:4px;font-style:italic;">Réponse: ${o.seller_response}</div>` : ''}
+        </div>`;
+      }).join('');
+      offresSec.innerHTML = `<div class="p-title">💶 Offres d'achat (${offers.length})</div>${rows}`;
+    }
+  }
+
+  // ── Activité ──
+  if (actRes && actSec) {
+    const { activity, autoEmails } = actRes;
+
+    // Fusionner et trier
+    const merged = [
+      ...(activity||[]).map(a => ({ ...a, source: 'admin' })),
+      ...(autoEmails||[]).map(a => ({ type: 'auto', description: AUTO_LABELS[a.type] || a.type, created_at: a.created_at, source: 'auto' })),
+    ].sort((a, b) => new Date(b.created_at) - new Date(a.created_at)).slice(0, 30);
+
+    if (!merged.length) {
+      actSec.innerHTML = `<div class="p-title">🕐 Historique des actions</div><div class="tl-empty">Aucune action enregistrée pour ce vendeur.</div>`;
+      return;
+    }
+
+    const items = merged.map(a => {
+      const icon = TYPE_ICON[a.type] || '📌';
+      const cls  = TYPE_CLASS[a.type] || 'auto';
+      const when = fmtTimeAgo(a.created_at);
+      return `<div class="tl-item">
+        <div class="tl-icon ${cls}">${icon}</div>
+        <div style="flex:1;min-width:0">
+          <div class="tl-desc">${a.description}</div>
+          <div class="tl-time">${when}</div>
+        </div>
+      </div>`;
+    }).join('');
+
+    actSec.innerHTML = `<div class="p-title">🕐 Historique des actions</div><div class="tl-wrap">${items}</div>`;
+  }
+}
+
+function fmtTimeAgo(dt) {
+  if (!dt) return '—';
+  const diff = Math.round((Date.now() - new Date(dt)) / 1000);
+  if (diff < 60)    return 'À l\'instant';
+  if (diff < 3600)  return `Il y a ${Math.round(diff/60)} min`;
+  if (diff < 86400) return `Il y a ${Math.round(diff/3600)} h`;
+  const d = new Date(dt);
+  return d.toLocaleDateString('fr-FR', { day:'2-digit', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit' });
 }
 
 /* ══════════════════════════════════════════════
@@ -898,6 +1571,17 @@ async function clearDemo() {
 /* ══════════════════════════════════════════════
    INIT
 ══════════════════════════════════════════════ */
+// Apply URL ?filter= param on load
+(function() {
+  const urlFilter = new URLSearchParams(window.location.search).get('filter');
+  const validFilters = ['all','paid-no-property','no-photos','ready-not-published','pending-visits','missing-docs','contract-not-signed'];
+  if (urlFilter && validFilters.includes(urlFilter)) {
+    activeCrmFilter = urlFilter;
+    document.querySelectorAll('.crm-filter').forEach(b => {
+      b.classList.toggle('active', b.dataset.filter === urlFilter);
+    });
+  }
+})();
 loadAll();
 startAutoRefresh();
 </script>

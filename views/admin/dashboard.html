@@ -28,9 +28,13 @@
     <a href="/admin/photographers">📷 Photographes</a>
     <a href="/admin/missions">📋 Missions</a>
     <a href="/admin/numbers">📱 Numéros IA</a>
+    <a href="/admin/emails">📧 Emails</a>
     <a href="/admin#clients">👤 Clients</a>
     <a href="/admin#contacts">📨 Contacts</a>
     <a href="/admin#documents">📄 Documents légaux</a>
+    <a href="/admin/marketing">📣 Marketing & Docs IA</a>
+    <a href="/admin/documents">📝 Documents légaux</a>
+    <a href="/admin/finance">💰 Finance</a>
     <a href="/admin/logout">← Déconnexion</a>
   </aside>
 
@@ -39,6 +43,16 @@
       <h1 style="font-family:'Cormorant Garamond',serif;color:#1A1A16;font-size:2rem;">Dashboard Admin</h1>
       <button onclick="document.getElementById('addClientModal').classList.add('show')" class="btn-primary">+ Ajouter un client</button>
     </div>
+
+    <!-- Alerts -->
+    <section id="alerts-section" style="margin-bottom:32px;">
+      <h2 style="font-family:'Cormorant Garamond',serif;font-size:1.3rem;color:#1A1A16;margin-bottom:14px;">Alertes en temps réel</h2>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;" id="alerts-grid">
+        <div style="background:#fff;border-radius:10px;padding:18px 20px;border-left:4px solid #e5e5e5;box-shadow:0 1px 4px rgba(0,0,0,0.05);">
+          <div style="font-size:0.72rem;color:#aaa;text-transform:uppercase;letter-spacing:0.05em;">Chargement...</div>
+        </div>
+      </div>
+    </section>
 
     <!-- Stats -->
     <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:16px;margin-bottom:32px;">
@@ -313,6 +327,73 @@ async function deleteClient(id, email) {
 loadStats();
 loadClients();
 loadContacts();
+loadAlerts();
+
+async function loadAlerts() {
+  try {
+    const data = await fetch('/admin/api/alerts').then(r => r.json());
+    const grid = document.getElementById('alerts-grid');
+    const cards = [
+      {
+        count: data.paidNoProperty,
+        label: 'payé(s) sans fiche',
+        sublabel: '> 24h',
+        color: '#dc2626',
+        bg: '#fff',
+        borderColor: '#dc2626',
+        filter: 'paid-no-property',
+      },
+      {
+        count: data.noPhotos,
+        label: 'sans photos',
+        sublabel: '> 48h',
+        color: '#d97706',
+        bg: '#fff',
+        borderColor: '#d97706',
+        filter: 'no-photos',
+      },
+      {
+        count: data.readyNotPublished,
+        label: 'prêt(s) non publié(s)',
+        sublabel: '> 72h',
+        color: '#ca8a04',
+        bg: '#fff',
+        borderColor: '#eab308',
+        filter: 'ready-not-published',
+      },
+      {
+        count: data.pendingVisits,
+        label: 'visite(s) en attente',
+        sublabel: '> 12h',
+        color: '#2563eb',
+        bg: '#fff',
+        borderColor: '#2563eb',
+        filter: 'pending-visits',
+      },
+      {
+        count: data.contractNotSigned || 0,
+        label: 'contrat(s) non signé(s)',
+        sublabel: 'après paiement',
+        color: '#7c3aed',
+        bg: '#fff',
+        borderColor: '#7c3aed',
+        filter: 'contract-not-signed',
+      },
+    ];
+    grid.innerHTML = cards.map(card => `
+      <div onclick="window.location.href='/admin/crm?filter=${card.filter}'"
+        style="background:${card.bg};border-radius:10px;padding:18px 20px;border-left:4px solid ${card.borderColor};box-shadow:0 1px 4px rgba(0,0,0,0.07);cursor:pointer;transition:box-shadow .15s;display:flex;flex-direction:column;gap:4px;"
+        onmouseover="this.style.boxShadow='0 4px 12px rgba(0,0,0,0.12)'"
+        onmouseout="this.style.boxShadow='0 1px 4px rgba(0,0,0,0.07)'">
+        <div style="font-family:'Cormorant Garamond',serif;font-size:2.2rem;font-weight:600;color:${card.color};line-height:1">${card.count}</div>
+        <div style="font-size:0.82rem;font-weight:600;color:#1A1A16;">${card.label}</div>
+        <div style="font-size:0.7rem;color:#aaa;">${card.sublabel}</div>
+      </div>
+    `).join('');
+  } catch(e) {
+    console.error('Alerts error', e);
+  }
+}
 </script>
 </body>
 </html>

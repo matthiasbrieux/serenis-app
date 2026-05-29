@@ -174,6 +174,7 @@
     <a href="/admin/photographers">📷 Photographes</a>
     <a href="/admin/missions">📋 Missions</a>
     <a href="/admin/numbers">📱 Numéros IA</a>
+    <a href="/admin/emails">📧 Emails</a>
     <a href="/admin/marketing" class="active">🚀 Marketing</a>
     <a href="/admin/logout">← Déconnexion</a>
   </aside>
@@ -186,13 +187,14 @@
 
     <!-- TABS -->
     <div class="tabs">
-      <button class="tab-btn active" onclick="showTab('plan')">📋 Plan d'action</button>
-      <button class="tab-btn" onclick="showTab('ads')">📣 Publicités</button>
-      <button class="tab-btn" onclick="showTab('scripts')">🎬 Scripts vidéo</button>
-      <button class="tab-btn" onclick="showTab('flyer')">🖨️ Flyer</button>
-      <button class="tab-btn" onclick="showTab('parrainage')">🎁 Parrainage</button>
-      <button class="tab-btn" onclick="showTab('partenaires')">🤝 Partenaires</button>
-      <button class="tab-btn" onclick="showTab('presentation')">📊 Présentation</button>
+      <button class="tab-btn active" onclick="showTab('plan', this)">📋 Plan d'action</button>
+      <button class="tab-btn" onclick="showTab('ads', this)">📣 Publicités</button>
+      <button class="tab-btn" onclick="showTab('scripts', this)">🎬 Scripts vidéo</button>
+      <button class="tab-btn" onclick="showTab('flyer', this)">🖨️ Flyer</button>
+      <button class="tab-btn" onclick="showTab('parrainage', this)">🎁 Parrainage</button>
+      <button class="tab-btn" onclick="showTab('partenaires', this)">🤝 Partenaires</button>
+      <button class="tab-btn" onclick="showTab('presentation', this)">📊 Présentation</button>
+      <button class="tab-btn" onclick="showTab('docs', this); loadDocs()">🤖 Documents IA</button>
     </div>
 
     <!-- ══════════════════════════════════════
@@ -1151,16 +1153,52 @@ Matthias Brieux — Serenis
       </div>
     </div>
 
+    <!-- ══════════════════════════════════════════════════════════
+         ONGLET DOCUMENTS IA
+    ════════════════════════════════════════════════════════════ -->
+    <div id="tab-docs" class="tab-panel">
+      <h2 class="section-title">Documents IA générés</h2>
+      <p class="section-sub">Tous les fichiers .md produits par les agents — cliquez pour lire, copiez en un clic.</p>
+
+      <div style="display:grid;grid-template-columns:300px 1fr;gap:24px;min-height:600px;">
+
+        <!-- Liste fichiers -->
+        <div style="background:#1A1A16;border-radius:12px;padding:16px;overflow-y:auto;max-height:80vh;">
+          <p style="font-size:0.7rem;letter-spacing:0.15em;text-transform:uppercase;color:rgba(255,255,255,0.25);margin-bottom:12px;">Fichiers disponibles</p>
+          <div id="docs-list" style="display:flex;flex-direction:column;gap:4px;">
+            <p style="color:#888;font-size:0.85rem;">Chargement…</p>
+          </div>
+        </div>
+
+        <!-- Contenu fichier -->
+        <div style="background:#1A1A16;border-radius:12px;padding:24px;overflow-y:auto;max-height:80vh;position:relative;">
+          <div id="docs-toolbar" style="display:none;position:sticky;top:0;background:#1A1A16;padding-bottom:12px;border-bottom:1px solid #2a2a28;margin-bottom:16px;display:flex;justify-content:space-between;align-items:center;z-index:10;">
+            <span id="docs-current-name" style="font-size:0.85rem;color:rgba(232,228,222,0.6);font-weight:500;"></span>
+            <div style="display:flex;gap:8px;">
+              <button onclick="copyDocContent()" style="background:rgba(196,96,58,0.15);border:1px solid rgba(196,96,58,0.3);color:#C4603A;padding:6px 16px;border-radius:6px;font-size:0.78rem;cursor:pointer;font-family:'DM Sans',sans-serif;" id="copy-doc-btn">Copier tout</button>
+              <button onclick="downloadDoc()" style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);color:rgba(232,228,222,0.7);padding:6px 16px;border-radius:6px;font-size:0.78rem;cursor:pointer;font-family:'DM Sans',sans-serif;">Télécharger</button>
+            </div>
+          </div>
+          <pre id="docs-content" style="display:none;color:rgba(232,228,222,0.85);font-family:'DM Sans',sans-serif;font-size:0.84rem;line-height:1.75;white-space:pre-wrap;word-wrap:break-word;"></pre>
+          <div id="docs-placeholder" style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:400px;color:rgba(255,255,255,0.15);text-align:center;">
+            <div style="font-size:3rem;margin-bottom:16px;">📄</div>
+            <p style="font-size:0.9rem;">Sélectionnez un fichier</p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
   </main>
 </div>
 
 <script>
 // Tabs
-function showTab(name) {
+function showTab(name, btn) {
   document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
   document.getElementById('tab-' + name).classList.add('active');
-  event.target.classList.add('active');
+  if (btn) btn.classList.add('active');
 }
 
 // Copy to clipboard
@@ -1233,6 +1271,126 @@ function printPresentation() {
     ${document.getElementById('pres-content').outerHTML}
     <script>window.onload=()=>window.print()<\/script></body></html>`);
   w.document.close();
+}
+
+// ── Documents IA ──────────────────────────────────────────────
+let _docsLoaded = false;
+let _currentDocName = '';
+let _currentDocContent = '';
+
+const DOC_LABELS = {
+  'TIKTOK_SCRIPTS_1_15.md': '🎵 TikTok Scripts 1-15',
+  'TIKTOK_SCRIPTS_16_30.md': '🎵 TikTok Scripts 16-30',
+  'INSTAGRAM_FEED_30_POSTS.md': '📸 Instagram Feed (30 posts)',
+  'INSTAGRAM_STORIES_40.md': '📱 Instagram Stories (40)',
+  'INSTAGRAM_REELS_20_SCRIPTS.md': '🎬 Instagram Reels (20)',
+  'FACEBOOK_40_POSTS.md': '👍 Facebook (40 posts)',
+  'LINKEDIN_25_POSTS.md': '💼 LinkedIn (25 posts)',
+  'TWITTER_X_50_POSTS.md': '🐦 Twitter/X (50 posts)',
+  'PINTEREST_40_PINS.md': '📌 Pinterest (40 pins)',
+  'FACEBOOK_ADS_24_AVANCEES.md': '📣 FB Ads avancées (24)',
+  'SERENIS_FACEBOOK_INSTAGRAM_ADS_12.md': '📣 FB/IG Ads de base (12)',
+  'GOOGLE_ADS_COPY_COMPLET.md': '🔍 Google Ads complet',
+  'FACEBOOK_INSTAGRAM_ADS_STRATEGY_ADVANCED.md': '📊 Stratégie Ads avancée',
+  'DISPLAY_BANNIÈRES_PROGRAMMATIQUE.md': '🖼️ Display & Programmatique',
+  'SNAPCHAT_BEREAL_CONTENUS.md': '👻 Snapchat & BeReal',
+  'SPOTS_AUDIO_RADIO_PODCAST.md': '🎙️ Radio & Podcast (15 spots)',
+  'YOUTUBE_SHORTS_30.md': '▶️ YouTube Shorts (30)',
+  'YOUTUBE_10_SCRIPTS_LONGS.md': '🎥 YouTube longs (10)',
+  'SCRIPTS_VIDEO_SERENIS.md': '🎬 Scripts vidéo généraux',
+  'SCRIPTS_TEMOIGNAGES_UGC_20.md': '🙋 Témoignages & UGC (20)',
+  'EMAIL_20_SEQUENCES_COMPLETES.md': '📧 Emails (20 séquences)',
+  'SEQUENCES_EMAIL_MARKETING.md': '📧 Séquences email marketing',
+  'SMS_WHATSAPP_50_NOUVEAUX.md': '💬 SMS/WhatsApp (50)',
+  'SMS_WHATSAPP_TEMPLATES_TWILIO.md': '💬 Templates Twilio',
+  'COMMUNICATIONS_SMS_WHATSAPP.md': '💬 Communications SMS',
+  'SMS_20_TEMPLATES.csv': '💬 SMS 20 templates CSV',
+  'SCRIPTS_PROSPECTION_COMPLET.md': '📞 Prospection cold',
+  'CAROUSELS_INFOGRAPHIES_15.md': '🖼️ Carrousels LinkedIn (15)',
+  'GOOGLE_MY_BUSINESS_COMPLET.md': '📍 Google My Business',
+  'ARTICLES_SEO_BLOG_8_COMPLETS.md': '📝 Articles SEO blog (8)',
+  'ARTICLES_SEO_SERENIS.md': '📝 Articles SEO',
+  'STRATEGIE_SEO_LOCAL_GMB_COMPLET.md': '🗺️ SEO Local & GMB',
+  'KIT_INFLUENCEURS_COMPLET.md': '🌟 Kit influenceurs',
+  'CAMPAGNES_SAISONNIERES_COMPLETES.md': '🌸 Campagnes saisonnières',
+  'MASTER_INDEX_MARKETING.md': '📚 Index master',
+  'calendrier_editorial_serenis_90j.md': '📅 Calendrier éditorial 90j',
+  'PLAN_FINANCIER_MARKETING_SERENIS.md': '💰 Plan financier marketing',
+  'PROGRAMME_PARRAINAGE_SERENIS.md': '🎁 Programme parrainage',
+  'GUIDE_GESTION_OBJECTIONS_SERENIS.md': '💬 Guide objections',
+  'GUIDE_SAV.md': '🛠️ Guide SAV',
+  'CHATBOT_SUPPORT_CLIENT.md': '🤖 Chatbot support',
+  'KIT_PROSPECTION_PARTENAIRES.md': '🤝 Kit partenaires',
+  'SERENIS_IDENTITE_VERBALE_COMPLETE.md': '✍️ Identité verbale',
+  'CONTENUS_DATA_DRIVEN_SERENIS.md': '📊 Contenus data-driven',
+  'GOOGLE_ADS_STRATEGY.md': '🔍 Stratégie Google Ads',
+  'STRATEGIE_RP_EVENEMENTS_SERENIS.md': '📰 Stratégie RP & Événements',
+  'SMS_CAMPAIGN_ACQUISITION_ANALYTICS.md': '📱 SMS Analytics',
+  'FINAL_RECOMMENDATIONS.md': '⭐ Recommandations finales',
+};
+
+function loadDocs() {
+  if (_docsLoaded) return;
+  fetch('/admin/api/docs')
+    .then(r => r.json())
+    .then(files => {
+      _docsLoaded = true;
+      const list = document.getElementById('docs-list');
+      list.innerHTML = '';
+      files.forEach(f => {
+        const label = DOC_LABELS[f.name] || f.name.replace('.md','').replace(/_/g,' ');
+        const kb = Math.round(f.size / 1024);
+        const btn = document.createElement('button');
+        btn.style.cssText = 'display:flex;flex-direction:column;align-items:flex-start;width:100%;padding:10px 12px;background:none;border:none;border-radius:8px;cursor:pointer;text-align:left;transition:background 0.15s;gap:2px;';
+        btn.innerHTML = `<span style="font-size:0.82rem;color:#e8e4de;font-family:\'DM Sans\',sans-serif;line-height:1.3;">${label}</span><span style="font-size:0.68rem;color:rgba(255,255,255,0.25);">${kb} Ko</span>`;
+        btn.onmouseover = () => btn.style.background = 'rgba(255,255,255,0.06)';
+        btn.onmouseout = () => { if (_currentDocName !== f.name) btn.style.background = ''; };
+        btn.onclick = () => openDoc(f.name, btn);
+        btn.dataset.filename = f.name;
+        list.appendChild(btn);
+      });
+    })
+    .catch(() => {
+      document.getElementById('docs-list').innerHTML = '<p style="color:#f87171;font-size:0.82rem;">Erreur de chargement</p>';
+    });
+}
+
+function openDoc(filename, btnEl) {
+  document.querySelectorAll('#docs-list button').forEach(b => b.style.background = '');
+  if (btnEl) { btnEl.style.background = 'rgba(196,96,58,0.2)'; }
+  document.getElementById('docs-content').style.display = 'none';
+  document.getElementById('docs-placeholder').innerHTML = '<p style="color:#888;font-size:0.85rem;">Chargement…</p>';
+  document.getElementById('docs-placeholder').style.display = 'flex';
+  fetch('/admin/api/docs/' + encodeURIComponent(filename))
+    .then(r => r.json())
+    .then(data => {
+      _currentDocName = data.name;
+      _currentDocContent = data.content;
+      const el = document.getElementById('docs-content');
+      el.textContent = data.content;
+      el.style.display = 'block';
+      document.getElementById('docs-placeholder').style.display = 'none';
+      document.getElementById('docs-toolbar').style.display = 'flex';
+      document.getElementById('docs-current-name').textContent = data.name;
+    });
+}
+
+function copyDocContent() {
+  navigator.clipboard.writeText(_currentDocContent).then(() => {
+    const btn = document.getElementById('copy-doc-btn');
+    btn.textContent = '✓ Copié !';
+    btn.style.background = '#4ade80';
+    btn.style.color = '#000';
+    setTimeout(() => { btn.textContent = 'Copier tout'; btn.style.background = ''; btn.style.color = ''; }, 2000);
+  });
+}
+
+function downloadDoc() {
+  const blob = new Blob([_currentDocContent], { type: 'text/markdown' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = _currentDocName;
+  a.click();
 }
 
 // Persist checkboxes in localStorage

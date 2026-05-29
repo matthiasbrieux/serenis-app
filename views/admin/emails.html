@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Emails — Admin Serenis</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css">
+  <style>
+    body { background: #f0f0ed; }
+    .admin-layout { display: grid; grid-template-columns: 220px 1fr; min-height: 100vh; }
+    .admin-sidebar { background: #1A1A16; padding: 24px 0; }
+    .admin-main { padding: 32px; }
+    .admin-sidebar a { display: block; padding: 12px 24px; color: rgba(255,255,255,0.6); font-size: 0.88rem; text-decoration: none; }
+    .admin-sidebar a:hover, .admin-sidebar a.active { color: #fff; background: rgba(255,255,255,0.08); }
+    .admin-sidebar .logo { color: #FDFCF8; padding: 0 24px 24px; font-family: 'Cormorant Garamond', serif; font-size: 1.4rem; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 16px; }
+    .card { background: #fff; border-radius: 12px; padding: 24px; margin-bottom: 24px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); }
+    .card-title { font-family: 'Cormorant Garamond', serif; font-size: 1.3rem; color: #1A1A16; margin: 0 0 20px; }
+    table { width: 100%; border-collapse: collapse; font-size: 0.875rem; }
+    th { text-align: left; padding: 10px 12px; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.05em; color: #aaa; border-bottom: 2px solid #f0f0ed; }
+    td { padding: 12px 12px; border-bottom: 1px solid #f5f5f2; vertical-align: middle; }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: #fafafa; }
+    .badge { display: inline-block; padding: 3px 10px; border-radius: 20px; font-size: 0.72rem; font-weight: 600; }
+    .badge-auto { background: #e8f4ec; color: #2e7d32; }
+    .badge-manual { background: #fff3e0; color: #e65100; }
+    .badge-seller { background: #e8f0fe; color: #1a73e8; }
+    .badge-acheteur { background: #fce4ec; color: #c62828; }
+    .badge-prospect { background: #f3e5f5; color: #6a1b9a; }
+    .badge-prestataire { background: #e0f2f1; color: #00695c; }
+    .btn-send { background: #C4785A; color: #fff; border: none; padding: 7px 16px; border-radius: 6px; font-size: 0.82rem; cursor: pointer; font-weight: 600; white-space: nowrap; }
+    .btn-send:hover { background: #b0654a; }
+    .btn-send:disabled { background: #ccc; cursor: not-allowed; }
+    .form-group { margin-bottom: 16px; }
+    label { display: block; font-size: 0.82rem; font-weight: 600; color: #444; margin-bottom: 6px; }
+    select, textarea { width: 100%; padding: 10px 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 0.88rem; font-family: inherit; }
+    textarea { resize: vertical; min-height: 100px; }
+    .send-btn-primary { background: #3D5A47; color: #fff; border: none; padding: 12px 28px; border-radius: 8px; font-size: 0.95rem; font-weight: 600; cursor: pointer; }
+    .send-btn-primary:hover { background: #2e4435; }
+    .toast { position: fixed; bottom: 24px; right: 24px; background: #3D5A47; color: #fff; padding: 14px 24px; border-radius: 10px; font-size: 0.9rem; z-index: 9999; opacity: 0; transition: opacity 0.3s; pointer-events: none; }
+    .toast.show { opacity: 1; }
+    .toast.error { background: #c62828; }
+    .log-time { font-size: 0.78rem; color: #999; }
+    .search-bar { display: flex; gap: 12px; margin-bottom: 20px; align-items: center; }
+    .search-bar input { flex: 1; padding: 9px 14px; border: 1px solid #ddd; border-radius: 8px; font-size: 0.88rem; }
+    .filter-btn { padding: 8px 16px; border-radius: 8px; border: 1px solid #ddd; background: #fff; font-size: 0.82rem; cursor: pointer; }
+    .filter-btn.active { background: #3D5A47; color: #fff; border-color: #3D5A47; }
+    #sendModal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.45); z-index: 1000; align-items: center; justify-content: center; }
+    #sendModal.show { display: flex; }
+    .modal-box { background: #fff; border-radius: 16px; padding: 32px; width: 520px; max-width: 95vw; box-shadow: 0 8px 40px rgba(0,0,0,0.18); }
+    .modal-title { font-family: 'Cormorant Garamond', serif; font-size: 1.4rem; color: #1A1A16; margin: 0 0 24px; }
+    .modal-close { float: right; background: none; border: none; font-size: 1.3rem; cursor: pointer; color: #999; line-height: 1; }
+    .custom-msg-wrap { display: none; }
+    .stat-pill { display: inline-block; background: #f0f0ed; border-radius: 20px; padding: 4px 12px; font-size: 0.82rem; color: #555; margin-right: 8px; }
+  </style>
+</head>
+<body>
+<div class="admin-layout">
+  <aside class="admin-sidebar">
+    <div class="logo">Sere<em style="color:#C4785A">nis</em> Admin</div>
+    <a href="/admin">📊 Dashboard</a>
+    <a href="/admin/crm">🎯 CRM Vendeurs</a>
+    <a href="/admin/photographers">📷 Photographes</a>
+    <a href="/admin/missions">📋 Missions</a>
+    <a href="/admin/numbers">📱 Numéros IA</a>
+    <a href="/admin/emails" class="active">📧 Emails</a>
+    <a href="/admin/marketing">📣 Marketing & Docs IA</a>
+    <a href="/admin/documents">📝 Documents légaux</a>
+    <a href="/admin/finance">💰 Finance</a>
+    <a href="/admin/logout">← Déconnexion</a>
+  </aside>
+
+  <main class="admin-main">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:28px;">
+      <div>
+        <h1 style="font-family:'Cormorant Garamond',serif;color:#1A1A16;font-size:2rem;margin:0 0 4px;">Gestion des emails</h1>
+        <p style="color:#888;font-size:0.88rem;margin:0;">Catalogue complet · Historique · Envoi manuel</p>
+      </div>
+      <button class="send-btn-primary" onclick="openSendModal()">✉️ Envoyer un email</button>
+    </div>
+
+    <!-- Résumé rapide -->
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:28px;" id="statsRow">
+      <div class="card" style="padding:18px 20px;margin-bottom:0;">
+        <div style="font-size:0.72rem;color:#aaa;text-transform:uppercase;letter-spacing:0.05em;">Total envoyés</div>
+        <div style="font-family:'Cormorant Garamond',serif;font-size:2rem;color:#3D5A47;" id="statTotal">—</div>
+      </div>
+      <div class="card" style="padding:18px 20px;margin-bottom:0;">
+        <div style="font-size:0.72rem;color:#aaa;text-transform:uppercase;letter-spacing:0.05em;">Cette semaine</div>
+        <div style="font-family:'Cormorant Garamond',serif;font-size:2rem;color:#3D5A47;" id="statWeek">—</div>
+      </div>
+      <div class="card" style="padding:18px 20px;margin-bottom:0;">
+        <div style="font-size:0.72rem;color:#aaa;text-transform:uppercase;letter-spacing:0.05em;">Types automatiques</div>
+        <div style="font-family:'Cormorant Garamond',serif;font-size:2rem;color:#3D5A47;" id="statAuto">—</div>
+      </div>
+      <div class="card" style="padding:18px 20px;margin-bottom:0;">
+        <div style="font-size:0.72rem;color:#aaa;text-transform:uppercase;letter-spacing:0.05em;">Envois manuels</div>
+        <div style="font-family:'Cormorant Garamond',serif;font-size:2rem;color:#C4785A;" id="statManual">—</div>
+      </div>
+    </div>
+
+    <!-- Catalogue -->
+    <div class="card">
+      <h2 class="card-title">📋 Catalogue des emails</h2>
+      <div class="search-bar">
+        <input type="text" id="catalogSearch" placeholder="Rechercher un type d'email..." oninput="filterCatalog()">
+        <button class="filter-btn active" onclick="setFilter('all', this)">Tous</button>
+        <button class="filter-btn" onclick="setFilter('auto', this)">Automatiques</button>
+        <button class="filter-btn" onclick="setFilter('manual', this)">Manuels</button>
+        <button class="filter-btn" onclick="setFilter('Vendeur', this)">Vendeurs</button>
+      </div>
+      <div style="overflow-x:auto;">
+        <table id="catalogTable">
+          <thead>
+            <tr>
+              <th>Email</th>
+              <th>Déclencheur</th>
+              <th>Destinataire</th>
+              <th>Type</th>
+              <th>Dernier envoi</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody id="catalogBody">
+            <tr><td colspan="6" style="text-align:center;color:#aaa;padding:32px;">Chargement...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Historique -->
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
+        <h2 class="card-title" style="margin:0;">📨 Historique des envois</h2>
+        <div style="display:flex;gap:8px;">
+          <input type="text" id="logSearch" placeholder="Filtrer par email..." style="padding:8px 12px;border:1px solid #ddd;border-radius:8px;font-size:0.82rem;width:200px;" oninput="filterLog()">
+          <button class="filter-btn" onclick="loadLog(0)">↺ Rafraîchir</button>
+        </div>
+      </div>
+      <div style="overflow-x:auto;">
+        <table>
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Type</th>
+              <th>Destinataire</th>
+              <th>Vendeur</th>
+            </tr>
+          </thead>
+          <tbody id="logBody">
+            <tr><td colspan="4" style="text-align:center;color:#aaa;padding:32px;">Chargement...</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div id="logPagination" style="margin-top:16px;display:flex;gap:8px;align-items:center;font-size:0.85rem;color:#666;"></div>
+    </div>
+  </main>
+</div>
+
+<!-- Modal envoi manuel -->
+<div id="sendModal">
+  <div class="modal-box">
+    <button class="modal-close" onclick="closeSendModal()">✕</button>
+    <h2 class="modal-title">Envoyer un email</h2>
+
+    <div class="form-group">
+      <label>Vendeur</label>
+      <select id="modalSeller">
+        <option value="">Chargement...</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label>Type d'email</label>
+      <select id="modalEmailType" onchange="onEmailTypeChange()">
+        <option value="">Choisir un type...</option>
+        <option value="no_photos">📸 Photos manquantes</option>
+        <option value="photographer_request">📷 Demande dispos photographe</option>
+        <option value="missing_doc">📄 Documents manquants</option>
+        <option value="not_published">🔔 Fiche non publiée</option>
+        <option value="post_first_visit">🏡 Retour 1ère session de visites</option>
+        <option value="check_in_no_offer">💬 Check-in sans offre</option>
+        <option value="contract_renewal">📋 Renouvellement contrat</option>
+        <option value="review_request">⭐ Demande d'avis</option>
+        <option value="prospect_nudge">👤 Relance prospect</option>
+        <option value="custom">✍️ Message personnalisé</option>
+      </select>
+    </div>
+
+    <div class="form-group custom-msg-wrap" id="customMsgWrap">
+      <label>Message personnalisé (texte brut)</label>
+      <textarea id="modalCustomMsg" placeholder="Bonjour [Prénom],&#10;..."></textarea>
+    </div>
+
+    <div id="emailPreviewBox" style="background:#f7f7f5;border-radius:8px;padding:14px 16px;margin-bottom:20px;font-size:0.82rem;color:#555;display:none;"></div>
+
+    <div style="display:flex;gap:12px;justify-content:flex-end;">
+      <button onclick="closeSendModal()" style="padding:11px 22px;border:1px solid #ddd;border-radius:8px;background:#fff;cursor:pointer;font-size:0.9rem;">Annuler</button>
+      <button class="send-btn-primary" onclick="sendEmail()" id="sendConfirmBtn">Envoyer ✉️</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+let allCatalog = [];
+let allLogs = [];
+let activeFilter = 'all';
+let logPage = 0;
+let sellers = [];
+
+const EMAIL_DESCRIPTIONS = {
+  no_photos: 'Rappelle au vendeur d\'ajouter des photos à son annonce.',
+  photographer_request: 'Demande au vendeur ses disponibilités pour la séance photo.',
+  missing_doc: 'Indique au vendeur les diagnostics manquants dans son dossier.',
+  not_published: 'Incite le vendeur à publier sa fiche prête mais non visible.',
+  post_first_visit: 'Demande au vendeur son retour après ses premières visites.',
+  check_in_no_offer: 'Check-in de soutien pour un vendeur sans offre après 14 jours.',
+  contract_renewal: 'Rappel de renouvellement 30 jours avant expiration du contrat.',
+  review_request: 'Demande un avis en ligne après une offre acceptée.',
+  prospect_nudge: 'Relance un prospect inscrit mais non encore passé à l\'achat.',
+  custom: 'Message libre rédigé manuellement par l\'administrateur.',
+};
+
+async function init() {
+  await Promise.all([loadCatalog(), loadLog(0), loadSellers()]);
+}
+
+async function loadCatalog() {
+  const r = await fetch('/admin/api/emails/catalog');
+  const { catalog } = await r.json();
+  allCatalog = catalog;
+  renderCatalog(catalog);
+
+  const autoCount = catalog.filter(e => e.auto).length;
+  document.getElementById('statAuto').textContent = autoCount;
+  document.getElementById('statManual').textContent = catalog.length - autoCount;
+}
+
+async function loadLog(page) {
+  logPage = page;
+  const r = await fetch(`/admin/api/emails/log?page=${page}`);
+  const { logs, total } = await r.json();
+  allLogs = logs;
+  renderLog(logs, total, page);
+  document.getElementById('statTotal').textContent = total.toLocaleString('fr-FR');
+}
+
+async function loadSellers() {
+  const r = await fetch('/admin/api/emails/sellers-list');
+  const data = await r.json();
+  sellers = data.sellers || [];
+  const sel = document.getElementById('modalSeller');
+  sel.innerHTML = '<option value="">Choisir un vendeur...</option>' +
+    sellers.map(s => `<option value="${s.id}">${s.first_name} ${s.last_name} — ${s.email}</option>`).join('');
+
+  // Week count from logs
+  const weekAgo = new Date(Date.now() - 7*86400000).toISOString();
+  const weekCount = allLogs.filter(l => l.sent_at >= weekAgo).length;
+  document.getElementById('statWeek').textContent = weekCount;
+}
+
+function renderCatalog(list) {
+  const tbody = document.getElementById('catalogBody');
+  if (!list.length) { tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:#aaa;padding:32px;">Aucun résultat</td></tr>'; return; }
+  tbody.innerHTML = list.map(e => {
+    const recBadge = e.recipient === 'Vendeur' ? 'badge-seller' : e.recipient === 'Acheteur' ? 'badge-acheteur' : e.recipient === 'Prospect' ? 'badge-prospect' : 'badge-prestataire';
+    const lastSent = e.last_sent ? new Date(e.last_sent).toLocaleDateString('fr-FR', { day:'2-digit', month:'short', year:'numeric' }) : '<span style="color:#ccc">Jamais</span>';
+    return `<tr>
+      <td>
+        <div style="font-weight:600;color:#1A1A16;">${e.label}</div>
+        <div style="font-size:0.78rem;color:#999;margin-top:2px;">${EMAIL_DESCRIPTIONS[e.id] || ''}</div>
+      </td>
+      <td style="color:#555;font-size:0.82rem;">${e.trigger}</td>
+      <td><span class="badge ${recBadge}">${e.recipient}</span></td>
+      <td><span class="badge ${e.auto ? 'badge-auto' : 'badge-manual'}">${e.auto ? '⚡ Auto' : '✋ Manuel'}</span></td>
+      <td class="log-time">${lastSent}</td>
+      <td><button class="btn-send" onclick="openSendModalWith('${e.id}')">Envoyer</button></td>
+    </tr>`;
+  }).join('');
+}
+
+function renderLog(logs, total, page) {
+  const tbody = document.getElementById('logBody');
+  if (!logs.length) { tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;color:#aaa;padding:32px;">Aucun envoi enregistré</td></tr>'; return; }
+  tbody.innerHTML = logs.map(l => {
+    const date = new Date(l.sent_at).toLocaleString('fr-FR', { day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit' });
+    const typeLabel = l.trigger_type.replace(/_/g, ' ').replace(':', ' — ');
+    const vendeur = (l.first_name || l.last_name) ? `${l.first_name || ''} ${l.last_name || ''}`.trim() : '—';
+    return `<tr>
+      <td class="log-time">${date}</td>
+      <td style="font-size:0.82rem;color:#444;">${typeLabel}</td>
+      <td style="font-size:0.82rem;">${l.recipient_email}</td>
+      <td style="font-size:0.82rem;color:#666;">${vendeur}</td>
+    </tr>`;
+  }).join('');
+
+  const pages = Math.ceil(total / 50);
+  const pag = document.getElementById('logPagination');
+  if (pages <= 1) { pag.innerHTML = `<span>${total} envoi(s) au total</span>`; return; }
+  pag.innerHTML = `
+    <span>${total} envois · Page ${page + 1}/${pages}</span>
+    ${page > 0 ? `<button class="filter-btn" onclick="loadLog(${page-1})">← Précédente</button>` : ''}
+    ${page < pages-1 ? `<button class="filter-btn" onclick="loadLog(${page+1})">Suivante →</button>` : ''}
+  `;
+}
+
+function filterCatalog() {
+  const q = document.getElementById('catalogSearch').value.toLowerCase();
+  let list = allCatalog;
+  if (activeFilter === 'auto') list = list.filter(e => e.auto);
+  else if (activeFilter === 'manual') list = list.filter(e => !e.auto);
+  else if (activeFilter !== 'all') list = list.filter(e => e.recipient === activeFilter);
+  if (q) list = list.filter(e => e.label.toLowerCase().includes(q) || e.trigger.toLowerCase().includes(q) || e.recipient.toLowerCase().includes(q));
+  renderCatalog(list);
+}
+
+function filterLog() {
+  const q = document.getElementById('logSearch').value.toLowerCase();
+  if (!q) { renderLog(allLogs, allLogs.length, logPage); return; }
+  const filtered = allLogs.filter(l => l.recipient_email.toLowerCase().includes(q) || l.trigger_type.toLowerCase().includes(q));
+  renderLog(filtered, filtered.length, 0);
+}
+
+function setFilter(f, btn) {
+  activeFilter = f;
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  filterCatalog();
+}
+
+function openSendModal() {
+  document.getElementById('sendModal').classList.add('show');
+  document.getElementById('modalEmailType').value = '';
+  document.getElementById('emailPreviewBox').style.display = 'none';
+  document.getElementById('customMsgWrap').style.display = 'none';
+}
+
+function openSendModalWith(emailId) {
+  openSendModal();
+  document.getElementById('modalEmailType').value = emailId;
+  onEmailTypeChange();
+}
+
+function closeSendModal() {
+  document.getElementById('sendModal').classList.remove('show');
+}
+
+function onEmailTypeChange() {
+  const type = document.getElementById('modalEmailType').value;
+  const customWrap = document.getElementById('customMsgWrap');
+  const preview = document.getElementById('emailPreviewBox');
+  customWrap.style.display = type === 'custom' ? 'block' : 'none';
+  if (type && type !== 'custom') {
+    preview.style.display = 'block';
+    preview.innerHTML = `<strong style="color:#3D5A47;">Aperçu :</strong> ${EMAIL_DESCRIPTIONS[type] || ''}`;
+  } else {
+    preview.style.display = 'none';
+  }
+}
+
+async function sendEmail() {
+  const seller_id = document.getElementById('modalSeller').value;
+  const email_type = document.getElementById('modalEmailType').value;
+  const custom_message = document.getElementById('modalCustomMsg').value;
+
+  if (!seller_id) { showToast('Veuillez sélectionner un vendeur', true); return; }
+  if (!email_type) { showToast('Veuillez choisir un type d\'email', true); return; }
+  if (email_type === 'custom' && !custom_message.trim()) { showToast('Veuillez saisir un message', true); return; }
+
+  const btn = document.getElementById('sendConfirmBtn');
+  btn.disabled = true;
+  btn.textContent = 'Envoi...';
+
+  try {
+    const r = await fetch('/admin/api/emails/send', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ seller_id, email_type, custom_message }),
+    });
+    const data = await r.json();
+    if (data.success) {
+      showToast('Email envoyé avec succès ✓');
+      closeSendModal();
+      loadLog(0);
+    } else {
+      showToast(data.error || 'Erreur lors de l\'envoi', true);
+    }
+  } catch(e) {
+    showToast('Erreur réseau', true);
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Envoyer ✉️';
+  }
+}
+
+function showToast(msg, isError = false) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast' + (isError ? ' error' : '') + ' show';
+  setTimeout(() => { t.className = 'toast' + (isError ? ' error' : ''); }, 3500);
+}
+
+document.getElementById('sendModal').addEventListener('click', function(e) {
+  if (e.target === this) closeSendModal();
+});
+
+init();
+</script>
+</body>
+</html>
