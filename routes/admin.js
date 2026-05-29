@@ -33,6 +33,15 @@ router.get('/finance', requireAdmin, (req, res) => {
   res.sendFile('finance.html', { root: './views/admin' });
 });
 
+router.get('/parcours', requireAdmin, (req, res) => {
+  res.sendFile('parcours.html', { root: './views/admin' });
+});
+
+router.get('/api/parcours/tokens', requireAdmin, (req, res) => {
+  const prop = db.prepare('SELECT acheteur_token, notaire_token, slug FROM properties WHERE published=1 AND acheteur_token IS NOT NULL LIMIT 1').get();
+  res.json({ prop: prop || null });
+});
+
 // ── API Documents légaux ──────────────────────────────────────
 router.get('/api/contrats', requireAdmin, (req, res) => {
   const contrats = db.prepare(`

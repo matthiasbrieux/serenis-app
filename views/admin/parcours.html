@@ -1,0 +1,974 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Parcours Vendeur & Acheteur — Admin</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { background: #0f0f0d; font-family: 'DM Sans', sans-serif; color: #fff; height: 100vh; overflow: hidden; display: flex; flex-direction: column; }
+
+/* ── Header ── */
+.top-bar { background: #1A1A16; border-bottom: 1px solid #2a2a24; padding: 12px 24px; display: flex; align-items: center; gap: 16px; flex-shrink: 0; }
+.top-bar a { color: #888; font-size: 0.82rem; text-decoration: none; }
+.top-bar a:hover { color: #fff; }
+.top-bar h1 { font-family: 'Cormorant Garamond', serif; font-size: 1.2rem; color: #fff; }
+.tabs { display: flex; gap: 6px; margin-left: auto; }
+.tab-btn { background: #2a2a24; border: none; color: #888; padding: 8px 20px; border-radius: 8px; cursor: pointer; font-family: inherit; font-size: 0.88rem; font-weight: 600; transition: all 0.15s; }
+.tab-btn.active { background: #3D5A47; color: #fff; }
+.step-counter { font-size: 0.78rem; color: #555; white-space: nowrap; }
+
+/* ── Main layout ── */
+.main { display: flex; flex: 1; overflow: hidden; }
+
+/* ── Left panel ── */
+.left { width: 340px; flex-shrink: 0; background: #141410; border-right: 1px solid #2a2a24; display: flex; flex-direction: column; padding: 28px 24px; overflow-y: auto; }
+.step-badge { display: inline-flex; align-items: center; gap: 6px; background: #3D5A4730; border: 1px solid #3D5A4760; color: #7daa8e; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; padding: 4px 12px; border-radius: 20px; margin-bottom: 16px; }
+.left h2 { font-family: 'Cormorant Garamond', serif; font-size: 1.6rem; color: #fff; margin-bottom: 10px; line-height: 1.2; }
+.left p { font-size: 0.88rem; color: #999; line-height: 1.65; margin-bottom: 16px; }
+.trigger-box { background: #1e1e18; border-left: 3px solid #C4785A; border-radius: 0 8px 8px 0; padding: 12px 14px; margin-top: 4px; }
+.trigger-label { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.08em; color: #C4785A; font-weight: 700; margin-bottom: 6px; }
+.trigger-text { font-size: 0.82rem; color: #bbb; line-height: 1.5; }
+.tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 16px; }
+.tag { font-size: 0.72rem; padding: 3px 10px; border-radius: 20px; background: #2a2a24; color: #888; }
+.tag.green { background: #3D5A4730; color: #7daa8e; }
+.tag.orange { background: #C4785A20; color: #C4785A; }
+.tag.blue { background: #1a73e820; color: #7aacf5; }
+
+.nav-row { display: flex; gap: 10px; margin-top: auto; padding-top: 24px; }
+.nav-btn { flex: 1; padding: 11px; border-radius: 10px; border: 1px solid #333; background: #1e1e18; color: #aaa; cursor: pointer; font-family: inherit; font-size: 0.88rem; font-weight: 600; transition: all 0.15s; }
+.nav-btn:hover:not(:disabled) { background: #2a2a24; color: #fff; border-color: #555; }
+.nav-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+.nav-btn.next { background: #3D5A47; border-color: #3D5A47; color: #fff; }
+.nav-btn.next:hover { background: #4d6e57; }
+
+/* ── Right panel ── */
+.right { flex: 1; display: flex; align-items: center; justify-content: center; overflow: hidden; background: #0f0f0d; padding: 20px; position: relative; }
+
+/* ── Dots ── */
+.dots { position: absolute; bottom: 16px; left: 50%; transform: translateX(-50%); display: flex; gap: 6px; }
+.dot { width: 6px; height: 6px; border-radius: 50%; background: #333; cursor: pointer; transition: all 0.15s; }
+.dot.active { background: #3D5A47; width: 18px; border-radius: 3px; }
+
+/* ── Browser frame ── */
+.browser-wrap { width: 100%; max-width: 860px; height: calc(100vh - 120px); max-height: 680px; display: flex; flex-direction: column; border-radius: 12px; overflow: hidden; box-shadow: 0 20px 60px rgba(0,0,0,0.6); }
+.browser-chrome { background: #2a2a24; padding: 10px 14px; display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+.browser-dots span { display: inline-block; width: 11px; height: 11px; border-radius: 50%; margin-right: 4px; }
+.browser-dots span:nth-child(1) { background: #ff5f57; }
+.browser-dots span:nth-child(2) { background: #febc2e; }
+.browser-dots span:nth-child(3) { background: #28c840; }
+.browser-url { flex: 1; background: #1a1a14; border-radius: 6px; padding: 5px 12px; font-size: 0.78rem; color: #888; font-family: monospace; }
+.browser-body { flex: 1; overflow: hidden; background: #fff; }
+.browser-body iframe { width: 100%; height: 100%; border: none; }
+
+/* ── Email frame ── */
+.email-wrap { width: 100%; max-width: 640px; height: calc(100vh - 120px); max-height: 680px; display: flex; flex-direction: column; border-radius: 12px; overflow: hidden; box-shadow: 0 20px 60px rgba(0,0,0,0.6); }
+.email-client-bar { background: #2a2a24; padding: 12px 16px; font-size: 0.78rem; color: #777; flex-shrink: 0; }
+.email-client-bar strong { color: #ccc; }
+.email-body { flex: 1; overflow-y: auto; background: #f4f4f0; padding: 20px; }
+.email-card { background: #fff; border-radius: 8px; overflow: hidden; max-width: 560px; margin: 0 auto; font-family: 'Helvetica Neue', Arial, sans-serif; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+.em-header { padding: 22px 28px; }
+.em-header .logo { font-family: Georgia, serif; font-size: 20px; color: #fff; }
+.em-header .logo em { color: #C4785A; font-style: normal; }
+.em-body { padding: 28px; }
+.em-body h2 { font-family: Georgia, serif; font-size: 20px; margin-bottom: 10px; }
+.em-body p { font-size: 13px; color: #555; line-height: 1.6; margin-bottom: 14px; }
+.em-box { background: #F5F0E8; border-left: 3px solid #C4785A; border-radius: 4px; padding: 14px 16px; margin: 14px 0; }
+.em-box p { margin: 3px 0; color: #1A1A16 !important; }
+.em-cta { display: block; background: #C4785A; color: #fff; padding: 13px 24px; border-radius: 7px; text-decoration: none; font-weight: bold; font-size: 14px; text-align: center; margin: 18px 0; }
+.em-footer { background: #3D5A47; padding: 18px 28px; text-align: center; }
+.em-footer p { font-size: 12px; color: #D4E4D8; margin: 2px 0; }
+
+/* ── Phone/SMS frame ── */
+.phone-wrap { width: 320px; height: 580px; }
+.phone-frame { background: #1c1c1e; border-radius: 44px; padding: 16px 12px; width: 100%; height: 100%; box-shadow: 0 0 0 10px #333, 0 20px 60px rgba(0,0,0,0.7); display: flex; flex-direction: column; }
+.phone-notch { width: 120px; height: 28px; background: #1c1c1e; border-radius: 0 0 18px 18px; margin: 0 auto 10px; }
+.phone-screen { flex: 1; background: #000; border-radius: 32px; overflow: hidden; display: flex; flex-direction: column; }
+.phone-status { background: #000; padding: 6px 20px; display: flex; justify-content: space-between; font-size: 11px; color: #fff; font-weight: 600; }
+.sms-header { background: #1c1c1e; padding: 8px 16px; text-align: center; }
+.sms-header p { font-size: 11px; color: #888; }
+.sms-header strong { font-size: 13px; color: #fff; display: block; }
+.sms-messages { flex: 1; padding: 12px 10px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; background: #000; }
+.sms-bubble { max-width: 82%; padding: 9px 13px; border-radius: 18px; font-size: 12px; line-height: 1.4; }
+.sms-bubble.them { background: #1c1c1e; color: #fff; border-bottom-left-radius: 4px; align-self: flex-start; }
+.sms-bubble.us { background: #0b84fe; color: #fff; border-bottom-right-radius: 4px; align-self: flex-end; }
+.sms-time { font-size: 10px; color: #555; text-align: center; }
+
+/* ── App mockup (dashboard/forms) ── */
+.app-wrap { width: 100%; max-width: 860px; height: calc(100vh - 120px); max-height: 680px; display: flex; flex-direction: column; border-radius: 12px; overflow: hidden; box-shadow: 0 20px 60px rgba(0,0,0,0.6); }
+.app-chrome { background: #2a2a24; padding: 10px 14px; display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+.app-body { flex: 1; overflow-y: auto; background: #F5F0E8; padding: 0; }
+
+/* ── App nav ── */
+.mock-nav { background: #3D5A47; padding: 12px 24px; display: flex; align-items: center; justify-content: space-between; }
+.mock-nav .logo { font-family: Georgia, serif; font-size: 18px; color: #fff; }
+.mock-nav .logo em { color: #C4785A; font-style: normal; }
+.mock-tabs { display: flex; gap: 4px; }
+.mock-tab { background: transparent; border: none; color: rgba(255,255,255,0.6); padding: 6px 14px; border-radius: 6px; font-size: 0.8rem; cursor: default; font-family: inherit; }
+.mock-tab.active { background: rgba(255,255,255,0.15); color: #fff; font-weight: 600; }
+
+.mock-container { padding: 24px; }
+.mock-section { background: #fff; border-radius: 12px; padding: 20px 22px; margin-bottom: 16px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); }
+.mock-section h3 { font-family: Georgia, serif; font-size: 1.1rem; color: #1A1A16; margin-bottom: 14px; }
+.mock-stat-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 16px; }
+.mock-stat { background: #fff; border-radius: 10px; padding: 16px; text-align: center; box-shadow: 0 1px 4px rgba(0,0,0,0.06); }
+.mock-stat .val { font-family: Georgia, serif; font-size: 1.8rem; color: #3D5A47; font-weight: 600; }
+.mock-stat .lbl { font-size: 0.72rem; color: #aaa; text-transform: uppercase; }
+.mock-alert { background: #fff3e0; border-left: 3px solid #ff9800; border-radius: 0 8px 8px 0; padding: 10px 14px; margin-bottom: 12px; font-size: 0.82rem; color: #e65100; }
+.mock-success { background: #e8f5e9; border-left: 3px solid #4caf50; border-radius: 0 8px 8px 0; padding: 10px 14px; margin-bottom: 12px; font-size: 0.82rem; color: #2e7d32; }
+.mock-form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; }
+.mock-field { display: flex; flex-direction: column; gap: 4px; }
+.mock-field label { font-size: 0.72rem; color: #aaa; text-transform: uppercase; letter-spacing: 0.04em; }
+.mock-field .val { background: #f8f8f5; border: 1px solid #e0dbd0; border-radius: 8px; padding: 9px 12px; font-size: 0.88rem; color: #333; }
+.mock-field .val.placeholder { color: #ccc; }
+.mock-btn { background: #3D5A47; color: #fff; border: none; padding: 11px 20px; border-radius: 8px; font-size: 0.88rem; font-weight: 600; cursor: default; font-family: inherit; }
+.mock-btn.orange { background: #C4785A; }
+.mock-progress { background: #e8f4ec; border-radius: 8px; padding: 14px 16px; margin-bottom: 12px; }
+.mock-progress .bar-bg { background: #c8e6c9; border-radius: 4px; height: 8px; margin: 8px 0; }
+.mock-progress .bar-fill { background: #3D5A47; height: 8px; border-radius: 4px; }
+.mock-photo-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+.mock-photo { background: #e0dbd0; border-radius: 8px; aspect-ratio: 4/3; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; color: #aaa; }
+.mock-photo.filled { background: #e8f4ec; color: #3D5A47; }
+.mock-doc-row { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px solid #f0ece4; }
+.mock-doc-icon { width: 36px; height: 36px; border-radius: 7px; display: flex; align-items: center; justify-content: center; font-size: 1rem; flex-shrink: 0; }
+.mock-doc-icon.done { background: #e8f4ec; }
+.mock-doc-icon.missing { background: #fde8e4; }
+.mock-doc-name { font-size: 0.88rem; color: #333; flex: 1; }
+.mock-doc-status { font-size: 0.72rem; font-weight: 600; }
+.mock-doc-status.done { color: #2e7d32; }
+.mock-doc-status.missing { color: #c62828; }
+
+.mock-notif { background: #fff; border: 1px solid #e0dbd0; border-radius: 10px; padding: 14px 16px; display: flex; gap: 12px; align-items: flex-start; margin-bottom: 10px; }
+.mock-notif .icon { width: 36px; height: 36px; border-radius: 50%; background: #e8f4ec; display: flex; align-items: center; justify-content: center; font-size: 1rem; flex-shrink: 0; }
+.mock-notif h4 { font-size: 0.88rem; color: #1A1A16; margin-bottom: 3px; }
+.mock-notif p { font-size: 0.78rem; color: #888; }
+.mock-notif .time { font-size: 0.7rem; color: #bbb; margin-top: 4px; }
+
+.mock-calendar { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
+.cal-hd { text-align: center; font-size: 0.65rem; color: #aaa; text-transform: uppercase; padding: 4px; }
+.cal-d { text-align: center; padding: 6px 4px; border-radius: 7px; font-size: 0.8rem; }
+.cal-d.empty { }
+.cal-d.past { color: #ddd; }
+.cal-d.avail { background: #e8f4ec; color: #2e7d32; font-weight: 600; cursor: pointer; }
+.cal-d.today { background: #3D5A47; color: #fff; font-weight: 700; border-radius: 50%; }
+
+.mock-link-box { display: flex; gap: 8px; align-items: center; background: #f8f8f5; border: 1px solid #e0dbd0; border-radius: 8px; padding: 10px 14px; margin-bottom: 10px; }
+.mock-link-box input { flex: 1; border: none; background: transparent; font-size: 0.8rem; color: #555; font-family: monospace; outline: none; }
+.mock-link-box button { background: #3D5A47; color: #fff; border: none; padding: 6px 14px; border-radius: 6px; font-size: 0.78rem; font-weight: 600; cursor: default; }
+
+.mock-offer { background: #fff; border: 1px solid #e0dbd0; border-radius: 10px; padding: 16px; }
+.mock-offer .amount { font-family: Georgia, serif; font-size: 2rem; color: #C4785A; }
+.mock-offer .buyer { font-size: 0.85rem; color: #555; margin-top: 4px; }
+
+/* ── Slide visibility ── */
+.slide { display: none; width: 100%; height: 100%; }
+.slide.active { display: flex; align-items: center; justify-content: center; }
+
+/* ── Agenda mock ── */
+.mock-slot-row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 12px; }
+.mock-slot { background: #e8f4ec; color: #2e7d32; border: 1.5px solid #c8e6c9; border-radius: 8px; padding: 7px 14px; font-size: 0.82rem; font-weight: 600; }
+
+@media (max-width: 900px) {
+  .left { width: 260px; }
+  .mock-stat-row { grid-template-columns: repeat(2, 1fr); }
+  .mock-form-row { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+
+<div class="top-bar">
+  <a href="/admin">← Admin</a>
+  <h1>Parcours Vendeur & Acheteur</h1>
+  <div class="tabs">
+    <button class="tab-btn active" onclick="switchJourney('vendeur')">🏠 Vendeur</button>
+    <button class="tab-btn" onclick="switchJourney('acheteur')">🔑 Acheteur</button>
+  </div>
+  <div class="step-counter" id="stepCounter">Étape 1 / 14</div>
+</div>
+
+<div class="main">
+  <!-- LEFT PANEL -->
+  <div class="left" id="leftPanel">
+    <div class="step-badge" id="stepBadge">Étape 1 — Vendeur</div>
+    <h2 id="slideTitle">—</h2>
+    <p id="slideDesc">—</p>
+    <div class="trigger-box" id="triggerBox">
+      <div class="trigger-label">⚡ Ce qui se passe</div>
+      <div class="trigger-text" id="triggerText">—</div>
+    </div>
+    <div class="tags" id="slideTags"></div>
+    <div class="nav-row">
+      <button class="nav-btn prev" id="btnPrev" onclick="navigate(-1)">← Précédent</button>
+      <button class="nav-btn next" id="btnNext" onclick="navigate(1)">Suivant →</button>
+    </div>
+  </div>
+
+  <!-- RIGHT PANEL -->
+  <div class="right" id="rightPanel">
+
+    <!-- ════════════════════════════════════════
+         VENDEUR SLIDES
+    ════════════════════════════════════════ -->
+
+    <!-- V1: Accueil -->
+    <div class="slide active" data-journey="vendeur" data-idx="0">
+      <div class="browser-wrap">
+        <div class="browser-chrome">
+          <div class="browser-dots"><span></span><span></span><span></span></div>
+          <div class="browser-url">venduparmo.fr</div>
+        </div>
+        <div class="browser-body"><iframe src="/" loading="lazy"></iframe></div>
+      </div>
+    </div>
+
+    <!-- V2: Tarifs -->
+    <div class="slide" data-journey="vendeur" data-idx="1">
+      <div class="browser-wrap">
+        <div class="browser-chrome">
+          <div class="browser-dots"><span></span><span></span><span></span></div>
+          <div class="browser-url">venduparmo.fr/tarifs</div>
+        </div>
+        <div class="browser-body"><iframe src="/tarifs" loading="lazy"></iframe></div>
+      </div>
+    </div>
+
+    <!-- V3: Email bienvenue -->
+    <div class="slide" data-journey="vendeur" data-idx="2">
+      <div class="email-wrap">
+        <div class="email-client-bar">
+          <strong>📧 Email reçu</strong> · De : Serenis &lt;contact@serenis.fr&gt; · À : vendeur@exemple.fr
+        </div>
+        <div class="email-body">
+          <div class="email-card">
+            <div class="em-header" style="background:#3D5A47;">
+              <div class="logo">Sere<em>nis</em></div>
+            </div>
+            <div class="em-body">
+              <h2 style="color:#2a4030;">Bienvenue Marie ! 🎉</h2>
+              <p>Votre espace est actif. Pour bien démarrer votre vente, suivez ces <strong>4 étapes dans l'ordre</strong> — chacune est simple et guidée.</p>
+              <div class="em-box">
+                <p style="font-size:11px;font-weight:bold;color:#888;text-transform:uppercase;margin-bottom:8px;">Vos identifiants de connexion</p>
+                <p><strong>Email :</strong> marie@exemple.fr</p>
+                <p><strong>Mot de passe temporaire :</strong> <code style="background:#e8e0d6;padding:2px 6px;border-radius:3px;">Seren2026!</code></p>
+              </div>
+              <p style="font-size:12px;font-weight:bold;color:#888;text-transform:uppercase;margin-bottom:10px;">Vos 4 premières étapes</p>
+              <table style="width:100%;">
+                <tr><td style="padding:8px 0;border-bottom:1px solid #f0ece4;"><strong>1.</strong> Remplir votre fiche bien</td></tr>
+                <tr><td style="padding:8px 0;border-bottom:1px solid #f0ece4;"><strong>2.</strong> Ajouter vos photos (pro + découverte + détails)</td></tr>
+                <tr><td style="padding:8px 0;border-bottom:1px solid #f0ece4;"><strong>3.</strong> Déposer vos diagnostics et documents</td></tr>
+                <tr><td style="padding:8px 0;"><strong>4.</strong> Renseigner vos disponibilités</td></tr>
+              </table>
+              <a href="#" class="em-cta">Accéder à mon espace →</a>
+              <p style="font-size:12px;color:#999;">Une question ? Répondez à cet email — Matthias vous répond personnellement.</p>
+            </div>
+            <div class="em-footer"><p>Serenis · contact@serenis.fr · 06 95 44 36 54</p></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- V4: Dashboard vide -->
+    <div class="slide" data-journey="vendeur" data-idx="3">
+      <div class="app-wrap">
+        <div class="app-chrome">
+          <div class="browser-dots"><span></span><span></span><span></span></div>
+          <div class="browser-url">venduparmo.fr/dashboard</div>
+        </div>
+        <div class="app-body">
+          <div class="mock-nav">
+            <div class="logo">Sere<em>nis</em></div>
+            <div class="mock-tabs">
+              <button class="mock-tab active">Tableau de bord</button>
+              <button class="mock-tab">Mon bien</button>
+              <button class="mock-tab">Mon agenda</button>
+            </div>
+          </div>
+          <div class="mock-container">
+            <div class="mock-alert">⚠️ Votre fiche bien n'est pas encore remplie. Commencez par ajouter les informations de votre bien pour activer votre dossier.</div>
+            <div class="mock-stat-row">
+              <div class="mock-stat"><div class="val">0</div><div class="lbl">Vues</div></div>
+              <div class="mock-stat"><div class="val">0</div><div class="lbl">Contacts</div></div>
+              <div class="mock-stat"><div class="val">0</div><div class="lbl">Visites</div></div>
+              <div class="mock-stat"><div class="val">0</div><div class="lbl">Offres</div></div>
+            </div>
+            <div class="mock-section">
+              <h3>Prochaines étapes</h3>
+              <div class="mock-doc-row"><div class="mock-doc-icon missing">📝</div><div class="mock-doc-name">Remplir ma fiche bien</div><div class="mock-doc-status missing">À faire</div></div>
+              <div class="mock-doc-row"><div class="mock-doc-icon missing">📸</div><div class="mock-doc-name">Ajouter mes photos</div><div class="mock-doc-status missing">À faire</div></div>
+              <div class="mock-doc-row"><div class="mock-doc-icon missing">📋</div><div class="mock-doc-name">Déposer mes diagnostics</div><div class="mock-doc-status missing">À faire</div></div>
+              <div class="mock-doc-row" style="border:none;"><div class="mock-doc-icon missing">📅</div><div class="mock-doc-name">Saisir mes disponibilités</div><div class="mock-doc-status missing">À faire</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- V5: Remplir la fiche -->
+    <div class="slide" data-journey="vendeur" data-idx="4">
+      <div class="app-wrap">
+        <div class="app-chrome">
+          <div class="browser-dots"><span></span><span></span><span></span></div>
+          <div class="browser-url">venduparmo.fr/mon-bien — Onglet Informations</div>
+        </div>
+        <div class="app-body">
+          <div class="mock-nav">
+            <div class="logo">Sere<em>nis</em></div>
+            <div class="mock-tabs">
+              <button class="mock-tab active">Informations</button>
+              <button class="mock-tab">Photos</button>
+              <button class="mock-tab">Documents</button>
+              <button class="mock-tab">Dossier</button>
+            </div>
+          </div>
+          <div class="mock-container">
+            <div class="mock-progress">
+              <div style="display:flex;justify-content:space-between;font-size:0.8rem;color:#3D5A47;font-weight:600;"><span>Complétion du dossier</span><span>45%</span></div>
+              <div class="bar-bg"><div class="bar-fill" style="width:45%;"></div></div>
+            </div>
+            <div class="mock-section">
+              <h3>Informations du bien</h3>
+              <div class="mock-form-row">
+                <div class="mock-field"><label>Type de bien</label><div class="val">Maison</div></div>
+                <div class="mock-field"><label>Adresse</label><div class="val">45 Boulevard des Pins</div></div>
+              </div>
+              <div class="mock-form-row">
+                <div class="mock-field"><label>Surface habitable</label><div class="val">142 m²</div></div>
+                <div class="mock-field"><label>Prix de vente</label><div class="val">385 000 €</div></div>
+              </div>
+              <div class="mock-form-row">
+                <div class="mock-field"><label>Pièces</label><div class="val">6</div></div>
+                <div class="mock-field"><label>Chambres</label><div class="val">4</div></div>
+              </div>
+              <div class="mock-form-row">
+                <div class="mock-field"><label>Chauffage</label><div class="val">Pompe à chaleur</div></div>
+                <div class="mock-field"><label>DPE</label><div class="val" style="color:#57b947;font-weight:700;">B — 82 kWh/m²/an</div></div>
+              </div>
+              <div class="mock-field" style="margin-bottom:14px;"><label>Description</label><div class="val" style="white-space:normal;line-height:1.5;">Belle maison familiale de plain-pied avec sous-sol complet, terrain arboré 620 m²…</div></div>
+              <button class="mock-btn">Enregistrer les modifications</button>
+            </div>
+            <div class="mock-section">
+              <h3>🚪 Descriptif des pièces</h3>
+              <div style="display:flex;gap:8px;flex-wrap:wrap;">
+                <div style="background:#e8f4ec;border-radius:8px;padding:8px 12px;font-size:0.8rem;"><strong>Séjour</strong> · RDC · 45 m²</div>
+                <div style="background:#e8f4ec;border-radius:8px;padding:8px 12px;font-size:0.8rem;"><strong>Cuisine</strong> · RDC · 18 m²</div>
+                <div style="background:#e8f4ec;border-radius:8px;padding:8px 12px;font-size:0.8rem;"><strong>Chambre 1</strong> · 1er étage · 22 m²</div>
+                <div style="background:#e8f4ec;border-radius:8px;padding:8px 12px;font-size:0.8rem;"><strong>+ 12 pièces</strong></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- V6: Upload photos -->
+    <div class="slide" data-journey="vendeur" data-idx="5">
+      <div class="app-wrap">
+        <div class="app-chrome">
+          <div class="browser-dots"><span></span><span></span><span></span></div>
+          <div class="browser-url">venduparmo.fr/mon-bien — Onglet Photos</div>
+        </div>
+        <div class="app-body">
+          <div class="mock-nav"><div class="logo">Sere<em>nis</em></div></div>
+          <div class="mock-container">
+            <div class="mock-section">
+              <h3>📸 Photos professionnelles</h3>
+              <p style="font-size:0.8rem;color:#888;margin-bottom:10px;">Prises par votre photographe — façade, séjour, pièces principales</p>
+              <div class="mock-photo-grid">
+                <div class="mock-photo filled">🏠</div>
+                <div class="mock-photo filled">🛋️</div>
+                <div class="mock-photo filled">🪟</div>
+                <div class="mock-photo" style="border:2px dashed #ddd;">+</div>
+              </div>
+            </div>
+            <div class="mock-section">
+              <h3>🏘️ Photos de découverte</h3>
+              <p style="font-size:0.8rem;color:#888;margin-bottom:10px;">Quartier, vue depuis le jardin, environnement</p>
+              <div class="mock-photo-grid">
+                <div class="mock-photo filled">🌳</div>
+                <div class="mock-photo filled">🏡</div>
+                <div class="mock-photo" style="border:2px dashed #ddd;">+</div>
+                <div class="mock-photo" style="border:2px dashed #ddd;">+</div>
+              </div>
+            </div>
+            <div class="mock-section">
+              <h3>🔍 Photos des détails</h3>
+              <p style="font-size:0.8rem;color:#888;margin-bottom:10px;">Cuisine, salle de bain, cheminée, parquet…</p>
+              <div class="mock-photo-grid">
+                <div class="mock-photo filled">🍳</div>
+                <div class="mock-photo filled">🛁</div>
+                <div class="mock-photo filled">🪵</div>
+                <div class="mock-photo" style="border:2px dashed #ddd;">+</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- V7: Dépôt documents -->
+    <div class="slide" data-journey="vendeur" data-idx="6">
+      <div class="app-wrap">
+        <div class="app-chrome">
+          <div class="browser-dots"><span></span><span></span><span></span></div>
+          <div class="browser-url">venduparmo.fr/mon-bien — Onglet Documents</div>
+        </div>
+        <div class="app-body">
+          <div class="mock-nav"><div class="logo">Sere<em>nis</em></div></div>
+          <div class="mock-container">
+            <div class="mock-section">
+              <h3>📋 Diagnostics techniques</h3>
+              <div class="mock-doc-row"><div class="mock-doc-icon done">🛡️</div><div class="mock-doc-name">DPE — Diagnostic de performance énergétique</div><div class="mock-doc-status done">✓ Déposé</div></div>
+              <div class="mock-doc-row"><div class="mock-doc-icon done">🧪</div><div class="mock-doc-name">Amiante</div><div class="mock-doc-status done">✓ Déposé</div></div>
+              <div class="mock-doc-row"><div class="mock-doc-icon missing">🔬</div><div class="mock-doc-name">Plomb (CREP)</div><div class="mock-doc-status missing">Manquant</div></div>
+              <div class="mock-doc-row"><div class="mock-doc-icon done">⚡</div><div class="mock-doc-name">Électricité</div><div class="mock-doc-status done">✓ Déposé</div></div>
+              <div class="mock-doc-row"><div class="mock-doc-icon missing">⚠️</div><div class="mock-doc-name">ERP — État des risques</div><div class="mock-doc-status missing">Manquant</div></div>
+              <div class="mock-doc-row" style="border:none;"><div class="mock-doc-icon done">💧</div><div class="mock-doc-name">Assainissement</div><div class="mock-doc-status done">✓ Déposé</div></div>
+            </div>
+            <div class="mock-section">
+              <h3>🔑 Dossier acheteur sérieux</h3>
+              <div class="mock-doc-row"><div class="mock-doc-icon done">📄</div><div class="mock-doc-name">Titre de propriété</div><div class="mock-doc-status done">✓ Déposé</div></div>
+              <div class="mock-doc-row" style="border:none;"><div class="mock-doc-icon done">💶</div><div class="mock-doc-name">Dernière taxe foncière</div><div class="mock-doc-status done">✓ Déposé</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- V8: Email documents manquants -->
+    <div class="slide" data-journey="vendeur" data-idx="7">
+      <div class="email-wrap">
+        <div class="email-client-bar"><strong>📧 Email reçu automatiquement</strong> · De : Serenis &lt;contact@serenis.fr&gt; · À : marie@exemple.fr</div>
+        <div class="email-body">
+          <div class="email-card">
+            <div class="em-header" style="background:#3D5A47;"><div class="logo">Sere<em>nis</em></div></div>
+            <div class="em-body">
+              <h2 style="color:#2a4030;">Marie, votre dossier est presque complet 📋</h2>
+              <p>Il vous manque encore <strong>2 documents obligatoires</strong> pour finaliser votre dossier et activer votre espace de partage :</p>
+              <div class="em-box">
+                <p>🔬 <strong>Plomb (CREP)</strong> — Obligatoire si construction avant 1949</p>
+                <p style="margin-top:8px;">⚠️ <strong>ERP</strong> — État des risques et pollutions</p>
+              </div>
+              <p style="font-size:12px;color:#999;">Ces documents sont requis par la loi et rassureront les acheteurs. Vous pouvez les déposer en quelques clics depuis votre espace.</p>
+              <a href="#" class="em-cta">Compléter mon dossier →</a>
+            </div>
+            <div class="em-footer"><p>Serenis · contact@serenis.fr</p></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- V9: Agenda disponibilités -->
+    <div class="slide" data-journey="vendeur" data-idx="8">
+      <div class="app-wrap">
+        <div class="app-chrome">
+          <div class="browser-dots"><span></span><span></span><span></span></div>
+          <div class="browser-url">venduparmo.fr/mon-agenda</div>
+        </div>
+        <div class="app-body">
+          <div class="mock-nav"><div class="logo">Sere<em>nis</em></div></div>
+          <div class="mock-container">
+            <div class="mock-section">
+              <h3>📅 Mes disponibilités pour les visites</h3>
+              <p style="font-size:0.82rem;color:#888;margin-bottom:16px;">Indiquez quand vous êtes disponible — les acheteurs pourront réserver directement depuis le dossier.</p>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px;">
+                <div class="mock-section" style="margin:0;border:1.5px solid #3D5A47;">
+                  <div style="font-weight:700;font-size:0.88rem;color:#3D5A47;margin-bottom:8px;">Samedi</div>
+                  <div class="mock-slot-row"><div class="mock-slot">10:00 — 12:00</div><div class="mock-slot">14:00 — 17:00</div></div>
+                </div>
+                <div class="mock-section" style="margin:0;border:1.5px solid #3D5A47;">
+                  <div style="font-weight:700;font-size:0.88rem;color:#3D5A47;margin-bottom:8px;">Mercredi</div>
+                  <div class="mock-slot-row"><div class="mock-slot">18:00 — 20:00</div></div>
+                </div>
+              </div>
+              <div class="mock-section" style="margin:0;">
+                <h3>📋 Visites planifiées</h3>
+                <div class="mock-notif"><div class="icon">📅</div><div><h4>Jean Dupont — Samedi 7 juin à 10:30</h4><p>jean.dupont@gmail.com · 06 12 34 56 78</p></div></div>
+                <div class="mock-notif"><div class="icon">📅</div><div><h4>Claire Martin — Samedi 7 juin à 14:00</h4><p>claire.martin@gmail.com</p></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- V10: Partager le dossier -->
+    <div class="slide" data-journey="vendeur" data-idx="9">
+      <div class="app-wrap">
+        <div class="app-chrome">
+          <div class="browser-dots"><span></span><span></span><span></span></div>
+          <div class="browser-url">venduparmo.fr/mon-bien — Onglet Documents → Partager</div>
+        </div>
+        <div class="app-body">
+          <div class="mock-nav"><div class="logo">Sere<em>nis</em></div></div>
+          <div class="mock-container">
+            <div class="mock-section">
+              <h3>🔗 Partager le dossier</h3>
+              <p style="font-size:0.82rem;color:#888;margin-bottom:16px;">Envoyez un lien direct à vos acheteurs ou notaire — aucun compte requis.</p>
+              <div style="background:#e8f4ec;border-radius:10px;padding:16px;margin-bottom:14px;">
+                <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;"><span style="font-size:1.2rem;">🔑</span><div><div style="font-weight:700;font-size:0.9rem;">Dossier Acheteur Sérieux</div><div style="font-size:0.72rem;color:#888;">Diagnostics + photos + caractéristiques</div></div></div>
+                <div class="mock-link-box"><input value="venduparmo.fr/dossier/acheteur/f99f76d…" readonly><button>Copier</button></div>
+              </div>
+              <div style="background:#fce4ec;border-radius:10px;padding:16px;margin-bottom:20px;">
+                <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;"><span style="font-size:1.2rem;">⚖️</span><div><div style="font-weight:700;font-size:0.9rem;">Dossier Notaire — Confidentiel</div><div style="font-size:0.72rem;color:#888;">Tous les documents · jamais transmis aux acheteurs</div></div></div>
+                <div class="mock-link-box"><input value="venduparmo.fr/dossier/notaire/eaa18ad…" readonly><button style="background:#6a1b9a;">Copier</button></div>
+              </div>
+              <div style="background:#1A1A16;border-radius:12px;padding:20px;">
+                <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;"><span style="font-size:1.2rem;">📧</span><div style="color:#fff;font-weight:700;">Envoyer le dossier à mon notaire</div></div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;">
+                  <input style="background:#111;border:1px solid #333;border-radius:8px;padding:10px;color:#fff;font-family:inherit;font-size:0.82rem;" value="Me Lemaire" readonly>
+                  <input style="background:#111;border:1px solid #333;border-radius:8px;padding:10px;color:#fff;font-family:inherit;font-size:0.82rem;" value="notaire@lemaire.fr" readonly>
+                </div>
+                <button class="mock-btn orange" style="width:100%;">📨 Envoyer le dossier par email</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- V11: Notification visite reçue -->
+    <div class="slide" data-journey="vendeur" data-idx="10">
+      <div class="phone-wrap">
+        <div class="phone-frame">
+          <div class="phone-notch"></div>
+          <div class="phone-screen">
+            <div class="phone-status"><span>9:41</span><span>●●●</span></div>
+            <div class="sms-header">
+              <strong>Serenis</strong>
+              <p>+33 9 XX XX XX XX</p>
+            </div>
+            <div class="sms-messages">
+              <div class="sms-time">Aujourd'hui 10:34</div>
+              <div class="sms-bubble them">🏠 Nouvelle visite sur votre bien.<br><br><strong>Date :</strong> Samedi 7 juin à 10:30<br><strong>Acheteur :</strong> Jean Dupont<br><strong>Contact :</strong> jean.dupont@gmail.com<br><br>Rendez-vous sur votre espace pour confirmer.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- V12: Email confirmation visite vendeur -->
+    <div class="slide" data-journey="vendeur" data-idx="11">
+      <div class="email-wrap">
+        <div class="email-client-bar"><strong>📧 Email reçu</strong> · Nouvelle demande de visite</div>
+        <div class="email-body">
+          <div class="email-card">
+            <div class="em-header" style="background:#3D5A47;"><div class="logo">Sere<em>nis</em></div></div>
+            <div class="em-body">
+              <h2 style="color:#2a4030;">Nouvelle visite planifiée 📅</h2>
+              <p>Un acheteur vient de planifier une visite de votre bien.</p>
+              <div class="em-box">
+                <p><strong>Acheteur :</strong> Jean Dupont</p>
+                <p><strong>Email :</strong> jean.dupont@gmail.com</p>
+                <p><strong>Téléphone :</strong> 06 12 34 56 78</p>
+                <p style="margin-top:10px;"><strong>📅 Date :</strong> Samedi 7 juin à 10:30</p>
+                <p><strong>🏠 Bien :</strong> 45 Boulevard des Pins, Toulouse</p>
+              </div>
+              <p style="font-size:12px;color:#999;">L'acheteur a reçu une confirmation par email. Retrouvez toutes vos visites dans votre agenda.</p>
+              <a href="#" class="em-cta">Voir mes visites →</a>
+            </div>
+            <div class="em-footer"><p>Serenis · contact@serenis.fr</p></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- V13: Notification offre reçue -->
+    <div class="slide" data-journey="vendeur" data-idx="12">
+      <div class="app-wrap">
+        <div class="app-chrome">
+          <div class="browser-dots"><span></span><span></span><span></span></div>
+          <div class="browser-url">venduparmo.fr/dashboard — Offre reçue</div>
+        </div>
+        <div class="app-body">
+          <div class="mock-nav"><div class="logo">Sere<em>nis</em></div></div>
+          <div class="mock-container">
+            <div class="mock-success">🎉 Nouvelle offre d'achat reçue ! Jean Dupont vous propose 375 000 €</div>
+            <div class="mock-stat-row">
+              <div class="mock-stat"><div class="val">142</div><div class="lbl">Vues</div></div>
+              <div class="mock-stat"><div class="val">8</div><div class="lbl">Contacts</div></div>
+              <div class="mock-stat"><div class="val">3</div><div class="lbl">Visites</div></div>
+              <div class="mock-stat"><div class="val" style="color:#C4785A;">1</div><div class="lbl">Offre</div></div>
+            </div>
+            <div class="mock-section">
+              <h3>💰 Offre reçue</h3>
+              <div class="mock-offer">
+                <div class="amount">375 000 €</div>
+                <div class="buyer">Jean Dupont · jean.dupont@gmail.com · 06 12 34 56 78</div>
+                <div style="font-size:0.78rem;color:#aaa;margin-top:4px;">Soumise le 3 juin 2026 · Valable 10 jours</div>
+                <div style="margin-top:14px;display:flex;gap:8px;">
+                  <button class="mock-btn" style="background:#2e7d32;flex:1;">✓ Accepter</button>
+                  <button class="mock-btn" style="background:#c62828;flex:1;">✗ Refuser</button>
+                  <button class="mock-btn" style="background:#e65100;flex:1;">↩ Contre-proposition</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- V14: Email offre reçue -->
+    <div class="slide" data-journey="vendeur" data-idx="13">
+      <div class="email-wrap">
+        <div class="email-client-bar"><strong>📧 Email reçu</strong> · 💰 Nouvelle offre d'achat — 375 000 €</div>
+        <div class="email-body">
+          <div class="email-card">
+            <div class="em-header" style="background:#1A1A16;"><div class="logo">Sere<em>nis</em></div></div>
+            <div class="em-body">
+              <h2 style="color:#C4785A;">🎉 Vous avez reçu une offre d'achat !</h2>
+              <p>Un acheteur souhaite acquérir votre bien. Voici le détail de l'offre :</p>
+              <div class="em-box" style="border-color:#C4785A;">
+                <p style="font-size:22px;font-weight:bold;color:#C4785A;font-family:Georgia,serif;">375 000 €</p>
+                <p style="margin-top:8px;"><strong>Acheteur :</strong> Jean Dupont</p>
+                <p><strong>Email :</strong> jean.dupont@gmail.com</p>
+                <p><strong>Téléphone :</strong> 06 12 34 56 78</p>
+                <p style="margin-top:8px;font-size:12px;color:#888;">Offre valable 10 jours</p>
+              </div>
+              <a href="#" class="em-cta">Répondre à l'offre →</a>
+              <p style="font-size:12px;color:#999;">Vous pouvez accepter, refuser ou faire une contre-proposition depuis votre espace vendeur.</p>
+            </div>
+            <div class="em-footer"><p>Serenis · contact@serenis.fr</p></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ════════════════════════════════════════
+         ACHETEUR SLIDES
+    ════════════════════════════════════════ -->
+
+    <!-- A1: Dossier acheteur -->
+    <div class="slide" data-journey="acheteur" data-idx="0">
+      <div class="browser-wrap">
+        <div class="browser-chrome">
+          <div class="browser-dots"><span></span><span></span><span></span></div>
+          <div class="browser-url" id="acheteurIframeUrl">venduparmo.fr/dossier/acheteur/…</div>
+        </div>
+        <div class="browser-body"><iframe id="acheteurIframe" src="" loading="lazy"></iframe></div>
+      </div>
+    </div>
+
+    <!-- A2: Contacte via formulaire -->
+    <div class="slide" data-journey="acheteur" data-idx="1">
+      <div class="browser-wrap">
+        <div class="browser-chrome">
+          <div class="browser-dots"><span></span><span></span><span></span></div>
+          <div class="browser-url">venduparmo.fr — Formulaire de contact</div>
+        </div>
+        <div class="app-body" style="background:#F5F0E8;overflow-y:auto;flex:1;">
+          <div style="max-width:500px;margin:40px auto;padding:0 20px;">
+            <div style="background:#fff;border-radius:16px;padding:28px;box-shadow:0 2px 12px rgba(0,0,0,0.08);">
+              <h2 style="font-family:Georgia,serif;font-size:1.4rem;color:#3D5A47;margin-bottom:6px;">Être rappelé par le vendeur</h2>
+              <p style="font-size:0.82rem;color:#888;margin-bottom:20px;">Laissez vos coordonnées — le vendeur vous répond rapidement.</p>
+              <div style="display:flex;flex-direction:column;gap:12px;">
+                <div class="mock-field"><label>Prénom et nom</label><div class="val">Jean Dupont</div></div>
+                <div class="mock-field"><label>Téléphone</label><div class="val">06 12 34 56 78</div></div>
+                <div class="mock-field"><label>Email</label><div class="val">jean.dupont@gmail.com</div></div>
+                <div class="mock-field"><label>Message (optionnel)</label><div class="val" style="white-space:normal;">Bonjour, je suis très intéressé par ce bien, pouvez-vous m'envoyer le dossier complet ?</div></div>
+                <button class="mock-btn" style="width:100%;padding:14px;">Envoyer ma demande</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- A3: Appel 09 / SMS -->
+    <div class="slide" data-journey="acheteur" data-idx="2">
+      <div class="phone-wrap">
+        <div class="phone-frame">
+          <div class="phone-notch"></div>
+          <div class="phone-screen">
+            <div class="phone-status"><span>9:41</span><span>●●●</span></div>
+            <div class="sms-header">
+              <strong>09 XX XX XX XX</strong>
+              <p>Serenis — Vendeur</p>
+            </div>
+            <div class="sms-messages">
+              <div class="sms-time">Aujourd'hui 10:12</div>
+              <div class="sms-bubble them">Bienvenue ! Pour recevoir le dossier complet de ce bien, répondez OUI ou tapez votre email.</div>
+              <div class="sms-bubble us">jean.dupont@gmail.com</div>
+              <div class="sms-bubble them">✅ Parfait ! Le dossier complet vient de vous être envoyé. Bonne découverte !</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- A4: Email dossier reçu -->
+    <div class="slide" data-journey="acheteur" data-idx="3">
+      <div class="email-wrap">
+        <div class="email-client-bar"><strong>📧 Email reçu</strong> · 🏠 Votre dossier acheteur — Maison Toulouse</div>
+        <div class="email-body">
+          <div class="email-card">
+            <div class="em-header" style="background:#3D5A47;"><div class="logo">Sere<em>nis</em></div></div>
+            <div class="em-body">
+              <h2 style="color:#2a4030;">Voici le dossier complet du bien</h2>
+              <p>Bonjour Jean, comme demandé, voici le dossier complet de la maison située au <strong>45 Boulevard des Pins, Toulouse</strong>.</p>
+              <div class="em-box">
+                <p>🏠 <strong>Maison</strong> · 142 m² · 6 pièces · 4 chambres</p>
+                <p>💶 <strong>Prix :</strong> 385 000 €</p>
+                <p>⚡ <strong>DPE :</strong> B — 82 kWh/m²/an</p>
+              </div>
+              <p>Ce dossier inclut : les photos, toutes les caractéristiques, les diagnostics accessibles et la possibilité de planifier une visite directement en ligne.</p>
+              <a href="#" class="em-cta">Accéder au dossier complet →</a>
+              <p style="font-size:12px;color:#999;">Lien valable · Aucun compte requis</p>
+            </div>
+            <div class="em-footer"><p>Serenis · contact@serenis.fr</p></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- A5: Dossier acheteur iframe -->
+    <div class="slide" data-journey="acheteur" data-idx="4">
+      <div class="browser-wrap">
+        <div class="browser-chrome">
+          <div class="browser-dots"><span></span><span></span><span></span></div>
+          <div class="browser-url">venduparmo.fr/dossier/acheteur/… — Section photos & caractéristiques</div>
+        </div>
+        <div class="browser-body"><iframe id="acheteurIframe2" src="" loading="lazy"></iframe></div>
+      </div>
+    </div>
+
+    <!-- A6: Réserver une visite -->
+    <div class="slide" data-journey="acheteur" data-idx="5">
+      <div class="browser-wrap">
+        <div class="browser-chrome">
+          <div class="browser-dots"><span></span><span></span><span></span></div>
+          <div class="browser-url">venduparmo.fr/dossier/acheteur/… — Planifier une visite</div>
+        </div>
+        <div class="app-body" style="background:#F5F0E8;overflow-y:auto;flex:1;">
+          <div style="max-width:600px;margin:24px auto;padding:0 20px;">
+            <div style="background:linear-gradient(135deg,#3D5A47,#4d6e5a);border-radius:16px;padding:24px;color:#fff;margin-bottom:16px;">
+              <h3 style="font-family:Georgia,serif;font-size:1.4rem;margin-bottom:6px;">Je souhaite visiter ce bien</h3>
+              <p style="color:rgba(255,255,255,0.75);font-size:0.88rem;margin-bottom:16px;">J'ai lu le dossier et je souhaite planifier une visite dans l'agenda du vendeur.</p>
+            </div>
+            <div style="background:#fff;border-radius:16px;padding:24px;box-shadow:0 2px 8px rgba(0,0,0,0.08);">
+              <div style="font-family:Georgia,serif;font-size:1.1rem;color:#3D5A47;margin-bottom:14px;">1. Choisissez une date</div>
+              <div class="mock-calendar">
+                <div class="cal-hd">Lu</div><div class="cal-hd">Ma</div><div class="cal-hd">Me</div><div class="cal-hd">Je</div><div class="cal-hd">Ve</div><div class="cal-hd">Sa</div><div class="cal-hd">Di</div>
+                <div class="cal-d past">2</div><div class="cal-d past">3</div><div class="cal-d avail">4</div><div class="cal-d past">5</div><div class="cal-d past">6</div><div class="cal-d avail">7</div><div class="cal-d today">8</div>
+                <div class="cal-d avail">9</div><div class="cal-d">10</div><div class="cal-d avail">11</div><div class="cal-d">12</div><div class="cal-d">13</div><div class="cal-d avail">14</div><div class="cal-d avail">15</div>
+              </div>
+              <div style="margin-top:16px;font-family:Georgia,serif;font-size:1.1rem;color:#3D5A47;margin-bottom:10px;">2. Horaires — Samedi 7 juin</div>
+              <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;">
+                <div class="mock-slot">10:00</div><div class="mock-slot" style="background:#3D5A47;color:#fff;border-color:#3D5A47;">10:30 ✓</div><div class="mock-slot">11:00</div><div class="mock-slot">14:00</div><div class="mock-slot">14:30</div>
+              </div>
+              <div style="font-family:Georgia,serif;font-size:1.1rem;color:#3D5A47;margin-bottom:10px;">3. Vos coordonnées</div>
+              <div style="background:#e8f4ec;border-radius:8px;padding:10px 14px;font-size:0.88rem;color:#2e7d32;font-weight:500;margin-bottom:12px;">📅 Samedi 7 juin à 10:30</div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;">
+                <div class="mock-field"><label>Prénom et nom</label><div class="val">Jean Dupont</div></div>
+                <div class="mock-field"><label>Email</label><div class="val">jean.dupont@gmail.com</div></div>
+              </div>
+              <button class="mock-btn orange" style="width:100%;padding:14px;">Confirmer ma visite</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- A7: Email confirmation visite acheteur -->
+    <div class="slide" data-journey="acheteur" data-idx="6">
+      <div class="email-wrap">
+        <div class="email-client-bar"><strong>📧 Email reçu</strong> · ✅ Votre visite est confirmée — Samedi 7 juin</div>
+        <div class="email-body">
+          <div class="email-card">
+            <div class="em-header" style="background:#3D5A47;"><div class="logo">Sere<em>nis</em></div></div>
+            <div class="em-body">
+              <h2 style="color:#2a4030;">✅ Visite confirmée !</h2>
+              <p>Bonjour Jean, votre visite est planifiée. Voici le récapitulatif :</p>
+              <div class="em-box">
+                <p>📅 <strong>Date :</strong> Samedi 7 juin 2026 à 10:30</p>
+                <p>🏠 <strong>Bien :</strong> 45 Boulevard des Pins, Toulouse</p>
+                <p>👤 <strong>Vendeur :</strong> Marie Lambert</p>
+                <p>📞 <strong>Téléphone vendeur :</strong> 06 XX XX XX XX</p>
+              </div>
+              <p style="font-size:12px;color:#999;">Un rappel vous sera envoyé la veille de la visite. Pour annuler ou modifier, contactez le vendeur directement.</p>
+              <a href="#" class="em-cta">Revoir le dossier du bien →</a>
+            </div>
+            <div class="em-footer"><p>Serenis · contact@serenis.fr</p></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- A8: Dossier notaire -->
+    <div class="slide" data-journey="acheteur" data-idx="7">
+      <div class="browser-wrap">
+        <div class="browser-chrome">
+          <div class="browser-dots"><span></span><span></span><span></span></div>
+          <div class="browser-url" id="notaireIframeUrl">venduparmo.fr/dossier/notaire/…</div>
+        </div>
+        <div class="browser-body"><iframe id="notaireIframe" src="" loading="lazy"></iframe></div>
+      </div>
+    </div>
+
+    <!-- A9: Offre d'achat -->
+    <div class="slide" data-journey="acheteur" data-idx="8">
+      <div class="app-wrap">
+        <div class="app-chrome">
+          <div class="browser-dots"><span></span><span></span><span></span></div>
+          <div class="browser-url">venduparmo.fr/bien/maison-toulouse — Formulaire offre</div>
+        </div>
+        <div class="app-body" style="background:#F5F0E8;overflow-y:auto;flex:1;">
+          <div style="max-width:500px;margin:40px auto;padding:0 20px;">
+            <div style="background:#fff;border-radius:16px;padding:28px;box-shadow:0 2px 12px rgba(0,0,0,0.08);">
+              <h2 style="font-family:Georgia,serif;font-size:1.4rem;color:#3D5A47;margin-bottom:6px;">Faire une offre d'achat</h2>
+              <p style="font-size:0.82rem;color:#888;margin-bottom:20px;">Prix affiché : <strong>385 000 €</strong></p>
+              <div style="display:flex;flex-direction:column;gap:12px;">
+                <div class="mock-field"><label>Votre offre (€)</label><div class="val" style="font-family:Georgia,serif;font-size:1.3rem;color:#C4785A;font-weight:700;">375 000</div></div>
+                <div class="mock-field"><label>Prénom et nom</label><div class="val">Jean Dupont</div></div>
+                <div class="mock-field"><label>Email</label><div class="val">jean.dupont@gmail.com</div></div>
+                <div class="mock-field"><label>Conditions (financement, délai…)</label><div class="val" style="white-space:normal;">Financement bancaire confirmé. Disponible pour signature dans les 3 semaines.</div></div>
+                <button class="mock-btn orange" style="width:100%;padding:14px;">📨 Soumettre mon offre</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- A10: Email confirmation offre acheteur -->
+    <div class="slide" data-journey="acheteur" data-idx="9">
+      <div class="email-wrap">
+        <div class="email-client-bar"><strong>📧 Email reçu</strong> · 💰 Votre offre a bien été transmise</div>
+        <div class="email-body">
+          <div class="email-card">
+            <div class="em-header" style="background:#1A1A16;"><div class="logo">Sere<em>nis</em></div></div>
+            <div class="em-body">
+              <h2 style="color:#C4785A;">Votre offre a été transmise au vendeur</h2>
+              <p>Bonjour Jean, votre offre d'achat a bien été reçue et transmise à Marie Lambert.</p>
+              <div class="em-box" style="border-color:#C4785A;">
+                <p style="font-size:20px;font-weight:bold;color:#C4785A;font-family:Georgia,serif;">375 000 €</p>
+                <p style="margin-top:8px;"><strong>Bien :</strong> 45 Boulevard des Pins, Toulouse</p>
+                <p><strong>Soumise le :</strong> 3 juin 2026</p>
+                <p><strong>Valable :</strong> 10 jours</p>
+              </div>
+              <p>Le vendeur vous contactera directement pour vous donner sa réponse. Vous pouvez également le joindre directement par téléphone.</p>
+              <p style="font-size:12px;color:#999;margin-top:12px;">Serenis est une plateforme de mise en relation. La vente se conclut directement entre les parties.</p>
+            </div>
+            <div class="em-footer"><p>Serenis · contact@serenis.fr</p></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- end right -->
+</div><!-- end main -->
+
+<div class="dots" id="dotsContainer"></div>
+
+<script>
+const JOURNEYS = {
+  vendeur: [
+    { title:'Page d\'accueil', desc:'Le vendeur découvre venduparmo.fr via Google, bouche-à-oreille ou pub. Il voit le concept, les témoignages, le tarif.', trigger:'Première visite. Il voit le CTA "Vendre mon bien" et clique sur Tarifs.', tags:['🌐 Web','Public','Marketing'] },
+    { title:'Page tarifs & inscription', desc:'Il choisit son pack (Sérénité), entre son adresse et paye. Son compte est créé automatiquement avec un mot de passe temporaire.', trigger:'Paiement Stripe validé → compte créé → email de bienvenue envoyé.', tags:['💳 Paiement','Stripe','Automatique'] },
+    { title:'Email de bienvenue', desc:'Reçu immédiatement après le paiement. Contient ses identifiants et les 4 étapes à suivre pour bien démarrer.', trigger:'Déclenché par Stripe webhook → sendWelcomeImproved().', tags:['✉️ Email','Automatique','Immédiat'] },
+    { title:'Dashboard vendeur — 1er accès', desc:'Il se connecte pour la première fois. Le dashboard est vide : 0 vues, 0 contacts. Des alertes l\'invitent à remplir sa fiche.', trigger:'Connexion avec les identifiants reçus par email.', tags:['🔐 Auth','Dashboard'] },
+    { title:'Remplir sa fiche bien', desc:'Il renseigne toutes les informations : type, adresse, surface, prix, DPE, pièces, chauffage, stationnement, mitoyenneté…', trigger:'Sauvegarde automatique au fur et à mesure. Score de complétion mis à jour.', tags:['📝 Fiche','Mon bien'] },
+    { title:'Upload des photos', desc:'3 catégories distinctes : photos professionnelles (façade, intérieur), photos de découverte (quartier), photos des détails (cuisine, sdb…).', trigger:'Upload Cloudinary. Photos classées et triables. Ordre personnalisable.', tags:['📸 Photos','Cloudinary'] },
+    { title:'Dépôt des diagnostics', desc:'DPE, Amiante, Plomb, Électricité, ERP, Assainissement… Chaque type a son slot dédié. Les manquants apparaissent en rouge.', trigger:'Upload Cloudinary. Marqués comme dossier "diagnostics" en base.', tags:['📋 Documents','Obligatoire'] },
+    { title:'Email — Documents manquants', desc:'Email automatique si des diagnostics obligatoires ne sont pas déposés après 48h. Rappelle exactement ce qui manque.', trigger:'Cron quotidien → sendMissingDocNudge() si docs manquants.', tags:['✉️ Email','Automatique','Cron'] },
+    { title:'Agenda — Disponibilités', desc:'Il renseigne ses créneaux (récurrents ou ponctuels). Les acheteurs peuvent réserver directement depuis le dossier sans appeler.', trigger:'Créneaux sauvegardés en agenda_slots. Utilisés par le calendrier acheteur.', tags:['📅 Agenda','Auto-gestion'] },
+    { title:'Partager le dossier', desc:'Deux liens uniques générés automatiquement : dossier acheteur (public) et dossier notaire (confidentiel). Peut envoyer le dossier notaire directement par email à son notaire.', trigger:'Tokens UUID générés à la création du bien. Révocables à tout moment.', tags:['🔗 Partage','Token','Email'] },
+    { title:'SMS — Nouvelle visite', desc:'Dès qu\'un acheteur réserve une visite via le calendrier, le vendeur reçoit un SMS immédiat avec le nom, l\'email et la date.', trigger:'POST /api/dossier/acheteur/:token/reserver → SMS Twilio au vendeur.', tags:['📱 SMS','Twilio','Temps réel'] },
+    { title:'Email — Confirmation visite', desc:'En complément du SMS, un email structuré avec toutes les infos acheteur et un bouton pour gérer la visite dans l\'agenda.', trigger:'sendVisitConfirmation() côté vendeur au moment de la réservation.', tags:['✉️ Email','Automatique'] },
+    { title:'Offre reçue — Notification', desc:'Un acheteur soumet une offre. Le dashboard affiche la notification, le montant, les conditions et les boutons Accepter / Refuser / Contre-proposition.', trigger:'POST /api/bien/:slug/offre → notification + email vendeur.', tags:['💰 Offre','Dashboard'] },
+    { title:'Email — Notification d\'offre', desc:'Email immédiat avec le montant de l\'offre, le nom et le contact de l\'acheteur, et un lien direct vers l\'espace vendeur.', trigger:'sendOfferNotification() → email vendeur immédiat.', tags:['✉️ Email','💰 Offre','Temps réel'] },
+  ],
+  acheteur: [
+    { title:'Dossier acheteur — Accueil', desc:'L\'acheteur reçoit le lien par SMS ou email. Il accède à une page complète : photos par catégorie, toutes les caractéristiques, diagnostics, pièces par niveau.', trigger:'Lien /dossier/acheteur/:token partagé par le vendeur ou envoyé auto par SMS.', tags:['📁 Dossier','Token','Public'] },
+    { title:'Formulaire de contact', desc:'Depuis l\'annonce publique, l\'acheteur peut laisser ses coordonnées pour être rappelé. Le vendeur reçoit une notification email et SMS.', trigger:'POST /api/contact → email + notification vendeur.', tags:['📞 Contact','Formulaire'] },
+    { title:'SMS via le 09…', desc:'L\'acheteur appelle ou envoie un SMS au numéro Twilio du bien. Le système détecte sa demande et lui répond automatiquement avec le lien dossier.', trigger:'Webhook Twilio → bot SMS → envoie le lien dossier acheteur par SMS.', tags:['📱 SMS','Twilio','Bot'] },
+    { title:'Email avec le dossier', desc:'L\'acheteur reçoit un email formaté avec un résumé du bien (surface, prix, DPE) et le bouton pour accéder au dossier complet.', trigger:'sendDossierEmail() déclenché après inscription ou demande SMS.', tags:['✉️ Email','Automatique'] },
+    { title:'Dossier acheteur — Contenu', desc:'Page complète : 8 photos organisées en 3 catégories, 8 groupes de caractéristiques (surfaces, chauffage, stationnement…), descriptif des pièces par niveau, diagnostics.', trigger:'Toutes les infos saisies par le vendeur. Aucun compte requis.', tags:['📁 Dossier','Complet'] },
+    { title:'Réserver une visite', desc:'Calendrier interactif avec les jours disponibles en vert. L\'acheteur choisit un jour, un horaire (30 min d\'intervalle), saisit ses coordonnées et confirme.', trigger:'POST /api/dossier/acheteur/:token/reserver → SMS + email vendeur + email acheteur.', tags:['📅 Visite','Calendrier','Auto'] },
+    { title:'Email — Confirmation visite acheteur', desc:'Email immédiat avec la date, l\'heure, l\'adresse exacte et un rappel J-1 automatique. Il peut revoir le dossier depuis ce mail.', trigger:'sendVisitConfirmation() côté acheteur + reminder J-1.', tags:['✉️ Email','Automatique'] },
+    { title:'Dossier notaire — Vue complète', desc:'Le notaire reçoit un lien confidentiel avec tous les documents organisés par type : DPE, Amiante, Plomb, Électricité, ERP, Assainissement + dossier acheteur + documents notaire.', trigger:'Lien envoyé par le vendeur via le bouton "Envoyer à mon notaire".', tags:['⚖️ Notaire','Confidentiel'] },
+    { title:'Faire une offre d\'achat', desc:'Depuis l\'annonce publique, l\'acheteur soumet son montant, ses conditions et ses coordonnées. Le vendeur reçoit une notification immédiate.', trigger:'POST /api/bien/:slug/offre → notification + email vendeur.', tags:['💰 Offre'] },
+    { title:'Email — Confirmation offre', desc:'L\'acheteur reçoit un accusé de réception avec le montant de son offre, la date et les coordonnées du vendeur pour la suite.', trigger:'sendOfferNotification() côté acheteur.', tags:['✉️ Email','💰 Offre'] },
+  ]
+};
+
+let currentJourney = 'vendeur';
+let currentIdx = 0;
+
+function switchJourney(j) {
+  currentJourney = j;
+  currentIdx = 0;
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b.textContent.includes(j === 'vendeur' ? 'Vendeur' : 'Acheteur')));
+  updateSlide();
+}
+
+function navigate(dir) {
+  const steps = JOURNEYS[currentJourney];
+  currentIdx = Math.max(0, Math.min(steps.length - 1, currentIdx + dir));
+  updateSlide();
+}
+
+function goToStep(idx) {
+  currentIdx = idx;
+  updateSlide();
+}
+
+function updateSlide() {
+  const steps = JOURNEYS[currentJourney];
+  const step = steps[currentIdx];
+
+  // Left panel
+  document.getElementById('stepBadge').textContent = `Étape ${currentIdx + 1} — ${currentJourney === 'vendeur' ? 'Vendeur' : 'Acheteur'}`;
+  document.getElementById('slideTitle').textContent = step.title;
+  document.getElementById('slideDesc').textContent = step.desc;
+  document.getElementById('triggerText').textContent = step.trigger;
+  document.getElementById('stepCounter').textContent = `Étape ${currentIdx + 1} / ${steps.length}`;
+
+  const tagsEl = document.getElementById('slideTags');
+  tagsEl.innerHTML = step.tags.map(t => `<span class="tag ${t.includes('Email')?'orange':t.includes('Vendeur')||t.includes('Acheteur')||t.includes('Public')?'green':t.includes('Notaire')?'blue':''}">${t}</span>`).join('');
+
+  // Buttons
+  document.getElementById('btnPrev').disabled = currentIdx === 0;
+  document.getElementById('btnNext').disabled = currentIdx === steps.length - 1;
+
+  // Show correct slide
+  document.querySelectorAll('.slide').forEach(s => {
+    s.classList.toggle('active', s.dataset.journey === currentJourney && parseInt(s.dataset.idx) === currentIdx);
+  });
+
+  // Dots
+  const dotsEl = document.getElementById('dotsContainer');
+  dotsEl.innerHTML = steps.map((_, i) => `<div class="dot ${i===currentIdx?'active':''}" onclick="goToStep(${i})"></div>`).join('');
+}
+
+// Load real tokens for iframes
+fetch('/admin/api/parcours/tokens').then(r => r.json()).then(({ prop }) => {
+  if (!prop) return;
+  const base = window.location.origin;
+  if (prop.acheteur_token) {
+    const url = `${base}/dossier/acheteur/${prop.acheteur_token}`;
+    document.getElementById('acheteurIframe').src = url;
+    document.getElementById('acheteurIframe2').src = url;
+    document.getElementById('acheteurIframeUrl').textContent = `venduparmo.fr/dossier/acheteur/${prop.acheteur_token.slice(0,8)}…`;
+  }
+  if (prop.notaire_token) {
+    const url = `${base}/dossier/notaire/${prop.notaire_token}`;
+    document.getElementById('notaireIframe').src = url;
+    document.getElementById('notaireIframeUrl').textContent = `venduparmo.fr/dossier/notaire/${prop.notaire_token.slice(0,8)}…`;
+  }
+}).catch(() => {});
+
+// Keyboard navigation
+document.addEventListener('keydown', e => {
+  if (e.key === 'ArrowRight' || e.key === 'ArrowDown') navigate(1);
+  if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') navigate(-1);
+  if (e.key === '1') switchJourney('vendeur');
+  if (e.key === '2') switchJourney('acheteur');
+});
+
+// Init
+updateSlide();
+</script>
+</body>
+</html>
