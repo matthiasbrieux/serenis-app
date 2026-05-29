@@ -1394,4 +1394,50 @@ async function sendDossierToNotaire({ notaireEmail, notaireName, sellerName, pro
   } catch(e) { console.error('[EMAIL ERROR] sendDossierToNotaire:', e.message); return false; }
 }
 
-module.exports = { sendWelcomeEmail, sendDossierEmail, sendVisitConfirmation, sendContactNotification, sendMissionAssigned, sendMissionConfirmed, sendMissionReminderJ1, sendProspectNudge, sendNoPropertyNudge, sendNoPhotosNudge, sendNotPublishedNudge, sendNewVisitRequest, sendVisitReminderSeller, sendMissingDocNudge, sendPublishedConfirmation, sendContractRenewal, sendReviewRequest, sendAdminDirectEmail, sendInvoiceEmail, sendOfferNotification, sendPostVisitBuyerNudge, sendWeeklyAdminReport, sendPhotographerAvailabilityRequest, sendPostFirstVisitFeedbackSeller, sendCheckInNoOffer, sendInfoNeededEmail, sendBuyerContactedSeller, sendVisitFeedbackRequest, sendSoldCongrats, sendWelcomeImproved, sendDossierToNotaire };
+// ── Prévisualisation email (capture HTML sans envoyer) ─────────
+async function previewEmail(type) {
+  const DEMO = {
+    email: 'marie.lambert@exemple.fr',
+    firstName: 'Marie',
+    lastName: 'Lambert',
+    property: { type: 'Maison', city: 'Toulouse', address: '45 Boulevard des Pins', price: 385000, slug: 'maison-toulouse' },
+  };
+
+  let capturedHtml = null;
+  const originalSend = sgMail.send;
+  sgMail.send = async (msg) => { capturedHtml = Array.isArray(msg) ? msg[0].html : msg.html; return [{ statusCode: 202 }]; };
+
+  try {
+    switch (type) {
+      case 'welcome':          await sendWelcomeEmail(DEMO.email, 'MotDePasse123', 'serenite'); break;
+      case 'welcome_v2':       await sendWelcomeImproved({ to: DEMO.email, firstName: DEMO.firstName, pack: 'serenite', tempPassword: 'MotDePasse123' }); break;
+      case 'no_property':      await sendNoPropertyNudge({ email: DEMO.email }); break;
+      case 'no_photos':        await sendNoPhotosNudge({ email: DEMO.email }); break;
+      case 'photographer_request': await sendPhotographerAvailabilityRequest({ email: DEMO.email, firstName: DEMO.firstName }); break;
+      case 'missing_doc':      await sendMissingDocNudge({ email: DEMO.email, firstName: DEMO.firstName, missingDocs: ['Amiante', 'Électricité', 'ERP'] }); break;
+      case 'not_published':    await sendNotPublishedNudge({ email: DEMO.email, firstName: DEMO.firstName }); break;
+      case 'post_first_visit': await sendPostFirstVisitFeedbackSeller({ email: DEMO.email, firstName: DEMO.firstName }); break;
+      case 'check_in_no_offer': await sendCheckInNoOffer({ email: DEMO.email, firstName: DEMO.firstName, daysPublished: 14 }); break;
+      case 'contract_renewal': await sendContractRenewal({ email: DEMO.email, firstName: DEMO.firstName, daysLeft: 30 }); break;
+      case 'review_request':   await sendReviewRequest({ email: DEMO.email, firstName: DEMO.firstName, propertyCity: 'Toulouse' }); break;
+      case 'visit_confirmation': await sendVisitConfirmation(DEMO.email, DEMO.firstName, DEMO.property, '2026-06-07', '10:30', false); break;
+      case 'visit_reminder_seller': await sendVisitReminderSeller({ sellerEmail: DEMO.email, buyerName: 'Jean Dupont', visitDate: '2026-06-07' }); break;
+      case 'new_visit_request': await sendNewVisitRequest({ sellerEmail: DEMO.email, buyerName: 'Jean Dupont', visitDate: '2026-06-07 à 10:30' }); break;
+      case 'contact_notification': await sendBuyerContactedSeller({ email: DEMO.email, firstName: DEMO.firstName, buyerName: 'Jean Dupont', buyerPhone: '06 12 34 56 78', propertyAddress: '45 Bd des Pins, Toulouse' }); break;
+      case 'offer_notification': await sendOfferNotification({ sellerEmail: DEMO.email, sellerFirstName: DEMO.firstName, buyerName: 'Jean Dupont', buyerEmail: 'jean.dupont@gmail.com', buyerPhone: '06 12 34 56 78', amount: 375000, conditions: 'Financement confirmé', propertyCity: 'Toulouse', propertyType: 'Maison' }); break;
+      case 'prospect_nudge':   await sendProspectNudge({ name: DEMO.firstName, email: DEMO.email }); break;
+      case 'info_needed':      await sendInfoNeededEmail({ email: DEMO.email, firstName: DEMO.firstName, missingFields: ['Superficie terrain', 'Type de chauffage', 'Année de construction'] }); break;
+      case 'buyer_contacted':  await sendBuyerContactedSeller({ email: DEMO.email, firstName: DEMO.firstName, buyerName: 'Jean Dupont', buyerPhone: '06 12 34 56 78', propertyAddress: '45 Bd des Pins, Toulouse' }); break;
+      case 'visit_feedback_buyer': await sendVisitFeedbackRequest({ email: DEMO.email, firstName: DEMO.firstName, visitDate: '7 juin 2026', buyerName: 'Jean Dupont' }); break;
+      case 'sold_congrats':    await sendSoldCongrats({ email: DEMO.email, firstName: DEMO.firstName, address: '45 Bd des Pins, Toulouse', price: 375000 }); break;
+      case 'mission_assigned': await sendMissionAssigned({ email: 'photographe@exemple.fr', firstName: 'Lucas' }, { address: '45 Bd des Pins', city: 'Toulouse', scheduled_date: '2026-06-07', scheduled_time: '09:00', client_name: 'Marie Lambert', client_phone: '06 95 44 36 54' }); break;
+      default: capturedHtml = `<p style="font-family:Arial;padding:32px;color:#888;">Prévisualisation non disponible pour ce type d'email (${type}).</p>`; break;
+    }
+  } finally {
+    sgMail.send = originalSend;
+  }
+
+  return capturedHtml || `<p style="font-family:Arial;padding:32px;color:#888;">Aucun contenu généré pour "${type}".</p>`;
+}
+
+module.exports = { sendWelcomeEmail, sendDossierEmail, sendVisitConfirmation, sendContactNotification, sendMissionAssigned, sendMissionConfirmed, sendMissionReminderJ1, sendProspectNudge, sendNoPropertyNudge, sendNoPhotosNudge, sendNotPublishedNudge, sendNewVisitRequest, sendVisitReminderSeller, sendMissingDocNudge, sendPublishedConfirmation, sendContractRenewal, sendReviewRequest, sendAdminDirectEmail, sendInvoiceEmail, sendOfferNotification, sendPostVisitBuyerNudge, sendWeeklyAdminReport, sendPhotographerAvailabilityRequest, sendPostFirstVisitFeedbackSeller, sendCheckInNoOffer, sendInfoNeededEmail, sendBuyerContactedSeller, sendVisitFeedbackRequest, sendSoldCongrats, sendWelcomeImproved, sendDossierToNotaire, previewEmail };

@@ -1100,6 +1100,17 @@ router.post('/api/emails/send', requireAdmin, async (req, res) => {
   }
 });
 
+// ── Prévisualisation email ─────────────────────────────────────
+router.get('/api/emails/preview/:id', requireAdmin, async (req, res) => {
+  try {
+    const { previewEmail } = require('../services/email');
+    const html = await previewEmail(req.params.id);
+    res.type('text/html').send(html);
+  } catch(e) {
+    res.status(500).type('text/html').send(`<p style="font-family:Arial;padding:32px;color:red;">Erreur : ${e.message}</p>`);
+  }
+});
+
 // ── Offres d'achat (vue admin) ────────────────────────────────
 router.get('/api/offres', requireAdmin, (req, res) => {
   const offres = db.prepare(`

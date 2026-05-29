@@ -201,9 +201,88 @@
   </div>
 </div>
 
+<!-- Modal aperçu email -->
+<div id="previewModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:1000;align-items:center;justify-content:center;">
+  <div style="background:#1A1A16;border-radius:16px;width:90vw;max-width:780px;height:88vh;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 24px 60px rgba(0,0,0,0.5);">
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid #2a2a24;flex-shrink:0;">
+      <div>
+        <div style="font-size:0.65rem;text-transform:uppercase;letter-spacing:0.1em;color:#888;margin-bottom:2px;">Aperçu email</div>
+        <div id="previewTitle" style="font-weight:700;color:#fff;font-size:1rem;"></div>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center;">
+        <button id="previewToggleBtn" onclick="togglePreviewMode()" style="background:#2a2a24;border:none;color:#ccc;padding:7px 14px;border-radius:8px;cursor:pointer;font-size:0.82rem;">👁 Visuel</button>
+        <button onclick="closePreview()" style="background:#2a2a24;border:none;color:#ccc;padding:7px 14px;border-radius:8px;cursor:pointer;font-size:0.82rem;">✕ Fermer</button>
+      </div>
+    </div>
+    <div style="flex:1;overflow:hidden;position:relative;">
+      <iframe id="previewIframe" style="width:100%;height:100%;border:none;background:#fff;"></iframe>
+      <textarea id="previewSource" style="display:none;width:100%;height:100%;border:none;padding:16px;font-family:monospace;font-size:0.78rem;background:#0f0f0d;color:#a8d4b8;resize:none;box-sizing:border-box;"></textarea>
+    </div>
+    <div style="padding:12px 20px;border-top:1px solid #2a2a24;display:flex;gap:8px;flex-shrink:0;">
+      <button onclick="copyHtml()" style="background:#2a2a24;border:none;color:#ccc;padding:8px 16px;border-radius:8px;cursor:pointer;font-size:0.82rem;">📋 Copier le HTML</button>
+      <span style="flex:1;font-size:0.75rem;color:#555;display:flex;align-items:center;">Données de démo : Marie Lambert · Toulouse · 385 000 €</span>
+    </div>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <script>
+let previewMode = 'visual'; // 'visual' | 'source'
+let currentPreviewHtml = '';
+
+async function openPreview(id, label) {
+  document.getElementById('previewModal').style.display = 'flex';
+  document.getElementById('previewTitle').textContent = label;
+  document.getElementById('previewIframe').srcdoc = '<div style="font-family:Arial;padding:40px;color:#999;text-align:center;">Chargement…</div>';
+  document.getElementById('previewSource').value = '';
+  previewMode = 'visual';
+  document.getElementById('previewToggleBtn').textContent = '< > Source';
+  document.getElementById('previewIframe').style.display = '';
+  document.getElementById('previewSource').style.display = 'none';
+  try {
+    const r = await fetch(`/admin/api/emails/preview/${id}`);
+    currentPreviewHtml = await r.text();
+    document.getElementById('previewIframe').srcdoc = currentPreviewHtml;
+    document.getElementById('previewSource').value = currentPreviewHtml;
+  } catch(e) {
+    document.getElementById('previewIframe').srcdoc = `<p style="font-family:Arial;padding:32px;color:red;">Erreur : ${e.message}</p>`;
+  }
+}
+
+function closePreview() {
+  document.getElementById('previewModal').style.display = 'none';
+  document.getElementById('previewIframe').srcdoc = '';
+}
+
+function togglePreviewMode() {
+  const iframe = document.getElementById('previewIframe');
+  const source = document.getElementById('previewSource');
+  const btn = document.getElementById('previewToggleBtn');
+  if (previewMode === 'visual') {
+    previewMode = 'source';
+    iframe.style.display = 'none';
+    source.style.display = 'block';
+    btn.textContent = '👁 Visuel';
+  } else {
+    previewMode = 'visual';
+    source.style.display = 'none';
+    iframe.style.display = 'block';
+    // Sync any edits from source back to iframe
+    currentPreviewHtml = source.value;
+    iframe.srcdoc = currentPreviewHtml;
+    btn.textContent = '< > Source';
+  }
+}
+
+function copyHtml() {
+  const html = previewMode === 'source' ? document.getElementById('previewSource').value : currentPreviewHtml;
+  navigator.clipboard.writeText(html).then(() => showToast('HTML copié !')).catch(() => showToast('Erreur copie', true));
+}
+
+// Fermer la modal sur Escape
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closePreview(); });
+
 let allCatalog = [];
 let allLogs = [];
 let activeFilter = 'all';
@@ -294,7 +373,10 @@ function renderCatalog(list) {
       <td><span class="badge ${recBadge}">${e.recipient}</span></td>
       <td><span class="badge ${e.auto ? 'badge-auto' : 'badge-manual'}">${e.auto ? '⚡ Auto' : '✋ Manuel'}</span></td>
       <td class="log-time">${lastSent}</td>
-      <td><button class="btn-send" onclick="openSendModalWith('${e.id}')">Envoyer</button></td>
+      <td style="display:flex;gap:6px;">
+        <button class="btn-send" style="background:#3D5A47;" onclick="openPreview('${e.id}','${e.label.replace(/'/g,"\\'")}')" title="Voir l'aperçu">👁 Aperçu</button>
+        <button class="btn-send" onclick="openSendModalWith('${e.id}')">Envoyer</button>
+      </td>
     </tr>`;
   }).join('');
 }
