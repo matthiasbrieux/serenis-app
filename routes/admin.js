@@ -981,6 +981,11 @@ const EMAIL_CATALOG = [
   { id: 'mission_assigned',      label: 'Mission assignée',                  trigger: 'Attribution photographe/coach',    recipient: 'Prestataire', auto: true },
   { id: 'offer_notification',    label: 'Notification offre reçue',          trigger: 'Offre soumise par acheteur',       recipient: 'Vendeur',  auto: true },
   { id: 'prospect_nudge',        label: 'Relance prospect',                  trigger: 'J+7 inscrit non payé',             recipient: 'Prospect', auto: true },
+  { id: 'info_needed',           label: 'Renseignements manquants sur la fiche', trigger: 'Manuel admin',                  recipient: 'Vendeur',  auto: false },
+  { id: 'buyer_contacted',       label: 'Un acheteur vous a contacté',       trigger: 'Formulaire contact annonce',       recipient: 'Vendeur',  auto: true },
+  { id: 'visit_feedback_buyer',  label: 'Retour visite (acheteur)',           trigger: 'J+1 après visite confirmée',       recipient: 'Acheteur', auto: false },
+  { id: 'sold_congrats',         label: 'Félicitations — bien vendu !',       trigger: 'Offre acceptée',                   recipient: 'Vendeur',  auto: false },
+  { id: 'welcome_v2',            label: 'Bienvenue (version améliorée)',      trigger: 'Création compte',                  recipient: 'Vendeur',  auto: true },
 ];
 
 router.get('/api/emails/catalog', requireAdmin, (req, res) => {
@@ -1065,8 +1070,13 @@ router.post('/api/emails/send', requireAdmin, async (req, res) => {
     } else if (email_type === 'custom') {
       if (!custom_message) return res.status(400).json({ error: 'custom_message requis' });
       ok = await sendAdminDirectEmail({ to: seller.email, subject: 'Message de Serenis', body: custom_message });
+    } else if (email_type === 'info_needed') {
+      ok = await sendAdminDirectEmail({ to: seller.email, subject: 'Des renseignements sont nécessaires sur votre dossier', body: custom_message || `Bonjour ${seller.first_name || ''},\n\nDes informations complémentaires sont nécessaires pour compléter votre dossier Serenis.\n\nN\'hésitez pas à nous contacter pour plus de détails.\n\nL\'équipe Serenis` });
+    } else if (email_type === 'sold_congrats') {
+      ok = await sendAdminDirectEmail({ to: seller.email, subject: 'Félicitations — votre bien est vendu !', body: custom_message || `Bonjour ${seller.first_name || ''},\n\nToute l'équipe Serenis vous félicite pour la vente de votre bien !\n\nMerci pour votre confiance.\n\nL'équipe Serenis` });
     } else {
-      return res.status(400).json({ error: 'Type d\'email inconnu' });
+      // Fallback générique pour les types non encore implémentés
+      ok = await sendAdminDirectEmail({ to: seller.email, subject: `Email Serenis — ${email_type}`, body: custom_message || `Bonjour ${seller.first_name || ''},\n\nMessage de l'équipe Serenis.\n\nL'équipe Serenis` });
     }
 
     if (ok) {
