@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tarifs — Serenis · Vendez sans agence</title>
+  <meta name="description" content="Serenis : vendez votre bien immobilier entre particuliers à partir de 499€. Pack Autonome ou Pack Sérénité avec photographe pro inclus.">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css">
+  <style>
+    body { background:#F5F0E8;font-family:'DM Sans',sans-serif;margin:0; }
+    nav { position:fixed;top:0;left:0;right:0;background:rgba(26,26,22,.92);backdrop-filter:blur(12px);z-index:100;padding:14px 32px;display:flex;justify-content:space-between;align-items:center; }
+    nav a.logo { font-family:'Cormorant Garamond',serif;color:#FDFCF8;font-size:1.4rem;text-decoration:none; }
+    nav a.logo em { color:#C4785A;font-style:normal; }
+    nav a.back { color:rgba(253,252,248,.6);font-size:.85rem;text-decoration:none; }
+    nav a.back:hover { color:#FDFCF8; }
+    .hero { padding:120px 32px 64px;text-align:center;max-width:700px;margin:0 auto; }
+    .hero h1 { font-family:'Cormorant Garamond',serif;font-size:3rem;color:#1A1A16;margin:0 0 16px;line-height:1.1; }
+    .hero p { font-size:1.05rem;color:#666;line-height:1.7;margin:0 0 12px; }
+    .saving { display:inline-block;background:#D4E4D8;color:#2a4030;font-weight:700;padding:8px 20px;border-radius:20px;font-size:.9rem;margin-top:8px; }
+    .packs { display:grid;grid-template-columns:1fr 1fr;gap:24px;max-width:860px;margin:0 auto 80px;padding:0 24px; }
+    @media(max-width:700px) { .packs { grid-template-columns:1fr; } .hero h1 { font-size:2.2rem; } }
+    .pack-card { background:#FDFCF8;border-radius:20px;overflow:hidden;box-shadow:0 8px 40px rgba(0,0,0,.07);border:2px solid transparent;transition:.2s; }
+    .pack-card.featured { border-color:#3D5A47; }
+    .pack-top { padding:32px 32px 24px; }
+    .pack-badge { display:inline-block;background:#C4785A;color:#fff;font-size:.72rem;font-weight:700;padding:3px 10px;border-radius:10px;margin-bottom:12px; }
+    .pack-name { font-family:'Cormorant Garamond',serif;font-size:1.7rem;color:#1A1A16;margin:0 0 8px; }
+    .pack-price { font-family:'Cormorant Garamond',serif;font-size:3rem;font-weight:700;color:#1A1A16;line-height:1; }
+    .pack-price small { font-size:1rem;font-weight:400;color:#888;font-family:'DM Sans',sans-serif; }
+    .pack-desc { font-size:.88rem;color:#888;margin:12px 0 0;line-height:1.6; }
+    .pack-features { padding:24px 32px;border-top:1px solid #f0ece6;display:flex;flex-direction:column;gap:10px; }
+    .feat { display:flex;align-items:flex-start;gap:10px;font-size:.88rem;color:#444;line-height:1.5; }
+    .feat .check { color:#3D5A47;font-weight:700;flex-shrink:0;margin-top:1px; }
+    .feat .cross { color:#bbb;flex-shrink:0;margin-top:1px; }
+    .pack-cta { padding:24px 32px 32px; }
+    .btn-pack { display:block;text-align:center;padding:14px 24px;border-radius:10px;font-weight:700;font-size:1rem;text-decoration:none;transition:.2s; }
+    .btn-pack.primary { background:#C4785A;color:#fff; }
+    .btn-pack.primary:hover { background:#b36a4e; }
+    .btn-pack.secondary { background:#f5f0e8;color:#3D5A47;border:1.5px solid #3D5A47; }
+    .btn-pack.secondary:hover { background:#D4E4D8; }
+    .comparison { font-size:.78rem;color:#aaa;text-align:center;margin-top:10px; }
+    .guarantee { max-width:720px;margin:0 auto 80px;padding:0 24px; }
+    .guarantee-card { background:#fff;border-radius:16px;padding:32px 36px;display:flex;gap:20px;align-items:flex-start;box-shadow:0 4px 20px rgba(0,0,0,.05); }
+    .guarantee-icon { font-size:2rem;flex-shrink:0; }
+    .guarantee h3 { font-family:'Cormorant Garamond',serif;font-size:1.4rem;color:#1A1A16;margin:0 0 8px; }
+    .guarantee p { font-size:.88rem;color:#666;line-height:1.7;margin:0; }
+    .faq-section { max-width:720px;margin:0 auto 80px;padding:0 24px; }
+    .faq-section h2 { font-family:'Cormorant Garamond',serif;font-size:1.8rem;color:#1A1A16;margin:0 0 28px;text-align:center; }
+    details { border-bottom:1px solid #e8e0d6;padding:18px 0; }
+    summary { font-weight:600;font-size:.95rem;color:#1A1A16;cursor:pointer;list-style:none;display:flex;justify-content:space-between;align-items:center; }
+    summary::after { content:'＋';color:#C4785A;font-size:1.1rem;flex-shrink:0; }
+    details[open] summary::after { content:'−'; }
+    details p { font-size:.88rem;color:#555;line-height:1.75;margin:12px 0 0;padding-left:0; }
+    footer { background:#1A1A16;color:rgba(253,252,248,.4);padding:28px 32px;font-size:.76rem;text-align:center;line-height:1.7; }
+  </style>
+</head>
+<body>
+  <nav>
+    <a href="/" class="logo">Sere<em>nis</em></a>
+    <a href="/" class="back">← Retour à l'accueil</a>
+  </nav>
+
+  <div class="hero">
+    <h1>Vendez votre bien.<br>Sans commission d'agence.</h1>
+    <p>Économisez en moyenne <strong>15 000 à 25 000 €</strong> par rapport à une agence traditionnelle.</p>
+    <span class="saving">Prix fixe · Pas de surprise · Pas de commission</span>
+  </div>
+
+  <div class="packs">
+    <!-- Pack Autonome -->
+    <div class="pack-card">
+      <div class="pack-top">
+        <div class="pack-name">Pack Autonome</div>
+        <div class="pack-price">499 € <small>TTC</small></div>
+        <p class="pack-desc">Tout ce qu'il faut pour vendre efficacement, sans photographe.</p>
+      </div>
+      <div class="pack-features">
+        <div class="feat"><span class="check">✓</span>Numéro dédié Serenis (bot SMS automatique)</div>
+        <div class="feat"><span class="check">✓</span>Dossier acheteur + dossier notaire en ligne</div>
+        <div class="feat"><span class="check">✓</span>Agenda connecté (réservation visite en ligne)</div>
+        <div class="feat"><span class="check">✓</span>Formation vidéo complète (15+ leçons)</div>
+        <div class="feat"><span class="check">✓</span>Coach IA (réponses personnalisées 24h/24)</div>
+        <div class="feat"><span class="check">✓</span>Publication automatique LeBonCoin, PAP…</div>
+        <div class="feat"><span class="check">✓</span>Guide photos immersives pièce par pièce</div>
+        <div class="feat"><span class="check">✓</span>Génération de texte d'annonce par IA</div>
+        <div class="feat"><span class="cross">✗</span><span style="color:#bbb;">Photographe professionnel Meero</span></div>
+        <div class="feat"><span class="cross">✗</span><span style="color:#bbb;">Retouches et livraison 48h</span></div>
+      </div>
+      <div class="pack-cta">
+        <a href="/#offres" class="btn-pack secondary">Choisir le Pack Autonome</a>
+        <p class="comparison">Économisez ~20 000 € vs agence</p>
+      </div>
+    </div>
+
+    <!-- Pack Sérénité -->
+    <div class="pack-card featured">
+      <div class="pack-top">
+        <div class="pack-badge">⭐ Le plus choisi</div>
+        <div class="pack-name">Pack Sérénité</div>
+        <div class="pack-price">999 € <small>TTC</small></div>
+        <p class="pack-desc">Tout le Pack Autonome + séance photo professionnelle incluse.</p>
+      </div>
+      <div class="pack-features">
+        <div class="feat"><span class="check">✓</span>Numéro dédié Serenis (bot SMS automatique)</div>
+        <div class="feat"><span class="check">✓</span>Dossier acheteur + dossier notaire en ligne</div>
+        <div class="feat"><span class="check">✓</span>Agenda connecté (réservation visite en ligne)</div>
+        <div class="feat"><span class="check">✓</span>Formation vidéo complète (15+ leçons)</div>
+        <div class="feat"><span class="check">✓</span>Coach IA (réponses personnalisées 24h/24)</div>
+        <div class="feat"><span class="check">✓</span>Publication automatique LeBonCoin, PAP…</div>
+        <div class="feat"><span class="check">✓</span>Guide photos immersives pièce par pièce</div>
+        <div class="feat"><span class="check">✓</span>Génération de texte d'annonce par IA</div>
+        <div class="feat"><span class="check" style="color:#C4785A;">✓</span><strong>Photographe professionnel Meero</strong></div>
+        <div class="feat"><span class="check" style="color:#C4785A;">✓</span><strong>Retouches et livraison sous 48h</strong></div>
+      </div>
+      <div class="pack-cta">
+        <a href="/#offres" class="btn-pack primary">Choisir le Pack Sérénité</a>
+        <p class="comparison">Économisez ~19 000 € vs agence · Photo pro incluse</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="guarantee">
+    <div class="guarantee-card">
+      <div class="guarantee-icon">🛡️</div>
+      <div>
+        <h3>Aucune commission, jamais</h3>
+        <p>Vous payez une fois, c'est tout. Pas de commission sur la vente, pas d'abonnement, pas de frais cachés. Le prix affiché est le prix payé — que votre bien soit vendu à 100 000 € ou à 800 000 €.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="faq-section">
+    <h2>Questions fréquentes sur les tarifs</h2>
+    <details>
+      <summary>Puis-je changer de pack après l'inscription ?</summary>
+      <p>Oui, contactez-nous par email à contact@serenis.fr ou par téléphone au 06 95 44 36 54. Nous procéderons à la mise à niveau moyennant la différence de tarif.</p>
+    </details>
+    <details>
+      <summary>Y a-t-il des frais supplémentaires ?</summary>
+      <p>Non. Le prix affiché est TTC, tout compris. Il n'y a aucun frais de mise en ligne, aucune commission sur la vente, aucun abonnement mensuel.</p>
+    </details>
+    <details>
+      <summary>Combien économise-t-on par rapport à une agence ?</summary>
+      <p>Une agence prend en général 4 à 7 % du prix de vente. Pour un bien à 300 000 €, c'est 12 000 à 21 000 € de commission. Avec Serenis à 999 €, vous économisez 11 000 à 20 000 € sur la même vente.</p>
+    </details>
+    <details>
+      <summary>Combien de temps pour vendre avec Serenis ?</summary>
+      <p>Le délai dépend du marché local, du prix et de la qualité du dossier. Nos vendeurs vendent en moyenne en 3 à 8 semaines avec un dossier complet (photos pro, diagnostics, agenda en ligne).</p>
+    </details>
+    <details>
+      <summary>Le paiement est-il sécurisé ?</summary>
+      <p>Oui, le paiement est traité par Stripe, l'un des leaders mondiaux du paiement en ligne. Vos données bancaires ne transitent jamais par nos serveurs.</p>
+    </details>
+    <details>
+      <summary>Puis-je être remboursé si je change d'avis ?</summary>
+      <p>Contactez-nous dans les 48h suivant l'achat si vous souhaitez annuler. Passé ce délai, les services ayant été activés (compte, numéro Twilio, accès plateforme), le remboursement ne sera pas possible.</p>
+    </details>
+  </div>
+
+  <footer>
+    <p>Serenis · Vendez votre bien immobilier entre particuliers</p>
+    <p>Matthias Brieux — 06 95 44 36 54 — contact@serenis.fr — Douai (59)</p>
+    <p style="margin-top:8px;"><a href="/cgv" style="color:inherit;">CGV</a> · <a href="/faq" style="color:inherit;">FAQ</a> · <a href="/" style="color:inherit;">Accueil</a></p>
+  </footer>
+</body>
+</html>
