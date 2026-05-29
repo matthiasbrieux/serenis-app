@@ -1404,7 +1404,10 @@ async function previewEmail(type) {
   };
 
   let capturedHtml = null;
-  const originalSend = sgMail.send;
+  // Forcer le passage du check SENDGRID_API_KEY dans chaque fonction
+  const savedKey = process.env.SENDGRID_API_KEY;
+  if (!savedKey) process.env.SENDGRID_API_KEY = 'SG.preview_only_not_a_real_key';
+  const originalSend = sgMail.send.bind(sgMail);
   sgMail.send = async (msg) => { capturedHtml = Array.isArray(msg) ? msg[0].html : msg.html; return [{ statusCode: 202 }]; };
 
   try {
@@ -1435,6 +1438,7 @@ async function previewEmail(type) {
     }
   } finally {
     sgMail.send = originalSend;
+    process.env.SENDGRID_API_KEY = savedKey;
   }
 
   return capturedHtml || `<p style="font-family:Arial;padding:32px;color:#888;">Aucun contenu généré pour "${type}".</p>`;
