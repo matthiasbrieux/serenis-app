@@ -375,6 +375,18 @@ try { db.exec("ALTER TABLE properties ADD COLUMN floor INTEGER"); } catch(e) {}
 try { db.exec("ALTER TABLE properties ADD COLUMN furnished BOOLEAN DEFAULT 0"); } catch(e) {}
 try { db.exec("ALTER TABLE property_publications ADD COLUMN updated_at DATETIME"); } catch(e) {}
 
+// ── Réinitialisation de mot de passe ─────────────────────────
+db.exec(`
+  CREATE TABLE IF NOT EXISTS password_reset_tokens (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    seller_id INTEGER NOT NULL REFERENCES sellers(id) ON DELETE CASCADE,
+    token TEXT UNIQUE NOT NULL,
+    expires_at DATETIME NOT NULL,
+    used_at DATETIME,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+  );
+`);
+
 // ── Offres d'achat ────────────────────────────────────────────
 db.exec(`
   CREATE TABLE IF NOT EXISTS offers (

@@ -1473,4 +1473,39 @@ async function sendPropertySoldToBuyer({ buyerEmail, buyerName, propertyType, pr
   } catch(e) { console.error('[EMAIL ERROR] sendPropertySoldToBuyer:', e.message); return false; }
 }
 
-module.exports = { sendWelcomeEmail, sendDossierEmail, sendVisitConfirmation, sendContactNotification, sendMissionAssigned, sendMissionConfirmed, sendMissionReminderJ1, sendProspectNudge, sendNoPropertyNudge, sendNoPhotosNudge, sendNotPublishedNudge, sendNewVisitRequest, sendVisitReminderSeller, sendMissingDocNudge, sendPublishedConfirmation, sendContractRenewal, sendReviewRequest, sendAdminDirectEmail, sendInvoiceEmail, sendOfferNotification, sendPostVisitBuyerNudge, sendWeeklyAdminReport, sendPhotographerAvailabilityRequest, sendPostFirstVisitFeedbackSeller, sendCheckInNoOffer, sendInfoNeededEmail, sendBuyerContactedSeller, sendVisitFeedbackRequest, sendSoldCongrats, sendPropertySoldToBuyer, sendWelcomeImproved, sendDossierToNotaire, previewEmail };
+async function sendPasswordResetEmail({ email, resetUrl }) {
+  const msg = {
+    to: email, from: FROM,
+    subject: 'Réinitialisation de votre mot de passe — Serenis',
+    html: `
+<!DOCTYPE html><html lang="fr"><body style="margin:0;padding:0;background:#F5F0E8;font-family:Arial,sans-serif;">
+<div style="max-width:560px;margin:40px auto;background:#FDFCF8;border-radius:16px;overflow:hidden;box-shadow:0 4px 20px rgba(0,0,0,.06);">
+  <div style="background:#1A1A16;padding:28px 36px;">
+    <span style="font-family:Georgia,serif;font-size:1.4rem;color:#FDFCF8;">Sere<span style="color:#C4785A;">nis</span></span>
+  </div>
+  <div style="padding:36px;">
+    <h2 style="font-family:Georgia,serif;font-size:1.4rem;color:#1A1A16;margin:0 0 16px;">Réinitialisation de mot de passe</h2>
+    <p style="font-size:.92rem;color:#444;line-height:1.7;margin:0 0 24px;">
+      Vous avez demandé à réinitialiser votre mot de passe. Cliquez sur le bouton ci-dessous pour choisir un nouveau mot de passe.
+    </p>
+    <a href="${resetUrl}" style="display:inline-block;background:#C4785A;color:#fff;text-decoration:none;padding:14px 28px;border-radius:8px;font-weight:700;font-size:.95rem;">
+      Choisir un nouveau mot de passe
+    </a>
+    <p style="font-size:.8rem;color:#999;margin:24px 0 0;line-height:1.6;">
+      Ce lien expire dans <strong>1 heure</strong>. Si vous n'avez pas demandé cette réinitialisation, ignorez cet email.
+    </p>
+  </div>
+  <div style="background:#f5f0e8;padding:16px 36px;text-align:center;">
+    <p style="font-size:.75rem;color:#aaa;margin:0;">Serenis · contact@serenis.fr · 06 95 44 36 54</p>
+  </div>
+</div>
+</body></html>`,
+  };
+  try {
+    if (!process.env.SENDGRID_API_KEY) { console.log('[EMAIL SKIPPED] PasswordReset:', email); return true; }
+    await sgMail.send(msg);
+    return true;
+  } catch(e) { console.error('[EMAIL ERROR] sendPasswordResetEmail:', e.message); return false; }
+}
+
+module.exports = { sendWelcomeEmail, sendDossierEmail, sendVisitConfirmation, sendContactNotification, sendMissionAssigned, sendMissionConfirmed, sendMissionReminderJ1, sendProspectNudge, sendNoPropertyNudge, sendNoPhotosNudge, sendNotPublishedNudge, sendNewVisitRequest, sendVisitReminderSeller, sendMissingDocNudge, sendPublishedConfirmation, sendContractRenewal, sendReviewRequest, sendAdminDirectEmail, sendInvoiceEmail, sendOfferNotification, sendPostVisitBuyerNudge, sendWeeklyAdminReport, sendPhotographerAvailabilityRequest, sendPostFirstVisitFeedbackSeller, sendCheckInNoOffer, sendInfoNeededEmail, sendBuyerContactedSeller, sendVisitFeedbackRequest, sendSoldCongrats, sendPropertySoldToBuyer, sendWelcomeImproved, sendDossierToNotaire, previewEmail, sendPasswordResetEmail };
