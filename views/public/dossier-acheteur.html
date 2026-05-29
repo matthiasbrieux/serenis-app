@@ -73,6 +73,17 @@
 
     .empty-docs { text-align: center; padding: 32px; color: #aaa; font-size: 0.9rem; }
 
+    /* ── Pièces ── */
+    .rooms-level { margin-bottom: 18px; }
+    .rooms-level-title { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.08em; font-weight: 700; color: #3D5A47; background: #e8f4ec; display: inline-block; padding: 3px 10px; border-radius: 20px; margin-bottom: 10px; }
+    .rooms-table { width: 100%; border-collapse: collapse; }
+    .rooms-table tr { border-bottom: 1px solid #f0ece4; }
+    .rooms-table tr:last-child { border-bottom: none; }
+    .rooms-table td { padding: 8px 4px; font-size: 0.9rem; }
+    .rooms-table td:first-child { color: #1A1A16; font-weight: 500; padding-left: 0; }
+    .rooms-table td:last-child { text-align: right; color: #3D5A47; font-weight: 600; white-space: nowrap; font-variant-numeric: tabular-nums; }
+    .rooms-total-row { display: flex; justify-content: space-between; align-items: center; background: #f5f0e8; border-radius: 10px; padding: 10px 14px; margin-top: 14px; font-size: 0.88rem; font-weight: 600; color: #1A1A16; }
+
     .loading { text-align: center; padding: 80px 20px; }
     .loading-spinner { width: 40px; height: 40px; border: 3px solid #e0e0d8; border-top-color: #3D5A47; border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 16px; }
     @keyframes spin { to { transform: rotate(360deg); } }
@@ -332,6 +343,40 @@ function render(p, ph, docs) {
     : '';
   const allDocsHtml = diagHtml + acheteurHtml || '<div class="empty-docs">Aucun document disponible pour le moment.</div>';
 
+  // ── Descriptif des pièces ──
+  const FLOOR_ORDER = ['RDC', '1er étage', '2e étage', '3e étage', '4e étage', 'Sous-sol'];
+  let roomsSectionHtml = '';
+  if (p.rooms_detail) {
+    try {
+      const rooms = JSON.parse(p.rooms_detail);
+      if (rooms && rooms.length) {
+        const byFloor = {};
+        rooms.forEach(r => {
+          const fl = r.floor || 'RDC';
+          if (!byFloor[fl]) byFloor[fl] = [];
+          byFloor[fl].push(r);
+        });
+        const orderedFloors = [...FLOOR_ORDER, ...Object.keys(byFloor).filter(f => !FLOOR_ORDER.includes(f))].filter(f => byFloor[f]);
+        const totalSurf = rooms.reduce((s, r) => s + (r.surface || 0), 0);
+        const levelsHtml = orderedFloors.map(fl => {
+          const flRooms = byFloor[fl];
+          const rows = flRooms.map(r =>
+            `<tr><td>${r.label || r.key}</td><td>${r.surface ? r.surface + ' m²' : '—'}</td></tr>`
+          ).join('');
+          return `<div class="rooms-level">
+            <div class="rooms-level-title">${fl}</div>
+            <table class="rooms-table"><tbody>${rows}</tbody></table>
+          </div>`;
+        }).join('');
+        roomsSectionHtml = `<div class="section">
+          <div class="section-title"><span>🚪</span> Descriptif des pièces</div>
+          ${levelsHtml}
+          ${totalSurf > 0 ? `<div class="rooms-total-row"><span>Surface totale des pièces</span><span>${Math.round(totalSurf * 10) / 10} m²</span></div>` : ''}
+        </div>`;
+      }
+    } catch(e) {}
+  }
+
   document.getElementById('content').innerHTML = `
     <div class="hero">
       <div class="hero-photos" id="heroPhotos">${mainPhoto}<div class="photo-count">${ph.length} photo${ph.length>1?'s':''}</div></div>
@@ -373,6 +418,8 @@ function render(p, ph, docs) {
       <div class="section-title"><span>🏠</span> Caractéristiques complètes</div>
       ${charakteristikHtml}
     </div>` : ''}
+
+    ${roomsSectionHtml}
 
     <div class="section">
       <div class="section-title"><span>📂</span> Documents</div>
