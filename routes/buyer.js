@@ -1,6 +1,8 @@
 const express = require('express');
 const router = express.Router();
 const rateLimit = require('express-rate-limit');
+const fs = require('fs');
+const path = require('path');
 const db = require('../database');
 
 const publicFormLimit = rateLimit({ windowMs: 15 * 60 * 1000, max: 8, standardHeaders: true, legacyHeaders: false, handler: (req, res) => res.status(429).json({ error: 'Trop de tentatives. Réessayez dans 15 minutes.' }) });
@@ -10,14 +12,35 @@ const { sendSmsNotification } = require('../services/twilio');
 
 // ── Page publique bien ──
 router.get('/bien/:slug', (req, res) => {
-  const property = db.prepare('SELECT id FROM properties WHERE slug = ? AND published = 1').get(req.params.slug);
+  const property = db.prepare('SELECT type, city, price, surface_habitable, rooms, description FROM properties WHERE slug = ? AND published = 1').get(req.params.slug);
   if (!property) return res.status(404).sendFile('404.html', { root: './public' });
   try {
+    const fullProp = db.prepare('SELECT id FROM properties WHERE slug = ? LIMIT 1').get(req.params.slug);
     const ip = (req.headers['x-forwarded-for'] || req.ip || '').split(',')[0].trim();
     const ipHash = require('crypto').createHash('sha256').update(ip).digest('hex').slice(0, 16);
-    db.prepare('INSERT INTO property_page_views (property_id, ip_hash) VALUES (?,?)').run(property.id, ipHash);
+    db.prepare('INSERT INTO property_page_views (property_id, ip_hash) VALUES (?,?)').run(fullProp.id, ipHash);
   } catch(e) {}
-  res.sendFile('property-public.html', { root: './views/property' });
+
+  // Injection SSR des meta OG pour Google/réseaux sociaux
+  try {
+    const typeLabel = property.type ? property.type.charAt(0).toUpperCase() + property.type.slice(1) : 'Bien';
+    const priceStr = property.price ? Number(property.price).toLocaleString('fr-FR') + ' €' : '';
+    const surfaceStr = property.surface_habitable ? `${property.surface_habitable} m²` : '';
+    const title = [typeLabel, property.city, priceStr].filter(Boolean).join(' — ');
+    const desc = property.description
+      ? property.description.slice(0, 160)
+      : `${typeLabel}${surfaceStr ? ' de ' + surfaceStr : ''}${property.city ? ' à ' + property.city : ''} — Dossier complet sur Serenis`;
+
+    let html = fs.readFileSync(path.join(__dirname, '../views/property/property-public.html'), 'utf8');
+    html = html
+      .replace('content="Bien à vendre — Serenis"', `content="${title.replace(/"/g, '&quot;')}"`)
+      .replace('content="Voir le dossier complet de ce bien"', `content="${desc.replace(/"/g, '&quot;')}"`)
+      .replace('content="Dossier complet disponible — Serenis"', `content="${desc.replace(/"/g, '&quot;')}"`);
+    res.setHeader('Content-Type', 'text/html');
+    res.send(html);
+  } catch(e) {
+    res.sendFile('property-public.html', { root: './views/property' });
+  }
 });
 
 // ── Export PDF dossier ──
