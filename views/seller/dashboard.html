@@ -651,6 +651,15 @@
           </div>
           <button type="submit" class="btn-primary" style="width:100%;">Sauvegarder</button>
         </form>
+
+        <!-- RGPD -->
+        <div style="margin-top:24px;padding-top:24px;border-top:1px solid #e8e0d6;">
+          <p style="font-size:0.82rem;font-weight:600;color:#888;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:14px;">Mes données & compte</p>
+          <div style="display:flex;flex-direction:column;gap:10px;">
+            <a href="/api/seller/rgpd/export" id="exportDataBtn" style="display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:11px 18px;background:#f5f0e8;border:1px solid #ddd;border-radius:8px;color:#444;font-size:0.88rem;font-weight:600;text-decoration:none;transition:background .15s;" onmouseenter="this.style.background='#e8e0d6'" onmouseleave="this.style.background='#f5f0e8'">⬇ Télécharger mes données (JSON)</a>
+            <button onclick="confirmDeleteAccount()" style="padding:11px 18px;background:#fff;border:1px solid #e53935;border-radius:8px;color:#e53935;font-size:0.88rem;font-weight:600;cursor:pointer;transition:background .15s;" onmouseenter="this.style.background='#fdf2f2'" onmouseleave="this.style.background='#fff'">🗑 Supprimer mon compte</button>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -1200,6 +1209,21 @@ async function loadData() {
 }
 
 loadData();
+
+async function confirmDeleteAccount() {
+  const ok = confirm('⚠️ Supprimer définitivement votre compte Serenis ?\n\nTous vos biens, photos, contacts acheteurs et données seront effacés.\n\nCette action est irréversible.');
+  if (!ok) return;
+  const ok2 = confirm('Dernière confirmation : voulez-vous vraiment supprimer votre compte ?');
+  if (!ok2) return;
+  const r = await fetch('/api/seller/rgpd/account', { method: 'DELETE' });
+  const data = await r.json();
+  if (data.success) {
+    alert('Votre compte a été supprimé. À bientôt.');
+    window.location.href = '/';
+  } else {
+    alert('Erreur lors de la suppression. Contactez contact@serenis.fr.');
+  }
+}
 </script>
 <script src="/js/transitions.js"></script>
 <script src="/js/seller-nav.js"></script>

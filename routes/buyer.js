@@ -4,7 +4,7 @@ const rateLimit = require('express-rate-limit');
 const db = require('../database');
 
 const publicFormLimit = rateLimit({ windowMs: 15 * 60 * 1000, max: 8, standardHeaders: true, legacyHeaders: false, handler: (req, res) => res.status(429).json({ error: 'Trop de tentatives. Réessayez dans 15 minutes.' }) });
-const { sendDossierEmail, sendVisitConfirmation, sendOfferNotification } = require('../services/email');
+const { sendDossierEmail, sendVisitConfirmation } = require('../services/email');
 const { v4: uuidv4 } = require('uuid');
 const { sendSmsNotification } = require('../services/twilio');
 
@@ -143,40 +143,6 @@ router.get('/api/bien/:slug/creneaux', (req, res) => {
   `).all(property.id);
 
   res.json({ slots, booked });
-});
-
-// ── Offres d'achat ──
-router.post('/api/bien/:slug/offre', publicFormLimit, async (req, res) => {
-  const property = db.prepare('SELECT * FROM properties WHERE slug = ? AND published = 1').get(req.params.slug);
-  if (!property) return res.json({ error: 'Bien non trouvé' });
-
-  const { buyer_name, buyer_email, buyer_phone, amount, conditions } = req.body;
-  if (!buyer_name || !buyer_email || !amount || isNaN(Number(amount)) || Number(amount) <= 0) {
-    return res.json({ error: 'Informations manquantes ou montant invalide' });
-  }
-
-  const uuid = uuidv4();
-  db.prepare(`
-    INSERT INTO offers (uuid, property_id, seller_id, buyer_name, buyer_email, buyer_phone, amount, conditions)
-    VALUES (?,?,?,?,?,?,?,?)
-  `).run(uuid, property.id, property.seller_id, buyer_name, buyer_email, buyer_phone || '', Math.round(Number(amount)), conditions || '');
-
-  const seller = db.prepare('SELECT email, first_name FROM sellers WHERE id = ?').get(property.seller_id);
-  try {
-    await sendOfferNotification({
-      sellerEmail: seller.email,
-      sellerFirstName: seller.first_name,
-      buyerName: buyer_name,
-      buyerEmail: buyer_email,
-      buyerPhone: buyer_phone,
-      amount: Math.round(Number(amount)),
-      conditions,
-      propertyCity: property.city,
-      propertyType: property.type,
-    });
-  } catch(e) { console.error('Offer notification error:', e.message); }
-
-  res.json({ success: true });
 });
 
 // ── Webhook SMS Twilio (exporté séparément pour urlencoded brut) ──

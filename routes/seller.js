@@ -974,4 +974,43 @@ router.delete('/api/guide-photos/:cloudinary_id', requireAuth, async (req, res) 
   res.json({ success: true });
 });
 
+// ── RGPD ─────────────────────────────────────────────────────
+router.get('/api/seller/rgpd/export', requireAuth, (req, res) => {
+  const seller = db.prepare('SELECT id, uuid, email, first_name, last_name, phone, pack, paid_at, created_at FROM sellers WHERE id=?').get(req.seller.id);
+  const property = db.prepare('SELECT * FROM properties WHERE seller_id=?').get(req.seller.id);
+  const photos = property ? db.prepare('SELECT url, category, room, angle_label, created_at FROM property_photos WHERE property_id=?').all(property.id) : [];
+  const documents = property ? db.prepare('SELECT name, doc_type, url, created_at FROM property_documents WHERE property_id=?').all(property.id) : [];
+  const visits = db.prepare('SELECT buyer_name, buyer_email, buyer_phone, visit_date, visit_time, status, created_at FROM visits WHERE seller_id=?').all(req.seller.id);
+  const contacts = db.prepare('SELECT buyer_name, buyer_phone, buyer_email, source, status, notes, created_at FROM buyer_contacts WHERE seller_id=?').all(req.seller.id);
+  const slots = db.prepare('SELECT day_of_week, specific_date, start_time, end_time, is_recurring FROM agenda_slots WHERE seller_id=?').all(req.seller.id);
+  const export_data = { exported_at: new Date().toISOString(), seller, property, photos, documents, visits, contacts, agenda_slots: slots };
+  res.setHeader('Content-Type', 'application/json');
+  res.setHeader('Content-Disposition', `attachment; filename="serenis-mes-donnees-${new Date().toISOString().slice(0,10)}.json"`);
+  res.send(JSON.stringify(export_data, null, 2));
+});
+
+router.delete('/api/seller/rgpd/account', requireAuth, async (req, res) => {
+  const sid = req.seller.id;
+  const property = db.prepare('SELECT id FROM properties WHERE seller_id=?').get(sid);
+  if (property) {
+    const photos = db.prepare('SELECT cloudinary_id FROM property_photos WHERE property_id=?').all(property.id);
+    const docs = db.prepare('SELECT cloudinary_id FROM property_documents WHERE property_id=? AND cloudinary_id IS NOT NULL').all(property.id);
+    if (process.env.CLOUDINARY_URL) {
+      const { cloudinary } = require('../services/upload');
+      for (const ph of photos) await cloudinary.uploader.destroy(ph.cloudinary_id).catch(() => {});
+      for (const d of docs) await cloudinary.uploader.destroy(d.cloudinary_id).catch(() => {});
+    }
+    db.prepare('DELETE FROM property_photos WHERE property_id=?').run(property.id);
+    db.prepare('DELETE FROM property_documents WHERE property_id=?').run(property.id);
+    db.prepare('DELETE FROM buyer_contacts WHERE property_id=?').run(property.id);
+    db.prepare('DELETE FROM visits WHERE property_id=?').run(property.id);
+    db.prepare('DELETE FROM properties WHERE id=?').run(property.id);
+  }
+  db.prepare('DELETE FROM agenda_slots WHERE seller_id=?').run(sid);
+  db.prepare('DELETE FROM notifications WHERE seller_id=?').run(sid);
+  db.prepare('DELETE FROM sellers WHERE id=?').run(sid);
+  res.clearCookie('token');
+  res.json({ success: true });
+});
+
 module.exports = router;
