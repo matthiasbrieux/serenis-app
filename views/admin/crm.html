@@ -195,6 +195,22 @@
     .crm-filter{border:1.5px solid var(--border);background:var(--surface);color:var(--text2);padding:5px 14px;border-radius:20px;font-size:0.76rem;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .12s;white-space:nowrap}
     .crm-filter:hover{border-color:#aaa;color:var(--dark)}
     .crm-filter.active{background:#C4603A;color:#fff;border-color:#C4603A}
+    .crm-filter.alert-filter{border-color:#fee2e2;background:#fff5f5;color:#dc2626}
+    .crm-filter.alert-filter:hover{border-color:#dc2626}
+    .crm-filter.alert-filter.active{background:#dc2626;color:#fff;border-color:#dc2626}
+
+    /* Alert icons in table */
+    .alert-icons{display:flex;flex-wrap:wrap;gap:3px;align-items:center}
+    .alert-ic{width:20px;height:20px;border-radius:5px;display:inline-flex;align-items:center;justify-content:center;font-size:.7rem;cursor:default;flex-shrink:0}
+    .alert-ic.red{background:var(--red-bg);color:var(--red)}
+    .alert-ic.amber{background:var(--amber-bg);color:var(--amber)}
+    .alert-ic.blue{background:var(--blue-bg);color:var(--blue)}
+
+    /* Progression bar */
+    .prog-wrap{min-width:80px}
+    .prog-bar{height:5px;background:#EEECEA;border-radius:3px;overflow:hidden;margin-top:3px}
+    .prog-fill{height:100%;border-radius:3px;transition:width .4s}
+    .prog-pct{font-size:0.66rem;font-weight:700;line-height:1}
 
     /* Empty */
     .empty-center{text-align:center;padding:72px 20px}
@@ -394,12 +410,12 @@
     <!-- Alert Filters -->
     <div id="crm-filters">
       <button class="crm-filter active" data-filter="all">Tous</button>
-      <button class="crm-filter" data-filter="paid-no-property">Payé sans fiche</button>
+      <button class="crm-filter" data-filter="pack-autonome">Pack Autonome</button>
+      <button class="crm-filter" data-filter="pack-serenite">Pack Sérénité</button>
       <button class="crm-filter" data-filter="no-photos">Sans photos</button>
-      <button class="crm-filter" data-filter="ready-not-published">Prêt à publier</button>
-      <button class="crm-filter" data-filter="pending-visits">Visites en attente</button>
-      <button class="crm-filter" data-filter="missing-docs">Docs manquants</button>
-      <button class="crm-filter" data-filter="contract-not-signed">Contrat non signé</button>
+      <button class="crm-filter" data-filter="missing-docs">Sans diagnostics</button>
+      <button class="crm-filter" data-filter="not-published">Non publiés</button>
+      <button class="crm-filter alert-filter" data-filter="en-alerte">⚠ En alerte (+30j sans activité)</button>
     </div>
 
     <!-- Table -->
@@ -744,16 +760,78 @@ function exportCSV() {
    KANBAN PIPELINE
 ══════════════════════════════════════════════ */
 const STAGES = [
-  { id:'inscrit',   label:'Inscrit',         color:'#f1f5f9', textColor:'#475569', fn: c => !!c.paid_at && !c.contrat_signe },
-  { id:'contrat',   label:'Contrat signé',   color:'#fef3c7', textColor:'#92400e', fn: c => !!c.contrat_signe && !c.photographer_scheduled },
-  { id:'photo',     label:'Photo planifiée', color:'#e0f2fe', textColor:'#0369a1', fn: c => !!c.photographer_scheduled && !c.published },
-  { id:'enligne',   label:'En ligne',        color:'#dcfce7', textColor:'#166534', fn: c => !!c.published && !c.vente_realisee },
-  { id:'vendu',     label:'Vendu',           color:'#ede9fe', textColor:'#5b21b6', fn: c => !!c.vente_realisee },
+  {
+    id: 'prospect',
+    label: 'Prospect',
+    color: '#f1f5f9', textColor: '#475569',
+    fn: c => !c.paid_at
+  },
+  {
+    id: 'onboarding',
+    label: 'Onboarding',
+    color: '#fef3c7', textColor: '#92400e',
+    fn: c => !!c.paid_at && !!((!c.city && !c.price) || !c.contrat_signe)
+  },
+  {
+    id: 'photos-manquantes',
+    label: 'Photos manquantes',
+    color: '#fff7ed', textColor: '#c2410c',
+    fn: c => !!c.paid_at && !!c.contrat_signe && !!(c.city || c.price) && (c.photos_count||0) === 0
+  },
+  {
+    id: 'pret-a-publier',
+    label: 'Prêt à publier',
+    color: '#ecfdf5', textColor: '#065f46',
+    fn: c => !!c.paid_at && !!c.contrat_signe && (c.photos_count||0) > 0 && !c.published
+  },
+  {
+    id: 'en-ligne-0-visite',
+    label: 'En ligne — 0 visite',
+    color: '#dcfce7', textColor: '#166534',
+    fn: c => !!c.published && !c.vente_realisee && (c.visits_count||0) === 0
+  },
+  {
+    id: 'visites-en-cours',
+    label: 'Visites en cours',
+    color: '#eff6ff', textColor: '#1d4ed8',
+    fn: c => !!c.published && !c.vente_realisee && (c.visits_count||0) > 0 && !(c.offre_recue)
+  },
+  {
+    id: 'offre-recue',
+    label: 'Offre reçue',
+    color: '#faf5ff', textColor: '#6d28d9',
+    fn: c => !!(c.offre_recue) && !c.vente_realisee
+  },
+  {
+    id: 'vendu',
+    label: 'Vendu',
+    color: '#f0fdf4', textColor: '#14532d',
+    fn: c => !!c.vente_realisee
+  },
 ];
 
 function kanbanStage(c) {
   for (const s of [...STAGES].reverse()) { if (s.fn(c)) return s.id; }
-  return 'inscrit';
+  return 'prospect';
+}
+
+function calcProgression(c) {
+  let score = 0;
+  // Profil 20% : email + téléphone + city/price
+  const profilOk = !!(c.email && c.phone && (c.city || c.price));
+  if (profilOk) score += 20;
+  else if (c.email) score += 10;
+  // Photos 20% : >= 1 photo
+  if ((c.photos_count||0) >= 5) score += 20;
+  else if ((c.photos_count||0) >= 1) score += 10;
+  // Docs 20% : >= 1 doc
+  if ((c.docs_count||0) >= 2) score += 20;
+  else if ((c.docs_count||0) >= 1) score += 10;
+  // Publication 20%
+  if (c.published) score += 20;
+  // Visites 20%
+  if ((c.visits_count||0) > 0) score += 20;
+  return Math.min(100, score);
 }
 
 function renderKanban() {
@@ -764,17 +842,31 @@ function renderKanban() {
     const cardsHtml = cards.map(c => {
       const score = calcScore(c);
       const sc = statusCls(score);
-      const clr = scoreClr(score);
+      const prog = calcProgression(c);
+      const progClr = prog >= 80 ? '#16a34a' : prog >= 40 ? '#d97706' : '#dc2626';
+      const packBadge = c.pack === 'serenite'
+        ? `<span class="k-tag" style="background:#fef3c7;color:#92400e">Sérénité</span>`
+        : `<span class="k-tag" style="background:#f1f5f9;color:#475569">Autonome</span>`;
+      const days = c.days_since_signup || 0;
       const alerts = getAlerts(c, score);
       const tagsHtml = alerts.slice(0,2).map(a =>
         `<span class="k-tag" style="background:${a.t==='red'?'#fee2e2':a.t==='amber'?'#fef3c7':'#dbeafe'};color:${a.t==='red'?'#dc2626':a.t==='amber'?'#d97706':'#2563eb'}">${a.m}</span>`
       ).join('');
       return `<div class="k-card ${sc}" onclick="openPanel(${c.id})">
-        <div class="k-name">${c.first_name||''} ${c.last_name||''}</div>
-        <div class="k-sub">${c.email}</div>
-        ${c.city ? `<div class="k-sub">${c.city}${c.price?' · '+c.price.toLocaleString('fr-FR')+'€':''}</div>` : ''}
-        <div class="k-score" style="color:${clr}">Score ${score}%</div>
-        ${tagsHtml ? `<div class="k-tags">${tagsHtml}</div>` : ''}
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:4px">
+          <div class="k-name">${c.first_name||''} ${c.last_name||''}</div>
+          <span style="font-size:.6rem;color:var(--text3);flex-shrink:0;margin-top:2px">J+${days}</span>
+        </div>
+        ${c.city || c.price ? `<div class="k-sub">${[c.city, c.price ? c.price.toLocaleString('fr-FR')+'€' : null].filter(Boolean).join(' · ')}</div>` : '<div class="k-sub" style="font-style:italic">Bien non renseigné</div>'}
+        <div class="k-tags" style="margin-top:4px">${packBadge}</div>
+        <div style="margin-top:6px">
+          <div style="display:flex;align-items:center;justify-content:space-between">
+            <span style="font-size:.62rem;color:var(--text3)">Progression</span>
+            <span style="font-size:.62rem;font-weight:700;color:${progClr}">${prog}%</span>
+          </div>
+          <div class="prog-bar" style="margin-top:2px"><div class="prog-fill" style="width:${prog}%;background:${progClr}"></div></div>
+        </div>
+        ${tagsHtml ? `<div class="k-tags" style="margin-top:5px">${tagsHtml}</div>` : ''}
       </div>`;
     }).join('') || `<div style="text-align:center;padding:20px;font-size:.75rem;color:#ccc">Aucun</div>`;
 

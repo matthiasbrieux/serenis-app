@@ -1055,4 +1055,292 @@ async function sendCheckInNoOffer({ email, firstName, daysPublished }) {
   } catch(e) { console.error('[EMAIL ERROR] sendCheckInNoOffer:', e.message); return false; }
 }
 
-module.exports = { sendWelcomeEmail, sendDossierEmail, sendVisitConfirmation, sendContactNotification, sendMissionAssigned, sendMissionConfirmed, sendMissionReminderJ1, sendProspectNudge, sendNoPropertyNudge, sendNoPhotosNudge, sendNotPublishedNudge, sendNewVisitRequest, sendVisitReminderSeller, sendMissingDocNudge, sendPublishedConfirmation, sendContractRenewal, sendReviewRequest, sendAdminDirectEmail, sendInvoiceEmail, sendOfferNotification, sendPostVisitBuyerNudge, sendWeeklyAdminReport, sendPhotographerAvailabilityRequest, sendPostFirstVisitFeedbackSeller, sendCheckInNoOffer };
+// ── Renseignements manquants sur la fiche (admin → vendeur) ──────────────────
+async function sendInfoNeededEmail({ email, firstName, missingFields }) {
+  const name = firstName || 'Vendeur';
+  const fieldList = (missingFields || []).map(f => `
+    <tr>
+      <td style="padding:8px 0;font-size:14px;color:#1A1A16;border-bottom:1px solid #e8e0d6;">
+        <span style="color:#C4785A;margin-right:10px;">→</span>${f}
+      </td>
+    </tr>`).join('');
+  const msg = {
+    to: email, from: FROM,
+    subject: 'Nous avons besoin de renseignements sur votre bien',
+    html: `
+<!DOCTYPE html><html lang="fr"><body style="margin:0;padding:0;background:#F5F0E8;font-family:Arial,sans-serif;">
+<table width="100%" cellpadding="0" cellspacing="0" style="background:#F5F0E8;padding:32px 0;">
+<tr><td align="center">
+<table width="600" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%;">
+  <tr><td style="background:#3D5A47;border-radius:12px 12px 0 0;padding:36px 40px;text-align:center;">
+    <h1 style="color:#FDFCF8;font-family:Georgia,serif;font-size:28px;margin:0 0 6px;">Serenis</h1>
+    <p style="color:#D4E4D8;font-size:14px;margin:0;">Vendez votre bien. Sereinement.</p>
+  </td></tr>
+  <tr><td style="background:#FDFCF8;padding:40px;">
+    <h2 style="color:#2a4030;font-family:Georgia,serif;font-size:22px;margin:0 0 16px;">Bonjour ${name},</h2>
+    <p style="color:#444;line-height:1.7;margin:0 0 20px;">Nous avons examiné votre fiche bien et il nous manque quelques informations importantes pour la compléter correctement. Un dossier complet rassure les acheteurs et augmente vos chances de vendre rapidement.</p>
+    <div style="background:#F5F0E8;border-left:4px solid #C4785A;border-radius:4px;padding:20px;margin:0 0 28px;">
+      <p style="font-size:13px;font-weight:bold;color:#888;text-transform:uppercase;letter-spacing:0.05em;margin:0 0 14px;">Informations manquantes</p>
+      <table width="100%" cellpadding="0" cellspacing="0">${fieldList || '<tr><td style="padding:8px 0;font-size:14px;color:#1A1A16;">Certaines informations clés sont incomplètes.</td></tr>'}</table>
+    </div>
+    <p style="color:#444;line-height:1.7;margin:0 0 28px;">Connectez-vous à votre espace pour compléter ces informations. Si vous avez la moindre question, répondez directement à cet email — Matthias vous répond personnellement.</p>
+    <div style="text-align:center;margin:0 0 32px;">
+      <a href="${BASE}/mon-bien" style="background:#C4785A;color:#fff;padding:16px 40px;text-decoration:none;border-radius:8px;font-weight:bold;font-size:15px;display:inline-block;">Compléter ma fiche →</a>
+    </div>
+    <p style="font-size:13px;color:#999;margin:0;">Une question ? Contactez Matthias au <strong>06 95 44 36 54</strong> ou par email.</p>
+  </td></tr>
+  <tr><td style="background:#3D5A47;border-radius:0 0 12px 12px;padding:24px 40px;text-align:center;">
+    <p style="color:#D4E4D8;font-size:13px;margin:0 0 6px;">Une question ? Matthias répond personnellement.</p>
+    <p style="color:#5C7A65;font-size:12px;margin:0;">06 95 44 36 54 — contact@serenis.fr — Douai (59)</p>
+  </td></tr>
+</table></td></tr></table>
+</body></html>`,
+  };
+  try {
+    if (!process.env.SENDGRID_API_KEY) { console.log('[EMAIL SKIPPED] InfoNeeded:', email); return true; }
+    await sgMail.send(msg);
+    return true;
+  } catch(e) { console.error('[EMAIL ERROR] sendInfoNeededEmail:', e.message); return false; }
+}
+
+// ── Notification vendeur : un acheteur a laissé ses coordonnées ──────────────
+async function sendBuyerContactedSeller({ email, firstName, buyerName, buyerPhone, propertyAddress }) {
+  const name = firstName || 'Vendeur';
+  const msg = {
+    to: email, from: FROM,
+    subject: `Un acheteur vous a contacté via votre annonce`,
+    html: `
+<!DOCTYPE html><html lang="fr"><body style="margin:0;padding:0;background:#F5F0E8;font-family:Arial,sans-serif;">
+<table width="100%" cellpadding="0" cellspacing="0" style="background:#F5F0E8;padding:32px 0;">
+<tr><td align="center">
+<table width="600" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%;">
+  <tr><td style="background:#3D5A47;border-radius:12px 12px 0 0;padding:36px 40px;text-align:center;">
+    <h1 style="color:#FDFCF8;font-family:Georgia,serif;font-size:28px;margin:0 0 6px;">Serenis</h1>
+    <p style="color:#D4E4D8;font-size:14px;margin:0;">Un acheteur vous a contacté !</p>
+  </td></tr>
+  <tr><td style="background:#FDFCF8;padding:40px;">
+    <h2 style="color:#2a4030;font-family:Georgia,serif;font-size:22px;margin:0 0 16px;">Bonjour ${name},</h2>
+    <p style="color:#444;line-height:1.7;margin:0 0 20px;">Bonne nouvelle — un acheteur a consulté votre annonce et souhaite vous contacter directement. Voici ses coordonnées :</p>
+    <div style="background:#D4E4D8;border-radius:10px;padding:24px;margin:0 0 28px;">
+      <p style="font-size:13px;font-weight:bold;color:#3D5A47;text-transform:uppercase;letter-spacing:0.05em;margin:0 0 14px;">Coordonnées de l'acheteur</p>
+      <p style="margin:6px 0;font-size:15px;color:#1A1A16;"><strong>Nom :</strong> ${buyerName}</p>
+      ${buyerPhone ? `<p style="margin:6px 0;font-size:15px;color:#1A1A16;"><strong>Téléphone :</strong> <a href="tel:${buyerPhone}" style="color:#C4785A;text-decoration:none;font-weight:bold;">${buyerPhone}</a></p>` : ''}
+      ${propertyAddress ? `<p style="margin:10px 0 0;font-size:14px;color:#3D5A47;"><strong>Annonce concernée :</strong> ${propertyAddress}</p>` : ''}
+    </div>
+    <p style="color:#444;line-height:1.7;margin:0 0 12px;">Nous vous recommandons de le rappeler dans les <strong>24 heures</strong> — la réactivité est un facteur clé pour convertir un contact en visite.</p>
+    <p style="color:#444;line-height:1.7;margin:0 0 28px;">Pensez à qualifier l'acheteur : financement, délai d'achat, situation actuelle. Ces informations vous aideront à prioriser vos visites.</p>
+    <div style="text-align:center;margin:0 0 32px;">
+      <a href="${BASE}/serenis-connect" style="background:#C4785A;color:#fff;padding:16px 40px;text-decoration:none;border-radius:8px;font-weight:bold;font-size:15px;display:inline-block;">Gérer mes contacts →</a>
+    </div>
+    <p style="font-size:13px;color:#999;margin:0;">Un doute sur la marche à suivre ? Répondez à cet email — Matthias vous conseille.</p>
+  </td></tr>
+  <tr><td style="background:#3D5A47;border-radius:0 0 12px 12px;padding:24px 40px;text-align:center;">
+    <p style="color:#D4E4D8;font-size:13px;margin:0 0 6px;">Une question ? Matthias répond personnellement.</p>
+    <p style="color:#5C7A65;font-size:12px;margin:0;">06 95 44 36 54 — contact@serenis.fr — Douai (59)</p>
+  </td></tr>
+</table></td></tr></table>
+</body></html>`,
+  };
+  try {
+    if (!process.env.SENDGRID_API_KEY) { console.log('[EMAIL SKIPPED] BuyerContactedSeller:', email); return true; }
+    await sgMail.send(msg);
+    return true;
+  } catch(e) { console.error('[EMAIL ERROR] sendBuyerContactedSeller:', e.message); return false; }
+}
+
+// ── Demande de retour visite à l'acheteur ────────────────────────────────────
+async function sendVisitFeedbackRequest({ email, firstName, visitDate, buyerName }) {
+  const name = firstName || buyerName || 'Madame, Monsieur';
+  const msg = {
+    to: email, from: FROM,
+    subject: `Comment s'est passée votre visite ?`,
+    html: `
+<!DOCTYPE html><html lang="fr"><body style="margin:0;padding:0;background:#F5F0E8;font-family:Arial,sans-serif;">
+<table width="100%" cellpadding="0" cellspacing="0" style="background:#F5F0E8;padding:32px 0;">
+<tr><td align="center">
+<table width="600" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%;">
+  <tr><td style="background:#3D5A47;border-radius:12px 12px 0 0;padding:36px 40px;text-align:center;">
+    <h1 style="color:#FDFCF8;font-family:Georgia,serif;font-size:28px;margin:0 0 6px;">Serenis</h1>
+    <p style="color:#D4E4D8;font-size:14px;margin:0;">Votre expérience nous intéresse</p>
+  </td></tr>
+  <tr><td style="background:#FDFCF8;padding:40px;">
+    <h2 style="color:#2a4030;font-family:Georgia,serif;font-size:22px;margin:0 0 16px;">Bonjour ${name},</h2>
+    <p style="color:#444;line-height:1.7;margin:0 0 16px;">Vous avez visité un bien le <strong>${visitDate}</strong> via la plateforme Serenis. Nous espérons que cette visite s'est déroulée dans les meilleures conditions.</p>
+    <p style="color:#444;line-height:1.7;margin:0 0 24px;">Votre retour est précieux — il nous aide à améliorer l'expérience pour tous et à conseiller le vendeur si besoin. Quelques questions rapides :</p>
+    <div style="background:#F5F0E8;border-radius:10px;padding:24px;margin:0 0 28px;">
+      <table width="100%" cellpadding="0" cellspacing="0">
+        <tr><td style="padding:10px 0;font-size:14px;color:#1A1A16;border-bottom:1px solid #e8e0d6;"><span style="color:#C4785A;margin-right:10px;">1.</span>Le bien correspondait-il à la description de l'annonce ?</td></tr>
+        <tr><td style="padding:10px 0;font-size:14px;color:#1A1A16;border-bottom:1px solid #e8e0d6;"><span style="color:#C4785A;margin-right:10px;">2.</span>Le vendeur était-il disponible et arrangeant ?</td></tr>
+        <tr><td style="padding:10px 0;font-size:14px;color:#1A1A16;border-bottom:1px solid #e8e0d6;"><span style="color:#C4785A;margin-right:10px;">3.</span>Ce bien vous intéresse-t-il encore ?</td></tr>
+        <tr><td style="padding:10px 0;font-size:14px;color:#1A1A16;"><span style="color:#C4785A;margin-right:10px;">4.</span>Y a-t-il autre chose que vous souhaiteriez nous dire ?</td></tr>
+      </table>
+    </div>
+    <p style="color:#444;line-height:1.7;margin:0 0 28px;">Répondez simplement à cet email — un membre de l'équipe Serenis lit chaque retour et peut vous aider si vous avez des questions sur la suite.</p>
+    <div style="text-align:center;margin:0 0 28px;">
+      <a href="mailto:contact@serenis.fr?subject=Retour%20visite%20du%20${encodeURIComponent(visitDate)}" style="background:#C4785A;color:#fff;padding:16px 40px;text-decoration:none;border-radius:8px;font-weight:bold;font-size:15px;display:inline-block;">Donner mon avis →</a>
+    </div>
+    <p style="font-size:13px;color:#999;margin:0;">Si ce bien ne vous correspond plus, d'autres annonces sont disponibles sur Serenis.</p>
+  </td></tr>
+  <tr><td style="background:#3D5A47;border-radius:0 0 12px 12px;padding:24px 40px;text-align:center;">
+    <p style="color:#D4E4D8;font-size:13px;margin:0 0 6px;">Serenis — plateforme de vente immobilière entre particuliers</p>
+    <p style="color:#5C7A65;font-size:12px;margin:0;">contact@serenis.fr — Douai (59)</p>
+  </td></tr>
+</table></td></tr></table>
+</body></html>`,
+  };
+  try {
+    if (!process.env.SENDGRID_API_KEY) { console.log('[EMAIL SKIPPED] VisitFeedbackRequest:', email); return true; }
+    await sgMail.send(msg);
+    return true;
+  } catch(e) { console.error('[EMAIL ERROR] sendVisitFeedbackRequest:', e.message); return false; }
+}
+
+// ── Félicitations vente conclue ───────────────────────────────────────────────
+async function sendSoldCongrats({ email, firstName, address, price }) {
+  const name = firstName || 'Vendeur';
+  const priceStr = price ? Number(price).toLocaleString('fr-FR') + ' €' : null;
+  const msg = {
+    to: email, from: FROM,
+    subject: `Félicitations, votre bien est vendu !`,
+    html: `
+<!DOCTYPE html><html lang="fr"><body style="margin:0;padding:0;background:#F5F0E8;font-family:Arial,sans-serif;">
+<table width="100%" cellpadding="0" cellspacing="0" style="background:#F5F0E8;padding:32px 0;">
+<tr><td align="center">
+<table width="600" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%;">
+  <tr><td style="background:#3D5A47;border-radius:12px 12px 0 0;padding:36px 40px;text-align:center;">
+    <h1 style="color:#FDFCF8;font-family:Georgia,serif;font-size:28px;margin:0 0 6px;">Serenis</h1>
+    <p style="color:#D4E4D8;font-size:14px;margin:0;">Vendez votre bien. Sereinement.</p>
+  </td></tr>
+  <tr><td style="background:#FDFCF8;padding:40px;">
+    <div style="text-align:center;margin-bottom:32px;">
+      <div style="display:inline-block;background:#D4E4D8;border-radius:50%;width:80px;height:80px;line-height:80px;font-size:40px;margin-bottom:16px;">🎉</div>
+      <h2 style="color:#2a4030;font-family:Georgia,serif;font-size:26px;margin:0 0 8px;">Félicitations ${name} !</h2>
+      <p style="color:#C4785A;font-size:16px;font-weight:bold;margin:0;">Votre bien est officiellement vendu.</p>
+    </div>
+    ${address || priceStr ? `
+    <div style="background:#D4E4D8;border-radius:10px;padding:24px;margin:0 0 28px;text-align:center;">
+      ${address ? `<p style="font-size:15px;font-weight:bold;color:#2a4030;margin:0 0 6px;">${address}</p>` : ''}
+      ${priceStr ? `<p style="font-family:Georgia,serif;font-size:28px;font-weight:bold;color:#3D5A47;margin:0;">${priceStr}</p>` : ''}
+    </div>` : ''}
+    <p style="color:#444;line-height:1.7;margin:0 0 16px;">C'est une réussite dont vous pouvez être fier(e). Vous avez choisi de vendre sans agence, avec les bons outils et la bonne méthode — et vous y êtes arrivé(e).</p>
+    <p style="color:#444;line-height:1.7;margin:0 0 16px;">Il ne reste plus qu'à finaliser la signature chez le notaire. Si vous avez des questions sur les dernières étapes, notre équipe est là pour vous accompagner jusqu'au bout.</p>
+    <div style="background:#F5F0E8;border-left:4px solid #C4785A;border-radius:4px;padding:16px 20px;margin:0 0 28px;">
+      <p style="margin:0;font-size:14px;color:#1A1A16;"><strong>Et maintenant ?</strong> Pensez à partager votre expérience — votre témoignage aide d'autres particuliers à se lancer. Répondez à cet email pour nous laisser votre avis.</p>
+    </div>
+    <div style="text-align:center;margin:0 0 32px;">
+      <a href="mailto:contact@serenis.fr?subject=Mon%20témoignage%20Serenis" style="background:#C4785A;color:#fff;padding:16px 40px;text-decoration:none;border-radius:8px;font-weight:bold;font-size:15px;display:inline-block;">Laisser mon témoignage →</a>
+    </div>
+    <p style="font-size:13px;color:#999;margin:0;text-align:center;">Merci de nous avoir fait confiance. À bientôt peut-être pour un prochain projet !</p>
+  </td></tr>
+  <tr><td style="background:#3D5A47;border-radius:0 0 12px 12px;padding:24px 40px;text-align:center;">
+    <p style="color:#D4E4D8;font-size:13px;margin:0 0 6px;">Une question ? Matthias répond personnellement.</p>
+    <p style="color:#5C7A65;font-size:12px;margin:0;">06 95 44 36 54 — contact@serenis.fr — Douai (59)</p>
+  </td></tr>
+</table></td></tr></table>
+</body></html>`,
+  };
+  try {
+    if (!process.env.SENDGRID_API_KEY) { console.log('[EMAIL SKIPPED] SoldCongrats:', email); return true; }
+    await sgMail.send(msg);
+    return true;
+  } catch(e) { console.error('[EMAIL ERROR] sendSoldCongrats:', e.message); return false; }
+}
+
+// ── Welcome amélioré avec checklist numérotée ─────────────────────────────────
+async function sendWelcomeImproved({ to, firstName, pack, tempPassword }) {
+  const name = firstName || '';
+  const isSerenite = pack === 'serenite';
+  const packLabel = isSerenite ? 'Pack Sérénité' : 'Pack Autonome';
+  const packColor = isSerenite ? '#3D5A47' : '#5a8a6a';
+
+  const steps = [
+    { num: '1', title: 'Compléter votre fiche bien', desc: 'Renseignez type de bien, surface, nombre de pièces, description et prix. Comptez 15 minutes.', link: `${BASE}/mon-bien`, cta: 'Remplir ma fiche' },
+    { num: '2', title: 'Ajouter vos photos', desc: 'Minimum 5 photos en haute résolution. Commencez par le salon et la cuisine, en journée pour profiter de la lumière naturelle.', link: `${BASE}/mon-bien`, cta: 'Ajouter mes photos' },
+    { num: '3', title: 'Ajouter vos diagnostics', desc: 'DPE obligatoire, plus tous les diagnostics disponibles. Un dossier complet rassure les acheteurs et accélère la vente.', link: `${BASE}/mon-bien`, cta: 'Déposer mes documents' },
+    { num: '4', title: 'Publier votre annonce', desc: 'Une fois la fiche validée par notre équipe, publiez en un clic et diffusez votre lien sur LeBonCoin, PAP, et votre réseau.', link: `${BASE}/mon-bien`, cta: 'Publier mon annonce' },
+  ];
+
+  const stepRows = steps.map(s => `
+    <tr>
+      <td style="padding:0 0 20px 0;">
+        <table width="100%" cellpadding="0" cellspacing="0" style="background:#F5F0E8;border-radius:10px;overflow:hidden;">
+          <tr>
+            <td style="background:#C4785A;width:48px;min-width:48px;text-align:center;vertical-align:top;padding:20px 0;">
+              <span style="font-family:Georgia,serif;font-size:22px;font-weight:bold;color:#fff;">${s.num}</span>
+            </td>
+            <td style="padding:16px 20px;vertical-align:top;">
+              <p style="font-size:15px;font-weight:bold;color:#2a4030;margin:0 0 6px;">${s.title}</p>
+              <p style="font-size:13px;color:#555;line-height:1.6;margin:0 0 12px;">${s.desc}</p>
+              <a href="${s.link}" style="font-size:13px;color:#C4785A;font-weight:bold;text-decoration:none;">${s.cta} →</a>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>`).join('');
+
+  const msg = {
+    to, from: FROM,
+    subject: `Bienvenue sur Serenis — vos 4 premières étapes`,
+    html: `
+<!DOCTYPE html>
+<html lang="fr">
+<body style="margin:0;padding:0;background:#F5F0E8;font-family:Arial,sans-serif;">
+<table width="100%" cellpadding="0" cellspacing="0" style="background:#F5F0E8;padding:32px 0;">
+<tr><td align="center">
+<table width="600" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%;">
+
+  <!-- Header -->
+  <tr><td style="background:${packColor};border-radius:12px 12px 0 0;padding:36px 40px;text-align:center;">
+    <h1 style="color:#FDFCF8;font-family:Georgia,serif;font-size:28px;margin:0 0 6px;">Serenis</h1>
+    <p style="color:#D4E4D8;font-size:14px;margin:0 0 16px;">Vendez votre bien. Sereinement.</p>
+    <div style="display:inline-block;background:rgba(255,255,255,0.18);border-radius:20px;padding:5px 18px;">
+      <span style="color:#fff;font-size:13px;font-weight:bold;">${packLabel}</span>
+    </div>
+  </td></tr>
+
+  <!-- Body -->
+  <tr><td style="background:#FDFCF8;padding:40px;">
+    <h2 style="color:#2a4030;font-family:Georgia,serif;font-size:22px;margin:0 0 8px;">Bienvenue${name ? ' ' + name : ''} !</h2>
+    <p style="color:#444;line-height:1.7;margin:0 0 28px;">Votre espace est actif. Pour bien démarrer votre vente, suivez ces <strong>4 étapes dans l'ordre</strong> — chacune est simple et guidée.</p>
+
+    <!-- Identifiants -->
+    <div style="background:#F5F0E8;border-left:4px solid #C4785A;border-radius:4px;padding:18px 20px;margin:0 0 32px;">
+      <p style="font-size:12px;font-weight:bold;color:#888;text-transform:uppercase;letter-spacing:0.05em;margin:0 0 10px;">Vos identifiants de connexion</p>
+      <p style="margin:4px 0;font-size:14px;color:#1A1A16;"><strong>Email :</strong> ${to}</p>
+      <p style="margin:4px 0;font-size:14px;color:#1A1A16;"><strong>Mot de passe temporaire :</strong> <code style="background:#e8e0d6;padding:2px 6px;border-radius:4px;font-size:13px;">${tempPassword || '(celui reçu lors de votre inscription)'}</code></p>
+      <p style="font-size:12px;color:#aaa;margin:10px 0 0;">Changez votre mot de passe dès votre première connexion.</p>
+    </div>
+
+    <!-- Étapes -->
+    <p style="font-size:13px;font-weight:bold;color:#888;text-transform:uppercase;letter-spacing:0.05em;margin:0 0 16px;">Vos 4 premières étapes</p>
+    <table width="100%" cellpadding="0" cellspacing="0">${stepRows}</table>
+
+    <!-- CTA principal -->
+    <div style="text-align:center;margin:8px 0 32px;">
+      <a href="${BASE}/dashboard" style="background:#C4785A;color:#fff;padding:16px 44px;text-decoration:none;border-radius:8px;font-weight:bold;font-size:16px;display:inline-block;letter-spacing:0.02em;">Accéder à mon espace →</a>
+    </div>
+
+    <p style="font-size:13px;color:#999;margin:0;">Une question sur la marche à suivre ? Répondez à cet email — Matthias vous répond personnellement.</p>
+  </td></tr>
+
+  <!-- Footer -->
+  <tr><td style="background:#3D5A47;border-radius:0 0 12px 12px;padding:24px 40px;text-align:center;">
+    <p style="color:#D4E4D8;font-size:13px;margin:0 0 6px;">Une question ? Matthias répond personnellement.</p>
+    <p style="color:#5C7A65;font-size:12px;margin:0;">06 95 44 36 54 — contact@serenis.fr — Douai (59)</p>
+    <p style="color:#4a6e55;font-size:11px;margin:12px 0 0;line-height:1.5;">Serenis est une plateforme numérique d'outils et de formation.<br>Le vendeur reste seul responsable de sa vente.</p>
+  </td></tr>
+
+</table>
+</td></tr>
+</table>
+</body>
+</html>`,
+  };
+  try {
+    if (!process.env.SENDGRID_API_KEY) { console.log('[EMAIL SKIPPED] WelcomeImproved:', to); return true; }
+    await sgMail.send(msg);
+    return true;
+  } catch(e) { console.error('[EMAIL ERROR] sendWelcomeImproved:', e.message); return false; }
+}
+
+module.exports = { sendWelcomeEmail, sendDossierEmail, sendVisitConfirmation, sendContactNotification, sendMissionAssigned, sendMissionConfirmed, sendMissionReminderJ1, sendProspectNudge, sendNoPropertyNudge, sendNoPhotosNudge, sendNotPublishedNudge, sendNewVisitRequest, sendVisitReminderSeller, sendMissingDocNudge, sendPublishedConfirmation, sendContractRenewal, sendReviewRequest, sendAdminDirectEmail, sendInvoiceEmail, sendOfferNotification, sendPostVisitBuyerNudge, sendWeeklyAdminReport, sendPhotographerAvailabilityRequest, sendPostFirstVisitFeedbackSeller, sendCheckInNoOffer, sendInfoNeededEmail, sendBuyerContactedSeller, sendVisitFeedbackRequest, sendSoldCongrats, sendWelcomeImproved };
