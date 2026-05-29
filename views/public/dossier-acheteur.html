@@ -236,16 +236,81 @@ function render(p, ph, docs) {
       ${p.dpe_cout_min && p.dpe_cout_max ? `<div style="font-size:0.88rem;color:#555;">Coût énergétique estimé : <strong>${p.dpe_cout_min}–${p.dpe_cout_max} €/an</strong></div>` : ''}
     </div>` : '<p style="color:#aaa;font-size:0.9rem;">DPE non renseigné</p>';
 
-  const detailItems = [
-    p.surface_habitable && { label: 'Surface habitable', value: p.surface_habitable + ' m²' },
-    p.surface_terrain && { label: 'Terrain', value: p.surface_terrain + ' m²' },
-    p.rooms && { label: 'Pièces', value: p.rooms },
-    p.bedrooms && { label: 'Chambres', value: p.bedrooms },
-    p.year_built && { label: 'Année', value: p.year_built },
-    p.heating_type && { label: 'Chauffage', value: p.heating_type },
-    p.taxe_fonciere && { label: 'Taxe foncière', value: Number(p.taxe_fonciere).toLocaleString('fr-FR') + ' €/an' },
-    p.charges_copro && { label: 'Charges copro', value: Number(p.charges_copro).toLocaleString('fr-FR') + ' €/an' },
-  ].filter(Boolean);
+  function di(label, value) { return value ? { label, value } : null; }
+  function diyn(label, val) { return val != null ? { label, value: val ? 'Oui' : 'Non' } : null; }
+
+  function detailGroup(icon, title, items) {
+    const filtered = items.filter(Boolean);
+    if (!filtered.length) return '';
+    return `<div style="margin-bottom:22px;">
+      <div style="font-size:0.68rem;text-transform:uppercase;letter-spacing:0.08em;font-weight:700;color:#bbb;margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid #f0ece4;">${icon} ${title}</div>
+      <div class="details-grid">${filtered.map(d => `<div class="detail-item"><div class="detail-label">${d.label}</div><div class="detail-value">${d.value}</div></div>`).join('')}</div>
+    </div>`;
+  }
+
+  const charakteristikHtml = [
+    detailGroup('📐', 'Surfaces & volumes', [
+      di('Surface habitable', p.surface_habitable && p.surface_habitable + ' m²'),
+      di('Surface terrain', p.surface_terrain && p.surface_terrain + ' m²'),
+      di('Hauteur plafond', p.hauteur_plafond && p.hauteur_plafond + ' cm'),
+      di('Surface terrasse', p.terrace_surface && p.terrace_surface + ' m²'),
+      di('Surface garage', p.garage_surface && p.garage_surface + ' m²'),
+    ]),
+    detailGroup('🚪', 'Pièces & aménagement', [
+      di('Nombre de pièces', p.rooms),
+      di('Chambres', p.bedrooms),
+      di('WC', p.wc_count),
+      di('Type de cuisine', p.cuisine_type),
+      diyn('Grenier', p.grenier_present),
+      di('Détail des pièces', p.rooms_detail),
+    ]),
+    detailGroup('🔥', 'Chauffage & eau chaude', [
+      di('Type de chauffage', p.heating_type),
+      di('Émission', p.heating_mechanism),
+      di('Eau chaude', p.eau_chaude_type),
+      di('Année installation', p.heating_year),
+      di('Détails', p.heating_details),
+      di('Cheminée', p.cheminee_type),
+    ]),
+    detailGroup('🌿', 'Extérieur & stationnement', [
+      di('Exposition', p.exposition),
+      diyn('Jardin', p.garden),
+      diyn('Terrasse', p.terrace),
+      di('Revêtement terrasse', p.terrace_revetement),
+      di('Mitoyenneté', p.mitoyennete),
+      di('Stationnement', p.stationnement_type),
+      di('Garage motorisé', p.garage_motorise ? 'Oui' : p.garage_motorise === 0 ? 'Non' : null),
+      di('Sol garage', p.garage_sol),
+    ]),
+    detailGroup('🧱', 'Construction & matériaux', [
+      di('Année construction', p.year_built),
+      di('Toiture', p.toiture_couverture),
+      di('Volets', p.volets_type),
+      di('Fenêtres', p.fenetres_type),
+      di('Sols/Dalle', p.sols_dalle),
+      di('Assainissement', p.assainissement_type),
+      di('Certificat assainissement', p.certificat_assainissement ? 'Fourni' : p.certificat_assainissement === 0 ? 'Non fourni' : null),
+    ]),
+    detailGroup('💶', 'Charges & fiscalité', [
+      di('Taxe foncière', p.taxe_fonciere && Number(p.taxe_fonciere).toLocaleString('fr-FR') + ' €/an'),
+      di('Charges copropriété', p.charges_copro && Number(p.charges_copro).toLocaleString('fr-FR') + ' €/an'),
+      di('Facture eau', p.facture_eau && Number(p.facture_eau).toLocaleString('fr-FR') + ' €/an'),
+      di('Facture électricité', p.facture_electricite && Number(p.facture_electricite).toLocaleString('fr-FR') + ' €/an'),
+      di('Facture gaz', p.facture_gaz != null && p.facture_gaz > 0 ? Number(p.facture_gaz).toLocaleString('fr-FR') + ' €/an' : (p.facture_gaz === 0 && p.heating_type ? 'Sans gaz' : null)),
+    ]),
+    detailGroup('📍', 'Proximité (minutes à pied)', [
+      di('Commerces', p.commerces && p.commerces + ' min'),
+      di('École maternelle', p.school_maternelle && p.school_maternelle + ' min'),
+      di('École primaire', p.school_primaire && p.school_primaire + ' min'),
+      di('Collège', p.school_college && p.school_college + ' min'),
+      di('Lycée', p.school_lycee && p.school_lycee + ' min'),
+      di('Gare', p.train_station && p.train_station + ' min'),
+      di('Autoroute', p.highway && p.highway + ' min'),
+    ]),
+    detailGroup('⭐', 'Équipements & prestations', [
+      p.equipment && { label: 'Inclus', value: p.equipment },
+    ]),
+  ].filter(Boolean).join('');
 
   function docHtml(doc) {
     const ext = doc.name?.split('.').pop()?.toLowerCase() || '';
@@ -294,14 +359,19 @@ function render(p, ph, docs) {
       <p style="color:#444;line-height:1.75;white-space:pre-line;">${p.description}</p>
     </div>` : ''}
 
+    ${p.virtual_tour_url ? `<div class="section">
+      <div class="section-title"><span>🎥</span> Visite virtuelle</div>
+      <a href="${p.virtual_tour_url}" target="_blank" style="display:inline-flex;align-items:center;gap:10px;background:#3D5A47;color:#fff;padding:13px 22px;border-radius:10px;text-decoration:none;font-weight:600;font-size:0.95rem;">Lancer la visite virtuelle →</a>
+    </div>` : ''}
+
     <div class="section">
       <div class="section-title"><span>⚡</span> Performance énergétique</div>
       ${dpeHtml}
     </div>
 
-    ${detailItems.length ? `<div class="section">
-      <div class="section-title"><span>🏠</span> Caractéristiques</div>
-      <div class="details-grid">${detailItems.map(d => `<div class="detail-item"><div class="detail-label">${d.label}</div><div class="detail-value">${d.value}</div></div>`).join('')}</div>
+    ${charakteristikHtml ? `<div class="section">
+      <div class="section-title"><span>🏠</span> Caractéristiques complètes</div>
+      ${charakteristikHtml}
     </div>` : ''}
 
     <div class="section">
