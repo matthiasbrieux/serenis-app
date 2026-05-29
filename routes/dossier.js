@@ -84,12 +84,19 @@ router.post('/api/dossier/acheteur/:token/reserver', async (req, res) => {
       .run(prop.id, prop.seller_id, buyer_name, buyer_email, buyer_phone || '', visit_date, visit_time);
 
     db.prepare("INSERT INTO notifications (seller_id, type, title, body) VALUES (?,?,?,?)")
-      .run(prop.seller_id, 'visit_request', 'Nouvelle demande de visite', `${buyer_name} souhaite visiter le ${visit_date} à ${visit_time}`);
+      .run(prop.seller_id, 'visit_request', 'Nouvelle demande de visite', `${buyer_name} (${buyer_phone || buyer_email}) souhaite visiter le ${visit_date} à ${visit_time}`);
 
     try {
-      const { sendVisitConfirmation } = require('../services/email');
+      const { sendVisitConfirmation, sendSmsToSeller } = require('../services/email');
       await sendVisitConfirmation(buyer_email, buyer_name, prop, visit_date, visit_time, false);
       await sendVisitConfirmation(prop.seller_email, prop.seller_first_name || 'Vendeur', prop, visit_date, visit_time, true);
+      // SMS au vendeur avec le numéro de l'acheteur pour contact direct
+      if (prop.seller_phone) {
+        const { sendSmsNotification } = require('../services/twilio');
+        await sendSmsNotification(prop.seller_phone,
+          `📅 Nouvelle visite programmée !\n${visit_date} à ${visit_time}\nAcheteur : ${buyer_name}\n📞 ${buyer_phone || 'non renseigné'}\n✉️ ${buyer_email}`
+        ).catch(() => {});
+      }
     } catch (e) {
       console.error('Visit email error:', e.message);
     }
