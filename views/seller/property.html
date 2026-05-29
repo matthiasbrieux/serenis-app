@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Mon bien — Serenis</title>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="manifest" href="/manifest.json">
   <link rel="stylesheet" href="/css/style.css">
   <style>
     /* ── Chip selectors ─────────────────────────── */
@@ -494,6 +495,10 @@
     }
     .photo-scroll-item:hover .photo-scroll-del { opacity: 1; }
     .photo-scroll-del:hover { background: rgba(200,30,30,0.9) !important; }
+    .photo-drag-handle { position:absolute; bottom:4px; left:50%; transform:translateX(-50%); background:rgba(0,0,0,0.45); color:#fff; border-radius:4px; padding:1px 6px; font-size:0.85rem; opacity:0; transition:opacity 0.15s; cursor:grab; z-index:4; pointer-events:none; letter-spacing:1px; }
+    .photo-scroll-item:hover .photo-drag-handle { opacity:1; }
+    .photo-scroll-item.drag-src { opacity:0.4; }
+    .photo-scroll-item.drag-over-item { outline:2px solid #C4785A; outline-offset:2px; border-radius:8px; }
     /* Fade-out right edge */
     .photo-scroll-outer::after {
       content: '';
@@ -808,6 +813,9 @@
       </a>
       <a href="/mes-publications" class="sidebar-item">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.55a11 11 0 0 1 14.08 0"/><path d="M1.42 9a16 16 0 0 1 21.16 0"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><circle cx="12" cy="20" r="1"/></svg> Mes publications
+      </a>
+      <a href="/coach-ia" class="sidebar-item">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/><circle cx="9" cy="10" r="1" fill="currentColor"/><circle cx="12" cy="10" r="1" fill="currentColor"/><circle cx="15" cy="10" r="1" fill="currentColor"/></svg>Coach IA
       </a>
     </nav>
     <div style="position:absolute;bottom:24px;left:0;right:0;padding:0 24px;">
@@ -1640,13 +1648,26 @@
         </div>
         <div class="form-group" style="margin-top:16px;">
           <label>Description libre du bien</label>
-          <textarea name="description" rows="5" placeholder="Décrivez votre bien : atouts, rénovations récentes, ambiance du quartier, luminosité, calme, vie de voisinage..."></textarea>
+          <textarea name="description" rows="5" placeholder="Décrivez votre bien : atouts, rénovations récentes, ambiance du quartier, luminosité, calme, vie de voisinage..." oninput="updateDescWordCount(this)"></textarea>
+          <div style="text-align:right;font-size:0.78rem;color:#888;margin-top:3px;"><span id="descWordCount">0</span> mot(s)</div>
           <div style="display:flex;align-items:center;gap:12px;margin-top:10px;flex-wrap:wrap;">
             <button type="button" class="btn-ai" onclick="generateAIDescription()" id="aiDescBtn">
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
               Générer avec l'IA
             </button>
-            <span id="aiDescStatus" class="ai-generating" style="display:none">Rédaction en cours...</span>
+            <button type="button" class="btn-ai" onclick="generateAIDescription()" id="aiRegenBtn" style="display:none;background:#fff;color:#3D5A47;border:1.5px solid #3D5A47;">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+              Régénérer
+            </button>
+            <button type="button" id="aiUseBtn" style="display:none;padding:8px 16px;border-radius:7px;border:none;background:#3D5A47;color:#fff;font-family:'DM Sans',sans-serif;font-size:0.84rem;font-weight:600;cursor:pointer;" onclick="useAIDescription()">Utiliser cette description</button>
+            <span id="aiDescStatus" class="ai-generating" style="display:none">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="animation:spin 1s linear infinite;vertical-align:middle;margin-right:4px"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>
+              Génération en cours...
+            </span>
+          </div>
+          <div id="aiDescPreview" style="display:none;margin-top:12px;">
+            <textarea id="aiDescText" rows="8" style="width:100%;padding:12px;border:1.5px solid #3D5A47;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:0.9rem;line-height:1.6;resize:vertical;box-sizing:border-box;background:#f0f7f2;color:#222;" oninput="(function(el){var c=el.value.trim()?el.value.trim().split(/\s+/).length:0;var s=document.getElementById('aiDescWordCount');if(s)s.textContent=c;})(this)"></textarea>
+            <div style="text-align:right;font-size:0.78rem;color:#888;margin-top:3px;"><span id="aiDescWordCount">0</span> mot(s)</div>
           </div>
           <div class="coach-tip" style="margin-top:8px;">
             <span class="coach-tip-icon">✍️</span>
@@ -1970,13 +1991,13 @@
         </div>
       </div>
 
-      <!-- ─── SECTION 1: Documents publics ─────────────── -->
+      <!-- ─── SECTION 1 : Diagnostics réglementaires ─── -->
       <div class="dpanel">
         <div class="dpanel-head">
           <div class="dpanel-icon" style="background:#edf4ef;">📋</div>
           <div style="flex:1;">
-            <div class="dpanel-title">Documents acheteurs</div>
-            <div class="dpanel-sub">Transmis automatiquement aux acheteurs après demande de visite · DPE, diagnostics, plans…</div>
+            <div class="dpanel-title">Diagnostics réglementaires</div>
+            <div class="dpanel-sub">Transmis automatiquement aux acheteurs dans le dossier · DPE, amiante, plomb, ERP…</div>
           </div>
           <span class="dpanel-badge" style="background:#e8f5e9;color:#2e7d32;">👁 Visible acheteurs</span>
         </div>
@@ -1986,18 +2007,29 @@
         </div>
         <div class="dpanel-body">
 
-          <div class="docs-sub-label">Diagnostics obligatoires &amp; recommandés — cliquez sur chaque case pour ajouter</div>
+          <!-- Option dossier unique -->
+          <div style="display:flex;align-items:center;gap:12px;padding:12px 16px;background:#f0f7f2;border:1px solid #c8ddd0;border-radius:10px;margin-bottom:18px;">
+            <div style="font-size:1.3rem;flex-shrink:0;">📎</div>
+            <div style="flex:1;">
+              <div style="font-weight:700;font-size:0.85rem;color:#2a4030;">Tous mes diagnostics en un seul fichier ?</div>
+              <div style="font-size:0.74rem;color:#888;margin-top:2px;">Si votre diagnostiqueur vous a fourni un PDF unique regroupant l'ensemble des diagnostics, téléchargez-le ici.</div>
+            </div>
+            <label id="diagCompletLabel" style="padding:7px 14px;border-radius:8px;border:1.5px solid #3D5A47;background:#fff;color:#3D5A47;font-family:'DM Sans',sans-serif;font-size:0.8rem;font-weight:600;cursor:pointer;white-space:nowrap;position:relative;overflow:hidden;">
+              Ajouter le PDF complet
+              <input type="file" id="diagCompletInput" accept=".pdf,.jpg,.jpeg,.png,.webp" style="position:absolute;inset:0;opacity:0;cursor:pointer;">
+            </label>
+            <div id="diagCompletRow" style="display:none;"></div>
+          </div>
+
+          <div class="docs-sub-label">Ou ajoutez chaque diagnostic séparément</div>
           <div class="diag-grid" id="diagGrid"></div>
 
-          <div class="docs-sep"><div class="docs-sep-line"></div><span class="docs-sep-txt">Autres documents acheteurs</span><div class="docs-sep-line"></div></div>
-
+          <div class="docs-sep"><div class="docs-sep-line"></div><span class="docs-sep-txt">Autre document acheteurs (plans, etc.)</span><div class="docs-sep-line"></div></div>
           <div class="docs-type-row">
             <span class="docs-type-lbl">Type :</span>
             <select id="docType" class="docs-type-sel">
               <option value="plan">Plan du bien</option>
-              <option value="entretien_ramonage">Entretien / ramonage</option>
-              <option value="facture_chaudiere">Facture chaudière / poêle</option>
-              <option value="autre">Autre document</option>
+              <option value="autre">Autre document acheteurs</option>
             </select>
           </div>
           <div class="docs-drop" id="docZone-client">
@@ -2008,44 +2040,69 @@
             <input type="file" id="docInput" accept=".pdf,.jpg,.jpeg,.png,.webp" aria-label="Sélectionner un fichier">
           </div>
           <div id="clientDocsList" style="display:flex;flex-direction:column;gap:8px;"></div>
-
         </div>
       </div>
 
-      <!-- ─── SECTION 2: Documents confidentiels ──────── -->
+      <!-- ─── SECTION 2 : Dossier acheteur sérieux ──── -->
       <div class="dpanel">
         <div class="dpanel-head">
-          <div class="dpanel-icon" style="background:#fce4ec;">🔒</div>
+          <div class="dpanel-icon" style="background:#fff3e0;">📂</div>
           <div style="flex:1;">
-            <div class="dpanel-title">Documents confidentiels</div>
-            <div class="dpanel-sub">Ces fichiers ne sont <strong style="color:#c62828;">jamais partagés</strong> avec les acheteurs — réservés au notaire et aux démarches administratives</div>
+            <div class="dpanel-title">Dossier acheteur sérieux</div>
+            <div class="dpanel-sub">Envoyé après visite aux acquéreurs qualifiés · Factures entretien, taxe foncière, eau, gaz, fenêtres…</div>
           </div>
-          <span class="dpanel-badge" style="background:#fce4ec;color:#c62828;">🔒 Jamais transmis</span>
+          <span class="dpanel-badge" style="background:#fff3e0;color:#e65100;">📬 Post-visite</span>
         </div>
         <div class="dpanel-body">
-
-          <div class="docs-sub-label">Documents courants — ajoutez en un clic</div>
-          <div id="confSlots"></div>
-
-          <div class="docs-sep"><div class="docs-sep-line"></div><span class="docs-sep-txt">Autres documents confidentiels</span><div class="docs-sep-line"></div></div>
-
+          <div class="docs-sub-label">Justificatifs de charges — ajoutez en un clic</div>
+          <div id="acheteurSlots"></div>
+          <div class="docs-sep"><div class="docs-sep-line"></div><span class="docs-sep-txt">Autre pièce acheteur sérieux</span><div class="docs-sep-line"></div></div>
           <div class="docs-type-row">
             <span class="docs-type-lbl">Type :</span>
-            <select id="confDocType" class="docs-type-sel conf">
-              <option value="acte">Acte notarié</option>
+            <select id="acheteurDocType" class="docs-type-sel" style="border-color:#f0d0be;">
+              <option value="autre_acheteur">Autre justificatif</option>
+            </select>
+          </div>
+          <div class="docs-drop" id="docZone-acheteur" style="border-color:#f0d0be;background:#fff8f5;">
+            <div class="docs-drop-ico">☁</div>
+            <div class="docs-drop-ttl">Glisser un fichier ici — ou cliquer pour parcourir</div>
+            <div class="docs-drop-sub">PDF ou image · Max 50 Mo</div>
+            <div class="docs-drop-bar" style="background:linear-gradient(90deg,#C4785A,#e8a07a);"></div>
+            <input type="file" id="acheteurDocInput" accept=".pdf,.jpg,.jpeg,.png,.webp" aria-label="Sélectionner un justificatif">
+          </div>
+          <div id="acheteurDocsList" style="display:flex;flex-direction:column;gap:8px;"></div>
+        </div>
+      </div>
+
+      <!-- ─── SECTION 3 : Dossier notaire complet ───── -->
+      <div class="dpanel">
+        <div class="dpanel-head">
+          <div class="dpanel-icon" style="background:#ede9fe;">⚖️</div>
+          <div style="flex:1;">
+            <div class="dpanel-title">Dossier notaire complet</div>
+            <div class="dpanel-sub">Titre de propriété, compromis, offre d'achat, diagnostics complets, assainissement, toutes factures — <strong style="color:#6a1b9a;">jamais transmis aux acheteurs</strong></div>
+          </div>
+          <span class="dpanel-badge" style="background:#ede9fe;color:#6a1b9a;">🔒 Confidentiel</span>
+        </div>
+        <div class="dpanel-body">
+          <div class="docs-sub-label">Documents pour passage chez le notaire</div>
+          <div id="notaireSlots"></div>
+          <div class="docs-sep"><div class="docs-sep-line"></div><span class="docs-sep-txt">Autre document notaire</span><div class="docs-sep-line"></div></div>
+          <div class="docs-type-row">
+            <span class="docs-type-lbl">Type :</span>
+            <select id="notaireDocType" class="docs-type-sel conf">
               <option value="identite">Pièce d'identité</option>
               <option value="confidentiel">Autre (confidentiel)</option>
             </select>
           </div>
-          <div class="docs-drop conf" id="docZone-conf">
+          <div class="docs-drop conf" id="docZone-notaire">
             <div class="docs-drop-ico">☁</div>
             <div class="docs-drop-ttl">Glisser un fichier ici — ou cliquer pour parcourir</div>
             <div class="docs-drop-sub">PDF ou image · Max 50 Mo</div>
             <div class="docs-drop-bar"></div>
-            <input type="file" id="confDocInput" accept=".pdf,.jpg,.jpeg,.png,.webp,image/*" aria-label="Sélectionner un fichier confidentiel">
+            <input type="file" id="notaireDocInput" accept=".pdf,.jpg,.jpeg,.png,.webp,image/*" aria-label="Sélectionner un document notaire">
           </div>
-          <div id="confDocsList" style="display:flex;flex-direction:column;gap:8px;"></div>
-
+          <div id="notaireDocsList" style="display:flex;flex-direction:column;gap:8px;"></div>
         </div>
       </div>
 
@@ -2773,7 +2830,6 @@ async function publishProperty() {
 // ── Form save ─────────────────────────────────────────
 document.getElementById('propertyForm').addEventListener('submit', async (e) => {
   e.preventDefault();
-  console.log('[save] form submit fired');
   const formData = new FormData(e.target);
   const data = {};
   formData.forEach((v, k) => { data[k] = v; });
@@ -2791,27 +2847,40 @@ document.getElementById('propertyForm').addEventListener('submit', async (e) => 
   data.rooms_detail = JSON.stringify(roomsList);
 
   const btn = e.target.querySelector('button[type="submit"]');
-  btn.textContent = 'Sauvegarde...'; btn.disabled = true;
+  const origTxt = btn.textContent;
+  btn.textContent = '● Sauvegarde...'; btn.disabled = true;
 
-  const res = await fetch('/api/property', {
-    method: 'POST', headers: {'Content-Type':'application/json'},
-    body: JSON.stringify(data)
-  });
-  const result = await res.json();
-  if (result.success) {
-    document.getElementById('saveSuccess').classList.remove('hidden');
-    setTimeout(() => document.getElementById('saveSuccess').classList.add('hidden'), 3000);
-    const btnFiche = document.getElementById('btnVoirFiche');
-    if (btnFiche) btnFiche.style.display = 'inline-flex';
-    showToast('Fiche sauvegardée ✓');
-    var emb = document.getElementById('editModeBar');
-    if (emb) emb.style.display = 'flex';
-    enterViewMode();
-  } else {
-    document.getElementById('saveError').textContent = result.error;
-    document.getElementById('saveError').classList.remove('hidden');
+  // Optimistic UI — show success immediately
+  const badge = document.getElementById('autosaveBadge');
+  if (badge) { badge.textContent = '● Envoi...'; badge.className = 'autosave-badge saving'; }
+
+  try {
+    const res = await fetch('/api/property', {
+      method: 'POST', headers: {'Content-Type':'application/json'},
+      body: JSON.stringify(data)
+    });
+    const result = await res.json();
+    if (result.success) {
+      document.getElementById('saveSuccess').classList.remove('hidden');
+      setTimeout(() => document.getElementById('saveSuccess').classList.add('hidden'), 3000);
+      const btnFiche = document.getElementById('btnVoirFiche');
+      if (btnFiche) btnFiche.style.display = 'inline-flex';
+      showToast('Fiche sauvegardée ✓');
+      if (badge) { const t = new Date().toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'}); badge.textContent = '✓ Sauvegardé à ' + t; badge.className = 'autosave-badge saved'; }
+      var emb = document.getElementById('editModeBar');
+      if (emb) emb.style.display = 'flex';
+      enterViewMode();
+    } else {
+      const errEl = document.getElementById('saveError');
+      if (errEl) { errEl.textContent = result.error || 'Erreur de sauvegarde'; errEl.classList.remove('hidden'); }
+      showToast(result.error || 'Erreur de sauvegarde', 'error');
+      if (badge) { badge.textContent = '⚠ Erreur'; badge.className = 'autosave-badge saving'; }
+    }
+  } catch(err) {
+    showToast('Erreur réseau — vérifiez votre connexion', 'error');
+    if (badge) { badge.textContent = '⚠ Hors ligne'; badge.className = 'autosave-badge saving'; }
   }
-  btn.textContent = 'Sauvegarder la fiche'; btn.disabled = false;
+  btn.textContent = origTxt; btn.disabled = false;
 });
 
 // ── Photo upload — 3 dossiers distincts ──────────────
@@ -2911,9 +2980,10 @@ function renderGrid(category) {
     const imgSrc = p.url || p.thumbnail_url || '';
     const thumbSrc = imgSrc.includes('/upload/') ? imgSrc.replace('/upload/', '/upload/w_500,c_fill,q_auto/') : imgSrc;
     const cidSafe = (p.cloudinary_id || '').replace(/'/g, "\\'");
-    return `<div class="photo-scroll-item" data-photo-idx="${i}" data-photo-cat="${category}">
+    return `<div class="photo-scroll-item" draggable="true" data-cid="${cidSafe}" data-photo-idx="${i}" data-photo-cat="${category}">
       <img src="${thumbSrc}" alt="Photo ${i+1}" loading="lazy" draggable="false">
       <button class="photo-scroll-del" data-cid="${cidSafe}" data-cat="${category}" title="Supprimer">${svgDel}</button>
+      <div class="photo-drag-handle" title="Glisser pour réordonner">⠿</div>
     </div>`;
   };
 
@@ -2930,7 +3000,70 @@ function renderGrid(category) {
     <button class="photo-scroll-nav next" data-scroll-dir="1" data-scroll-cat="${category}">${svgNext}</button>
   </div>`;
 
-  initScrollCarousel(document.getElementById('scroll-track-' + category));
+  const track = document.getElementById('scroll-track-' + category);
+  initScrollCarousel(track);
+  initReorder(track, category);
+}
+
+let _dragSrcCid = null;
+let _dragSrcCat = null;
+
+function initReorder(track, category) {
+  if (!track) return;
+  track.addEventListener('dragstart', e => {
+    const item = e.target.closest('.photo-scroll-item[draggable]');
+    if (!item || item.getAttribute('aria-hidden')) { e.preventDefault(); return; }
+    _dragSrcCid = item.dataset.cid;
+    _dragSrcCat = category;
+    e.dataTransfer.effectAllowed = 'move';
+    setTimeout(() => item.classList.add('drag-src'), 0);
+  });
+  track.addEventListener('dragend', () => {
+    track.querySelectorAll('.photo-scroll-item').forEach(el => {
+      el.classList.remove('drag-src', 'drag-over-item');
+    });
+  });
+  track.addEventListener('dragover', e => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+    const item = e.target.closest('.photo-scroll-item');
+    if (item && !item.getAttribute('aria-hidden')) {
+      track.querySelectorAll('.photo-scroll-item').forEach(el => el.classList.remove('drag-over-item'));
+      item.classList.add('drag-over-item');
+    }
+  });
+  track.addEventListener('dragleave', e => {
+    const item = e.target.closest('.photo-scroll-item');
+    if (item) item.classList.remove('drag-over-item');
+  });
+  track.addEventListener('drop', e => {
+    e.preventDefault();
+    const item = e.target.closest('.photo-scroll-item');
+    if (!item || item.getAttribute('aria-hidden') || !_dragSrcCid) return;
+    const targetCid = item.dataset.cid;
+    if (_dragSrcCid === targetCid || _dragSrcCat !== category) return;
+    const photos = allPhotos[category];
+    const srcIdx = photos.findIndex(p => p.cloudinary_id === _dragSrcCid);
+    const tgtIdx = photos.findIndex(p => p.cloudinary_id === targetCid);
+    if (srcIdx < 0 || tgtIdx < 0) return;
+    const [moved] = photos.splice(srcIdx, 1);
+    photos.splice(tgtIdx, 0, moved);
+    photos.forEach((p, i) => { p.order_index = i; });
+    savePhotoOrder(photos.map(p => ({ cloudinary_id: p.cloudinary_id, order_index: p.order_index })));
+    renderGrid(category);
+    _dragSrcCid = null;
+    _dragSrcCat = null;
+  });
+}
+
+async function savePhotoOrder(photos) {
+  try {
+    await fetch('/api/property/photos/reorder', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ photos }),
+    });
+  } catch(e) { console.error('Reorder save error:', e); }
 }
 
 function initScrollCarousel(track) {
@@ -3106,26 +3239,30 @@ const _svgId    = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" s
 const _svgPen   = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>`;
 
 const DOC_META = {
-  dpe:              { icon:_svgShield, color:'#e8f5e9', text:'#2e7d32', label:'DPE' },
-  amiante:          { icon:_svgFile,   color:'#fce4ec', text:'#c62828', label:'Amiante' },
-  plomb:            { icon:_svgFile,   color:'#fce4ec', text:'#c62828', label:'Plomb' },
-  electricite:      { icon:_svgZap,    color:'#fff8e1', text:'#f57f17', label:'Électricité' },
-  gaz:              { icon:_svgFlame,  color:'#fff3e0', text:'#e65100', label:'Gaz' },
-  assainissement:   { icon:_svgDrop,   color:'#e3f2fd', text:'#1565c0', label:'Assainissement' },
-  erp:              { icon:_svgShield, color:'#fff8e1', text:'#f57f17', label:'ERP' },
-  facture_chaudiere:{ icon:_svgFlame,  color:'#fff3e0', text:'#e65100', label:'Facture chaudière' },
-  entretien_ramonage:{ icon:_svgFile,  color:'#e3f2fd', text:'#1565c0', label:'Entretien / ramonage' },
-  cheminee:         { icon:_svgFlame,  color:'#fff3e0', text:'#e65100', label:'Cheminée' },
-  autre:            { icon:_svgFile,   color:'#f5f5f5', text:'#555',    label:'Autre' },
-  titre:            { icon:_svgHome,   color:'#f0f5f1', text:'#3D5A47', label:'Titre propriété' },
-  taxe:             { icon:_svgFile,   color:'#f0f5f1', text:'#3D5A47', label:'Taxe foncière' },
-  compromis:        { icon:_svgPen,    color:'#f5f0ff', text:'#6a1b9a', label:'Compromis' },
-  acte:             { icon:_svgPen,    color:'#f5f0ff', text:'#6a1b9a', label:'Acte notarié' },
-  identite:         { icon:_svgId,     color:'#fce4ec', text:'#c62828', label:'Pièce d\'identité' },
-  confidentiel:     { icon:_svgLock,   color:'#fce4ec', text:'#c62828', label:'Confidentiel' },
+  dpe:                  { icon:_svgShield, color:'#e8f5e9', text:'#2e7d32', label:'DPE' },
+  amiante:              { icon:_svgFile,   color:'#fce4ec', text:'#c62828', label:'Amiante' },
+  plomb:                { icon:_svgFile,   color:'#fce4ec', text:'#c62828', label:'Plomb' },
+  electricite:          { icon:_svgZap,    color:'#fff8e1', text:'#f57f17', label:'Électricité' },
+  gaz:                  { icon:_svgFlame,  color:'#fff3e0', text:'#e65100', label:'Gaz' },
+  assainissement:       { icon:_svgDrop,   color:'#e3f2fd', text:'#1565c0', label:'Assainissement' },
+  erp:                  { icon:_svgShield, color:'#fff8e1', text:'#f57f17', label:'ERP' },
+  diagnostics_complets: { icon:_svgFile,   color:'#e8f5e9', text:'#2e7d32', label:'Diagnostics complets' },
+  plan:                 { icon:_svgFile,   color:'#f5f5f5', text:'#555',    label:'Plan du bien' },
+  facture_chaudiere:    { icon:_svgFlame,  color:'#fff3e0', text:'#e65100', label:'Entretien chaudière' },
+  entretien_ramonage:   { icon:_svgFile,   color:'#e3f2fd', text:'#1565c0', label:'Ramonage' },
+  taxe_fonciere:        { icon:_svgFile,   color:'#f0f5f1', text:'#3D5A47', label:'Taxe foncière' },
+  facture_eau:          { icon:_svgDrop,   color:'#e3f2fd', text:'#1565c0', label:'Facture eau' },
+  facture_gaz:          { icon:_svgFlame,  color:'#fff3e0', text:'#e65100', label:'Facture gaz' },
+  facture_fenetres:     { icon:_svgFile,   color:'#e8f5e9', text:'#2e7d32', label:'Facture fenêtres' },
+  autre_acheteur:       { icon:_svgFile,   color:'#fff8f5', text:'#C4785A', label:'Autre acheteur sérieux' },
+  titre:                { icon:_svgHome,   color:'#ede9fe', text:'#6a1b9a', label:'Titre de propriété' },
+  compromis:            { icon:_svgPen,    color:'#ede9fe', text:'#6a1b9a', label:'Compromis de vente' },
+  offre_achat:          { icon:_svgPen,    color:'#ede9fe', text:'#6a1b9a', label:"Offre d'achat" },
+  acte:                 { icon:_svgPen,    color:'#ede9fe', text:'#6a1b9a', label:'Acte notarié' },
+  identite:             { icon:_svgId,     color:'#fce4ec', text:'#c62828', label:'Pièce d\'identité' },
+  confidentiel:         { icon:_svgLock,   color:'#fce4ec', text:'#c62828', label:'Confidentiel' },
+  autre:                { icon:_svgFile,   color:'#f5f5f5', text:'#555',    label:'Autre' },
 };
-
-const CONFIDENTIAL_TYPES = new Set(['titre','taxe','compromis','acte','identite','confidentiel']);
 
 const DIAG_SLOTS = [
   { type:'dpe',            icon:'🛡️', label:'DPE',             desc:'Diagnostic de performance énergétique', req:true },
@@ -3138,26 +3275,40 @@ const DIAG_SLOTS = [
 ];
 const DIAG_SLOT_TYPES = new Set(DIAG_SLOTS.map(function(s){ return s.type; }));
 
-const CONF_SLOTS = [
-  { type:'titre',    icon:'🏠', label:'Titre de propriété', desc:'Atteste que vous êtes propriétaire du bien' },
-  { type:'taxe',     icon:'📄', label:'Taxe foncière',      desc:'Avis annuel — utile pour estimation des charges' },
-  { type:'compromis',icon:'✍️', label:'Compromis de vente', desc:'Si une promesse de vente est déjà signée' },
+const ACHETEUR_SLOTS = [
+  { type:'facture_chaudiere',  icon:'🔥', label:'Entretien chaudière', desc:"Facture ou certificat d'entretien annuel" },
+  { type:'entretien_ramonage', icon:'🏠', label:'Ramonage',            desc:'Certificat de ramonage de la cheminée' },
+  { type:'taxe_fonciere',      icon:'📄', label:'Taxe foncière',       desc:'Avis annuel de taxe foncière' },
+  { type:'facture_eau',        icon:'💧', label:'Facture eau',         desc:"Dernière facture d'eau" },
+  { type:'facture_gaz',        icon:'🔥', label:'Facture gaz',         desc:'Dernière facture de gaz' },
+  { type:'facture_fenetres',   icon:'🪟', label:'Facture fenêtres',    desc:'Facture de pose ou remplacement des fenêtres' },
 ];
-const CONF_SLOT_TYPES = new Set(CONF_SLOTS.map(function(s){ return s.type; }));
+const ACHETEUR_SLOT_TYPES = new Set(ACHETEUR_SLOTS.map(function(s){ return s.type; }));
+
+const NOTAIRE_SLOTS = [
+  { type:'titre',       icon:'🏠', label:'Titre de propriété',  desc:'Atteste que vous êtes propriétaire du bien' },
+  { type:'compromis',   icon:'✍️', label:'Compromis de vente',  desc:'Si une promesse de vente est déjà signée' },
+  { type:'offre_achat', icon:'📝', label:"Offre d'achat",       desc:"Offre d'achat signée par l'acquéreur" },
+  { type:'acte',        icon:'⚖️', label:'Acte notarié',        desc:'Acte authentique de vente' },
+];
+const NOTAIRE_SLOT_TYPES = new Set(NOTAIRE_SLOTS.map(function(s){ return s.type; }));
 
 // ═══════════════════════════════════════════════════════
 // DOCUMENT UPLOAD SYSTEM — slot-based premium
 // ═══════════════════════════════════════════════════════
 
-async function doDocUpload(file, docType, isConf, containerEl) {
+async function doDocUpload(file, docType, folder, containerEl) {
+  var safeFolder = folder || 'diagnostics';
   var label = (DOC_META[docType] || DOC_META.autre).label;
-  var zone = containerEl || document.getElementById(isConf ? 'docZone-conf' : 'docZone-client');
+  var defaultZoneId = safeFolder === 'notaire' ? 'docZone-notaire' : safeFolder === 'acheteur_serieux' ? 'docZone-acheteur' : 'docZone-client';
+  var zone = containerEl || document.getElementById(defaultZoneId);
   if (zone) zone.classList.add('uploading');
 
   var fd = new FormData();
   fd.append('document', file);
   fd.append('name', label);
   fd.append('doc_type', docType);
+  fd.append('folder', safeFolder);
 
   try {
     var res = await fetch('/api/property/documents', { method: 'POST', body: fd });
@@ -3255,7 +3406,7 @@ function initDiagGrid() {
       return function() {
         var f = this.files[0];
         if (!f) return;
-        doDocUpload(f, t, false, c);
+        doDocUpload(f, t, 'diagnostics', c);
         this.value = '';
       };
     })(slot.type, card));
@@ -3280,21 +3431,21 @@ function initDiagGrid() {
         c.classList.remove('drag-over');
         var f = e.dataTransfer.files[0];
         if (!f) return;
-        doDocUpload(f, t, false, c);
+        doDocUpload(f, t, 'diagnostics', c);
       };
     })(slot.type, card));
   });
 }
 
-function initConfSlots() {
-  var container = document.getElementById('confSlots');
+function _initSlotGrid(slots, containerId, folder) {
+  var container = document.getElementById(containerId);
   if (!container) return;
   while (container.firstChild) container.removeChild(container.firstChild);
 
-  CONF_SLOTS.forEach(function(slot) {
+  slots.forEach(function(slot) {
     var card = document.createElement('div');
     card.className = 'conf-slot';
-    card.id = 'conf-slot-' + slot.type;
+    card.id = folder + '-slot-' + slot.type;
 
     var ico = document.createElement('div');
     ico.className = 'conf-slot-ico';
@@ -3313,7 +3464,7 @@ function initConfSlots() {
 
     var acts = document.createElement('div');
     acts.className = 'conf-slot-acts';
-    acts.id = 'conf-acts-' + slot.type;
+    acts.id = folder + '-acts-' + slot.type;
 
     var lbl = document.createElement('label');
     lbl.className = 'conf-upload-lbl';
@@ -3335,14 +3486,14 @@ function initConfSlots() {
     card.appendChild(cbar);
     container.appendChild(card);
 
-    fileInput.addEventListener('change', (function(t, c) {
+    fileInput.addEventListener('change', (function(t, c, fl) {
       return function() {
         var f = this.files[0];
         if (!f) return;
-        doDocUpload(f, t, true, c);
+        doDocUpload(f, t, fl, c);
         this.value = '';
       };
-    })(slot.type, card));
+    })(slot.type, card, folder));
 
     card.addEventListener('dragover', function(e) {
       e.preventDefault(); e.stopPropagation();
@@ -3352,19 +3503,22 @@ function initConfSlots() {
       e.stopPropagation();
       card.classList.remove('drag-over');
     });
-    card.addEventListener('drop', (function(t, c) {
+    card.addEventListener('drop', (function(t, c, fl) {
       return function(e) {
         e.preventDefault(); e.stopPropagation();
         c.classList.remove('drag-over');
         var f = e.dataTransfer.files[0];
         if (!f) return;
-        doDocUpload(f, t, true, c);
+        doDocUpload(f, t, fl, c);
       };
-    })(slot.type, card));
+    })(slot.type, card, folder));
   });
 }
 
-function initDocUploadZone(inputId, zoneId, typeSelectId, isConf) {
+function initAcheteurSlots() { _initSlotGrid(ACHETEUR_SLOTS, 'acheteurSlots', 'acheteur_serieux'); }
+function initNotaireSlots()  { _initSlotGrid(NOTAIRE_SLOTS,  'notaireSlots',  'notaire'); }
+
+function initDocUploadZone(inputId, zoneId, typeSelectId, folder) {
   var input = document.getElementById(inputId);
   var zone = document.getElementById(zoneId);
   if (!input || !zone) return;
@@ -3373,7 +3527,7 @@ function initDocUploadZone(inputId, zoneId, typeSelectId, isConf) {
     var file = this.files[0];
     if (!file) return;
     var docType = document.getElementById(typeSelectId).value;
-    doDocUpload(file, docType, isConf);
+    doDocUpload(file, docType, folder);
     this.value = '';
   });
 
@@ -3391,7 +3545,7 @@ function initDocUploadZone(inputId, zoneId, typeSelectId, isConf) {
     var file = e.dataTransfer.files[0];
     if (!file) return;
     var docType = document.getElementById(typeSelectId).value;
-    doDocUpload(file, docType, isConf);
+    doDocUpload(file, docType, folder);
   });
 
   zone.addEventListener('keydown', function(e) {
@@ -3400,9 +3554,22 @@ function initDocUploadZone(inputId, zoneId, typeSelectId, isConf) {
 }
 
 initDiagGrid();
-initConfSlots();
-initDocUploadZone('docInput',     'docZone-client', 'docType',     false);
-initDocUploadZone('confDocInput', 'docZone-conf',   'confDocType', true);
+initAcheteurSlots();
+initNotaireSlots();
+initDocUploadZone('docInput',        'docZone-client',   'docType',        'diagnostics');
+initDocUploadZone('acheteurDocInput','docZone-acheteur', 'acheteurDocType','acheteur_serieux');
+initDocUploadZone('notaireDocInput', 'docZone-notaire',  'notaireDocType', 'notaire');
+
+(function() {
+  var diagCompletInput = document.getElementById('diagCompletInput');
+  if (!diagCompletInput) return;
+  diagCompletInput.addEventListener('change', function() {
+    var f = this.files[0];
+    if (!f) return;
+    doDocUpload(f, 'diagnostics_complets', 'diagnostics', document.getElementById('diagCompletLabel'));
+    this.value = '';
+  });
+})();
 
 async function deleteDocument(id) {
   try {
@@ -3481,13 +3648,74 @@ function renderDocList(listId, items, emptyMsg) {
   items.forEach(function(d) { list.appendChild(_docsCard(d)); });
 }
 
+function _renderSlotFilled(card, acts, doc, folder) {
+  card.classList.add('filled');
+  while (acts.firstChild) acts.removeChild(acts.firstChild);
+  var check = document.createElement('div');
+  check.className = 'conf-check';
+  check.textContent = '✓';
+  var viewLink = document.createElement('a');
+  viewLink.className = 'conf-view-btn';
+  viewLink.href = doc.url;
+  viewLink.target = '_blank';
+  viewLink.rel = 'noopener';
+  viewLink.textContent = 'Ouvrir';
+  var delBtn = document.createElement('button');
+  delBtn.type = 'button';
+  delBtn.className = 'conf-del';
+  delBtn.setAttribute('aria-label', 'Supprimer');
+  delBtn.innerHTML = '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>';
+  delBtn.addEventListener('click', (function(docId) {
+    return function() { if (confirm('Supprimer ce document ?')) deleteDocument(docId); };
+  })(doc.id));
+  acts.appendChild(check);
+  acts.appendChild(viewLink);
+  acts.appendChild(delBtn);
+}
+
+function _renderSlotEmpty(card, acts, slotType, folder) {
+  card.classList.remove('filled');
+  if (!acts.querySelector('.conf-upload-lbl')) {
+    while (acts.firstChild) acts.removeChild(acts.firstChild);
+    var lbl = document.createElement('label');
+    lbl.className = 'conf-upload-lbl';
+    var lblTxt = document.createTextNode('+ Ajouter');
+    var inp = document.createElement('input');
+    inp.type = 'file';
+    inp.accept = '.pdf,.jpg,.jpeg,.png,.webp,image/*';
+    inp.setAttribute('aria-hidden', 'true');
+    inp.addEventListener('change', (function(t, c, fl) {
+      return function() {
+        var f = this.files[0];
+        if (!f) return;
+        doDocUpload(f, t, fl, c);
+        this.value = '';
+      };
+    })(slotType, card, folder));
+    lbl.appendChild(lblTxt);
+    lbl.appendChild(inp);
+    acts.appendChild(lbl);
+  }
+}
+
 function renderDocuments(docs) {
-  var diagMap = {}, confMap = {}, clientDocs = [], otherConfDocs = [];
+  var diagMap = {}, acheteurMap = {}, notaireMap = {};
+  var clientDocs = [], acheteurOtherDocs = [], notaireOtherDocs = [];
+  var diagCompleteDoc = null;
+
   docs.forEach(function(d) {
-    if (DIAG_SLOT_TYPES.has(d.doc_type))         diagMap[d.doc_type] = d;
-    else if (CONF_SLOT_TYPES.has(d.doc_type))    confMap[d.doc_type] = d;
-    else if (CONFIDENTIAL_TYPES.has(d.doc_type)) otherConfDocs.push(d);
-    else                                          clientDocs.push(d);
+    var f = d.folder || 'diagnostics';
+    if (f === 'notaire') {
+      if (NOTAIRE_SLOT_TYPES.has(d.doc_type)) notaireMap[d.doc_type] = d;
+      else notaireOtherDocs.push(d);
+    } else if (f === 'acheteur_serieux') {
+      if (ACHETEUR_SLOT_TYPES.has(d.doc_type)) acheteurMap[d.doc_type] = d;
+      else acheteurOtherDocs.push(d);
+    } else {
+      if (d.doc_type === 'diagnostics_complets') { diagCompleteDoc = d; }
+      else if (DIAG_SLOT_TYPES.has(d.doc_type)) { diagMap[d.doc_type] = d; }
+      else clientDocs.push(d);
+    }
   });
 
   // ── Diagnostic slots ────────────────────────────────
@@ -3514,23 +3742,19 @@ function renderDocuments(docs) {
       if (fileRow) {
         while (fileRow.firstChild) fileRow.removeChild(fileRow.firstChild);
         fileRow.style.display = 'flex';
-
         var fIco = document.createElement('span');
         fIco.className = 'diag-file-icon';
         fIco.textContent = '📄';
-
         var fName = document.createElement('span');
         fName.className = 'diag-file-name';
         fName.title = doc.name;
         fName.textContent = doc.name;
-
         var fOpen = document.createElement('a');
         fOpen.className = 'diag-file-open';
         fOpen.href = doc.url;
         fOpen.target = '_blank';
         fOpen.rel = 'noopener';
         fOpen.textContent = 'Ouvrir';
-
         var fDel = document.createElement('button');
         fDel.type = 'button';
         fDel.className = 'diag-file-del';
@@ -3539,7 +3763,6 @@ function renderDocuments(docs) {
         fDel.addEventListener('click', (function(docId) {
           return function() { if (confirm('Supprimer ce document ?')) deleteDocument(docId); };
         })(doc.id));
-
         fileRow.appendChild(fIco);
         fileRow.appendChild(fName);
         fileRow.appendChild(fOpen);
@@ -3559,6 +3782,34 @@ function renderDocuments(docs) {
     }
   });
 
+  // ── Diag complet (single PDF) ────────────────────────
+  var diagCompletRow = document.getElementById('diagCompletRow');
+  if (diagCompletRow) {
+    if (diagCompleteDoc) {
+      diagCompletRow.style.display = 'flex';
+      diagCompletRow.style.alignItems = 'center';
+      diagCompletRow.style.gap = '8px';
+      diagCompletRow.style.fontSize = '0.82rem';
+      diagCompletRow.style.color = '#2a4030';
+      while (diagCompletRow.firstChild) diagCompletRow.removeChild(diagCompletRow.firstChild);
+      var dcIco = document.createElement('span'); dcIco.textContent = '📎';
+      var dcName = document.createElement('span'); dcName.textContent = diagCompleteDoc.name; dcName.style.flex='1';
+      var dcOpen = document.createElement('a');
+      dcOpen.href = diagCompleteDoc.url; dcOpen.target='_blank'; dcOpen.rel='noopener';
+      dcOpen.textContent = 'Ouvrir'; dcOpen.style.cssText='color:#3D5A47;font-weight:600;';
+      var dcDel = document.createElement('button');
+      dcDel.type='button'; dcDel.style.cssText='border:none;background:none;cursor:pointer;color:#c62828;font-size:0.8rem;padding:2px 6px;';
+      dcDel.textContent = '✕';
+      dcDel.addEventListener('click', (function(id){ return function(){ if(confirm('Supprimer ?')) deleteDocument(id); }; })(diagCompleteDoc.id));
+      diagCompletRow.appendChild(dcIco);
+      diagCompletRow.appendChild(dcName);
+      diagCompletRow.appendChild(dcOpen);
+      diagCompletRow.appendChild(dcDel);
+    } else {
+      diagCompletRow.style.display = 'none';
+    }
+  }
+
   // ── Progress bar ────────────────────────────────────
   var pct  = Math.round((diagDone / DIAG_SLOTS.length) * 100);
   var fill = document.getElementById('diagProgressFill');
@@ -3566,71 +3817,33 @@ function renderDocuments(docs) {
   if (fill) fill.style.width = pct + '%';
   if (txt)  txt.textContent  = diagDone + '/' + DIAG_SLOTS.length + ' diagnostics';
 
-  // ── Confidential quick-slots ────────────────────────
-  CONF_SLOTS.forEach(function(slot) {
-    var card = document.getElementById('conf-slot-' + slot.type);
-    var acts = document.getElementById('conf-acts-' + slot.type);
+  // ── Acheteur sérieux slots ───────────────────────────
+  ACHETEUR_SLOTS.forEach(function(slot) {
+    var card = document.getElementById('acheteur_serieux-slot-' + slot.type);
+    var acts = document.getElementById('acheteur_serieux-acts-' + slot.type);
     if (!card || !acts) return;
+    var doc = acheteurMap[slot.type];
+    if (doc) _renderSlotFilled(card, acts, doc, 'acheteur_serieux');
+    else     _renderSlotEmpty(card, acts, slot.type, 'acheteur_serieux');
+  });
 
-    var doc = confMap[slot.type];
-    if (doc) {
-      card.classList.add('filled');
-      while (acts.firstChild) acts.removeChild(acts.firstChild);
-
-      var check = document.createElement('div');
-      check.className = 'conf-check';
-      check.textContent = '✓';
-
-      var viewLink = document.createElement('a');
-      viewLink.className = 'conf-view-btn';
-      viewLink.href = doc.url;
-      viewLink.target = '_blank';
-      viewLink.rel = 'noopener';
-      viewLink.textContent = 'Ouvrir';
-
-      var delBtn = document.createElement('button');
-      delBtn.type = 'button';
-      delBtn.className = 'conf-del';
-      delBtn.setAttribute('aria-label', 'Supprimer');
-      delBtn.innerHTML = '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>';
-      delBtn.addEventListener('click', (function(docId) {
-        return function() { if (confirm('Supprimer ce document ?')) deleteDocument(docId); };
-      })(doc.id));
-
-      acts.appendChild(check);
-      acts.appendChild(viewLink);
-      acts.appendChild(delBtn);
-    } else {
-      card.classList.remove('filled');
-      if (!acts.querySelector('.conf-upload-lbl')) {
-        while (acts.firstChild) acts.removeChild(acts.firstChild);
-        var lbl = document.createElement('label');
-        lbl.className = 'conf-upload-lbl';
-        var lblTxt = document.createTextNode('+ Ajouter');
-        var inp = document.createElement('input');
-        inp.type = 'file';
-        inp.accept = '.pdf,.jpg,.jpeg,.png,.webp,image/*';
-        inp.setAttribute('aria-hidden', 'true');
-        inp.addEventListener('change', (function(t, c) {
-          return function() {
-            var f = this.files[0];
-            if (!f) return;
-            doDocUpload(f, t, true, c);
-            this.value = '';
-          };
-        })(slot.type, card));
-        lbl.appendChild(lblTxt);
-        lbl.appendChild(inp);
-        acts.appendChild(lbl);
-      }
-    }
+  // ── Notaire slots ────────────────────────────────────
+  NOTAIRE_SLOTS.forEach(function(slot) {
+    var card = document.getElementById('notaire-slot-' + slot.type);
+    var acts = document.getElementById('notaire-acts-' + slot.type);
+    if (!card || !acts) return;
+    var doc = notaireMap[slot.type];
+    if (doc) _renderSlotFilled(card, acts, doc, 'notaire');
+    else     _renderSlotEmpty(card, acts, slot.type, 'notaire');
   });
 
   // ── Generic lists ────────────────────────────────────
   renderDocList('clientDocsList', clientDocs,
     'Aucun autre document acheteur · Glissez vos fichiers ou cliquez sur la zone ci-dessus');
-  renderDocList('confDocsList', otherConfDocs,
-    "Aucun autre document confidentiel · Acte notarié, pièce d'identité…");
+  renderDocList('acheteurDocsList', acheteurOtherDocs,
+    'Aucun autre justificatif · Glissez vos fichiers ou cliquez sur la zone ci-dessus');
+  renderDocList('notaireDocsList', notaireOtherDocs,
+    "Aucun autre document notaire · Pièce d'identité, acte…");
 
   // ── Intro banner ─────────────────────────────────────
   var bannerEl = document.getElementById('docIntroBannerText');
@@ -3647,14 +3860,43 @@ function renderDocuments(docs) {
 }
 
 // ── AI Description generator ───────────────────────────
+function updateDescWordCount(el) {
+  const count = el.value.trim() ? el.value.trim().split(/\s+/).length : 0;
+  const counter = document.getElementById('descWordCount');
+  if (counter) counter.textContent = count;
+}
+
+function useAIDescription() {
+  const aiText = document.getElementById('aiDescText');
+  const mainTextarea = document.querySelector('[name="description"]');
+  if (!aiText || !mainTextarea) return;
+  mainTextarea.value = aiText.value;
+  updateDescWordCount(mainTextarea);
+  document.getElementById('aiDescPreview').style.display = 'none';
+  document.getElementById('aiUseBtn').style.display = 'none';
+  document.getElementById('aiRegenBtn').style.display = 'none';
+  document.getElementById('aiDescBtn').style.display = 'inline-flex';
+  mainTextarea.style.background = '#f0f7f2';
+  setTimeout(() => mainTextarea.style.background = '', 1500);
+  showToast('Description appliquée !');
+  updateCompletion();
+}
+
 async function generateAIDescription() {
   const btn = document.getElementById('aiDescBtn');
+  const regenBtn = document.getElementById('aiRegenBtn');
+  const useBtn = document.getElementById('aiUseBtn');
   const status = document.getElementById('aiDescStatus');
-  const textarea = document.querySelector('[name="description"]');
+  const preview = document.getElementById('aiDescPreview');
+  const aiDescText = document.getElementById('aiDescText');
+  const aiWordCount = document.getElementById('aiDescWordCount');
 
+  // Show spinner state
   btn.disabled = true;
-  btn.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="animation:spin 1s linear infinite"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg> Génération...`;
+  regenBtn.disabled = true;
   status.style.display = 'inline';
+  preview.style.display = 'none';
+  useBtn.style.display = 'none';
 
   const form = document.getElementById('propertyForm');
   const formData = new FormData(form);
@@ -3676,20 +3918,26 @@ async function generateAIDescription() {
     });
     const data = await res.json();
     if (data.description) {
-      textarea.value = data.description;
-      textarea.style.background = '#f0f7f2';
-      setTimeout(() => textarea.style.background = '', 1500);
+      aiDescText.value = data.description;
+      const wc = data.description.trim().split(/\s+/).length;
+      if (aiWordCount) aiWordCount.textContent = wc;
+      preview.style.display = 'block';
+      useBtn.style.display = 'inline-block';
+      regenBtn.style.display = 'inline-flex';
+      btn.style.display = 'none';
       showToast('Texte généré !');
-      updateCompletion();
     } else {
-      showToast(data.error || 'Erreur de génération', 'error');
+      const msg = (data.error && data.error.toLowerCase().includes('anthropic_api_key'))
+        ? 'Clé API Anthropic non configurée — contactez l\'administrateur'
+        : (data.error || 'Erreur de génération');
+      showToast(msg, 'error');
     }
   } catch(e) {
     showToast('Erreur réseau', 'error');
   }
 
   btn.disabled = false;
-  btn.innerHTML = `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg> Générer avec l'IA`;
+  regenBtn.disabled = false;
   status.style.display = 'none';
 }
 
@@ -3744,7 +3992,7 @@ function buildFicheHtml() {
   const decouvertePhotos = (allPhotos.decouverte || []).filter(p => !p._temp);
   const detailsPhotos = (allPhotos.details || []).filter(p => !p._temp);
   const mainPhoto = proPhotos[0] || decouvertePhotos[0] || detailsPhotos[0] || null;
-  const publicDocs = (_propertyData?.documents || []).filter(d => !CONFIDENTIAL_TYPES.has(d.doc_type));
+  const publicDocs = (_propertyData?.documents || []).filter(d => !d.folder || d.folder === 'diagnostics');
 
   const row = (label, value) => value ? `<tr><td class="fd-label">${label}</td><td class="fd-value">${value}</td></tr>` : '';
 
@@ -4029,15 +4277,23 @@ async function saveTourUrl() {
   }
 }
 
+let _sellerInfoCache = null;
 async function fetchSellerForFiche() {
+  if (_sellerInfoCache) {
+    document.querySelectorAll('.fiche-seller-name').forEach(el => { el.textContent = _sellerInfoCache.name; });
+    document.querySelectorAll('.fiche-seller-phone').forEach(el => { el.textContent = _sellerInfoCache.phone; });
+    return;
+  }
   try {
     const res = await fetch('/api/me');
     const data = await res.json();
     if (data.seller) {
-      const name = [data.seller.first_name, data.seller.last_name].filter(Boolean).join(' ') || 'Vendeur particulier';
-      const phone = data.seller.phone || data.seller.twilio_number || '';
-      document.querySelectorAll('.fiche-seller-name').forEach(el => { el.textContent = name; });
-      document.querySelectorAll('.fiche-seller-phone').forEach(el => { el.textContent = phone; });
+      _sellerInfoCache = {
+        name: [data.seller.first_name, data.seller.last_name].filter(Boolean).join(' ') || 'Vendeur particulier',
+        phone: data.seller.phone || data.seller.twilio_number || ''
+      };
+      document.querySelectorAll('.fiche-seller-name').forEach(el => { el.textContent = _sellerInfoCache.name; });
+      document.querySelectorAll('.fiche-seller-phone').forEach(el => { el.textContent = _sellerInfoCache.phone; });
     }
   } catch(e) {}
 }
@@ -4813,6 +5069,566 @@ document.getElementById('btnBackToView').addEventListener('click', function() {
 });
 
 initRoomPanel();
+
+// ══════════════════════════════════════════════════════════════
+//  WIZARD — premier remplissage de la fiche (exhaustif)
+// ══════════════════════════════════════════════════════════════
+(function() {
+
+  const wzFiles = []; // fichiers à uploader après création
+
+  // ── helpers ──────────────────────────────────────────────────
+  function chip(val, label, multi) {
+    return `<div class="wz-chip ${multi?'wz-multi':''}" data-val="${val}">${label}</div>`;
+  }
+  function equip(val, icon, label) {
+    return `<div class="wz-equip" data-val="${val}"><span>${icon}</span><label>${label}</label></div>`;
+  }
+  function card(val, icon, label) {
+    return `<div class="wz-card" data-val="${val}">${icon}<span>${label}</span></div>`;
+  }
+  function stepper(id, label, minVal, def) {
+    return `<div class="wz-stepper"><label>${label}</label><div class="wz-step-ctrl"><button type="button" id="${id}-m">−</button><span id="${id}-val">${def}</span><button type="button" id="${id}-p">+</button></div></div>`;
+  }
+  function bindStepper(id, minVal, def) {
+    let v = def;
+    const upd = () => document.getElementById(id+'-val').textContent = v;
+    document.getElementById(id+'-m').addEventListener('click', () => { if(v>minVal) v--; upd(); });
+    document.getElementById(id+'-p').addEventListener('click', () => { v++; upd(); });
+  }
+  function numInput(id, placeholder, unit, min) {
+    return `<div class="wz-field"><div class="wz-num-wrap"><input id="${id}" type="number" placeholder="${placeholder}" min="${min||0}" step="1" /><span class="wz-unit">${unit}</span></div></div>`;
+  }
+
+  const STEPS = [
+
+    { id:'type', title:"Quel type de bien vendez-vous ?", subtitle:"Un seul choix",
+      html:`<div class="wz-cards">
+        ${card('Maison','🏠','Maison')}${card('Appartement','🏢','Appartement')}
+        ${card('Terrain','🌿','Terrain')}${card('Local commercial','🛍','Local')}
+        ${card('Immeuble','🛗','Immeuble')}${card('Autre','📦','Autre')}
+      </div>`,
+      validate:(d)=>d.type },
+
+    { id:'localisation', title:"Où se situe votre bien ?", subtitle:"Adresse complète",
+      html:`<div class="wz-field"><label>Adresse</label><input id="wz-address" type="text" placeholder="12 rue des Lilas" /></div>
+        <div class="wz-row">
+          <div class="wz-field"><label>Ville</label><input id="wz-city" type="text" placeholder="Douai" /></div>
+          <div class="wz-field"><label>Code postal</label><input id="wz-postal" type="text" placeholder="59500" maxlength="5" /></div>
+        </div>`,
+      validate:(d)=>d.city&&d.postal_code },
+
+    { id:'prix', title:"À quel prix souhaitez-vous vendre ?", subtitle:"Vous pourrez ajuster à tout moment",
+      html:`<div class="wz-price-wrap"><input id="wz-price" type="number" placeholder="185 000" min="0" step="1000" /><span class="wz-currency">€</span></div>
+        <p style="text-align:center;color:rgba(245,240,232,0.4);font-size:0.82rem;margin-top:12px;">Prix net vendeur — hors frais de notaire</p>`,
+      validate:(d)=>d.price>0 },
+
+    { id:'raison', title:"Pourquoi vendez-vous ?", subtitle:"Un seul choix",
+      html:`<div class="wz-chips">
+        ${['Déménagement professionnel',"Achat d'un bien plus grand","Achat d'un bien plus petit",'Succession','Projet de vie','Autre'].map(v=>chip(v,v,false)).join('')}
+      </div>`,
+      validate:()=>true },
+
+    { id:'surfaces', title:"Surfaces du bien", subtitle:"Approximatif — vous affinerez ensuite",
+      html:`<div class="wz-row">
+          <div class="wz-field"><label>Surface habitable (m²)</label><input id="wz-surface" type="number" placeholder="90" min="1" /></div>
+          <div class="wz-field"><label>Surface terrain (m²)</label><input id="wz-terrain" type="number" placeholder="450" min="0" /></div>
+        </div>
+        <div class="wz-field" style="margin-top:10px;"><label>Hauteur sous plafond (m)</label>
+          <div class="wz-num-wrap"><input id="wz-hsp" type="number" placeholder="2.5" min="1" max="10" step="0.1" /><span class="wz-unit">m</span></div>
+        </div>`,
+      validate:(d)=>d.surface_habitable>0 },
+
+    { id:'pieces', title:"Nombre de pièces", subtitle:"Comptez les pièces principales",
+      html:`<div class="wz-row" style="margin-bottom:14px;">
+          ${stepper('wz-rooms','Pièces',1,3)}${stepper('wz-beds','Chambres',0,2)}
+        </div>
+        <div class="wz-row">
+          ${stepper('wz-wc','WC',0,1)}${stepper('wz-sdb','Salles de bain',0,1)}
+        </div>`,
+      validate:()=>true,
+      onMount:()=>{ bindStepper('wz-rooms',1,3); bindStepper('wz-beds',0,2); bindStepper('wz-wc',0,1); bindStepper('wz-sdb',0,1); } },
+
+    { id:'mitoyennete', title:"Le bien est-il mitoyen ?", subtitle:"Un seul choix",
+      html:`<div class="wz-chips">
+        ${['Individuel (non mitoyen)','Mitoyen 1 côté','Mitoyen 2 côtés','En copropriété'].map(v=>chip(v,v,false)).join('')}
+      </div>`,
+      validate:()=>true },
+
+    { id:'exposition', title:"Exposition principale", subtitle:"La luminosité est un critère déterminant",
+      html:`<div class="wz-expo-grid">
+        ${[['NO','↖'],['N','↑'],['NE','↗'],['O','←'],['',''],['E','→'],['SO','↙'],['S','↓'],['SE','↘']].map(([v,a])=>v?'<div class="wz-expo" data-val="'+v+'">'+a+'<span>'+v+'</span></div>':'<div class="wz-expo-empty"></div>').join('')}
+      </div>`,
+      validate:()=>true },
+
+    { id:'annee', title:"Année de construction", subtitle:"Utilisez le curseur",
+      html:`<div class="wz-field">
+          <label>Année : <strong id="wz-year-disp">1990</strong></label>
+          <input id="wz-year" type="range" min="1900" max="2026" value="1990" style="width:100%;accent-color:#C4603A;margin-top:12px;" />
+        </div>`,
+      validate:(d)=>d.year_built,
+      onMount:()=>{
+        const sl=document.getElementById('wz-year'),dp=document.getElementById('wz-year-disp');
+        sl.addEventListener('input',()=>dp.textContent=sl.value);
+      }},
+
+    { id:'dpe', title:"DPE — Diagnostic de performance énergétique", subtitle:"Obligatoire pour publier",
+      html:`<div class="wz-field" style="margin-bottom:18px;">
+          <label>Classe DPE</label>
+          <div class="wz-dpe-row">
+            ${['A','B','C','D','E','F','G'].map(l=>'<div class="wz-dpe" data-dpe="'+l+'">'+l+'</div>').join('')}
+          </div>
+        </div>
+        <div class="wz-row" style="margin-bottom:10px;">
+          <div class="wz-field"><label>Conso. énergie (kWh/m²/an)</label><input id="wz-dpe-conso" type="number" placeholder="150" min="0" /></div>
+          <div class="wz-field"><label>Émissions GES (kgCO₂/m²/an)</label><input id="wz-dpe-ges" type="number" placeholder="35" min="0" /></div>
+        </div>
+        <div class="wz-row">
+          <div class="wz-field"><label>Coût annuel min (€)</label><input id="wz-dpe-min" type="number" placeholder="800" min="0" /></div>
+          <div class="wz-field"><label>Coût annuel max (€)</label><input id="wz-dpe-max" type="number" placeholder="1200" min="0" /></div>
+        </div>`,
+      validate:(d)=>d.dpe_class,
+      onMount:()=>{
+        document.querySelectorAll('.wz-dpe').forEach(el=>el.addEventListener('click',()=>{document.querySelectorAll('.wz-dpe').forEach(x=>x.classList.remove('sel'));el.classList.add('sel');}));
+      }},
+
+    { id:'chauffage', title:"Chauffage", subtitle:"Plusieurs choix possibles",
+      html:`<div style="font-size:0.76rem;color:rgba(245,240,232,0.32);margin-bottom:8px;">Énergie utilisée (plusieurs possibles)</div>
+        <div class="wz-chips" id="wz-chauf-type" style="margin-bottom:20px;">
+          ${['Gaz naturel','Électrique','Fioul','Pompe à chaleur','Bois / granulés','Géothermie','Solaire thermique','Autre'].map(v=>chip(v,v,true)).join('')}
+        </div>
+        <div style="font-size:0.76rem;color:rgba(245,240,232,0.32);margin-bottom:8px;">Mécanisme (un seul)</div>
+        <div class="wz-chips" id="wz-chauf-meca" style="margin-bottom:20px;">
+          ${['Radiateurs','Plancher chauffant','Poêle / insert','Climatisation réversible','Convecteurs','Autre'].map(v=>chip(v,v,false)).join('')}
+        </div>
+        <div class="wz-field"><label>Année dernier entretien chaudière</label><div class="wz-num-wrap"><input id="wz-heating-year" type="number" placeholder="2022" min="1990" max="2026" /><span class="wz-unit">an</span></div></div>`,
+      validate:()=>true },
+
+    { id:'eau_chaude', title:"Production d'eau chaude", subtitle:"Plusieurs choix possibles",
+      html:`<div class="wz-chips">
+        ${['Ballon électrique','Chaudière','Chauffe-eau gaz','Collective','Géothermie','Individuelle','Panneaux solaires','Pompe à chaleur','Thermodynamique'].map(v=>chip(v,v,true)).join('')}
+      </div>`,
+      validate:()=>true },
+
+    { id:'fenetres', title:"Menuiseries — Fenêtres", subtitle:"Plusieurs choix possibles",
+      html:`<div class="wz-chips">
+        ${['PVC Double Vitrage','PVC Simple Vitrage','Aluminium Double Vitrage','Aluminium Simple Vitrage','Bois double vitrage','Bois simple vitrage','Double vitrage','Simple et double vitrage','Survitrage','Mixte alu et PVC','Mixte Bois - PVC'].map(v=>chip(v,v,true)).join('')}
+      </div>`,
+      validate:()=>true },
+
+    { id:'volets', title:"Volets", subtitle:"Plusieurs choix possibles",
+      html:`<div class="wz-chips">
+        ${['Aluminium','Bois','Électrique Métallique','Électrique PVC','Métallique','Mixte manuels-électriques','Mixte roulants-bois','Pliants','PVC','PVC Roulant','Roulants','Roulants électriques','Solaires','Sans'].map(v=>chip(v,v,true)).join('')}
+      </div>`,
+      validate:()=>true },
+
+    { id:'cheminee', title:"Cheminée / Poêle", subtitle:"Plusieurs choix possibles — ou Aucune",
+      html:`<div class="wz-chips">
+        ${['Foyer ouvert','Insert','Poêle à bois','Poêle à granulés','Poêle à fioul','Poêle de masse','Conduit existant','Pas de conduit','Aucune'].map(v=>chip(v,v,true)).join('')}
+      </div>`,
+      validate:()=>true },
+
+    { id:'cuisine', title:"Type de cuisine", subtitle:"Plusieurs choix possibles",
+      html:`<div class="wz-chips">
+        ${['Aménagée','Aménagée/équipée','Américaine','Ouverte sur séjour','Semi-ouverte','Fermée',"Cuisine d'été"].map(v=>chip(v,v,true)).join('')}
+      </div>`,
+      validate:()=>true },
+
+    { id:'sols', title:"Structure des planchers", subtitle:"Un seul choix",
+      html:`<div class="wz-chips">
+        ${['Béton','Bois','Mixte Bois-Béton','Parpaing','Pierre'].map(v=>chip(v,v,false)).join('')}
+      </div>`,
+      validate:()=>true },
+
+    { id:'toiture', title:"Toiture — Couverture", subtitle:"Plusieurs choix possibles",
+      html:`<div class="wz-chips">
+        ${['Tuiles terre cuite','Tuiles béton','Tuile Alsacienne','Ardoises naturelles','Ardoises synthétiques','Ardoises & Fibrociment','Lauze','Bac acier','Zinc','Cuivre','Fibrociment','Chaume','Shingle','Tôle','Terrasse plate','Autre'].map(v=>chip(v,v,true)).join('')}
+      </div>`,
+      validate:()=>true },
+
+    { id:'stationnement', title:"Stationnement", subtitle:"Plusieurs choix possibles",
+      html:`<div style="font-size:0.76rem;color:rgba(245,240,232,0.32);margin-bottom:8px;">Type de stationnement (plusieurs possibles)</div>
+        <div class="wz-chips" id="wz-stat-type" style="margin-bottom:20px;">
+          ${['Garage fermé','Garage double','Box','Couvert','Extérieur','Extérieur et couvert','Sous-sol','Sans'].map(v=>chip(v,v,true)).join('')}
+        </div>
+        <div style="font-size:0.76rem;color:rgba(245,240,232,0.32);margin-bottom:8px;">Porte de garage</div>
+        <div class="wz-chips" id="wz-garage-porte" style="margin-bottom:16px;">
+          ${['⚙️ Motorisée','🖐 Manuelle','Mixte'].map(v=>chip(v,v,false)).join('')}
+        </div>
+        <div style="font-size:0.76rem;color:rgba(245,240,232,0.32);margin-bottom:8px;">Sol du garage</div>
+        <div class="wz-chips" id="wz-garage-sol" style="margin-bottom:16px;">
+          ${['Terre battue','Dalle béton','Carrelié','Résine époxy'].map(v=>chip(v,v,false)).join('')}
+        </div>
+        <div class="wz-field"><label>Surface garage/box (m²)</label><div class="wz-num-wrap"><input id="wz-garage-surface" type="number" placeholder="18" min="0" /><span class="wz-unit">m²</span></div></div>`,
+      validate:()=>true },
+
+    { id:'exterieur', title:"Extérieurs", subtitle:"Sélectionnez tout ce qui s'applique",
+      html:`<div class="wz-equip-grid" style="margin-bottom:20px;">
+          ${[{v:'garden',i:'🌳',l:'Jardin'},{v:'terrace',i:'🪺',l:'Terrasse'},{v:'piscine',i:'🏊',l:'Piscine'}].map(e=>'<div class="wz-equip" data-val="'+e.v+'"><span>'+e.i+'</span><label>'+e.l+'</label></div>').join('')}
+        </div>
+        <div id="wz-terrace-detail" style="display:none;margin-top:4px;padding:14px;background:rgba(255,255,255,0.04);border-radius:10px;">
+          <div style="font-size:0.76rem;color:rgba(245,240,232,0.32);margin-bottom:10px;">Détails terrasse</div>
+          <div class="wz-field"><label>Surface terrasse (m²)</label><div class="wz-num-wrap"><input id="wz-terrace-surface" type="number" placeholder="20" min="0" /><span class="wz-unit">m²</span></div></div>
+          <div style="font-size:0.76rem;color:rgba(245,240,232,0.32);margin:8px 0 6px;">Revêtement</div>
+          <div class="wz-chips" id="wz-terrace-rev">
+            ${['Dalle brute','Carrelié','Sur plots','Bois / composite','Graviers','Pierre naturelle'].map(v=>chip(v,v,false)).join('')}
+          </div>
+        </div>`,
+      validate:()=>true,
+      onMount:()=>{
+        const terEq=document.querySelector('.wz-equip[data-val="terrace"]');
+        const det=document.getElementById('wz-terrace-detail');
+        if(terEq) terEq.addEventListener('click',()=>{ setTimeout(()=>{ det.style.display=terEq.classList.contains('sel')?'block':'none'; },30); });
+      }},
+
+    { id:'equipements', title:"Espaces & équipements", subtitle:"Sélectionnez tout ce qui s'applique",
+      html:`<div class="wz-equip-grid">
+          ${[{v:'cave',i:'🍷',l:'Cave'},{v:'cellier',i:'📦',l:'Cellier'},{v:'buanderie',i:'🫧',l:'Buanderie'},{v:'balcon',i:'🏠',l:'Balcon'},{v:'veranda',i:'🌿',l:'Véranda'},{v:'grenier',i:'🏠️',l:'Grenier'}].map(e=>'<div class="wz-equip" data-val="'+e.v+'"><span>'+e.i+'</span><label>'+e.l+'</label></div>').join('')}
+        </div>`,
+      validate:()=>true },
+
+    { id:'assainissement', title:"Assainissement", subtitle:"Un seul choix",
+      html:`<div class="wz-chips" id="wz-assain-chips" style="margin-bottom:20px;">
+          ${["Tout à l'égout",'Fosse septique','Micro-station','Fosse toutes eaux','Fosse à refaire','Fosse morte','Séparation des eaux','Sans'].map(v=>chip(v,v,false)).join('')}
+        </div>
+        <div style="font-size:0.76rem;color:rgba(245,240,232,0.32);margin-bottom:8px;">Certificat de conformité assainissement</div>
+        <div class="wz-chips" id="wz-cert-chips">
+          ${chip('oui','✅ Oui, je l’ai',false)}${chip('non','Non / à obtenir',false)}
+        </div>`,
+      validate:()=>true },
+
+    { id:'proximite', title:"À proximité du bien", subtitle:"Plusieurs choix possibles",
+      html:`<div class="wz-chips">
+        ${[['Commerces','commerces'],['École maternelle','school_maternelle'],['École primaire','school_primaire'],['Collège','school_college'],['Lycée','school_lycee'],['Accès autoroute','highway'],['Gare / RER','train_station']].map(([l,v])=>chip(v,l,true)).join('')}
+      </div>`,
+      validate:()=>true },
+
+    { id:'charges', title:"Charges & factures annuelles", subtitle:"Optionnel — rassure les acheteurs",
+      html:`<div class="wz-row" style="margin-bottom:12px;">
+          <div class="wz-field"><label>Taxe foncière (€/an)</label><div class="wz-num-wrap"><input id="wz-taxe" type="number" placeholder="1 200" min="0" /><span class="wz-unit">€</span></div></div>
+          <div class="wz-field"><label>Facture eau (€/mois)</label><div class="wz-num-wrap"><input id="wz-eau" type="number" placeholder="25" min="0" /><span class="wz-unit">€</span></div></div>
+        </div>
+        <div class="wz-row">
+          <div class="wz-field"><label>Facture électricité (€/mois)</label><div class="wz-num-wrap"><input id="wz-elec" type="number" placeholder="80" min="0" /><span class="wz-unit">€</span></div></div>
+          <div class="wz-field"><label>Facture gaz (€/mois)</label><div class="wz-num-wrap"><input id="wz-gaz" type="number" placeholder="60" min="0" /><span class="wz-unit">€</span></div></div>
+        </div>`,
+      validate:()=>true },
+
+    { id:'documents', title:"Documents à joindre", subtitle:"Optionnel maintenant — vous pourrez en ajouter après",
+      html:`<div class="wz-doc-list">
+          <label class="wz-doc-item" id="wz-doc-taxe">
+            <input type="file" accept=".pdf,image/*" data-label="Taxe foncière" style="display:none" />
+            <span class="wz-doc-icon">📄</span>
+            <div class="wz-doc-info"><strong>Taxe foncière</strong><small>Avis d’imposition taxe foncière</small></div>
+            <span class="wz-doc-status" id="wz-doc-taxe-status">+ Joindre</span>
+          </label>
+          <label class="wz-doc-item" id="wz-doc-chaudiere">
+            <input type="file" accept=".pdf,image/*" data-label="Entretien chaudière" style="display:none" />
+            <span class="wz-doc-icon">🔧</span>
+            <div class="wz-doc-info"><strong>Entretien chaudière / ramonage</strong><small>Dernier contrat ou facture d’entretien</small></div>
+            <span class="wz-doc-status" id="wz-doc-chaudiere-status">+ Joindre</span>
+          </label>
+          <label class="wz-doc-item" id="wz-doc-assainissement">
+            <input type="file" accept=".pdf,image/*" data-label="Certificat assainissement" style="display:none" />
+            <span class="wz-doc-icon">✅</span>
+            <div class="wz-doc-info"><strong>Certificat assainissement</strong><small>Certificat de conformité</small></div>
+            <span class="wz-doc-status" id="wz-doc-assainissement-status">+ Joindre</span>
+          </label>
+          <label class="wz-doc-item" id="wz-doc-autre">
+            <input type="file" accept=".pdf,image/*" data-label="Autre document" style="display:none" />
+            <span class="wz-doc-icon">📎</span>
+            <div class="wz-doc-info"><strong>Autre document</strong><small>Plans, devis, diagnostics…</small></div>
+            <span class="wz-doc-status" id="wz-doc-autre-status">+ Joindre</span>
+          </label>
+        </div>
+        <p style="color:rgba(245,240,232,0.28);font-size:0.76rem;margin-top:14px;text-align:center;">Vous pouvez aussi ajouter des documents depuis votre fiche complète.</p>`,
+      validate:()=>true,
+      onMount:()=>{
+        ['wz-doc-taxe','wz-doc-chaudiere','wz-doc-assainissement','wz-doc-autre'].forEach(id=>{
+          const label=document.getElementById(id);
+          const input=label.querySelector('input[type=file]');
+          const status=document.getElementById(id+'-status');
+          input.addEventListener('change',()=>{
+            if(input.files[0]){
+              const f={file:input.files[0],label:input.dataset.label};
+              const i=wzFiles.findIndex(x=>x.label===f.label);
+              if(i>=0) wzFiles[i]=f; else wzFiles.push(f);
+              status.textContent='✓ '+input.files[0].name.slice(0,18);
+              status.style.color='#C4603A';
+            }
+          });
+        });
+      }},
+
+    { id:'description', title:"Décrivez votre bien", subtitle:"Optionnel — l’IA peut générer la description ensuite",
+      html:`<textarea id="wz-desc" rows="6" placeholder="Maison lumineuse au calme, proche des commodités. Jardin arboré de 450m², cuisine équipée rénovée en 2021..." style="width:100%;padding:14px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.12);border-radius:10px;color:#F5F0E8;font-family:'DM Sans',sans-serif;font-size:0.9rem;line-height:1.6;resize:vertical;box-sizing:border-box;outline:none;"></textarea>`,
+      validate:()=>true },
+
+    { id:'fin', title:"Votre fiche est prête ! 🎉", subtitle:"Toutes vos informations ont été enregistrées.",
+      html:`<div style="text-align:center;padding:12px 0;">
+          <div style="font-size:3.2rem;margin-bottom:14px;">🏡</div>
+          <p style="color:rgba(245,240,232,0.6);font-size:0.9rem;line-height:1.9;max-width:380px;margin:0 auto;">Votre fiche de base est enregistrée.<br>Accédez à votre espace complet pour :<br><span style="color:#C4603A;">📸 Ajouter vos photos</span> · <span style="color:#C4603A;">📄 Compléter les détails</span> · <span style="color:#C4603A;">🚀 Publier</span></p>
+        </div>`,
+      validate:()=>true },
+  ];
+
+  let currentStep = 0;
+  const wzData = {};
+
+  function multiVals() {
+    return [...document.querySelectorAll('.wz-chip.wz-multi.sel')].map(c=>c.dataset.val).join(', ');
+  }
+  function singleVal(container) {
+    const c=(container||document).querySelector('.wz-chip:not(.wz-multi).sel');
+    return c?c.dataset.val:'';
+  }
+  function singleValIn(id) {
+    const el=document.getElementById(id); if(!el) return '';
+    const c=el.querySelector('.wz-chip.sel'); return c?c.dataset.val:'';
+  }
+
+  function collectStep(idx) {
+    const id=STEPS[idx].id;
+    if(id==='type'){ const c=document.querySelector('.wz-card.sel'); if(c) wzData.type=c.dataset.val; }
+    else if(id==='localisation'){
+      wzData.address=(document.getElementById('wz-address')||{}).value||'';
+      wzData.city=(document.getElementById('wz-city')||{}).value||'';
+      wzData.postal_code=(document.getElementById('wz-postal')||{}).value||'';
+    }
+    else if(id==='prix'){ wzData.price=parseInt((document.getElementById('wz-price')||{}).value)||0; }
+    else if(id==='raison'){ const v=singleVal(); if(v) wzData.sale_reason=v; }
+    else if(id==='surfaces'){
+      wzData.surface_habitable=parseFloat((document.getElementById('wz-surface')||{}).value)||0;
+      wzData.surface_terrain=parseFloat((document.getElementById('wz-terrain')||{}).value)||0;
+      const hsp=(document.getElementById('wz-hsp')||{}).value; if(hsp) wzData.hauteur_plafond=hsp;
+    }
+    else if(id==='pieces'){
+      wzData.rooms=parseInt((document.getElementById('wz-rooms-val')||{}).textContent)||0;
+      wzData.bedrooms=parseInt((document.getElementById('wz-beds-val')||{}).textContent)||0;
+      wzData.wc_count=parseInt((document.getElementById('wz-wc-val')||{}).textContent)||0;
+    }
+    else if(id==='mitoyennete'){ const v=singleVal(); if(v) wzData.mitoyennete=v; }
+    else if(id==='exposition'){ const c=document.querySelector('.wz-expo.sel'); if(c) wzData.exposition=c.dataset.val; }
+    else if(id==='annee'){ wzData.year_built=(document.getElementById('wz-year')||{}).value||'1990'; }
+    else if(id==='dpe'){
+      const dpe=document.querySelector('.wz-dpe.sel'); if(dpe) wzData.dpe_class=dpe.dataset.dpe;
+      ['wz-dpe-conso','wz-dpe-ges','wz-dpe-min','wz-dpe-max'].forEach((eid,i)=>{
+        const v=(document.getElementById(eid)||{}).value;
+        if(v) wzData[['dpe_conso_energie','dpe_ges','dpe_cout_min','dpe_cout_max'][i]]=v;
+      });
+    }
+    else if(id==='chauffage'){
+      const typeEl=document.getElementById('wz-chauf-type');
+      if(typeEl){ const v=[...typeEl.querySelectorAll('.wz-chip.sel')].map(c=>c.dataset.val).join(', '); if(v) wzData.heating_type=v; }
+      const mecaEl=document.getElementById('wz-chauf-meca');
+      if(mecaEl){ const c=mecaEl.querySelector('.wz-chip.sel'); if(c) wzData.heating_mechanism=c.dataset.val; }
+      const hy=(document.getElementById('wz-heating-year')||{}).value; if(hy) wzData.heating_year=hy;
+    }
+    else if(id==='eau_chaude'){ const v=multiVals(); if(v) wzData.eau_chaude_type=v; }
+    else if(id==='fenetres'){ const v=multiVals(); if(v) wzData.fenetres_type=v; }
+    else if(id==='volets'){ const v=multiVals(); if(v) wzData.volets_type=v; }
+    else if(id==='cheminee'){ const v=multiVals(); if(v) wzData.cheminee_type=v; }
+    else if(id==='cuisine'){ const v=multiVals(); if(v) wzData.cuisine_type=v; }
+    else if(id==='sols'){ const v=singleVal(); if(v) wzData.sols_dalle=v; }
+    else if(id==='toiture'){ const v=multiVals(); if(v) wzData.toiture_couverture=v; }
+    else if(id==='stationnement'){
+      const statEl=document.getElementById('wz-stat-type');
+      if(statEl){ const v=[...statEl.querySelectorAll('.wz-chip.sel')].map(c=>c.dataset.val).join(', '); if(v) wzData.stationnement_type=v; }
+      const porte=singleValIn('wz-garage-porte'); if(porte) wzData.garage_motorise=porte;
+      const sol=singleValIn('wz-garage-sol'); if(sol) wzData.garage_sol=sol;
+      const gs=(document.getElementById('wz-garage-surface')||{}).value; if(gs) wzData.garage_surface=gs;
+    }
+    else if(id==='exterieur'){
+      wzData.garden=document.querySelector('.wz-equip[data-val="garden"]')?.classList.contains('sel')?'1':'0';
+      wzData.terrace=document.querySelector('.wz-equip[data-val="terrace"]')?.classList.contains('sel')?'1':'0';
+      const ts=(document.getElementById('wz-terrace-surface')||{}).value; if(ts) wzData.terrace_surface=ts;
+      const tr=singleValIn('wz-terrace-rev'); if(tr) wzData.terrace_revetement=tr;
+      if(document.querySelector('.wz-equip[data-val="piscine"]')?.classList.contains('sel')) wzData._piscine=true;
+    }
+    else if(id==='equipements'){
+      const equips=[];
+      ['cave','cellier','buanderie','balcon','veranda'].forEach(k=>{
+        if(document.querySelector('.wz-equip[data-val="'+k+'"]')?.classList.contains('sel')) equips.push({cave:'Cave',cellier:'Cellier',buanderie:'Buanderie',balcon:'Balcon',veranda:'Véranda'}[k]);
+      });
+      if(document.querySelector('.wz-equip[data-val="grenier"]')?.classList.contains('sel')){ wzData.grenier_present='1'; equips.push('Grenier'); }
+      if(equips.length) wzData._equipExtras=equips;
+    }
+    else if(id==='assainissement'){
+      const v=singleValIn('wz-assain-chips'); if(v) wzData.assainissement_type=v;
+      const cert=singleValIn('wz-cert-chips');
+      wzData.certificat_assainissement=cert==='oui'?'1':'0';
+    }
+    else if(id==='proximite'){
+      const sel=[...document.querySelectorAll('.wz-chip.wz-multi.sel')].map(c=>c.dataset.val);
+      ['commerces','school_maternelle','school_primaire','school_college','school_lycee','highway','train_station'].forEach(k=>{ if(sel.includes(k)) wzData[k]='1'; });
+    }
+    else if(id==='charges'){
+      ['wz-taxe','wz-eau','wz-elec','wz-gaz'].forEach((eid,i)=>{
+        const v=(document.getElementById(eid)||{}).value;
+        if(v) wzData[['taxe_fonciere','facture_eau','facture_electricite','facture_gaz'][i]]=v;
+      });
+    }
+    else if(id==='description'){ wzData.description=(document.getElementById('wz-desc')||{}).value||''; }
+  }
+
+  function renderStep(idx) {
+    const s=STEPS[idx], total=STEPS.length-1;
+    document.getElementById('wz-progress-fill').style.width=Math.round((idx/total)*100)+'%';
+    document.getElementById('wz-step-num').textContent=idx<total?(idx+1)+' / '+total:'✓';
+    document.getElementById('wz-title').textContent=s.title;
+    document.getElementById('wz-subtitle').textContent=s.subtitle;
+    document.getElementById('wz-body').innerHTML=s.html;
+    document.getElementById('wz-back').style.visibility=idx===0?'hidden':'visible';
+    document.getElementById('wz-next').textContent=idx===STEPS.length-1?'Terminer ✓':'Suivant →';
+
+    if(s.id==='type'&&wzData.type) document.querySelectorAll('.wz-card').forEach(c=>{if(c.dataset.val===wzData.type)c.classList.add('sel');});
+    if(s.id==='exposition'&&wzData.exposition) document.querySelectorAll('.wz-expo').forEach(c=>{if(c.dataset.val===wzData.exposition)c.classList.add('sel');});
+    if(s.id==='dpe'&&wzData.dpe_class) document.querySelectorAll('.wz-dpe').forEach(c=>{if(c.dataset.dpe===wzData.dpe_class)c.classList.add('sel');});
+
+    document.querySelectorAll('.wz-chip.wz-multi').forEach(c=>c.addEventListener('click',()=>c.classList.toggle('sel')));
+    document.querySelectorAll('.wz-chip:not(.wz-multi)').forEach(c=>c.addEventListener('click',function(){
+      const grp=this.closest('[id],.wz-chips');
+      grp.querySelectorAll('.wz-chip:not(.wz-multi)').forEach(x=>x.classList.remove('sel'));
+      this.classList.add('sel');
+    }));
+    document.querySelectorAll('.wz-card').forEach(c=>c.addEventListener('click',()=>{document.querySelectorAll('.wz-card').forEach(x=>x.classList.remove('sel'));c.classList.add('sel');}));
+    document.querySelectorAll('.wz-equip').forEach(c=>c.addEventListener('click',()=>c.classList.toggle('sel')));
+    document.querySelectorAll('.wz-expo').forEach(c=>c.addEventListener('click',()=>{document.querySelectorAll('.wz-expo').forEach(x=>x.classList.remove('sel'));c.classList.add('sel');}));
+    document.querySelectorAll('.wz-dpe').forEach(el=>el.addEventListener('click',()=>{document.querySelectorAll('.wz-dpe').forEach(x=>x.classList.remove('sel'));el.classList.add('sel');}));
+
+    if(s.onMount) s.onMount();
+  }
+
+  async function submitWizard() {
+    const equips=[];
+    if(wzData._piscine) equips.push('Piscine');
+    if(wzData._equipExtras) equips.push(...wzData._equipExtras);
+    if(equips.length) wzData.equipment=equips.join(', ');
+    delete wzData._piscine; delete wzData._equipExtras;
+
+    const btn=document.getElementById('wz-next');
+    btn.disabled=true; btn.textContent='Enregistrement…';
+    try {
+      await fetch('/api/property',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(wzData)});
+      for(const f of wzFiles){
+        try { const fd=new FormData(); fd.append('file',f.file); fd.append('label',f.label); await fetch('/api/property/documents',{method:'POST',body:fd}); }
+        catch(e){ console.warn('Upload failed:',f.label); }
+      }
+    } catch(e){ console.error(e); }
+    const ov=document.getElementById('wz-overlay');
+    ov.style.opacity='0';
+    setTimeout(()=>{ ov.remove(); loadProperty(); },400);
+  }
+
+  function showWizard() {
+    const overlay=document.createElement('div');
+    overlay.id='wz-overlay';
+    overlay.innerHTML=`<div id="wz-panel">
+      <div id="wz-header"><div id="wz-progress-bar"><div id="wz-progress-fill"></div></div><span id="wz-step-num"></span></div>
+      <div id="wz-content"><h2 id="wz-title"></h2><p id="wz-subtitle"></p><div id="wz-body"></div></div>
+      <div id="wz-footer"><button id="wz-back" type="button">← Retour</button><button id="wz-next" type="button">Suivant →</button></div>
+    </div>`;
+    document.body.appendChild(overlay);
+
+    document.getElementById('wz-back').addEventListener('click',()=>{ collectStep(currentStep); if(currentStep>0){currentStep--;renderStep(currentStep);} });
+    document.getElementById('wz-next').addEventListener('click',()=>{
+      collectStep(currentStep);
+      if(!STEPS[currentStep].validate(wzData)){
+        const b=document.getElementById('wz-body'); b.style.animation='wz-shake 0.3s ease'; setTimeout(()=>b.style.animation='',400); return;
+      }
+      if(currentStep<STEPS.length-1){currentStep++;renderStep(currentStep);} else submitWizard();
+    });
+    requestAnimationFrame(()=>{ overlay.style.opacity='1'; renderStep(0); });
+  }
+
+  const style=document.createElement('style');
+  style.textContent=`
+    #wz-overlay{position:fixed;inset:0;background:#0E0E0D;z-index:9999;display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity 0.4s ease;}
+    #wz-panel{width:100%;max-width:600px;margin:0 auto;display:flex;flex-direction:column;height:100vh;max-height:100vh;}
+    #wz-header{padding:22px 32px 0;display:flex;align-items:center;gap:16px;flex-shrink:0;}
+    #wz-progress-bar{flex:1;height:3px;background:rgba(255,255,255,0.1);border-radius:99px;overflow:hidden;}
+    #wz-progress-fill{height:100%;background:#C4603A;border-radius:99px;transition:width 0.4s ease;}
+    #wz-step-num{font-size:0.74rem;color:rgba(245,240,232,0.28);font-family:'DM Sans',sans-serif;white-space:nowrap;min-width:44px;text-align:right;}
+    #wz-content{flex:1;overflow-y:auto;padding:24px 32px 14px;}
+    #wz-title{font-family:'Playfair Display',Georgia,serif;font-size:clamp(1.15rem,3.2vw,1.75rem);color:#F5F0E8;font-weight:600;margin-bottom:5px;line-height:1.25;}
+    #wz-subtitle{font-size:0.78rem;color:rgba(245,240,232,0.3);font-family:'DM Sans',sans-serif;margin-bottom:22px;}
+    #wz-footer{padding:14px 32px 30px;display:flex;gap:10px;flex-shrink:0;border-top:1px solid rgba(255,255,255,0.05);}
+    #wz-back{background:none;border:1px solid rgba(255,255,255,0.11);color:rgba(245,240,232,0.45);padding:10px 20px;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:0.86rem;cursor:pointer;transition:all 0.15s;}
+    #wz-back:hover{border-color:rgba(255,255,255,0.22);color:#F5F0E8;}
+    #wz-next{flex:1;background:#C4603A;color:#F5F0E8;border:none;padding:12px 24px;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:0.9rem;font-weight:600;cursor:pointer;transition:background 0.15s;}
+    #wz-next:hover{background:#b05430;}#wz-next:disabled{background:#7a3d24;cursor:not-allowed;}
+    .wz-cards{display:grid;grid-template-columns:repeat(2,1fr);gap:9px;}
+    .wz-card{background:rgba(255,255,255,0.05);border:2px solid rgba(255,255,255,0.08);border-radius:12px;padding:15px 10px;text-align:center;cursor:pointer;transition:all 0.15s;display:flex;flex-direction:column;align-items:center;gap:5px;font-size:1.4rem;color:#F5F0E8;font-family:'DM Sans',sans-serif;user-select:none;}
+    .wz-card span{font-size:0.8rem;color:rgba(245,240,232,0.65);}
+    .wz-card:hover{border-color:rgba(196,96,58,0.4);}
+    .wz-card.sel{border-color:#C4603A;background:rgba(196,96,58,0.12);}
+    .wz-field{display:flex;flex-direction:column;gap:5px;margin-bottom:11px;}
+    .wz-field label{font-size:0.76rem;color:rgba(245,240,232,0.38);font-family:'DM Sans',sans-serif;letter-spacing:0.02em;}
+    .wz-field input{background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.11);border-radius:8px;padding:10px 12px;color:#F5F0E8;font-family:'DM Sans',sans-serif;font-size:0.9rem;outline:none;transition:border-color 0.15s;width:100%;box-sizing:border-box;}
+    .wz-field input:focus{border-color:#C4603A;}
+    .wz-num-wrap{position:relative;display:flex;align-items:center;}
+    .wz-num-wrap input{padding-right:38px;}
+    .wz-unit{position:absolute;right:11px;font-size:0.8rem;color:rgba(245,240,232,0.3);pointer-events:none;}
+    .wz-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+    .wz-price-wrap{position:relative;display:flex;align-items:center;}
+    .wz-price-wrap input{width:100%;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.11);border-radius:10px;padding:16px 46px 16px 18px;color:#F5F0E8;font-family:'Playfair Display',serif;font-size:1.6rem;font-weight:600;outline:none;text-align:center;box-sizing:border-box;}
+    .wz-price-wrap input:focus{border-color:#C4603A;}
+    .wz-currency{position:absolute;right:16px;font-size:1.2rem;color:rgba(245,240,232,0.35);}
+    .wz-stepper{display:flex;flex-direction:column;align-items:center;gap:7px;background:rgba(255,255,255,0.04);border-radius:12px;padding:12px 8px;}
+    .wz-stepper label{font-size:0.74rem;color:rgba(245,240,232,0.38);font-family:'DM Sans',sans-serif;text-align:center;}
+    .wz-step-ctrl{display:flex;align-items:center;gap:10px;}
+    .wz-step-ctrl button{width:30px;height:30px;border-radius:50%;border:1px solid rgba(255,255,255,0.14);background:none;color:#F5F0E8;font-size:1rem;cursor:pointer;transition:all 0.15s;}
+    .wz-step-ctrl button:hover{border-color:#C4603A;color:#C4603A;}
+    .wz-step-ctrl span{font-family:'Playfair Display',serif;font-size:1.6rem;color:#F5F0E8;min-width:24px;text-align:center;}
+    .wz-dpe-row{display:flex;gap:5px;flex-wrap:wrap;}
+    .wz-dpe{flex:1;min-width:30px;text-align:center;padding:8px 3px;border-radius:7px;cursor:pointer;font-weight:700;font-size:0.85rem;font-family:'DM Sans',sans-serif;border:2px solid transparent;transition:all 0.15s;}
+    .wz-dpe[data-dpe="A"]{background:rgba(0,166,81,0.15);color:#00A651;}
+    .wz-dpe[data-dpe="B"]{background:rgba(85,190,85,0.15);color:#55BE55;}
+    .wz-dpe[data-dpe="C"]{background:rgba(170,210,85,0.15);color:#AAD255;}
+    .wz-dpe[data-dpe="D"]{background:rgba(255,218,0,0.15);color:#FFDA00;}
+    .wz-dpe[data-dpe="E"]{background:rgba(255,153,0,0.15);color:#FF9900;}
+    .wz-dpe[data-dpe="F"]{background:rgba(255,85,0,0.15);color:#FF5500;}
+    .wz-dpe[data-dpe="G"]{background:rgba(220,20,20,0.15);color:#DC1414;}
+    .wz-dpe.sel{border-color:currentColor;}
+    .wz-chips{display:flex;flex-wrap:wrap;gap:6px;}
+    .wz-chip{padding:7px 13px;border-radius:99px;border:1px solid rgba(255,255,255,0.11);color:rgba(245,240,232,0.65);font-family:'DM Sans',sans-serif;font-size:0.8rem;cursor:pointer;transition:all 0.15s;background:rgba(255,255,255,0.04);user-select:none;}
+    .wz-chip:hover{border-color:rgba(196,96,58,0.35);}
+    .wz-chip.sel{border-color:#C4603A;background:rgba(196,96,58,0.12);color:#F5F0E8;}
+    .wz-equip-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;}
+    .wz-equip{background:rgba(255,255,255,0.04);border:2px solid rgba(255,255,255,0.08);border-radius:12px;padding:13px 7px;text-align:center;cursor:pointer;transition:all 0.15s;display:flex;flex-direction:column;align-items:center;gap:4px;user-select:none;}
+    .wz-equip span{font-size:1.35rem;}
+    .wz-equip label{font-size:0.7rem;color:rgba(245,240,232,0.48);font-family:'DM Sans',sans-serif;cursor:pointer;}
+    .wz-equip:hover{border-color:rgba(196,96,58,0.35);}
+    .wz-equip.sel{border-color:#C4603A;background:rgba(196,96,58,0.1);}
+    .wz-expo-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;max-width:250px;margin:0 auto;}
+    .wz-expo{background:rgba(255,255,255,0.04);border:2px solid rgba(255,255,255,0.08);border-radius:9px;padding:12px 5px;text-align:center;cursor:pointer;transition:all 0.15s;display:flex;flex-direction:column;align-items:center;gap:2px;font-size:1rem;color:#F5F0E8;user-select:none;}
+    .wz-expo span{font-size:0.65rem;color:rgba(245,240,232,0.4);font-family:'DM Sans',sans-serif;}
+    .wz-expo:hover,.wz-expo.sel{border-color:#C4603A;}
+    .wz-expo.sel{background:rgba(196,96,58,0.12);}
+    .wz-expo-empty{background:transparent;}
+    .wz-doc-list{display:flex;flex-direction:column;gap:7px;}
+    .wz-doc-item{display:flex;align-items:center;gap:11px;padding:13px 14px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:11px;cursor:pointer;transition:all 0.15s;}
+    .wz-doc-item:hover{border-color:rgba(196,96,58,0.28);background:rgba(196,96,58,0.04);}
+    .wz-doc-icon{font-size:1.3rem;flex-shrink:0;}
+    .wz-doc-info{flex:1;}
+    .wz-doc-info strong{display:block;font-family:'DM Sans',sans-serif;font-size:0.85rem;color:#F5F0E8;font-weight:600;}
+    .wz-doc-info small{font-family:'DM Sans',sans-serif;font-size:0.72rem;color:rgba(245,240,232,0.3);}
+    .wz-doc-status{font-family:'DM Sans',sans-serif;font-size:0.75rem;color:rgba(245,240,232,0.25);white-space:nowrap;}
+    @keyframes wz-shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-7px)}40%{transform:translateX(7px)}60%{transform:translateX(-5px)}80%{transform:translateX(5px)}}
+  `;
+  document.head.appendChild(style);
+
+  window._wizardInit = function(hasProperty) { if (!hasProperty) showWizard(); };
+})();
+
+// Patch loadProperty — détecter fiche vide et lancer le wizard
+const _origLoad = loadProperty;
+loadProperty = async function() {
+  const res = await fetch('/api/property');
+  const data = await res.json();
+  if (!data.property && window._wizardInit) { window._wizardInit(false); return; }
+  return _origLoad.apply(this, arguments);
+};
 loadProperty();
 </script>
 <!-- ── Bento lightbox ─────────────────────────────────── -->
