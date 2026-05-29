@@ -170,9 +170,13 @@ document.querySelectorAll('[data-pack]').forEach(btn => {
   btn.addEventListener('click', (e) => {
     e.preventDefault();
     selectedPack = btn.dataset.pack;
-    const labels = { serenite: 'Pack Sérénité — 999 € TTC' };
+    const labels = {
+      serenite: 'Pack Sérénité — 999 € TTC',
+      autonome: 'Pack Autonome — 499 € TTC',
+    };
     const descs = {
-      serenite: 'Photos pro, visite virtuelle, numéro 09, dossier automatique, agenda, coach IA. Tout inclus.'
+      serenite: 'Photos pro, visite virtuelle, numéro 09, dossier automatique, agenda, coach IA. Tout inclus.',
+      autonome: 'Numéro dédié, dossiers automatisés, agenda visites, coach IA, formation vidéo. Sans photographe.',
     };
     document.getElementById('modalTitle').textContent = labels[selectedPack];
     document.getElementById('modalPackInfo').textContent = descs[selectedPack];
@@ -203,9 +207,15 @@ if (paymentForm) {
   paymentForm.addEventListener('submit', async (e) => {
     e.preventDefault();
     const email = document.getElementById('paymentEmail').value.trim();
+    const password = document.getElementById('paymentPassword')?.value || '';
     const btn = document.getElementById('payBtn');
     const errDiv = document.getElementById('payError');
     if (!email) return;
+    if (password && password.length < 8) {
+      errDiv.textContent = 'Mot de passe trop court (8 caractères minimum).';
+      errDiv.classList.remove('hidden');
+      return;
+    }
 
     btn.textContent = 'Redirection...';
     btn.disabled = true;
@@ -215,7 +225,7 @@ if (paymentForm) {
       const res = await fetch('/create-checkout', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ pack: selectedPack, email })
+        body: JSON.stringify({ pack: selectedPack, email, password })
       });
       const data = await res.json();
       if (data.url) {

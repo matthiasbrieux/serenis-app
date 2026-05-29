@@ -96,7 +96,7 @@
         <div class="feat"><span class="cross">✗</span><span style="color:#bbb;">Retouches et livraison 48h</span></div>
       </div>
       <div class="pack-cta">
-        <a href="/#offres" class="btn-pack secondary">Choisir le Pack Autonome</a>
+        <button onclick="openCheckout('autonome')" class="btn-pack secondary" style="cursor:pointer;border:none;width:100%;">Choisir le Pack Autonome</button>
         <p class="comparison">Économisez ~20 000 € vs agence</p>
       </div>
     </div>
@@ -122,11 +122,103 @@
         <div class="feat"><span class="check" style="color:#C4785A;">✓</span><strong>Retouches et livraison sous 48h</strong></div>
       </div>
       <div class="pack-cta">
-        <a href="/#offres" class="btn-pack primary">Choisir le Pack Sérénité</a>
+        <button onclick="openCheckout('serenite')" class="btn-pack primary" style="cursor:pointer;border:none;width:100%;">Choisir le Pack Sérénité</button>
         <p class="comparison">Économisez ~19 000 € vs agence · Photo pro incluse</p>
       </div>
     </div>
   </div>
+
+  <!-- Checkout modal -->
+  <div id="checkoutModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:1000;align-items:center;justify-content:center;padding:16px;">
+    <div style="background:#FDFCF8;border-radius:20px;padding:36px 32px;max-width:440px;width:100%;position:relative;box-shadow:0 20px 60px rgba(0,0,0,.2);">
+      <button onclick="closeCheckout()" style="position:absolute;top:16px;right:16px;background:none;border:none;font-size:1.4rem;color:#888;cursor:pointer;">×</button>
+      <h2 id="checkoutTitle" style="font-family:'Cormorant Garamond',serif;font-size:1.6rem;color:#1A1A16;margin:0 0 6px;"></h2>
+      <p id="checkoutPrice" style="font-family:'Cormorant Garamond',serif;font-size:2.2rem;font-weight:700;color:#1A1A16;margin:0 0 24px;"></p>
+      <form id="checkoutForm" onsubmit="submitCheckout(event)">
+        <input type="email" id="checkoutEmail" placeholder="Votre email" required
+          style="width:100%;padding:12px 14px;border:1.5px solid #ddd;border-radius:8px;font-size:.95rem;margin-bottom:12px;box-sizing:border-box;font-family:'DM Sans',sans-serif;">
+        <input type="password" id="checkoutPassword" placeholder="Mot de passe (8 caractères min.)" required minlength="8"
+          style="width:100%;padding:12px 14px;border:1.5px solid #ddd;border-radius:8px;font-size:.95rem;margin-bottom:12px;box-sizing:border-box;font-family:'DM Sans',sans-serif;">
+        <input type="password" id="checkoutPassword2" placeholder="Confirmer le mot de passe" required minlength="8"
+          style="width:100%;padding:12px 14px;border:1.5px solid #ddd;border-radius:8px;font-size:.95rem;margin-bottom:16px;box-sizing:border-box;font-family:'DM Sans',sans-serif;">
+        <label style="display:flex;gap:10px;align-items:flex-start;font-size:.82rem;color:#555;margin-bottom:20px;cursor:pointer;">
+          <input type="checkbox" id="checkoutCgv" required style="margin-top:2px;flex-shrink:0;">
+          J'accepte les <a href="/cgv" target="_blank" style="color:#C4785A;">CGV</a> et le contrat de prestation Serenis.
+        </label>
+        <div id="checkoutError" style="display:none;color:#c0392b;font-size:.85rem;margin-bottom:12px;padding:10px;background:#fdf2f0;border-radius:6px;"></div>
+        <button type="submit" id="checkoutBtn"
+          style="width:100%;padding:14px;background:#C4785A;color:#fff;border:none;border-radius:10px;font-weight:700;font-size:1rem;cursor:pointer;font-family:'DM Sans',sans-serif;">
+          Payer en toute sécurité →
+        </button>
+        <p style="text-align:center;font-size:.75rem;color:#aaa;margin:12px 0 0;">🔒 Paiement sécurisé par Stripe · Données chiffrées</p>
+      </form>
+    </div>
+  </div>
+  <script>
+    let _checkoutPack = null;
+    function openCheckout(pack) {
+      _checkoutPack = pack;
+      document.getElementById('checkoutTitle').textContent = pack === 'serenite' ? 'Pack Sérénité' : 'Pack Autonome';
+      document.getElementById('checkoutPrice').textContent = pack === 'serenite' ? '999 € TTC' : '499 € TTC';
+      document.getElementById('checkoutError').style.display = 'none';
+      document.getElementById('checkoutEmail').value = '';
+      document.getElementById('checkoutPassword').value = '';
+      document.getElementById('checkoutPassword2').value = '';
+      document.getElementById('checkoutCgv').checked = false;
+      document.getElementById('checkoutBtn').textContent = 'Payer en toute sécurité →';
+      document.getElementById('checkoutBtn').disabled = false;
+      const m = document.getElementById('checkoutModal');
+      m.style.display = 'flex';
+      document.body.style.overflow = 'hidden';
+    }
+    function closeCheckout() {
+      document.getElementById('checkoutModal').style.display = 'none';
+      document.body.style.overflow = '';
+    }
+    document.getElementById('checkoutModal').addEventListener('click', function(e) {
+      if (e.target === this) closeCheckout();
+    });
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') closeCheckout();
+    });
+    async function submitCheckout(e) {
+      e.preventDefault();
+      const email = document.getElementById('checkoutEmail').value.trim();
+      const password = document.getElementById('checkoutPassword').value;
+      const password2 = document.getElementById('checkoutPassword2').value;
+      const errDiv = document.getElementById('checkoutError');
+      const btn = document.getElementById('checkoutBtn');
+      errDiv.style.display = 'none';
+      if (password !== password2) {
+        errDiv.textContent = 'Les mots de passe ne correspondent pas.';
+        errDiv.style.display = 'block';
+        return;
+      }
+      btn.textContent = 'Redirection en cours…';
+      btn.disabled = true;
+      try {
+        const res = await fetch('/create-checkout', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ pack: _checkoutPack, email, password }),
+        });
+        const data = await res.json();
+        if (data.url) {
+          window.location.href = data.url;
+        } else {
+          errDiv.textContent = data.error || 'Erreur. Réessayez ou appelez le 06 95 44 36 54.';
+          errDiv.style.display = 'block';
+          btn.textContent = 'Payer en toute sécurité →';
+          btn.disabled = false;
+        }
+      } catch {
+        errDiv.textContent = 'Erreur réseau. Réessayez.';
+        errDiv.style.display = 'block';
+        btn.textContent = 'Payer en toute sécurité →';
+        btn.disabled = false;
+      }
+    }
+  </script>
 
   <div class="guarantee">
     <div class="guarantee-card">

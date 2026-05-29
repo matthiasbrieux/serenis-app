@@ -9,30 +9,45 @@ const { sendWelcomeEmail, sendInvoiceEmail } = require('../services/email');
 
 // Checkout session creation
 router.post('/create-checkout', async (req, res) => {
-  const { pack, email, password, plan } = req.body;
-  if (pack !== 'serenite') return res.json({ error: 'Pack invalide' });
+  const { pack, email, plan } = req.body;
+  let { password } = req.body;
+  if (!['serenite', 'autonome'].includes(pack)) return res.json({ error: 'Pack invalide' });
   if (!email) return res.json({ error: 'Email requis' });
-  if (!password || password.length < 8) return res.json({ error: 'Mot de passe trop court (8 caractères minimum).' });
+  // Si aucun mot de passe fourni (certains formulaires ne l'incluent pas), on en génère un temporaire
+  if (!password || password.length < 8) {
+    if (!password) {
+      password = require('crypto').randomBytes(12).toString('base64url');
+    } else {
+      return res.json({ error: 'Mot de passe trop court (8 caractères minimum).' });
+    }
+  }
 
   if (!process.env.STRIPE_SECRET_KEY) {
     return res.json({ error: 'Paiement non configuré. Contactez Matthias au 06 95 44 36 54.' });
   }
 
-  const is4x = plan === '4x';
-  const amount = is4x ? 24900 : 99900; // 249€ ou 999€ en centimes
-  const productName = is4x
-    ? 'Pack Sérénité — Serenis (1er paiement sur 4)'
-    : 'Pack Sérénité — Serenis';
-  const productDesc = is4x
-    ? '1er versement sur 4 · 249€ × 4 = 996€ · sans frais ni intérêts'
-    : 'Photographe pro · Visite virtuelle · Numéro Serenis · Dossiers automatisés';
+  const isSerenite = pack === 'serenite';
+  const is4x = plan === '4x' && isSerenite; // paiement 4x uniquement pour Sérénité
+
+  let amount, productName, productDesc;
+  if (isSerenite) {
+    amount = is4x ? 24900 : 99900; // 249€ × 4 ou 999€
+    productName = is4x ? 'Pack Sérénité — Serenis (1er paiement sur 4)' : 'Pack Sérénité — Serenis';
+    productDesc = is4x
+      ? '1er versement sur 4 · 249€ × 4 = 996€ · sans frais ni intérêts'
+      : 'Photographe pro · Numéro dédié · Dossiers automatisés · Coach IA';
+  } else {
+    amount = 49900; // 499€
+    productName = 'Pack Autonome — Serenis';
+    productDesc = 'Numéro dédié · Dossiers automatisés · Agenda visites · Coach IA · Formation vidéo';
+  }
 
   try {
     const hashed = await bcrypt.hash(password, 12);
     const uuid = uuidv4();
     const existing = db.prepare('SELECT id FROM sellers WHERE email = ?').get(email.toLowerCase());
     if (existing) {
-      db.prepare('UPDATE sellers SET password=? WHERE id=?').run(hashed, existing.id);
+      db.prepare('UPDATE sellers SET password=?, pack=? WHERE id=?').run(hashed, pack, existing.id);
     } else {
       db.prepare('INSERT INTO sellers (uuid, email, password, pack) VALUES (?,?,?,?)').run(uuid, email.toLowerCase(), hashed, pack);
     }
@@ -52,7 +67,7 @@ router.post('/create-checkout', async (req, res) => {
       customer_email: email,
       success_url: `${process.env.BASE_URL}/paiement-succes?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${process.env.BASE_URL}/#offres`,
-      metadata: { pack, email, seller_id: String(seller.id), plan: plan || 'unique', installment: is4x ? '1' : '1', total_installments: is4x ? '4' : '1' },
+      metadata: { pack, email, seller_id: String(seller.id), plan: plan || 'unique', installment: '1', total_installments: is4x ? '4' : '1' },
       locale: 'fr',
     });
     res.json({ url: session.url });
