@@ -257,17 +257,15 @@ router.post('/api/property/publish', requireAuth, async (req, res) => {
     console.error('[EMAIL] sendPublishedConfirmation error:', e.message);
   }
 
-  // Assign Twilio number for Sérénité pack
-  if (req.seller.pack === 'serenite') {
-    const seller = db.prepare('SELECT twilio_number FROM sellers WHERE id=?').get(req.seller.id);
-    if (!seller.twilio_number) {
-      try {
-        const num = await assignTwilioNumber(req.seller.id);
-        res.json({ success: true, twilio_number: num, slug: property.slug });
-        return;
-      } catch (e) {
-        console.error('Twilio assign error:', e);
-      }
+  // Assign Twilio number for all packs (both include a dedicated number)
+  const sellerRow = db.prepare('SELECT twilio_number, pack FROM sellers WHERE id=?').get(req.seller.id);
+  if (!sellerRow.twilio_number) {
+    try {
+      const num = await assignTwilioNumber(req.seller.id);
+      res.json({ success: true, twilio_number: num, slug: property.slug });
+      return;
+    } catch (e) {
+      console.error('Twilio assign error:', e);
     }
   }
   res.json({ success: true, slug: property.slug });
@@ -642,6 +640,41 @@ router.put('/api/visits/:id/notes', requireAuth, express.json(), (req, res) => {
   const { notes } = req.body;
   db.prepare('UPDATE visits SET notes=? WHERE id=? AND seller_id=?').run(notes || '', req.params.id, req.seller.id);
   res.json({ success: true });
+});
+
+router.post('/api/visits/:id/reminder', requireAuth, async (req, res) => {
+  const visit = db.prepare('SELECT * FROM visits WHERE id=? AND seller_id=?').get(req.params.id, req.seller.id);
+  if (!visit) return res.status(404).json({ error: 'Visite introuvable' });
+  if (!visit.buyer_phone) return res.status(400).json({ error: 'Aucun numéro de téléphone pour cet acheteur' });
+
+  const seller = db.prepare('SELECT twilio_number, first_name FROM sellers WHERE id=?').get(req.seller.id);
+  if (!seller?.twilio_number) return res.status(400).json({ error: 'Numéro Twilio non configuré — publiez votre bien d\'abord' });
+
+  // Formater la date en français
+  const [year, month, day] = visit.visit_date.split('-');
+  const dateObj = new Date(Number(year), Number(month) - 1, Number(day));
+  const JOURS = ['dimanche','lundi','mardi','mercredi','jeudi','vendredi','samedi'];
+  const MOIS = ['janvier','février','mars','avril','mai','juin','juillet','août','septembre','octobre','novembre','décembre'];
+  const dateStr = `${JOURS[dateObj.getDay()]} ${day} ${MOIS[dateObj.getMonth()]}`;
+
+  // Heure au format lisible
+  const [h, m] = (visit.visit_time || '').split(':');
+  const heureStr = m && m !== '00' ? `${h}h${m}` : `${h}h`;
+
+  // Prénom acheteur (premier mot du nom)
+  const prenom = (visit.buyer_name || '').split(' ')[0];
+
+  const body = `Bonjour ${prenom}, je me permets de vous rappeler notre visite du ${dateStr} à ${heureStr}. Pouvez-vous me confirmer votre présence ? Merci.`;
+
+  try {
+    const twilio = require('twilio')(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN);
+    await twilio.messages.create({ from: seller.twilio_number, to: visit.buyer_phone, body });
+    db.prepare("UPDATE visits SET reminder_sent=1 WHERE id=?").run(visit.id);
+    res.json({ success: true, message: body });
+  } catch(e) {
+    console.error('SMS reminder error:', e.message);
+    res.status(500).json({ error: 'Échec envoi SMS — vérifiez les credentials Twilio', detail: e.message });
+  }
 });
 
 router.post('/api/connect/contacts', requireAuth, express.json(), (req, res) => {

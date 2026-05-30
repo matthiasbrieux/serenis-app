@@ -108,6 +108,18 @@
     .btn-refuse:hover { background: #fdf2f2; border-color: #e74c3c; }
     .btn-cancel-sm { padding: 6px 12px; border-radius: 8px; background: #fff; color: #888; border: 1px solid #e0d8ce; font-family: 'DM Sans', sans-serif; font-size: 0.8rem; font-weight: 500; cursor: pointer; transition: 0.15s; }
     .btn-cancel-sm:hover { border-color: #e74c3c; color: #e74c3c; background: #fdf2f2; }
+    .btn-sms-reminder {
+      padding: 7px 13px; border-radius: 8px;
+      background: #f0f5f1; color: #3D5A47; border: 1.5px solid #c8ddd0;
+      font-family: 'DM Sans', sans-serif; font-size: 0.81rem; font-weight: 600;
+      cursor: pointer; transition: 0.15s; display: inline-flex; align-items: center; gap: 5px;
+    }
+    .btn-sms-reminder:hover { background: #3D5A47; color: #fff; border-color: #3D5A47; }
+    .btn-sms-reminder:disabled { opacity: 0.5; cursor: not-allowed; }
+    .btn-sms-reminder.sent { background: #e8f5e9; color: #2e7d32; border-color: #c8e6c9; cursor: default; }
+    .phone-link { color: #3D5A47; text-decoration: none; font-weight: 600; }
+    .phone-link:hover { text-decoration: underline; }
+    .reminder-sent-tag { font-size: 0.71rem; color: #2e7d32; background: #e8f5e9; padding: 2px 8px; border-radius: 10px; font-weight: 600; }
     .visit-notes-wrap { margin-top: 10px; }
     .visit-notes-input { width: 100%; border: 1px solid #e0d8ce; border-radius: 8px; padding: 8px 12px; font-family: 'DM Sans', sans-serif; font-size: 0.82rem; resize: none; outline: none; color: #333; line-height: 1.5; background: #fafaf8; }
     .visit-notes-input:focus { border-color: #3D5A47; background: #fff; }
@@ -581,7 +593,23 @@ function renderVisits() {
   const svgCal = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>`;
   const svgClock = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>`;
   const svgPhone = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.41a2 2 0 0 1 2-2.18h3a2 2 0 0 1 2 1.72 12.13 12.13 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.13 12.13 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>`;
-  list.innerHTML = filtered.map(v => `
+  list.innerHTML = filtered.map(v => {
+    // Construire le message SMS pré-rempli
+    const prenom = (v.buyer_name || '').split(' ')[0];
+    const [yr, mo, dy] = (v.visit_date || '').split('-');
+    const dateObj = yr ? new Date(Number(yr), Number(mo) - 1, Number(dy)) : null;
+    const JOURS = ['dimanche','lundi','mardi','mercredi','jeudi','vendredi','samedi'];
+    const MOIS = ['janvier','février','mars','avril','mai','juin','juillet','août','septembre','octobre','novembre','décembre'];
+    const dateStr = dateObj ? `${JOURS[dateObj.getDay()]} ${dy} ${MOIS[dateObj.getMonth()]}` : v.visit_date;
+    const [h, m] = (v.visit_time || '').split(':');
+    const heureStr = m && m !== '00' ? `${h}h${m}` : `${h}h`;
+    const smsMsg = encodeURIComponent(`Bonjour ${prenom}, je me permets de vous rappeler notre visite du ${dateStr} à ${heureStr}. Pouvez-vous me confirmer votre présence ? Merci.`);
+    const phoneLinkHtml = v.buyer_phone
+      ? `<a class="phone-link" href="sms:${v.buyer_phone}?&body=${smsMsg}" title="Ouvrir SMS pré-rempli">${v.buyer_phone}</a>`
+      : '';
+    const reminderSentTag = v.reminder_sent ? `<span class="reminder-sent-tag">Rappel envoyé</span>` : '';
+
+    return `
     <div class="visit-card" id="vcard-${v.id}">
       <div class="visit-card-header">
         <div style="display:flex;align-items:center;gap:12px;">
@@ -596,23 +624,32 @@ function renderVisits() {
       <div class="visit-details">
         <div class="visit-detail-row"><span class="visit-detail-icon">${svgCal}</span>${formatDate(v.visit_date)}</div>
         <div class="visit-detail-row"><span class="visit-detail-icon">${svgClock}</span>${v.visit_time || '—'}</div>
-        ${v.buyer_phone ? `<div class="visit-detail-row"><span class="visit-detail-icon">${svgPhone}</span>${v.buyer_phone}</div>` : ''}
+        ${v.buyer_phone ? `<div class="visit-detail-row"><span class="visit-detail-icon">${svgPhone}</span>${phoneLinkHtml}</div>` : ''}
       </div>
       ${v.status === 'pending' ? `
       <div class="visit-actions">
         <button class="btn-confirm" onclick="changeVisitStatus(${v.id},'confirmed')">Confirmer</button>
         <button class="btn-refuse" onclick="changeVisitStatus(${v.id},'cancelled')">Refuser</button>
       </div>` : ''}
-      ${v.status === 'confirmed' ? `
+      ${v.status !== 'cancelled' && v.buyer_phone ? `
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-top:8px;gap:8px;flex-wrap:wrap;">
+        <button class="btn-sms-reminder ${v.reminder_sent ? 'sent' : ''}" id="btn-reminder-${v.id}"
+          onclick="sendReminder(${v.id})" ${v.reminder_sent ? 'title="Rappel déjà envoyé — cliquer pour renvoyer"' : ''}>
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.41a2 2 0 0 1 2-2.18h3a2 2 0 0 1 2 1.72 12.13 12.13 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.13 12.13 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+          ${v.reminder_sent ? 'Rappel envoyé' : 'Envoyer rappel SMS'}
+        </button>
+        ${v.status === 'confirmed' ? `<button class="btn-cancel-sm" onclick="if(confirm('Annuler cette visite ?')) changeVisitStatus(${v.id},'cancelled')">Annuler</button>` : ''}
+        ${reminderSentTag && !v.reminder_sent ? reminderSentTag : ''}
+      </div>` : (v.status === 'confirmed' ? `
       <div style="display:flex;justify-content:flex-end;margin-top:8px;">
         <button class="btn-cancel-sm" onclick="if(confirm('Annuler cette visite ?')) changeVisitStatus(${v.id},'cancelled')">Annuler la visite</button>
-      </div>` : ''}
+      </div>` : '')}
       <div class="visit-notes-wrap">
         <textarea class="visit-notes-input" rows="2" placeholder="Notes post-visite (impressions, retours acheteur…)" id="notes-${v.id}" onblur="saveNotes(${v.id})">${v.notes || ''}</textarea>
         <div class="visit-notes-saved" id="notes-saved-${v.id}">✓ Enregistré</div>
       </div>
-    </div>
-  `).join('');
+    </div>`;
+  }).join('');
 }
 
 async function changeVisitStatus(id, status) {
@@ -631,6 +668,32 @@ async function changeVisitStatus(id, status) {
       showToast(status === 'confirmed' ? 'Visite confirmée' : 'Visite annulée');
     }
   } catch(e) { showToast('Erreur', 'error'); }
+}
+
+async function sendReminder(id) {
+  const btn = document.getElementById('btn-reminder-' + id);
+  if (btn) { btn.disabled = true; btn.textContent = 'Envoi…'; }
+  try {
+    const res = await fetch(`/api/visits/${id}/reminder`, { method: 'POST' });
+    const data = await res.json();
+    if (data.success) {
+      const v = allVisits.find(v => v.id === id);
+      if (v) v.reminder_sent = 1;
+      if (btn) {
+        btn.className = 'btn-sms-reminder sent';
+        btn.innerHTML = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.41a2 2 0 0 1 2-2.18h3a2 2 0 0 1 2 1.72 12.13 12.13 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.13 12.13 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg> Rappel envoyé`;
+        btn.disabled = false;
+        btn.title = 'Rappel envoyé — cliquer pour renvoyer';
+      }
+      showToast('Rappel SMS envoyé à l\'acheteur');
+    } else {
+      if (btn) { btn.disabled = false; btn.textContent = 'Envoyer rappel SMS'; }
+      showToast(data.error || 'Erreur envoi SMS', 'error');
+    }
+  } catch(e) {
+    if (btn) { btn.disabled = false; btn.textContent = 'Envoyer rappel SMS'; }
+    showToast('Erreur réseau', 'error');
+  }
 }
 
 async function saveNotes(id) {

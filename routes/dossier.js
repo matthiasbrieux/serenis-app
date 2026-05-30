@@ -85,7 +85,7 @@ router.post('/api/dossier/acheteur/:token/reserver', async (req, res) => {
       .run(prop.seller_id, 'visit_request', 'Nouvelle demande de visite', `${buyer_name} (${buyer_phone || buyer_email}) souhaite visiter le ${visit_date} à ${visit_time}`);
 
     try {
-      const { sendVisitConfirmation, sendSmsToSeller } = require('../services/email');
+      const { sendVisitConfirmation } = require('../services/email');
       await sendVisitConfirmation(buyer_email, buyer_name, prop, visit_date, visit_time, false);
       await sendVisitConfirmation(prop.seller_email, prop.seller_first_name || 'Vendeur', prop, visit_date, visit_time, true);
       // SMS au vendeur avec le numéro de l'acheteur pour contact direct
@@ -112,7 +112,6 @@ router.post('/api/property/regenerate-tokens', requireAuth, (req, res) => {
   const prop = db.prepare('SELECT id FROM properties WHERE seller_id = ?').get(req.seller.id);
   if (!prop) return res.status(404).json({ error: 'Bien introuvable' });
 
-  const newToken = uuidv4();
   if (type === 'acheteur' || type === 'both') {
     db.prepare('UPDATE properties SET acheteur_token = ? WHERE id = ?').run(uuidv4(), prop.id);
   }
