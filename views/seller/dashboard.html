@@ -570,32 +570,6 @@
         <div class="stat-value green" id="statViews">—</div>
         <div class="stat-sub" id="statViewsSub">— aujourd'hui</div>
       </div>
-      <!-- Numéro IA -->
-      <div class="stat-card" id="twilioCard">
-        <div class="stat-label">Numéro IA</div>
-        <div class="stat-value-small" id="statTwilio" style="margin-top:6px;font-size:1.05rem;font-weight:600;color:#3D5A47;letter-spacing:0.03em;">—</div>
-        <div class="stat-sub" id="twilioHint">En cours d'attribution</div>
-      </div>
-    </div>
-
-    <!-- Numéro IA explainer -->
-    <div id="twilioExplainer" class="card one-col" style="display:none;border-left:4px solid #3D5A47;padding:20px 24px;">
-      <div style="display:flex;align-items:flex-start;gap:16px;">
-        <div style="display:flex;align-items:center;justify-content:center;flex-shrink:0;"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg></div>
-        <div>
-          <div style="font-weight:600;color:#3D5A47;margin-bottom:6px;">Votre numéro IA est activé</div>
-          <p style="color:#5a6e5f;font-size:0.88rem;margin:0;line-height:1.6;">
-            Utilisez ce numéro dans vos annonces immobilières pour centraliser toutes les demandes acheteurs et organiser vos visites.
-            Les appels et SMS sont automatiquement gérés par l'IA — elle qualifie les acheteurs, répond à leurs questions et planifie vos visites.
-            <strong>Vous n'avez rien à gérer.</strong>
-          </p>
-        </div>
-        <div style="flex-shrink:0;text-align:center;">
-          <div id="twilioNumberBig" style="font-family:'Cormorant Garamond',serif;font-size:1.5rem;font-weight:600;color:#1C1C1A;white-space:nowrap;margin-bottom:8px;"></div>
-          <img id="twilioQr" src="" alt="QR code" style="display:none;width:90px;height:90px;border-radius:6px;border:2px solid #e8e0d6;">
-          <div style="font-size:.7rem;color:#aaa;margin-top:4px;">Scanner pour appeler</div>
-        </div>
-      </div>
     </div>
 
     <!-- ══ Séance photo — barre de progression + réservation ══ -->
@@ -671,11 +645,6 @@
           <div class="form-group">
             <label>Téléphone personnel</label>
             <input type="tel" name="phone" id="pfPhone" placeholder="06 xx xx xx xx">
-          </div>
-          <div id="pfTwilioWrap" class="form-group" style="display:none;">
-            <label>Numéro Serenis attribué</label>
-            <input type="text" id="pfTwilio" disabled style="background:#f0f7f2;color:#3D5A47;font-weight:600;cursor:default;">
-            <p class="form-hint" style="margin-top:4px;">Numéro IA à mettre dans vos annonces</p>
           </div>
           <div class="form-group">
             <label>Changer le mot de passe</label>
@@ -1373,11 +1342,6 @@ async function loadData() {
     document.getElementById('pfLastName').value  = seller.last_name  || '';
     document.getElementById('pfPhone').value     = seller.phone      || '';
     document.getElementById('pfEmail').value     = seller.email      || '';
-    if (seller.twilio_number) {
-      document.getElementById('pfTwilio').value  = seller.twilio_number;
-      document.getElementById('pfTwilioWrap').style.display = 'block';
-    }
-
     /* — Stat cards — */
     // Score
     const score = scoreData.score || 0;
@@ -1391,21 +1355,6 @@ async function loadData() {
     document.getElementById('statVisits').textContent   = stats.visits   || 0;
     document.getElementById('statViews').textContent    = stats.views_total ?? '—';
     document.getElementById('statViewsSub').textContent = (stats.views_today || 0) + ' aujourd\'hui · ' + (stats.views_week || 0) + ' cette semaine';
-
-    // Numéro IA
-    if (seller.twilio_number) {
-      document.getElementById('statTwilio').textContent = seller.twilio_number;
-      document.getElementById('twilioHint').textContent = 'Actif — à mettre dans vos annonces';
-      document.getElementById('twilioExplainer').style.display = 'block';
-      document.getElementById('twilioNumberBig').textContent = seller.twilio_number;
-      const qrImg = document.getElementById('twilioQr');
-      const qrNum = encodeURIComponent(seller.twilio_number.replace(/\s/g, ''));
-      qrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=90x90&data=${qrNum}&bgcolor=ffffff&color=1C1C1A&margin=4`;
-      qrImg.style.display = 'block';
-    } else {
-      document.getElementById('statTwilio').textContent = 'En cours d\'attribution';
-      document.getElementById('twilioHint').textContent = 'Disponible avec le pack Sérénité';
-    }
 
     /* — Progression bar — */
     renderProgressionBar(seller, property, photos, publications, stats);
