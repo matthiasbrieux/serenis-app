@@ -80,16 +80,16 @@ router.post('/api/dossier/acheteur/:token/reserver', async (req, res) => {
     const conflict = db.prepare("SELECT id FROM visits WHERE property_id=? AND visit_date=? AND visit_time=? AND status != 'cancelled'").get(prop.id, visit_date, visit_time);
     if (conflict) return res.status(409).json({ error: 'Ce créneau est déjà pris. Choisissez un autre horaire.' });
 
-    db.prepare('INSERT INTO visits (property_id, seller_id, buyer_name, buyer_email, buyer_phone, visit_date, visit_time) VALUES (?,?,?,?,?,?,?)')
+    db.prepare("INSERT INTO visits (property_id, seller_id, buyer_name, buyer_email, buyer_phone, visit_date, visit_time, status) VALUES (?,?,?,?,?,?,?,'pending')")
       .run(prop.id, prop.seller_id, buyer_name, buyer_email, buyer_phone || '', visit_date, visit_time);
 
     db.prepare("INSERT INTO notifications (seller_id, type, title, body) VALUES (?,?,?,?)")
       .run(prop.seller_id, 'visit_request', 'Nouvelle demande de visite', `${buyer_name} (${buyer_phone || buyer_email}) souhaite visiter le ${visit_date} à ${visit_time}`);
 
     try {
-      const { sendVisitConfirmation } = require('../services/email');
-      await sendVisitConfirmation(buyer_email, buyer_name, prop, visit_date, visit_time, false);
-      await sendVisitConfirmation(prop.seller_email, prop.seller_first_name || 'Vendeur', prop, visit_date, visit_time, true);
+      const { sendVisitRequestReceived, sendNewVisitRequest } = require('../services/email');
+      await sendVisitRequestReceived(buyer_email, buyer_name, prop, visit_date, visit_time);
+      await sendNewVisitRequest(prop.seller_email, prop.seller_first_name || 'Vendeur', prop, visit_date, visit_time, buyer_name, buyer_phone || buyer_email);
       // SMS au vendeur avec le numéro de l'acheteur pour contact direct
       if (prop.seller_phone) {
         const { sendSmsNotification } = require('../services/twilio');
