@@ -2858,11 +2858,11 @@ document.getElementById('propertyForm').addEventListener('change', updateComplet
 // ── Load property data ────────────────────────────────
 let _propertyData = null;
 let _baseUrl = window.location.origin;
-fetch('/api/config').then(r => r.json()).then(c => { if (c.base_url) _baseUrl = c.base_url; }).catch(() => {});
 
 async function loadProperty() {
-  const res = await fetch('/api/property');
-  const data = await res.json();
+  const [configRes, propRes] = await Promise.all([fetch('/api/config'), fetch('/api/property')]);
+  try { const c = await configRes.json(); if (c.base_url) _baseUrl = c.base_url; } catch(e) {}
+  const data = await propRes.json();
   if (!data.property) return;
   _propertyData = data;
   const p = data.property;
