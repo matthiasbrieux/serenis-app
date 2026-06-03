@@ -20,6 +20,7 @@ router.get('/mon-bien', requireAuth, (req, res) => {
   res.send(html);
 });
 router.get('/ma-formation', requireAuth, (req, res) => res.sendFile('library.html', { root: './views/seller' }));
+router.get('/coaching-vpm', requireAuth, (req, res) => res.sendFile('coaching-vpm.html', { root: './views/seller' }));
 router.get('/mon-agenda', requireAuth, (req, res) => res.sendFile('agenda.html', { root: './views/seller' }));
 router.get('/ma-bibliotheque', requireAuth, (req, res) => res.sendFile('biblio.html', { root: './views/seller' }));
 router.get('/onboarding', requireAuth, (req, res) => res.sendFile('onboarding.html', { root: './views/seller' }));

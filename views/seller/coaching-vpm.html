@@ -1,0 +1,979 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Coaching Vendu Par Moi — Programme complet</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,400&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css">
+  <style>
+    .vpm-hero {
+      background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+      border-radius: 16px;
+      padding: 36px 40px;
+      margin-bottom: 32px;
+      color: #fff;
+      position: relative;
+      overflow: hidden;
+    }
+    .vpm-hero::before {
+      content: '';
+      position: absolute;
+      top: -60px; right: -60px;
+      width: 220px; height: 220px;
+      background: radial-gradient(circle, rgba(201,148,58,0.2) 0%, transparent 70%);
+      border-radius: 50%;
+    }
+    .vpm-badge {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 4px 14px; border-radius: 100px;
+      background: rgba(201,148,58,0.15); border: 1px solid rgba(201,148,58,0.4);
+      color: #C9943A; font-size: 0.68rem; font-weight: 700;
+      letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 16px;
+    }
+    .vpm-hero-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 2rem; font-weight: 600; line-height: 1.2;
+      margin: 0 0 10px; color: #fff;
+    }
+    .vpm-hero-title span { color: #C9943A; }
+    .vpm-hero-sub { font-size: 0.88rem; color: rgba(255,255,255,0.65); margin: 0 0 24px; line-height: 1.6; max-width: 520px; }
+    .vpm-stats { display: flex; gap: 32px; }
+    .vpm-stat-n { font-family: 'Cormorant Garamond', serif; font-size: 1.8rem; font-weight: 600; color: #C9943A; line-height: 1; }
+    .vpm-stat-l { font-size: 0.72rem; color: rgba(255,255,255,0.5); margin-top: 3px; }
+
+    .vpm-progress-bar {
+      height: 4px; background: rgba(255,255,255,0.1); border-radius: 2px;
+      margin-top: 24px; overflow: hidden;
+    }
+    .vpm-progress-fill {
+      height: 100%; background: linear-gradient(90deg, #C9943A, #e8b86d);
+      border-radius: 2px; transition: width 0.5s ease;
+    }
+    .vpm-prog-label { font-size: 0.72rem; color: rgba(255,255,255,0.45); margin-top: 6px; }
+
+    /* Modules */
+    .vpm-modules { display: flex; flex-direction: column; gap: 10px; }
+    .vpm-mod {
+      background: #fff; border: 1.5px solid #E8E3DB;
+      border-radius: 14px; overflow: hidden; transition: border-color 0.2s;
+    }
+    .vpm-mod.done { border-color: #C9943A; }
+    .vpm-mod-hdr {
+      display: flex; align-items: center; gap: 14px;
+      padding: 18px 20px; cursor: pointer;
+      transition: background 0.2s; user-select: none;
+    }
+    .vpm-mod-hdr:hover { background: #FAF8F4; }
+    .vpm-mod.open .vpm-mod-hdr { background: #1a1a1a; }
+    .vpm-mod-num {
+      width: 36px; height: 36px; border-radius: 10px;
+      background: #F5F0E8; border: 1.5px solid #E8E3DB;
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Cormorant Garamond', serif; font-size: 1rem; font-weight: 600;
+      color: #C9943A; flex-shrink: 0; transition: all 0.2s;
+    }
+    .vpm-mod.open .vpm-mod-num { background: #C9943A; border-color: #C9943A; color: #fff; }
+    .vpm-mod.done .vpm-mod-num { background: #C9943A; border-color: #C9943A; color: #fff; }
+    .vpm-mod-tw { flex: 1; min-width: 0; }
+    .vpm-mod-title { font-weight: 700; font-size: 0.95rem; color: #1a1a1a; transition: color 0.2s; }
+    .vpm-mod.open .vpm-mod-title { color: #fff; }
+    .vpm-mod-sub { font-size: 0.75rem; color: #888; margin-top: 2px; transition: color 0.2s; }
+    .vpm-mod.open .vpm-mod-sub { color: rgba(255,255,255,0.55); }
+    .vpm-mod-meta { font-size: 0.7rem; color: #C9943A; font-weight: 600; margin-top: 3px; transition: color 0.2s; }
+    .vpm-mod.open .vpm-mod-meta { color: rgba(201,148,58,0.8); }
+    .vpm-mod-chk {
+      width: 22px; height: 22px; border-radius: 50%;
+      border: 1.5px solid #D0C9BE; display: flex; align-items: center;
+      justify-content: center; font-size: 0.75rem; color: transparent;
+      cursor: pointer; flex-shrink: 0; transition: all 0.2s; background: #fff;
+    }
+    .vpm-mod.done .vpm-mod-chk { background: #C9943A; border-color: #C9943A; color: #fff; }
+    .vpm-mod.open .vpm-mod-chk { border-color: rgba(255,255,255,0.4); }
+    .vpm-mod.open.done .vpm-mod-chk { background: #C9943A; border-color: #C9943A; color: #fff; }
+    .vpm-mod-arr { color: #C9943A; font-size: 1rem; flex-shrink: 0; transition: transform 0.2s, color 0.2s; }
+    .vpm-mod.open .vpm-mod-arr { transform: rotate(90deg); color: rgba(255,255,255,0.5); }
+
+    .vpm-mod-body {
+      display: none; padding: 0 24px 28px;
+      border-top: 1px solid #F0ECE6;
+    }
+    .vpm-mod.open .vpm-mod-body { display: block; }
+
+    /* Steps inside module */
+    .vpm-steps { display: flex; flex-direction: column; gap: 10px; margin-top: 20px; }
+    .vpm-step {
+      border: 1.5px solid #EDE8E1; border-radius: 10px;
+      overflow: hidden; transition: border-color 0.2s;
+    }
+    .vpm-step.done { border-color: #C9943A; }
+    .vpm-step-hdr {
+      display: flex; align-items: center; gap: 10px;
+      padding: 13px 16px; cursor: pointer;
+      background: #FDFBF8; transition: background 0.15s;
+    }
+    .vpm-step-hdr:hover { background: #F5F0E8; }
+    .vpm-step.open .vpm-step-hdr { background: #2d2419; }
+    .vpm-step-dot {
+      width: 8px; height: 8px; border-radius: 50%;
+      background: #D0C9BE; flex-shrink: 0; transition: background 0.2s;
+    }
+    .vpm-step.done .vpm-step-dot { background: #C9943A; }
+    .vpm-step.open .vpm-step-dot { background: #C9943A; }
+    .vpm-step-t { font-size: 0.85rem; font-weight: 600; color: #333; flex: 1; transition: color 0.2s; }
+    .vpm-step.open .vpm-step-t { color: #fff; }
+    .vpm-step-chk {
+      width: 18px; height: 18px; border-radius: 50%; border: 1.5px solid #C9943A;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.65rem; color: transparent; cursor: pointer; flex-shrink: 0;
+      background: #fff; transition: all 0.2s;
+    }
+    .vpm-step.done .vpm-step-chk { background: #C9943A; color: #fff; }
+    .vpm-step.open .vpm-step-chk { border-color: rgba(201,148,58,0.5); }
+    .vpm-step.open.done .vpm-step-chk { background: #C9943A; color: #fff; border-color: #C9943A; }
+    .tts-btn-vpm {
+      font-size: 0.7rem; padding: 3px 10px; border-radius: 6px;
+      border: 1px solid rgba(201,148,58,0.5); background: transparent;
+      color: rgba(201,148,58,0.9); cursor: pointer; font-family: inherit;
+      font-weight: 600; transition: all 0.15s; white-space: nowrap; flex-shrink: 0;
+    }
+    .tts-btn-vpm:hover { background: rgba(201,148,58,0.12); }
+    .vpm-step.open .tts-btn-vpm { border-color: rgba(201,148,58,0.6); color: #C9943A; background: rgba(201,148,58,0.1); }
+    .tts-btn-vpm.tts-playing { background: #C9943A; color: #fff; border-color: #C9943A; }
+
+    .vpm-step-body { display: none; padding: 16px 20px 20px; border-top: 1px solid #F0ECE6; }
+    .vpm-step.open .vpm-step-body { display: block; }
+
+    /* Content blocks */
+    .vpm-block { margin-bottom: 16px; }
+    .vpm-block:last-child { margin-bottom: 0; }
+    .vpm-section-title {
+      font-weight: 700; font-size: 0.82rem; color: #1a1a1a;
+      margin: 0 0 8px; display: flex; align-items: center; gap: 6px;
+    }
+    .vpm-section-title::before { content:''; display:block; width:3px; height:14px; background:#C9943A; border-radius:2px; flex-shrink:0; }
+
+    .vpm-tip {
+      background: #FBF6ED; border: 1px solid #E8D5A8;
+      border-radius: 8px; padding: 11px 14px;
+      font-size: 0.82rem; color: #6B4C18; line-height: 1.6;
+      margin-bottom: 10px;
+    }
+    .vpm-alert {
+      background: #FFF5F0; border: 1px solid #F5C4A0;
+      border-radius: 8px; padding: 11px 14px;
+      font-size: 0.82rem; color: #7A3A0A; line-height: 1.6;
+      margin-bottom: 10px;
+    }
+    .vpm-success {
+      background: #F0F5F1; border: 1px solid #C5D9CB;
+      border-radius: 8px; padding: 11px 14px;
+      font-size: 0.82rem; color: #3D5A47; line-height: 1.6;
+      margin-bottom: 10px;
+    }
+    .vpm-q-list { display: flex; flex-direction: column; gap: 8px; margin: 10px 0; }
+    .vpm-q {
+      display: flex; align-items: flex-start; gap: 10px;
+      background: #FDFBF8; border: 1px solid #EDE8E1;
+      border-radius: 8px; padding: 10px 13px;
+    }
+    .vpm-q-num {
+      width: 22px; height: 22px; border-radius: 50%;
+      background: #C9943A; color: #fff; font-size: 0.68rem;
+      font-weight: 700; display: flex; align-items: center;
+      justify-content: center; flex-shrink: 0; margin-top: 1px;
+    }
+    .vpm-q-text { font-size: 0.83rem; line-height: 1.5; color: #333; }
+    .vpm-q-why { font-size: 0.75rem; color: #888; margin-top: 3px; font-style: italic; }
+
+    .vpm-cl { display: flex; flex-direction: column; gap: 6px; margin: 10px 0; }
+    .vpm-cl-item {
+      display: flex; align-items: flex-start; gap: 10px;
+      padding: 9px 12px; background: #FAFAF8; border: 1px solid #EDE8E1;
+      border-radius: 7px; cursor: pointer; transition: all 0.15s;
+    }
+    .vpm-cl-item:hover { border-color: #C9943A; background: #FBF6ED; }
+    .vpm-cl-item.checked { border-color: #C9943A; background: #FBF6ED; }
+    .vpm-cl-cb {
+      width: 18px; height: 18px; border-radius: 4px;
+      border: 1.5px solid #C9943A; background: #fff;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.7rem; color: transparent; flex-shrink: 0; margin-top: 1px;
+      transition: all 0.15s;
+    }
+    .vpm-cl-item.checked .vpm-cl-cb { background: #C9943A; color: #fff; }
+    .vpm-cl-text { font-size: 0.82rem; color: #333; line-height: 1.4; }
+    .vpm-cl-item.checked .vpm-cl-text { text-decoration: line-through; color: #aaa; }
+
+    .vpm-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .vpm-card {
+      border: 1px solid #EDE8E1; border-radius: 10px;
+      padding: 14px 16px; background: #FDFBF8;
+    }
+    .vpm-card-title { font-weight: 700; font-size: 0.82rem; color: #C9943A; margin-bottom: 6px; }
+    .vpm-card ul { margin: 0; padding-left: 14px; }
+    .vpm-card li { font-size: 0.8rem; line-height: 1.8; color: #444; }
+
+    .vpm-script { background: #1a1a1a; border-radius: 10px; padding: 16px 18px; margin: 10px 0; }
+    .vpm-script-line { display: flex; gap: 10px; margin-bottom: 8px; }
+    .vpm-script-line:last-child { margin-bottom: 0; }
+    .vpm-script-who {
+      font-size: 0.68rem; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.08em; padding: 3px 8px; border-radius: 4px;
+      flex-shrink: 0; margin-top: 2px; height: fit-content;
+    }
+    .vpm-script-who.v { background: rgba(201,148,58,0.2); color: #C9943A; }
+    .vpm-script-who.a { background: rgba(255,255,255,0.08); color: rgba(255,255,255,0.6); }
+    .vpm-script-text { font-size: 0.82rem; color: rgba(255,255,255,0.85); line-height: 1.6; font-style: italic; }
+
+    .vpm-table { width: 100%; border-collapse: collapse; margin: 10px 0; font-size: 0.82rem; }
+    .vpm-table th { background: #F5F0E8; color: #8B6A3A; font-weight: 600; padding: 8px 10px; text-align: left; border-bottom: 1.5px solid #E8D5A8; }
+    .vpm-table td { padding: 8px 10px; border-bottom: 1px solid #F0ECE6; color: #333; vertical-align: top; }
+    .vpm-table tr:last-child td { border-bottom: none; }
+
+    .vpm-livrable {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px;
+      margin-top: 28px;
+    }
+    .vpm-livrable-card {
+      background: #fff; border: 1.5px solid #E8E3DB;
+      border-radius: 12px; padding: 18px 16px; text-align: center;
+      transition: border-color 0.2s, transform 0.2s;
+    }
+    .vpm-livrable-card:hover { border-color: #C9943A; transform: translateY(-2px); }
+    .vpm-livrable-icon { font-size: 1.6rem; margin-bottom: 8px; }
+    .vpm-livrable-title { font-weight: 700; font-size: 0.82rem; color: #1a1a1a; margin-bottom: 4px; }
+    .vpm-livrable-desc { font-size: 0.75rem; color: #888; line-height: 1.5; }
+
+    .vpm-section-header {
+      display: flex; align-items: center; gap: 12px;
+      margin: 32px 0 16px;
+    }
+    .vpm-section-header-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.3rem; font-weight: 600; color: #1a1a1a;
+    }
+    .vpm-section-header-line {
+      flex: 1; height: 1px; background: #E8E3DB;
+    }
+
+    @media (max-width: 640px) {
+      .vpm-grid { grid-template-columns: 1fr; }
+      .vpm-livrable { grid-template-columns: 1fr 1fr; }
+      .vpm-stats { gap: 20px; }
+      .vpm-hero { padding: 24px 20px; }
+      .vpm-hero-title { font-size: 1.5rem; }
+    }
+  </style>
+</head>
+<body>
+  <div class="sidebar">
+    <a href="/" class="logo">
+      <svg width="28" height="28" viewBox="0 0 40 40" fill="none"><rect width="40" height="40" rx="10" fill="#3D5A47"/><path d="M10 28L20 12L30 28" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/><path d="M14 22H26" stroke="white" stroke-width="2.5" stroke-linecap="round"/></svg>
+      <span class="logo-text">Serenis</span>
+    </a>
+    <nav class="sidebar-nav">
+      <a href="/dashboard" class="sidebar-item">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>Tableau de bord
+      </a>
+      <a href="/ma-formation" class="sidebar-item">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>Ma formation
+      </a>
+      <a href="/coaching-vpm" class="sidebar-item active">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/><path d="M15 8l2 2 4-4"/></svg>Coaching VPM
+      </a>
+      <a href="/mon-bien" class="sidebar-item">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>Mon bien
+      </a>
+      <a href="/mon-agenda" class="sidebar-item">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>Mon agenda
+      </a>
+      <a href="/ma-bibliotheque" class="sidebar-item">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>Ma bibliothèque
+      </a>
+    </nav>
+    <a href="/logout" style="color:rgba(61,90,71,0.45);font-size:0.8rem;">Déconnexion →</a>
+  </div>
+
+  <main class="main-content">
+    <div class="page-header">
+      <div>
+        <h1 class="page-title">Coaching Vendu Par Moi</h1>
+        <p class="page-subtitle" id="progLabel">0 module complété sur 8 · 0%</p>
+      </div>
+    </div>
+
+    <!-- Hero -->
+    <div class="vpm-hero">
+      <div class="vpm-badge">Programme complet · 8 modules · 6 heures</div>
+      <h2 class="vpm-hero-title">Vendre seul,<br>au bon prix, <span>avec méthode.</span></h2>
+      <p class="vpm-hero-sub">L'intégralité du programme Vendu Par Moi — de l'estimation du prix à la remise des clés chez le notaire. 22 ans d'expérience terrain condensés en 8 modules pratiques.</p>
+      <div class="vpm-stats">
+        <div>
+          <div class="vpm-stat-n">8</div>
+          <div class="vpm-stat-l">Modules</div>
+        </div>
+        <div>
+          <div class="vpm-stat-n">6h</div>
+          <div class="vpm-stat-l">De contenu</div>
+        </div>
+        <div>
+          <div class="vpm-stat-n">8 000€</div>
+          <div class="vpm-stat-l">Économisés en moyenne</div>
+        </div>
+      </div>
+      <div class="vpm-progress-bar">
+        <div class="vpm-progress-fill" id="progFill" style="width:0%"></div>
+      </div>
+      <div class="vpm-prog-label" id="progFillLabel">Commencez par le Module 01 — Analyse DVF</div>
+    </div>
+
+    <!-- Modules -->
+    <div class="vpm-modules" id="vpmModules"></div>
+
+    <!-- Livrables -->
+    <div class="vpm-section-header">
+      <div class="vpm-section-header-title">Vos livrables inclus</div>
+      <div class="vpm-section-header-line"></div>
+    </div>
+    <div class="vpm-livrable">
+      <div class="vpm-livrable-card">
+        <div class="vpm-livrable-icon">📊</div>
+        <div class="vpm-livrable-title">Rapport DVF</div>
+        <div class="vpm-livrable-desc">Analyse des ventes réelles de votre secteur avec positionnement de prix argumenté</div>
+      </div>
+      <div class="vpm-livrable-card">
+        <div class="vpm-livrable-icon">📋</div>
+        <div class="vpm-livrable-title">12 questions de qualification</div>
+        <div class="vpm-livrable-desc">Le script complet pour filtrer les vrais acheteurs avant chaque visite</div>
+      </div>
+      <div class="vpm-livrable-card">
+        <div class="vpm-livrable-icon">🏡</div>
+        <div class="vpm-livrable-title">Guide home staging</div>
+        <div class="vpm-livrable-desc">Checklist mise en valeur + stratégie publication Leboncoin et PAP (20-50€)</div>
+      </div>
+      <div class="vpm-livrable-card">
+        <div class="vpm-livrable-icon">🤝</div>
+        <div class="vpm-livrable-title">Guide conduite de visites</div>
+        <div class="vpm-livrable-desc">Parcours type, discours préparé, réponses aux questions pièges</div>
+      </div>
+      <div class="vpm-livrable-card">
+        <div class="vpm-livrable-icon">💬</div>
+        <div class="vpm-livrable-title">Scripts de négociation</div>
+        <div class="vpm-livrable-desc">Réponses aux offres basses, contre-propositions, gestion multi-acheteurs</div>
+      </div>
+      <div class="vpm-livrable-card">
+        <div class="vpm-livrable-icon">✅</div>
+        <div class="vpm-livrable-title">Checklist notaire 25 points</div>
+        <div class="vpm-livrable-desc">Tous les documents à réunir avant le compromis et l'acte définitif</div>
+      </div>
+    </div>
+
+  </main>
+
+  <script>
+  const VPM_MODULES = [
+    {
+      num:'01', title:'Analyse DVF & positionnement prix',
+      subtitle:'Fixer le bon prix dès le premier jour',
+      meta:'~45 min · Fondamental',
+      steps:[
+        {
+          title:'Comprendre et utiliser DVF.fr',
+          speakText:`DVF signifie Demandes de Valeurs Foncières. C'est la base de données officielle de tous les actes de vente notariés en France, accessible gratuitement. Contrairement aux prix affichés sur les annonces, DVF affiche les prix réellement payés. C'est votre boussole absolue.`,
+          content:`
+            <div class="vpm-block">
+              <div class="vpm-section-title">Qu'est-ce que DVF ?</div>
+              <p style="font-size:0.83rem;line-height:1.7;margin:0 0 10px;">DVF (Demandes de Valeurs Foncières) est la base de données officielle du gouvernement français regroupant l'ensemble des transactions immobilières notariées. Contrairement aux annonces, ce sont les prix <strong>réellement payés</strong>, pas les prix demandés.</p>
+              <div class="vpm-tip">💡 Accès gratuit sur <strong>dvf.etalab.gouv.fr</strong> ou sur <strong>app.dvf.etalab.gouv.fr</strong> (carte interactive)</div>
+            </div>
+            <div class="vpm-block">
+              <div class="vpm-section-title">Comment l'utiliser pas à pas</div>
+              <div class="vpm-q-list">
+                <div class="vpm-q"><div class="vpm-q-num">1</div><div><div class="vpm-q-text">Entrez l'adresse de votre bien sur la carte DVF</div><div class="vpm-q-why">Visualisez les ventes dans un rayon de 300m à 1km</div></div></div>
+                <div class="vpm-q"><div class="vpm-q-num">2</div><div><div class="vpm-q-text">Filtrez sur les 2 dernières années et le même type de bien</div><div class="vpm-q-why">Les ventes trop anciennes ne reflètent pas le marché actuel</div></div></div>
+                <div class="vpm-q"><div class="vpm-q-num">3</div><div><div class="vpm-q-text">Notez 5 à 10 ventes comparables (surface similaire ±20%)</div><div class="vpm-q-why">Plus l'échantillon est grand, plus la moyenne est fiable</div></div></div>
+                <div class="vpm-q"><div class="vpm-q-num">4</div><div><div class="vpm-q-text">Calculez le prix moyen au m² de ces ventes</div><div class="vpm-q-why">C'est votre base de référence marché</div></div></div>
+                <div class="vpm-q"><div class="vpm-q-num">5</div><div><div class="vpm-q-text">Complétez avec MeilleursAgents.com et 2 estimations gratuites d'agence</div><div class="vpm-q-why">Triangulés, ces 3 sources donnent un prix juste et défendable</div></div></div>
+              </div>
+            </div>
+            <div class="vpm-block">
+              <div class="vpm-section-title">L'erreur classique à ne jamais faire</div>
+              <div class="vpm-alert">⚠️ Surestimer de 10% pour "avoir de la marge à négocier" = zéro visite pendant 2 mois. Un bien trop cher ne se vend pas — il se désintègre. Chaque semaine à un prix trop élevé détruit sa valeur perçue.</div>
+            </div>`
+        },
+        {
+          title:'Calculer mon prix au m² et ajuster',
+          speakText:`Le prix au m² est votre boussole. Calculez-le depuis les ventes DVF récentes proches, puis ajustez selon vos atouts. Exposition plein sud, garage double, jardin, état général excellent — chaque atout se valorise. L'objectif est un prix qui attire les visites dès la première semaine.`,
+          content:`
+            <div class="vpm-block">
+              <div class="vpm-section-title">Grille d'ajustement du prix</div>
+              <table class="vpm-table">
+                <thead><tr><th>Critère</th><th>Ajustement indicatif</th></tr></thead>
+                <tbody>
+                  <tr><td>Exposition plein sud (toutes pièces)</td><td>+2% à +4%</td></tr>
+                  <tr><td>Garage ou parking inclus</td><td>+3% à +6%</td></tr>
+                  <tr><td>Jardin exposé + terrain plat</td><td>+5% à +10%</td></tr>
+                  <tr><td>Rénovation complète récente (< 5 ans)</td><td>+5% à +8%</td></tr>
+                  <tr><td>DPE A ou B</td><td>+3% à +6%</td></tr>
+                  <tr><td>DPE F ou G</td><td>-5% à -12%</td></tr>
+                  <tr><td>Proximité nuisance (route, voie ferrée)</td><td>-5% à -10%</td></tr>
+                  <tr><td>Travaux à prévoir importants</td><td>À déduire au coût réel</td></tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="vpm-block">
+              <div class="vpm-section-title">Règle des 3 semaines</div>
+              <div class="vpm-tip">Si vous n'avez pas eu de demandes de visite dans les 3 semaines suivant la publication, votre prix est trop élevé. Baissez de 3 à 5% et relancez une annonce fraîche.</div>
+            </div>`
+        }
+      ]
+    },
+    {
+      num:'02', title:'Mesures Loi Carrez',
+      subtitle:'Surface officielle — obligation légale',
+      meta:'~30 min · Juridique',
+      steps:[
+        {
+          title:'Ce que dit la loi — et ce que ça change pour vous',
+          speakText:`La loi Carrez est une obligation légale pour tout appartement ou bien en copropriété. Elle impose de mentionner la surface privative exacte dans le compromis et l'acte de vente. Si vous annoncez plus d'un mètre carré de trop et que l'acheteur le prouve dans l'année, il peut exiger une réduction de prix proportionnelle à l'écart.`,
+          content:`
+            <div class="vpm-block">
+              <div class="vpm-section-title">Définition légale</div>
+              <p style="font-size:0.83rem;line-height:1.7;margin:0 0 10px;">La Loi Carrez (décret du 18 décembre 1996) impose de mentionner la surface habitable privative dans tout acte de vente d'un lot de copropriété. Une erreur de plus de 5% engage votre responsabilité pour réduction de prix pendant 1 an après la vente.</p>
+              <div class="vpm-alert">⚠️ En maison individuelle hors copropriété : la Loi Carrez n'est pas obligatoire, mais indiquer la surface habitable (Loi Boutin) reste une bonne pratique.</div>
+            </div>
+            <div class="vpm-block">
+              <div class="vpm-section-title">Ce qui compte — Ce qui ne compte pas</div>
+              <div class="vpm-grid">
+                <div class="vpm-card">
+                  <div class="vpm-card-title">✅ Inclus dans la surface</div>
+                  <ul><li>Toutes les pièces ≥ 1,80 m de hauteur</li><li>Séjour, chambres, cuisine, salle de bain</li><li>Couloirs et dressing (si ≥ 1,80 m)</li><li>Sous-sol aménagé habitable (≥ 1,80 m)</li></ul>
+                </div>
+                <div class="vpm-card">
+                  <div class="vpm-card-title">❌ Exclus de la surface</div>
+                  <ul><li>Balcons, terrasses, loggias</li><li>Caves, celliers, garages</li><li>Parties communes</li><li>Combles non aménagés</li><li>Surfaces sous 1,80 m de hauteur</li></ul>
+                </div>
+              </div>
+            </div>
+            <div class="vpm-block">
+              <div class="vpm-section-title">La règle des 5% — Exemple concret</div>
+              <div class="vpm-tip">Vous vendez 200 000€ un bien annoncé à 80 m². Si la surface réelle est 75 m² (−6,25%), l'acheteur peut réclamer : 200 000 × 6,25% = <strong>12 500€ de réduction de prix</strong>.</div>
+            </div>`
+        },
+        {
+          title:'Comment mesurer soi-même au télémètre laser',
+          speakText:`Un télémètre laser vendu entre 15 et 30 euros en magasin de bricolage vous permet de mesurer avec la précision requise. Mesurez chaque pièce, notez longueur par largeur, additionnez les surfaces avec une hauteur d'au moins un mètre quatre-vingts, et soustrayez les embrasures. En copropriété, faites-le réaliser par un diagnostiqueur pour être couvert.`,
+          content:`
+            <div class="vpm-block">
+              <div class="vpm-section-title">Matériel nécessaire</div>
+              <div class="vpm-tip">📐 Un télémètre laser (Leroy Merlin / Brico Dépôt : 15-30€) suffit pour une mesure précise.</div>
+            </div>
+            <div class="vpm-block">
+              <div class="vpm-section-title">Méthode de mesure pièce par pièce</div>
+              <div class="vpm-cl" id="cl-carrez">
+                <div class="vpm-cl-item" onclick="toggleCl(this)"><div class="vpm-cl-cb">✓</div><div class="vpm-cl-text">Mesurez chaque pièce : longueur × largeur</div></div>
+                <div class="vpm-cl-item" onclick="toggleCl(this)"><div class="vpm-cl-cb">✓</div><div class="vpm-cl-text">Notez chaque surface sur un plan griffonné</div></div>
+                <div class="vpm-cl-item" onclick="toggleCl(this)"><div class="vpm-cl-cb">✓</div><div class="vpm-cl-text">Vérifiez la hauteur de chaque zone (≥ 1,80 m pour compter)</div></div>
+                <div class="vpm-cl-item" onclick="toggleCl(this)"><div class="vpm-cl-cb">✓</div><div class="vpm-cl-text">Excluez les balcons, terrasses, caves et garages</div></div>
+                <div class="vpm-cl-item" onclick="toggleCl(this)"><div class="vpm-cl-cb">✓</div><div class="vpm-cl-text">Soustrayez les murs et embrasures (en général ~2-3%)</div></div>
+                <div class="vpm-cl-item" onclick="toggleCl(this)"><div class="vpm-cl-cb">✓</div><div class="vpm-cl-text">Additionnez toutes les surfaces valides</div></div>
+              </div>
+            </div>
+            <div class="vpm-block">
+              <div class="vpm-alert">⚠️ Bien en copropriété → faites réaliser le Carrez par un diagnostiqueur certifié. La certification vous protège de tout recours acheteur.</div>
+            </div>`
+        }
+      ]
+    },
+    {
+      num:'03', title:'Home staging & reportage photo',
+      subtitle:'Déclencher l\'envie avant la visite',
+      meta:'~45 min · Mise en valeur',
+      steps:[
+        {
+          title:'Les principes du home staging efficace',
+          speakText:`Quatre-vingt-dix pourcents des acheteurs décident de visiter en huit secondes sur les photos. Votre objectif est simple : que l'acheteur se projette dans une maison neutre, lumineuse, rangée — pas dans votre vie. Dépersonnalisez. Rangez. Allumez. Ouvrez tout.`,
+          content:`
+            <div class="vpm-block">
+              <div class="vpm-section-title">La règle des 8 secondes</div>
+              <p style="font-size:0.83rem;line-height:1.7;margin:0 0 10px;">90% des acheteurs décident de visiter ou non en moins de 8 secondes sur les photos. La première photo est votre couverture de magazine — elle doit montrer la meilleure pièce, la mieux éclairée, la plus rangée.</p>
+            </div>
+            <div class="vpm-block">
+              <div class="vpm-section-title">Checklist home staging avant photos</div>
+              <div class="vpm-cl" id="cl-homestaging">
+                <div class="vpm-cl-item" onclick="toggleCl(this)"><div class="vpm-cl-cb">✓</div><div class="vpm-cl-text">Enlever toutes les photos personnelles et objets décoratifs trop intimes</div></div>
+                <div class="vpm-cl-item" onclick="toggleCl(this)"><div class="vpm-cl-cb">✓</div><div class="vpm-cl-text">Désencombrer chaque pièce — moins de mobilier = plus d'espace perçu</div></div>
+                <div class="vpm-cl-item" onclick="toggleCl(this)"><div class="vpm-cl-cb">✓</div><div class="vpm-cl-text">Nettoyer les vitres — la lumière naturelle est votre meilleure alliée</div></div>
+                <div class="vpm-cl-item" onclick="toggleCl(this)"><div class="vpm-cl-cb">✓</div><div class="vpm-cl-text">Ouvrir tous les volets et rideaux au maximum</div></div>
+                <div class="vpm-cl-item" onclick="toggleCl(this)"><div class="vpm-cl-cb">✓</div><div class="vpm-cl-text">Repositionner les meubles pour maximiser la perspective</div></div>
+                <div class="vpm-cl-item" onclick="toggleCl(this)"><div class="vpm-cl-cb">✓</div><div class="vpm-cl-text">Dégager complètement le plan de travail cuisine</div></div>
+                <div class="vpm-cl-item" onclick="toggleCl(this)"><div class="vpm-cl-cb">✓</div><div class="vpm-cl-text">Faire le lit avec un couvre-lit neutre (blanc ou beige)</div></div>
+                <div class="vpm-cl-item" onclick="toggleCl(this)"><div class="vpm-cl-cb">✓</div><div class="vpm-cl-text">Sortir la voiture du garage ou de devant la façade</div></div>
+                <div class="vpm-cl-item" onclick="toggleCl(this)"><div class="vpm-cl-cb">✓</div><div class="vpm-cl-text">Sortir le salon de jardin et arroser les plantes (extérieur)</div></div>
+              </div>
+            </div>`
+        },
+        {
+          title:'Réaliser un reportage photo de qualité',
+          speakText:`Le smartphone actuel suffit pour des photos de qualité si vous maîtrisez la lumière. Prenez les photos en format paysage, au niveau d'une épaule, en incluant un coin de la pièce précédente. Commencez par la meilleure pièce. Terminez par l'extérieur. Visez 12 à 15 photos pour une annonce complète.`,
+          content:`
+            <div class="vpm-block">
+              <div class="vpm-section-title">Les 3 catégories de photos pour Serenis</div>
+              <div class="vpm-grid">
+                <div class="vpm-card">
+                  <div class="vpm-card-title">📸 Photos professionnelles</div>
+                  <ul><li>Annonces Leboncoin & PAP</li><li>Format paysage, lumière naturelle</li><li>10-15 photos, meilleures pièces en premier</li></ul>
+                </div>
+                <div class="vpm-card">
+                  <div class="vpm-card-title">🚶 Photos de découverte</div>
+                  <ul><li>Visite virtuelle pièce par pièce</li><li>Sens de visite logique</li><li>Acheteur se déplace sans se déplacer</li></ul>
+                </div>
+                <div class="vpm-card">
+                  <div class="vpm-card-title">🔧 Photos techniques</div>
+                  <ul><li>Tableau électrique, chaudière, toiture</li><li>Rassurent sur l'état du bien</li><li>Réduisent les questions en visite</li></ul>
+                </div>
+              </div>
+            </div>
+            <div class="vpm-block">
+              <div class="vpm-section-title">Stratégie de visibilité Leboncoin & PAP</div>
+              <table class="vpm-table">
+                <thead><tr><th>Option</th><th>Coût</th><th>Quand l'utiliser</th></tr></thead>
+                <tbody>
+                  <tr><td>Annonce gratuite de base</td><td>0€</td><td>Toujours — c'est votre base</td></tr>
+                  <tr><td>Top annonce (remontée immédiate)</td><td>~20€</td><td>J1 de publication + J+21</td></tr>
+                  <tr><td>Annonce premium (visuel coloré)</td><td>~15€</td><td>Marché concurrentiel</td></tr>
+                  <tr><td>Republication via modification</td><td>0€</td><td>Modifiez 1 détail tous les 7 jours</td></tr>
+                </tbody>
+              </table>
+              <div class="vpm-tip">💡 Budget recommandé les 3 premières semaines (période la plus critique) : <strong>20 à 50€</strong>. C'est le seul moment où la visibilité payante vaut vraiment son coût.</div>
+            </div>`
+        }
+      ]
+    },
+    {
+      num:'04', title:'Rédaction & publication de l\'annonce',
+      subtitle:'L\'annonce qui donne envie de visiter',
+      meta:'~30 min · Copywriting',
+      steps:[
+        {
+          title:'Écrire une annonce qui convertit',
+          speakText:`Votre annonce est la première impression — elle se joue en quelques secondes. Commencez par un titre accrocheur avec la surface, le type, et le point fort. Décrivez les pièces, les atouts, le quartier. Et surtout : ne jamais écrire prix négociable — c'est une invitation directe aux offres basses.`,
+          content:`
+            <div class="vpm-block">
+              <div class="vpm-section-title">Structure de l'annonce parfaite</div>
+              <table class="vpm-table">
+                <thead><tr><th>Section</th><th>Ce qu'il faut écrire</th></tr></thead>
+                <tbody>
+                  <tr><td><strong>Titre</strong></td><td>[Surface] m² · [Type] · [Point fort] · [Ville]<br><span style="font-size:0.75rem;color:#888;">Ex : 95 m² · Maison · Jardin plein sud · Douai</span></td></tr>
+                  <tr><td><strong>Accroche</strong></td><td>1 phrase qui résume l'essentiel et donne envie de lire la suite</td></tr>
+                  <tr><td><strong>Pièces</strong></td><td>Décrivez chaque pièce avec surface + point fort + exposition</td></tr>
+                  <tr><td><strong>Extérieur</strong></td><td>Terrain m², exposition, jardin, terrasse, garage</td></tr>
+                  <tr><td><strong>Travaux</strong></td><td>Listez ce qui a été fait + année (toiture 2020, PAC 2022...)</td></tr>
+                  <tr><td><strong>Quartier</strong></td><td>École (distance à pied), commerces, transports</td></tr>
+                  <tr><td><strong>Infos clés</strong></td><td>DPE lettre, taxe foncière, charges, disponibilité</td></tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="vpm-block">
+              <div class="vpm-section-title">Phrases à ne jamais écrire</div>
+              <div class="vpm-alert">
+                <strong>Bannissez ces formulations :</strong><br>
+                ❌ "Prix négociable" — invitation aux offres basses<br>
+                ❌ "Vendu en l'état" — signal de problèmes cachés<br>
+                ❌ "À rénover entièrement" — sans préciser le budget travaux<br>
+                ❌ "Coup de cœur garanti" — cliché qui dilue la crédibilité<br>
+                ❌ "Cause mutation / divorce / décès" — affaiblit votre position de négociation
+              </div>
+            </div>
+            <div class="vpm-block">
+              <div class="vpm-section-title">Exemple — Mauvaise vs Bonne annonce</div>
+              <div class="vpm-grid">
+                <div class="vpm-card" style="border-color:#F5A0A0;background:#FFF5F5;">
+                  <div class="vpm-card-title" style="color:#c62828;">❌ Mauvaise</div>
+                  <p style="font-size:0.8rem;color:#666;line-height:1.6;margin:0;">"Belle maison bien entretenue, grande cuisine, salon lumineux, 3 chambres, jardin. Prix négociable. Cause mutation. À visiter absolument."</p>
+                </div>
+                <div class="vpm-card" style="border-color:#C5D9CB;background:#F0F5F1;">
+                  <div class="vpm-card-title" style="color:#3D5A47;">✅ Bonne</div>
+                  <p style="font-size:0.8rem;color:#333;line-height:1.6;margin:0;">"95 m² · Maison · Jardin plein sud · Douai Nord. Séjour 28 m² exposé sud, cuisine équipée ouverte 14 m², 3 chambres. Toiture refaite 2021, PAC 2023, DPE C. École 5 min à pied. TF 1 400€/an."</p>
+                </div>
+              </div>
+            </div>`
+        }
+      ]
+    },
+    {
+      num:'05', title:'Qualification des contacts acheteurs',
+      subtitle:'Les 12 questions pour filtrer les vrais acheteurs',
+      meta:'~45 min · Méthode clé',
+      steps:[
+        {
+          title:'Pourquoi qualifier avant d\'ouvrir votre porte',
+          speakText:`Un acheteur non finançable peut vous faire perdre trois à six mois. Vous organisez, vous rangez, vous attendez — et au bout de deux mois, la banque refuse le prêt. La qualification téléphonique prend dix minutes et vous évite ce scénario. Ne donnez jamais votre adresse avant d'avoir qualifié.`,
+          content:`
+            <div class="vpm-block">
+              <div class="vpm-section-title">Le coût d'un acheteur non qualifié</div>
+              <div class="vpm-alert">Un acheteur non finançable = 3 à 6 mois perdus. Pendant ce temps, vos vrais acheteurs regardent d'autres biens et ne reviennent pas.</div>
+            </div>
+            <div class="vpm-block">
+              <div class="vpm-section-title">Règle d'or</div>
+              <div class="vpm-tip">💡 L'adresse exacte du bien, vous la donnez UNIQUEMENT après avoir qualifié le contact. Avant ça, indiquez seulement le quartier ou la commune.</div>
+            </div>`
+        },
+        {
+          title:'Les 12 questions de qualification — Script complet',
+          speakText:`Voici les douze questions à poser avant chaque visite. Posez-les naturellement, en conversation, pas comme un interrogatoire. Commencez par les questions budget et financement — ce sont les plus importantes. Si les réponses vous satisfont, fixez le rendez-vous. Sinon, poliment : demandez à être rappelé quand leur situation évolue.`,
+          content:`
+            <div class="vpm-block">
+              <div class="vpm-section-title">Le script de qualification</div>
+              <div class="vpm-script">
+                <div class="vpm-script-line"><span class="vpm-script-who v">Vous</span><span class="vpm-script-text">« Avant de fixer un rendez-vous, puis-je vous poser quelques questions rapides sur votre projet ? »</span></div>
+                <div class="vpm-script-line"><span class="vpm-script-who a">Acheteur</span><span class="vpm-script-text">« Bien sûr. »</span></div>
+              </div>
+            </div>
+            <div class="vpm-block">
+              <div class="vpm-section-title">Les 12 questions</div>
+              <div class="vpm-q-list">
+                <div class="vpm-q"><div class="vpm-q-num">1</div><div><div class="vpm-q-text">Quel est votre budget global pour cet achat ?</div><div class="vpm-q-why">Question éliminatoire n°1 — si le budget est incompatible avec votre prix, inutile d'aller plus loin</div></div></div>
+                <div class="vpm-q"><div class="vpm-q-num">2</div><div><div class="vpm-q-text">Avez-vous déjà rencontré votre banque ou un courtier ?</div><div class="vpm-q-why">Un acheteur qui n'a pas fait sa simulation n'est pas encore prêt</div></div></div>
+                <div class="vpm-q"><div class="vpm-q-num">3</div><div><div class="vpm-q-text">Disposez-vous d'un accord de principe ou d'une attestation de financement ?</div><div class="vpm-q-why">Le plus rassurant — mais rare au stade de la première prise de contact</div></div></div>
+                <div class="vpm-q"><div class="vpm-q-num">4</div><div><div class="vpm-q-text">Quel est votre apport personnel ?</div><div class="vpm-q-why">Un apport ≥ 10% des frais de notaire indique un dossier sérieux</div></div></div>
+                <div class="vpm-q"><div class="vpm-q-num">5</div><div><div class="vpm-q-text">Envisagez-vous un achat comptant ou à crédit ?</div><div class="vpm-q-why">Un achat comptant simplifie considérablement la transaction</div></div></div>
+                <div class="vpm-q"><div class="vpm-q-num">6</div><div><div class="vpm-q-text">Dans quel délai souhaitez-vous idéalement emménager ?</div><div class="vpm-q-why">Permet d'évaluer l'urgence réelle du projet</div></div></div>
+                <div class="vpm-q"><div class="vpm-q-num">7</div><div><div class="vpm-q-text">Êtes-vous actuellement propriétaire d'un bien ?</div><div class="vpm-q-why">Si oui, leur achat dépend peut-être d'une vente en cascade — à approfondir</div></div></div>
+                <div class="vpm-q"><div class="vpm-q-num">8</div><div><div class="vpm-q-text">Si oui, votre bien est-il déjà en vente ou vendu ?</div><div class="vpm-q-why">Un compromis signé de leur côté = acheteur beaucoup plus solide</div></div></div>
+                <div class="vpm-q"><div class="vpm-q-num">9</div><div><div class="vpm-q-text">Visitez-vous d'autres biens en ce moment ?</div><div class="vpm-q-why">Révèle le niveau d'avancement de la recherche et la comparaison avec votre bien</div></div></div>
+                <div class="vpm-q"><div class="vpm-q-num">10</div><div><div class="vpm-q-text">Qu'est-ce qui vous a particulièrement attiré dans mon annonce ?</div><div class="vpm-q-why">Identifie le point fort perçu — à valoriser pendant la visite</div></div></div>
+                <div class="vpm-q"><div class="vpm-q-num">11</div><div><div class="vpm-q-text">Y a-t-il des critères indispensables pour vous ? (surface, exposition, garage...)</div><div class="vpm-q-why">Permet de vérifier que votre bien correspond réellement à leurs attentes</div></div></div>
+                <div class="vpm-q"><div class="vpm-q-num">12</div><div><div class="vpm-q-text">Y a-t-il des points bloquants potentiels que vous souhaiteriez vérifier avant de vous déplacer ?</div><div class="vpm-q-why">Évite une visite pour rien si un critère rédhibitoire existe</div></div></div>
+              </div>
+            </div>
+            <div class="vpm-block">
+              <div class="vpm-success">✅ Un acheteur qui répond clairement aux 12 questions, avec un budget cohérent et un financement avancé = VISITE PRIORITAIRE. Répondez dans l'heure et proposez un créneau sous 48h.</div>
+            </div>`
+        }
+      ]
+    },
+    {
+      num:'06', title:'Formation à la conduite des visites',
+      subtitle:'Guider sans vendre — laisser l\'acheteur se projeter',
+      meta:'~45 min · Mise en situation',
+      steps:[
+        {
+          title:'Préparer son parcours de visite',
+          speakText:`Une visite se prépare en vingt minutes si votre bien est déjà rangé. Définissez votre parcours à l'avance : commencez par la meilleure pièce, terminez par la deuxième meilleure. L'acheteur doit partir sur une impression positive, pas sur le débarras ou les toilettes.`,
+          content:`
+            <div class="vpm-block">
+              <div class="vpm-section-title">La règle du parcours</div>
+              <div class="vpm-tip">Commencez par la meilleure pièce — généralement le séjour ou la pièce de vie — et terminez par la deuxième meilleure. L'acheteur doit repartir avec une image forte en tête.</div>
+            </div>
+            <div class="vpm-block">
+              <div class="vpm-section-title">Checklist 20 minutes avant chaque visite</div>
+              <div class="vpm-cl" id="cl-visite">
+                <div class="vpm-cl-item" onclick="toggleCl(this)"><div class="vpm-cl-cb">✓</div><div class="vpm-cl-text">Tous les volets ouverts dans chaque pièce</div></div>
+                <div class="vpm-cl-item" onclick="toggleCl(this)"><div class="vpm-cl-cb">✓</div><div class="vpm-cl-text">Lumières d'ambiance allumées (évitez les plafonniers)</div></div>
+                <div class="vpm-cl-item" onclick="toggleCl(this)"><div class="vpm-cl-cb">✓</div><div class="vpm-cl-text">Température à 20°C — aérez 20 min avant, puis réchauffez</div></div>
+                <div class="vpm-cl-item" onclick="toggleCl(this)"><div class="vpm-cl-cb">✓</div><div class="vpm-cl-text">Plan de travail cuisine dégagé, abattant WC fermé</div></div>
+                <div class="vpm-cl-item" onclick="toggleCl(this)"><div class="vpm-cl-cb">✓</div><div class="vpm-cl-text">Poubelles cachées ou sorties</div></div>
+                <div class="vpm-cl-item" onclick="toggleCl(this)"><div class="vpm-cl-cb">✓</div><div class="vpm-cl-text">Voiture sortie si devant la façade</div></div>
+                <div class="vpm-cl-item" onclick="toggleCl(this)"><div class="vpm-cl-cb">✓</div><div class="vpm-cl-text">Dossier acheteur envoyé 24h avant (diagnostics inclus)</div></div>
+              </div>
+            </div>`
+        },
+        {
+          title:'Comment se comporter pendant la visite',
+          speakText:`Votre rôle est de guider — pas de faire la visite comme un agent. Laissez l'acheteur entrer en premier dans chaque pièce. Restez un pas en retrait. Les silences sont positifs : c'est lui qui s'imagine déjà vivre là. Ne remplissez pas tous les silences — c'est une erreur de nervosité.`,
+          content:`
+            <div class="vpm-block">
+              <div class="vpm-section-title">Les comportements qui font vendre</div>
+              <table class="vpm-table">
+                <thead><tr><th>Comportement</th><th>Pourquoi ça marche</th></tr></thead>
+                <tbody>
+                  <tr><td>Laissez l'acheteur entrer en premier dans chaque pièce</td><td>Il découvre l'espace sans obstruction</td></tr>
+                  <tr><td>Restez un pas en retrait</td><td>Disponible, mais pas intrusif</td></tr>
+                  <tr><td>Laissez des silences</td><td>L'acheteur s'imagine vivre là — ne coupez pas sa réflexion</td></tr>
+                  <tr><td>Parlez des atouts au moment de les montrer</td><td>L'impact est immédiat, pas dans l'abstrait</td></tr>
+                  <tr><td>Proposez une seconde visite spontanément</td><td>Signal fort : vous êtes confiant</td></tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="vpm-block">
+              <div class="vpm-section-title">Réponses aux questions pièges</div>
+              <table class="vpm-table">
+                <thead><tr><th>Question piège</th><th>Réponse recommandée</th></tr></thead>
+                <tbody>
+                  <tr><td>« Pourquoi vous vendez ? »</td><td>Réponse courte et positive : « Nouveau projet de vie » ou « Agrandissement »</td></tr>
+                  <tr><td>« Il y a des travaux à prévoir ? »</td><td>Honnête mais contextualisé : « La cuisine est à rafraîchir — c'est intégré dans le prix »</td></tr>
+                  <tr><td>« Vous êtes pressés de vendre ? »</td><td>Jamais : « Non, je prends le temps de trouver le bon acheteur »</td></tr>
+                  <tr><td>« Vous avez eu des offres ? »</td><td>« J'ai eu des contacts sérieux mais rien ne correspondait à mes critères »</td></tr>
+                  <tr><td>« Quel est le principal défaut ? »</td><td>Transformez : « La cuisine est à moderniser — c'est intégré dans notre prix »</td></tr>
+                </tbody>
+              </table>
+              <div class="vpm-alert">⚠️ Ne dites jamais : "On est obligés de vendre rapidement", "Le prix est très négociable", "Les voisins sont un peu bruyants".</div>
+            </div>`
+        }
+      ]
+    },
+    {
+      num:'07', title:'Techniques de négociation',
+      subtitle:'Défendre votre prix avec méthode',
+      meta:'~45 min · Négociation',
+      steps:[
+        {
+          title:'Définir son prix plancher avant de recevoir les offres',
+          speakText:`Avant de recevoir votre première offre, décidez de votre prix plancher — le minimum absolu en dessous duquel vous ne descendrez pas. Ce chiffre, vous le gardez pour vous. Il vous permet de négocier sereinement, sans panique et sans improvisation. Une offre basse n'est pas un affront — c'est le début d'une conversation.`,
+          content:`
+            <div class="vpm-block">
+              <div class="vpm-section-title">Définir son prix plancher</div>
+              <p style="font-size:0.83rem;line-height:1.7;margin:0 0 10px;">Avant de recevoir votre première offre, fixez votre prix plancher en privé. C'est le montant en dessous duquel vous n'irez pas, quelles que soient les circonstances. Ce chiffre ne se dit jamais à l'acheteur.</p>
+              <div class="vpm-tip">💡 Méthode : Prix affiché − 5% = votre prix plancher psychologique. Exemple : bien affiché 280 000€ → prix plancher = 266 000€.</div>
+            </div>
+            <div class="vpm-block">
+              <div class="vpm-section-title">Comment répondre à une offre</div>
+              <table class="vpm-table">
+                <thead><tr><th>Offre reçue</th><th>Stratégie recommandée</th></tr></thead>
+                <tbody>
+                  <tr><td>Au prix demandé</td><td>Acceptez immédiatement, par écrit</td></tr>
+                  <tr><td>− 2% à − 5%</td><td>Contre-proposez à −1% ou tenez votre prix avec justificatif DVF</td></tr>
+                  <tr><td>− 5% à − 10%</td><td>Contre-proposez en valorisant les atouts (travaux récents, DPE, emplacement)</td></tr>
+                  <tr><td>Plus de − 10%</td><td>Déclinez poliment, expliquez votre valorisation, restez ouvert</td></tr>
+                </tbody>
+              </table>
+              <div class="vpm-alert">⚠️ Répondez dans les 24h — au-delà, l'acheteur cherche ailleurs et perd son enthousiasme.</div>
+            </div>`
+        },
+        {
+          title:'Scripts de négociation — Exercices pratiques',
+          speakText:`Voici des dialogues à pratiquer. L'objectif est que vous ayez une réponse prête à chaque situation, sans improvisation. Une réponse préparée sonne calme et assurée. Une réponse improvisée sonne hésitante et fragile. Répétez ces scripts jusqu'à ce qu'ils soient naturels.`,
+          content:`
+            <div class="vpm-block">
+              <div class="vpm-section-title">Script — Contre-proposition ferme</div>
+              <div class="vpm-script">
+                <div class="vpm-script-line"><span class="vpm-script-who a">Acheteur</span><span class="vpm-script-text">« On vous propose 260 000€ pour votre bien à 275 000€. »</span></div>
+                <div class="vpm-script-line"><span class="vpm-script-who v">Vous</span><span class="vpm-script-text">« Merci pour votre offre. Mon bien est valorisé à 275 000€ selon les ventes récentes du secteur. Je peux aller à 270 000€ — c'est ma position ferme. »</span></div>
+                <div class="vpm-script-line"><span class="vpm-script-who a">Acheteur</span><span class="vpm-script-text">« 265 000€ ? »</span></div>
+                <div class="vpm-script-line"><span class="vpm-script-who v">Vous</span><span class="vpm-script-text">« 268 000€ et je laisse l'ensemble de la cuisine équipée — c'est ma dernière position. »</span></div>
+              </div>
+            </div>
+            <div class="vpm-block">
+              <div class="vpm-section-title">Script — Gestion de plusieurs acheteurs</div>
+              <div class="vpm-script">
+                <div class="vpm-script-line"><span class="vpm-script-who v">Vous</span><span class="vpm-script-text">« Je vous informe que j'ai d'autres personnes intéressées. Je vous laisse jusqu'au [date] pour me transmettre votre position définitive. »</span></div>
+              </div>
+              <div class="vpm-tip">💡 Ne montez jamais les acheteurs les uns contre les autres — fixez la même date limite pour tous, comparez les offres sur le prix ET les conditions (financement, délai, peu de conditions suspensives).</div>
+            </div>
+            <div class="vpm-block">
+              <div class="vpm-section-title">Script — Relance J+7 après visite sans retour</div>
+              <div class="vpm-script">
+                <div class="vpm-script-line"><span class="vpm-script-who v">Vous</span><span class="vpm-script-text">« Bonjour [Prénom], une semaine s'est écoulée depuis votre visite. J'ai eu plusieurs contacts cette semaine sur le bien. Si votre projet est toujours d'actualité, je vous conseille de ne pas trop attendre. Je reste disponible pour une 2ème visite. »</span></div>
+              </div>
+            </div>`
+        }
+      ]
+    },
+    {
+      num:'08', title:'Du compromis au notaire',
+      subtitle:'Les 25 points pour sécuriser votre vente',
+      meta:'~60 min · Juridique',
+      steps:[
+        {
+          title:'Les étapes entre l\'acceptation de l\'offre et la signature',
+          speakText:`Une fois votre offre acceptée, trois dates structurent la fin de votre vente. D'abord le compromis — puis dix jours de rétractation — puis environ deux mois pour que la banque de l'acheteur étudie le dossier — puis l'acte de vente définitif chez le notaire. Comptez deux à trois mois en tout.`,
+          content:`
+            <div class="vpm-block">
+              <div class="vpm-section-title">Le calendrier des 3 mois</div>
+              <table class="vpm-table">
+                <thead><tr><th>Semaine</th><th>Étape</th></tr></thead>
+                <tbody>
+                  <tr><td>Semaine 1</td><td>Signature du compromis</td></tr>
+                  <tr><td>Semaine 2</td><td>Fin du délai de rétractation acheteur (10 jours)</td></tr>
+                  <tr><td>Semaines 3 à 8</td><td>Instruction du financement par la banque</td></tr>
+                  <tr><td>Semaines 8 à 10</td><td>Émission de l'offre de prêt</td></tr>
+                  <tr><td>Semaines 10 à 12</td><td>Préparation de l'acte authentique par le notaire</td></tr>
+                  <tr><td>Signature</td><td>Remise des clés · Versement du prix de vente</td></tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="vpm-block">
+              <div class="vpm-success">💰 En vendant sans agence, vous avez économisé en moyenne 8 000 à 16 000€ de frais d'agence — tout en gardant le contrôle total de votre vente du premier jour jusqu'à la remise des clés.</div>
+            </div>`
+        },
+        {
+          title:'Checklist notaire — Les 25 points à réunir',
+          speakText:`Voici les vingt-cinq documents à réunir avant le compromis. Commencez à les rassembler dès que vous publiez votre annonce — ne les cherchez pas en urgence le jour de l'offre. Chaque document manquant peut retarder la vente de plusieurs semaines.`,
+          content:`
+            <div class="vpm-block">
+              <div class="vpm-section-title">Documents côté vendeur — À réunir dès maintenant</div>
+              <div class="vpm-cl" id="cl-notaire">
+                <div class="vpm-cl-item" onclick="toggleCl(this)"><div class="vpm-cl-cb">✓</div><div class="vpm-cl-text"><strong>1.</strong> Titre de propriété (acte d'acquisition)</div></div>
+                <div class="vpm-cl-item" onclick="toggleCl(this)"><div class="vpm-cl-cb">✓</div><div class="vpm-cl-text"><strong>2.</strong> Diagnostic DPE (moins de 10 ans)</div></div>
+                <div class="vpm-cl-item" onclick="toggleCl(this)"><div class="vpm-cl-cb">✓</div><div class="vpm-cl-text"><strong>3.</strong> Diagnostic amiante (si construction avant 1997)</div></div>
+                <div class="vpm-cl-item" onclick="toggleCl(this)"><div class="vpm-cl-cb">✓</div><div class="vpm-cl-text"><strong>4.</strong> Diagnostic plomb (CREP) (si construction avant 1949)</div></div>
+                <div class="vpm-cl-item" onclick="toggleCl(this)"><div class="vpm-cl-cb">✓</div><div class="vpm-cl-text"><strong>5.</strong> Diagnostic électricité (si installation > 15 ans)</div></div>
+                <div class="vpm-cl-item" onclick="toggleCl(this)"><div class="vpm-cl-cb">✓</div><div class="vpm-cl-text"><strong>6.</strong> Diagnostic gaz (si installation > 15 ans)</div></div>
+                <div class="vpm-cl-item" onclick="toggleCl(this)"><div class="vpm-cl-cb">✓</div><div class="vpm-cl-text"><strong>7.</strong> État des Risques et Pollutions (ERP) — à actualiser moins de 6 mois avant la vente</div></div>
+                <div class="vpm-cl-item" onclick="toggleCl(this)"><div class="vpm-cl-cb">✓</div><div class="vpm-cl-text"><strong>8.</strong> Mesure Carrez (si copropriété)</div></div>
+                <div class="vpm-cl-item" onclick="toggleCl(this)"><div class="vpm-cl-cb">✓</div><div class="vpm-cl-text"><strong>9.</strong> Dernier avis de taxe foncière (année en cours)</div></div>
+                <div class="vpm-cl-item" onclick="toggleCl(this)"><div class="vpm-cl-cb">✓</div><div class="vpm-cl-text"><strong>10.</strong> Règlement de copropriété + état descriptif de division (si copropriété)</div></div>
+                <div class="vpm-cl-item" onclick="toggleCl(this)"><div class="vpm-cl-cb">✓</div><div class="vpm-cl-text"><strong>11.</strong> 3 derniers procès-verbaux d'assemblée générale (si copropriété)</div></div>
+                <div class="vpm-cl-item" onclick="toggleCl(this)"><div class="vpm-cl-cb">✓</div><div class="vpm-cl-text"><strong>12.</strong> Relevé de charges de copropriété (si copropriété)</div></div>
+                <div class="vpm-cl-item" onclick="toggleCl(this)"><div class="vpm-cl-cb">✓</div><div class="vpm-cl-text"><strong>13.</strong> Factures de travaux réalisés (moins de 10 ans)</div></div>
+                <div class="vpm-cl-item" onclick="toggleCl(this)"><div class="vpm-cl-cb">✓</div><div class="vpm-cl-text"><strong>14.</strong> Garanties décennales des entreprises (si travaux < 10 ans)</div></div>
+                <div class="vpm-cl-item" onclick="toggleCl(this)"><div class="vpm-cl-cb">✓</div><div class="vpm-cl-text"><strong>15.</strong> Déclarations préalables de travaux en mairie (si extension ou modification extérieure)</div></div>
+                <div class="vpm-cl-item" onclick="toggleCl(this)"><div class="vpm-cl-cb">✓</div><div class="vpm-cl-text"><strong>16.</strong> Permis de construire (si applicable)</div></div>
+                <div class="vpm-cl-item" onclick="toggleCl(this)"><div class="vpm-cl-cb">✓</div><div class="vpm-cl-text"><strong>17.</strong> Certificat de conformité des travaux (si permis de construire)</div></div>
+                <div class="vpm-cl-item" onclick="toggleCl(this)"><div class="vpm-cl-cb">✓</div><div class="vpm-cl-text"><strong>18.</strong> Documents d'assainissement (si fosse septique ou non-conformité)</div></div>
+                <div class="vpm-cl-item" onclick="toggleCl(this)"><div class="vpm-cl-cb">✓</div><div class="vpm-cl-text"><strong>19.</strong> Plans du bien (si disponibles)</div></div>
+                <div class="vpm-cl-item" onclick="toggleCl(this)"><div class="vpm-cl-cb">✓</div><div class="vpm-cl-text"><strong>20.</strong> Notices et garanties des équipements (chaudière, PAC, électroménager inclus)</div></div>
+                <div class="vpm-cl-item" onclick="toggleCl(this)"><div class="vpm-cl-cb">✓</div><div class="vpm-cl-text"><strong>21.</strong> Pièce d'identité vendeur(s) en cours de validité</div></div>
+                <div class="vpm-cl-item" onclick="toggleCl(this)"><div class="vpm-cl-cb">✓</div><div class="vpm-cl-text"><strong>22.</strong> Justificatif de domicile vendeur(s) (moins de 3 mois)</div></div>
+                <div class="vpm-cl-item" onclick="toggleCl(this)"><div class="vpm-cl-cb">✓</div><div class="vpm-cl-text"><strong>23.</strong> RIB du ou des vendeurs (pour virement du prix de vente)</div></div>
+                <div class="vpm-cl-item" onclick="toggleCl(this)"><div class="vpm-cl-cb">✓</div><div class="vpm-cl-text"><strong>24.</strong> Livret de famille ou contrat de mariage / PACS (si vendeurs en couple)</div></div>
+                <div class="vpm-cl-item" onclick="toggleCl(this)"><div class="vpm-cl-cb">✓</div><div class="vpm-cl-text"><strong>25.</strong> Coordonnées complètes du notaire de l'acheteur (nom, étude, email, téléphone)</div></div>
+              </div>
+              <div class="vpm-tip" style="margin-top:12px;">💡 Cochez chaque document au fur et à mesure. Transmettez le dossier complet au notaire dès l'offre acceptée — plus vous êtes réactif, plus les délais sont courts.</div>
+            </div>`
+        }
+      ]
+    }
+  ];
+
+  const doneMods = JSON.parse(localStorage.getItem('vpm_done_mods') || '{}');
+  const doneSteps = JSON.parse(localStorage.getItem('vpm_done_steps') || '{}');
+
+  function updateProgress() {
+    const total = VPM_MODULES.reduce((s,m) => s + m.steps.length, 0);
+    let done = 0;
+    VPM_MODULES.forEach((m,mi) => m.steps.forEach((_,si) => { if(doneSteps[mi+'-'+si]) done++; }));
+    const pct = total ? Math.round(done/total*100) : 0;
+    document.getElementById('progLabel').textContent = `${done} étape${done>1?'s':''} complétée${done>1?'s':''} sur ${total} · ${pct}%`;
+    document.getElementById('progFill').style.width = pct + '%';
+    document.getElementById('progFillLabel').textContent = pct === 100 ? '🎉 Programme complet — Félicitations !' : pct === 0 ? 'Commencez par le Module 01 — Analyse DVF' : `${pct}% du programme complété`;
+  }
+
+  function toggleCl(el) {
+    el.classList.toggle('checked');
+  }
+
+  let vpmSpeaking = false;
+  let vpmUtterance = null;
+  function pickFrVoice() {
+    const vs = window.speechSynthesis.getVoices();
+    return vs.find(v => v.lang.startsWith('fr') && v.name.includes('Google'))
+      || vs.find(v => v.lang.startsWith('fr') && !v.localService)
+      || vs.find(v => v.lang.startsWith('fr'))
+      || null;
+  }
+  function stopVpmAudio() {
+    if (window.speechSynthesis) window.speechSynthesis.cancel();
+    vpmSpeaking = false;
+    document.querySelectorAll('.tts-btn-vpm').forEach(b => { b.textContent = '▶ Écouter'; b.classList.remove('tts-playing'); });
+  }
+  function playVpmAudio(mi, si, btn) {
+    if (!window.speechSynthesis) return;
+    if (vpmSpeaking) { stopVpmAudio(); return; }
+    const step = VPM_MODULES[mi]?.steps?.[si];
+    if (!step?.speakText) return;
+    const chunks = step.speakText.match(/[^.!?]+[.!?]*/g)?.map(s=>s.trim()).filter(Boolean) || [step.speakText];
+    document.querySelectorAll('.tts-btn-vpm').forEach(b => { b.textContent = '▶ Écouter'; b.classList.remove('tts-playing'); });
+    if (btn) { btn.textContent = '⏹ Arrêter'; btn.classList.add('tts-playing'); }
+    vpmSpeaking = true;
+    let i = 0;
+    function speak() {
+      if (i >= chunks.length || !vpmSpeaking) { stopVpmAudio(); return; }
+      const u = new SpeechSynthesisUtterance(chunks[i++]);
+      u.lang = 'fr-FR'; u.rate = 0.92; u.pitch = 1;
+      const v = pickFrVoice(); if (v) u.voice = v;
+      u.onend = () => { if(vpmSpeaking) setTimeout(speak, 80); };
+      u.onerror = () => stopVpmAudio();
+      window.speechSynthesis.speak(u);
+    }
+    window.speechSynthesis.cancel();
+    setTimeout(speak, 50);
+  }
+
+  function renderModules() {
+    const container = document.getElementById('vpmModules');
+    VPM_MODULES.forEach((mod, mi) => {
+      const allDone = mod.steps.every((_,si) => doneSteps[mi+'-'+si]);
+      const modEl = document.createElement('div');
+      modEl.className = 'vpm-mod' + (allDone ? ' done' : '');
+      modEl.id = 'mod-' + mi;
+
+      const stepsHtml = mod.steps.map((step, si) => {
+        const sdone = doneSteps[mi+'-'+si] ? ' done' : '';
+        const ttsBtn = step.speakText ? `<button class="tts-btn-vpm" onclick="event.stopPropagation();playVpmAudio(${mi},${si},this)">▶ Écouter</button>` : '';
+        return `<div class="vpm-step${sdone}" id="step-${mi}-${si}">
+          <div class="vpm-step-hdr" onclick="toggleStep(${mi},${si})">
+            <div class="vpm-step-dot"></div>
+            <div class="vpm-step-t">${step.title}</div>
+            ${ttsBtn}
+            <div class="vpm-step-chk" onclick="event.stopPropagation();markStep(${mi},${si})">✓</div>
+          </div>
+          <div class="vpm-step-body">${step.content || ''}</div>
+        </div>`;
+      }).join('');
+
+      modEl.innerHTML = `
+        <div class="vpm-mod-hdr" onclick="toggleMod(${mi})">
+          <div class="vpm-mod-num">${mod.num}</div>
+          <div class="vpm-mod-tw">
+            <div class="vpm-mod-title">${mod.title}</div>
+            <div class="vpm-mod-sub">${mod.subtitle}</div>
+            <div class="vpm-mod-meta">${mod.meta} · ${mod.steps.length} étape${mod.steps.length>1?'s':''}</div>
+          </div>
+          <div class="vpm-mod-chk" onclick="event.stopPropagation();markMod(${mi})">✓</div>
+          <div class="vpm-mod-arr">›</div>
+        </div>
+        <div class="vpm-mod-body">
+          <div class="vpm-steps">${stepsHtml}</div>
+        </div>`;
+      container.appendChild(modEl);
+    });
+  }
+
+  function toggleMod(mi) {
+    const el = document.getElementById('mod-'+mi);
+    const wasOpen = el.classList.contains('open');
+    document.querySelectorAll('.vpm-mod.open').forEach(m => m.classList.remove('open'));
+    document.querySelectorAll('.vpm-step.open').forEach(s => s.classList.remove('open'));
+    if (!wasOpen) el.classList.add('open');
+  }
+
+  function toggleStep(mi, si) {
+    const el = document.getElementById('step-'+mi+'-'+si);
+    const wasOpen = el.classList.contains('open');
+    const mod = document.getElementById('mod-'+mi);
+    mod.querySelectorAll('.vpm-step.open').forEach(s => s.classList.remove('open'));
+    if (!wasOpen) el.classList.add('open');
+  }
+
+  function markStep(mi, si) {
+    const key = mi+'-'+si;
+    doneSteps[key] = !doneSteps[key];
+    localStorage.setItem('vpm_done_steps', JSON.stringify(doneSteps));
+    const el = document.getElementById('step-'+mi+'-'+si);
+    el.classList.toggle('done', !!doneSteps[key]);
+    const allDone = VPM_MODULES[mi].steps.every((_,s) => doneSteps[mi+'-'+s]);
+    document.getElementById('mod-'+mi).classList.toggle('done', allDone);
+    updateProgress();
+  }
+
+  function markMod(mi) {
+    const allDone = VPM_MODULES[mi].steps.every((_,si) => doneSteps[mi+'-'+si]);
+    VPM_MODULES[mi].steps.forEach((_,si) => {
+      const key = mi+'-'+si;
+      doneSteps[key] = !allDone;
+      document.getElementById('step-'+mi+'-'+si)?.classList.toggle('done', !allDone);
+    });
+    localStorage.setItem('vpm_done_steps', JSON.stringify(doneSteps));
+    document.getElementById('mod-'+mi).classList.toggle('done', !allDone);
+    updateProgress();
+  }
+
+  renderModules();
+  updateProgress();
+  if (window.speechSynthesis) window.speechSynthesis.getVoices();
+  </script>
+</body>
+</html>
