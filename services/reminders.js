@@ -32,6 +32,8 @@ async function sendVisitReminders() {
       }
 
       db.prepare('UPDATE visits SET reminder_sent = 1 WHERE id = ?').run(visit.id);
+      db.prepare("INSERT INTO notifications (seller_id, type, title, body) VALUES (?,?,?,?)")
+        .run(visit.seller_id, 'visit_reminder', '📅 Rappel visite demain', `${visit.buyer_name} — ${visit.visit_date} à ${visit.visit_time}`);
       console.log(`Reminder sent for visit ${visit.id}`);
     } catch (e) {
       console.error(`Reminder error for visit ${visit.id}:`, e.message);

@@ -583,10 +583,9 @@
       </div>
       <div class="notif-pills">
         <button class="notif-pill active" data-tab="all" onclick="notifSwitchTab('all')">Tout</button>
-        <button class="notif-pill" data-tab="visits" onclick="notifSwitchTab('visits')">Visites</button>
-        <button class="notif-pill" data-tab="offers" onclick="notifSwitchTab('offers')">Offres</button>
-        <button class="notif-pill" data-tab="contacts" onclick="notifSwitchTab('contacts')">Contacts</button>
-        <button class="notif-pill" data-tab="system" onclick="notifSwitchTab('system')">Système</button>
+        <button class="notif-pill" data-tab="pending" onclick="notifSwitchTab('pending')">À confirmer</button>
+        <button class="notif-pill" data-tab="confirmed" onclick="notifSwitchTab('confirmed')">Confirmées</button>
+        <button class="notif-pill" data-tab="reminder" onclick="notifSwitchTab('reminder')">Rappels</button>
       </div>
       <div id="notif-content">
         <div style="text-align:center;padding:60px;color:#aaa;">Chargement…</div>
@@ -1225,30 +1224,32 @@ function notifSwitchTab(tab) {
 
 function notifBuildItems() {
   const items=[];
-  const typeMap={
-    visit_request:{icon:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>',cls:'ni-visit',tab:'visits'},
-    visit_confirmed:{icon:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>',cls:'ni-visit',tab:'visits'},
-    new_contact:{icon:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>',cls:'ni-contact',tab:'contacts'},
-    new_offer:{icon:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/></svg>',cls:'ni-offer',tab:'offers'},
-  };
-  const bellIcon='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>';
-  (notifData.notifications||[]).forEach(n=>{
-    const t=typeMap[n.type]||{icon:bellIcon,cls:'ni-system',tab:'system'};
-    items.push({tab:t.tab,icon:t.icon,iconCls:t.cls,title:n.title||n.type,sub:n.body||'',date:n.created_at,unread:!n.read_at});
-  });
   const calIcon='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>';
-  const userIcon='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>';
-  const euroIcon='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/></svg>';
+  const checkIcon='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>';
+  const bellIcon='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#C4603A" stroke-width="1.8"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>';
+
+  // Notifications de visite uniquement (demandes + rappels)
+  (notifData.notifications||[]).filter(n=>['visit_request','visit_confirmed','visit_reminder'].includes(n.type)).forEach(n=>{
+    const icon = n.type==='visit_confirmed' ? checkIcon : n.type==='visit_reminder' ? bellIcon : calIcon;
+    const cls  = n.type==='visit_reminder' ? 'ni-visit' : 'ni-visit';
+    const tab  = n.type==='visit_request' ? 'pending' : n.type==='visit_reminder' ? 'reminder' : 'confirmed';
+    items.push({tab, icon, iconCls:cls, title:n.title||'', sub:n.body||'', date:n.created_at, unread:!n.read_at});
+  });
+
+  // Visites de la BDD
   (notifData.visits||[]).forEach(v=>{
-    const statusLabel={confirmed:'Confirmée',pending:'En attente',cancelled:'Annulée',done:'Réalisée'}[v.status]||v.status;
-    items.push({tab:'visits',icon:calIcon,iconCls:'ni-visit',title:`Visite — ${v.buyer_name}`,sub:`${v.visit_date} à ${v.visit_time} · ${statusLabel}`,date:v.created_at,unread:false});
+    const isPending = v.status==='pending';
+    items.push({
+      tab: isPending ? 'pending' : 'confirmed',
+      icon: isPending ? calIcon : checkIcon,
+      iconCls:'ni-visit',
+      title: isPending ? `⏳ À confirmer — ${v.buyer_name}` : `✅ Confirmée — ${v.buyer_name}`,
+      sub:`${v.visit_date} à ${v.visit_time}`,
+      date:v.created_at,
+      unread: isPending
+    });
   });
-  (notifData.offers||[]).forEach(o=>{
-    items.push({tab:'offers',icon:euroIcon,iconCls:'ni-offer',title:`Offre de ${o.buyer_name} — ${Number(o.amount).toLocaleString('fr-FR')} €`,sub:`${o.status==='pending'?'En attente de réponse':o.status}`,date:o.created_at,unread:o.status==='pending'});
-  });
-  (notifData.contacts||[]).forEach(c=>{
-    items.push({tab:'contacts',icon:userIcon,iconCls:'ni-contact',title:`Nouveau contact — ${c.buyer_name||c.buyer_phone||'Acquéreur'}`,sub:`Via ${c.source==='sms'?'SMS':c.source==='manuel'?'Ajout manuel':c.source}`,date:c.created_at,unread:false});
-  });
+
   return items.sort((a,b)=>new Date(b.date)-new Date(a.date));
 }
 
@@ -1256,7 +1257,7 @@ function notifRender() {
   if (!notifData) return;
   const content=document.getElementById('notif-content');
   const allItems=notifBuildItems();
-  const filtered=notifActiveTab==='all'?allItems:allItems.filter(i=>i.tab===notifActiveTab);
+  const filtered=notifActiveTab==='all'?allItems:allItems.filter(i=>i.tab===notifActiveTab||i.tab===notifActiveTab);
   if (!filtered.length) { content.innerHTML='<div class="empty-state"><div class="empty-state-icon"><svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#ccc" stroke-width="1.5"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg></div><p>Aucune notification.</p></div>'; return; }
   const groups={};
   filtered.forEach(item=>{
