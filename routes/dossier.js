@@ -89,7 +89,7 @@ router.post('/api/dossier/acheteur/:token/reserver', async (req, res) => {
     try {
       const { sendVisitRequestReceived, sendNewVisitRequest } = require('../services/email');
       await sendVisitRequestReceived(buyer_email, buyer_name, prop, visit_date, visit_time);
-      await sendNewVisitRequest(prop.seller_email, prop.seller_first_name || 'Vendeur', prop, visit_date, visit_time, buyer_name, buyer_phone || buyer_email);
+      await sendNewVisitRequest({ sellerEmail: prop.seller_email, buyerName: buyer_name, visitDate: `${visit_date} à ${visit_time}`, notes: buyer_phone ? `📞 ${buyer_phone}` : buyer_email });
       // SMS au vendeur avec le numéro de l'acheteur pour contact direct
       if (prop.seller_phone) {
         const { sendSmsNotification } = require('../services/twilio');

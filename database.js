@@ -107,7 +107,6 @@ db.exec(`
     visit_date TEXT NOT NULL,
     visit_time TEXT NOT NULL,
     status TEXT DEFAULT 'pending',
-    notes TEXT,
     reminder_sent BOOLEAN DEFAULT 0,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP
   );
