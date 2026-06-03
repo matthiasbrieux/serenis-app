@@ -2,136 +2,120 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
+  <script>if("scrollRestoration"in history)history.scrollRestoration="manual";</script>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Mon agenda — Serenis</title>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
   <link rel="manifest" href="/manifest.json">
   <link rel="stylesheet" href="/css/style.css">
   <style>
-    /* ── Stats cards ─────────────────────────────────── */
-    .agenda-stats {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 14px;
-      margin-bottom: 28px;
-    }
-    @media(max-width:700px){ .agenda-stats { grid-template-columns: repeat(2,1fr); } }
-    .stat-card-agenda {
-      background: #fff;
-      border-radius: 14px;
-      padding: 20px;
-      border: 1px solid #e8e0d6;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-    }
-    .stat-card-agenda .stat-val {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 2.2rem;
-      font-weight: 600;
-      color: #1A1A16;
-      line-height: 1;
-    }
-    .stat-card-agenda .stat-lbl {
-      font-size: 0.75rem;
-      color: #888;
-      margin-top: 4px;
-      font-weight: 500;
-    }
-    .stat-icon {
-      width: 44px; height: 44px;
-      border-radius: 50%;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 1.2rem;
-      flex-shrink: 0;
-    }
+    /* ── Stats ────────────────────────────────────────── */
+    .agenda-stats { display:grid; grid-template-columns:repeat(6,1fr); gap:10px; margin-bottom:24px; }
+    @media(max-width:1100px){ .agenda-stats { grid-template-columns:repeat(3,1fr); } }
+    @media(max-width:600px){ .agenda-stats { grid-template-columns:repeat(2,1fr); } }
+    .stat-card-agenda { background:#fff; border-radius:12px; padding:16px 14px; border:1px solid #e8e0d6; display:flex; align-items:center; gap:10px; }
+    .stat-card-agenda.urgent { border-color:#ffe082; background:#fffdf5; }
+    .stat-card-agenda .stat-val { font-family:'Cormorant Garamond',serif; font-size:1.9rem; font-weight:600; color:#1A1A16; line-height:1; }
+    .stat-card-agenda .stat-lbl { font-size:0.71rem; color:#888; margin-top:3px; font-weight:500; line-height:1.3; }
+    .stat-icon { width:38px; height:38px; border-radius:50%; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
 
-    /* ── Tabs ────────────────────────────────────────── */
-    .agenda-tabs {
-      display: flex; gap: 6px; margin-bottom: 24px; flex-wrap: wrap;
-    }
-    .agenda-tab {
-      padding: 9px 20px; border-radius: 50px;
-      border: 2px solid #D4E4D8;
-      background: #FDFCF8; color: #333;
-      font-family: 'DM Sans', sans-serif; font-size: 0.88rem; font-weight: 600;
-      cursor: pointer; transition: 0.18s;
-    }
-    .agenda-tab.active { background: #3D5A47; color: #fff; border-color: #3D5A47; }
-    .agenda-tab:hover:not(.active) { border-color: #3D5A47; color: #3D5A47; }
-    .agenda-panel { display: none; }
-    .agenda-panel.active { display: block; }
+    /* ── Dashboard layout ─────────────────────────────── */
+    .dash-main-grid { display:grid; grid-template-columns:1fr 360px; gap:20px; align-items:start; margin-bottom:28px; }
+    @media(max-width:960px){ .dash-main-grid { grid-template-columns:1fr; } }
+    .dash-cal-col { display:flex; flex-direction:column; gap:16px; min-width:0; }
+    .dash-sidebar { display:flex; flex-direction:column; gap:14px; position:sticky; top:16px; }
+    @media(max-width:960px){ .dash-sidebar { position:static; } }
 
-    /* ── Visit cards ─────────────────────────────────── */
-    .visit-card {
-      background: #fff;
-      border: 1px solid #e8e0d6;
-      border-radius: 14px;
-      padding: 18px 20px;
-      transition: 0.18s;
-    }
-    .visit-card:hover { border-color: #c8ddd0; box-shadow: 0 4px 16px rgba(0,0,0,0.06); }
-    .visit-card-header {
-      display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; margin-bottom: 12px;
-    }
-    .visit-avatar {
-      width: 40px; height: 40px; border-radius: 50%;
-      background: linear-gradient(135deg, #3D5A47, #5C7A65);
-      color: #fff; font-weight: 700; font-size: 0.9rem;
-      display: flex; align-items: center; justify-content: center;
-      flex-shrink: 0;
-    }
-    .visit-info { flex: 1; }
-    .visit-name { font-weight: 700; font-size: 0.95rem; color: #1A1A16; }
-    .visit-meta { font-size: 0.78rem; color: #888; margin-top: 2px; }
-    .visit-details { display: flex; flex-direction: column; gap: 6px; margin-bottom: 14px; }
-    .visit-detail-row {
-      display: flex; align-items: center; gap: 8px;
-      font-size: 0.84rem; color: #555;
-    }
-    .visit-detail-icon { font-size: 0.9rem; flex-shrink: 0; opacity: 0.7; }
-    .visit-actions { display: flex; gap: 8px; }
-    .btn-confirm {
-      flex: 1; padding: 8px 14px; border-radius: 8px;
-      background: #3D5A47; color: #fff; border: none;
-      font-family: 'DM Sans', sans-serif; font-size: 0.83rem; font-weight: 600;
-      cursor: pointer; transition: 0.15s;
-    }
-    .btn-confirm:hover { background: #2a4030; }
-    .btn-refuse {
-      flex: 1; padding: 8px 14px; border-radius: 8px;
-      background: #fff; color: #e74c3c; border: 1.5px solid #ffd5d5;
-      font-family: 'DM Sans', sans-serif; font-size: 0.83rem; font-weight: 600;
-      cursor: pointer; transition: 0.15s;
-    }
-    .btn-refuse:hover { background: #fdf2f2; border-color: #e74c3c; }
-    .btn-cancel-sm { padding: 6px 12px; border-radius: 8px; background: #fff; color: #888; border: 1px solid #e0d8ce; font-family: 'DM Sans', sans-serif; font-size: 0.8rem; font-weight: 500; cursor: pointer; transition: 0.15s; }
-    .btn-cancel-sm:hover { border-color: #e74c3c; color: #e74c3c; background: #fdf2f2; }
-    .btn-sms-reminder {
-      padding: 7px 13px; border-radius: 8px;
-      background: #f0f5f1; color: #3D5A47; border: 1.5px solid #c8ddd0;
-      font-family: 'DM Sans', sans-serif; font-size: 0.81rem; font-weight: 600;
-      cursor: pointer; transition: 0.15s; display: inline-flex; align-items: center; gap: 5px;
-    }
-    .btn-sms-reminder:hover { background: #3D5A47; color: #fff; border-color: #3D5A47; }
-    .btn-sms-reminder:disabled { opacity: 0.5; cursor: not-allowed; }
-    .btn-sms-reminder.sent { background: #e8f5e9; color: #2e7d32; border-color: #c8e6c9; cursor: default; }
-    .phone-link { color: #3D5A47; text-decoration: none; font-weight: 600; }
-    .phone-link:hover { text-decoration: underline; }
-    .reminder-sent-tag { font-size: 0.71rem; color: #2e7d32; background: #e8f5e9; padding: 2px 8px; border-radius: 10px; font-weight: 600; }
-    .visit-notes-wrap { margin-top: 10px; }
-    .visit-notes-input { width: 100%; border: 1px solid #e0d8ce; border-radius: 8px; padding: 8px 12px; font-family: 'DM Sans', sans-serif; font-size: 0.82rem; resize: none; outline: none; color: #333; line-height: 1.5; background: #fafaf8; }
-    .visit-notes-input:focus { border-color: #3D5A47; background: #fff; }
-    .visit-notes-saved { font-size: 0.73rem; color: #3D5A47; margin-top: 3px; display: none; }
+    /* ── Sidebar sections ─────────────────────────────── */
+    .sidebar-section { background:#fff; border:1px solid #e8e0d6; border-radius:14px; overflow:hidden; }
+    .sidebar-section-title { padding:13px 16px; font-size:0.79rem; font-weight:700; color:#666; text-transform:uppercase; letter-spacing:0.05em; border-bottom:1px solid #f0ede8; display:flex; align-items:center; justify-content:space-between; gap:8px; }
+    .urgent-title { background:#fff8e1; color:#9a5500; border-bottom:2px solid #ffe082; }
+    .count-chip { display:inline-flex; align-items:center; justify-content:center; background:#e74c3c; color:#fff; font-size:10px; font-weight:700; border-radius:50%; min-width:20px; height:20px; padding:0 4px; }
+    .sidebar-body { padding:12px; display:flex; flex-direction:column; gap:10px; max-height:340px; overflow-y:auto; }
+    .sidebar-body.no-max { max-height:none; }
 
-    /* Status badges */
-    .vbadge {
-      display: inline-flex; align-items: center; gap: 5px;
-      padding: 3px 10px; border-radius: 20px;
-      font-size: 0.72rem; font-weight: 700; letter-spacing: 0.04em;
-      text-transform: uppercase;
-    }
+    /* ── Compact visit cards (sidebar) ───────────────── */
+    .visit-compact { background:#fafaf8; border:1px solid #e8e0d6; border-radius:10px; padding:12px 14px; }
+    .visit-compact.pending { background:#fffdf8; border-color:#f57f17; border-left:3px solid #f57f17; }
+    .vc-top { display:flex; align-items:center; gap:10px; margin-bottom:8px; }
+    .vc-avatar { width:32px; height:32px; border-radius:50%; background:linear-gradient(135deg,#3D5A47,#5C7A65); color:#fff; font-size:0.75rem; font-weight:700; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+    .vc-name { font-size:0.88rem; font-weight:700; color:#1A1A16; }
+    .vc-when { font-size:0.75rem; color:#888; }
+    .vc-actions { display:flex; gap:6px; }
+    .vc-confirm { flex:1; padding:7px 10px; border-radius:7px; background:#3D5A47; color:#fff; border:none; font-family:'DM Sans',sans-serif; font-size:0.78rem; font-weight:600; cursor:pointer; }
+    .vc-confirm:hover { background:#2a4030; }
+    .vc-refuse { flex:1; padding:7px 10px; border-radius:7px; background:#fff; color:#c0392b; border:1.5px solid #ffd5d5; font-family:'DM Sans',sans-serif; font-size:0.78rem; font-weight:600; cursor:pointer; }
+    .vc-refuse:hover { background:#fdf2f2; }
+    .vc-cancel { padding:6px 10px; border-radius:7px; background:#f5f0e8; color:#888; border:none; font-family:'DM Sans',sans-serif; font-size:0.75rem; font-weight:500; cursor:pointer; }
+    .vc-cancel:hover { background:#e8e0d6; color:#c0392b; }
+
+    /* ── Contact item (sidebar) ──────────────────────── */
+    .contact-item { display:flex; align-items:center; gap:10px; padding:10px 12px; border-bottom:1px solid #f5f0e8; }
+    .contact-item:last-child { border-bottom:none; }
+    .contact-avatar { width:32px; height:32px; border-radius:50%; background:#e8f5e9; color:#3D5A47; font-size:0.7rem; font-weight:700; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+    .contact-avatar.call { background:#e3f2fd; color:#1565c0; }
+    .contact-info { flex:1; min-width:0; }
+    .contact-phone { font-size:0.82rem; font-weight:600; color:#1A1A16; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .contact-meta { font-size:0.71rem; color:#aaa; margin-top:1px; }
+    .contact-source { font-size:0.68rem; font-weight:700; padding:2px 6px; border-radius:4px; }
+    .contact-source.voice { background:#e3f2fd; color:#1565c0; }
+    .contact-source.sms { background:#e8f5e9; color:#2e7d32; }
+    .contact-source.manuel { background:#f3e5f5; color:#7b1fa2; }
+
+    /* ── Dispo section ────────────────────────────────── */
+    .dispo-card { background:#fff; border:1px solid #e8e0d6; border-radius:14px; padding:24px; }
+    .dispo-card h3 { margin:0 0 4px; font-size:0.95rem; font-weight:700; color:#1A1A16; }
+
+    /* ── Below sections ──────────────────────────────── */
+    .dash-below-section { margin-bottom:28px; }
+    .section-header-bar { display:flex; align-items:center; justify-content:space-between; margin-bottom:16px; flex-wrap:wrap; gap:8px; }
+    .section-title-big { font-size:1rem; font-weight:700; color:#1A1A16; }
+
+    /* ── Tabs ─────────────────────────────────────────── */
+    .agenda-tabs { display:flex; gap:6px; margin-bottom:24px; flex-wrap:wrap; }
+    .agenda-tab { padding:9px 20px; border-radius:50px; border:2px solid #D4E4D8; background:#FDFCF8; color:#333; font-family:'DM Sans',sans-serif; font-size:0.88rem; font-weight:600; cursor:pointer; transition:0.18s; display:flex; align-items:center; gap:6px; }
+    .agenda-tab.active { background:#3D5A47; color:#fff; border-color:#3D5A47; }
+    .agenda-tab:hover:not(.active) { border-color:#3D5A47; color:#3D5A47; }
+    .agenda-panel { display:none; }
+    .agenda-panel.active { display:block; }
+
+    /* ── Visit section labels ─────────────────────────── */
+    .visits-section-label { font-size:0.72rem; text-transform:uppercase; letter-spacing:0.08em; font-weight:700; margin:24px 0 10px; padding-left:2px; color:#aaa; }
+    .visits-section-label.urgent { color:#C4785A; }
+    .visits-section-label.upcoming { color:#3D5A47; }
+    .visits-section-label:first-child { margin-top:0; }
+
+    /* ── Visit cards ──────────────────────────────────── */
+    .visit-card { background:#fff; border:1px solid #e8e0d6; border-radius:14px; padding:18px 20px; transition:0.18s; }
+    .visit-card:hover { border-color:#c8ddd0; box-shadow:0 4px 16px rgba(0,0,0,0.06); }
+    .visit-card.pending-card { border-left:3px solid #f57f17; background:#fffdf8; }
+    .visit-card-header { display:flex; align-items:flex-start; justify-content:space-between; gap:12px; margin-bottom:12px; }
+    .visit-avatar { width:40px; height:40px; border-radius:50%; background:linear-gradient(135deg,#3D5A47,#5C7A65); color:#fff; font-weight:700; font-size:0.9rem; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+    .visit-info { flex:1; }
+    .visit-name { font-weight:700; font-size:0.95rem; color:#1A1A16; }
+    .visit-meta { font-size:0.78rem; color:#888; margin-top:2px; }
+    .visit-details { display:flex; flex-direction:column; gap:6px; margin-bottom:14px; }
+    .visit-detail-row { display:flex; align-items:center; gap:8px; font-size:0.84rem; color:#555; }
+    .visit-detail-icon { font-size:0.9rem; flex-shrink:0; opacity:0.7; }
+    .visit-actions { display:flex; gap:8px; }
+    .btn-confirm { flex:1; padding:8px 14px; border-radius:8px; background:#3D5A47; color:#fff; border:none; font-family:'DM Sans',sans-serif; font-size:0.83rem; font-weight:600; cursor:pointer; transition:0.15s; }
+    .btn-confirm:hover { background:#2a4030; }
+    .btn-refuse { flex:1; padding:8px 14px; border-radius:8px; background:#fff; color:#e74c3c; border:1.5px solid #ffd5d5; font-family:'DM Sans',sans-serif; font-size:0.83rem; font-weight:600; cursor:pointer; transition:0.15s; }
+    .btn-refuse:hover { background:#fdf2f2; border-color:#e74c3c; }
+    .btn-cancel-sm { padding:6px 12px; border-radius:8px; background:#fff; color:#888; border:1px solid #e0d8ce; font-family:'DM Sans',sans-serif; font-size:0.8rem; font-weight:500; cursor:pointer; transition:0.15s; }
+    .btn-cancel-sm:hover { border-color:#e74c3c; color:#e74c3c; background:#fdf2f2; }
+    .btn-sms-reminder { padding:7px 13px; border-radius:8px; background:#f0f5f1; color:#3D5A47; border:1.5px solid #c8ddd0; font-family:'DM Sans',sans-serif; font-size:0.81rem; font-weight:600; cursor:pointer; transition:0.15s; display:inline-flex; align-items:center; gap:5px; }
+    .btn-sms-reminder:hover { background:#3D5A47; color:#fff; border-color:#3D5A47; }
+    .btn-sms-reminder:disabled { opacity:0.5; cursor:not-allowed; }
+    .btn-sms-reminder.sent { background:#e8f5e9; color:#2e7d32; border-color:#c8e6c9; }
+    .phone-link { color:#3D5A47; text-decoration:none; font-weight:600; }
+    .phone-link:hover { text-decoration:underline; }
+    .reminder-sent-tag { font-size:0.71rem; color:#2e7d32; background:#e8f5e9; padding:2px 8px; border-radius:10px; font-weight:600; }
+    .visit-notes-wrap { margin-top:10px; }
+    .visit-notes-input { width:100%; border:1px solid #e0d8ce; border-radius:8px; padding:8px 12px; font-family:'DM Sans',sans-serif; font-size:0.82rem; resize:none; outline:none; color:#333; line-height:1.5; background:#fafaf8; }
+    .visit-notes-input:focus { border-color:#3D5A47; background:#fff; }
+    .visit-notes-saved { font-size:0.73rem; color:#3D5A47; margin-top:3px; display:none; }
+    .vbadge { display:inline-flex; align-items:center; gap:5px; padding:3px 10px; border-radius:20px; font-size:0.72rem; font-weight:700; letter-spacing:0.04em; text-transform:uppercase; }
     .vbadge::before { content:''; width:6px; height:6px; border-radius:50%; display:inline-block; }
     .vbadge-confirmed { background:#e8f5e9; color:#2e7d32; }
     .vbadge-confirmed::before { background:#2e7d32; }
@@ -139,167 +123,198 @@
     .vbadge-pending::before { background:#f57f17; }
     .vbadge-cancelled { background:#f5f5f5; color:#888; }
     .vbadge-cancelled::before { background:#bbb; }
+    .visits-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(300px,1fr)); gap:14px; }
 
-    /* Filter bar */
-    .filter-bar {
-      display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-bottom: 18px;
-    }
-    .filter-search {
-      flex: 1; min-width: 160px; padding: 9px 12px 9px 36px;
-      border: 1.5px solid #e8e0d6; border-radius: 8px;
-      font-family: 'DM Sans', sans-serif; font-size: 0.87rem;
-      background: #fff; position: relative;
-    }
-    .search-wrap { position: relative; flex: 1; min-width: 160px; }
-    .search-icon {
-      position: absolute; left: 10px; top: 50%; transform: translateY(-50%);
-      pointer-events: none; color: #aaa;
-    }
-    .filter-select {
-      padding: 9px 12px; border: 1.5px solid #e8e0d6; border-radius: 8px;
-      font-family: 'DM Sans', sans-serif; font-size: 0.87rem; background: #fff; cursor: pointer;
-    }
+    /* ── Calendar ─────────────────────────────────────── */
+    .calendar-layout { display:grid; grid-template-columns:1fr 300px; gap:20px; align-items:start; }
+    @media(max-width:800px){ .calendar-layout { grid-template-columns:1fr; } }
+    .calendar-card { background:#fff; border-radius:14px; border:1px solid #e8e0d6; padding:24px; }
+    .cal-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:20px; }
+    .cal-month { font-family:'Cormorant Garamond',serif; font-size:1.5rem; font-weight:600; color:#1A1A16; }
+    .cal-nav { width:34px; height:34px; border-radius:8px; border:1.5px solid #e8e0d6; background:#fff; cursor:pointer; transition:0.15s; display:flex; align-items:center; justify-content:center; font-size:1rem; color:#555; }
+    .cal-nav:hover { border-color:#3D5A47; color:#3D5A47; background:#f0f5f1; }
+    .cal-grid { display:grid; grid-template-columns:repeat(7,1fr); gap:4px; }
+    .cal-day-label { text-align:center; font-size:0.7rem; font-weight:700; color:#aaa; text-transform:uppercase; letter-spacing:0.05em; padding-bottom:8px; }
+    .cal-cell { aspect-ratio:1; border-radius:8px; border:1.5px solid transparent; display:flex; flex-direction:column; align-items:center; justify-content:center; cursor:pointer; transition:0.15s; position:relative; font-size:0.85rem; font-weight:500; }
+    .cal-cell:hover:not(.cal-empty) { background:#f0f5f1; border-color:#c8ddd0; }
+    .cal-cell.cal-today { border-color:#3D5A47; color:#3D5A47; font-weight:700; }
+    .cal-cell.cal-selected { background:#3D5A47; color:#fff; border-color:#3D5A47; }
+    .cal-cell.cal-empty { cursor:default; }
+    .cal-dots { display:flex; gap:2px; position:absolute; bottom:4px; left:50%; transform:translateX(-50%); }
+    .cal-dot { width:4px; height:4px; border-radius:50%; }
+    .cal-dot-confirmed { background:#2e7d32; }
+    .cal-dot-pending { background:#f57f17; }
+    .day-detail { background:#fff; border-radius:14px; border:1px solid #e8e0d6; padding:20px; }
+    .day-detail-title { font-size:0.78rem; font-weight:700; text-transform:uppercase; letter-spacing:0.07em; color:#888; margin-bottom:14px; }
+    .day-slot { display:flex; align-items:center; gap:12px; padding:10px 0; border-bottom:1px solid #f0ebe4; }
+    .day-slot:last-child { border-bottom:none; }
+    .day-slot-dot { width:10px; height:10px; border-radius:50%; flex-shrink:0; }
+    .day-slot-time { font-weight:700; font-size:0.88rem; min-width:44px; }
+    .day-slot-info { flex:1; }
+    .day-slot-name { font-size:0.87rem; font-weight:600; color:#1A1A16; }
+    .day-slot-sub { font-size:0.75rem; color:#888; }
 
-    /* Visits grid */
-    .visits-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 14px; }
+    /* ── Availability ─────────────────────────────────── */
+    .avail-month-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:20px; }
+    .avail-month-label { font-family:'Cormorant Garamond',serif; font-size:1.3rem; font-weight:600; color:#1A1A16; }
+    .avail-slot-list { display:flex; flex-direction:column; gap:10px; margin-bottom:20px; }
+    .avail-slot-item { display:flex; align-items:center; gap:14px; padding:14px 16px; background:#fff; border:1px solid #e8e0d6; border-radius:10px; overflow:hidden; }
+    .avail-slot-date { font-weight:600; font-size:0.9rem; color:#1A1A16; flex:1; }
+    .avail-slot-time { font-size:0.84rem; color:#666; background:#f5f0e8; padding:4px 10px; border-radius:6px; }
+    .avail-slot-del { width:30px; height:30px; border-radius:6px; border:1.5px solid #ffd5d5; background:#fff0f0; color:#e74c3c; display:flex; align-items:center; justify-content:center; cursor:pointer; flex-shrink:0; transition:0.15s; }
+    .avail-slot-del:hover { background:#e74c3c; color:#fff; border-color:#e74c3c; }
+    .avail-slot-del svg { width:14px; height:14px; stroke:currentColor; pointer-events:none; }
+    @keyframes slotOut { from { opacity:1; transform:translateX(0); max-height:60px; } to { opacity:0; transform:translateX(12px); max-height:0; padding:0; margin:0; } }
+    .avail-slot-item.removing { animation:slotOut 0.22s ease forwards; }
+    .avail-add-form { background:#fff; border:1.5px dashed #D4E4D8; border-radius:12px; padding:18px; margin-top:16px; }
+    .avail-add-form h4 { font-size:0.88rem; font-weight:600; color:#1A1A16; margin-bottom:14px; }
+    .avail-form-row { display:flex; gap:10px; align-items:center; flex-wrap:wrap; margin-bottom:10px; }
+    .avail-input { border:1.5px solid #e8e0d6; border-radius:8px; padding:8px 10px; font-size:0.87rem; font-family:'DM Sans',sans-serif; background:#fff; color:#1A1A16; }
+    .avail-input:focus { outline:none; border-color:#3D5A47; }
+    .avail-input[type=date] { flex:1; min-width:140px; }
+    .avail-input[type=time] { width:110px; }
 
-    /* ── Calendar ────────────────────────────────────── */
-    .calendar-layout { display: grid; grid-template-columns: 1fr 320px; gap: 20px; align-items: start; }
-    @media(max-width:800px){ .calendar-layout { grid-template-columns: 1fr; } }
-    .calendar-card { background: #fff; border-radius: 14px; border: 1px solid #e8e0d6; padding: 24px; }
-    .cal-header {
-      display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px;
-    }
-    .cal-month { font-family: 'Cormorant Garamond', serif; font-size: 1.5rem; font-weight: 600; color: #1A1A16; }
-    .cal-nav {
-      width: 34px; height: 34px; border-radius: 8px; border: 1.5px solid #e8e0d6;
-      background: #fff; cursor: pointer; transition: 0.15s;
-      display: flex; align-items: center; justify-content: center; font-size: 1rem; color: #555;
-    }
-    .cal-nav:hover { border-color: #3D5A47; color: #3D5A47; background: #f0f5f1; }
-    .cal-grid { display: grid; grid-template-columns: repeat(7,1fr); gap: 4px; }
-    .cal-day-label {
-      text-align: center; font-size: 0.7rem; font-weight: 700;
-      color: #aaa; text-transform: uppercase; letter-spacing: 0.05em; padding-bottom: 8px;
-    }
-    .cal-cell {
-      aspect-ratio: 1; border-radius: 8px; border: 1.5px solid transparent;
-      display: flex; flex-direction: column; align-items: center; justify-content: center;
-      cursor: pointer; transition: 0.15s; position: relative; font-size: 0.85rem; font-weight: 500;
-    }
-    .cal-cell:hover:not(.cal-empty) { background: #f0f5f1; border-color: #c8ddd0; }
-    .cal-cell.cal-today { border-color: #3D5A47; color: #3D5A47; font-weight: 700; }
-    .cal-cell.cal-selected { background: #3D5A47; color: #fff; border-color: #3D5A47; }
-    .cal-cell.cal-empty { cursor: default; }
-    .cal-dots {
-      display: flex; gap: 2px; position: absolute; bottom: 4px; left: 50%; transform: translateX(-50%);
-    }
-    .cal-dot { width: 4px; height: 4px; border-radius: 50%; }
-    .cal-dot-confirmed { background: #2e7d32; }
-    .cal-dot-pending { background: #f57f17; }
+    /* ── Notifications ────────────────────────────────── */
+    .notif-group { margin-bottom:28px; }
+    .notif-group-title { font-size:.72rem; text-transform:uppercase; letter-spacing:.07em; color:#aaa; font-weight:600; margin-bottom:10px; }
+    .notif-card { background:#fff; border:1px solid #e8e0d6; border-radius:12px; padding:14px 18px; margin-bottom:8px; display:flex; align-items:flex-start; gap:14px; transition:box-shadow .15s; }
+    .notif-card:hover { box-shadow:0 3px 14px rgba(0,0,0,.06); }
+    .notif-card.unread { border-left:3px solid #C4785A; background:#fffcf9; }
+    .notif-icon-n { width:38px; height:38px; border-radius:50%; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+    .ni-visit { background:#e8f4ec; }
+    .ni-offer { background:#fef3c7; }
+    .ni-contact { background:#dbeafe; }
+    .ni-system { background:#ede9fe; }
+    .notif-body { flex:1; min-width:0; }
+    .notif-title-n { font-weight:600; font-size:.88rem; color:#1C1C1A; margin-bottom:2px; }
+    .notif-sub-n { font-size:.8rem; color:#888; }
+    .notif-time { font-size:.72rem; color:#bbb; flex-shrink:0; margin-top:2px; white-space:nowrap; }
+    .unread-dot { display:inline-block; width:7px; height:7px; border-radius:50%; background:#C4785A; margin-left:5px; vertical-align:middle; }
+    .notif-pills { display:flex; gap:6px; margin-bottom:20px; flex-wrap:wrap; }
+    .notif-pill { padding:6px 14px; border-radius:50px; border:1.5px solid #e8e0d6; background:#fff; color:#666; font-size:.8rem; font-weight:600; cursor:pointer; font-family:'DM Sans',sans-serif; transition:.15s; }
+    .notif-pill.active { background:#3D5A47; color:#fff; border-color:#3D5A47; }
+    .notif-pill:hover:not(.active) { border-color:#3D5A47; color:#3D5A47; }
+    .notif-badge { display:inline-flex; align-items:center; justify-content:center; background:#C4603A; color:#fff; font-size:10px; font-weight:700; border-radius:50%; width:16px; height:16px; flex-shrink:0; }
 
-    /* Day detail panel */
-    .day-detail { background: #fff; border-radius: 14px; border: 1px solid #e8e0d6; padding: 20px; }
-    .day-detail-title { font-family: 'DM Sans', sans-serif; font-size: 0.78rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em; color: #888; margin-bottom: 14px; }
-    .day-slot {
-      display: flex; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px solid #f0ebe4;
-    }
-    .day-slot:last-child { border-bottom: none; }
-    .day-slot-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
-    .day-slot-time { font-weight: 700; font-size: 0.88rem; min-width: 44px; }
-    .day-slot-info { flex: 1; }
-    .day-slot-name { font-size: 0.87rem; font-weight: 600; color: #1A1A16; }
-    .day-slot-sub { font-size: 0.75rem; color: #888; }
+    /* ── Contacts / Acquéreurs ────────────────────────── */
+    .contacts-section { background:#fff; border-radius:16px; border:1px solid #e8e0d6; overflow:hidden; margin-bottom:24px; }
+    .panel-card-header { padding:16px 20px; border-bottom:1px solid #f0ede8; display:flex; justify-content:space-between; align-items:center; }
+    .panel-card-title { font-size:0.88rem; font-weight:700; color:#1a1a1a; }
+    .contacts-table { width:100%; border-collapse:collapse; }
+    .contacts-table thead th { padding:11px 16px; font-size:0.7rem; text-transform:uppercase; letter-spacing:0.08em; color:#aaa; font-weight:700; text-align:left; border-bottom:1px solid #f0ede8; background:#fafaf8; }
+    .contacts-table tbody tr { border-bottom:1px solid #f5f0e8; transition:0.12s; }
+    .contacts-table tbody tr:last-child { border-bottom:none; }
+    .contacts-table tbody tr:hover { background:#fafaf9; }
+    .contacts-table td { padding:12px 16px; font-size:0.85rem; vertical-align:middle; }
+    .contact-name { font-weight:600; color:#1a1a1a; }
+    .contact-phone { font-size:0.78rem; color:#888; margin-top:1px; }
+    .contact-source { font-size:0.72rem; padding:2px 8px; border-radius:20px; font-weight:600; }
+    .source-serenis { background:#f0f5f1; color:#3D5A47; }
+    .source-manuel { background:#f5f0e8; color:#C4785A; }
+    .contact-status-select { padding:3px 8px; border-radius:6px; border:1.5px solid #e8e0d6; font-size:0.75rem; font-family:'DM Sans',sans-serif; cursor:pointer; background:#fff; color:#333; font-weight:600; }
+    .contact-status-select.status-new { border-color:#3D5A47; color:#3D5A47; }
+    .contact-status-select.status-qualified { border-color:#4cb84c; color:#2e7d32; }
+    .contact-status-select.status-visit_planned { border-color:#f5a818; color:#e65100; }
+    .contact-status-select.status-not_retained { border-color:#ccc; color:#999; }
+    .contact-actions { display:flex; gap:6px; }
+    .btn-icon { width:30px; height:30px; border-radius:8px; border:1.5px solid #e8e0d6; background:#fff; display:flex; align-items:center; justify-content:center; cursor:pointer; transition:0.15s; }
+    .btn-icon:hover { border-color:#3D5A47; background:#f0f5f1; }
+    .btn-icon.danger:hover { border-color:#c62828; background:#fce4ec; }
 
-    /* ── Availability editor ─────────────────────────── */
-    .week-schedule { display: flex; flex-direction: column; gap: 0; }
-    .day-row { display:flex;align-items:flex-start;gap:16px;padding:16px 0;border-bottom:1px solid #f0ebe4; }
-    .day-row:last-child { border-bottom:none; }
-    .day-label { width:100px;flex-shrink:0;display:flex;align-items:center;gap:10px;padding-top:4px; }
-    .day-name { font-weight:600;font-size:0.9rem;color:#1A1A16; }
-    .day-row.day-off .day-name { color:#bbb; }
-    .toggle-wrap { position:relative;flex-shrink:0; }
-    .toggle-input { position:absolute;opacity:0;width:0;height:0; }
-    .toggle-track {
-      display:block;width:40px;height:22px;border-radius:11px;
-      background:#e0d8cc;cursor:pointer;transition:0.2s;position:relative;
-    }
-    .toggle-track::after {
-      content:'';position:absolute;top:3px;left:3px;
-      width:16px;height:16px;border-radius:50%;background:#bbb;transition:0.2s;
-    }
-    .toggle-input:checked + .toggle-track { background:#3D5A47; }
-    .toggle-input:checked + .toggle-track::after { transform:translateX(18px);background:#fff; }
-    .day-ranges { flex:1;display:flex;flex-direction:column;gap:8px; }
-    .day-off-label { color:#bbb;font-size:0.85rem;padding-top:4px; }
-    .range-row { display:flex;align-items:center;gap:8px; }
-    .range-time {
-      border:1.5px solid #D4E4D8;border-radius:8px;padding:7px 10px;
-      font-size:0.87rem;font-family:'DM Sans',sans-serif;background:#fff;color:#1A1A16;width:96px;
-    }
-    .range-sep { color:#aaa;font-size:0.85rem; }
-    .range-delete {
-      width:28px;height:28px;border-radius:50%;background:#fff0f0;color:#e74c3c;
-      border:1.5px solid #ffd5d5;font-size:0.75rem;font-weight:700;
-      display:flex;align-items:center;justify-content:center;cursor:pointer;transition:0.15s;flex-shrink:0;
-    }
-    .range-delete:hover { background:#e74c3c;color:#fff;border-color:#e74c3c; }
-    .add-range-btn {
-      font-size:0.8rem;color:#3D5A47;font-weight:600;cursor:pointer;
-      background:none;border:1.5px dashed #D4E4D8;border-radius:8px;padding:6px 12px;
-      transition:0.15s;width:fit-content;font-family:'DM Sans',sans-serif;
-    }
-    .add-range-btn:hover { background:#f0f5f1;border-color:#3D5A47; }
+    /* ── Mail templates ───────────────────────────────── */
+    .mc-section { background:#fff; border-radius:16px; border:1px solid #e8e0d6; overflow:hidden; margin-bottom:24px; }
+    .mc-section-header { padding:20px 24px 16px; border-bottom:1px solid #f0ede8; }
+    .mc-section-title { font-size:1rem; font-weight:700; color:#1a1a1a; margin:0 0 4px; }
+    .mc-section-sub { font-size:0.78rem; color:#999; line-height:1.5; }
+    .mc-tabs { display:flex; flex-wrap:wrap; gap:6px; padding:16px 24px; border-bottom:1px solid #f0ede8; }
+    .mc-tab { padding:5px 14px; border-radius:20px; border:1.5px solid #e8e0d6; background:#fff; font-family:'DM Sans',sans-serif; font-size:0.75rem; font-weight:600; color:#888; cursor:pointer; transition:0.15s; }
+    .mc-tab:hover { border-color:#3D5A47; color:#3D5A47; }
+    .mc-tab.active { background:#3D5A47; border-color:#3D5A47; color:#fff; }
+    .mc-cards { padding:16px 24px; display:flex; flex-direction:column; gap:10px; }
+    .mc-card { border:1.5px solid #e8e0d6; border-radius:12px; overflow:hidden; transition:border-color 0.2s; }
+    .mc-card.open { border-color:#3D5A47; }
+    .mc-card-hdr { display:flex; align-items:center; gap:12px; padding:13px 16px; cursor:pointer; background:#fafaf8; transition:background 0.15s; user-select:none; }
+    .mc-card.open .mc-card-hdr { background:#3D5A47; }
+    .mc-card-step { width:22px; height:22px; border-radius:50%; background:#e8e0d6; color:#888; font-size:0.65rem; font-weight:700; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+    .mc-card.open .mc-card-step { background:rgba(255,255,255,0.2); color:#fff; }
+    .mc-card-label { flex:1; font-size:0.85rem; font-weight:600; color:#333; }
+    .mc-card.open .mc-card-label { color:#fff; }
+    .mc-card-arr { font-size:1rem; color:#bbb; transition:transform 0.2s; }
+    .mc-card.open .mc-card-arr { transform:rotate(90deg); color:rgba(255,255,255,0.7); }
+    .mc-card-body { display:none; padding:18px 18px 16px; }
+    .mc-card.open .mc-card-body { display:block; }
+    .mc-objet { font-size:0.72rem; font-weight:700; text-transform:uppercase; letter-spacing:0.07em; color:#aaa; margin-bottom:4px; }
+    .mc-objet-val { font-size:0.82rem; font-weight:600; color:#3D5A47; margin-bottom:14px; }
+    .mc-mail-text { font-size:0.82rem; line-height:1.9; color:#444; white-space:pre-wrap; background:#f8f5f0; border-radius:10px; padding:14px 16px; margin-bottom:12px; }
+    .mc-copy-btn { display:inline-flex; align-items:center; gap:6px; padding:7px 14px; background:#3D5A47; color:#fff; border:none; border-radius:8px; font-family:'DM Sans',sans-serif; font-size:0.78rem; font-weight:600; cursor:pointer; transition:0.15s; }
+    .mc-copy-btn:hover { background:#2a4030; }
+    .mc-copy-btn.copied { background:#4cb84c; }
 
-    /* Empty state */
-    .empty-state {
-      text-align: center; padding: 48px 24px; color: #bbb;
-      border: 2px dashed #e8e0d6; border-radius: 14px;
-    }
-    .empty-state-icon { margin-bottom: 12px; display: flex; justify-content: center; }
-    .empty-state-icon svg { width: 36px; height: 36px; stroke: #ccc; }
-    .empty-state p { font-size: 0.9rem; line-height: 1.5; }
+    /* ── Modals ───────────────────────────────────────── */
+    .modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,0.45); z-index:500; display:flex; align-items:center; justify-content:center; padding:20px; opacity:0; pointer-events:none; transition:opacity 0.2s; }
+    .modal-overlay.open { opacity:1; pointer-events:all; }
+    .modal { background:#fff; border-radius:20px; padding:28px 32px; width:100%; max-width:480px; transform:translateY(12px); transition:transform 0.2s; max-height:90vh; overflow-y:auto; }
+    .modal-overlay.open .modal { transform:translateY(0); }
+    .modal-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:24px; }
+    .modal-title { font-size:1.1rem; font-weight:700; color:#1a1a1a; }
+    .modal-close { width:32px; height:32px; border-radius:50%; border:none; background:#f5f0e8; cursor:pointer; font-size:1rem; display:flex; align-items:center; justify-content:center; color:#666; }
+    .modal-close:hover { background:#e8e0d6; }
+    .modal-field { margin-bottom:16px; }
+    .modal-field label { display:block; font-size:0.8rem; font-weight:600; color:#555; margin-bottom:6px; }
+    .modal-field input, .modal-field select, .modal-field textarea { width:100%; padding:10px 14px; border:1.5px solid #e8e0d6; border-radius:10px; font-family:'DM Sans',sans-serif; font-size:0.9rem; color:#222; background:#fff; transition:0.15s; }
+    .modal-field input:focus, .modal-field select:focus, .modal-field textarea:focus { outline:none; border-color:#3D5A47; box-shadow:0 0 0 3px rgba(61,90,71,0.1); }
+    .modal-field textarea { resize:vertical; min-height:80px; }
+    .modal-row { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+    .modal-actions { display:flex; gap:10px; margin-top:24px; }
+    .btn-primary-modal { flex:1; padding:11px; background:#3D5A47; color:#fff; border:none; border-radius:10px; font-family:'DM Sans',sans-serif; font-size:0.9rem; font-weight:600; cursor:pointer; transition:0.15s; }
+    .btn-primary-modal:hover { background:#2a4030; }
+    .btn-secondary-modal { padding:11px 20px; background:#f5f0e8; color:#666; border:none; border-radius:10px; font-family:'DM Sans',sans-serif; font-size:0.9rem; font-weight:600; cursor:pointer; }
+    .btn-secondary-modal:hover { background:#e8e0d6; }
 
-    /* ── Availability month ──────────────────────────── */
-    .avail-month-header {
-      display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px;
-    }
-    .avail-month-label { font-family: 'Cormorant Garamond', serif; font-size: 1.3rem; font-weight: 600; color: #1A1A16; }
-    .avail-slot-list { display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; }
-    .avail-slot-item {
-      display: flex; align-items: center; gap: 14px; padding: 14px 16px;
-      background: #fff; border: 1px solid #e8e0d6; border-radius: 10px;
-    }
-    .avail-slot-date { font-weight: 600; font-size: 0.9rem; color: #1A1A16; flex: 1; }
-    .avail-slot-time { font-size: 0.84rem; color: #666; background: #f5f0e8; padding: 4px 10px; border-radius: 6px; }
-    .avail-slot-del {
-      width: 30px; height: 30px; border-radius: 6px; border: 1.5px solid #ffd5d5;
-      background: #fff0f0; color: #e74c3c; display: flex; align-items: center; justify-content: center;
-      cursor: pointer; flex-shrink: 0; transition: background 0.15s, border-color 0.15s, transform 0.1s;
-    }
-    .avail-slot-del:hover { background: #e74c3c; color: #fff; border-color: #e74c3c; }
-    .avail-slot-del:active { transform: scale(0.88); }
-    .avail-slot-del svg { width: 14px; height: 14px; stroke: currentColor; pointer-events: none; }
-    @keyframes slotOut {
-      from { opacity: 1; transform: translateX(0); max-height: 60px; }
-      to   { opacity: 0; transform: translateX(12px); max-height: 0; padding: 0; margin: 0; }
-    }
-    .avail-slot-item.removing {
-      overflow: hidden;
-      animation: slotOut 0.22s ease forwards;
-    }
-    .avail-add-form {
-      background: #fff; border: 1.5px dashed #D4E4D8; border-radius: 12px; padding: 18px;
-    }
-    .avail-add-form h4 { font-size: 0.88rem; font-weight: 600; color: #1A1A16; margin-bottom: 14px; }
-    .avail-form-row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-bottom: 10px; }
-    .avail-input {
-      border: 1.5px solid #e8e0d6; border-radius: 8px; padding: 8px 10px;
-      font-size: 0.87rem; font-family: 'DM Sans', sans-serif; background: #fff; color: #1A1A16;
-    }
-    .avail-input:focus { outline: none; border-color: #3D5A47; }
-    .avail-input[type=date] { flex: 1; min-width: 140px; }
-    .avail-input[type=time] { width: 110px; }
+    /* ── Buttons ──────────────────────────────────────── */
+    .add-btn { display:inline-flex; align-items:center; gap:6px; padding:8px 16px; background:#3D5A47; color:#fff; border:none; border-radius:8px; font-family:'DM Sans',sans-serif; font-size:0.83rem; font-weight:600; cursor:pointer; transition:0.15s; }
+    .add-btn:hover { background:#2a4030; }
+    .add-btn-sec { display:inline-flex; align-items:center; gap:6px; padding:8px 16px; background:#fff; color:#3D5A47; border:1.5px solid #3D5A47; border-radius:8px; font-family:'DM Sans',sans-serif; font-size:0.83rem; font-weight:600; cursor:pointer; transition:0.15s; }
+    .add-btn-sec:hover { background:#f0f5f1; }
+    .btn-primary { padding:10px 22px; background:#3D5A47; color:#fff; border:none; border-radius:10px; font-family:'DM Sans',sans-serif; font-size:0.88rem; font-weight:600; cursor:pointer; transition:0.15s; }
+    .btn-primary:hover { background:#2a4030; }
+
+    /* ── Empty states ─────────────────────────────────── */
+    .empty-state { text-align:center; padding:40px 24px; color:#bbb; border:2px dashed #e8e0d6; border-radius:14px; }
+    .empty-state-icon { margin-bottom:12px; display:flex; justify-content:center; }
+    .empty-state p { font-size:0.9rem; line-height:1.5; }
+
+    /* ── Toast ────────────────────────────────────────── */
+    .toast { position:fixed; bottom:28px; right:28px; z-index:9999; padding:12px 20px; border-radius:10px; background:#3D5A47; color:#fff; font-size:0.88rem; font-weight:500; box-shadow:0 8px 24px rgba(0,0,0,0.18); transform:translateY(8px); opacity:0; transition:all 0.25s; pointer-events:none; }
+    .toast.show { transform:translateY(0); opacity:1; }
+    .toast.error { background:#c62828; }
+
+    /* ── Serenis number pill ──────────────────────────── */
+    .serenis-number-pill { display:inline-flex; align-items:center; gap:6px; background:#f0f5f1; border:1px solid #c8ddd0; padding:5px 12px; border-radius:20px; font-size:0.8rem; color:#3D5A47; font-weight:600; }
+
+    /* ── Serenis Connect card ─────────────────────────── */
+    .sc-card { background:#fff; border:1.5px solid #c8ddd0; border-radius:16px; padding:22px 24px; margin-bottom:20px; display:grid; grid-template-columns:1fr 1fr; gap:24px; align-items:start; }
+    @media(max-width:680px){ .sc-card { grid-template-columns:1fr; gap:16px; } }
+    .sc-num-badge { display:inline-flex; align-items:center; gap:6px; font-size:0.72rem; font-weight:700; color:#3D5A47; text-transform:uppercase; letter-spacing:0.06em; margin-bottom:10px; }
+    .sc-num-display { font-family:'Cormorant Garamond',serif; font-size:2rem; font-weight:600; color:#1A1A16; letter-spacing:0.04em; margin-bottom:12px; line-height:1; }
+    .sc-num-display.no-num { font-family:'DM Sans',sans-serif; font-size:0.9rem; color:#aaa; font-weight:400; letter-spacing:0; }
+    .sc-btn-copy { display:inline-flex; align-items:center; gap:6px; padding:8px 16px; border-radius:8px; background:#3D5A47; color:#fff; border:none; font-family:'DM Sans',sans-serif; font-size:0.82rem; font-weight:600; cursor:pointer; transition:0.15s; }
+    .sc-btn-copy:hover { background:#2a4030; }
+    .sc-btn-copy:disabled { background:#9db8a4; cursor:not-allowed; }
+    .sc-num-desc { font-size:0.78rem; color:#888; margin-top:10px; line-height:1.5; }
+    .sc-divider { width:1.5px; background:#e8e0d6; border-radius:2px; }
+    @media(max-width:680px){ .sc-divider { display:none; } }
+    .sc-accroche-label { font-size:0.72rem; font-weight:700; color:#888; text-transform:uppercase; letter-spacing:0.06em; margin-bottom:10px; }
+    .sc-accroche-box { background:#f8f6f2; border:1.5px solid #e8e0d6; border-radius:10px; padding:14px 16px; font-size:0.85rem; color:#444; line-height:1.65; margin-bottom:12px; font-style:italic; }
+    .sc-accroche-num { font-weight:700; color:#3D5A47; font-style:normal; }
+    .sc-btn-copy-phrase { display:inline-flex; align-items:center; gap:6px; padding:7px 14px; border-radius:8px; background:#fff; color:#3D5A47; border:1.5px solid #3D5A47; font-family:'DM Sans',sans-serif; font-size:0.82rem; font-weight:600; cursor:pointer; transition:0.15s; }
+    .sc-btn-copy-phrase:hover { background:#f0f5f1; }
+
+    /* ── Misc ─────────────────────────────────────────── */
+    .form-success { color:#3D5A47; font-size:0.82rem; }
+    .form-success.hidden { display:none; }
+    .page-header h1 { font-size:1.5rem; font-weight:700; color:#1A1A16; margin:0 0 4px; }
+    .page-header-sub { font-size:0.87rem; color:#888; }
   </style>
 </head>
 <body>
@@ -322,7 +337,7 @@
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg> Mon bien
       </a>
       <a href="/mon-guide-photos" class="sidebar-item">
-        📸 Guide photos
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg> Guide photos
       </a>
       <a href="/mon-agenda" class="sidebar-item active">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg> Mon agenda
@@ -330,171 +345,137 @@
       <a href="/ma-bibliotheque" class="sidebar-item">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg> Ma bibliothèque
       </a>
-      <a href="/serenis-connect" class="sidebar-item">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.27h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 9a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>Serenis Connect
-      </a>
       <a href="/mes-publications" class="sidebar-item">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.55a11 11 0 0 1 14.08 0"/><path d="M1.42 9a16 16 0 0 1 21.16 0"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><circle cx="12" cy="20" r="1"/></svg> Mes publications
       </a>
       <a href="/mes-offres" class="sidebar-item">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>Mes offres
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/></svg> Mes offres
       </a>
       <a href="/coach-ia" class="sidebar-item">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/><circle cx="9" cy="10" r="1" fill="currentColor"/><circle cx="12" cy="10" r="1" fill="currentColor"/><circle cx="15" cy="10" r="1" fill="currentColor"/></svg>Coach IA
-      </a>
-      <a href="/mes-notifications" class="sidebar-item">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>Notifications
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/><circle cx="9" cy="10" r="1" fill="currentColor"/><circle cx="12" cy="10" r="1" fill="currentColor"/><circle cx="15" cy="10" r="1" fill="currentColor"/></svg> Coach IA
       </a>
     </nav>
     <div style="position:absolute;bottom:24px;left:0;right:0;padding:0 24px;">
+      <div id="sidebarPack" style="color:rgba(212,228,216,0.7);font-size:0.75rem;margin-bottom:8px;line-height:1.4;"></div>
       <a href="/logout" style="color:rgba(212,228,216,0.5);font-size:0.8rem;">Déconnexion →</a>
     </div>
   </aside>
 
   <main class="main-content">
-    <div class="page-header">
-      <h1>Mon agenda</h1>
-      <p>Gérez vos visites et vos disponibilités hebdomadaires</p>
+
+    <!-- Header -->
+    <div class="page-header" style="margin-bottom:24px;">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:12px;">
+        <div>
+          <h1>Mon agenda</h1>
+          <div class="page-header-sub">Visites, acquéreurs et disponibilités — tout au même endroit</div>
+        </div>
+        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+          <div class="serenis-number-pill" id="serenisNumberPill" style="display:none;">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.27h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 9a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+            <span id="serenisNumberText">—</span>
+          </div>
+          <button class="add-btn-sec" onclick="openModal('addContactOverlay')">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Acquéreur
+          </button>
+          <button class="add-btn" onclick="openModal('addVisitOverlay')">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Programmer une visite
+          </button>
+        </div>
+      </div>
     </div>
 
     <!-- Stats -->
+    <!-- Stats -->
     <div class="agenda-stats">
-      <div class="stat-card-agenda">
-        <div>
-          <div class="stat-val" id="statTotal">0</div>
-          <div class="stat-lbl">Total visites</div>
-        </div>
-        <div class="stat-icon" style="background:#f0f5f1;">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#3D5A47" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-        </div>
-      </div>
-      <div class="stat-card-agenda">
-        <div>
-          <div class="stat-val" id="statPending">0</div>
-          <div class="stat-lbl">En attente</div>
-        </div>
+      <div class="stat-card-agenda urgent">
         <div class="stat-icon" style="background:#fff8e1;">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#f57f17" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#f57f17" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
         </div>
+        <div><div class="stat-val" id="statPending">0</div><div class="stat-lbl">À confirmer</div></div>
       </div>
       <div class="stat-card-agenda">
-        <div>
-          <div class="stat-val" id="statConfirmed">0</div>
-          <div class="stat-lbl">Confirmées</div>
-        </div>
         <div class="stat-icon" style="background:#e8f5e9;">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#2e7d32" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2e7d32" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
         </div>
+        <div><div class="stat-val" id="statConfirmed">0</div><div class="stat-lbl">Confirmées</div></div>
       </div>
       <div class="stat-card-agenda">
-        <div>
-          <div class="stat-val" id="statToday">0</div>
-          <div class="stat-lbl">Aujourd'hui</div>
-        </div>
         <div class="stat-icon" style="background:#e3f2fd;">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1565c0" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><line x1="12" y1="14" x2="12" y2="18"/><line x1="10" y1="16" x2="14" y2="16"/></svg>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#1565c0" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.27h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 9a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
         </div>
+        <div><div class="stat-val" id="statCalls">0</div><div class="stat-lbl">Appels reçus</div></div>
+      </div>
+      <div class="stat-card-agenda">
+        <div class="stat-icon" style="background:#f3e5f5;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#7b1fa2" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        </div>
+        <div><div class="stat-val" id="statSms">0</div><div class="stat-lbl">Contacts SMS</div></div>
+      </div>
+      <div class="stat-card-agenda">
+        <div class="stat-icon" style="background:#f0f5f1;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#3D5A47" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        </div>
+        <div><div class="stat-val" id="statContacts">0</div><div class="stat-lbl">Acquéreurs</div></div>
+      </div>
+      <div class="stat-card-agenda">
+        <div class="stat-icon" style="background:#fce4ec;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#c2185b" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><line x1="12" y1="14" x2="12" y2="18"/><line x1="10" y1="16" x2="14" y2="16"/></svg>
+        </div>
+        <div><div class="stat-val" id="statToday">0</div><div class="stat-lbl">Aujourd'hui</div></div>
       </div>
     </div>
 
-    <!-- Tabs -->
-    <div class="agenda-tabs">
-      <button class="agenda-tab active" data-panel="visits" style="display:flex;align-items:center;gap:7px;">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
-        Visites
-      </button>
-      <button class="agenda-tab" data-panel="calendar" style="display:flex;align-items:center;gap:7px;">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-        Calendrier
-      </button>
-      <button class="agenda-tab" data-panel="availability" style="display:flex;align-items:center;gap:7px;">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-        Mes disponibilités
-      </button>
-    </div>
+    <!-- Dashboard principale : calendrier + sidebar actions -->
+    <div class="dash-main-grid">
 
-    <!-- ── Panel: Visites ──────────────────────────────── -->
-    <div class="agenda-panel active" id="panel-visits">
+      <!-- ── Colonne calendrier (gauche) ───────────────── -->
+      <div class="dash-cal-col">
 
-      <div class="filter-bar">
-        <div class="search-wrap">
-          <svg class="search-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-          <input class="filter-search" type="text" id="searchVisits" placeholder="Rechercher un acheteur…">
-        </div>
-        <select class="filter-select" id="filterStatus">
-          <option value="all">Tous les statuts</option>
-          <option value="confirmed">Confirmées</option>
-          <option value="pending">En attente</option>
-          <option value="cancelled">Annulées</option>
-        </select>
-        <div style="font-size:0.82rem;color:#888;" id="visitCount"></div>
-      </div>
-
-      <div class="visits-grid" id="visitsList"></div>
-    </div>
-    <!-- SVG defs for visit cards (injected via JS) -->
-
-    <!-- ── Panel: Calendrier ──────────────────────────── -->
-    <div class="agenda-panel" id="panel-calendar">
-      <div class="calendar-layout">
+        <!-- Grand calendrier -->
         <div class="calendar-card">
           <div class="cal-header">
             <span class="cal-month" id="calMonthLabel"></span>
-            <div style="display:flex;gap:6px;">
-              <button class="cal-nav" id="calPrev">‹</button>
-              <button class="cal-nav" id="calNext">›</button>
+            <div style="display:flex;gap:6px;align-items:center;">
+              <button class="cal-nav" id="calPrev">&#8249;</button>
+              <button class="cal-nav" id="calNext">&#8250;</button>
             </div>
           </div>
           <div class="cal-grid">
-            <div class="cal-day-label">Lun</div>
-            <div class="cal-day-label">Mar</div>
-            <div class="cal-day-label">Mer</div>
-            <div class="cal-day-label">Jeu</div>
-            <div class="cal-day-label">Ven</div>
-            <div class="cal-day-label">Sam</div>
-            <div class="cal-day-label">Dim</div>
+            <div class="cal-day-label">Lun</div><div class="cal-day-label">Mar</div><div class="cal-day-label">Mer</div>
+            <div class="cal-day-label">Jeu</div><div class="cal-day-label">Ven</div><div class="cal-day-label">Sam</div><div class="cal-day-label">Dim</div>
           </div>
           <div class="cal-grid" id="calGrid" style="margin-top:4px;"></div>
         </div>
 
+        <!-- Détail du jour sélectionné -->
         <div class="day-detail" id="dayDetail">
           <div class="day-detail-title" id="dayDetailTitle">Sélectionnez un jour</div>
           <div id="dayDetailContent">
-            <div class="empty-state" style="padding:24px 12px;border:none;">
-              <div class="empty-state-icon"><svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#ccc" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div>
-              <p>Cliquez sur un jour pour voir les visites</p>
-            </div>
+            <div style="text-align:center;padding:20px;color:#bbb;font-size:0.85rem;">Cliquez sur un jour du calendrier</div>
           </div>
         </div>
-      </div>
-    </div>
 
-    <!-- ── Panel: Mes disponibilités ─────────────────── -->
-    <div class="agenda-panel" id="panel-availability">
-      <div style="display:grid;grid-template-columns:1.3fr 1fr;gap:20px;align-items:start;">
-
-        <div class="form-section">
+        <!-- Disponibilités -->
+        <div class="dispo-card">
           <div class="avail-month-header">
             <div>
-              <h3 style="margin-bottom:2px;">Mes disponibilités</h3>
-              <p style="color:#888;font-size:0.82rem;">Renseignez vos créneaux une seule fois. Vous pouvez en ajouter à tout moment.</p>
+              <h3>Mes disponibilités</h3>
+              <p style="color:#888;font-size:0.81rem;margin:2px 0 0;">Créneaux proposés aux acquéreurs</p>
             </div>
-            <div style="display:flex;gap:6px;">
-              <button class="cal-nav" id="availPrev">‹</button>
-              <span class="avail-month-label" id="availMonthLabel" style="padding:0 8px;display:flex;align-items:center;"></span>
-              <button class="cal-nav" id="availNext">›</button>
+            <div style="display:flex;gap:6px;align-items:center;">
+              <button class="cal-nav" id="availPrev">&#8249;</button>
+              <span class="avail-month-label" id="availMonthLabel" style="padding:0 8px;display:flex;align-items:center;font-size:0.95rem;"></span>
+              <button class="cal-nav" id="availNext">&#8250;</button>
             </div>
           </div>
-
           <div class="avail-slot-list" id="availSlotList">
-            <div style="text-align:center;padding:24px;color:#bbb;font-size:0.85rem;">Aucun créneau pour ce mois</div>
+            <div style="text-align:center;padding:24px;color:#bbb;font-size:0.85rem;border:1.5px dashed #e8e0d6;border-radius:10px;">Aucun créneau pour ce mois</div>
           </div>
-
           <div class="avail-add-form">
-            <h4>
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#3D5A47" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:5px;"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-              Ajouter un créneau
-            </h4>
+            <h4><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#3D5A47" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:5px;"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Ajouter un créneau</h4>
             <div class="avail-form-row">
               <input type="date" class="avail-input" id="availDate">
               <span style="color:#aaa;font-size:0.85rem;">de</span>
@@ -504,324 +485,517 @@
             </div>
             <button id="addAvailSlot" class="btn-primary" style="font-size:0.85rem;padding:9px 20px;">Ajouter ce créneau</button>
           </div>
-
           <div style="margin-top:16px;display:flex;align-items:center;gap:12px;">
             <button id="saveAgenda" class="btn-primary" style="flex:1;">Enregistrer mes disponibilités</button>
-            <span id="agendaSuccess" class="form-success hidden">Sauvegardé</span>
+            <span id="agendaSuccess" class="form-success hidden">Sauvegardé &#10003;</span>
           </div>
         </div>
 
-        <div class="form-section">
-          <h3 style="margin-bottom:8px;">Lien de réservation</h3>
-          <p style="color:#666;font-size:0.84rem;margin-bottom:12px;">Partagez ce lien avec vos acheteurs pour qu'ils réservent directement un créneau.</p>
+        <!-- Lien de réservation -->
+        <div style="background:#fff;border:1px solid #e8e0d6;border-radius:14px;padding:20px;">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#3D5A47" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+            <strong style="font-size:0.9rem;color:#1A1A16;">Lien de réservation</strong>
+          </div>
+          <p style="color:#666;font-size:0.82rem;margin-bottom:10px;">Partagez ce lien pour que vos acquéreurs réservent directement un créneau.</p>
           <div id="bookingLinkBox" style="display:none;">
             <div style="display:flex;gap:8px;align-items:center;">
               <input type="text" id="bookingLink" readonly style="flex:1;background:#F5F0E8;font-size:0.8rem;padding:9px 12px;border:1.5px solid #e8e0d6;border-radius:8px;">
-              <button onclick="copyBookingLink()" class="btn-primary" style="white-space:nowrap;padding:10px 16px;font-size:0.83rem;">Copier</button>
+              <button onclick="copyBookingLink()" class="btn-primary" style="white-space:nowrap;padding:9px 14px;font-size:0.81rem;">Copier</button>
             </div>
           </div>
-          <p id="noLinkMsg" style="color:#bbb;font-size:0.84rem;">Publiez votre bien pour obtenir votre lien.</p>
+          <p id="noLinkMsg" style="color:#bbb;font-size:0.83rem;margin:0;">Publiez votre bien pour obtenir votre lien.</p>
         </div>
 
+      </div><!-- end dash-cal-col -->
+
+      <!-- ── Sidebar actions (droite) ──────────────────── -->
+      <aside class="dash-sidebar">
+
+        <!-- URGENT: À confirmer -->
+        <div class="sidebar-section" id="pendingSection" style="display:none;">
+          <div class="sidebar-section-title urgent-title">
+            <span style="display:flex;align-items:center;gap:6px;">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              À confirmer
+            </span>
+            <span class="count-chip" id="pendingCountBadge">0</span>
+          </div>
+          <div class="sidebar-body" id="pendingList"></div>
+        </div>
+
+        <!-- État vide visites -->
+        <div id="visitsEmpty" style="display:none;background:#fff;border:1.5px dashed #e8e0d6;border-radius:14px;padding:32px 20px;text-align:center;color:#bbb;">
+          <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#ddd" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom:10px;"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          <p style="font-size:0.87rem;line-height:1.5;margin:0;">Aucune visite pour le moment.<br>Programmez-en une ou partagez votre lien.</p>
+          <button class="add-btn" onclick="openModal('addVisitOverlay')" style="margin-top:14px;">+ Programmer une visite</button>
+        </div>
+
+        <!-- Prochaines visites confirmées -->
+        <div class="sidebar-section" id="upcomingSection" style="display:none;">
+          <div class="sidebar-section-title">
+            <span style="display:flex;align-items:center;gap:6px;">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#2e7d32" stroke-width="2.2"><polyline points="20 6 9 17 4 12"/></svg>
+              Prochaines visites
+            </span>
+          </div>
+          <div class="sidebar-body" id="upcomingList"></div>
+        </div>
+
+        <!-- Historique -->
+        <div class="sidebar-section" id="pastSection" style="display:none;">
+          <div class="sidebar-section-title">Historique</div>
+          <div class="sidebar-body" id="pastList"></div>
+        </div>
+
+        <!-- Contacts acquéreurs (appels + SMS) -->
+        <div class="sidebar-section">
+          <div class="sidebar-section-title">
+            Contacts acquéreurs
+            <button class="add-btn-sec" onclick="openModal('addContactOverlay')" style="padding:5px 10px;font-size:0.74rem;border-radius:6px;">+ Ajouter</button>
+          </div>
+          <div id="recentContactsList">
+            <div style="text-align:center;padding:28px;color:#bbb;font-size:0.83rem;">Chargement…</div>
+          </div>
+        </div>
+
+        <!-- Notifications récentes -->
+        <div class="sidebar-section">
+          <div class="sidebar-section-title">Activité récente</div>
+          <div id="notifSidebarContent">
+            <div style="text-align:center;padding:28px;color:#bbb;font-size:0.83rem;">Chargement…</div>
+          </div>
+        </div>
+
+      </aside>
+    </div><!-- end dash-main-grid -->
+
+    <!-- ── Acquéreurs — numéro + table + mails ─────────── -->
+    <div class="dash-below-section" id="panel-acquereurs">
+
+      <!-- Numéro Serenis + phrase d'accroche -->
+      <div class="sc-card" id="scCard" style="display:none;">
+        <div>
+          <div class="sc-num-badge">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.27h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 9a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+            Votre numéro dédié Serenis
+          </div>
+          <div class="sc-num-display" id="scNumDisplay">—</div>
+          <button class="sc-btn-copy" id="scCopyBtn" onclick="copySerenisNumber()" disabled>
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+            Copier le numéro
+          </button>
+          <div class="sc-num-desc">Publiez ce numéro dans toutes vos annonces. Il centralise automatiquement les appels, SMS et demandes de visite.</div>
+        </div>
+        <div>
+          <div class="sc-accroche-label">Phrase d'accroche — à coller dans votre annonce</div>
+          <div class="sc-accroche-box">
+            Pour visiter ce bien ou obtenir la fiche descriptive complète, contactez-moi directement au <span class="sc-accroche-num" id="scAccrocheNum">—</span>. La prise de contact est instantanée.
+          </div>
+          <button class="sc-btn-copy-phrase" onclick="copyAccroche()">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+            Copier la phrase
+          </button>
+        </div>
+      </div>
+      <div id="scNoNumHint" style="display:none;background:#fff8e1;border:1px solid #ffe082;border-radius:12px;padding:14px 18px;margin-bottom:20px;font-size:0.84rem;color:#7a5900;">
+        <strong>Votre numéro Serenis sera attribué automatiquement</strong> lors de la publication de votre bien.
+      </div>
+
+      <div class="section-header-bar">
+        <div class="section-title-big">Acquéreurs</div>
+        <button class="add-btn-sec" onclick="openModal('addContactOverlay')" style="padding:7px 14px;font-size:0.81rem;">+ Ajouter un acquéreur</button>
+      </div>
+      <div id="contactsTableWrap">
+        <div class="empty-state" style="border:none;padding:32px 24px;">
+          <div class="empty-state-icon"><svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#ccc" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>
+          <p>Aucun acquéreur enregistré<br>Publiez votre numéro Serenis dans vos annonces pour recevoir des contacts</p>
+        </div>
+      </div>
+
+      <div class="mc-section" style="margin-top:28px;">
+        <div class="mc-section-header">
+          <div class="mc-section-title">Modèles de mails — Serenis Connect</div>
+          <div class="mc-section-sub">Rédigés de la part de Serenis pour vos acquéreurs. Copiez, personnalisez le prénom et envoyez.</div>
+        </div>
+        <div class="mc-tabs" id="mcTabs"></div>
+        <div class="mc-cards" id="mcCards"></div>
+      </div>
+    </div>
+
+    <!-- ── Notifications complètes ────────────────────── -->
+    <div class="dash-below-section" id="panel-notifications">
+      <div class="section-header-bar">
+        <div class="section-title-big">Notifications <span id="notif-unread-badge" class="count-chip" style="display:none;font-size:11px;width:auto;padding:0 6px;border-radius:10px;"></span></div>
+        <button onclick="notifMarkAllRead()" style="padding:7px 16px;border-radius:8px;border:1.5px solid #e8e0d6;background:#fff;color:#666;font-size:.8rem;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;">Tout marquer comme lu</button>
+      </div>
+      <div class="notif-pills">
+        <button class="notif-pill active" data-tab="all" onclick="notifSwitchTab('all')">Tout</button>
+        <button class="notif-pill" data-tab="visits" onclick="notifSwitchTab('visits')">Visites</button>
+        <button class="notif-pill" data-tab="offers" onclick="notifSwitchTab('offers')">Offres</button>
+        <button class="notif-pill" data-tab="contacts" onclick="notifSwitchTab('contacts')">Contacts</button>
+        <button class="notif-pill" data-tab="system" onclick="notifSwitchTab('system')">Système</button>
+      </div>
+      <div id="notif-content">
+        <div style="text-align:center;padding:60px;color:#aaa;">Chargement…</div>
       </div>
     </div>
 
   </main>
 </div>
+<!-- ── Modal: Programmer une visite ── -->
+<div class="modal-overlay" id="addVisitOverlay">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">Programmer une visite</div>
+      <button class="modal-close" onclick="closeModal('addVisitOverlay')">×</button>
+    </div>
+    <div class="modal-field">
+      <label>Nom de l'acquéreur</label>
+      <input type="text" id="vBuyerName" placeholder="Marie Dupont">
+    </div>
+    <div class="modal-row">
+      <div class="modal-field">
+        <label>Téléphone</label>
+        <input type="tel" id="vBuyerPhone" placeholder="06 XX XX XX XX">
+      </div>
+      <div class="modal-field">
+        <label>Email (optionnel)</label>
+        <input type="email" id="vBuyerEmail" placeholder="email@exemple.fr">
+      </div>
+    </div>
+    <div class="modal-row">
+      <div class="modal-field">
+        <label>Date *</label>
+        <input type="date" id="vDate">
+      </div>
+      <div class="modal-field">
+        <label>Heure *</label>
+        <input type="time" id="vTime">
+      </div>
+    </div>
+    <div class="modal-field">
+      <label>Notes (optionnel)</label>
+      <textarea id="vNotes" placeholder="Précisions sur la visite…"></textarea>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-secondary-modal" onclick="closeModal('addVisitOverlay')">Annuler</button>
+      <button class="btn-primary-modal" onclick="submitAddVisit()">Programmer la visite</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── Modal: Ajouter un acquéreur ── -->
+<div class="modal-overlay" id="addContactOverlay">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">Ajouter un acquéreur</div>
+      <button class="modal-close" onclick="closeModal('addContactOverlay')">×</button>
+    </div>
+    <div class="modal-field">
+      <label>Nom</label>
+      <input type="text" id="cBuyerName" placeholder="Jean Martin">
+    </div>
+    <div class="modal-row">
+      <div class="modal-field">
+        <label>Téléphone</label>
+        <input type="tel" id="cBuyerPhone" placeholder="06 XX XX XX XX">
+      </div>
+      <div class="modal-field">
+        <label>Email (optionnel)</label>
+        <input type="email" id="cBuyerEmail" placeholder="email@exemple.fr">
+      </div>
+    </div>
+    <div class="modal-field">
+      <label>Budget estimé (€)</label>
+      <input type="number" id="cBuyerBudget" placeholder="350000">
+    </div>
+    <div class="modal-field">
+      <label>Notes</label>
+      <textarea id="cNotes" placeholder="Motivations, financement…"></textarea>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-secondary-modal" onclick="closeModal('addContactOverlay')">Annuler</button>
+      <button class="btn-primary-modal" onclick="submitAddContact()">Ajouter l'acquéreur</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
 
 <script>
 // ── State ─────────────────────────────────────────────
+let _data = null;
 let allVisits = [];
 let calDate = new Date();
 let calSelected = null;
+let _mcAcheteurUrl = '';
 
 // ── Tabs ──────────────────────────────────────────────
-document.querySelectorAll('.agenda-tab').forEach(btn => {
-  btn.addEventListener('click', () => {
-    document.querySelectorAll('.agenda-tab').forEach(b => b.classList.remove('active'));
-    document.querySelectorAll('.agenda-panel').forEach(p => p.classList.remove('active'));
-    btn.classList.add('active');
-    document.getElementById('panel-' + btn.dataset.panel).classList.add('active');
-    if (btn.dataset.panel === 'calendar') renderCalendar();
-  });
-});
+// Tabs supprimés — tout est sur une seule page
 
 // ── Stats ─────────────────────────────────────────────
-function updateStats(visits) {
+function updateStats() {
   const today = new Date().toISOString().split('T')[0];
-  document.getElementById('statTotal').textContent = visits.length;
-  document.getElementById('statPending').textContent = visits.filter(v => v.status === 'pending').length;
-  document.getElementById('statConfirmed').textContent = visits.filter(v => v.status === 'confirmed').length;
-  document.getElementById('statToday').textContent = visits.filter(v => v.visit_date === today).length;
+  const pending = allVisits.filter(v => v.status === 'pending');
+  const confirmed = allVisits.filter(v => v.status === 'confirmed');
+  const todayV = allVisits.filter(v => v.visit_date === today && v.status !== 'cancelled');
+  const contacts = _data?.contacts || [];
+  document.getElementById('statPending').textContent = pending.length;
+  document.getElementById('statConfirmed').textContent = confirmed.length;
+  document.getElementById('statToday').textContent = todayV.length;
+  document.getElementById('statContacts').textContent = contacts.length;
+  const statCalls = document.getElementById('statCalls');
+  const statSms = document.getElementById('statSms');
+  if (statCalls) statCalls.textContent = contacts.filter(c => c.source === 'voice').length;
+  if (statSms) statSms.textContent = contacts.filter(c => c.source === 'sms').length;
 }
 
-// ── Visit cards ───────────────────────────────────────
-function initials(name) {
-  return (name || '?').split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2);
-}
+// ── Visit rendering ───────────────────────────────────
+function initials(name) { return (name||'?').split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2); }
 function badgeHtml(status) {
-  const map = { confirmed: ['vbadge-confirmed', 'Confirmée'], pending: ['vbadge-pending', 'En attente'], cancelled: ['vbadge-cancelled', 'Annulée'] };
-  const [cls, label] = map[status] || map.pending;
+  const map = { confirmed:['vbadge-confirmed','Confirmée'], pending:['vbadge-pending','En attente'], cancelled:['vbadge-cancelled','Annulée'] };
+  const [cls,label] = map[status] || map.pending;
   return `<span class="vbadge ${cls}">${label}</span>`;
 }
 function formatDate(dateStr) {
   if (!dateStr) return '—';
-  const d = new Date(dateStr + 'T00:00:00');
-  return d.toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' });
+  const d = new Date(dateStr+'T00:00:00');
+  return d.toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long'});
 }
 
-function renderVisits() {
-  const q = (document.getElementById('searchVisits').value || '').toLowerCase();
-  const sf = document.getElementById('filterStatus').value;
-  const filtered = allVisits.filter(v => {
-    const matchQ = !q || v.buyer_name?.toLowerCase().includes(q) || v.buyer_email?.toLowerCase().includes(q);
-    const matchS = sf === 'all' || v.status === sf;
-    return matchQ && matchS;
-  });
-
-  document.getElementById('visitCount').textContent = `${filtered.length} visite${filtered.length !== 1 ? 's' : ''}`;
-
-  const list = document.getElementById('visitsList');
-  if (!filtered.length) {
-    list.innerHTML = `<div class="empty-state" style="grid-column:1/-1;">
-      <div class="empty-state-icon"><svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#ccc" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div>
-      <p>Aucune visite trouvée.<br>Les acheteurs réservent via votre lien de réservation.</p>
-    </div>`;
-    return;
-  }
-
+function buildVisitCardHtml(v) {
+  const prenom = (v.buyer_name||'').split(' ')[0];
+  const [yr,mo,dy] = (v.visit_date||'').split('-');
+  const dateObj = yr ? new Date(Number(yr),Number(mo)-1,Number(dy)) : null;
+  const JOURS=['dimanche','lundi','mardi','mercredi','jeudi','vendredi','samedi'];
+  const MOIS=['janvier','février','mars','avril','mai','juin','juillet','août','septembre','octobre','novembre','décembre'];
+  const dateStr = dateObj ? `${JOURS[dateObj.getDay()]} ${dy} ${MOIS[dateObj.getMonth()]}` : v.visit_date;
+  const [h,m] = (v.visit_time||'').split(':');
+  const heureStr = m&&m!=='00'?`${h}h${m}`:`${h}h`;
+  const smsMsg = encodeURIComponent(`Bonjour ${prenom}, je me permets de vous rappeler notre visite du ${dateStr} à ${heureStr}. Pouvez-vous me confirmer votre présence ? Merci.`);
+  const phoneLinkHtml = v.buyer_phone ? `<a class="phone-link" href="sms:${v.buyer_phone}?&body=${smsMsg}">${v.buyer_phone}</a>` : '';
   const svgCal = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>`;
   const svgClock = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>`;
   const svgPhone = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.41a2 2 0 0 1 2-2.18h3a2 2 0 0 1 2 1.72 12.13 12.13 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.13 12.13 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>`;
-  list.innerHTML = filtered.map(v => {
-    // Construire le message SMS pré-rempli
-    const prenom = (v.buyer_name || '').split(' ')[0];
-    const [yr, mo, dy] = (v.visit_date || '').split('-');
-    const dateObj = yr ? new Date(Number(yr), Number(mo) - 1, Number(dy)) : null;
-    const JOURS = ['dimanche','lundi','mardi','mercredi','jeudi','vendredi','samedi'];
-    const MOIS = ['janvier','février','mars','avril','mai','juin','juillet','août','septembre','octobre','novembre','décembre'];
-    const dateStr = dateObj ? `${JOURS[dateObj.getDay()]} ${dy} ${MOIS[dateObj.getMonth()]}` : v.visit_date;
-    const [h, m] = (v.visit_time || '').split(':');
-    const heureStr = m && m !== '00' ? `${h}h${m}` : `${h}h`;
-    const smsMsg = encodeURIComponent(`Bonjour ${prenom}, je me permets de vous rappeler notre visite du ${dateStr} à ${heureStr}. Pouvez-vous me confirmer votre présence ? Merci.`);
-    const phoneLinkHtml = v.buyer_phone
-      ? `<a class="phone-link" href="sms:${v.buyer_phone}?&body=${smsMsg}" title="Ouvrir SMS pré-rempli">${v.buyer_phone}</a>`
-      : '';
-    const reminderSentTag = v.reminder_sent ? `<span class="reminder-sent-tag">Rappel envoyé</span>` : '';
-
-    return `
-    <div class="visit-card" id="vcard-${v.id}">
-      <div class="visit-card-header">
-        <div style="display:flex;align-items:center;gap:12px;">
-          <div class="visit-avatar">${initials(v.buyer_name)}</div>
-          <div class="visit-info">
-            <div class="visit-name">${v.buyer_name}</div>
-            <div class="visit-meta">${v.buyer_email || ''}</div>
-          </div>
+  return `
+  <div class="visit-card${v.status==='pending'?' pending-card':''}" id="vcard-${v.id}">
+    <div class="visit-card-header">
+      <div style="display:flex;align-items:center;gap:12px;">
+        <div class="visit-avatar">${initials(v.buyer_name)}</div>
+        <div class="visit-info">
+          <div class="visit-name">${v.buyer_name||'Acquéreur'}</div>
+          <div class="visit-meta">${v.buyer_email||''}</div>
         </div>
-        ${badgeHtml(v.status)}
       </div>
-      <div class="visit-details">
-        <div class="visit-detail-row"><span class="visit-detail-icon">${svgCal}</span>${formatDate(v.visit_date)}</div>
-        <div class="visit-detail-row"><span class="visit-detail-icon">${svgClock}</span>${v.visit_time || '—'}</div>
-        ${v.buyer_phone ? `<div class="visit-detail-row"><span class="visit-detail-icon">${svgPhone}</span>${phoneLinkHtml}</div>` : ''}
-      </div>
-      ${v.status === 'pending' ? `
-      <div class="visit-actions">
-        <button class="btn-confirm" onclick="changeVisitStatus(${v.id},'confirmed')">Confirmer</button>
-        <button class="btn-refuse" onclick="changeVisitStatus(${v.id},'cancelled')">Refuser</button>
-      </div>` : ''}
-      ${v.status !== 'cancelled' && v.buyer_phone ? `
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-top:8px;gap:8px;flex-wrap:wrap;">
-        <button class="btn-sms-reminder ${v.reminder_sent ? 'sent' : ''}" id="btn-reminder-${v.id}"
-          onclick="sendReminder(${v.id})" ${v.reminder_sent ? 'title="Rappel déjà envoyé — cliquer pour renvoyer"' : ''}>
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.41a2 2 0 0 1 2-2.18h3a2 2 0 0 1 2 1.72 12.13 12.13 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.13 12.13 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
-          ${v.reminder_sent ? 'Rappel envoyé' : 'Envoyer rappel SMS'}
-        </button>
-        ${v.status === 'confirmed' ? `<button class="btn-cancel-sm" onclick="if(confirm('Annuler cette visite ?')) changeVisitStatus(${v.id},'cancelled')">Annuler</button>` : ''}
-        ${reminderSentTag && !v.reminder_sent ? reminderSentTag : ''}
-      </div>` : (v.status === 'confirmed' ? `
-      <div style="display:flex;justify-content:flex-end;margin-top:8px;">
-        <button class="btn-cancel-sm" onclick="if(confirm('Annuler cette visite ?')) changeVisitStatus(${v.id},'cancelled')">Annuler la visite</button>
-      </div>` : '')}
-      <div class="visit-notes-wrap">
-        <textarea class="visit-notes-input" rows="2" placeholder="Notes post-visite (impressions, retours acheteur…)" id="notes-${v.id}" onblur="saveNotes(${v.id})">${v.notes || ''}</textarea>
-        <div class="visit-notes-saved" id="notes-saved-${v.id}">✓ Enregistré</div>
-      </div>
+      ${badgeHtml(v.status)}
+    </div>
+    <div class="visit-details">
+      <div class="visit-detail-row"><span class="visit-detail-icon">${svgCal}</span>${formatDate(v.visit_date)}</div>
+      <div class="visit-detail-row"><span class="visit-detail-icon">${svgClock}</span>${v.visit_time||'—'}</div>
+      ${v.buyer_phone?`<div class="visit-detail-row"><span class="visit-detail-icon">${svgPhone}</span>${phoneLinkHtml}</div>`:''}
+    </div>
+    ${v.status==='pending'?`
+    <div class="visit-actions">
+      <button class="btn-confirm" onclick="changeVisitStatus(${v.id},'confirmed')">✓ Confirmer</button>
+      <button class="btn-refuse" onclick="changeVisitStatus(${v.id},'cancelled')">Refuser</button>
+    </div>`:''}
+    ${v.status!=='cancelled'&&v.buyer_phone?`
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-top:8px;gap:8px;flex-wrap:wrap;">
+      <button class="btn-sms-reminder${v.reminder_sent?' sent':''}" id="btn-reminder-${v.id}" onclick="sendReminder(${v.id})">
+        ${svgPhone} ${v.reminder_sent?'Rappel envoyé':'Envoyer rappel SMS'}
+      </button>
+      ${v.status==='confirmed'?`<button class="btn-cancel-sm" onclick="if(confirm('Annuler cette visite ?')) changeVisitStatus(${v.id},'cancelled')">Annuler</button>`:''}
+    </div>`:(v.status==='confirmed'?`<div style="display:flex;justify-content:flex-end;margin-top:8px;"><button class="btn-cancel-sm" onclick="if(confirm('Annuler cette visite ?')) changeVisitStatus(${v.id},'cancelled')">Annuler la visite</button></div>`:'')}
+    <div class="visit-notes-wrap">
+      <textarea class="visit-notes-input" rows="2" placeholder="Notes post-visite…" id="notes-${v.id}" onblur="saveNotes(${v.id})">${v.notes||''}</textarea>
+      <div class="visit-notes-saved" id="notes-saved-${v.id}">✓ Enregistré</div>
+    </div>
+  </div>`;
+}
+
+function buildVisitCompact(v) {
+  const ini = initials(v.buyer_name);
+  const dateStr = v.visit_date ? new Date(v.visit_date+'T12:00:00').toLocaleDateString('fr-FR',{weekday:'short',day:'numeric',month:'short'}) : '—';
+  const time = v.visit_time ? v.visit_time.slice(0,5) : '—';
+  const isPending = v.status==='pending';
+  let actions = '';
+  if (isPending) {
+    actions = `<div class="vc-actions">
+      <button class="vc-confirm" onclick="changeVisitStatus(${v.id},'confirmed')">✓ Confirmer</button>
+      <button class="vc-refuse" onclick="changeVisitStatus(${v.id},'cancelled')">Refuser</button>
     </div>`;
-  }).join('');
+  } else if (v.status==='confirmed') {
+    actions = `<div class="vc-actions">
+      <button class="vc-cancel" onclick="if(confirm('Annuler cette visite ?')) changeVisitStatus(${v.id},'cancelled')">Annuler</button>
+      ${v.buyer_phone?`<button class="vc-cancel" style="color:#3D5A47;border-color:#c8ddd0;" id="btn-reminder-${v.id}" onclick="sendReminder(${v.id})">${v.reminder_sent?'✓ Rappel':'SMS rappel'}</button>`:''}
+    </div>`;
+  }
+  return `<div class="visit-compact${isPending?' pending':''}" id="vcard-${v.id}">
+    <div class="vc-top">
+      <div class="vc-avatar">${ini}</div>
+      <div><div class="vc-name">${v.buyer_name||'Acquéreur'}</div><div class="vc-when">${dateStr} · ${time}</div></div>
+    </div>
+    ${actions}
+  </div>`;
+}
+
+function renderVisits() {
+  const today = new Date().toISOString().split('T')[0];
+  const pending = allVisits.filter(v => v.status==='pending').sort((a,b)=>(a.visit_date+a.visit_time).localeCompare(b.visit_date+b.visit_time));
+  const upcoming = allVisits.filter(v => v.status==='confirmed' && v.visit_date>=today).sort((a,b)=>(a.visit_date+a.visit_time).localeCompare(b.visit_date+b.visit_time));
+  const past = allVisits.filter(v => v.status==='cancelled'||v.status==='done'||(v.status==='confirmed'&&v.visit_date<today)).sort((a,b)=>b.visit_date.localeCompare(a.visit_date));
+
+  const pendingSection = document.getElementById('pendingSection');
+  const upcomingSection = document.getElementById('upcomingSection');
+  const pastSection = document.getElementById('pastSection');
+  const emptyEl = document.getElementById('visitsEmpty');
+  const badge = document.getElementById('pendingCountBadge');
+
+  if (!allVisits.length) {
+    pendingSection.style.display='none'; upcomingSection.style.display='none'; pastSection.style.display='none';
+    emptyEl.style.display='block'; return;
+  }
+  emptyEl.style.display='none';
+
+  // Pending (urgent)
+  if (pending.length) {
+    pendingSection.style.display='block';
+    if (badge) badge.textContent=pending.length;
+    document.getElementById('pendingList').innerHTML = pending.map(buildVisitCompact).join('');
+  } else {
+    pendingSection.style.display='none';
+  }
+
+  // Upcoming
+  if (upcoming.length) {
+    upcomingSection.style.display='block';
+    document.getElementById('upcomingList').innerHTML = upcoming.map(buildVisitCompact).join('');
+  } else {
+    upcomingSection.style.display='none';
+  }
+
+  // Past (max 5)
+  if (past.length) {
+    pastSection.style.display='block';
+    document.getElementById('pastList').innerHTML = past.slice(0,5).map(buildVisitCompact).join('');
+  } else {
+    pastSection.style.display='none';
+  }
 }
 
 async function changeVisitStatus(id, status) {
   try {
-    const res = await fetch(`/api/visits/${id}/status`, {
-      method: 'PUT', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ status })
-    });
+    const res = await fetch(`/api/visits/${id}/status`,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({status})});
+    if (!res.ok) { const err=await res.json().catch(()=>{}); showToast(err?.error||'Erreur serveur','error'); return; }
     const data = await res.json();
     if (data.success) {
-      const v = allVisits.find(v => v.id === id);
-      if (v) v.status = status;
-      renderVisits();
-      updateStats(allVisits);
-      renderCalendar();
-      showToast(status === 'confirmed' ? 'Visite confirmée' : 'Visite annulée');
-    }
-  } catch(e) { showToast('Erreur', 'error'); }
+      const v = allVisits.find(v=>v.id===id);
+      if (v) v.status=status;
+      renderVisits(); updateStats(); renderCalendar();
+      showToast(status==='confirmed'?'Visite confirmée ✓':'Visite annulée');
+    } else { showToast(data.error||'Erreur','error'); }
+  } catch(e) { showToast('Erreur réseau','error'); }
 }
 
 async function sendReminder(id) {
-  const btn = document.getElementById('btn-reminder-' + id);
-  if (btn) { btn.disabled = true; btn.textContent = 'Envoi…'; }
+  const btn = document.getElementById('btn-reminder-'+id);
+  if (btn) { btn.disabled=true; btn.textContent='Envoi…'; }
   try {
-    const res = await fetch(`/api/visits/${id}/reminder`, { method: 'POST' });
+    const res = await fetch(`/api/visits/${id}/reminder`,{method:'POST'});
     const data = await res.json();
     if (data.success) {
-      const v = allVisits.find(v => v.id === id);
-      if (v) v.reminder_sent = 1;
-      if (btn) {
-        btn.className = 'btn-sms-reminder sent';
-        btn.innerHTML = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.41a2 2 0 0 1 2-2.18h3a2 2 0 0 1 2 1.72 12.13 12.13 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.13 12.13 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg> Rappel envoyé`;
-        btn.disabled = false;
-        btn.title = 'Rappel envoyé — cliquer pour renvoyer';
-      }
-      showToast('Rappel SMS envoyé à l\'acheteur');
+      const v = allVisits.find(v=>v.id===id);
+      if (v) v.reminder_sent=1;
+      if (btn) { btn.className='btn-sms-reminder sent'; btn.innerHTML='✓ Rappel envoyé'; btn.disabled=false; }
+      showToast('Rappel SMS envoyé');
     } else {
-      if (btn) { btn.disabled = false; btn.textContent = 'Envoyer rappel SMS'; }
-      showToast(data.error || 'Erreur envoi SMS', 'error');
+      if (btn) { btn.disabled=false; btn.textContent='Envoyer rappel SMS'; }
+      showToast(data.error||'Erreur envoi SMS','error');
     }
   } catch(e) {
-    if (btn) { btn.disabled = false; btn.textContent = 'Envoyer rappel SMS'; }
-    showToast('Erreur réseau', 'error');
+    if (btn) { btn.disabled=false; btn.textContent='Envoyer rappel SMS'; }
+    showToast('Erreur réseau','error');
   }
 }
 
 async function saveNotes(id) {
-  const el = document.getElementById('notes-' + id);
+  const el = document.getElementById('notes-'+id);
   if (!el) return;
   const notes = el.value;
-  const v = allVisits.find(v => v.id === id);
-  if (v && v.notes === notes) return;
+  const v = allVisits.find(v=>v.id===id);
+  if (v&&v.notes===notes) return;
   try {
-    await fetch(`/api/visits/${id}/notes`, {
-      method: 'PUT', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ notes }),
-    });
-    if (v) v.notes = notes;
-    const saved = document.getElementById('notes-saved-' + id);
-    if (saved) { saved.style.display = 'block'; setTimeout(() => saved.style.display = 'none', 2000); }
+    await fetch(`/api/visits/${id}/notes`,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({notes})});
+    if (v) v.notes=notes;
+    const saved=document.getElementById('notes-saved-'+id);
+    if (saved) { saved.style.display='block'; setTimeout(()=>saved.style.display='none',2000); }
   } catch(e) {}
 }
 
-document.getElementById('searchVisits').addEventListener('input', renderVisits);
-document.getElementById('filterStatus').addEventListener('change', renderVisits);
-
 // ── Calendar ──────────────────────────────────────────
-const MONTHS_FR = ['Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août','Septembre','Octobre','Novembre','Décembre'];
+const MONTHS_FR=['Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août','Septembre','Octobre','Novembre','Décembre'];
 
 function renderCalendar() {
-  const year = calDate.getFullYear();
-  const month = calDate.getMonth();
-  document.getElementById('calMonthLabel').textContent = `${MONTHS_FR[month]} ${year}`;
-
-  const firstDay = new Date(year, month, 1);
-  const lastDay = new Date(year, month + 1, 0);
-  // Monday-based: convert Sunday (0) → 6, else day-1
-  let startPad = firstDay.getDay();
-  startPad = startPad === 0 ? 6 : startPad - 1;
-
-  const grid = document.getElementById('calGrid');
-  const today = new Date().toISOString().split('T')[0];
-  let html = '';
-
-  for (let i = 0; i < startPad; i++) html += `<div class="cal-cell cal-empty"></div>`;
-
-  for (let d = 1; d <= lastDay.getDate(); d++) {
-    const dateStr = `${year}-${String(month+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
-    const dayVisits = allVisits.filter(v => v.visit_date === dateStr);
-    const isToday = dateStr === today;
-    const isSel = calSelected === dateStr;
-    let cls = 'cal-cell';
-    if (isToday) cls += ' cal-today';
-    if (isSel) cls += ' cal-selected';
-
-    const dots = dayVisits.slice(0,3).map(v =>
-      `<span class="cal-dot ${v.status === 'confirmed' ? 'cal-dot-confirmed' : 'cal-dot-pending'}"></span>`
-    ).join('');
-
-    html += `<div class="${cls}" onclick="selectCalDay('${dateStr}')">
-      ${d}
-      ${dots ? `<div class="cal-dots">${dots}</div>` : ''}
-    </div>`;
+  const year=calDate.getFullYear(), month=calDate.getMonth();
+  document.getElementById('calMonthLabel').textContent=`${MONTHS_FR[month]} ${year}`;
+  const firstDay=new Date(year,month,1), lastDay=new Date(year,month+1,0);
+  let startPad=firstDay.getDay(); startPad=startPad===0?6:startPad-1;
+  const grid=document.getElementById('calGrid');
+  const today=new Date().toISOString().split('T')[0];
+  let html='';
+  for(let i=0;i<startPad;i++) html+=`<div class="cal-cell cal-empty"></div>`;
+  for(let d=1;d<=lastDay.getDate();d++) {
+    const dateStr=`${year}-${String(month+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    const dayVisits=allVisits.filter(v=>v.visit_date===dateStr);
+    let cls='cal-cell';
+    if (dateStr===today) cls+=' cal-today';
+    if (calSelected===dateStr) cls+=' cal-selected';
+    const dots=dayVisits.slice(0,3).map(v=>`<span class="cal-dot ${v.status==='confirmed'?'cal-dot-confirmed':'cal-dot-pending'}"></span>`).join('');
+    html+=`<div class="${cls}" onclick="selectCalDay('${dateStr}')">${d}${dots?`<div class="cal-dots">${dots}</div>`:''}</div>`;
   }
-
-  grid.innerHTML = html;
+  grid.innerHTML=html;
   if (calSelected) renderDayDetail(calSelected);
 }
 
-function selectCalDay(dateStr) {
-  calSelected = dateStr;
-  renderCalendar();
-  renderDayDetail(dateStr);
-}
+function selectCalDay(dateStr) { calSelected=dateStr; renderCalendar(); renderDayDetail(dateStr); }
 
 function renderDayDetail(dateStr) {
-  const d = new Date(dateStr + 'T00:00:00');
-  const label = d.toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' });
-  document.getElementById('dayDetailTitle').textContent = label;
-
-  const dayVisits = allVisits.filter(v => v.visit_date === dateStr).sort((a,b) => (a.visit_time||'').localeCompare(b.visit_time||''));
-  const content = document.getElementById('dayDetailContent');
-
-  if (!dayVisits.length) {
-    content.innerHTML = `<div style="text-align:center;padding:24px 12px;color:#bbb;font-size:0.85rem;">Aucune visite ce jour</div>`;
-    return;
-  }
-
-  content.innerHTML = dayVisits.map(v => `
+  const d=new Date(dateStr+'T00:00:00');
+  document.getElementById('dayDetailTitle').textContent=d.toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long'});
+  const dayVisits=allVisits.filter(v=>v.visit_date===dateStr).sort((a,b)=>(a.visit_time||'').localeCompare(b.visit_time||''));
+  const content=document.getElementById('dayDetailContent');
+  if (!dayVisits.length) { content.innerHTML=`<div style="text-align:center;padding:24px 12px;color:#bbb;font-size:0.85rem;">Aucune visite ce jour</div>`; return; }
+  content.innerHTML=dayVisits.map(v=>`
     <div class="day-slot">
       <div class="day-slot-dot" style="background:${v.status==='confirmed'?'#2e7d32':'#f57f17'}"></div>
       <div class="day-slot-time">${v.visit_time||'—'}</div>
       <div class="day-slot-info">
         <div class="day-slot-name">${v.buyer_name}</div>
-        <div class="day-slot-sub">${v.status === 'confirmed' ? 'Confirmée' : 'En attente'}</div>
+        <div class="day-slot-sub">${v.status==='confirmed'?'Confirmée':'En attente'}</div>
       </div>
-    </div>
-  `).join('');
+    </div>`).join('');
 }
 
-document.getElementById('calPrev').addEventListener('click', () => {
-  calDate = new Date(calDate.getFullYear(), calDate.getMonth() - 1);
-  renderCalendar();
-});
-document.getElementById('calNext').addEventListener('click', () => {
-  calDate = new Date(calDate.getFullYear(), calDate.getMonth() + 1);
-  renderCalendar();
-});
+document.getElementById('calPrev').addEventListener('click',()=>{ calDate=new Date(calDate.getFullYear(),calDate.getMonth()-1); renderCalendar(); });
+document.getElementById('calNext').addEventListener('click',()=>{ calDate=new Date(calDate.getFullYear(),calDate.getMonth()+1); renderCalendar(); });
 
-// ── Disponibilités mensuelles ─────────────────────────
-let availSlots = []; // { date: 'YYYY-MM-DD', start: 'HH:MM', end: 'HH:MM' }
-let availMonth = new Date();
-availMonth.setDate(1);
-
-function availMonthKey(d) {
-  return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0');
-}
+// ── Disponibilités ────────────────────────────────────
+let availSlots=[];
+let availMonth=new Date(); availMonth.setDate(1);
+function availMonthKey(d) { return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0'); }
 
 function renderAvailMonth() {
-  document.getElementById('availMonthLabel').textContent = MONTHS_FR[availMonth.getMonth()] + ' ' + availMonth.getFullYear();
-  const key = availMonthKey(availMonth);
-  const monthSlots = availSlots.filter(s => s.date.startsWith(key)).sort((a, b) => a.date.localeCompare(b.date) || a.start.localeCompare(b.start));
-  const list = document.getElementById('availSlotList');
-  if (!monthSlots.length) {
-    list.innerHTML = `<div style="text-align:center;padding:28px;color:#bbb;font-size:0.85rem;border:1.5px dashed #e8e0d6;border-radius:10px;">Aucun créneau pour ce mois</div>`;
-    return;
-  }
-  const svgX = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>`;
-  list.innerHTML = monthSlots.map((s) => {
-    const d = new Date(s.date + 'T00:00:00');
-    const label = d.toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' });
-    const globalIdx = availSlots.indexOf(s);
+  document.getElementById('availMonthLabel').textContent=MONTHS_FR[availMonth.getMonth()]+' '+availMonth.getFullYear();
+  const key=availMonthKey(availMonth);
+  const monthSlots=availSlots.filter(s=>s.date.startsWith(key)).sort((a,b)=>a.date.localeCompare(b.date)||a.start.localeCompare(b.start));
+  const list=document.getElementById('availSlotList');
+  if (!monthSlots.length) { list.innerHTML=`<div style="text-align:center;padding:28px;color:#bbb;font-size:0.85rem;border:1.5px dashed #e8e0d6;border-radius:10px;">Aucun créneau pour ce mois</div>`; return; }
+  const svgX=`<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>`;
+  list.innerHTML=monthSlots.map(s=>{
+    const d=new Date(s.date+'T00:00:00');
+    const label=d.toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long'});
+    const globalIdx=availSlots.indexOf(s);
     return `<div class="avail-slot-item" data-slot-idx="${globalIdx}">
       <div class="avail-slot-date">${label}</div>
       <div class="avail-slot-time">${s.start} – ${s.end}</div>
@@ -830,172 +1004,480 @@ function renderAvailMonth() {
   }).join('');
 }
 
-function deleteAvailSlot(idx, itemEl) {
+document.getElementById('availSlotList').addEventListener('click',function(e) {
+  const btn=e.target.closest('[data-del-idx]');
+  if (!btn) return;
+  const idx=parseInt(btn.dataset.delIdx,10);
+  if (isNaN(idx)||idx<0||idx>=availSlots.length) return;
+  const itemEl=btn.closest('.avail-slot-item');
   if (itemEl) {
     itemEl.classList.add('removing');
-    itemEl.addEventListener('animationend', () => {
-      availSlots.splice(idx, 1);
-      persistAvail();
-      renderAvailMonth();
-    }, { once: true });
-  } else {
-    availSlots.splice(idx, 1);
-    persistAvail();
-    renderAvailMonth();
-  }
-}
+    itemEl.addEventListener('animationend',()=>{ availSlots.splice(idx,1); persistAvail(); renderAvailMonth(); },{once:true});
+  } else { availSlots.splice(idx,1); persistAvail(); renderAvailMonth(); }
+});
+
+document.getElementById('availPrev').addEventListener('click',()=>{ availMonth=new Date(availMonth.getFullYear(),availMonth.getMonth()-1,1); renderAvailMonth(); });
+document.getElementById('availNext').addEventListener('click',()=>{ availMonth=new Date(availMonth.getFullYear(),availMonth.getMonth()+1,1); renderAvailMonth(); });
+document.getElementById('availDate').value=new Date().toISOString().split('T')[0];
+
+document.getElementById('addAvailSlot').addEventListener('click',()=>{
+  const date=document.getElementById('availDate').value;
+  const start=document.getElementById('availStart').value;
+  const end=document.getElementById('availEnd').value;
+  if (!date) { showToast('Choisissez une date','error'); return; }
+  if (start>=end) { showToast('L\'heure de fin doit être après le début','error'); return; }
+  availSlots.push({date,start,end});
+  const d=new Date(date+'T00:00:00');
+  availMonth=new Date(d.getFullYear(),d.getMonth(),1);
+  persistAvail(); renderAvailMonth();
+});
 
 function persistAvail() {
-  localStorage.setItem('avail_slots_v2', JSON.stringify(availSlots));
-  fetch('/api/agenda', {
-    method: 'POST', headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ slots: scheduleToSlots() })
-  }).then(r => r.json()).then(data => {
-    if (data.success) showToast('Créneau supprimé');
-  }).catch(() => showToast('Erreur de sauvegarde', 'error'));
+  localStorage.setItem('avail_slots_v2',JSON.stringify(availSlots));
+  fetch('/api/agenda',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({slots:availSlots.map(s=>({date:s.date,start:s.start,end:s.end}))})})
+    .then(r=>r.json()).then(d=>{ if(d.success) showToast('Créneau supprimé'); }).catch(()=>showToast('Erreur','error'));
 }
 
-document.getElementById('availSlotList').addEventListener('click', function(e) {
-  var btn = e.target.closest('[data-del-idx]');
-  if (!btn) return;
-  var idx = parseInt(btn.dataset.delIdx, 10);
-  if (isNaN(idx) || idx < 0 || idx >= availSlots.length) return;
-  var itemEl = btn.closest('.avail-slot-item');
-  deleteAvailSlot(idx, itemEl);
+document.getElementById('saveAgenda').addEventListener('click',async()=>{
+  const btn=document.getElementById('saveAgenda');
+  btn.textContent='Enregistrement…'; btn.disabled=true;
+  localStorage.setItem('avail_slots_v2',JSON.stringify(availSlots));
+  try {
+    const res=await fetch('/api/agenda',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({slots:availSlots.map(s=>({date:s.date,start:s.start,end:s.end}))})});
+    const data=await res.json();
+    if (data.success) {
+      showToast('Disponibilités enregistrées ✓');
+      const ok=document.getElementById('agendaSuccess');
+      ok.classList.remove('hidden'); setTimeout(()=>ok.classList.add('hidden'),3000);
+    }
+  } catch(e) { showToast('Erreur de sauvegarde','error'); }
+  btn.textContent='Enregistrer mes disponibilités'; btn.disabled=false;
 });
 
-document.getElementById('availPrev').addEventListener('click', () => {
-  availMonth = new Date(availMonth.getFullYear(), availMonth.getMonth() - 1, 1);
-  renderAvailMonth();
-});
-document.getElementById('availNext').addEventListener('click', () => {
-  availMonth = new Date(availMonth.getFullYear(), availMonth.getMonth() + 1, 1);
-  renderAvailMonth();
-});
-
-// Set default date to today
-document.getElementById('availDate').value = new Date().toISOString().split('T')[0];
-
-document.getElementById('addAvailSlot').addEventListener('click', () => {
-  const date = document.getElementById('availDate').value;
-  const start = document.getElementById('availStart').value;
-  const end = document.getElementById('availEnd').value;
-  if (!date) { showToast('Choisissez une date', 'error'); return; }
-  if (start >= end) { showToast('L\'heure de fin doit être après le début', 'error'); return; }
-  availSlots.push({ date, start, end });
-  // Navigate to the month of the added slot
-  const d = new Date(date + 'T00:00:00');
-  availMonth = new Date(d.getFullYear(), d.getMonth(), 1);
-  persistAvail();
-  renderAvailMonth();
-});
-
-function scheduleToSlots() {
-  // Send specific-date slots to the API
-  return availSlots.map(s => ({ date: s.date, start: s.start, end: s.end }));
-}
-
-function slotsToSchedule(slots) {
-  // Prefer server-stored specific_date slots; fall back to localStorage
-  const specificSlots = slots.filter(s => s.specific_date);
-  if (specificSlots.length) {
-    availSlots = specificSlots.map(s => ({ date: s.specific_date, start: s.start_time, end: s.end_time }));
-    localStorage.setItem('avail_slots_v2', JSON.stringify(availSlots));
+// ── Contacts / Acquéreurs ─────────────────────────────
+function renderContacts() {
+  const wrap=document.getElementById('contactsTableWrap');
+  const contacts=_data?.contacts||[];
+  if (!contacts.length) {
+    wrap.innerHTML=`<div class="empty-state" style="border:none;border-radius:0;"><div class="empty-state-icon"><svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#ccc" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div><p>Aucun acquéreur enregistré</p></div>`;
     return;
   }
-  // Fall back to localStorage
-  const saved = JSON.parse(localStorage.getItem('avail_slots_v2') || '[]');
-  if (saved.length) { availSlots = saved; return; }
-  // Last resort: convert recurring day-of-week slots to approximate monthly dates
-  const now = new Date();
-  availSlots = [];
-  slots.forEach(s => {
-    const dow = s.day_of_week;
-    for (let dd = 1; dd <= 31; dd++) {
-      const dt = new Date(now.getFullYear(), now.getMonth(), dd);
-      if (dt.getMonth() !== now.getMonth()) break;
-      if (dt.getDay() === dow) {
-        availSlots.push({ date: dt.toISOString().split('T')[0], start: s.start_time, end: s.end_time });
-      }
-    }
-  });
+  const STATUS_OPTS=[{val:'new',label:'Nouveau'},{val:'qualified',label:'Qualifié'},{val:'visit_planned',label:'Visite planifiée'},{val:'not_retained',label:'Non retenu'}];
+  const rows=contacts.map(c=>{
+    const date=c.created_at?new Date(c.created_at).toLocaleDateString('fr-FR',{day:'2-digit',month:'short'}):'—';
+    const statusOpts=STATUS_OPTS.map(o=>`<option value="${o.val}" ${c.status===o.val?'selected':''}>${o.label}</option>`).join('');
+    const budget=c.buyer_budget?parseInt(c.buyer_budget).toLocaleString('fr-FR')+' €':'—';
+    return `<tr>
+      <td><div class="contact-name">${c.buyer_name||'—'}</div><div class="contact-phone">${c.buyer_phone||''}</div></td>
+      <td style="color:#666;font-size:0.83rem;">${c.buyer_email||'—'}</td>
+      <td style="font-size:0.83rem;color:#555;">${budget}</td>
+      <td><span class="contact-source ${c.source==='serenis'?'source-serenis':'source-manuel'}">${c.source==='serenis'?'Serenis':'Manuel'}</span></td>
+      <td><select class="contact-status-select status-${c.status}" onchange="updateContactStatus(${c.id},this)">${statusOpts}</select></td>
+      <td style="color:#aaa;font-size:0.8rem;">${date}</td>
+      <td><div class="contact-actions">
+        <button class="btn-icon" title="Programmer une visite" data-cid="${c.id}" data-cprefill="true"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></button>
+        <button class="btn-icon danger" title="Supprimer" data-cid="${c.id}" data-cdelete="true"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg></button>
+      </div></td>
+    </tr>`;
+  }).join('');
+  wrap.innerHTML=`<div style="overflow-x:auto;"><table class="contacts-table"><thead><tr><th>Acquéreur</th><th>Email</th><th>Budget</th><th>Source</th><th>Statut</th><th>Ajouté</th><th></th></tr></thead><tbody>${rows}</tbody></table></div>`;
 }
 
-document.getElementById('saveAgenda').addEventListener('click', async () => {
-  const btn = document.getElementById('saveAgenda');
-  btn.textContent = 'Enregistrement…'; btn.disabled = true;
-  localStorage.setItem('avail_slots_v2', JSON.stringify(availSlots));
-  try {
-    const res = await fetch('/api/agenda', {
-      method: 'POST', headers: {'Content-Type':'application/json'},
-      body: JSON.stringify({ slots: scheduleToSlots() })
-    });
-    const data = await res.json();
-    if (data.success) {
-      showToast('Disponibilités enregistrées');
-      const ok = document.getElementById('agendaSuccess');
-      ok.classList.remove('hidden');
-      setTimeout(() => ok.classList.add('hidden'), 3000);
-    }
-  } catch(e) { showToast('Erreur lors de la sauvegarde', 'error'); }
-  btn.textContent = 'Enregistrer mes disponibilités'; btn.disabled = false;
+document.getElementById('contactsTableWrap').addEventListener('click',function(e) {
+  const btn=e.target.closest('[data-cid]');
+  if (!btn) return;
+  const id=parseInt(btn.dataset.cid,10);
+  if (btn.dataset.cprefill) prefillVisit(id);
+  else if (btn.dataset.cdelete) deleteContact(id);
 });
 
-// ── Load data ─────────────────────────────────────────
-async function loadVisits() {
-  try {
-    const res = await fetch('/api/visits');
-    const data = await res.json();
-    allVisits = data.visits || [];
-    updateStats(allVisits);
-    renderVisits();
-  } catch(e) {}
+async function updateContactStatus(id,select) {
+  const status=select.value;
+  select.className='contact-status-select status-'+status;
+  try { await fetch(`/api/connect/contacts/${id}/status`,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({status})}); } catch(e) { showToast('Erreur','error'); }
 }
 
-async function loadAgenda() {
-  try {
-    const res = await fetch('/api/agenda');
-    const data = await res.json();
-    if (data.slots?.length) slotsToSchedule(data.slots);
-  } catch(e) {
-    const saved = JSON.parse(localStorage.getItem('avail_slots_v2') || '[]');
-    if (saved.length) availSlots = saved;
+async function deleteContact(id) {
+  if (!confirm('Supprimer cet acquéreur ?')) return;
+  await fetch(`/api/connect/contacts/${id}`,{method:'DELETE'});
+  showToast('Acquéreur supprimé');
+  await loadData();
+}
+
+function prefillVisit(contactId) {
+  const c=(_data?.contacts||[]).find(x=>x.id===contactId);
+  if (!c) return;
+  document.getElementById('vBuyerName').value=c.buyer_name||'';
+  document.getElementById('vBuyerPhone').value=c.buyer_phone||'';
+  document.getElementById('vBuyerEmail').value=c.buyer_email||'';
+  openModal('addVisitOverlay');
+}
+
+// ── Contacts récents (sidebar) ─────────────────────────
+function renderRecentContacts() {
+  const el = document.getElementById('recentContactsList');
+  if (!el) return;
+  const contacts = (_data?.contacts || []).slice(0, 8);
+  if (!contacts.length) {
+    el.innerHTML = `<div style="text-align:center;padding:24px;color:#bbb;font-size:0.82rem;">Aucun contact pour l'instant.<br>Publiez votre numéro Serenis dans vos annonces.</div>`;
+    return;
   }
-  renderAvailMonth();
+  const sourceLabel = { voice:'📞 Appel', sms:'💬 SMS', manuel:'✏️ Manuel' };
+  const sourceClass = { voice:'voice', sms:'sms', manuel:'manuel' };
+  el.innerHTML = contacts.map(c => {
+    const when = c.created_at ? new Date(c.created_at).toLocaleDateString('fr-FR',{day:'2-digit',month:'short'}) : '';
+    const phone = c.buyer_name || c.buyer_phone || '—';
+    const src = c.source || 'sms';
+    return `<div class="contact-item">
+      <div class="contact-avatar ${src==='voice'?'call':''}">${(c.buyer_name||c.buyer_phone||'?')[0].toUpperCase()}</div>
+      <div class="contact-info">
+        <div class="contact-phone">${phone}</div>
+        <div class="contact-meta">${c.buyer_email||''} ${when}</div>
+      </div>
+      <span class="contact-source ${sourceClass[src]||'sms'}">${sourceLabel[src]||'SMS'}</span>
+    </div>`;
+  }).join('');
 }
 
-async function loadBookingLink() {
+// ── Notifications sidebar ──────────────────────────────
+function renderNotifSidebar() {
+  const el = document.getElementById('notifSidebarContent');
+  if (!el) return;
+  const notifs = (_data?.notifications || []).filter(n=>!n.read_at).slice(0,5);
+  if (!notifs.length) {
+    el.innerHTML = `<div style="text-align:center;padding:18px;color:#bbb;font-size:0.81rem;">Aucune nouvelle notification</div>`;
+    return;
+  }
+  const TYPE_ICONS = { visit_request:'📅', visit_confirmed:'✅', offer:'💼', contact:'👤', system:'ℹ️' };
+  el.innerHTML = notifs.map(n => `
+    <div class="contact-item">
+      <div class="contact-avatar" style="background:#f0f5f1;font-size:1rem;">${TYPE_ICONS[n.type]||'🔔'}</div>
+      <div class="contact-info">
+        <div class="contact-phone" style="font-size:0.82rem;">${n.title||''}</div>
+        <div class="contact-meta">${n.body||''}</div>
+      </div>
+    </div>`).join('');
+}
+
+// ── Modals ─────────────────────────────────────────────
+function openModal(id) { document.getElementById(id).classList.add('open'); document.body.style.overflow='hidden'; }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); document.body.style.overflow=''; }
+document.querySelectorAll('.modal-overlay').forEach(o=>{ o.addEventListener('click',e=>{ if(e.target===o) closeModal(o.id); }); });
+
+function openAddVisit() {
+  document.getElementById('vDate').value=new Date().toISOString().split('T')[0];
+  document.getElementById('vTime').value='14:00';
+  openModal('addVisitOverlay');
+}
+
+async function submitAddVisit() {
+  const body={
+    buyer_name:document.getElementById('vBuyerName').value.trim(),
+    buyer_phone:document.getElementById('vBuyerPhone').value.trim(),
+    buyer_email:document.getElementById('vBuyerEmail').value.trim(),
+    visit_date:document.getElementById('vDate').value,
+    visit_time:document.getElementById('vTime').value,
+    notes:document.getElementById('vNotes').value.trim(),
+  };
+  if (!body.visit_date||!body.visit_time) { showToast('Date et heure requises','error'); return; }
   try {
-    const res = await fetch('/api/property');
-    const data = await res.json();
-    if (data.property?.published && data.property?.slug) {
-      const url = `${window.location.origin}/bien/${data.property.slug}#reservation`;
-      document.getElementById('bookingLinkBox').style.display = 'block';
-      document.getElementById('bookingLink').value = url;
-      document.getElementById('noLinkMsg').style.display = 'none';
-    }
-  } catch(e) {}
+    const res=await fetch('/api/visits',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+    const data=await res.json();
+    if (data.error) { showToast(data.error,'error'); return; }
+    closeModal('addVisitOverlay');
+    ['vBuyerName','vBuyerPhone','vBuyerEmail','vNotes'].forEach(id=>document.getElementById(id).value='');
+    showToast('Visite programmée ✓');
+    await loadData();
+  } catch(e) { showToast('Erreur réseau','error'); }
 }
 
+async function submitAddContact() {
+  const body={
+    buyer_name:document.getElementById('cBuyerName').value.trim(),
+    buyer_phone:document.getElementById('cBuyerPhone').value.trim(),
+    buyer_email:document.getElementById('cBuyerEmail').value.trim(),
+    buyer_budget:document.getElementById('cBuyerBudget').value.trim(),
+    notes:document.getElementById('cNotes').value.trim(),
+  };
+  try {
+    const res=await fetch('/api/connect/contacts',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+    const data=await res.json();
+    if (data.error) { showToast(data.error,'error'); return; }
+    closeModal('addContactOverlay');
+    ['cBuyerName','cBuyerPhone','cBuyerEmail','cBuyerBudget','cNotes'].forEach(id=>document.getElementById(id).value='');
+    showToast('Acquéreur ajouté ✓');
+    await loadData();
+  } catch(e) { showToast('Erreur réseau','error'); }
+}
+
+// ── Mail templates ────────────────────────────────────
+const MC_CATS=[{key:'contact',label:'Premier contact'},{key:'fiche',label:'Fiche & Photos'},{key:'visite',label:'Visite'},{key:'apres',label:'Après visite'},{key:'relance',label:'Relances'},{key:'offre',label:'Offre'}];
+let _mcActiveCat='contact';
+
+const MC_MAILS=[
+  {cat:'contact',step:1,label:'Prise de contact initiale',objet:'Votre intérêt pour le bien à [Ville] — Serenis',hasLink:false,corps:`Bonjour [Prénom],\n\nVous avez contacté le numéro Serenis concernant le bien situé à [Ville].\n\nLe propriétaire fait appel à Serenis, un service dédié à la vente entre particuliers, pour gérer les contacts acquéreurs dans les meilleures conditions.\n\nSi ce bien vous intéresse encore, nous pouvons vous transmettre :\n— La fiche descriptive complète du bien\n— Les photos professionnelles\n— Toutes les informations sur les charges et la fiscalité\n\nIl vous suffit de nous confirmer votre intérêt en répondant à ce message.\n\nCordialement,\nL'équipe Serenis\nPour le compte du propriétaire`},
+  {cat:'fiche',step:1,label:'Fiche descriptive complète',objet:'Fiche descriptive et photos — [Ville]',hasLink:true,linkLabel:'Lien fiche + photos + agenda',corps:`Bonjour [Prénom],\n\nSuite à votre contact, le propriétaire vous transmet via Serenis la fiche descriptive complète de son bien :\n\n→ {{LIEN}}\n\nCette fiche vous donne une vision complète du bien avant même de vous déplacer. Elle inclut également l'agenda en ligne du propriétaire si vous souhaitez réserver une visite directement.\n\nCordialement,\nL'équipe Serenis`},
+  {cat:'fiche',step:2,label:'DPE et diagnostics',objet:'Diagnostics techniques du bien à [Ville]',hasLink:true,linkLabel:'Lien dossier (inclut diagnostics)',corps:`Bonjour [Prénom],\n\nEn amont de votre visite, le propriétaire vous transmet via Serenis le dossier complet incluant le DPE et l'ensemble des diagnostics obligatoires :\n\n→ {{LIEN}}\n\nPrenez le temps de les consulter avant de vous déplacer.\n\nCordialement,\nL'équipe Serenis`},
+  {cat:'visite',step:1,label:'Confirmation de visite',objet:'Confirmation de votre visite — [Ville] le [Date]',hasLink:false,corps:`Bonjour [Prénom],\n\nNous confirmons votre visite du bien situé à [Ville] :\n\n📅 Date : [Date]\n⏰ Heure : [Heure]\n📍 Adresse : [Adresse]\n\nLe propriétaire vous accueillera directement. N'hésitez pas à nous contacter si vous avez des questions.\n\nCordialement,\nL'équipe Serenis`},
+  {cat:'visite',step:2,label:'Rappel de visite (J-1)',objet:'Rappel — Votre visite demain à [Ville]',hasLink:false,corps:`Bonjour [Prénom],\n\nNous vous rappelons votre visite prévue demain :\n\n📅 [Date] à [Heure]\n📍 [Adresse]\n\nSi vous ne pouvez pas vous présenter, merci de nous prévenir le plus tôt possible afin que le propriétaire puisse organiser sa journée.\n\nCordialement,\nL'équipe Serenis`},
+  {cat:'apres',step:1,label:'Suivi post-visite',objet:'Suite à votre visite — [Ville]',hasLink:false,corps:`Bonjour [Prénom],\n\nNous espérons que votre visite du bien à [Ville] s'est bien passée.\n\nAvez-vous des questions sur le bien ou souhaitez-vous obtenir des informations complémentaires ?\n\nSi ce bien vous intéresse, n'hésitez pas à nous faire part de vos retours.\n\nCordialement,\nL'équipe Serenis`},
+  {cat:'relance',step:1,label:'Relance douce (J+3)',objet:'Le bien à [Ville] est toujours disponible',hasLink:true,linkLabel:'Lien dossier complet',corps:`Bonjour [Prénom],\n\nNous revenons vers vous concernant le bien à [Ville] que vous avez visité récemment.\n\nCe bien est toujours disponible. Si vous avez des questions ou souhaitez organiser une deuxième visite, le dossier complet reste accessible ici :\n\n→ {{LIEN}}\n\nCordialement,\nL'équipe Serenis`},
+  {cat:'relance',step:2,label:'Dernière relance',objet:'Dernière information — Bien à [Ville]',hasLink:false,corps:`Bonjour [Prénom],\n\nNous vous contactons une dernière fois concernant le bien à [Ville].\n\nSi votre projet d'acquisition est toujours d'actualité, n'hésitez pas à revenir vers nous. Dans le cas contraire, nous comprenons tout à fait.\n\nBonne continuation dans vos recherches.\n\nCordialement,\nL'équipe Serenis`},
+  {cat:'offre',step:1,label:'Accusé réception d\'offre',objet:'Votre offre reçue — Bien à [Ville]',hasLink:false,corps:`Bonjour [Prénom],\n\nNous accusons bonne réception de votre offre d'achat pour le bien situé à [Ville].\n\nVotre offre a été transmise au propriétaire. Il reviendra vers vous dans les meilleurs délais.\n\nCordialement,\nL'équipe Serenis`},
+];
+
+function renderMcTabs() {
+  const tabs=document.getElementById('mcTabs');
+  if (!tabs) return;
+  tabs.innerHTML=MC_CATS.map(c=>`<button class="mc-tab ${c.key===_mcActiveCat?'active':''}" onclick="switchMcCat('${c.key}')">${c.label}</button>`).join('');
+}
+
+function switchMcCat(cat) { _mcActiveCat=cat; renderMcTabs(); renderMcCards(); }
+
+function renderMcCards() {
+  const cards=document.getElementById('mcCards');
+  if (!cards) return;
+  const mails=MC_MAILS.filter(m=>m.cat===_mcActiveCat);
+  cards.innerHTML=mails.map((m,i)=>{
+    const corps=m.hasLink&&_mcAcheteurUrl?m.corps.replace('{{LIEN}}',_mcAcheteurUrl):m.corps.replace('{{LIEN}}','[Lien à coller ici]');
+    return `<div class="mc-card" id="mc-card-${i}">
+      <div class="mc-card-hdr" onclick="toggleMcCard(${i})">
+        <div class="mc-card-step">${m.step}</div>
+        <div class="mc-card-label">${m.label}</div>
+        <span class="mc-card-arr">›</span>
+      </div>
+      <div class="mc-card-body">
+        <div class="mc-objet">Objet</div>
+        <div class="mc-objet-val">${m.objet}</div>
+        <div class="mc-mail-text">${corps}</div>
+        <button class="mc-copy-btn" onclick="copyMcMail(${i},'${encodeURIComponent(corps)}','${encodeURIComponent(m.objet)}')">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+          Copier le corps du mail
+        </button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function toggleMcCard(idx) {
+  const card=document.getElementById('mc-card-'+idx);
+  if (card) card.classList.toggle('open');
+}
+
+function copyMcMail(idx,bodyEnc,subjectEnc) {
+  const body=decodeURIComponent(bodyEnc);
+  navigator.clipboard.writeText(body).then(()=>{
+    const btn=document.querySelector(`#mc-card-${idx} .mc-copy-btn`);
+    if (btn) { btn.textContent='✓ Copié !'; btn.classList.add('copied'); setTimeout(()=>{ btn.innerHTML='<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Copier le corps du mail'; btn.classList.remove('copied'); },2000); }
+    showToast('Corps du mail copié ✓');
+  }).catch(()=>showToast('Erreur copie','error'));
+}
+
+// ── Notifications ─────────────────────────────────────
+let notifData=null, notifActiveTab='all';
+
+function notifTimeAgo(dateStr) {
+  if (!dateStr) return '';
+  const diff=Math.floor((Date.now()-new Date(dateStr).getTime())/1000);
+  if (diff<60) return 'À l\'instant';
+  if (diff<3600) return Math.floor(diff/60)+' min';
+  if (diff<86400) return Math.floor(diff/3600)+'h';
+  if (diff<604800) return Math.floor(diff/86400)+'j';
+  return new Date(dateStr).toLocaleDateString('fr-FR');
+}
+
+function notifSwitchTab(tab) {
+  notifActiveTab=tab;
+  document.querySelectorAll('.notif-pill').forEach(t=>t.classList.toggle('active',t.dataset.tab===tab));
+  notifRender();
+}
+
+function notifBuildItems() {
+  const items=[];
+  const typeMap={
+    visit_request:{icon:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>',cls:'ni-visit',tab:'visits'},
+    visit_confirmed:{icon:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>',cls:'ni-visit',tab:'visits'},
+    new_contact:{icon:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>',cls:'ni-contact',tab:'contacts'},
+    new_offer:{icon:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/></svg>',cls:'ni-offer',tab:'offers'},
+  };
+  const bellIcon='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>';
+  (notifData.notifications||[]).forEach(n=>{
+    const t=typeMap[n.type]||{icon:bellIcon,cls:'ni-system',tab:'system'};
+    items.push({tab:t.tab,icon:t.icon,iconCls:t.cls,title:n.title||n.type,sub:n.body||'',date:n.created_at,unread:!n.read_at});
+  });
+  const calIcon='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>';
+  const userIcon='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>';
+  const euroIcon='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/></svg>';
+  (notifData.visits||[]).forEach(v=>{
+    const statusLabel={confirmed:'Confirmée',pending:'En attente',cancelled:'Annulée',done:'Réalisée'}[v.status]||v.status;
+    items.push({tab:'visits',icon:calIcon,iconCls:'ni-visit',title:`Visite — ${v.buyer_name}`,sub:`${v.visit_date} à ${v.visit_time} · ${statusLabel}`,date:v.created_at,unread:false});
+  });
+  (notifData.offers||[]).forEach(o=>{
+    items.push({tab:'offers',icon:euroIcon,iconCls:'ni-offer',title:`Offre de ${o.buyer_name} — ${Number(o.amount).toLocaleString('fr-FR')} €`,sub:`${o.status==='pending'?'En attente de réponse':o.status}`,date:o.created_at,unread:o.status==='pending'});
+  });
+  (notifData.contacts||[]).forEach(c=>{
+    items.push({tab:'contacts',icon:userIcon,iconCls:'ni-contact',title:`Nouveau contact — ${c.buyer_name||c.buyer_phone||'Acquéreur'}`,sub:`Via ${c.source==='sms'?'SMS':c.source==='manuel'?'Ajout manuel':c.source}`,date:c.created_at,unread:false});
+  });
+  return items.sort((a,b)=>new Date(b.date)-new Date(a.date));
+}
+
+function notifRender() {
+  if (!notifData) return;
+  const content=document.getElementById('notif-content');
+  const allItems=notifBuildItems();
+  const filtered=notifActiveTab==='all'?allItems:allItems.filter(i=>i.tab===notifActiveTab);
+  if (!filtered.length) { content.innerHTML='<div class="empty-state"><div class="empty-state-icon"><svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#ccc" stroke-width="1.5"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg></div><p>Aucune notification.</p></div>'; return; }
+  const groups={};
+  filtered.forEach(item=>{
+    const d=item.date?new Date(item.date):null;
+    const key=d?d.toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long'}):'Date inconnue';
+    if (!groups[key]) groups[key]=[];
+    groups[key].push(item);
+  });
+  content.innerHTML=Object.entries(groups).map(([label,items])=>`
+    <div class="notif-group">
+      <div class="notif-group-title">${label}</div>
+      ${items.map(i=>`<div class="notif-card ${i.unread?'unread':''}">
+        <div class="notif-icon-n ${i.iconCls}">${i.icon}</div>
+        <div class="notif-body">
+          <div class="notif-title-n">${i.title}${i.unread?'<span class="unread-dot"></span>':''}</div>
+          <div class="notif-sub-n">${i.sub||''}</div>
+        </div>
+        <div class="notif-time">${notifTimeAgo(i.date)}</div>
+      </div>`).join('')}
+    </div>`).join('');
+}
+
+async function notifMarkAllRead() {
+  await fetch('/api/notifications/read-all',{method:'POST'});
+  if (notifData) notifData.notifications.forEach(n=>n.read_at=new Date().toISOString());
+  notifRender();
+  const badge=document.getElementById('notif-unread-badge');
+  if (badge) badge.style.display='none';
+}
+
+async function loadNotifications() {
+  try {
+    const r=await fetch('/api/notifications/all');
+    notifData=await r.json();
+    const unread=(notifData.notifications||[]).filter(n=>!n.read_at).length;
+    const badge=document.getElementById('notif-unread-badge');
+    if (badge) { badge.textContent=unread||''; badge.style.display=unread?'inline-flex':'none'; }
+    notifRender();
+  } catch(e) {
+    const content=document.getElementById('notif-content');
+    if (content) content.innerHTML='<div class="empty-state"><p>Erreur de chargement</p></div>';
+  }
+}
+
+// ── Toast ─────────────────────────────────────────────
+function showToast(msg,type='success') {
+  const t=document.getElementById('toast');
+  t.textContent=msg;
+  t.className='toast'+(type==='error'?' error':'');
+  t.classList.add('show');
+  clearTimeout(t._timer);
+  t._timer=setTimeout(()=>t.classList.remove('show'),3000);
+}
+window.showToast=showToast;
+
+// ── Copy booking link ─────────────────────────────────
 function copyBookingLink() {
-  const input = document.getElementById('bookingLink');
-  navigator.clipboard.writeText(input.value).catch(() => { input.select(); document.execCommand('copy'); });
+  const input=document.getElementById('bookingLink');
+  navigator.clipboard.writeText(input.value).catch(()=>{ input.select(); document.execCommand('copy'); });
   showToast('Lien copié !');
 }
 
-function showToast(msg, type = 'success') {
-  let t = document.querySelector('.toast');
-  if (!t) { t = document.createElement('div'); t.className = 'toast'; document.body.appendChild(t); }
-  t.textContent = msg;
-  t.className = 'toast' + (type === 'error' ? ' error' : '');
-  t.classList.add('show');
-  setTimeout(() => t.classList.remove('show'), 3000);
+function copySerenisNumber() {
+  const num=document.getElementById('scNumDisplay').textContent;
+  if(!num||num==='—') return;
+  navigator.clipboard.writeText(num).catch(()=>{});
+  showToast('Numéro copié !');
 }
-window.showToast = showToast;
 
-loadVisits();
-loadAgenda();
-loadBookingLink();
+function copyAccroche() {
+  const num=document.getElementById('scAccrocheNum').textContent||'—';
+  const phrase=`Pour visiter ce bien ou obtenir la fiche descriptive complète, contactez-moi directement au ${num}. La prise de contact est instantanée.`;
+  navigator.clipboard.writeText(phrase).catch(()=>{});
+  showToast('Phrase copiée !');
+}
+
+// ── Data loading ──────────────────────────────────────
+async function loadData() {
+  try {
+    const [overviewRes,agendaRes]=await Promise.all([fetch('/api/connect/overview'),fetch('/api/agenda')]);
+    _data=await overviewRes.json();
+    allVisits=_data.visits||[];
+
+    // Serenis number — pill in header + card in Acquéreurs tab
+    const num=_data.seller?.twilio_number;
+    const pill=document.getElementById('serenisNumberPill');
+    if (num&&pill) { document.getElementById('serenisNumberText').textContent=num; pill.style.display='inline-flex'; }
+    // Acquéreurs tab card
+    const scCard=document.getElementById('scCard');
+    const scNoNum=document.getElementById('scNoNumHint');
+    if (num) {
+      document.getElementById('scNumDisplay').textContent=num;
+      document.getElementById('scAccrocheNum').textContent=num;
+      const btn=document.getElementById('scCopyBtn'); if(btn) btn.disabled=false;
+      if(scCard) scCard.style.display='grid';
+      if(scNoNum) scNoNum.style.display='none';
+    } else {
+      if(scCard) scCard.style.display='none';
+      if(scNoNum) scNoNum.style.display='block';
+    }
+
+    // Booking link
+    if (_data.property?.slug&&_data.property?.published) {
+      const url=`${window.location.origin}/bien/${_data.property.slug}#reservation`;
+      document.getElementById('bookingLinkBox').style.display='block';
+      document.getElementById('bookingLink').value=url;
+      document.getElementById('noLinkMsg').style.display='none';
+    }
+
+    // Acheteur URL for mail templates
+    if (_data.property?.acheteur_token) {
+      _mcAcheteurUrl=window.location.origin+'/dossier/acheteur/'+_data.property.acheteur_token;
+    }
+
+    // Sidebar pack
+    const packEl=document.getElementById('sidebarPack');
+    if (packEl&&_data.seller) packEl.innerHTML=`<strong>${_data.seller.pack||'Autonome'}</strong><span>Espace vendeur</span>`;
+
+    updateStats();
+    renderVisits();
+    renderContacts();
+    renderRecentContacts();
+    renderNotifSidebar();
+    renderMcTabs();
+    renderMcCards();
+
+    // Availability
+    const agendaData=await agendaRes.json();
+    if (agendaData.slots?.length) {
+      const specificSlots=agendaData.slots.filter(s=>s.specific_date);
+      if (specificSlots.length) {
+        availSlots=specificSlots.map(s=>({date:s.specific_date,start:s.start_time,end:s.end_time}));
+        localStorage.setItem('avail_slots_v2',JSON.stringify(availSlots));
+      } else {
+        const saved=JSON.parse(localStorage.getItem('avail_slots_v2')||'[]');
+        if (saved.length) availSlots=saved;
+      }
+    } else {
+      const saved=JSON.parse(localStorage.getItem('avail_slots_v2')||'[]');
+      if (saved.length) availSlots=saved;
+    }
+    renderAvailMonth();
+
+  } catch(e) { showToast('Erreur de chargement','error'); }
+}
+
+// ── Init ──────────────────────────────────────────────
+loadData().then(() => {
+  renderCalendar();
+  renderAvailMonth();
+  loadNotifications();
+});
 </script>
 <script src="/js/transitions.js"></script>
 <script src="/js/seller-nav.js"></script>

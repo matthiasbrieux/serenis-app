@@ -20,6 +20,7 @@ app.use(helmet({
       imgSrc: ["'self'", "data:", "*.cloudinary.com", "res.cloudinary.com", "images.unsplash.com", "api.qrserver.com"],
       connectSrc: ["'self'", "api.stripe.com"],
       frameSrc: ["'self'", "js.stripe.com"],
+      mediaSrc: ["'self'"],
     }
   }
 }));
@@ -180,7 +181,7 @@ app.listen(PORT, () => {
   backupDatabase(); // premier backup au démarrage
   setInterval(() => backupDatabase(), 24 * 60 * 60 * 1000); // backup quotidien
 
-  const { sendVisitReminders, sendMissionReminders, sendAutomatedNudges, sendContractExpiryReminders, sendPostVisitBuyerNudges, sendWeeklyAdminReportEmail, sendPhotographerAvailabilityNudges, sendPostFirstVisitFeedbackNudges, sendCheckInNoOfferNudges } = require('./services/reminders');
+  const { sendVisitReminders, sendMissionReminders, sendAutomatedNudges, sendContractExpiryReminders, sendPostVisitBuyerNudges, sendWeeklyAdminReportEmail, sendPhotographerAvailabilityNudges, sendPostFirstVisitFeedbackNudges, sendCheckInNoOfferNudges, chargeInstallments } = require('./services/reminders');
 
   function runDailyJobs() {
     sendVisitReminders().catch(e => console.error('Reminder job error:', e.message));
@@ -191,6 +192,7 @@ app.listen(PORT, () => {
     sendPhotographerAvailabilityNudges().catch(e => console.error('Photographer nudge job error:', e.message));
     sendPostFirstVisitFeedbackNudges().catch(e => console.error('Post-visit feedback job error:', e.message));
     sendCheckInNoOfferNudges().catch(e => console.error('Check-in no offer job error:', e.message));
+    chargeInstallments().catch(e => console.error('Installment charge job error:', e.message));
   }
 
   function scheduleReminders() {

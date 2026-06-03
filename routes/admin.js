@@ -38,7 +38,16 @@ router.get('/parcours', requireAdmin, (req, res) => {
 });
 
 router.get('/api/parcours/tokens', requireAdmin, (req, res) => {
-  const prop = db.prepare('SELECT acheteur_token, notaire_token, slug FROM properties WHERE published=1 AND acheteur_token IS NOT NULL LIMIT 1').get();
+  // Préfère un bien publié avec photos, sinon prend le premier disponible
+  const prop = db.prepare(`
+    SELECT p.acheteur_token, p.notaire_token, p.slug, p.address, p.city,
+      s.first_name, s.last_name,
+      (SELECT COUNT(*) FROM property_photos pp WHERE pp.property_id = p.id) as photo_count
+    FROM properties p JOIN sellers s ON s.id = p.seller_id
+    WHERE p.acheteur_token IS NOT NULL
+    ORDER BY p.published DESC, photo_count DESC
+    LIMIT 1
+  `).get();
   res.json({ prop: prop || null });
 });
 
@@ -242,9 +251,9 @@ router.post('/api/seed-demo', requireAdmin, (req, res) => {
     VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
   `);
   const insertProp = db.prepare(`
-    INSERT INTO properties (uuid, seller_id, slug, type, address, city, postal_code,
+    INSERT INTO properties (uuid, seller_id, slug, acheteur_token, notaire_token, type, address, city, postal_code,
       surface_habitable, rooms, price, description, status, published, published_at, created_at)
-    VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+    VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
   `);
   const insertPhoto = db.prepare('INSERT INTO property_photos (property_id, cloudinary_id, url, order_index) VALUES (?,?,?,?)');
   const insertDoc   = db.prepare("INSERT INTO property_documents (property_id, name, url, doc_type) VALUES (?,?,?,?)");
@@ -266,7 +275,7 @@ router.post('/api/seed-demo', requireAdmin, (req, res) => {
     const p = d.property;
     const propUuid = uuidv4();
     const slug = `demo-${p.city.toLowerCase().replace(/\s/g,'-')}-${sellerId}`;
-    const pr = insertProp.run(propUuid, sellerId, slug, p.type, p.address, p.city, p.postal,
+    const pr = insertProp.run(propUuid, sellerId, slug, uuidv4(), uuidv4(), p.type, p.address, p.city, p.postal,
       p.surface, p.rooms, p.price, p.description, p.status, p.published ? 1 : 0, p.published_at || null, d.paid_at);
     const propertyId = pr.lastInsertRowid;
     for (let i = 0; i < (p.photosCount||0); i++) {
@@ -306,7 +315,7 @@ router.delete('/api/seed-demo', requireAdmin, (req, res) => {
 });
 
 router.get('/create-seller', requireAdmin, async (req, res) => {
-  const { email, password } = req.query;
+  const { email, password, pack } = req.query;
   if (!email || !password) return res.status(400).send('Paramètres manquants');
   const hashed = await bcrypt.hash(password, 12);
   const existing = db.prepare('SELECT id FROM sellers WHERE email = ?').get(email.toLowerCase());
@@ -315,9 +324,14 @@ router.get('/create-seller', requireAdmin, async (req, res) => {
     return res.send(`✓ Mot de passe mis à jour pour ${email}`);
   }
   const uuid = uuidv4();
-  db.prepare('INSERT INTO sellers (uuid, email, password, pack, paid_at) VALUES (?,?,?,?,CURRENT_TIMESTAMP)')
-    .run(uuid, email.toLowerCase(), hashed, 'serenite');
-  res.send(`✓ Compte créé — email: ${email}`);
+  const r = db.prepare('INSERT INTO sellers (uuid, email, password, pack, paid_at) VALUES (?,?,?,?,CURRENT_TIMESTAMP)')
+    .run(uuid, email.toLowerCase(), hashed, pack || 'serenite');
+  const sellerId = r.lastInsertRowid;
+  // Crée automatiquement une fiche bien vide avec les tokens dossier
+  const propUuid = uuidv4();
+  db.prepare('INSERT INTO properties (uuid, seller_id, slug, acheteur_token, notaire_token, status) VALUES (?,?,?,?,?,?)')
+    .run(propUuid, sellerId, `bien-${sellerId}`, uuidv4(), uuidv4(), 'preparation');
+  res.send(`✓ Compte créé — email: ${email} — dossier acheteur activé`);
 });
 
 // ── Stats dashboard ─────────────────────────────────────────

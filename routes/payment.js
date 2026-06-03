@@ -1,22 +1,35 @@
 const express = require('express');
 const router = express.Router();
+const rateLimit = require('express-rate-limit');
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { v4: uuidv4 } = require('uuid');
 const db = require('../database');
-const { sendWelcomeEmail, sendInvoiceEmail } = require('../services/email');
+const { sendWelcomeImproved, sendInvoiceEmail } = require('../services/email');
+const crypto = require('crypto');
+
+const checkoutLimit = rateLimit({
+  windowMs: 60 * 60 * 1000, // 1h
+  max: 8,
+  keyGenerator: (req) => (req.body?.email || req.ip),
+  standardHeaders: true,
+  legacyHeaders: false,
+  handler: (req, res) => res.status(429).json({ error: 'Trop de tentatives. Réessayez dans une heure ou appelez le 06 95 44 36 54.' }),
+});
 
 // Checkout session creation
-router.post('/create-checkout', async (req, res) => {
+router.post('/create-checkout', express.json(), checkoutLimit, async (req, res) => {
   const { pack, email, plan } = req.body;
   let { password } = req.body;
   if (!['serenite', 'autonome'].includes(pack)) return res.json({ error: 'Pack invalide' });
   if (!email) return res.json({ error: 'Email requis' });
   // Si aucun mot de passe fourni (certains formulaires ne l'incluent pas), on en génère un temporaire
+  let needsPasswordReset = false;
   if (!password || password.length < 8) {
     if (!password) {
-      password = require('crypto').randomBytes(12).toString('base64url');
+      password = crypto.randomBytes(12).toString('base64url');
+      needsPasswordReset = true;
     } else {
       return res.json({ error: 'Mot de passe trop court (8 caractères minimum).' });
     }
@@ -53,7 +66,7 @@ router.post('/create-checkout', async (req, res) => {
     }
     const seller = db.prepare('SELECT id FROM sellers WHERE email=?').get(email.toLowerCase());
 
-    const session = await stripe.checkout.sessions.create({
+    const sessionParams = {
       payment_method_types: ['card'],
       line_items: [{
         price_data: {
@@ -67,9 +80,14 @@ router.post('/create-checkout', async (req, res) => {
       customer_email: email,
       success_url: `${process.env.BASE_URL}/paiement-succes?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${process.env.BASE_URL}/#offres`,
-      metadata: { pack, email, seller_id: String(seller.id), plan: plan || 'unique', installment: '1', total_installments: is4x ? '4' : '1' },
+      metadata: { pack, email, seller_id: String(seller.id), plan: plan || 'unique', installment: '1', total_installments: is4x ? '4' : '1', needs_password_reset: needsPasswordReset ? 'true' : 'false' },
       locale: 'fr',
-    });
+    };
+    // Pour le 4x : sauvegarder la carte pour les 3 versements suivants
+    if (is4x) {
+      sessionParams.payment_intent_data = { setup_future_usage: 'off_session' };
+    }
+    const session = await stripe.checkout.sessions.create(sessionParams);
     res.json({ url: session.url });
   } catch (err) {
     console.error('Stripe error:', err.message);
@@ -208,8 +226,37 @@ async function activateSeller(session) {
     }
   }
 
-  // Email de bienvenue
-  try { await sendWelcomeEmail(seller.email, null, pack || 'serenite'); } catch(e) {}
+  // Gestion plan 4x — sauvegarder la carte + initialiser le suivi des mensualités
+  const is4xPlan = session.metadata?.total_installments === '4';
+  if (is4xPlan) {
+    try {
+      const customerId = session.customer || seller.stripe_customer_id;
+      if (customerId) {
+        const pms = await stripe.paymentMethods.list({ customer: customerId, type: 'card', limit: 1 });
+        const pmId = pms.data[0]?.id;
+        if (pmId) {
+          const nextDate = new Date(Date.now() + 30 * 24 * 3600 * 1000).toISOString().split('T')[0];
+          db.prepare('UPDATE sellers SET stripe_payment_method_id=?, installments_paid=1, installments_total=4, next_installment_date=? WHERE id=?')
+            .run(pmId, nextDate, seller.id);
+          console.log(`✓ Carte sauvegardée pour paiement 4x — seller ${seller.id}`);
+        }
+      }
+    } catch(e) { console.error('4x setup error:', e.message); }
+  }
+
+  // Email de bienvenue — avec lien reset si mot de passe auto-généré
+  try {
+    const needsReset = session.metadata?.needs_password_reset === 'true';
+    if (needsReset) {
+      const resetToken = crypto.randomBytes(32).toString('hex');
+      const expires = new Date(Date.now() + 7 * 24 * 3600 * 1000).toISOString();
+      db.prepare('INSERT INTO password_reset_tokens (seller_id, token, expires_at) VALUES (?,?,?)').run(seller.id, resetToken, expires);
+      const base = process.env.BASE_URL || 'https://venduparmo.fr';
+      await sendWelcomeImproved({ to: seller.email, firstName: seller.first_name, pack: pack || 'serenite', resetUrl: `${base}/reset-password?token=${resetToken}` });
+    } else {
+      await sendWelcomeImproved({ to: seller.email, firstName: seller.first_name, pack: pack || 'serenite' });
+    }
+  } catch(e) { console.error('Welcome email error:', e.message); }
 
   // Facture automatique
   try {

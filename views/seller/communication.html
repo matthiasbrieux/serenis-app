@@ -2,6 +2,7 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
+  <script>if("scrollRestoration"in history)history.scrollRestoration="manual";</script>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Serenis Connect — Centre de communication</title>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
@@ -282,6 +283,51 @@
     .toast.show { transform:translateY(0);opacity:1; }
     .toast.error { background:#c62828; }
 
+    /* ── Mails Connect ───────────────── */
+    .mc-section { background:#fff;border-radius:16px;border:1px solid #e8e0d6;overflow:hidden;margin-bottom:24px; }
+    .mc-section-header { padding:20px 24px 16px;border-bottom:1px solid #f0ede8; }
+    .mc-section-title { font-size:1rem;font-weight:700;color:#1a1a1a;margin:0 0 4px; }
+    .mc-section-sub { font-size:0.78rem;color:#999;line-height:1.5; }
+    .mc-tabs { display:flex;flex-wrap:wrap;gap:6px;padding:16px 24px;border-bottom:1px solid #f0ede8; }
+    .mc-tab {
+      padding:5px 14px;border-radius:20px;border:1.5px solid #e8e0d6;background:#fff;
+      font-family:'DM Sans',sans-serif;font-size:0.75rem;font-weight:600;color:#888;cursor:pointer;transition:0.15s;
+    }
+    .mc-tab:hover { border-color:#3D5A47;color:#3D5A47; }
+    .mc-tab.active { background:#3D5A47;border-color:#3D5A47;color:#fff; }
+    .mc-cards { padding:16px 24px;display:flex;flex-direction:column;gap:10px; }
+    .mc-card { border:1.5px solid #e8e0d6;border-radius:12px;overflow:hidden;transition:border-color 0.2s; }
+    .mc-card.open { border-color:#3D5A47; }
+    .mc-card-hdr {
+      display:flex;align-items:center;gap:12px;padding:13px 16px;cursor:pointer;
+      background:#fafaf8;transition:background 0.15s;user-select:none;
+    }
+    .mc-card.open .mc-card-hdr { background:#3D5A47; }
+    .mc-card-step {
+      width:22px;height:22px;border-radius:50%;background:#e8e0d6;color:#888;
+      font-size:0.65rem;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;
+    }
+    .mc-card.open .mc-card-step { background:rgba(255,255,255,0.2);color:#fff; }
+    .mc-card-label { flex:1;font-size:0.85rem;font-weight:600;color:#333; }
+    .mc-card.open .mc-card-label { color:#fff; }
+    .mc-card-arr { font-size:1rem;color:#bbb;transition:transform 0.2s; }
+    .mc-card.open .mc-card-arr { transform:rotate(90deg);color:rgba(255,255,255,0.7); }
+    .mc-card-body { display:none;padding:18px 18px 16px; }
+    .mc-card.open .mc-card-body { display:block; }
+    .mc-objet { font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;color:#aaa;margin-bottom:4px; }
+    .mc-objet-val { font-size:0.82rem;font-weight:600;color:#3D5A47;margin-bottom:14px; }
+    .mc-mail-text {
+      font-size:0.82rem;line-height:1.9;color:#444;white-space:pre-wrap;
+      background:#f8f5f0;border-radius:10px;padding:14px 16px;margin-bottom:12px;
+    }
+    .mc-copy-btn {
+      display:inline-flex;align-items:center;gap:6px;padding:7px 14px;
+      background:#3D5A47;color:#fff;border:none;border-radius:8px;
+      font-family:'DM Sans',sans-serif;font-size:0.78rem;font-weight:600;cursor:pointer;transition:0.15s;
+    }
+    .mc-copy-btn:hover { background:#2a4030; }
+    .mc-copy-btn.copied { background:#4cb84c; }
+
     /* ── Section add-btn ──────────────── */
     .add-btn {
       display:inline-flex;align-items:center;gap:6px;
@@ -334,12 +380,8 @@
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>Mon bien
       </a>
       <a href="/mon-guide-photos" class="sidebar-item">
-        📸 Guide photos
-      </a>
-      <a href="/serenis-connect" class="sidebar-item active">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.27h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 9a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>Serenis Connect
-      </a>
-      <a href="/mon-agenda" class="sidebar-item">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>Guide photos
+      </a>      <a href="/mon-agenda" class="sidebar-item">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>Mon agenda
       </a>
       <a href="/ma-bibliotheque" class="sidebar-item">
@@ -509,6 +551,16 @@
       </div>
     </div>
 
+    <!-- Mails Serenis Connect -->
+    <div class="mc-section">
+      <div class="mc-section-header">
+        <div class="mc-section-title">Mails Serenis Connect</div>
+        <div class="mc-section-sub">Ces modèles sont rédigés de la part de Serenis pour vos acquéreurs, à chaque étape du parcours. Vous n'avez rien à rédiger — copiez, personnalisez le prénom et envoyez.</div>
+      </div>
+      <div class="mc-tabs" id="mcTabs"></div>
+      <div class="mc-cards" id="mcCards"></div>
+    </div>
+
   </main>
 </div>
 
@@ -597,12 +649,19 @@
 let _data = null;
 
 // ── Boot ───────────────────────────────────────────────
+let _mcAcheteurUrl = '';
+
 async function loadData() {
   try {
     const res = await fetch('/api/connect/overview');
     _data = await res.json();
+    if (_data.property?.acheteur_token) {
+      _mcAcheteurUrl = window.location.origin + '/dossier/acheteur/' + _data.property.acheteur_token;
+    }
     renderAll();
     loadAiInsight();
+    renderMcTabs();
+    renderMcCards();
   } catch(e) {
     showToast('Erreur de chargement', 'error');
   }
@@ -1002,6 +1061,404 @@ document.getElementById('contactsTableWrap').addEventListener('click', function(
 
 // ── Init ───────────────────────────────────────────────
 loadData();
+
+// ── Mails Serenis Connect ──────────────────────────────
+const MC_CATS = [
+  { key:'contact', label:'Premier contact' },
+  { key:'fiche',   label:'Fiche & Photos' },
+  { key:'visite',  label:'Visite' },
+  { key:'apres',   label:'Après visite' },
+  { key:'relance', label:'Relances' },
+  { key:'offre',   label:'Offre' },
+];
+
+// {{LIEN}} est remplacé dynamiquement par l'URL acheteur réelle
+const MC_MAILS = [
+  // ── Premier contact ──
+  {
+    cat:'contact', step:1, label:'Prise de contact initiale',
+    objet:'Votre intérêt pour le bien à [Ville] — Serenis',
+    hasLink: false,
+    corps:`Bonjour [Prénom],
+
+Vous avez contacté le numéro Serenis concernant le bien situé à [Ville].
+
+Le propriétaire fait appel à Serenis, un service dédié à la vente entre particuliers, pour gérer les contacts acquéreurs dans les meilleures conditions.
+
+Si ce bien vous intéresse encore, nous pouvons vous transmettre :
+— La fiche descriptive complète du bien
+— Les photos professionnelles et les photos de découverte pièce par pièce
+— Toutes les informations sur les charges et la fiscalité
+
+Il vous suffit de nous confirmer votre intérêt en répondant à ce message.
+
+Cordialement,
+L'équipe Serenis
+Pour le compte du propriétaire`
+  },
+
+  // ── Fiche & Photos ──
+  {
+    cat:'fiche', step:1, label:'Fiche descriptive complète',
+    objet:'Fiche descriptive et photos — [Ville]',
+    hasLink: true, linkLabel: 'Lien fiche + photos + agenda',
+    corps:`Bonjour [Prénom],
+
+Suite à votre contact, le propriétaire vous transmet via Serenis la fiche descriptive complète de son bien (photos, description, surface, informations techniques) :
+
+→ {{LIEN}}
+
+Cette fiche vous donne une vision complète du bien avant même de vous déplacer. Elle inclut également l'agenda en ligne du propriétaire si vous souhaitez réserver une visite directement.
+
+N'hésitez pas à nous contacter si vous avez des questions.
+
+Cordialement,
+L'équipe Serenis
+Pour le compte du propriétaire`
+  },
+  {
+    cat:'fiche', step:2, label:'DPE et diagnostics — avant visite',
+    objet:'Diagnostics techniques du bien à [Ville]',
+    hasLink: true, linkLabel: 'Lien dossier (inclut diagnostics)',
+    corps:`Bonjour [Prénom],
+
+En amont de votre visite, le propriétaire vous transmet via Serenis le dossier complet incluant le DPE et l'ensemble des diagnostics obligatoires du bien (performance énergétique, amiante, plomb, électricité…) :
+
+→ {{LIEN}}
+
+Prenez le temps de les consulter avant de vous déplacer. Si après lecture vous souhaitez maintenir votre visite, vous pouvez confirmer directement depuis ce lien.
+
+Cordialement,
+L'équipe Serenis
+Pour le compte du propriétaire`
+  },
+  {
+    cat:'fiche', step:3, label:'Photos professionnelles',
+    objet:'Photos professionnelles du bien à [Ville]',
+    hasLink: true, linkLabel: 'Lien dossier (photos incluses)',
+    corps:`Bonjour [Prénom],
+
+Le propriétaire vous transmet via Serenis les photos professionnelles de son bien. N'hésitez pas à les consulter avant votre rendez-vous :
+
+→ {{LIEN}}
+
+Cordialement,
+L'équipe Serenis
+Pour le compte du propriétaire`
+  },
+  {
+    cat:'fiche', step:4, label:'Photos de découverte (pièce par pièce)',
+    objet:'Visite virtuelle du bien à [Ville]',
+    hasLink: true, linkLabel: 'Lien dossier (photos découverte incluses)',
+    corps:`Bonjour [Prénom],
+
+Le propriétaire vous transmet via Serenis les photos de découverte de son bien — séjour, cuisine, chambres, salle de bain, pièce par pièce — pour vous permettre de le visiter à distance avant de vous déplacer :
+
+→ {{LIEN}}
+
+Si après consultation vous souhaitez organiser une visite, l'agenda du propriétaire est accessible directement depuis ce lien.
+
+Cordialement,
+L'équipe Serenis
+Pour le compte du propriétaire`
+  },
+  {
+    cat:'fiche', step:5, label:'Photos extérieur & façade',
+    objet:'Photos extérieur et façade — [Ville]',
+    hasLink: true, linkLabel: 'Lien dossier (photos extérieur incluses)',
+    corps:`Bonjour [Prénom],
+
+Le propriétaire vous transmet via Serenis les photos de la façade et de l'extérieur de son bien, pour que vous puissiez visualiser l'environnement avant votre visite :
+
+→ {{LIEN}}
+
+Cordialement,
+L'équipe Serenis
+Pour le compte du propriétaire`
+  },
+  {
+    cat:'fiche', step:6, label:'Photos techniques (chaudière, tableau…)',
+    objet:'Photos techniques du bien à [Ville]',
+    hasLink: true, linkLabel: 'Lien dossier (photos techniques incluses)',
+    corps:`Bonjour [Prénom],
+
+Avant votre visite, le propriétaire vous transmet via Serenis les photos techniques de son bien (chaudière, compteur, installation électrique…) pour vous permettre d'en prendre connaissance :
+
+→ {{LIEN}}
+
+Cordialement,
+L'équipe Serenis
+Pour le compte du propriétaire`
+  },
+  {
+    cat:'fiche', step:7, label:'Toutes les photos + fiche complète',
+    objet:'Dossier complet du bien à [Ville]',
+    hasLink: true, linkLabel: 'Lien dossier complet',
+    corps:`Bonjour [Prénom],
+
+Suite à votre intérêt, le propriétaire vous transmet via Serenis le dossier complet de son bien : photos professionnelles, façade et extérieur, pièces à vivre, photos techniques, fiche descriptive et diagnostics :
+
+→ {{LIEN}}
+
+Vous y trouverez également l'agenda en ligne du propriétaire pour réserver une visite directement si ce bien vous convient.
+
+N'hésitez pas à nous contacter pour toute question.
+
+Cordialement,
+L'équipe Serenis
+Pour le compte du propriétaire`
+  },
+  {
+    cat:'fiche', step:8, label:'Relance après envoi fiche (sans retour)',
+    objet:'Avez-vous pu consulter le dossier du bien à [Ville] ?',
+    hasLink: true, linkLabel: 'Lien dossier (relance)',
+    corps:`Bonjour [Prénom],
+
+Nous voulions nous assurer que vous avez bien pu accéder au dossier du bien à [Ville] que nous vous avons transmis.
+
+Si vous avez des questions ou si vous souhaitez organiser une visite, l'agenda du propriétaire est accessible ici :
+
+→ {{LIEN}}
+
+Nous restons disponibles pour tout renseignement.
+
+Cordialement,
+L'équipe Serenis
+Pour le compte du propriétaire`
+  },
+
+  // ── Visite ──
+  {
+    cat:'visite', step:1, label:'Invitation à réserver une visite',
+    objet:'Souhaitez-vous visiter le bien à [Ville] ?',
+    hasLink: true, linkLabel: 'Lien agenda (inclus dans le dossier)',
+    corps:`Bonjour [Prénom],
+
+Nous espérons que le dossier du bien à [Ville] vous a donné une bonne vision de l'ensemble.
+
+Si vous souhaitez le visiter, le propriétaire a mis en place un agenda en ligne — vous pouvez choisir le créneau qui vous convient directement ici :
+
+→ {{LIEN}}
+
+Si vous avez des questions avant de vous déplacer, n'hésitez pas à nous contacter.
+
+Cordialement,
+L'équipe Serenis
+Pour le compte du propriétaire`
+  },
+  {
+    cat:'visite', step:2, label:'Confirmation de visite',
+    objet:'Votre visite est confirmée — [Ville]',
+    hasLink: false,
+    corps:`Bonjour [Prénom],
+
+Votre visite est bien confirmée :
+
+📅 Date : [Jour] [Date]
+⏰ Heure : [Heure]
+📍 Adresse : [Adresse complète]
+
+Le propriétaire vous accueillera directement sur place. En cas d'empêchement, merci de nous en informer dès que possible.
+
+À bientôt,
+L'équipe Serenis
+Pour le compte du propriétaire`
+  },
+  {
+    cat:'visite', step:3, label:'Rappel visite (J-1)',
+    objet:'Rappel — votre visite demain à [Heure]',
+    hasLink: false,
+    corps:`Bonjour [Prénom],
+
+Petit rappel : votre visite est prévue demain, [Jour] [Date] à [Heure].
+
+📍 Adresse : [Adresse complète]
+
+En cas d'empêchement, merci de nous le signaler dès que possible afin que le propriétaire puisse libérer le créneau.
+
+À demain,
+L'équipe Serenis
+Pour le compte du propriétaire`
+  },
+
+  // ── Après visite ──
+  {
+    cat:'apres', step:1, label:'Dossier acheteur sérieux (post-visite)',
+    objet:'Suite à votre visite — documents complémentaires',
+    hasLink: true, linkLabel: 'Lien dossier acheteur sérieux',
+    corps:`Bonjour [Prénom],
+
+Nous espérons que votre visite du bien à [Ville] s'est bien passée.
+
+Pour vous aider dans votre réflexion, le propriétaire vous transmet via Serenis un dossier complémentaire regroupant les justificatifs d'entretien, les travaux réalisés avec leur année, et les équipements inclus dans la vente :
+
+→ {{LIEN}}
+
+Ce dossier est transmis exclusivement aux acquéreurs ayant visité le bien. N'hésitez pas à nous contacter si vous souhaitez formuler une offre.
+
+Cordialement,
+L'équipe Serenis
+Pour le compte du propriétaire`
+  },
+  {
+    cat:'apres', step:2, label:'Remerciement après visite',
+    objet:'Merci pour votre visite — [Ville]',
+    hasLink: false,
+    corps:`Bonjour [Prénom],
+
+Merci d'avoir pris le temps de visiter le bien à [Ville].
+
+Si vous avez des questions complémentaires ou souhaitez échanger sur un point précis, n'hésitez pas à nous le faire savoir. Nous restons disponibles pour accompagner votre réflexion.
+
+Cordialement,
+L'équipe Serenis
+Pour le compte du propriétaire`
+  },
+
+  // ── Relances ──
+  {
+    cat:'relance', step:1, label:'Relance post-visite (J+5 sans retour)',
+    objet:'Avez-vous eu le temps de réfléchir au bien à [Ville] ?',
+    hasLink: false,
+    corps:`Bonjour [Prénom],
+
+Suite à votre visite du bien à [Ville], nous voulions prendre de vos nouvelles.
+
+Si vous êtes toujours intéressé et que vous avez des questions, le propriétaire est disponible pour y répondre. Si votre projet a évolué, n'hésitez pas à nous le faire savoir.
+
+Cordialement,
+L'équipe Serenis
+Pour le compte du propriétaire`
+  },
+  {
+    cat:'relance', step:2, label:'Relance finale (J+14 sans réponse)',
+    objet:'Dernière nouvelle concernant le bien à [Ville]',
+    hasLink: false,
+    corps:`Bonjour [Prénom],
+
+Nous revenons vers vous une dernière fois concernant le bien à [Ville] que vous avez visité.
+
+Si ce projet est toujours d'actualité, nous sommes disponibles pour répondre à vos questions ou organiser un second passage. Dans le cas contraire, nous vous souhaitons une belle recherche.
+
+Cordialement,
+L'équipe Serenis
+Pour le compte du propriétaire`
+  },
+
+  // ── Offre ──
+  {
+    cat:'offre', step:1, label:'Guide pour formuler une offre',
+    objet:'Comment formuler votre offre d\'achat — [Ville]',
+    hasLink: false,
+    corps:`Bonjour [Prénom],
+
+Si vous souhaitez formuler une offre sur le bien à [Ville], voici comment procéder.
+
+Une offre d'achat doit être transmise par écrit et préciser :
+— Le montant proposé
+— Votre mode de financement (crédit ou comptant)
+— Les conditions éventuelles (obtention de prêt, délai souhaité)
+— La durée de validité (généralement 5 à 10 jours)
+
+Vous pouvez nous la transmettre par email à cette adresse. Le propriétaire vous répondra dans les meilleurs délais.
+
+Cordialement,
+L'équipe Serenis
+Pour le compte du propriétaire`
+  },
+  {
+    cat:'offre', step:2, label:'Accusé de réception d\'une offre',
+    objet:'Votre offre a bien été transmise — [Ville]',
+    hasLink: false,
+    corps:`Bonjour [Prénom],
+
+Nous avons bien reçu votre offre d'achat pour le bien à [Ville] et l'avons transmise immédiatement au propriétaire.
+
+Le propriétaire dispose généralement de 24 à 48 heures pour vous apporter une réponse. Nous vous tiendrons informé dès que nous aurons un retour.
+
+Merci pour votre démarche.
+
+Cordialement,
+L'équipe Serenis
+Pour le compte du propriétaire`
+  },
+];
+
+let activeMcCat = 'contact';
+
+function renderMcTabs() {
+  document.getElementById('mcTabs').innerHTML = MC_CATS.map(c =>
+    `<button class="mc-tab${c.key === activeMcCat ? ' active' : ''}" data-mc="${c.key}">${c.label}</button>`
+  ).join('');
+  document.querySelectorAll('.mc-tab').forEach(btn => {
+    btn.addEventListener('click', () => { activeMcCat = btn.dataset.mc; renderMcTabs(); renderMcCards(); });
+  });
+}
+
+// Stockage indexé pour éviter les problèmes d'échappement dans onclick
+window._mcMailStore = {};
+
+function renderMcCards() {
+  const mails = MC_MAILS.filter(m => m.cat === activeMcCat);
+  const lien = _mcAcheteurUrl;
+  window._mcMailStore = {};
+
+  document.getElementById('mcCards').innerHTML = mails.map((m, i) => {
+    const id = `mc-${m.cat}-${i}`;
+    const corpsWithLink = m.corps.replace(/{{LIEN}}/g, lien || '[lien dossier Serenis]');
+    window._mcMailStore[id] = { objet: m.objet, corps: corpsWithLink, lien };
+
+    const linkRow = m.hasLink ? `
+      <div style="font-size:0.7rem;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;color:#aaa;margin-bottom:5px;">${m.linkLabel}</div>
+      <div style="display:flex;gap:7px;align-items:center;margin-bottom:12px;">
+        <input type="text" readonly onclick="this.select()" value="${lien || 'Lien disponible après création de votre bien'}"
+          style="flex:1;min-width:0;padding:7px 10px;border:1.5px solid ${lien ? '#c8ddd0' : '#e8e0d6'};border-radius:7px;font-size:0.76rem;color:${lien ? '#3D5A47' : '#bbb'};background:#fafaf8;cursor:pointer;font-family:inherit;outline:none;">
+        <button class="mc-copy-btn" style="padding:7px 12px;" onclick="copyMcLink('${id}',this)">${lien ? 'Copier le lien' : '—'}</button>
+      </div>` : '';
+
+    return `<div class="mc-card" id="${id}">
+      <div class="mc-card-hdr" onclick="document.getElementById('${id}').classList.toggle('open')">
+        <div class="mc-card-step">${m.step}</div>
+        <div class="mc-card-label">${m.label}</div>
+        <div class="mc-card-arr">›</div>
+      </div>
+      <div class="mc-card-body">
+        <div class="mc-objet">Objet</div>
+        <div class="mc-objet-val">${m.objet}</div>
+        ${linkRow}
+        <div class="mc-mail-text">${corpsWithLink}</div>
+        <button class="mc-copy-btn" onclick="copyMcMailById('${id}',this)">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+          Copier le mail complet
+        </button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function copyMcLink(id, btn) {
+  const d = window._mcMailStore[id];
+  if (!d?.lien) return;
+  navigator.clipboard.writeText(d.lien).then(() => {
+    const orig = btn.textContent; btn.textContent = '✓ Copié !';
+    setTimeout(() => btn.textContent = orig, 1500);
+  });
+}
+
+function copyMcMailById(id, btn) {
+  const d = window._mcMailStore[id];
+  if (!d) return;
+  navigator.clipboard.writeText(`Objet : ${d.objet}\n\n${d.corps}`).then(() => {
+    btn.classList.add('copied'); btn.textContent = '✓ Copié !';
+    setTimeout(() => {
+      btn.classList.remove('copied');
+      btn.innerHTML = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Copier le mail complet';
+    }, 2000);
+  });
+}
+
+renderMcTabs();
+renderMcCards();
 </script>
 <script src="/js/seller-nav.js"></script>
 </body>

@@ -14,8 +14,7 @@
       el.appendChild(span);
     }
     badge('a[href="/mes-offres"]', pendingOffers);
-    badge('a[href="/mon-agenda"]', upcomingVisits);
-    badge('a[href="/mes-notifications"]', unreadNotifs);
+    badge('a[href="/mon-agenda"]', (upcomingVisits || 0) + (unreadNotifs || 0) || undefined);
   } catch(e) {}
 })();
 

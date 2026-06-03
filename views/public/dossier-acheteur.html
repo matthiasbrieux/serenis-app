@@ -17,15 +17,31 @@
     .container { max-width: 900px; margin: 0 auto; padding: 32px 20px 60px; }
 
     .hero { background: #fff; border-radius: 16px; overflow: hidden; margin-bottom: 24px; box-shadow: 0 2px 12px rgba(0,0,0,0.08); }
-    .hero-photos { position: relative; height: 340px; background: #e0e0d8; overflow: hidden; }
-    .hero-photos img { width: 100%; height: 100%; object-fit: cover; }
+    .hero-photos { position: relative; height: 340px; background: #e0e0d8; overflow: hidden; cursor: zoom-in; }
+    .hero-photos img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.25s; }
+    .hero-photos:hover img { transform: scale(1.02); }
     .hero-photos .photo-count { position: absolute; bottom: 12px; right: 16px; background: rgba(0,0,0,0.55); color: #fff; font-size: 0.78rem; padding: 4px 10px; border-radius: 12px; }
+    .hero-photos .expand-hint { position: absolute; bottom: 12px; left: 16px; background: rgba(0,0,0,0.55); color: #fff; font-size: 0.76rem; padding: 4px 10px; border-radius: 12px; display: flex; align-items: center; gap: 4px; }
     .photo-categories { background: #f5f5f0; padding: 12px 14px; }
     .photo-cat-label { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.06em; font-weight: 600; color: #666; margin-bottom: 7px; margin-top: 14px; }
     .photo-cat-label:first-child { margin-top: 0; }
     .photo-cat-strip { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 4px; }
     .photo-cat-strip img { width: 88px; height: 64px; object-fit: cover; border-radius: 7px; cursor: pointer; opacity: 0.7; transition: opacity 0.2s, box-shadow 0.2s; flex-shrink: 0; }
     .photo-cat-strip img.active, .photo-cat-strip img:hover { opacity: 1; box-shadow: 0 0 0 2px #3D5A47; }
+
+    /* ── Lightbox ── */
+    .ph-lb { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.96); z-index: 9999; align-items: center; justify-content: center; flex-direction: column; }
+    .ph-lb.open { display: flex; }
+    .ph-lb-img { max-width: 92vw; max-height: 82vh; object-fit: contain; border-radius: 6px; display: block; }
+    .ph-lb-close { position: absolute; top: 18px; right: 22px; background: none; border: none; color: #fff; font-size: 2rem; cursor: pointer; opacity: 0.75; line-height: 1; padding: 0; }
+    .ph-lb-close:hover { opacity: 1; }
+    .ph-lb-prev, .ph-lb-next { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(255,255,255,0.12); border: none; color: #fff; font-size: 2rem; padding: 14px 20px; cursor: pointer; border-radius: 8px; transition: 0.15s; line-height: 1; }
+    .ph-lb-prev { left: 16px; } .ph-lb-next { right: 16px; }
+    .ph-lb-prev:hover, .ph-lb-next:hover { background: rgba(255,255,255,0.25); }
+    .ph-lb-count { position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); color: rgba(255,255,255,0.65); font-size: 0.85rem; white-space: nowrap; }
+    .ph-lb-strip { position: absolute; bottom: 48px; left: 50%; transform: translateX(-50%); display: flex; gap: 6px; max-width: 90vw; overflow-x: auto; padding: 4px; }
+    .ph-lb-strip img { width: 56px; height: 40px; object-fit: cover; border-radius: 4px; cursor: pointer; opacity: 0.5; flex-shrink: 0; transition: 0.15s; }
+    .ph-lb-strip img.active { opacity: 1; outline: 2px solid #fff; }
 
     .hero-info { padding: 24px 28px 20px; }
     .prop-type-badge { display: inline-block; background: #e8f4ec; color: #2e7d32; font-size: 0.72rem; font-weight: 600; padding: 3px 10px; border-radius: 20px; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.05em; }
@@ -95,16 +111,30 @@
     .footer { text-align: center; padding: 32px 20px; font-size: 0.78rem; color: #aaa; }
 
     /* ── Booking ── */
-    .visit-cta { background: linear-gradient(135deg, #3D5A47, #4d6e5a); border-radius: 16px; padding: 28px; color: #fff; margin-bottom: 20px; }
+    .visit-cta { background: linear-gradient(135deg, #3D5A47, #4d6e5a); border-radius: 16px; padding: 28px; color: #fff; margin-bottom: 20px; transition: opacity 0.3s; }
+    .visit-cta.hidden { opacity: 0; pointer-events: none; height: 0; padding: 0; margin: 0; overflow: hidden; }
     .visit-cta h3 { font-family: 'Cormorant Garamond', serif; font-size: 1.5rem; margin-bottom: 8px; }
     .visit-cta p { color: rgba(255,255,255,0.78); font-size: 0.9rem; margin-bottom: 20px; }
     .visit-open-btn { background: #C4785A; color: #fff; border: none; padding: 14px 30px; border-radius: 10px; font-size: 1rem; font-weight: 600; cursor: pointer; font-family: inherit; transition: background 0.2s; }
     .visit-open-btn:hover { background: #b3684a; }
 
-    .booking-panel { background: #fff; border-radius: 16px; padding: 28px; margin-bottom: 20px; box-shadow: 0 2px 12px rgba(0,0,0,0.08); display: none; }
+    .booking-panel { background: #fff; border-radius: 16px; padding: 28px; margin-bottom: 20px; box-shadow: 0 2px 16px rgba(0,0,0,0.10); display: none; animation: fadeSlideIn 0.3s ease; }
     .booking-panel.open { display: block; }
+    @keyframes fadeSlideIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+    /* Progress stepper */
+    .booking-progress { display: flex; align-items: center; gap: 0; margin-bottom: 24px; }
+    .bp-step { display: flex; align-items: center; gap: 8px; flex: 1; }
+    .bp-dot { width: 28px; height: 28px; border-radius: 50%; border: 2px solid #d0e8d4; background: #f0f7f2; color: #aaa; font-size: 0.75rem; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: all 0.25s; }
+    .bp-dot.active { background: #3D5A47; border-color: #3D5A47; color: #fff; }
+    .bp-dot.done { background: #C4785A; border-color: #C4785A; color: #fff; }
+    .bp-label { font-size: 0.72rem; color: #aaa; font-weight: 500; transition: color 0.25s; }
+    .bp-label.active { color: #3D5A47; font-weight: 600; }
+    .bp-line { flex: 1; height: 2px; background: #e8e0d6; margin: 0 6px; transition: background 0.25s; }
+    .bp-line.done { background: #C4785A; }
+
     .booking-step { display: none; }
-    .booking-step.active { display: block; }
+    .booking-step.active { display: block; animation: fadeSlideIn 0.2s ease; }
     .step-title { font-family: 'Cormorant Garamond', serif; font-size: 1.2rem; color: #3D5A47; margin-bottom: 16px; }
 
     .cal-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
@@ -140,10 +170,12 @@
     .bform-submit:hover { background: #b3684a; }
     .bform-submit:disabled { background: #ccc; cursor: not-allowed; }
 
-    .booking-success { text-align: center; padding: 32px 20px; }
-    .booking-success .icon { font-size: 3rem; margin-bottom: 12px; }
-    .booking-success h3 { font-family: 'Cormorant Garamond', serif; font-size: 1.5rem; color: #3D5A47; margin-bottom: 8px; }
-    .booking-success p { color: #666; font-size: 0.9rem; }
+    .booking-success { text-align: center; padding: 36px 20px 28px; }
+    .booking-success .icon { font-size: 3.2rem; margin-bottom: 14px; animation: popIn 0.4s cubic-bezier(0.175,0.885,0.32,1.275); }
+    @keyframes popIn { from { transform: scale(0.5); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+    .booking-success h3 { font-family: 'Cormorant Garamond', serif; font-size: 1.6rem; color: #3D5A47; margin-bottom: 10px; }
+    .booking-success p { color: #666; font-size: 0.9rem; line-height: 1.6; }
+    .booking-success .success-tag { display: inline-block; background: #e8f4ec; color: #2e7d32; font-size: 0.75rem; font-weight: 700; padding: 4px 12px; border-radius: 20px; margin-bottom: 14px; text-transform: uppercase; letter-spacing: 0.05em; }
     .no-slots-msg { text-align: center; padding: 28px; color: #aaa; font-size: 0.9rem; }
 
     @media (max-width: 500px) { .bform-row { grid-template-columns: 1fr; } }
@@ -186,8 +218,8 @@ let currentPhotoIdx = 0;
 let photos = [];
 
 const DPE_COLORS = { A:'#00a651', B:'#57b947', C:'#8dc63f', D:'#f7ec13', E:'#fbaf3f', F:'#f15a24', G:'#ed1c24' };
-const CATEGORY_LABELS = { pro: '📸 Photos professionnelles', decouverte: '🏘️ Photos de découverte', details: '🔍 Photos des détails' };
-const CATEGORY_ORDER = ['pro', 'decouverte', 'details'];
+const CATEGORY_LABELS = { pro: '📸 Photos professionnelles', exterieur: '🏡 Extérieur & façade', decouverte: '🏠 Photos découverte', details: '🔍 Photos des détails' };
+const CATEGORY_ORDER = ['pro', 'exterieur', 'decouverte', 'details'];
 
 async function load() {
   try {
@@ -212,7 +244,9 @@ function render(p, ph, docs) {
   const diagDocs = docs.filter(d => !d.folder || d.folder === 'diagnostics');
   const acheteurDocs = docs.filter(d => d.folder === 'acheteur_serieux');
 
-  const mainPhoto = ph.length ? `<img id="mainPhoto" src="${ph[0].url}" alt="Photo principale">` : `<div style="display:flex;align-items:center;justify-content:center;height:100%;color:#aaa;">Aucune photo</div>`;
+  const mainPhoto = ph.length
+    ? `<img id="mainPhoto" src="${ph[0].url}" alt="Photo principale" onclick="lbOpen(currentPhotoIdx)">`
+    : `<div style="display:flex;align-items:center;justify-content:center;height:100%;color:#aaa;">Aucune photo</div>`;
 
   // Group photos by category
   const byCategory = {};
@@ -230,12 +264,18 @@ function render(p, ph, docs) {
       const label = CATEGORY_LABELS[cat] || cat;
       const thumbs = imgs.map(img => {
         const idx = ph.indexOf(img);
-        return `<img src="${img.thumbnail_url || img.url}" class="${idx===0?'active':''}" onclick="setPhoto(${idx})" alt="">`;
+        return `<img src="${img.thumbnail_url || img.url}" class="${idx===0?'active':''}" onclick="lbOpen(${idx})" alt="">`;
       }).join('');
       return `<div class="photo-cat-label">${label}</div><div class="photo-cat-strip">${thumbs}</div>`;
     }).join('');
     photoStrip = `<div class="photo-categories">${catSections}</div>`;
   }
+
+  // Init lightbox strip after DOM render (deferred)
+  setTimeout(function() {
+    const strip = document.getElementById('phLbStrip');
+    if (strip) strip.innerHTML = lbBuildStrip();
+  }, 0);
 
   const dpeHtml = p.dpe_class ? `
     <div class="dpe-row">
@@ -382,7 +422,7 @@ function render(p, ph, docs) {
   const immersivePhotos = ph.filter(p2 => p2.category === 'decouverte').length;
   if (proPhotos >= 5) scoreItems.push({ ok:true, label:`${proPhotos} photos professionnelles` });
   else if (proPhotos > 0) scoreItems.push({ ok:false, label:`${proPhotos} photo${proPhotos>1?'s':''} pro (min. 5 recommandées)` });
-  if (immersivePhotos > 0) scoreItems.push({ ok:true, label:`${immersivePhotos} photo${immersivePhotos>1?'s':''} immersives` });
+  if (immersivePhotos > 0) scoreItems.push({ ok:true, label:`${immersivePhotos} photo${immersivePhotos>1?'s':''} découverte` });
   if (docs.length >= 3) scoreItems.push({ ok:true, label:`${docs.length} documents disponibles` });
   else if (docs.length > 0) scoreItems.push({ ok:true, label:`${docs.length} document${docs.length>1?'s':''}` });
   if (p.description && p.description.length > 80) scoreItems.push({ ok:true, label:'Description détaillée' });
@@ -409,7 +449,7 @@ function render(p, ph, docs) {
   document.getElementById('content').innerHTML = `
     ${scoreHtml}
     <div class="hero">
-      <div class="hero-photos" id="heroPhotos">${mainPhoto}<div class="photo-count">${ph.length} photo${ph.length>1?'s':''}</div></div>
+      <div class="hero-photos" id="heroPhotos" onclick="lbOpen(currentPhotoIdx)">${mainPhoto}<div class="photo-count">${ph.length} photo${ph.length>1?'s':''}</div>${ph.length>1?'<div class="expand-hint">⛶ Voir toutes les photos</div>':''}</div>
       ${photoStrip}
       <div class="hero-info">
         <div class="prop-type-badge">${typeLabel}</div>
@@ -463,6 +503,23 @@ function render(p, ph, docs) {
     </div>
 
     <div class="booking-panel" id="bookingPanel">
+      <div class="booking-progress" id="bookingProgress">
+        <div class="bp-step">
+          <div class="bp-dot active" id="bpd1">1</div>
+          <div class="bp-label active" id="bpl1">Date</div>
+        </div>
+        <div class="bp-line" id="bpline1"></div>
+        <div class="bp-step">
+          <div class="bp-dot" id="bpd2">2</div>
+          <div class="bp-label" id="bpl2">Horaire</div>
+        </div>
+        <div class="bp-line" id="bpline2"></div>
+        <div class="bp-step">
+          <div class="bp-dot" id="bpd3">3</div>
+          <div class="bp-label" id="bpl3">Coordonnées</div>
+        </div>
+      </div>
+
       <div class="booking-step active" id="stepCalendar">
         <div class="step-title">1. Choisissez une date</div>
         <div class="cal-header">
@@ -498,9 +555,11 @@ function render(p, ph, docs) {
 
       <div class="booking-step" id="stepSuccess">
         <div class="booking-success">
-          <div class="icon">✅</div>
-          <h3>Visite confirmée !</h3>
-          <p id="successMsg">Un email de confirmation vous a été envoyé.<br>Le vendeur a également été notifié.</p>
+          <div class="icon">🏡</div>
+          <div class="success-tag">Demande transmise</div>
+          <h3>C'est noté !</h3>
+          <p id="successMsg">Votre demande de visite a bien été transmise.</p>
+          <p id="successMsgSub" style="margin-top:10px;font-size:0.82rem;color:#aaa;line-height:1.6;">Le propriétaire vous contactera très prochainement pour confirmer votre visite et répondre à vos éventuelles questions.</p>
         </div>
       </div>
     </div>
@@ -520,10 +579,11 @@ let calWeekOffset = 0;
 let selectedDate = null, selectedTime = null;
 
 async function openBooking() {
+  document.getElementById('visitCta').classList.add('hidden');
   document.getElementById('bookingPanel').classList.add('open');
-  document.getElementById('visitCta').scrollIntoView({ behavior: 'smooth', block: 'start' });
   if (!agendaSlots.length && agendaBooked !== null) await loadAgenda();
   buildCalendar();
+  setTimeout(() => document.getElementById('bookingPanel').scrollIntoView({ behavior: 'smooth', block: 'start' }), 50);
 }
 
 async function loadAgenda() {
@@ -633,6 +693,23 @@ function showStep(id) {
   ['stepCalendar','stepTime','stepForm','stepSuccess'].forEach(s => {
     document.getElementById(s).classList.toggle('active', s === id);
   });
+  // Update progress stepper
+  const stepMap = { stepCalendar:1, stepTime:2, stepForm:3, stepSuccess:4 };
+  const cur = stepMap[id] || 1;
+  for (let i = 1; i <= 3; i++) {
+    const dot = document.getElementById('bpd'+i);
+    const lbl = document.getElementById('bpl'+i);
+    if (i < cur) { dot.className = 'bp-dot done'; dot.textContent = '✓'; }
+    else if (i === cur) { dot.className = 'bp-dot active'; dot.textContent = i; }
+    else { dot.className = 'bp-dot'; dot.textContent = i; }
+    lbl.className = 'bp-label' + (i === cur ? ' active' : '');
+    if (i < 3) {
+      document.getElementById('bpline'+i).className = 'bp-line' + (i < cur ? ' done' : '');
+    }
+  }
+  // Hide progress on success
+  document.getElementById('bookingProgress').style.display = id === 'stepSuccess' ? 'none' : 'flex';
+  document.getElementById('bookingPanel').scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
 async function submitBooking() {
@@ -659,7 +736,8 @@ async function submitBooking() {
     const DAYS = ['dimanche','lundi','mardi','mercredi','jeudi','vendredi','samedi'];
     const MONTHS = ['janvier','février','mars','avril','mai','juin','juillet','août','septembre','octobre','novembre','décembre'];
     const label = DAYS[new Date(selectedDate+'T12:00:00').getDay()] + ' ' + parseInt(d) + ' ' + MONTHS[parseInt(mo)-1] + ' ' + y;
-    document.getElementById('successMsg').innerHTML = `Votre visite est planifiée pour le <strong>${label} à ${selectedTime}</strong>.<br>Un email de confirmation a été envoyé à <strong>${email}</strong>.<br>Le vendeur a également été notifié.`;
+    document.getElementById('successMsg').innerHTML = `Votre demande de visite pour le <strong>${label} à ${selectedTime}</strong> a bien été transmise au propriétaire.`;
+    document.getElementById('successMsgSub').innerHTML = `Le propriétaire vous contactera très prochainement pour vous confirmer cette dernière et répondre à vos éventuelles questions.<br><br><span style="font-size:0.8rem;color:#bbb;">Un email récapitulatif a été envoyé à <strong>${email}</strong>.</span>`;
     showStep('stepSuccess');
   } catch(e) {
     alert('Erreur réseau, réessayez.');
@@ -671,12 +749,62 @@ function setPhoto(idx) {
   currentPhotoIdx = idx;
   const main = document.getElementById('mainPhoto');
   if (main && photos[idx]) main.src = photos[idx].url;
-  document.querySelectorAll('.photos-strip img').forEach((img, i) => {
+  document.querySelectorAll('.photo-cat-strip img').forEach((img, i) => {
     img.classList.toggle('active', i === idx);
   });
 }
 
+// ── Lightbox ──────────────────────────────────────────
+let _lbIdx = 0;
+function lbOpen(idx) {
+  if (!photos.length) return;
+  _lbIdx = (idx || 0);
+  lbRender();
+  document.getElementById('phLb').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function lbClose() {
+  document.getElementById('phLb').classList.remove('open');
+  document.body.style.overflow = '';
+}
+function lbMove(dir) {
+  _lbIdx = (_lbIdx + dir + photos.length) % photos.length;
+  lbRender();
+}
+function lbRender() {
+  const ph = photos[_lbIdx];
+  if (!ph) return;
+  document.getElementById('phLbImg').src = ph.url;
+  document.getElementById('phLbCount').textContent = (_lbIdx + 1) + ' / ' + photos.length;
+  document.querySelectorAll('.ph-lb-strip img').forEach((el, i) => el.classList.toggle('active', i === _lbIdx));
+  const activeThumb = document.querySelector('.ph-lb-strip img.active');
+  if (activeThumb) activeThumb.scrollIntoView({ inline: 'center', behavior: 'smooth', block: 'nearest' });
+}
+function lbBuildStrip() {
+  if (photos.length <= 1) return '';
+  return photos.map((ph, i) =>
+    `<img src="${ph.thumbnail_url || ph.url}" class="${i===0?'active':''}" onclick="event.stopPropagation();_lbIdx=${i};lbRender()" alt="">`
+  ).join('');
+}
+document.addEventListener('keydown', function(e) {
+  const lb = document.getElementById('phLb');
+  if (!lb || !lb.classList.contains('open')) return;
+  if (e.key === 'Escape') lbClose();
+  if (e.key === 'ArrowLeft') lbMove(-1);
+  if (e.key === 'ArrowRight') lbMove(1);
+});
+
 load();
 </script>
+
+<div class="ph-lb" id="phLb" onclick="if(event.target===this)lbClose()">
+  <button class="ph-lb-close" onclick="lbClose()">✕</button>
+  <img class="ph-lb-img" id="phLbImg" src="" alt="">
+  <button class="ph-lb-prev" onclick="event.stopPropagation();lbMove(-1)">‹</button>
+  <button class="ph-lb-next" onclick="event.stopPropagation();lbMove(1)">›</button>
+  <div class="ph-lb-count" id="phLbCount"></div>
+  <div class="ph-lb-strip" id="phLbStrip"></div>
+</div>
+
 </body>
 </html>

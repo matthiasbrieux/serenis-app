@@ -6,19 +6,18 @@ const path = require('path');
 const db = require('../database');
 
 const publicFormLimit = rateLimit({ windowMs: 15 * 60 * 1000, max: 8, standardHeaders: true, legacyHeaders: false, handler: (req, res) => res.status(429).json({ error: 'Trop de tentatives. Réessayez dans 15 minutes.' }) });
-const { sendDossierEmail, sendVisitConfirmation } = require('../services/email');
+const { sendDossierEmail, sendVisitConfirmation, sendVisitRequestReceived, sendNewVisitRequest } = require('../services/email');
 const { v4: uuidv4 } = require('uuid');
 const { sendSmsNotification } = require('../services/twilio');
 
 // ── Page publique bien ──
 router.get('/bien/:slug', (req, res) => {
-  const property = db.prepare('SELECT type, city, price, surface_habitable, rooms, description FROM properties WHERE slug = ? AND published = 1').get(req.params.slug);
+  const property = db.prepare('SELECT id, type, city, price, surface_habitable, rooms, description FROM properties WHERE slug = ? AND published = 1').get(req.params.slug);
   if (!property) return res.status(404).sendFile('404.html', { root: './public' });
   try {
-    const fullProp = db.prepare('SELECT id FROM properties WHERE slug = ? LIMIT 1').get(req.params.slug);
     const ip = (req.headers['x-forwarded-for'] || req.ip || '').split(',')[0].trim();
     const ipHash = require('crypto').createHash('sha256').update(ip).digest('hex').slice(0, 16);
-    db.prepare('INSERT INTO property_page_views (property_id, ip_hash) VALUES (?,?)').run(fullProp.id, ipHash);
+    db.prepare('INSERT INTO property_page_views (property_id, ip_hash) VALUES (?,?)').run(property.id, ipHash);
   } catch(e) {}
 
   // Injection SSR des meta OG pour Google/réseaux sociaux
@@ -30,12 +29,14 @@ router.get('/bien/:slug', (req, res) => {
     const desc = property.description
       ? property.description.slice(0, 160)
       : `${typeLabel}${surfaceStr ? ' de ' + surfaceStr : ''}${property.city ? ' à ' + property.city : ''} — Dossier complet sur Serenis`;
+    const firstPhoto = db.prepare('SELECT url FROM property_photos WHERE property_id = ? ORDER BY order_index LIMIT 1').get(property.id);
 
     let html = fs.readFileSync(path.join(__dirname, '../views/property/property-public.html'), 'utf8');
     html = html
       .replace('content="Bien à vendre — Serenis"', `content="${title.replace(/"/g, '&quot;')}"`)
       .replace('content="Voir le dossier complet de ce bien"', `content="${desc.replace(/"/g, '&quot;')}"`)
-      .replace('content="Dossier complet disponible — Serenis"', `content="${desc.replace(/"/g, '&quot;')}"`);
+      .replace('content="Dossier complet disponible — Serenis"', `content="${desc.replace(/"/g, '&quot;')}"`)
+      .replace('content="OG_IMAGE_PLACEHOLDER"', `content="${firstPhoto?.url || ''}"`);
     res.setHeader('Content-Type', 'text/html');
     res.send(html);
   } catch(e) {
@@ -134,22 +135,25 @@ router.post('/api/bien/:slug/reserver', publicFormLimit, async (req, res) => {
   if (conflict) return res.json({ error: 'Ce créneau est déjà pris. Choisissez un autre horaire.' });
 
   db.prepare(`
-    INSERT INTO visits (property_id, seller_id, buyer_name, buyer_email, buyer_phone, visit_date, visit_time)
-    VALUES (?,?,?,?,?,?,?)
+    INSERT INTO visits (property_id, seller_id, buyer_name, buyer_email, buyer_phone, visit_date, visit_time, status)
+    VALUES (?,?,?,?,?,?,?,'pending')
   `).run(property.id, property.seller_id, buyer_name, buyer_email, buyer_phone || '', visit_date, visit_time);
 
   const seller = db.prepare('SELECT email, phone, first_name FROM sellers WHERE id = ?').get(property.seller_id);
 
+  db.prepare("INSERT INTO notifications (seller_id, type, title, body) VALUES (?,'visit_request',?,?)")
+    .run(property.seller_id, 'Nouvelle demande de visite', `${buyer_name} — ${visit_date} à ${visit_time}`);
+
   try {
-    await sendVisitConfirmation(buyer_email, buyer_name, property, visit_date, visit_time, false);
-    await sendVisitConfirmation(seller.email, seller.first_name || 'Vendeur', property, visit_date, visit_time, true);
+    await sendVisitRequestReceived(buyer_email, buyer_name, property, visit_date, visit_time);
+    if (seller.email) await sendNewVisitRequest({ sellerEmail: seller.email, buyerName: buyer_name, visitDate: `${visit_date} à ${visit_time}`, notes: '' });
     if (seller.phone) {
       await sendSmsNotification(seller.phone,
-        `Nouvelle visite sur votre bien.\nDate : ${visit_date} à ${visit_time}\nAcquéreur : ${buyer_name} — ${buyer_email}`
+        `Nouvelle demande de visite sur votre bien.\nDate : ${visit_date} à ${visit_time}\nAcquéreur : ${buyer_name} — ${buyer_email}\nConnectez-vous pour confirmer.`
       );
     }
   } catch (e) {
-    console.error('Visit confirmation error:', e.message);
+    console.error('Visit request email error:', e.message);
   }
 
   res.json({ success: true });
@@ -226,6 +230,19 @@ Pour recevoir ce dossier par email et être tenu(e) informé(e), répondez avec 
 
 // ── Webhook Voice Twilio ──
 function voiceWebhook(req, res) {
+  const { From, To } = req.body;
+  if (From && To) {
+    try {
+      const seller = db.prepare(`SELECT s.*, p.id as property_id FROM sellers s JOIN properties p ON p.seller_id = s.id WHERE s.twilio_number = ? AND p.published = 1`).get(To);
+      if (seller) {
+        const existing = db.prepare('SELECT id FROM buyer_contacts WHERE property_id=? AND buyer_phone=?').get(seller.property_id, From);
+        if (!existing) {
+          db.prepare("INSERT INTO buyer_contacts (property_id, seller_id, buyer_phone, source) VALUES (?,?,?,'voice')").run(seller.property_id, seller.id, From);
+        }
+        if (seller.phone) sendSmsNotification(seller.phone, `📞 Appel reçu sur votre bien de la part du ${From}.`).catch(() => {});
+      }
+    } catch (e) { console.error('voiceWebhook DB error:', e.message); }
+  }
   res.type('text/xml').send(`<?xml version="1.0" encoding="UTF-8"?>
 <Response>
   <Say language="fr-FR" voice="Polly.Celine">

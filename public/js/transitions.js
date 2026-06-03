@@ -189,7 +189,13 @@
   }
 
   // ── Init ──────────────────────────────────────────────────
+  // Désactiver la restauration auto du scroll — on revient toujours en haut
+  if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
+
   document.addEventListener('DOMContentLoaded', () => {
+    // Forcer le scroll en haut à chaque navigation
+    window.scrollTo(0, 0);
+
     // Lire la direction de navigation depuis sessionStorage
     const savedDirection = sessionStorage.getItem('navDirection') || 'none';
     sessionStorage.removeItem('navDirection');

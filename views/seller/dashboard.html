@@ -2,6 +2,7 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
+  <script>if("scrollRestoration"in history)history.scrollRestoration="manual";</script>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Tableau de bord — Serenis</title>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
@@ -392,6 +393,44 @@
     @media (max-width: 480px) {
       .stats-grid { grid-template-columns: 1fr 1fr; }
     }
+    /* ── Séance photo booking ── */
+    .ps-card { background:#f5f0e8; border:1px solid rgba(0,0,0,0.08); border-radius:10px; padding:20px 24px; margin-bottom:16px; }
+    .ps-card h4 { font-family:'Cormorant Garamond',serif; font-size:1.05rem; font-weight:600; margin:0 0 14px; color:#1C1C1A; }
+    .ps-cal-grid { display:grid; grid-template-columns:repeat(7,1fr); gap:3px; margin-bottom:16px; }
+    .ps-cal-head { text-align:center; font-size:0.65rem; text-transform:uppercase; letter-spacing:0.08em; color:#8C8880; padding:5px 0; font-weight:500; }
+    .ps-cal-cell { min-height:48px; border-radius:6px; padding:5px 5px; cursor:pointer; transition:background 0.1s; background:#fff; border:1px solid transparent; }
+    .ps-cal-cell:hover { background:#ede8e0; }
+    .ps-cal-cell.has-slots { background:#f0fdf4; border-color:#a7f3d0; }
+    .ps-cal-cell.selected { background:#1C1C1A; border-color:#1C1C1A; }
+    .ps-cal-cell.selected .ps-day-num { color:#F5F0E8; }
+    .ps-cal-cell.other-month { opacity:0.3; pointer-events:none; }
+    .ps-cal-cell.past { opacity:0.3; pointer-events:none; }
+    .ps-day-num { font-size:0.78rem; font-weight:500; color:#1C1C1A; }
+    .ps-slot-count { font-size:0.62rem; color:#059669; margin-top:2px; }
+    .ps-slots-list { display:flex; flex-direction:column; gap:8px; }
+    .ps-slot-item { display:flex; justify-content:space-between; align-items:center; padding:11px 15px; border:1.5px solid rgba(0,0,0,0.1); border-radius:8px; cursor:pointer; transition:all 0.15s; background:#fff; }
+    .ps-slot-item:hover { border-color:#C4603A; background:#fff8f5; }
+    .ps-slot-item.selected { border-color:#1C1C1A; background:#1C1C1A; color:#F5F0E8; }
+    .ps-slot-item.selected .ps-slot-phot { color:rgba(245,240,232,0.6); }
+    .ps-slot-time { font-weight:600; font-size:0.88rem; }
+    .ps-slot-phot { font-size:0.78rem; color:#8C8880; }
+    .ps-slot-rating { font-size:0.78rem; color:#C9A84C; }
+    .ps-month-nav { display:flex; align-items:center; gap:12px; margin-bottom:14px; }
+    .ps-month-nav button { background:none; border:1px solid rgba(0,0,0,0.12); border-radius:6px; padding:4px 11px; cursor:pointer; font-size:0.85rem; }
+    .ps-month-nav button:hover { background:#e8e0d6; }
+    .ps-month-label { font-weight:500; font-size:0.88rem; min-width:130px; }
+    .ps-status-badge { display:inline-flex; align-items:center; gap:6px; padding:5px 13px; border-radius:20px; font-size:0.78rem; font-weight:500; }
+    .ps-badge-assigned { background:#fef3c7; color:#92400e; }
+    .ps-badge-confirmed { background:#d1fae5; color:#065f46; }
+    .ps-badge-completed { background:#dbeafe; color:#1e40af; }
+    .ps-info-grid { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+    .ps-info-item label { font-size:0.7rem; text-transform:uppercase; letter-spacing:0.06em; color:#8C8880; display:block; margin-bottom:3px; }
+    .ps-info-item span { font-size:0.88rem; font-weight:500; color:#1C1C1A; }
+    .ps-btn { padding:11px 24px; border:none; border-radius:8px; font-family:inherit; font-size:0.88rem; font-weight:500; cursor:pointer; transition:all 0.15s; }
+    .ps-btn-primary { background:#1C1C1A; color:#F5F0E8; }
+    .ps-btn-primary:hover { background:#333; }
+    .ps-btn-primary:disabled { opacity:0.4; cursor:not-allowed; }
+    .ps-notice { background:#fef3c7; border:1px solid #fde68a; border-radius:8px; padding:12px 15px; font-size:0.83rem; color:#92400e; margin-bottom:14px; }
   </style>
 </head>
 <body>
@@ -435,12 +474,8 @@
         </svg>Mon bien
       </a>
       <a href="/mon-guide-photos" class="sidebar-item">
-        📸 Guide photos
-      </a>
-      <a href="/serenis-connect" class="sidebar-item">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.27h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 9a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>Serenis Connect
-      </a>
-      <a href="/mon-agenda" class="sidebar-item">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="vertical-align:middle;margin-right:5px;"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>Guide photos
+      </a>      <a href="/mon-agenda" class="sidebar-item">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
           <rect x="3" y="4" width="18" height="18" rx="2"/>
           <line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>
@@ -460,9 +495,6 @@
       </a>
       <a href="/coach-ia" class="sidebar-item">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/><circle cx="9" cy="10" r="1" fill="currentColor"/><circle cx="12" cy="10" r="1" fill="currentColor"/><circle cx="15" cy="10" r="1" fill="currentColor"/></svg>Coach IA
-      </a>
-      <a href="/mes-notifications" class="sidebar-item">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>Notifications
       </a>
     </nav>
     <div class="sidebar-footer">
@@ -549,7 +581,7 @@
     <!-- Numéro IA explainer -->
     <div id="twilioExplainer" class="card one-col" style="display:none;border-left:4px solid #3D5A47;padding:20px 24px;">
       <div style="display:flex;align-items:flex-start;gap:16px;">
-        <div style="font-size:1.8rem;line-height:1;flex-shrink:0;">📱</div>
+        <div style="display:flex;align-items:center;justify-content:center;flex-shrink:0;"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg></div>
         <div>
           <div style="font-weight:600;color:#3D5A47;margin-bottom:6px;">Votre numéro IA est activé</div>
           <p style="color:#5a6e5f;font-size:0.88rem;margin:0;line-height:1.6;">
@@ -566,16 +598,17 @@
       </div>
     </div>
 
-    <!-- ══ Séance photo — barre de progression ══ -->
+    <!-- ══ Séance photo — barre de progression + réservation ══ -->
     <div class="card one-col" id="photo-progress-card" style="margin-bottom:24px;padding:24px 28px;">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;flex-wrap:wrap;gap:12px;">
         <div>
-          <h3 style="margin:0 0 4px;font-family:'Cormorant Garamond',serif;font-size:1.2rem;">📷 Votre séance photo</h3>
-          <p style="margin:0;font-size:0.82rem;color:#8C8880;">Reportage HD + visite virtuelle par notre partenaire Meero</p>
+          <h3 style="margin:0 0 4px;font-family:'Cormorant Garamond',serif;font-size:1.2rem;display:flex;align-items:center;gap:6px;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg> Votre séance photo</h3>
+          <p style="margin:0;font-size:0.82rem;color:#8C8880;">Reportage HD + visite virtuelle par notre partenaire photographe</p>
         </div>
         <div id="photo-booking-cta"></div>
       </div>
       <div id="photo-steps" style="display:flex;align-items:flex-start;gap:0;overflow-x:auto;padding-bottom:4px;"></div>
+      <div id="photo-booking-section" style="margin-top:24px;"></div>
     </div>
 
     <!-- Statut & Checklist widget -->
@@ -657,7 +690,7 @@
           <p style="font-size:0.82rem;font-weight:600;color:#888;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:14px;">Mes données & compte</p>
           <div style="display:flex;flex-direction:column;gap:10px;">
             <a href="/api/seller/rgpd/export" id="exportDataBtn" style="display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:11px 18px;background:#f5f0e8;border:1px solid #ddd;border-radius:8px;color:#444;font-size:0.88rem;font-weight:600;text-decoration:none;transition:background .15s;" onmouseenter="this.style.background='#e8e0d6'" onmouseleave="this.style.background='#f5f0e8'">⬇ Télécharger mes données (JSON)</a>
-            <button onclick="confirmDeleteAccount()" style="padding:11px 18px;background:#fff;border:1px solid #e53935;border-radius:8px;color:#e53935;font-size:0.88rem;font-weight:600;cursor:pointer;transition:background .15s;" onmouseenter="this.style.background='#fdf2f2'" onmouseleave="this.style.background='#fff'">🗑 Supprimer mon compte</button>
+            <button onclick="confirmDeleteAccount()" style="display:inline-flex;align-items:center;gap:6px;padding:11px 18px;background:#fff;border:1px solid #e53935;border-radius:8px;color:#e53935;font-size:0.88rem;font-weight:600;cursor:pointer;transition:background .15s;" onmouseenter="this.style.background='#fdf2f2'" onmouseleave="this.style.background='#fff'"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg> Supprimer mon compte</button>
           </div>
         </div>
       </div>
@@ -1001,27 +1034,23 @@ function renderStatutWidget(meData) {
 // ── Barre de progression séance photo ────────────────────────────────────────
 function renderPhotoProgress(seller) {
   const STEPS = [
-    { key: 'paid',       label: 'Paiement',         icon: '💳', done: !!seller.paid_at },
-    { key: 'booking',    label: 'Demande envoyée',   icon: '📋', done: !!(seller.client_availability || seller.booking_step >= 1) },
-    { key: 'rdv',        label: 'RDV confirmé',      icon: '📅', done: !!seller.photographer_scheduled, detail: seller.photographer_date ? `Le ${seller.photographer_date}` + (seller.photographer_name ? ` · ${seller.photographer_name}` : '') : null },
-    { key: 'done',       label: 'Séance réalisée',   icon: '📸', done: !!seller.photographer_done },
-    { key: 'delivered',  label: 'Photos livrées',    icon: '🖼️', done: !!seller.photo_report_url, link: seller.photo_report_url || null },
+    { key: 'paid',       label: 'Paiement',         icon: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>', done: !!seller.paid_at },
+    { key: 'booking',    label: 'Demande envoyée',   icon: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1"/></svg>', done: !!(seller.client_availability || seller.booking_step >= 1) },
+    { key: 'rdv',        label: 'RDV confirmé',      icon: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>', done: !!seller.photographer_scheduled, detail: seller.photographer_date ? `Le ${seller.photographer_date}` + (seller.photographer_name ? ` · ${seller.photographer_name}` : '') : null },
+    { key: 'done',       label: 'Séance réalisée',   icon: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>', done: !!seller.photographer_done },
+    { key: 'delivered',  label: 'Photos livrées',    icon: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>', done: !!seller.photo_report_url, link: seller.photo_report_url || null },
   ];
 
   const firstIncomplete = STEPS.findIndex(s => !s.done);
   const allDone = firstIncomplete === -1;
 
-  // CTA
+  // CTA (photos delivered shortcut only)
   const cta = document.getElementById('photo-booking-cta');
   if (cta) {
-    if (!seller.paid_at) {
-      cta.innerHTML = '';
-    } else if (!seller.client_availability && !seller.booking_step) {
-      cta.innerHTML = `<a href="/booking" style="display:inline-block;background:#C4603A;color:#fff;padding:9px 20px;border-radius:6px;text-decoration:none;font-size:0.85rem;font-weight:500;">Réserver ma séance →</a>`;
-    } else if (seller.photo_report_url) {
-      cta.innerHTML = `<a href="${seller.photo_report_url}" target="_blank" style="display:inline-block;background:#059669;color:#fff;padding:9px 20px;border-radius:6px;text-decoration:none;font-size:0.85rem;font-weight:500;">📁 Voir mes photos →</a>`;
+    if (seller.photo_report_url) {
+      cta.innerHTML = `<a href="${seller.photo_report_url}" target="_blank" style="display:inline-flex;align-items:center;gap:6px;background:#059669;color:#fff;padding:9px 20px;border-radius:6px;text-decoration:none;font-size:0.85rem;font-weight:500;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg> Voir mes photos →</a>`;
     } else {
-      cta.innerHTML = `<span style="font-size:0.8rem;color:#8C8880;">Notre équipe vous contacte sous 24-48h</span>`;
+      cta.innerHTML = '';
     }
   }
 
@@ -1047,6 +1076,218 @@ function renderPhotoProgress(seller) {
   }).join('');
 }
 
+// ── Séance photo: réservation en ligne depuis le tableau de bord ─────────────
+(function() {
+  const MONTHS_FR = ['Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août','Septembre','Octobre','Novembre','Décembre'];
+  let psCurrentDate = new Date();
+  let psSlots = [];
+  let psSlotsByDate = {};
+  let psSelectedDate = null;
+  let psSelectedSlotId = null;
+
+  function dateStr(d) { return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`; }
+
+  async function safeJson(res) {
+    const ct = res.headers.get('content-type') || '';
+    if (!ct.includes('application/json')) {
+      if (res.url && res.url.includes('/login')) { window.location.href = '/login'; return null; }
+      throw new Error('Session expirée — rechargez la page.');
+    }
+    return res.json();
+  }
+
+  window.loadPhotoBookingDashboard = async function(property) {
+    const el = document.getElementById('photo-booking-section');
+    if (!el) return;
+    try {
+      const mr = await fetch('/api/seller/my-mission');
+      const mData = await safeJson(mr);
+      if (!mData) return;
+      if (mData.mission) { renderDashMissionStatus(el, mData.mission); return; }
+
+      if (!property?.postal_code) {
+        el.innerHTML = `<div class="ps-notice" style="display:flex;align-items:flex-start;gap:8px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="flex-shrink:0;margin-top:2px;"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg><span>Renseignez le code postal de votre bien dans <a href="/mon-bien" style="color:#92400e;font-weight:600;">Mon bien</a> pour réserver votre séance photo.</span></div>`;
+        return;
+      }
+      const sr = await fetch('/api/seller/available-slots?postal_code=' + encodeURIComponent(property.postal_code));
+      const sData = await safeJson(sr);
+      if (!sData) return;
+      if (sData.error) throw new Error(sData.error);
+      psSlots = sData.slots || [];
+      psSlotsByDate = {};
+      psSlots.forEach(s => { (psSlotsByDate[s.date] = psSlotsByDate[s.date] || []).push(s); });
+      renderDashBookingForm(el, property);
+    } catch(e) {
+      console.error('Photo booking error:', e);
+      el.innerHTML = `<div style="color:#dc2626;font-size:0.86rem;">Erreur : ${e.message || 'rechargez la page.'}</div>`;
+    }
+  };
+
+  function renderDashMissionStatus(el, m) {
+    const STATUS = { assigned:'En attente de confirmation photographe', confirmed:'Confirmée', completed:'Réalisée', pending:'En cours d\'assignation' };
+    const BADGE = { assigned:'ps-badge-assigned', confirmed:'ps-badge-confirmed', completed:'ps-badge-completed', pending:'ps-badge-assigned' };
+    el.innerHTML = `
+      <div class="ps-card">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;flex-wrap:wrap;gap:10px;">
+          <h4 style="margin:0;">Mission #${m.uuid.slice(0,8).toUpperCase()}</h4>
+          <span class="ps-status-badge ${BADGE[m.status]||''}">${STATUS[m.status]||m.status}</span>
+        </div>
+        <div class="ps-info-grid">
+          <div class="ps-info-item"><label>Date</label><span>${m.scheduled_date || '—'}</span></div>
+          <div class="ps-info-item"><label>Heure</label><span>${m.scheduled_time || '—'}</span></div>
+          <div class="ps-info-item"><label>Adresse</label><span>${m.address||'—'}</span></div>
+          <div class="ps-info-item"><label>Ville</label><span>${m.city||'—'}</span></div>
+          ${m.photographer_first_name ? `
+          <div class="ps-info-item"><label>Photographe</label><span>${m.photographer_first_name} ${m.photographer_last_name}</span></div>
+          <div class="ps-info-item"><label>Contact</label><span>${m.photographer_phone||'Communiqué par email'}</span></div>` : ''}
+        </div>
+        ${m.photos_url ? `<div style="margin-top:16px;padding-top:14px;border-top:1px solid rgba(0,0,0,0.06);">
+          <a href="${m.photos_url}" target="_blank" style="display:inline-flex;align-items:center;gap:5px;color:#C4603A;font-size:0.88rem;font-weight:500;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg> Accéder à mes photos →</a>
+        </div>` : ''}
+        ${m.virtual_tour_url ? `<div style="margin-top:10px;">
+          <a href="${m.virtual_tour_url}" target="_blank" style="display:inline-flex;align-items:center;gap:5px;color:#C4603A;font-size:0.88rem;font-weight:500;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg> Voir la visite virtuelle →</a>
+        </div>` : ''}
+        ${m.status === 'assigned' ? `<div style="margin-top:14px;font-size:0.8rem;color:#8C8880;">Le photographe a reçu la notification et doit confirmer sous 24h.</div>` : ''}
+      </div>`;
+  }
+
+  function renderDashBookingForm(el, prop) {
+    const hasSlots = psSlots.length > 0;
+    el.innerHTML = `
+      <div style="font-size:0.82rem;color:#8C8880;margin-bottom:14px;">Réservez votre séance photo directement ci-dessous — photographes disponibles autour de <strong>${prop.postal_code}</strong>.</div>
+      ${!hasSlots ? `<div class="ps-notice" style="display:flex;align-items:flex-start;gap:8px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="flex-shrink:0;margin-top:2px;"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg><span>Aucun photographe disponible dans votre zone pour les 60 prochains jours. Notre équipe vous contactera pour planifier manuellement.</span></div>` : ''}
+      ${hasSlots ? `
+      <div class="ps-card">
+        <h4>1. Choisissez une date</h4>
+        <div class="ps-month-nav">
+          <button id="ps-prev">‹</button>
+          <span class="ps-month-label" id="ps-month-label"></span>
+          <button id="ps-next">›</button>
+        </div>
+        <div class="ps-cal-grid">
+          <div class="ps-cal-head">Lun</div><div class="ps-cal-head">Mar</div>
+          <div class="ps-cal-head">Mer</div><div class="ps-cal-head">Jeu</div>
+          <div class="ps-cal-head">Ven</div><div class="ps-cal-head">Sam</div>
+          <div class="ps-cal-head">Dim</div>
+        </div>
+        <div class="ps-cal-grid" id="ps-cal-body"></div>
+      </div>
+      <div class="ps-card" id="ps-slots-card" style="display:none;">
+        <h4>2. Choisissez un créneau</h4>
+        <div class="ps-slots-list" id="ps-slots-list"></div>
+      </div>
+      <div class="ps-card" id="ps-notes-card" style="display:none;">
+        <h4>3. Informations d'accès <span style="font-weight:400;font-size:0.82rem;color:#8C8880;">(optionnel)</span></h4>
+        <textarea id="ps-access-notes" rows="3" style="width:100%;padding:10px 12px;border:1.5px solid rgba(0,0,0,0.1);border-radius:6px;font-family:inherit;font-size:0.86rem;resize:vertical;background:#fff;" placeholder="Ex : code d'entrée, étage, gardien, chien, clé chez le voisin…"></textarea>
+        <div style="margin-top:14px;display:flex;align-items:center;gap:14px;flex-wrap:wrap;">
+          <button class="ps-btn ps-btn-primary" id="ps-confirm-btn" disabled>Confirmer la réservation</button>
+          <span id="ps-confirm-msg" style="font-size:0.8rem;color:#059669;display:none;"></span>
+          <span id="ps-confirm-err" style="font-size:0.8rem;color:#dc2626;display:none;"></span>
+        </div>
+        <div style="margin-top:10px;font-size:0.76rem;color:#8C8880;">Le photographe recevra une notification et confirmera sous 24h. Vous serez informé par email.</div>
+      </div>` : ''}`;
+
+    if (!hasSlots) return;
+    renderPsCal();
+    document.getElementById('ps-prev').addEventListener('click', () => {
+      psCurrentDate = new Date(psCurrentDate.getFullYear(), psCurrentDate.getMonth()-1, 1);
+      renderPsCal();
+    });
+    document.getElementById('ps-next').addEventListener('click', () => {
+      psCurrentDate = new Date(psCurrentDate.getFullYear(), psCurrentDate.getMonth()+1, 1);
+      renderPsCal();
+    });
+    document.getElementById('ps-confirm-btn').addEventListener('click', confirmDashBooking);
+  }
+
+  function renderPsCal() {
+    const today = dateStr(new Date());
+    document.getElementById('ps-month-label').textContent = MONTHS_FR[psCurrentDate.getMonth()] + ' ' + psCurrentDate.getFullYear();
+    const first = new Date(psCurrentDate.getFullYear(), psCurrentDate.getMonth(), 1);
+    let startDow = first.getDay(); if (startDow === 0) startDow = 7;
+    const daysInMonth = new Date(psCurrentDate.getFullYear(), psCurrentDate.getMonth()+1, 0).getDate();
+    let html = '';
+    for (let i = 1; i < startDow; i++) html += '<div class="ps-cal-cell other-month"></div>';
+    for (let d = 1; d <= daysInMonth; d++) {
+      const ds = dateStr(new Date(psCurrentDate.getFullYear(), psCurrentDate.getMonth(), d));
+      const daySlots = psSlotsByDate[ds] || [];
+      const isPast = ds < today;
+      const isSelected = ds === psSelectedDate;
+      const classes = ['ps-cal-cell', daySlots.length ? 'has-slots' : '', isSelected ? 'selected' : '', isPast ? 'past' : ''].filter(Boolean).join(' ');
+      html += `<div class="${classes}" data-date="${ds}">
+        <div class="ps-day-num">${d}</div>
+        ${daySlots.length ? `<div class="ps-slot-count">${daySlots.length} créneau${daySlots.length>1?'x':''}</div>` : ''}
+      </div>`;
+    }
+    document.getElementById('ps-cal-body').innerHTML = html;
+    document.querySelectorAll('.ps-cal-cell[data-date]').forEach(el => {
+      el.addEventListener('click', () => selectPsDate(el.dataset.date));
+    });
+  }
+
+  function selectPsDate(ds) {
+    psSelectedDate = ds;
+    psSelectedSlotId = null;
+    renderPsCal();
+    const slots = psSlotsByDate[ds] || [];
+    const card = document.getElementById('ps-slots-card');
+    const notesCard = document.getElementById('ps-notes-card');
+    const confirmBtn = document.getElementById('ps-confirm-btn');
+    if (!slots.length) { card.style.display = 'none'; notesCard.style.display = 'none'; return; }
+    card.style.display = 'block';
+    notesCard.style.display = 'none';
+    if (confirmBtn) confirmBtn.disabled = true;
+    document.getElementById('ps-slots-list').innerHTML = slots.map(s => `
+      <div class="ps-slot-item" data-slot-id="${s.id}">
+        <div>
+          <div class="ps-slot-time">${s.start_time} – ${s.end_time}</div>
+          <div class="ps-slot-phot">${s.first_name} ${s.last_name}</div>
+        </div>
+        <div class="ps-slot-rating" style="display:flex;align-items:center;gap:3px;"><svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" stroke="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg> ${s.rating ? s.rating.toFixed(1) : '5.0'}</div>
+      </div>`).join('');
+    document.querySelectorAll('.ps-slot-item').forEach(el => {
+      el.addEventListener('click', () => {
+        document.querySelectorAll('.ps-slot-item').forEach(x => x.classList.remove('selected'));
+        el.classList.add('selected');
+        psSelectedSlotId = parseInt(el.dataset.slotId);
+        notesCard.style.display = 'block';
+        if (confirmBtn) confirmBtn.disabled = false;
+        notesCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      });
+    });
+  }
+
+  async function confirmDashBooking() {
+    const btn = document.getElementById('ps-confirm-btn');
+    const msg = document.getElementById('ps-confirm-msg');
+    const err = document.getElementById('ps-confirm-err');
+    if (!psSelectedSlotId) return;
+    btn.disabled = true; btn.textContent = 'Réservation…';
+    err.style.display = 'none';
+    try {
+      const r = await fetch('/api/seller/book-photography', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ slot_id: psSelectedSlotId, access_notes: document.getElementById('ps-access-notes').value })
+      });
+      const d = await r.json();
+      if (d.success) {
+        msg.textContent = '✓ Réservation confirmée ! Le photographe va recevoir la notification.';
+        msg.style.display = 'inline';
+        btn.textContent = 'Réservé ✓';
+        setTimeout(() => loadData(), 2000);
+      } else {
+        err.textContent = d.error || 'Erreur';
+        err.style.display = 'inline';
+        btn.disabled = false; btn.textContent = 'Confirmer la réservation';
+      }
+    } catch {
+      err.textContent = 'Erreur réseau';
+      err.style.display = 'inline';
+      btn.disabled = false; btn.textContent = 'Confirmer la réservation';
+    }
+  }
+})();
+
 /* ══ Notifications ══ */
 let notifOpen = false;
 function toggleNotifPanel() {
@@ -1070,11 +1311,16 @@ function renderNotifications(notifications) {
     list.innerHTML = '<div style="padding:24px;text-align:center;color:#aaa;font-size:0.82rem;">Aucune notification</div>';
     return;
   }
-  const icons = { visit_request:'📅', visit_confirmed:'✅', new_contact:'📩', visit_cancelled:'❌' };
+  const icons = {
+    visit_request:   '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>',
+    visit_confirmed: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>',
+    new_contact:     '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>',
+    visit_cancelled: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>'
+  };
   list.innerHTML = notifications.map(n => `
     <div style="padding:12px 16px;border-bottom:1px solid rgba(0,0,0,0.05);background:${n.read_at?'#fff':'#F9FFF9'};">
       <div style="display:flex;gap:10px;align-items:flex-start;">
-        <span style="font-size:1.1rem;flex-shrink:0">${icons[n.type]||'🔔'}</span>
+        <span style="flex-shrink:0;display:flex;align-items:center;">${icons[n.type]||'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>'}</span>
         <div style="min-width:0">
           <div style="font-size:0.82rem;font-weight:600;color:#1C1C1A">${n.title||''}</div>
           <div style="font-size:0.78rem;color:#666;margin-top:2px;line-height:1.4">${n.body||''}</div>
@@ -1169,6 +1415,9 @@ async function loadData() {
 
     /* — Photo progress — */
     renderPhotoProgress(seller);
+    if (seller.paid_at && !seller.photographer_done) {
+      loadPhotoBookingDashboard(property);
+    }
 
     /* — Score section — */
     renderScore(scoreData);

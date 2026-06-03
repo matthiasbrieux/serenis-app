@@ -10,11 +10,13 @@ router.get('/api/dossier/acheteur/:token', (req, res) => {
     SELECT p.*, s.first_name, s.last_name, s.phone as seller_phone, s.email as seller_email
     FROM properties p
     JOIN sellers s ON s.id = p.seller_id
-    WHERE p.acheteur_token = ? AND p.published = 1
+    WHERE p.acheteur_token = ?
   `).get(req.params.token);
-  if (!prop) return res.status(404).json({ error: 'Dossier introuvable ou annonce non publiée' });
+  if (!prop) return res.status(404).json({ error: 'Dossier introuvable' });
 
-  const photos = db.prepare('SELECT url, thumbnail_url, order_index, category FROM property_photos WHERE property_id = ? ORDER BY order_index').all(prop.id);
+  const photos = prop.exterieur_photos_public
+    ? db.prepare('SELECT url, thumbnail_url, order_index, category FROM property_photos WHERE property_id = ? ORDER BY order_index').all(prop.id)
+    : db.prepare("SELECT url, thumbnail_url, order_index, category FROM property_photos WHERE property_id = ? AND (category IS NULL OR category != 'exterieur') ORDER BY order_index").all(prop.id);
   const docs = db.prepare(`
     SELECT id, name, url, doc_type, folder, created_at
     FROM property_documents
@@ -51,7 +53,7 @@ router.get('/api/dossier/notaire/:token', (req, res) => {
 
 // ── Créneaux disponibles (par token acheteur) ────────────────
 router.get('/api/dossier/acheteur/:token/creneaux', (req, res) => {
-  const prop = db.prepare('SELECT id, seller_id FROM properties WHERE acheteur_token = ? AND published = 1').get(req.params.token);
+  const prop = db.prepare('SELECT id, seller_id FROM properties WHERE acheteur_token = ?').get(req.params.token);
   if (!prop) return res.status(404).json({ error: 'Dossier introuvable' });
 
   const slots = db.prepare('SELECT * FROM agenda_slots WHERE seller_id = ? AND active = 1').all(prop.seller_id);
@@ -66,7 +68,7 @@ router.post('/api/dossier/acheteur/:token/reserver', async (req, res) => {
     const prop = db.prepare(`
       SELECT p.*, s.email as seller_email, s.first_name as seller_first_name, s.phone as seller_phone
       FROM properties p JOIN sellers s ON s.id = p.seller_id
-      WHERE p.acheteur_token = ? AND p.published = 1
+      WHERE p.acheteur_token = ?
     `).get(req.params.token);
     if (!prop) return res.status(404).json({ error: 'Dossier introuvable' });
 

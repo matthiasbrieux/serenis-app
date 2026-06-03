@@ -439,6 +439,27 @@ db.exec(`
   );
 `);
 
+// ── Paiement 4x — suivi des mensualités ──────────────────────
+const installmentCols = [
+  "ALTER TABLE sellers ADD COLUMN installments_paid INTEGER DEFAULT 1",
+  "ALTER TABLE sellers ADD COLUMN installments_total INTEGER DEFAULT 1",
+  "ALTER TABLE sellers ADD COLUMN next_installment_date DATE",
+  "ALTER TABLE sellers ADD COLUMN stripe_payment_method_id TEXT",
+];
+installmentCols.forEach(sql => { try { db.exec(sql); } catch(e) {} });
+
+// ── Travaux récents ───────────────────────────────────────────
+try { db.exec("ALTER TABLE properties ADD COLUMN travaux_recents TEXT"); } catch(e) {}
+
+// ── Visibilité photos dans le dossier acheteur ───────────────
+try { db.exec("ALTER TABLE properties ADD COLUMN exterieur_photos_public INTEGER DEFAULT 0"); } catch(e) {}
+try { db.exec("ALTER TABLE properties ADD COLUMN pro_photos_public INTEGER DEFAULT 0"); } catch(e) {}
+try { db.exec("ALTER TABLE properties ADD COLUMN decouverte_photos_public INTEGER DEFAULT 0"); } catch(e) {}
+try { db.exec("ALTER TABLE properties ADD COLUMN details_photos_public INTEGER DEFAULT 0"); } catch(e) {}
+try { db.exec("ALTER TABLE properties ADD COLUMN diagnostics_in_dossier INTEGER DEFAULT 1"); } catch(e) {}
+try { db.exec("ALTER TABLE properties ADD COLUMN plan_docs_visible INTEGER DEFAULT 1"); } catch(e) {}
+try { db.exec("ALTER TABLE properties ADD COLUMN acheteur_docs_visible INTEGER DEFAULT 1"); } catch(e) {}
+
 // Grandfathering : les comptes existants ayant déjà payé sont considérés comme ayant signé
 // (évite de bloquer des clients réels lors du déploiement de cette nouvelle contrainte)
 try {

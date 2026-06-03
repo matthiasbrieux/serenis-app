@@ -6,7 +6,7 @@ const db = require('../database');
 const { requireAuth } = require('../middleware/auth');
 const { uploadPhoto, uploadDocument } = require('../services/upload');
 const { assignTwilioNumber } = require('../services/twilio');
-const { sendSoldCongrats, sendPropertySoldToBuyer } = require('../services/email');
+const { sendSoldCongrats, sendPropertySoldToBuyer, sendVisitConfirmation } = require('../services/email');
 
 // Pages vendeur (toutes protégées)
 router.get('/dashboard', requireAuth, (req, res) => res.sendFile('dashboard.html', { root: './views/seller' }));
@@ -131,7 +131,7 @@ router.post('/api/property', requireAuth, express.json(), (req, res) => {
     'facture_eau','facture_electricite','facture_gaz',
     'commerces','school_maternelle','school_primaire','school_college','school_lycee',
     'highway','train_station','equipment','sale_reason','price','description','rooms_detail',
-    'virtual_tour_url'
+    'virtual_tour_url','travaux_recents','exterieur_photos_public','pro_photos_public','decouverte_photos_public','details_photos_public','diagnostics_in_dossier','plan_docs_visible','acheteur_docs_visible'
   ];
   const data = {};
   fields.forEach(f => { if (req.body[f] !== undefined) data[f] = req.body[f]; });
@@ -421,6 +421,27 @@ Style : direct, chaleureux, expert. Pas de jargon inutile. Réponses courtes (3-
   }
 });
 
+// ── Alex vocal — résumé de step ──────────────────────────────────
+router.post('/api/formation/speak', requireAuth, express.json(), async (req, res) => {
+  const { moduleTitle, stepTitle, keyPoints = [] } = req.body;
+  if (!process.env.ANTHROPIC_API_KEY) {
+    return res.json({ text: `${stepTitle}. ${keyPoints[0] || 'Voici ce que vous allez apprendre dans cette étape.'}` });
+  }
+  const Anthropic = require('@anthropic-ai/sdk');
+  const client = new Anthropic.default({ apiKey: process.env.ANTHROPIC_API_KEY });
+  try {
+    const response = await client.messages.create({
+      model: 'claude-haiku-4-5-20251001',
+      max_tokens: 100,
+      system: `Tu es Alex, coach immobilier vocal. En 2 phrases courtes et naturelles (style parlé, pas écrit), tu annonces ce que le vendeur va apprendre dans cette étape. Sois motivant et direct. Pas de liste, pas de titre, pas de ponctuation excessive. Maximum 35 mots.`,
+      messages: [{ role: 'user', content: `Module : ${moduleTitle}\nÉtape : ${stepTitle}\nPoints clés du module : ${keyPoints.slice(0, 2).join(' / ')}` }],
+    });
+    res.json({ text: response.content[0].text });
+  } catch (e) {
+    res.json({ text: `${stepTitle}. Regardez bien cette étape, elle est essentielle pour votre vente.` });
+  }
+});
+
 // ── Export dossier PDF ────────────────────────────────────────────
 router.post('/api/property/export-pdf', requireAuth, express.json({ limit: '2mb' }), async (req, res) => {
   const { html, title } = req.body;
@@ -566,11 +587,11 @@ router.post('/api/performances/analyze', requireAuth, express.json(), async (req
 // SERENIS CONNECT — Communication Hub
 // ═══════════════════════════════════════════════════════
 
-router.get('/serenis-connect', requireAuth, (req, res) => res.sendFile('communication.html', { root: './views/seller' }));
+router.get('/serenis-connect', requireAuth, (req, res) => res.redirect('/mon-agenda'));
 
 router.get('/api/connect/overview', requireAuth, (req, res) => {
   const seller = db.prepare('SELECT id, uuid, email, first_name, last_name, phone, pack, twilio_number FROM sellers WHERE id = ?').get(req.seller.id);
-  const property = db.prepare('SELECT id, type, city, postal_code, price, rooms, bedrooms, surface_habitable FROM properties WHERE seller_id = ?').get(req.seller.id);
+  const property = db.prepare('SELECT id, slug, published, type, city, postal_code, price, rooms, bedrooms, surface_habitable, acheteur_token, notaire_token FROM properties WHERE seller_id = ?').get(req.seller.id);
   const visits = property
     ? db.prepare('SELECT * FROM visits WHERE seller_id = ? ORDER BY visit_date ASC, visit_time ASC').all(req.seller.id)
     : [];
@@ -585,6 +606,8 @@ router.get('/api/connect/overview', requireAuth, (req, res) => {
     visits_confirmed: visits.filter(v => v.status === 'confirmed').length,
     visits_done: visits.filter(v => v.status === 'done').length,
     unread: notifications.filter(n => !n.read_at).length,
+    calls_received: contacts.filter(c => c.source === 'voice').length,
+    sms_received: contacts.filter(c => c.source === 'sms').length,
   };
   res.json({ seller, property, visits, contacts, notifications, stats });
 });
@@ -619,14 +642,17 @@ router.post('/api/visits', requireAuth, express.json(), async (req, res) => {
   res.json({ success: true, id: result.lastInsertRowid });
 });
 
-router.put('/api/visits/:id/status', requireAuth, express.json(), (req, res) => {
+router.put('/api/visits/:id/status', requireAuth, express.json(), async (req, res) => {
   const { status } = req.body;
   if (!['pending','confirmed','cancelled','done'].includes(status)) return res.status(400).json({ error: 'Statut invalide' });
   db.prepare('UPDATE visits SET status=? WHERE id=? AND seller_id=?').run(status, req.params.id, req.seller.id);
-  const visit = db.prepare('SELECT * FROM visits WHERE id=?').get(req.params.id);
+  const visit = db.prepare('SELECT v.*, p.type, p.address, p.city FROM visits v LEFT JOIN properties p ON p.id = v.property_id WHERE v.id=?').get(req.params.id);
   if (visit && status === 'confirmed') {
     db.prepare('INSERT INTO notifications (seller_id, type, title, body) VALUES (?,\'visit_confirmed\',?,?)')
       .run(req.seller.id, 'Visite confirmée', `${visit.buyer_name} — ${visit.visit_date} à ${visit.visit_time}`);
+    if (visit.buyer_email) {
+      sendVisitConfirmation(visit.buyer_email, visit.buyer_name, visit, visit.visit_date, visit.visit_time, false).catch(e => console.error('Buyer confirm email error:', e.message));
+    }
   }
   res.json({ success: true });
 });
@@ -896,8 +922,8 @@ router.get('/api/notifications/counts', requireAuth, (req, res) => {
   res.json({ pendingOffers, upcomingVisits, unreadNotifs });
 });
 
-// ── Centre de notifications ───────────────────────────────────
-router.get('/mes-notifications', requireAuth, (req, res) => res.sendFile('notifications.html', { root: './views/seller' }));
+// ── Centre de notifications — redirigé vers l'agenda ─────────
+router.get('/mes-notifications', requireAuth, (req, res) => res.redirect('/mon-agenda'));
 
 router.get('/api/notifications/all', requireAuth, (req, res) => {
   const property = db.prepare('SELECT id FROM properties WHERE seller_id=?').get(req.seller.id);

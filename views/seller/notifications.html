@@ -2,6 +2,7 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
+  <script>if("scrollRestoration"in history)history.scrollRestoration="manual";</script>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Notifications — Serenis</title>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
@@ -107,7 +108,7 @@ function render() {
   const filtered = activeTab === 'all' ? allItems : allItems.filter(i => i.tab === activeTab);
 
   if (!filtered.length) {
-    content.innerHTML = `<div class="empty-state"><div class="icon">🔔</div><p>Aucune notification ici pour le moment.</p></div>`;
+    content.innerHTML = `<div class="empty-state"><div class="icon"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg></div><p>Aucune notification ici pour le moment.</p></div>`;
     return;
   }
 
@@ -143,12 +144,12 @@ function buildItems() {
   // System notifications from DB
   (data.notifications || []).forEach(n => {
     const typeMap = {
-      visit_request:   { icon: '📅', cls: 'ni-visit',   tab: 'visits'   },
-      visit_confirmed: { icon: '✅', cls: 'ni-visit',   tab: 'visits'   },
-      new_contact:     { icon: '👤', cls: 'ni-contact', tab: 'contacts' },
-      new_offer:       { icon: '💰', cls: 'ni-offer',   tab: 'offers'   },
+      visit_request:   { icon: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>', cls: 'ni-visit',   tab: 'visits'   },
+      visit_confirmed: { icon: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>', cls: 'ni-visit',   tab: 'visits'   },
+      new_contact:     { icon: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>', cls: 'ni-contact', tab: 'contacts' },
+      new_offer:       { icon: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><path d="M14.5 9.5A2.5 2.5 0 0 0 12 7h-2v5h2a2.5 2.5 0 0 0 0-5H10v10h2.5"/></svg>', cls: 'ni-offer',   tab: 'offers'   },
     };
-    const t = typeMap[n.type] || { icon: '🔔', cls: 'ni-system', tab: 'system' };
+    const t = typeMap[n.type] || { icon: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>', cls: 'ni-system', tab: 'system' };
     items.push({
       tab: t.tab, icon: t.icon, iconCls: t.cls,
       title: n.title || n.type,
@@ -162,7 +163,7 @@ function buildItems() {
   (data.visits || []).forEach(v => {
     const statusLabel = { confirmed: 'Confirmée', pending: 'En attente', cancelled: 'Annulée', done: 'Réalisée' }[v.status] || v.status;
     items.push({
-      tab: 'visits', icon: '📅', iconCls: 'ni-visit',
+      tab: 'visits', icon: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>', iconCls: 'ni-visit',
       title: `Visite — ${v.buyer_name}`,
       sub: `${v.visit_date} à ${v.visit_time} · ${statusLabel}`,
       date: v.created_at, unread: false,
@@ -172,7 +173,7 @@ function buildItems() {
   // Offers
   (data.offers || []).forEach(o => {
     items.push({
-      tab: 'offers', icon: '💰', iconCls: 'ni-offer',
+      tab: 'offers', icon: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><path d="M14.5 9.5A2.5 2.5 0 0 0 12 7h-2v5h2a2.5 2.5 0 0 0 0-5H10v10h2.5"/></svg>', iconCls: 'ni-offer',
       title: `Offre de ${o.buyer_name} — ${Number(o.amount).toLocaleString('fr-FR')} €`,
       sub: `Reçue le ${new Date(o.created_at).toLocaleDateString('fr-FR')} · ${o.status === 'pending' ? 'En attente de réponse' : o.status}`,
       date: o.created_at, unread: o.status === 'pending',
@@ -182,7 +183,7 @@ function buildItems() {
   // Contacts
   (data.contacts || []).forEach(c => {
     items.push({
-      tab: 'contacts', icon: '👤', iconCls: 'ni-contact',
+      tab: 'contacts', icon: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>', iconCls: 'ni-contact',
       title: `Nouveau contact — ${c.buyer_name || c.buyer_email || c.buyer_phone || 'Acquéreur'}`,
       sub: `Via ${c.source === 'sms' ? 'SMS' : c.source === 'manuel' ? 'Ajout manuel' : c.source} · Dossier ${c.dossier_sent ? 'envoyé' : 'non envoyé'}`,
       date: c.created_at, unread: false,

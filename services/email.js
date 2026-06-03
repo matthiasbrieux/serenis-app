@@ -449,7 +449,7 @@ async function sendNewVisitRequest({ sellerEmail, buyerName, visitDate, notes })
     </div>
     <p style="color:#444;line-height:1.7;margin:0 0 24px;">Connectez-vous à votre espace Serenis pour confirmer ou proposer un autre créneau.</p>
     <div style="text-align:center;margin:0 0 32px;">
-      <a href="${BASE}/serenis-connect" style="background:#C4785A;color:#fff;padding:14px 36px;text-decoration:none;border-radius:8px;font-weight:bold;font-size:15px;display:inline-block;">Gérer mes visites →</a>
+      <a href="${BASE}/mon-agenda" style="background:#C4785A;color:#fff;padding:14px 36px;text-decoration:none;border-radius:8px;font-weight:bold;font-size:15px;display:inline-block;">Gérer mes visites →</a>
     </div>
   </td></tr>
   <tr><td style="background:#3D5A47;border-radius:0 0 12px 12px;padding:20px 40px;text-align:center;">
@@ -495,7 +495,7 @@ async function sendVisitReminderSeller({ sellerEmail, buyerName, visitDate }) {
       <li>Prévoyez 45 à 60 minutes pour la visite</li>
     </ul>
     <div style="text-align:center;">
-      <a href="${BASE}/serenis-connect" style="background:#1C1C1A;color:#F5F0E8;padding:14px 36px;text-decoration:none;border-radius:8px;font-weight:bold;font-size:15px;display:inline-block;">Voir mes visites →</a>
+      <a href="${BASE}/mon-agenda" style="background:#1C1C1A;color:#F5F0E8;padding:14px 36px;text-decoration:none;border-radius:8px;font-weight:bold;font-size:15px;display:inline-block;">Voir mes visites →</a>
     </div>
   </td></tr>
   <tr><td style="background:#3D5A47;border-radius:0 0 12px 12px;padding:20px 40px;text-align:center;">
@@ -1130,7 +1130,7 @@ async function sendBuyerContactedSeller({ email, firstName, buyerName, buyerPhon
     <p style="color:#444;line-height:1.7;margin:0 0 12px;">Nous vous recommandons de le rappeler dans les <strong>24 heures</strong> — la réactivité est un facteur clé pour convertir un contact en visite.</p>
     <p style="color:#444;line-height:1.7;margin:0 0 28px;">Pensez à qualifier l'acheteur : financement, délai d'achat, situation actuelle. Ces informations vous aideront à prioriser vos visites.</p>
     <div style="text-align:center;margin:0 0 32px;">
-      <a href="${BASE}/serenis-connect" style="background:#C4785A;color:#fff;padding:16px 40px;text-decoration:none;border-radius:8px;font-weight:bold;font-size:15px;display:inline-block;">Gérer mes contacts →</a>
+      <a href="${BASE}/mon-agenda" style="background:#C4785A;color:#fff;padding:16px 40px;text-decoration:none;border-radius:8px;font-weight:bold;font-size:15px;display:inline-block;">Gérer mes contacts →</a>
     </div>
     <p style="font-size:13px;color:#999;margin:0;">Un doute sur la marche à suivre ? Répondez à cet email — Matthias vous conseille.</p>
   </td></tr>
@@ -1247,7 +1247,7 @@ async function sendSoldCongrats({ email, firstName, address, price }) {
 }
 
 // ── Welcome amélioré avec checklist numérotée ─────────────────────────────────
-async function sendWelcomeImproved({ to, firstName, pack, tempPassword }) {
+async function sendWelcomeImproved({ to, firstName, pack, tempPassword, resetUrl }) {
   const name = firstName || '';
   const isSerenite = pack === 'serenite';
   const packLabel = isSerenite ? 'Pack Sérénité' : 'Pack Autonome';
@@ -1307,8 +1307,12 @@ async function sendWelcomeImproved({ to, firstName, pack, tempPassword }) {
     <div style="background:#F5F0E8;border-left:4px solid #C4785A;border-radius:4px;padding:18px 20px;margin:0 0 32px;">
       <p style="font-size:12px;font-weight:bold;color:#888;text-transform:uppercase;letter-spacing:0.05em;margin:0 0 10px;">Vos identifiants de connexion</p>
       <p style="margin:4px 0;font-size:14px;color:#1A1A16;"><strong>Email :</strong> ${to}</p>
-      <p style="margin:4px 0;font-size:14px;color:#1A1A16;"><strong>Mot de passe temporaire :</strong> <code style="background:#e8e0d6;padding:2px 6px;border-radius:4px;font-size:13px;">${tempPassword || '(celui reçu lors de votre inscription)'}</code></p>
-      <p style="font-size:12px;color:#aaa;margin:10px 0 0;">Changez votre mot de passe dès votre première connexion.</p>
+      ${resetUrl
+        ? `<p style="margin:10px 0 0;font-size:13px;color:#555;">Pour définir votre mot de passe, cliquez sur le bouton ci-dessous (lien valable 7 jours) :</p>
+           <div style="text-align:center;margin:14px 0 0;"><a href="${resetUrl}" style="background:#3D5A47;color:#fff;padding:12px 28px;text-decoration:none;border-radius:8px;font-weight:bold;font-size:14px;display:inline-block;">Définir mon mot de passe →</a></div>`
+        : `<p style="margin:4px 0;font-size:14px;color:#1A1A16;"><strong>Mot de passe :</strong> celui choisi lors de votre inscription.</p>
+           <p style="font-size:12px;color:#aaa;margin:10px 0 0;">Vous pouvez le modifier depuis votre espace.</p>`
+      }
     </div>
 
     <!-- Étapes -->
@@ -1508,4 +1512,31 @@ async function sendPasswordResetEmail({ email, resetUrl }) {
   } catch(e) { console.error('[EMAIL ERROR] sendPasswordResetEmail:', e.message); return false; }
 }
 
-module.exports = { sendWelcomeEmail, sendDossierEmail, sendVisitConfirmation, sendContactNotification, sendMissionAssigned, sendMissionConfirmed, sendMissionReminderJ1, sendProspectNudge, sendNoPropertyNudge, sendNoPhotosNudge, sendNotPublishedNudge, sendNewVisitRequest, sendVisitReminderSeller, sendMissingDocNudge, sendPublishedConfirmation, sendContractRenewal, sendReviewRequest, sendAdminDirectEmail, sendInvoiceEmail, sendOfferNotification, sendPostVisitBuyerNudge, sendWeeklyAdminReport, sendPhotographerAvailabilityRequest, sendPostFirstVisitFeedbackSeller, sendCheckInNoOffer, sendInfoNeededEmail, sendBuyerContactedSeller, sendVisitFeedbackRequest, sendSoldCongrats, sendPropertySoldToBuyer, sendWelcomeImproved, sendDossierToNotaire, previewEmail, sendPasswordResetEmail };
+async function sendVisitRequestReceived(to, name, property, date, time) {
+  const msg = {
+    to, from: FROM,
+    subject: `Demande de visite reçue — ${date} à ${time}`,
+    html: `
+<div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;">
+  <div style="background:#3D5A47;padding:24px;text-align:center;">
+    <h1 style="color:#FDFCF8;font-family:Georgia,serif;margin:0;">Serenis</h1>
+  </div>
+  <div style="padding:32px;background:#FDFCF8;">
+    <h2 style="color:#3D5A47;">Demande de visite reçue ⏳</h2>
+    <p>Bonjour ${name},</p>
+    <p>Votre demande de visite a bien été reçue. Le vendeur va la confirmer prochainement — vous recevrez un email de confirmation dès validation.</p>
+    <div style="background:#FFF8E1;border-left:4px solid #F57F17;padding:20px;border-radius:4px;margin:20px 0;">
+      <p style="margin:0 0 8px;"><strong>Bien :</strong> ${property.type || ''} — ${property.address || ''}, ${property.city || ''}</p>
+      <p style="margin:0 0 8px;"><strong>Date souhaitée :</strong> ${date}</p>
+      <p style="margin:0;"><strong>Heure :</strong> ${time}</p>
+    </div>
+    <p style="color:#666;font-size:13px;">En attente de confirmation du vendeur.</p>
+    <p style="font-size:13px;color:#666;">Serenis — plateforme numérique d'outils et de formation</p>
+  </div>
+</div>`,
+  };
+  if (!process.env.SENDGRID_API_KEY) { console.log('[EMAIL SKIPPED] VisitRequestReceived:', to); return; }
+  await sgMail.send(msg);
+}
+
+module.exports = { sendWelcomeEmail, sendDossierEmail, sendVisitConfirmation, sendVisitRequestReceived, sendContactNotification, sendMissionAssigned, sendMissionConfirmed, sendMissionReminderJ1, sendProspectNudge, sendNoPropertyNudge, sendNoPhotosNudge, sendNotPublishedNudge, sendNewVisitRequest, sendVisitReminderSeller, sendMissingDocNudge, sendPublishedConfirmation, sendContractRenewal, sendReviewRequest, sendAdminDirectEmail, sendInvoiceEmail, sendOfferNotification, sendPostVisitBuyerNudge, sendWeeklyAdminReport, sendPhotographerAvailabilityRequest, sendPostFirstVisitFeedbackSeller, sendCheckInNoOffer, sendInfoNeededEmail, sendBuyerContactedSeller, sendVisitFeedbackRequest, sendSoldCongrats, sendPropertySoldToBuyer, sendWelcomeImproved, sendDossierToNotaire, previewEmail, sendPasswordResetEmail };

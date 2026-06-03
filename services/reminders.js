@@ -352,4 +352,56 @@ async function sendCheckInNoOfferNudges() {
   }
 }
 
-module.exports = { sendVisitReminders, sendMissionReminders, sendAutomatedNudges, sendContractExpiryReminders, sendPostVisitBuyerNudges, sendWeeklyAdminReportEmail, sendPhotographerAvailabilityNudges, sendPostFirstVisitFeedbackNudges, sendCheckInNoOfferNudges };
+async function chargeInstallments() {
+  if (!process.env.STRIPE_SECRET_KEY) return;
+  const today = new Date().toISOString().split('T')[0];
+  const due = db.prepare(`
+    SELECT * FROM sellers
+    WHERE installments_total > 1
+      AND installments_paid < installments_total
+      AND next_installment_date <= ?
+      AND stripe_customer_id IS NOT NULL
+      AND stripe_payment_method_id IS NOT NULL
+  `).all(today);
+
+  if (!due.length) return;
+  const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
+  const { sendInvoiceEmail } = require('./email');
+
+  for (const seller of due) {
+    const installmentNum = seller.installments_paid + 1;
+    try {
+      const pi = await stripe.paymentIntents.create({
+        amount: 24900, // 249 € — chaque mensualité Sérénité 4x
+        currency: 'eur',
+        customer: seller.stripe_customer_id,
+        payment_method: seller.stripe_payment_method_id,
+        confirm: true,
+        off_session: true,
+        description: `Pack Sérénité Serenis — versement ${installmentNum}/${seller.installments_total}`,
+        metadata: { seller_id: String(seller.id), installment: String(installmentNum) },
+      });
+
+      if (pi.status === 'succeeded') {
+        const newPaid = seller.installments_paid + 1;
+        const nextDate = newPaid < seller.installments_total
+          ? new Date(Date.now() + 30 * 24 * 3600 * 1000).toISOString().split('T')[0]
+          : null;
+        db.prepare('UPDATE sellers SET installments_paid=?, next_installment_date=? WHERE id=?')
+          .run(newPaid, nextDate, seller.id);
+        const invoiceNumber = `SER-${new Date().getFullYear()}-${String(seller.id).padStart(5, '0')}-V${installmentNum}`;
+        await sendInvoiceEmail({ email: seller.email, firstName: seller.first_name, amount: 24900, pack: 'serenite', invoiceNumber, date: new Date() }).catch(() => {});
+        console.log(`✓ 4x versement ${installmentNum}/${seller.installments_total} encaissé — seller ${seller.id} (${seller.email})`);
+      }
+    } catch(e) {
+      console.error(`4x charge error seller ${seller.id}:`, e.message);
+      // Alerte admin si carte refusée
+      try {
+        db.prepare(`INSERT INTO notifications (seller_id, type, title, body) VALUES (0,'admin_alert','Échec mensualité 4x',?)`)
+          .run(`${seller.email} (id=${seller.id}) — versement ${installmentNum}/${seller.installments_total} refusé : ${e.message}`);
+      } catch(ne) {}
+    }
+  }
+}
+
+module.exports = { sendVisitReminders, sendMissionReminders, sendAutomatedNudges, sendContractExpiryReminders, sendPostVisitBuyerNudges, sendWeeklyAdminReportEmail, sendPhotographerAvailabilityNudges, sendPostFirstVisitFeedbackNudges, sendCheckInNoOfferNudges, chargeInstallments };
