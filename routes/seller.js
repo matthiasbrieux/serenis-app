@@ -10,7 +10,15 @@ const { sendSoldCongrats, sendPropertySoldToBuyer, sendVisitConfirmation } = req
 
 // Pages vendeur (toutes protégées)
 router.get('/dashboard', requireAuth, (req, res) => res.sendFile('dashboard.html', { root: './views/seller' }));
-router.get('/mon-bien', requireAuth, (req, res) => res.sendFile('property.html', { root: './views/seller' }));
+router.get('/mon-bien', requireAuth, (req, res) => {
+  const base = process.env.BASE_URL || `${req.protocol}://${req.get('host')}`;
+  const fs = require('fs');
+  const path = require('path');
+  let html = fs.readFileSync(path.join(__dirname, '../views/seller/property.html'), 'utf8');
+  html = html.replace('let _baseUrl = window.location.origin;', `let _baseUrl = ${JSON.stringify(base)};`);
+  res.setHeader('Content-Type', 'text/html');
+  res.send(html);
+});
 router.get('/ma-formation', requireAuth, (req, res) => res.sendFile('library.html', { root: './views/seller' }));
 router.get('/mon-agenda', requireAuth, (req, res) => res.sendFile('agenda.html', { root: './views/seller' }));
 router.get('/ma-bibliotheque', requireAuth, (req, res) => res.sendFile('biblio.html', { root: './views/seller' }));
