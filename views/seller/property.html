@@ -2992,23 +2992,21 @@ async function loadProperty() {
     if (tourInput) { tourInput.value = p.virtual_tour_url; document.getElementById('tourUrlStatus').textContent = '✓ Lien enregistré'; }
   }
 
-  // Liens partage — dossier acheteur & notaire
-  if (p.acheteur_token) {
-    const acheteurUrl = _baseUrl + '/dossier/acheteur/' + p.acheteur_token;
+  // Liens partage — URLs construites côté serveur (BASE_URL garanti)
+  if (p.acheteur_url) {
+    const acheteurUrl = p.acheteur_url;
     ['pro','exterieur','decouverte','details','all','fiche','acheteur','dpe'].forEach(function(k) {
       var inp = document.getElementById('ev-link-' + k);
       var sms = document.getElementById('ev-sms-' + k);
       if (inp) inp.value = acheteurUrl;
       if (sms) sms.textContent = acheteurUrl;
     });
-    // Photos tab share inputs
     ['pro','exterieur','decouverte','details','all'].forEach(function(k) {
       var inp = document.getElementById('share-link-' + k);
       var sms = document.getElementById('share-sms-' + k);
       if (inp) inp.value = acheteurUrl;
       if (sms) sms.textContent = acheteurUrl;
     });
-    // Documents tab share inputs
     var diagInp = document.getElementById('diagShareInput');
     var diagSms = document.getElementById('diag-share-sms-link');
     if (diagInp) diagInp.value = acheteurUrl;
@@ -3018,11 +3016,10 @@ async function loadProperty() {
     if (acheteurInp) acheteurInp.value = acheteurUrl;
     if (acheteurSms) acheteurSms.textContent = acheteurUrl;
   }
-  if (p.notaire_token) {
-    const notaireUrl = _baseUrl + '/dossier/notaire/' + p.notaire_token;
+  if (p.notaire_url) {
+    const notaireUrl = p.notaire_url;
     var notaireInp = document.getElementById('ev-link-notaire');
     if (notaireInp) notaireInp.value = notaireUrl;
-    // Notaire email template
     var notaireMsg = document.getElementById('ev-msg-notaire-text');
     const notaireEmail = 'Bonjour Maître,\n\nSuite à notre accord sur la vente du bien situé au [adresse], je vous transmets le dossier complet incluant le titre de propriété, les diagnostics, et l\'ensemble des documents nécessaires à la rédaction du compromis.\n\nLien sécurisé : ' + notaireUrl + '\n\nRestant à votre disposition,\n[Votre prénom et nom]';
     if (notaireMsg) notaireMsg.textContent = notaireEmail;
@@ -5580,7 +5577,7 @@ const CMD_ACTIONS = [
   { section:'Actions',    icon:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>', label:'Copier le lien public',   fn: () => {
     const slugEl = document.querySelector('[data-slug]') || document.querySelector('input[name="slug"]');
     const slugVal = slugEl?.value || slugEl?.dataset?.slug || window._propSlug;
-    if (slugVal) { navigator.clipboard.writeText(_baseUrl + '/bien/' + slugVal); showToast('Lien copié !'); }
+    if (slugVal) { const url = (window._propertyData?.property?.bien_url) || (_baseUrl + '/bien/' + slugVal); navigator.clipboard.writeText(url); showToast('Lien copié !'); }
     else showToast('Publiez votre bien pour obtenir un lien', 'error');
   }},
   { section:'Pages', icon:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>', label:'Tableau de bord', fn: () => { window.location.href = '/seller'; } },

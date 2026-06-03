@@ -127,6 +127,10 @@ router.get('/api/property', requireAuth, (req, res) => {
   if (!property) return res.json({ property: null });
   const photos = db.prepare('SELECT * FROM property_photos WHERE property_id = ? ORDER BY order_index').all(property.id);
   const documents = db.prepare('SELECT * FROM property_documents WHERE property_id = ?').all(property.id);
+  const base = process.env.BASE_URL || `${req.protocol}://${req.get('host')}`;
+  property.acheteur_url = property.acheteur_token ? `${base}/dossier/acheteur/${property.acheteur_token}` : null;
+  property.notaire_url  = property.notaire_token  ? `${base}/dossier/notaire/${property.notaire_token}`   : null;
+  property.bien_url     = property.slug            ? `${base}/bien/${property.slug}`                       : null;
   res.json({ property, photos, documents });
 });
 
