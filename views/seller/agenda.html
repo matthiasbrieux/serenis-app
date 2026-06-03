@@ -438,14 +438,6 @@
           <div class="cal-grid" id="calGrid" style="margin-top:4px;"></div>
         </div>
 
-        <!-- Détail du jour sélectionné -->
-        <div class="day-detail" id="dayDetail">
-          <div class="day-detail-title" id="dayDetailTitle">Sélectionnez un jour</div>
-          <div id="dayDetailContent">
-            <div style="text-align:center;padding:20px;color:#bbb;font-size:0.85rem;">Cliquez sur un jour du calendrier</div>
-          </div>
-        </div>
-
         <!-- Disponibilités -->
         <div class="dispo-card">
           <div class="avail-month-header">
@@ -914,24 +906,7 @@ function renderCalendar() {
   if (calSelected) renderDayDetail(calSelected);
 }
 
-function selectCalDay(dateStr) { calSelected=dateStr; renderCalendar(); renderDayDetail(dateStr); }
-
-function renderDayDetail(dateStr) {
-  const d=new Date(dateStr+'T00:00:00');
-  document.getElementById('dayDetailTitle').textContent=d.toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long'});
-  const dayVisits=allVisits.filter(v=>v.visit_date===dateStr).sort((a,b)=>(a.visit_time||'').localeCompare(b.visit_time||''));
-  const content=document.getElementById('dayDetailContent');
-  if (!dayVisits.length) { content.innerHTML=`<div style="text-align:center;padding:24px 12px;color:#bbb;font-size:0.85rem;">Aucune visite ce jour</div>`; return; }
-  content.innerHTML=dayVisits.map(v=>`
-    <div class="day-slot">
-      <div class="day-slot-dot" style="background:${v.status==='confirmed'?'#2e7d32':'#f57f17'}"></div>
-      <div class="day-slot-time">${v.visit_time||'—'}</div>
-      <div class="day-slot-info">
-        <div class="day-slot-name">${v.buyer_name}</div>
-        <div class="day-slot-sub">${v.status==='confirmed'?'Confirmée':'En attente'}</div>
-      </div>
-    </div>`).join('');
-}
+function selectCalDay(dateStr) { calSelected=dateStr; renderCalendar(); }
 
 document.getElementById('calPrev').addEventListener('click',()=>{ calDate=new Date(calDate.getFullYear(),calDate.getMonth()-1); renderCalendar(); });
 document.getElementById('calNext').addEventListener('click',()=>{ calDate=new Date(calDate.getFullYear(),calDate.getMonth()+1); renderCalendar(); });
