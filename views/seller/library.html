@@ -191,6 +191,12 @@
     .step-arr { color: #B8CFC0; font-size: 1.1rem; flex-shrink: 0; transition: transform 0.2s, color 0.2s; }
     .step-card.open .step-arr { color: rgba(255,255,255,0.7); }
     .step-card.open .step-arr { transform: rotate(90deg); }
+    .tts-btn { padding:5px 12px; border-radius:20px; border:1.5px solid #3D5A47; background:#fff; color:#3D5A47; font-size:0.75rem; font-weight:700; cursor:pointer; flex-shrink:0; font-family:'DM Sans',sans-serif; transition:all 0.15s; white-space:nowrap; }
+    .tts-btn:hover { background:#3D5A47; color:#fff; }
+    .tts-btn.tts-playing { background:#C4603A; border-color:#C4603A; color:#fff; }
+    .step-card.open .tts-btn { border-color:rgba(255,255,255,0.7); color:#fff; background:rgba(255,255,255,0.12); }
+    .step-card.open .tts-btn:hover { background:rgba(255,255,255,0.25); }
+    .step-card.open .tts-btn.tts-playing { background:#C4603A; border-color:#C4603A; }
     .step-body { display: none; padding: 0 20px 24px; border-top: 1px solid #F0ECE6; margin-top: 0; }
     .step-card.open .step-body { display: block; }
     .sst { margin-top: 0; }
@@ -1407,7 +1413,7 @@ function stopAgent() {
 }
 
 function _pickFrVoice() {
-  const voices = (_cachedVoices.length ? _cachedVoices : window.speechSynthesis.getVoices());
+  const voices = window.speechSynthesis.getVoices();
   return voices.find(v => v.lang.startsWith('fr') && v.localService && !v.name.includes('Compact'))
       || voices.find(v => v.lang.startsWith('fr'))
       || voices.find(v => v.localService)
@@ -1428,45 +1434,66 @@ function _speakChunks(chunks, voice, iphone) {
   window.speechSynthesis.speak(u);
 }
 
-function triggerStepAgent(mi, si) {
+// Appelé directement depuis le bouton onclick — garantit le geste utilisateur dans tous les navigateurs
+function playStepAudio(mi, si, btn) {
   if (!window.speechSynthesis) return;
-  window.speechSynthesis.cancel();
-  document.querySelector('.iphone')?.classList.remove('speaking');
-  agentSpeaking = false;
-  _clearTtsKeepAlive();
+
+  // Si déjà en train de parler → stop
+  if (agentSpeaking) {
+    stopAgent();
+    document.querySelectorAll('.tts-btn').forEach(b => { b.textContent = '▶ Écouter'; b.classList.remove('tts-playing'); });
+    return;
+  }
+
+  const step = MODULES[mi]?.steps?.[si];
+  if (!step?.speakText) return;
+
   stopAgentIntro();
-
-  const mod = MODULES[mi];
-  const step = mod?.steps?.[si];
-  if (!step) return;
-
-  const text = step.speakText || '';
-  if (!text) return;
-
+  const text = step.speakText;
   const iphone = document.querySelector('.iphone');
   const chunks = text.match(/[^.!?]+[.!?]*/g)?.map(s => s.trim()).filter(Boolean) || [text];
   const voice = _pickFrVoice();
 
-  const doSpeak = () => {
-    iphone?.classList.add('speaking');
-    agentSpeaking = true;
-    window.speechSynthesis.resume();
-    _speakChunks(chunks, voice, iphone);
-    _ttsKeepAlive = setInterval(() => {
-      if (window.speechSynthesis.speaking) {
-        window.speechSynthesis.pause();
-        window.speechSynthesis.resume();
-      } else { _clearTtsKeepAlive(); }
-    }, 10000);
+  // Mise à jour bouton
+  document.querySelectorAll('.tts-btn').forEach(b => { b.textContent = '▶ Écouter'; b.classList.remove('tts-playing'); });
+  if (btn) { btn.textContent = '⏹ Arrêter'; btn.classList.add('tts-playing'); }
+
+  iphone?.classList.add('speaking');
+  agentSpeaking = true;
+
+  // onend global pour remettre le bouton
+  const origOnEnd = () => {
+    if (btn) { btn.textContent = '▶ Écouter'; btn.classList.remove('tts-playing'); }
   };
 
-  // Firefox perd le contexte du geste utilisateur dès qu'on sort du call stack (setTimeout)
-  // → parler directement dans Firefox, délai uniquement pour Chrome (bug cancel+speak)
-  if (/Firefox/.test(navigator.userAgent)) {
-    doSpeak();
-  } else {
-    _ttsPendingTimer = setTimeout(() => { _ttsPendingTimer = null; doSpeak(); }, 80);
-  }
+  const speakChunksLocal = (cks) => {
+    if (!cks.length) {
+      iphone?.classList.remove('speaking');
+      agentSpeaking = false;
+      _clearTtsKeepAlive();
+      origOnEnd();
+      return;
+    }
+    const u = new SpeechSynthesisUtterance(cks[0]);
+    u.lang = 'fr-FR'; u.rate = 0.88; u.pitch = 1.05; u.volume = 1;
+    if (voice) u.voice = voice;
+    u.onend = () => speakChunksLocal(cks.slice(1));
+    u.onerror = () => { iphone?.classList.remove('speaking'); agentSpeaking = false; _clearTtsKeepAlive(); origOnEnd(); };
+    window.speechSynthesis.speak(u);
+  };
+
+  window.speechSynthesis.cancel();
+  // Délai minimal après cancel pour éviter le bug Chrome cancel+speak
+  setTimeout(() => { speakChunksLocal(chunks); }, 50);
+
+  _ttsKeepAlive = setInterval(() => {
+    if (window.speechSynthesis.speaking) { window.speechSynthesis.pause(); window.speechSynthesis.resume(); }
+    else { _clearTtsKeepAlive(); }
+  }, 10000);
+}
+
+function triggerStepAgent(mi, si) {
+  // L'audio est maintenant déclenché uniquement via le bouton ▶ Écouter
 }
 
 // ── Key points ──
@@ -1542,6 +1569,7 @@ function renderModules() {
         <div class="step-hdr" data-mi="${mi}" data-si="${si}">
           <div class="step-chk" data-chk="1" data-mi="${mi}" data-si="${si}">✓</div>
           <div class="step-tw"><div class="step-t">${step.title}</div><div class="step-m">${step.meta}</div>${step.tag ? `<div class="step-tag">→ ${step.tag}</div>` : ''}</div>
+          ${step.speakText ? `<button class="tts-btn" onclick="event.stopPropagation();playStepAudio(${mi},${si},this)">▶ Écouter</button>` : ''}
           <div class="step-arr">›</div>
         </div>
         <div class="step-body">
