@@ -584,7 +584,7 @@ async function loadSlots() {
   document.getElementById('visitDate').min = tomorrow.toISOString().split('T')[0];
 
   document.getElementById('visitDate').addEventListener('change', function() {
-    const dow = new Date(this.value).getDay();
+    const dow = new Date(this.value + 'T12:00:00').getDay();
     const slot = data.slots?.find(s => s.day_of_week === dow);
     const timeSelect = document.getElementById('visitTime');
     timeSelect.innerHTML = '<option value="">Choisir...</option>';
