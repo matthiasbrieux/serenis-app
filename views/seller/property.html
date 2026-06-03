@@ -2857,6 +2857,9 @@ document.getElementById('propertyForm').addEventListener('change', updateComplet
 
 // ── Load property data ────────────────────────────────
 let _propertyData = null;
+let _baseUrl = window.location.origin;
+fetch('/api/config').then(r => r.json()).then(c => { if (c.base_url) _baseUrl = c.base_url; }).catch(() => {});
+
 async function loadProperty() {
   const res = await fetch('/api/property');
   const data = await res.json();
@@ -2991,7 +2994,7 @@ async function loadProperty() {
 
   // Liens partage — dossier acheteur & notaire
   if (p.acheteur_token) {
-    const acheteurUrl = window.location.origin + '/dossier/acheteur/' + p.acheteur_token;
+    const acheteurUrl = _baseUrl + '/dossier/acheteur/' + p.acheteur_token;
     ['pro','exterieur','decouverte','details','all','fiche','acheteur','dpe'].forEach(function(k) {
       var inp = document.getElementById('ev-link-' + k);
       var sms = document.getElementById('ev-sms-' + k);
@@ -3016,7 +3019,7 @@ async function loadProperty() {
     if (acheteurSms) acheteurSms.textContent = acheteurUrl;
   }
   if (p.notaire_token) {
-    const notaireUrl = window.location.origin + '/dossier/notaire/' + p.notaire_token;
+    const notaireUrl = _baseUrl + '/dossier/notaire/' + p.notaire_token;
     var notaireInp = document.getElementById('ev-link-notaire');
     if (notaireInp) notaireInp.value = notaireUrl;
     // Notaire email template
@@ -5577,7 +5580,7 @@ const CMD_ACTIONS = [
   { section:'Actions',    icon:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>', label:'Copier le lien public',   fn: () => {
     const slugEl = document.querySelector('[data-slug]') || document.querySelector('input[name="slug"]');
     const slugVal = slugEl?.value || slugEl?.dataset?.slug || window._propSlug;
-    if (slugVal) { navigator.clipboard.writeText(window.location.origin + '/bien/' + slugVal); showToast('Lien copié !'); }
+    if (slugVal) { navigator.clipboard.writeText(_baseUrl + '/bien/' + slugVal); showToast('Lien copié !'); }
     else showToast('Publiez votre bien pour obtenir un lien', 'error');
   }},
   { section:'Pages', icon:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>', label:'Tableau de bord', fn: () => { window.location.href = '/seller'; } },

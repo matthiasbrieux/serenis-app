@@ -107,6 +107,12 @@ router.post('/api/profile', requireAuth, express.json(), async (req, res) => {
   res.json({ success: true });
 });
 
+// Config publique (base URL)
+router.get('/api/config', requireAuth, (req, res) => {
+  const base = process.env.BASE_URL || `${req.protocol}://${req.get('host')}`;
+  res.json({ base_url: base });
+});
+
 // Property CRUD
 router.get('/api/property', requireAuth, (req, res) => {
   const property = db.prepare('SELECT * FROM properties WHERE seller_id = ?').get(req.seller.id);
