@@ -964,7 +964,7 @@
           </div>
           <div class="form-group">
             <label>Prix souhaité (€) *</label>
-            <input type="number" name="price" required placeholder="185000" min="1">
+            <input type="text" inputmode="numeric" name="price" required placeholder="140 000">
             <span class="situation-toggle" onclick="toggleSituation('prix')">Mise en situation acheteur</span>
             <div class="situation-block hidden" id="situation-prix">
               <div class="situation-line">
@@ -3059,6 +3059,7 @@ document.getElementById('propertyForm').addEventListener('submit', async (e) => 
     if (el) data[f] = el.value;
   });
 
+  if (data.price) data.price = String(data.price).replace(/\s/g, '');
   data.rooms_detail = JSON.stringify(roomsList);
   data.travaux_recents = JSON.stringify(travauxList);
 
@@ -5806,7 +5807,7 @@ initRoomPanel();
       validate:(d)=>d.city&&d.postal_code },
 
     { id:'prix', title:"À quel prix souhaitez-vous vendre ?", subtitle:"Vous pourrez ajuster à tout moment",
-      html:`<div class="wz-price-wrap"><input id="wz-price" type="number" placeholder="185000" min="1" /><span class="wz-currency">€</span></div>
+      html:`<div class="wz-price-wrap"><input id="wz-price" type="text" inputmode="numeric" placeholder="140 000" /><span class="wz-currency">€</span></div>
         <p style="text-align:center;color:rgba(245,240,232,0.4);font-size:0.82rem;margin-top:12px;">Prix net vendeur — hors frais de notaire</p>`,
       validate:(d)=>d.price>0 },
 
@@ -6082,7 +6083,7 @@ initRoomPanel();
       wzData.city=(document.getElementById('wz-city')||{}).value||'';
       wzData.postal_code=(document.getElementById('wz-postal')||{}).value||'';
     }
-    else if(id==='prix'){ wzData.price=parseInt((document.getElementById('wz-price')||{}).value)||0; }
+    else if(id==='prix'){ wzData.price=parseInt(((document.getElementById('wz-price')||{}).value||'').replace(/\s/g,''))||0; }
     else if(id==='raison'){ const v=singleVal(); if(v) wzData.sale_reason=v; }
     else if(id==='surfaces'){
       wzData.surface_habitable=parseFloat((document.getElementById('wz-surface')||{}).value)||0;
