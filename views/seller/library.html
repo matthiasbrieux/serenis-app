@@ -629,6 +629,26 @@
     .iphone-slide-cta:hover { background:#a85a40; }
     .iphone-slide-kp { display:flex; align-items:flex-start; gap:7px; font-size:0.59rem; color:rgba(255,255,255,0.82); line-height:1.5; margin-bottom:7px; }
     .iphone-slide-kp-dot { width:5px; height:5px; border-radius:50%; background:#C4785A; flex-shrink:0; margin-top:4px; }
+    /* Slide agent */
+    .iphone-agent-avatar { width:68px; height:80px; border-radius:34px 34px 28px 28px; overflow:hidden; border:2px solid rgba(212,228,216,0.22); margin:0 auto 10px; position:relative; }
+    .iphone-agent-avatar svg { width:100%; height:100%; }
+    .iphone-agent-rings { position:absolute; inset:-8px; pointer-events:none; }
+    .iphone-agent-ring { position:absolute; inset:0; border-radius:50%; border:1.5px solid rgba(196,200,196,0.2); }
+    .iphone-agent-name { font-family:'Cormorant Garamond',serif; font-size:1.05rem; font-weight:600; color:#fff; text-align:center; line-height:1.2; }
+    .iphone-agent-role { font-size:0.52rem; color:rgba(212,228,216,0.5); letter-spacing:0.07em; text-transform:uppercase; text-align:center; margin:3px 0 10px; }
+    .iphone-agent-quote { font-size:0.59rem; color:rgba(255,255,255,0.78); line-height:1.65; text-align:center; font-style:italic; background:rgba(0,0,0,0.28); border-radius:8px; padding:8px 10px; margin-bottom:12px; transition:opacity 0.3s; }
+    .iphone-agent-listen { background:#C4785A; color:#fff; border:none; border-radius:9px; padding:9px 14px; width:100%; font-size:0.68rem; font-weight:700; cursor:pointer; font-family:'DM Sans',sans-serif; transition:background 0.15s; margin-bottom:6px; display:flex; align-items:center; justify-content:center; gap:6px; }
+    .iphone-agent-listen:hover { background:#a85a40; }
+    .iphone-agent-skip { width:100%; background:none; border:1px solid rgba(255,255,255,0.18); color:rgba(255,255,255,0.5); border-radius:8px; padding:6px; font-size:0.6rem; cursor:pointer; font-family:'DM Sans',sans-serif; transition:all 0.15s; }
+    .iphone-agent-skip:hover { border-color:rgba(255,255,255,0.35); color:rgba(255,255,255,0.75); }
+    .iphone-agent-waves { display:flex; align-items:flex-end; gap:2px; height:14px; justify-content:center; margin-top:4px; opacity:0; transition:opacity 0.3s; }
+    .iphone-agent-waves.active { opacity:1; }
+    .iphone-agent-waves span { display:block; width:2px; border-radius:2px; background:rgba(212,228,216,0.7); }
+    .iphone-agent-waves.active span:nth-child(1){animation:awb .9s ease-in-out infinite;height:5px;}
+    .iphone-agent-waves.active span:nth-child(2){animation:awb .9s ease-in-out .12s infinite;height:10px;}
+    .iphone-agent-waves.active span:nth-child(3){animation:awb .9s ease-in-out .06s infinite;height:14px;}
+    .iphone-agent-waves.active span:nth-child(4){animation:awb .9s ease-in-out .18s infinite;height:11px;}
+    .iphone-agent-waves.active span:nth-child(5){animation:awb .9s ease-in-out .09s infinite;height:7px;}
 
   </style>
 </head>
@@ -1639,7 +1659,7 @@ function renderModules() {
     const div = document.createElement('div');
     div.className = 'mod-content' + (mi === activeModule ? ' active' : '');
 
-    let html = (mi === 1 ? AGENT_INTRO_HTML : '') + `<div class="mod-hdr"><div class="mod-num">${mod.num}</div><div><div class="mod-hdr-title">${mod.title}</div><div class="mod-hdr-sub">${mod.subtitle}</div></div></div><div class="steps-list">`;
+    let html = `<div class="mod-hdr"><div class="mod-num">${mod.num}</div><div><div class="mod-hdr-title">${mod.title}</div><div class="mod-hdr-sub">${mod.subtitle}</div></div></div><div class="steps-list">`;
 
     mod.steps.forEach((step, si) => {
       const key = `${mi}_${si}`;
@@ -2024,11 +2044,15 @@ function _getAgentAudio() {
     }
     if (newIdx !== _agentSubIdx) {
       _agentSubIdx = newIdx;
+      // Sync to iPhone slide subtitle if active
+      const iphoneQuote = document.getElementById('iphoneAgentQuote');
+      if (iphoneQuote) { iphoneQuote.style.opacity = '0'; setTimeout(() => { iphoneQuote.textContent = AGENT_INTRO_SCRIPT[newIdx] || ''; iphoneQuote.style.opacity = '1'; }, 180); }
+      // Also sync main card subtitle if present
       const sub = document.getElementById('agentIntroSubtitle');
       if (sub) { sub.style.opacity = '0'; setTimeout(() => { sub.textContent = AGENT_INTRO_SCRIPT[newIdx] || ''; sub.style.opacity = '1'; }, 180); }
     }
   });
-  el.addEventListener('ended', stopAgentIntro);
+  el.addEventListener('ended', () => { stopIphoneAgent(); stopAgentIntro(); });
   el.addEventListener('error', (e) => {
     const btn = document.getElementById('agentIntroPlayBtn');
     if (btn) btn.innerHTML = '<svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg> Écouter l\'introduction';
@@ -2083,7 +2107,13 @@ function showModuleSlides(mi) {
   const container = document.getElementById('iphoneSlides');
   if (!container) return;
   const kps = mod.keyPoints.slice(0, 4);
-  container.innerHTML = `
+  const hasAgent = (mi === 1); // Module "Préparer sa vente" uniquement
+  const total = hasAgent ? 3 : 2;
+
+  const dots = (active) => Array.from({length:total}, (_,i) =>
+    `<div class="iphone-slide-dot${i===active?' active':''}"></div>`).join('');
+
+  const slide1 = `
     <div class="iphone-slide active">
       <div class="iphone-slide-deco"></div>
       <div class="iphone-slide-island-space"></div>
@@ -2091,19 +2121,80 @@ function showModuleSlides(mi) {
       <div class="iphone-slide-title">${mod.title}</div>
       <div class="iphone-slide-sub">${mod.subtitle}</div>
       <div class="iphone-slide-text">${mod.aiMsg}</div>
-      <div class="iphone-slide-dots"><div class="iphone-slide-dot active"></div><div class="iphone-slide-dot"></div></div>
+      <div class="iphone-slide-dots">${dots(0)}</div>
       <button class="iphone-slide-cta" onclick="goToIphoneSlide(1)">Points clés →</button>
-    </div>
+    </div>`;
+
+  const slide2 = `
     <div class="iphone-slide">
       <div class="iphone-slide-deco"></div>
       <div class="iphone-slide-island-space"></div>
       <div class="iphone-slide-num">Module ${mod.num} · Ce que vous allez apprendre</div>
       <div class="iphone-slide-title" style="font-size:1.05rem;margin-bottom:12px;">Points clés</div>
       <div style="margin-bottom:13px;">${kps.map(k=>`<div class="iphone-slide-kp"><div class="iphone-slide-kp-dot"></div><span>${k}</span></div>`).join('')}</div>
-      <div class="iphone-slide-dots"><div class="iphone-slide-dot"></div><div class="iphone-slide-dot active"></div></div>
-      <button class="iphone-slide-cta" onclick="dismissIphoneSlides()">Commencer →</button>
+      <div class="iphone-slide-dots">${dots(1)}</div>
+      <button class="iphone-slide-cta" onclick="${hasAgent ? 'goToIphoneSlide(2)' : 'dismissIphoneSlides()'}">Commencer →</button>
     </div>`;
+
+  const slide3 = hasAgent ? `
+    <div class="iphone-slide">
+      <div class="iphone-slide-deco"></div>
+      <div class="iphone-slide-island-space"></div>
+      <div style="position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;flex:1;justify-content:center;">
+        <div class="iphone-agent-avatar" id="iphoneAgentAvatar">${AGENT_AVATAR_SVG}</div>
+        <div class="iphone-agent-name">Nicolas Mercier</div>
+        <div class="iphone-agent-role">Conseiller · 12 ans d'expérience</div>
+        <div class="iphone-agent-quote" id="iphoneAgentQuote">« Votre dossier vendeur, c'est votre meilleur commercial. »</div>
+        <div class="iphone-agent-waves" id="iphoneAgentWaves"><span></span><span></span><span></span><span></span><span></span></div>
+      </div>
+      <div style="position:relative;z-index:1;">
+        <div class="iphone-slide-dots">${dots(2)}</div>
+        <button class="iphone-agent-listen" id="iphoneAgentBtn" onclick="toggleIphoneAgent()">
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+          Écouter Nicolas Mercier
+        </button>
+        <button class="iphone-agent-skip" onclick="stopIphoneAgent();dismissIphoneSlides();">Passer →</button>
+      </div>
+    </div>` : '';
+
+  container.innerHTML = slide1 + slide2 + slide3;
   container.classList.add('visible');
+}
+
+// ── Agent iPhone slide ──
+let _iphoneAgentIdx = -1;
+
+function toggleIphoneAgent() {
+  const audio = _getAgentAudio();
+  if (!audio) return;
+  if (!audio.paused) { stopIphoneAgent(); return; }
+  window.speechSynthesis?.cancel();
+  _iphoneAgentIdx = -1;
+  const btn = document.getElementById('iphoneAgentBtn');
+  const waves = document.getElementById('iphoneAgentWaves');
+  const avatar = document.getElementById('iphoneAgentAvatar');
+  if (btn) btn.innerHTML = '<svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg> Arrêter';
+  if (waves) waves.classList.add('active');
+  if (avatar) { avatar.querySelector('.mouth-open')?.setAttribute('style',''); avatar.querySelector('.mouth-closed')?.setAttribute('style',''); avatar.classList.add('speaking'); }
+  const doPlay = () => { audio.currentTime = 0; audio.volume = 1; audio.play().catch(() => stopIphoneAgent()); };
+  if (audio.readyState >= 2) doPlay();
+  else { audio.load(); audio.addEventListener('canplay', doPlay, { once: true }); }
+  // Sync subtitles to iPhone slide
+  audio._iphoneMode = true;
+}
+
+function stopIphoneAgent() {
+  const audio = document.getElementById('agentAudioEl');
+  if (audio && !audio.paused) { audio.pause(); audio.currentTime = 0; audio._iphoneMode = false; }
+  const btn = document.getElementById('iphoneAgentBtn');
+  const waves = document.getElementById('iphoneAgentWaves');
+  const avatar = document.getElementById('iphoneAgentAvatar');
+  const quote = document.getElementById('iphoneAgentQuote');
+  if (btn) btn.innerHTML = '<svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg> Écouter Nicolas Mercier';
+  if (waves) waves.classList.remove('active');
+  if (avatar) avatar.classList.remove('speaking');
+  if (quote) quote.textContent = '« Votre dossier vendeur, c\'est votre meilleur commercial. »';
+  _iphoneAgentIdx = -1;
 }
 
 function goToIphoneSlide(idx) {
@@ -2116,6 +2207,7 @@ function goToIphoneSlide(idx) {
 }
 
 function dismissIphoneSlides() {
+  stopIphoneAgent();
   const container = document.getElementById('iphoneSlides');
   if (container) { container.classList.remove('visible'); container.innerHTML = ''; }
 }
