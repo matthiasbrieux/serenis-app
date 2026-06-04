@@ -45,13 +45,13 @@ router.post('/create-checkout', express.json(), checkoutLimit, async (req, res) 
   let amount, productName, productDesc;
   if (isSerenite) {
     amount = is4x ? 24900 : 99900; // 249€ × 4 ou 999€
-    productName = is4x ? 'Pack Sérénité — Serenis (1er paiement sur 4)' : 'Pack Sérénité — Serenis';
+    productName = is4x ? 'Pack Sérénité — Vendu Par Moi (1er paiement sur 4)' : 'Pack Sérénité — Vendu Par Moi';
     productDesc = is4x
       ? '1er versement sur 4 · 249€ × 4 = 996€ · sans frais ni intérêts'
       : 'Photographe pro · Numéro dédié · Dossiers automatisés · Coach IA';
   } else {
     amount = 49900; // 499€
-    productName = 'Pack Autonome — Serenis';
+    productName = 'Pack Autonome — Vendu Par Moi';
     productDesc = 'Numéro dédié · Dossiers automatisés · Agenda visites · Coach IA · Formation vidéo';
   }
 
@@ -170,7 +170,7 @@ async function assignPhoneNumber(seller) {
       voiceMethod: 'POST',
       smsUrl: `${base}/webhook/sms`,
       smsMethod: 'POST',
-      friendlyName: `Serenis — ${seller.email}`,
+      friendlyName: `Vendu Par Moi — ${seller.email}`,
     });
 
     const num = purchased.phoneNumber;

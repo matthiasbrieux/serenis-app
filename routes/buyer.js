@@ -28,14 +28,14 @@ router.get('/bien/:slug', (req, res) => {
     const title = [typeLabel, property.city, priceStr].filter(Boolean).join(' — ');
     const desc = property.description
       ? property.description.slice(0, 160)
-      : `${typeLabel}${surfaceStr ? ' de ' + surfaceStr : ''}${property.city ? ' à ' + property.city : ''} — Dossier complet sur Serenis`;
+      : `${typeLabel}${surfaceStr ? ' de ' + surfaceStr : ''}${property.city ? ' à ' + property.city : ''} — Dossier complet sur Vendu Par Moi`;
     const firstPhoto = db.prepare('SELECT url FROM property_photos WHERE property_id = ? ORDER BY order_index LIMIT 1').get(property.id);
 
     let html = fs.readFileSync(path.join(__dirname, '../views/property/property-public.html'), 'utf8');
     html = html
-      .replace('content="Bien à vendre — Serenis"', `content="${title.replace(/"/g, '&quot;')}"`)
+      .replace('content="Bien à vendre — Vendu Par Moi"', `content="${title.replace(/"/g, '&quot;')}"`)
       .replace('content="Voir le dossier complet de ce bien"', `content="${desc.replace(/"/g, '&quot;')}"`)
-      .replace('content="Dossier complet disponible — Serenis"', `content="${desc.replace(/"/g, '&quot;')}"`)
+      .replace('content="Dossier complet disponible — Vendu Par Moi"', `content="${desc.replace(/"/g, '&quot;')}"`)
       .replace('content="OG_IMAGE_PLACEHOLDER"', `content="${firstPhoto?.url || ''}"`);
     res.setHeader('Content-Type', 'text/html');
     res.send(html);
@@ -85,7 +85,7 @@ router.get('/api/bien/:slug/pdf', async (req, res) => {
     .contact{background:#D4E4D8;padding:14px;border-radius:8px;text-align:center;margin:16px 0}
     .ft{background:#1C1C1A;color:#666;font-size:10px;padding:14px 28px;line-height:1.6;margin-top:24px}
   </style></head><body>
-  <div class="hd"><h1>Serenis</h1><p>Dossier généré le ${new Date().toLocaleDateString('fr-FR')}</p></div>
+  <div class="hd"><h1>Vendu Par Moi</h1><p>Dossier généré le ${new Date().toLocaleDateString('fr-FR')}</p></div>
   <div class="pb">${price}<small>${property.type || ''} — ${property.city || ''} (${property.postal_code || ''})</small></div>
   <div class="body">
     <div class="chips">${chips}</div>
@@ -94,7 +94,7 @@ router.get('/api/bien/:slug/pdf', async (req, res) => {
     ${rows ? `<div class="sec">Caractéristiques</div><table>${rows}</table>` : ''}
     ${seller?.twilio_number ? `<div class="contact"><p style="font-weight:bold;color:#2a4030;margin-bottom:4px;">📞 Recevoir ce dossier par email</p><p style="font-size:17px;font-weight:bold;color:#2a4030;">${seller.twilio_number}</p><p style="font-size:11px;color:#555;">Envoyez votre adresse email par SMS — réponse automatique</p></div>` : ''}
   </div>
-  <div class="ft">Annonce publiée par un particulier. Serenis fournit des outils numériques. Le vendeur reste seul responsable de sa vente.<br>Serenis · Matthias Brieux · 06 95 44 36 54 · contact@serenis.fr · Douai (59)</div>
+  <div class="ft">Annonce publiée par un particulier. Vendu Par Moi fournit des outils numériques. Le vendeur reste seul responsable de sa vente.<br>Vendu Par Moi · Matthias Brieux · 06 95 44 36 54 · contact@vendupar moi.fr · Douai (59)</div>
   </body></html>`;
 
   try {

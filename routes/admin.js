@@ -777,7 +777,7 @@ router.get('/marketing/flyer', requireAdmin, (req, res) => {
       <div class="items">
         <div class="item"><span class="item-icon">✔</span><div class="item-text"><strong>Séance photo professionnelle</strong> à domicile — livrée en 48h</div></div>
         <div class="item"><span class="item-icon">✔</span><div class="item-text"><strong>Visite virtuelle 360°</strong> pour attirer les acheteurs à distance</div></div>
-        <div class="item"><span class="item-icon">✔</span><div class="item-text"><strong>Numéro Serenis intelligent</strong> — filtre les appels, qualifie les acheteurs</div></div>
+        <div class="item"><span class="item-icon">✔</span><div class="item-text"><strong>Numéro Vendu Par Moi intelligent</strong> — filtre les appels, qualifie les acheteurs</div></div>
         <div class="item"><span class="item-icon">✔</span><div class="item-text"><strong>Dossiers acheteurs automatisés</strong> — envoyés à chaque contact sérieux</div></div>
         <div class="item"><span class="item-icon">✔</span><div class="item-text"><strong>Formation complète + coaching</strong> jusqu'à la vente</div></div>
       </div>
@@ -788,7 +788,7 @@ router.get('/marketing/flyer', requireAdmin, (req, res) => {
       </div>
       <a class="cta">serenis-app.onrender.com</a>
       <div class="footer">
-        <div class="footer-text">Serenis — Vente immobilière entre particuliers</div>
+        <div class="footer-text">Vendu Par Moi — Vente immobilière entre particuliers</div>
         <div class="footer-text">📞 06 95 44 36 54 · Matthias répond en direct</div>
       </div>
     </div>
@@ -820,10 +820,10 @@ router.get('/marketing/parrainage', requireAdmin, (req, res) => {
     <div class="cheque">
       <div class="header"><div class="logo">Sere<em>nis</em></div><div class="badge">🎁 Chèque Parrainage</div></div>
       <div class="amount">100 €</div>
-      <div class="title">Offerts pour chaque ami qui vend avec Serenis</div>
-      <div class="desc">Vous avez vendu votre bien avec Serenis. Merci de nous faire confiance.<br>En signe de gratitude, voici votre chèque parrainage.</div>
+      <div class="title">Offerts pour chaque ami qui vend avec Vendu Par Moi</div>
+      <div class="desc">Vous avez vendu votre bien avec Vendu Par Moi. Merci de nous faire confiance.<br>En signe de gratitude, voici votre chèque parrainage.</div>
       <div class="conditions"><strong>Comment ça marche :</strong><br>1. Partagez votre code personnel à un proche qui souhaite vendre son bien<br>2. Il s'inscrit sur serenis-app.onrender.com et utilise votre code<br>3. Dès son paiement confirmé, vous recevez 100€ par virement sur votre compte<br><br><strong>Conditions :</strong> valable 12 mois · 1 parrainage = 1 virement · cumulable sans limite · votre filleul bénéficie de 50€ de réduction</div>
-      <div class="footer"><div><div style="font-size:0.72rem;color:#aaa;margin-bottom:6px;">Votre code personnel</div><div class="code">SERENIS-XXXX</div></div><div class="validity">Valable jusqu'au [DATE + 12 mois]<br>Matthias Brieux — 06 95 44 36 54</div></div>
+      <div class="footer"><div><div style="font-size:0.72rem;color:#aaa;margin-bottom:6px;">Votre code personnel</div><div class="code">VPM-XXXX</div></div><div class="validity">Valable jusqu'au [DATE + 12 mois]<br>Matthias Brieux — 06 95 44 36 54</div></div>
     </div>
     <script>window.onload=()=>window.print()</script>
   </body></html>`);
