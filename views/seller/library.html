@@ -2183,22 +2183,20 @@ function showModuleSlides(mi) {
     </div>`;
 
   const slide3 = hasAgent ? `
-    <div class="iphone-slide">
-      <div class="iphone-slide-deco"></div>
-      <div class="iphone-slide-island-space"></div>
-      <div style="position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;flex:1;justify-content:center;">
-        <div class="iphone-agent-avatar" id="iphoneAgentAvatar">${AGENT_AVATAR_SVG}</div>
-        <div class="iphone-agent-name">Matthias Brieux</div>
-        <div class="iphone-agent-role">Conseiller · 12 ans d'expérience</div>
-        <div class="iphone-agent-quote" id="iphoneAgentQuote">« Votre dossier vendeur, c'est votre meilleur commercial. »</div>
-        <div class="iphone-agent-waves" id="iphoneAgentWaves"><span></span><span></span><span></span><span></span><span></span></div>
+    <div class="iphone-slide" style="background:#000;padding:0;">
+      <div style="position:absolute;top:10px;left:50%;transform:translateX(-50%);width:88px;height:26px;background:#000;border-radius:14px;z-index:20;"></div>
+      <video id="iphoneAgentVideo" src="/videos/agent-matthias.mov"
+        style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;"
+        playsinline webkit-playsinline></video>
+      <div id="iphoneVideoOverlay" style="position:absolute;inset:0;z-index:10;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.32);" onclick="toggleIphoneAgent()">
+        <div style="width:54px;height:54px;border-radius:50%;background:rgba(255,255,255,0.92);display:flex;align-items:center;justify-content:center;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="#1C3028"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+        </div>
       </div>
-      <div style="position:relative;z-index:1;">
+      <div style="position:absolute;bottom:0;left:0;right:0;z-index:15;padding:14px 14px 46px;background:linear-gradient(to top,rgba(0,0,0,0.78) 0%,transparent 100%);">
+        <div class="iphone-agent-name">Matthias Brieux</div>
+        <div class="iphone-agent-role" style="margin-bottom:10px;">Conseiller · 12 ans d'expérience</div>
         <div class="iphone-slide-dots">${dots(2)}</div>
-        <button class="iphone-agent-listen" id="iphoneAgentBtn" onclick="toggleIphoneAgent()">
-          <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-          Écouter Matthias Brieux
-        </button>
         <button class="iphone-agent-skip" onclick="stopIphoneAgent();dismissIphoneSlides();">Passer →</button>
       </div>
     </div>` : '';
@@ -2211,35 +2209,23 @@ function showModuleSlides(mi) {
 let _iphoneAgentIdx = -1;
 
 function toggleIphoneAgent() {
-  const audio = _getAgentAudio();
-  if (!audio) return;
-  if (!audio.paused) { stopIphoneAgent(); return; }
-  window.speechSynthesis?.cancel();
-  _iphoneAgentIdx = -1;
-  const btn = document.getElementById('iphoneAgentBtn');
-  const waves = document.getElementById('iphoneAgentWaves');
-  const avatar = document.getElementById('iphoneAgentAvatar');
-  if (btn) btn.innerHTML = '<svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg> Arrêter';
-  if (waves) waves.classList.add('active');
-  if (avatar) { avatar.querySelector('.mouth-open')?.setAttribute('style',''); avatar.querySelector('.mouth-closed')?.setAttribute('style',''); avatar.classList.add('speaking'); }
-  const doPlay = () => { audio.currentTime = 0; audio.volume = 1; audio.play().catch(() => stopIphoneAgent()); };
-  if (audio.readyState >= 2) doPlay();
-  else { audio.load(); audio.addEventListener('canplay', doPlay, { once: true }); }
-  // Sync subtitles to iPhone slide
-  audio._iphoneMode = true;
+  const video = document.getElementById('iphoneAgentVideo');
+  if (!video) return;
+  const overlay = document.getElementById('iphoneVideoOverlay');
+  if (video.paused) {
+    video.play().catch(() => {});
+    if (overlay) overlay.style.display = 'none';
+  } else {
+    video.pause();
+    if (overlay) overlay.style.display = 'flex';
+  }
 }
 
 function stopIphoneAgent() {
-  const audio = document.getElementById('agentAudioEl');
-  if (audio && !audio.paused) { audio.pause(); audio.currentTime = 0; audio._iphoneMode = false; }
-  const btn = document.getElementById('iphoneAgentBtn');
-  const waves = document.getElementById('iphoneAgentWaves');
-  const avatar = document.getElementById('iphoneAgentAvatar');
-  const quote = document.getElementById('iphoneAgentQuote');
-  if (btn) btn.innerHTML = '<svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg> Écouter Matthias Brieux';
-  if (waves) waves.classList.remove('active');
-  if (avatar) avatar.classList.remove('speaking');
-  if (quote) quote.textContent = '« Votre dossier vendeur, c\'est votre meilleur commercial. »';
+  const video = document.getElementById('iphoneAgentVideo');
+  if (video) { video.pause(); video.currentTime = 0; }
+  const overlay = document.getElementById('iphoneVideoOverlay');
+  if (overlay) overlay.style.display = 'flex';
   _iphoneAgentIdx = -1;
 }
 
