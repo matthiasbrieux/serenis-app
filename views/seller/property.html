@@ -3104,6 +3104,8 @@ document.getElementById('propertyForm').addEventListener('submit', async (e) => 
 const PHOTO_CATS = ['pro', 'exterieur', 'decouverte', 'details'];
 let allPhotos = { pro: [], exterieur: [], decouverte: [], details: [] };
 const photoVisibility = { pro: 0, exterieur: 0, decouverte: 0, details: 0 };
+const _uploadLock = {};
+let _tempIdCounter = 0;
 
 function updateVisToggleUI(cat) {
   const btn = document.getElementById(cat + '-vis-btn');
@@ -3213,39 +3215,48 @@ PHOTO_CATS.forEach(cat => {
 
 async function uploadPhotos(files, category) {
   if (!files || !files.length) return;
+  if (_uploadLock[category]) return;
+  _uploadLock[category] = true;
+  const input = document.getElementById('photoInput-' + category);
+  if (input) input.value = '';
+
   const progress = document.getElementById('progress-' + category);
   const bar = document.getElementById('progressBar-' + category);
   const text = document.getElementById('progressText-' + category);
   progress.classList.remove('hidden');
 
   const tempIds = [];
-  Array.from(files).forEach((file, i) => {
-    const tempId = 'temp-' + Date.now() + i;
+  Array.from(files).forEach((file) => {
+    const tempId = 'temp-' + (++_tempIdCounter);
     tempIds.push(tempId);
     allPhotos[category].push({ url: URL.createObjectURL(file), cloudinary_id: tempId, category, _temp: true });
   });
   renderGrid(category);
 
-  for (let i = 0; i < files.length; i++) {
-    text.textContent = `Upload ${i + 1}/${files.length} — ${files[i].name}`;
-    bar.style.width = `${((i + 1) / files.length) * 100}%`;
-    const fd = new FormData();
-    fd.append('photos', files[i]);
-    fd.append('category', category);
-    const res = await fetch('/api/property/photos', { method: 'POST', body: fd });
-    const data = await res.json();
-    if (data.error) {
-      showToast(data.error, 'error');
-      allPhotos[category] = allPhotos[category].filter(p => p.cloudinary_id !== tempIds[i]);
-    } else if (data.photos && data.photos[0]) {
-      const idx = allPhotos[category].findIndex(p => p.cloudinary_id === tempIds[i]);
-      if (idx !== -1) allPhotos[category][idx] = { ...data.photos[0], category };
+  try {
+    for (let i = 0; i < files.length; i++) {
+      text.textContent = `Upload ${i + 1}/${files.length} — ${files[i].name}`;
+      bar.style.width = `${((i + 1) / files.length) * 100}%`;
+      const fd = new FormData();
+      fd.append('photos', files[i]);
+      fd.append('category', category);
+      const res = await fetch('/api/property/photos', { method: 'POST', body: fd });
+      const data = await res.json();
+      if (data.error) {
+        showToast(data.error, 'error');
+        allPhotos[category] = allPhotos[category].filter(p => p.cloudinary_id !== tempIds[i]);
+      } else if (data.photos && data.photos[0]) {
+        const idx = allPhotos[category].findIndex(p => p.cloudinary_id === tempIds[i]);
+        if (idx !== -1) allPhotos[category][idx] = { ...data.photos[0], category };
+        else allPhotos[category] = allPhotos[category].filter(p => p.cloudinary_id !== tempIds[i]);
+      }
+      renderGrid(category);
     }
-    renderGrid(category);
+  } finally {
+    _uploadLock[category] = false;
   }
   text.textContent = 'Enregistré ✓';
   setTimeout(() => progress.classList.add('hidden'), 2000);
-  document.getElementById('photoInput-' + category).value = '';
 }
 
 function renderPhotos(photos) {
@@ -3310,7 +3321,13 @@ function renderGrid(category) {
   const evCountEl = document.getElementById('ev-count-' + category);
   if (!grid) return;
   const photos = allPhotos[category] || [];
-  const realPhotos = photos.filter(p => !p._temp);
+  const seen = new Set();
+  const realPhotos = photos.filter(p => {
+    if (p._temp) return false;
+    if (seen.has(p.cloudinary_id)) return false;
+    seen.add(p.cloudinary_id);
+    return true;
+  });
   const tempPhotos = photos.filter(p => p._temp);
 
   countEl.textContent = realPhotos.length || '';
