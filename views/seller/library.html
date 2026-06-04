@@ -1944,10 +1944,6 @@ function updateModuleVideo() {
   }
 }
 
-// ── Strip emoji from HTML string (display only, data unchanged) ──
-function stripEmojiStr(s) {
-  return s.replace(/(\ud83c[\udc00-\udfff]|\ud83d[\udc00-\udfff]|\ud83e[\udc00-\udfff]|\u2705|\u274c|\u2728|\u2757|\u2753|\u26a0\ufe0f?|\u23f0\ufe0f?|\u231a\ufe0f?|\u00a9\ufe0f?|\u00ae\ufe0f?)/g, '');
-}
 
 // ── Render modules ──
 function renderModules() {
@@ -2059,7 +2055,7 @@ function renderModules() {
       html += `<button class="ask-coach-btn" data-step="${step.title.replace(/'/g,"\\'")}">Demander à Alex sur cette étape →</button></div></div>`;
     });
     html += `</div>`;
-    div.innerHTML = stripEmojiStr(html);
+    div.innerHTML = html;
     initAnnonceInfo();
     container.appendChild(div);
   });
