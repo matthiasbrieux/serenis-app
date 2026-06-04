@@ -1944,6 +1944,19 @@ function updateModuleVideo() {
   }
 }
 
+// ── Strip emoji from rendered content (display only, data unchanged) ──
+const _emojiRx = /(\ud83c[\udc00-\udfff]|\ud83d[\udc00-\udfff]|\ud83e[\udc00-\udfff]|[⌀-➿][️]?|[⬀-⯿][️]?|[©®][️]?|[‼⁉][️]?)/g;
+function stripEmojiFromElement(root) {
+  const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+  let node;
+  while ((node = walker.nextNode())) {
+    if (_emojiRx.test(node.nodeValue)) {
+      node.nodeValue = node.nodeValue.replace(_emojiRx, '');
+      _emojiRx.lastIndex = 0;
+    }
+  }
+}
+
 // ── Render modules ──
 function renderModules() {
   const tabs = document.getElementById('modTabs');
@@ -2059,6 +2072,7 @@ function renderModules() {
     container.appendChild(div);
   });
 
+  stripEmojiFromElement(container);
   updateProgress();
 }
 
