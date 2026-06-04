@@ -886,6 +886,40 @@
       .mod-tabs-row { grid-template-columns: 1fr; }
     }
 
+    /* ── Module fade-in ── */
+    @keyframes modFadeIn { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
+    .mod-content.active { animation: modFadeIn 0.24s cubic-bezier(0.16,1,0.3,1); }
+
+    /* ── Module tab progress bar ── */
+    .mod-tab-prog { height:2px; background:rgba(0,0,0,0.07); border-radius:2px; margin-top:5px; overflow:hidden; }
+    .mod-tab.active .mod-tab-prog { background:rgba(255,255,255,0.22); }
+    .mod-tab-prog-fill { height:100%; border-radius:2px; background:#3D5A47; transition:width 0.4s cubic-bezier(0.16,1,0.3,1); }
+    .mod-tab.active .mod-tab-prog-fill { background:rgba(255,255,255,0.85); }
+    .mod-phase-apres .mod-tab .mod-tab-prog-fill { background:#9b6b0a; }
+    .mod-phase-apres .mod-tab.active .mod-tab-prog-fill { background:rgba(255,255,255,0.85); }
+
+    /* ── sst-title — style Notion ── */
+    .sst-title {
+      display:flex !important; align-items:center !important; gap:10px !important;
+      font-size:0.62rem !important; font-weight:700 !important;
+      letter-spacing:0.09em !important; text-transform:uppercase !important;
+      color:#3D5A47 !important; margin:0 0 16px !important;
+      padding:0 !important; background:none !important;
+      border:none !important; border-radius:0 !important; box-shadow:none !important;
+    }
+    .sst-title::before { display:none !important; }
+    .sst-title::after { content:'' !important; flex:1 !important; height:1px !important; background:#E0EAE3 !important; display:inline-block !important; }
+
+    /* ── Coach IA immersif ── */
+    .coach-avatar-sm { width:28px; height:28px; border-radius:50%; background:rgba(255,255,255,0.18); color:#fff; font-weight:700; font-size:0.78rem; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+    .coach-msg-row { display:flex; align-items:flex-end; gap:7px; max-width:92%; align-self:flex-start; }
+    .coach-dot { width:22px; height:22px; border-radius:50%; background:#3D5A47; color:#fff; font-size:0.55rem; font-weight:800; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+    .ai-typing { display:none; align-items:center; gap:7px; padding:2px 14px; }
+    .ai-typing.show { display:flex; }
+    .ai-typing-bub { padding:9px 12px; background:#F0F5F1; border-radius:12px 12px 12px 4px; display:flex; gap:4px; align-items:center; }
+    .ai-td { width:5px; height:5px; border-radius:50%; background:#3D5A47; opacity:0.5; animation:bounce 1.2s infinite; }
+    .ai-td:nth-child(2) { animation-delay:0.2s; } .ai-td:nth-child(3) { animation-delay:0.4s; }
+
   </style>
 </head>
 <body>
@@ -1092,14 +1126,19 @@
 <button class="coach-bubble" id="coachToggle" title="Coach IA Alex"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9.5 2A2.5 2.5 0 0 1 12 4.5v15a2.5 2.5 0 0 1-4.96-.46 2.5 2.5 0 0 1-2.96-3.08 3 3 0 0 1-.34-5.58 2.5 2.5 0 0 1 1.32-4.24 2.5 2.5 0 0 1 1.98-3A2.5 2.5 0 0 1 9.5 2z"/><path d="M14.5 2A2.5 2.5 0 0 0 12 4.5v15a2.5 2.5 0 0 0 4.96-.46 2.5 2.5 0 0 0 2.96-3.08 3 3 0 0 0 .34-5.58 2.5 2.5 0 0 0-1.32-4.24 2.5 2.5 0 0 0-1.98-3A2.5 2.5 0 0 0 14.5 2z"/></svg></button>
 <div class="coach-panel" id="coachPanel">
   <div class="coach-panel-hdr">
-    <span>Alex — Coach IA</span>
+    <div class="coach-avatar-sm">A</div>
+    <div style="flex:1;">
+      <div style="color:#fff;font-weight:600;font-size:0.88rem;line-height:1.2;">Alex</div>
+      <div style="color:rgba(255,255,255,0.5);font-size:0.68rem;">Coach IA · En ligne</div>
+    </div>
     <button class="coach-close" id="coachClose">×</button>
   </div>
   <div class="coach-msgs" id="aiMsgs">
-    <div class="ai-msg-a">Bonjour ! Je suis Alex, votre coach IA. Posez-moi vos questions sur la vente entre particuliers.</div>
+    <div class="coach-msg-row"><div class="coach-dot">A</div><div class="ai-msg-a">Bonjour ! Je suis Alex, votre coach IA. Posez-moi vos questions sur la vente entre particuliers.</div></div>
   </div>
   <div class="ai-typing" id="aiTyping">
-    <div class="ai-td"></div><div class="ai-td"></div><div class="ai-td"></div>
+    <div class="coach-dot">A</div>
+    <div class="ai-typing-bub"><div class="ai-td"></div><div class="ai-td"></div><div class="ai-td"></div></div>
   </div>
   <div class="coach-chips">
     <button class="coach-chip" data-q="Quel prix fixer pour mon bien ?">Prix à fixer ?</button>
@@ -1928,7 +1967,10 @@ function renderModules() {
     phaseMods.forEach(({ mod, mi }) => {
       const btn = document.createElement('button');
       btn.className = 'mod-tab' + (mi === activeModule ? ' active' : '');
-      btn.innerHTML = `<span class="mod-tab-num">${mod.num}</span><span class="mod-tab-label">${mod.title}</span>`;
+      const totalSteps = mod.steps?.length || 0;
+      const doneCount = mod.steps ? mod.steps.filter((_, si) => doneSteps[`${mi}_${si}`]).length : 0;
+      const progPct = totalSteps > 0 ? Math.round(doneCount / totalSteps * 100) : 0;
+      btn.innerHTML = `<span class="mod-tab-num">${mod.num}</span><span class="mod-tab-label">${mod.title}<div class="mod-tab-prog"><div class="mod-tab-prog-fill" style="width:${progPct}%"></div></div></span>`;
       btn.type = 'button';
       btn.addEventListener('click', () => { stopAgent(); activeModule = mi; if (mod.mailCat) activeMailCat = mod.mailCat; renderModules(); updateKeyPoints(); updateModuleVideo(); showModuleSlides(mi); triggerAiModuleMsg(mi); renderMails(); renderChecklists(); });
       row.appendChild(btn);
@@ -2127,10 +2169,17 @@ let lastAiModule = -1;
 
 function addMsg(text, role) {
   const msgs = document.getElementById('aiMsgs');
-  const el = document.createElement('div');
-  el.className = role === 'alex' ? 'ai-msg-a' : 'ai-msg-u';
-  el.innerHTML = text.replace(/\n/g, '<br>');
-  msgs.appendChild(el);
+  if (role === 'alex') {
+    const row = document.createElement('div');
+    row.className = 'coach-msg-row';
+    row.innerHTML = `<div class="coach-dot">A</div><div class="ai-msg-a">${text.replace(/\n/g, '<br>')}</div>`;
+    msgs.appendChild(row);
+  } else {
+    const el = document.createElement('div');
+    el.className = 'ai-msg-u';
+    el.innerHTML = text.replace(/\n/g, '<br>');
+    msgs.appendChild(el);
+  }
   msgs.scrollTop = msgs.scrollHeight;
 }
 
