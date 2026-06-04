@@ -249,14 +249,35 @@
     .mail-pre { font-size: 0.8rem; line-height: 1.7; color: #333; white-space: pre-wrap; font-family: 'DM Sans', sans-serif; margin: 0 0 10px; }
     .mail-copy { padding: 6px 14px; border-radius: 100px; background: #3D5A47; color: #fff; font-size: 0.75rem; font-weight: 500; cursor: pointer; border: none; font-family: 'DM Sans', sans-serif; }
 
-    /* ── Checklists ── */
-    .ck-section { margin-bottom: 20px; }
-    .ck-title { font-weight: 600; font-size: 0.88rem; color: #1a1a1a; margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
-    .ck-count { font-size: 0.75rem; color: #888; font-weight: 400; }
-    .ck-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 6px; }
-    .ck-item { display: flex; align-items: flex-start; gap: 8px; padding: 8px 10px; border-radius: 8px; border: 1.5px solid #E8E3DB; cursor: pointer; transition: all 0.15s; font-size: 0.8rem; color: #333; }
-    .ck-item.checked { border-color: #3D5A47; background: #F0F5F1; }
-    .ck-item input { flex-shrink: 0; accent-color: #3D5A47; margin-top: 2px; }
+    /* ── Checklists — Premium ── */
+    .ck-card { border: 1.5px solid #DDD8D0; border-radius: 16px; overflow: hidden; margin-bottom: 28px; box-shadow: 0 2px 12px rgba(0,0,0,0.05); }
+    .ck-hdr { background: linear-gradient(135deg, #1C3028 0%, #2D4A38 100%); padding: 20px 22px; display: flex; gap: 14px; align-items: flex-start; }
+    .ck-hdr-icon { width: 44px; height: 44px; border-radius: 12px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.15); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .ck-hdr-body { flex: 1; min-width: 0; }
+    .ck-hdr-title { font-weight: 700; font-size: 0.95rem; color: #fff; margin-bottom: 2px; }
+    .ck-hdr-meta { font-size: 0.67rem; color: rgba(212,228,216,0.6); margin-bottom: 12px; }
+    .ck-prog-track { background: rgba(255,255,255,0.12); border-radius: 4px; height: 4px; overflow: hidden; }
+    .ck-prog-fill { height: 100%; background: #C4785A; border-radius: 4px; transition: width 0.4s ease; width: 0%; }
+    .ck-prog-stats { display: flex; justify-content: space-between; margin-top: 7px; }
+    .ck-prog-label { font-size: 0.6rem; color: rgba(212,228,216,0.55); }
+    .ck-prog-pct { font-size: 0.6rem; color: rgba(196,120,90,0.9); font-weight: 700; }
+    .ck-list { background: #fff; }
+    .ck-row { display: flex; align-items: center; gap: 14px; padding: 13px 20px; border-bottom: 1px solid #F0EDE8; cursor: pointer; transition: background 0.14s; user-select: none; position: relative; }
+    .ck-row:last-child { border-bottom: none; }
+    .ck-row:hover { background: #FAFAF8; }
+    .ck-row.ck-done { background: #F6FAF7; }
+    .ck-box { width: 24px; height: 24px; border-radius: 50%; border: 2px solid #C8DDD0; flex-shrink: 0; display: flex; align-items: center; justify-content: center; transition: all 0.2s; background: #fff; }
+    .ck-row.ck-done .ck-box { background: #3D5A47; border-color: #3D5A47; }
+    .ck-chk { opacity: 0; transition: opacity 0.15s; }
+    .ck-row.ck-done .ck-chk { opacity: 1; }
+    .ck-label { flex: 1; font-size: 0.83rem; color: #333; line-height: 1.4; transition: color 0.2s; }
+    .ck-row.ck-done .ck-label { color: #8aab95; text-decoration: line-through; text-decoration-color: #C8DDD0; }
+    .ck-num { font-size: 0.6rem; font-weight: 700; color: #bbb; flex-shrink: 0; min-width: 16px; text-align: right; }
+    .ck-done-banner { display: none; align-items: center; gap: 12px; background: linear-gradient(135deg, #2D4A38, #3D6B4A); padding: 15px 20px; }
+    .ck-done-banner.show { display: flex; }
+    .ck-done-banner-icon { font-size: 1.3rem; flex-shrink: 0; }
+    .ck-done-banner-t { font-size: 0.82rem; font-weight: 700; color: #fff; }
+    .ck-done-banner-s { font-size: 0.68rem; color: rgba(255,255,255,0.6); margin-top: 2px; }
 
     /* ── AI Coach floating ── */
     .coach-bubble {
@@ -1724,38 +1745,75 @@ function renderMails() {
 }
 
 // ── Checklists ──
-function renderChecklist(type, containerId, countId) {
+const CK_ICONS = { estimation:'📊', docs:'📁', photos:'📸', visite:'🏡', edl:'🔑' };
+
+function renderChecklist(type, title, containerId) {
   const saved = JSON.parse(localStorage.getItem(`ck_${type}`) || '{}');
+  const items = CHECKLISTS[type];
+  const total = items.length;
+  const doneCnt = Object.values(saved).filter(Boolean).length;
+  const pct = Math.round((doneCnt / total) * 100);
   const el = document.getElementById(containerId);
-  el.innerHTML = CHECKLISTS[type].map((item, i) => `
-    <label class="ck-item${saved[i] ? ' checked' : ''}">
-      <input type="checkbox" ${saved[i] ? 'checked' : ''} data-t="${type}" data-i="${i}">
-      <span>${item}</span>
-    </label>`).join('');
-  const updateCount = () => {
-    const checked = el.querySelectorAll('input:checked').length;
-    document.getElementById(countId).textContent = `(${checked}/${CHECKLISTS[type].length})`;
+  el.innerHTML = `
+    <div class="ck-card">
+      <div class="ck-hdr">
+        <div class="ck-hdr-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="rgba(212,228,216,0.85)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+        </div>
+        <div class="ck-hdr-body">
+          <div class="ck-hdr-title">${title}</div>
+          <div class="ck-hdr-meta">${total} points à valider</div>
+          <div class="ck-prog-track"><div class="ck-prog-fill" style="width:${pct}%"></div></div>
+          <div class="ck-prog-stats">
+            <span class="ck-prog-label"><span class="ck-done-n">${doneCnt}</span>/${total} complété${doneCnt > 1 ? 's' : ''}</span>
+            <span class="ck-prog-pct"><span class="ck-pct-n">${pct}</span>%</span>
+          </div>
+        </div>
+      </div>
+      <div class="ck-list">
+        ${items.map((item, i) => `
+          <div class="ck-row${saved[i] ? ' ck-done' : ''}" data-i="${i}">
+            <div class="ck-box">
+              <svg class="ck-chk" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+            </div>
+            <span class="ck-label">${item}</span>
+            <span class="ck-num">${i + 1}</span>
+          </div>`).join('')}
+        <div class="ck-done-banner${doneCnt === total && total > 0 ? ' show' : ''}">
+          <div class="ck-done-banner-icon">🎯</div>
+          <div><div class="ck-done-banner-t">Check-list complète !</div><div class="ck-done-banner-s">Toutes les étapes sont validées — parfait.</div></div>
+        </div>
+      </div>
+    </div>`;
+
+  const updateProgress = () => {
+    const done = el.querySelectorAll('.ck-row.ck-done').length;
+    const p = Math.round((done / total) * 100);
+    el.querySelector('.ck-prog-fill').style.width = p + '%';
+    el.querySelector('.ck-done-n').textContent = done;
+    el.querySelector('.ck-pct-n').textContent = p;
+    el.querySelector('.ck-prog-label').innerHTML = `<span class="ck-done-n">${done}</span>/${total} complété${done > 1 ? 's' : ''}`;
+    el.querySelector('.ck-done-banner').classList.toggle('show', done === total && total > 0);
   };
-  el.querySelectorAll('input').forEach(inp => {
-    inp.addEventListener('change', () => {
-      saved[inp.dataset.i] = inp.checked;
-      inp.closest('.ck-item').classList.toggle('checked', inp.checked);
+
+  el.querySelectorAll('.ck-row').forEach(row => {
+    row.addEventListener('click', () => {
+      const i = row.dataset.i;
+      const isDone = row.classList.toggle('ck-done');
+      saved[i] = isDone;
       localStorage.setItem(`ck_${type}`, JSON.stringify(saved));
-      updateCount();
+      updateProgress();
     });
   });
-  updateCount();
 }
 
 function renderChecklists() {
   const sections = MODULE_CHECKLISTS[activeModule] || [];
   const container = document.getElementById('ckContainer');
-  container.innerHTML = sections.map(s => `
-    <div class="ck-section">
-      <div class="ck-title">${s.title} <span class="ck-count" id="ckCnt_${s.key}"></span></div>
-      <div class="ck-grid" id="ck-${s.key}"></div>
-    </div>`).join('');
-  sections.forEach(s => renderChecklist(s.key, `ck-${s.key}`, `ckCnt_${s.key}`));
+  const hdr = document.getElementById('ckHdr');
+  if (hdr) hdr.style.display = sections.length ? '' : 'none';
+  container.innerHTML = sections.map(s => `<div id="ckWrap_${s.key}"></div>`).join('');
+  sections.forEach(s => renderChecklist(s.key, s.title, `ckWrap_${s.key}`));
 }
 
 // ── AI Chat ──
