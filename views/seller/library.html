@@ -2344,10 +2344,12 @@ function closeCelebration() {
   document.getElementById('celebrateOverlay').classList.remove('show');
 }
 
-document.getElementById('celebrateOverlay').addEventListener('click', e => {
-  if (e.target === document.getElementById('celebrateOverlay')) closeCelebration();
-});
-document.getElementById('celebrateSkip').addEventListener('click', closeCelebration);
+setTimeout(() => {
+  document.getElementById('celebrateOverlay')?.addEventListener('click', e => {
+    if (e.target === document.getElementById('celebrateOverlay')) closeCelebration();
+  });
+  document.getElementById('celebrateSkip')?.addEventListener('click', closeCelebration);
+}, 0);
 
 document.getElementById('coachToggle').addEventListener('click', () => document.getElementById('coachPanel').classList.toggle('open'));
 document.getElementById('coachClose').addEventListener('click', () => document.getElementById('coachPanel').classList.remove('open'));
