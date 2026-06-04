@@ -806,11 +806,73 @@
     /* Proof bar numbers — Inter */
     .f-proof-n { font-family: 'Inter', sans-serif; font-size: 1.4rem; font-weight: 700; letter-spacing: -0.02em; }
 
+    /* ── Animation d'ouverture fluide des steps ── */
+    .step-body {
+      display: block !important;
+      overflow: hidden;
+      max-height: 0;
+      padding-top: 0;
+      padding-bottom: 0 !important;
+      padding-left: 22px;
+      padding-right: 22px;
+      border-top: 1px solid transparent;
+      transition: max-height 0.35s cubic-bezier(0.4, 0, 0.2, 1),
+                  padding-bottom 0.28s ease,
+                  border-top-color 0.2s;
+    }
+    .step-card.open .step-body {
+      max-height: 3500px;
+      padding-bottom: 22px !important;
+      border-top-color: #F0ECE6;
+    }
+    @media (max-width: 640px) {
+      .step-body { padding-left: 16px; padding-right: 16px; }
+    }
+
+    /* ── Tips premium ── */
+    .tip-i {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      padding: 11px 14px;
+      background: linear-gradient(135deg, #EDF5F0 0%, #E4F0E8 100%);
+      border: 1px solid #C5DDD0;
+      border-radius: 10px;
+      margin-bottom: 7px;
+    }
+    .tip-icon {
+      width: 26px; height: 26px;
+      border-radius: 7px;
+      background: #3D5A47; color: #fff;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0; margin-top: 1px;
+    }
+    .tip-text { font-size: 0.82rem; color: #1E3D29; line-height: 1.58; }
+
+    /* ── Warnings premium ── */
+    .warn-i {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      padding: 11px 14px;
+      background: linear-gradient(135deg, #FFF5EF 0%, #FDF0EB 100%);
+      border: 1px solid #E8C5B0;
+      border-radius: 10px;
+      margin-bottom: 7px;
+    }
+    .warn-icon {
+      width: 26px; height: 26px;
+      border-radius: 7px;
+      background: #C4785A; color: #fff;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0; margin-top: 1px;
+    }
+    .warn-text { font-size: 0.82rem; color: #7A3A1E; line-height: 1.58; }
+
     /* Mobile */
     @media (max-width: 640px) {
       .mod-tabs-row { grid-template-columns: 1fr 1fr; }
       .step-hdr { padding: 14px 16px; }
-      .step-body { padding: 0 16px 20px; }
       .mod-hdr { padding: 16px 18px; }
       .section-hdr { margin: 36px 0 12px; }
     }
@@ -1909,11 +1971,11 @@ function renderModules() {
       }
       if (step.tips?.length) {
         html += `<div class="sst"><div class="sst-title">Conseils</div>`;
-        step.tips.forEach(t => { html += `<div class="tip-i"><span style="display:inline-flex;align-items:center;vertical-align:middle;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><line x1="9" y1="18" x2="15" y2="18"/><line x1="10" y1="22" x2="14" y2="22"/><path d="M15.09 14c.18-.98.65-1.74 1.41-2.5A4.65 4.65 0 0 0 18 8 6 6 0 0 0 6 8c0 1 .23 2.23 1.5 3.5A4.61 4.61 0 0 1 8.91 14"/></svg></span> ${t}</div>`; });
+        step.tips.forEach(t => { html += `<div class="tip-i"><div class="tip-icon"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div><div class="tip-text">${t}</div></div>`; });
         html += `</div>`;
       }
       if (step.warnings?.length) {
-        step.warnings.forEach(w => { html += `<div class="warn-i"><span style="display:inline-flex;align-items:center;vertical-align:middle;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></span> ${w}</div>`; });
+        step.warnings.forEach(w => { html += `<div class="warn-i"><div class="warn-icon"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div><div class="warn-text">${w}</div></div>`; });
       }
       if (step.cta) { html += step.cta; }
       if (step.sections?.length) {
