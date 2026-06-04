@@ -5,13 +5,13 @@
   <script>if("scrollRestoration"in history)history.scrollRestoration="manual";</script>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Tableau de bord — Vendu Par Moi</title>
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;1,400&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="manifest" href="/manifest.json">
   <link rel="stylesheet" href="/css/style.css">
   <style>
     /* ——— Base ——— */
     *, *::before, *::after { box-sizing: border-box; }
-    body { font-family: 'DM Sans', sans-serif; background: #F5F0E8; margin: 0; }
+    body { font-family: 'Inter', system-ui, -apple-system, sans-serif; background: #F5F0E8; margin: 0; -webkit-font-smoothing: antialiased; }
 
     /* ——— Layout ——— */
     .app-layout { display: flex; min-height: 100vh; }
@@ -178,18 +178,28 @@
       border: 1.5px solid #e8e0d6;
       border-radius: 14px;
       padding: 20px;
-      transition: box-shadow 0.3s cubic-bezier(0.16,1,0.3,1);
+      position: relative;
+      overflow: hidden;
+      transition: box-shadow 0.3s cubic-bezier(0.16,1,0.3,1), border-color 0.2s;
     }
-    .stat-card:hover {
-      box-shadow: 0 4px 20px rgba(61,90,71,0.08);
+    .stat-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, #5a8a6a, #3D5A47);
+      opacity: 0;
+      transition: opacity 0.2s;
     }
+    .stat-card:hover { box-shadow: 0 4px 20px rgba(61,90,71,0.1); border-color: #d0c8be; }
+    .stat-card:hover::before { opacity: 1; }
     .stat-label {
-      font-size: 0.76rem; color: #9a9087; font-weight: 500;
-      text-transform: uppercase; letter-spacing: 0.05em;
-      margin-bottom: 8px;
+      font-size: 0.72rem; color: #9a9087; font-weight: 500;
+      text-transform: uppercase; letter-spacing: 0.06em;
+      margin-bottom: 10px;
     }
     .stat-value {
-      font-size: 2rem; font-weight: 600; color: #2d3e33;
+      font-size: 2.1rem; font-weight: 600; color: #2d3e33;
       font-family: 'Cormorant Garamond', serif;
       line-height: 1;
     }
@@ -198,11 +208,11 @@
     .stat-value.red { color: #c45a5a; }
     .stat-value-small {
       font-size: 0.95rem; font-weight: 500; color: #4a5e52;
-      font-family: 'DM Sans', sans-serif;
+      font-family: 'Inter', system-ui, sans-serif;
       margin-top: 2px;
     }
     .stat-sub {
-      font-size: 0.78rem; color: #b0a89f; margin-top: 4px;
+      font-size: 0.75rem; color: #b0a89f; margin-top: 5px;
     }
     .stat-score-denom {
       font-size: 1.1rem; color: #b0a89f; font-weight: 400;
@@ -251,7 +261,7 @@
       transition: background 0.2s, border-color 0.2s;
     }
     .reco-item:hover { background: #f0f7f2; border-color: #c8ddd0; }
-    .reco-icon { font-size: 1rem; flex-shrink: 0; }
+    .reco-icon { width:28px; height:28px; border-radius:7px; background:#f0f7f2; display:flex; align-items:center; justify-content:center; flex-shrink:0; color:#3D5A47; }
     .reco-text { flex: 1; font-size: 0.83rem; color: #3d3830; font-weight: 400; }
     .reco-cta { font-size: 0.8rem; color: #C4785A; font-weight: 600; flex-shrink: 0; }
 
@@ -287,7 +297,7 @@
       padding: 10px 14px;
       border: 1.5px solid #e0d8ce;
       border-radius: 8px;
-      font-family: 'DM Sans', sans-serif;
+      font-family: 'Inter', sans-serif;
       font-size: 0.9rem;
       color: #2d3e33;
       background: #fdfcf8;
@@ -303,7 +313,7 @@
       padding: 10px 20px;
       background: #3D5A47; color: #FDFCF8;
       border: none; border-radius: 8px;
-      font-family: 'DM Sans', sans-serif;
+      font-family: 'Inter', sans-serif;
       font-size: 0.88rem; font-weight: 500;
       cursor: pointer; text-decoration: none;
       transition: background 0.2s, box-shadow 0.2s;
@@ -314,7 +324,7 @@
       padding: 10px 20px;
       background: transparent; color: #3D5A47;
       border: 1.5px solid #c8ddd0; border-radius: 8px;
-      font-family: 'DM Sans', sans-serif;
+      font-family: 'Inter', sans-serif;
       font-size: 0.88rem; font-weight: 500;
       cursor: pointer; text-decoration: none;
       transition: background 0.2s, border-color 0.2s;
@@ -329,7 +339,7 @@
       border-radius: 8px;
       font-size: 0.85rem; color: #5a6e5f;
       background: #F5F0E8;
-      font-family: 'DM Sans', sans-serif;
+      font-family: 'Inter', sans-serif;
     }
 
     /* ——— Footer note ——— */
@@ -581,21 +591,21 @@
     <div id="statut-widget" style="display:none; margin: 0 0 24px;">
       <!-- Alert banners (shown conditionally) -->
       <div id="alert-pending-visits" style="display:none; background:rgba(196,96,58,0.15); border:1px solid rgba(196,96,58,0.4); border-radius:12px; padding:14px 18px; margin-bottom:12px; align-items:center; gap:12px; cursor:pointer;" onclick="window.location.href='/mon-agenda'">
-        <span style="font-size:1.2rem;">&#x1F4C5;</span>
-        <span id="alert-visits-text" style="font-family:'DM Sans',sans-serif; font-size:0.88rem; color:#F5F0E8; font-weight:600;"></span>
+        <span style="display:flex;align-items:center;justify-content:center;width:30px;height:30px;border-radius:8px;background:rgba(196,96,58,0.3);flex-shrink:0;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="rgba(245,240,232,0.9)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span>
+        <span id="alert-visits-text" style="font-size:0.88rem; color:#F5F0E8; font-weight:600;"></span>
       </div>
       <div id="alert-no-photos" style="display:none; background:rgba(255,165,0,0.1); border:1px solid rgba(255,165,0,0.3); border-radius:12px; padding:14px 18px; margin-bottom:12px; align-items:center; gap:12px;">
-        <span style="font-size:1.2rem;">&#x1F4F8;</span>
-        <span style="font-family:'DM Sans',sans-serif; font-size:0.88rem; color:#F5F0E8;">Aucune photo &#8212; <a href="/mon-bien" style="color:#C4603A; text-decoration:none; font-weight:600;">Ajoutez vos photos pour attirer les acheteurs &#x2192;</a></span>
+        <span style="display:flex;align-items:center;justify-content:center;width:30px;height:30px;border-radius:8px;background:rgba(255,165,0,0.2);flex-shrink:0;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="rgba(245,240,232,0.9)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg></span>
+        <span style="font-size:0.88rem; color:#F5F0E8;">Aucune photo &#8212; <a href="/mon-bien" style="color:#C4603A; text-decoration:none; font-weight:600;">Ajoutez vos photos pour attirer les acheteurs &#x2192;</a></span>
       </div>
       <div id="alert-missing-docs" style="display:none; background:rgba(255,200,0,0.08); border:1px solid rgba(255,200,0,0.25); border-radius:12px; padding:14px 18px; margin-bottom:16px; align-items:center; gap:12px;">
-        <span style="font-size:1.2rem;">&#x1F4C4;</span>
-        <span id="alert-docs-text" style="font-family:'DM Sans',sans-serif; font-size:0.88rem; color:#F5F0E8;"></span>
+        <span style="display:flex;align-items:center;justify-content:center;width:30px;height:30px;border-radius:8px;background:rgba(255,200,0,0.15);flex-shrink:0;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="rgba(245,240,232,0.9)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg></span>
+        <span id="alert-docs-text" style="font-size:0.88rem; color:#F5F0E8;"></span>
       </div>
 
       <!-- Completion sections -->
       <div style="background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08); border-radius:16px; padding:20px 24px;">
-        <div style="font-family:'DM Sans',sans-serif; font-size:0.78rem; font-weight:700; text-transform:uppercase; letter-spacing:0.08em; color:rgba(245,240,232,0.4); margin-bottom:16px;">Avancement de votre dossier</div>
+        <div style="font-family:'Inter',sans-serif; font-size:0.78rem; font-weight:700; text-transform:uppercase; letter-spacing:0.08em; color:rgba(245,240,232,0.4); margin-bottom:16px;">Avancement de votre dossier</div>
         <!-- Progress rows inserted by JS -->
         <div id="completion-rows"></div>
       </div>
@@ -892,7 +902,7 @@ function renderScore(scoreData) {
   document.getElementById('recoList').innerHTML = recos.length
     ? recos.slice(0, 4).map(r => `
         <a href="${r.link || '#'}" class="reco-item">
-          <span class="reco-icon">${r.icon || '→'}</span>
+          <span class="reco-icon"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></span>
           <span class="reco-text">${r.text}</span>
           <span class="reco-cta">→ Agir</span>
         </a>
@@ -928,8 +938,8 @@ function copyLink() {
 function renderCompletionRow(label, pct, cta) {
   return `<div style="margin-bottom:14px;">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
-      <span style="font-family:'DM Sans',sans-serif;font-size:0.85rem;color:#F5F0E8;">${label}</span>
-      <span style="font-family:'DM Sans',sans-serif;font-size:0.78rem;color:rgba(245,240,232,0.4);">${Math.round(pct)}%</span>
+      <span style="font-family:'Inter',sans-serif;font-size:0.85rem;color:#F5F0E8;">${label}</span>
+      <span style="font-family:'Inter',sans-serif;font-size:0.78rem;color:rgba(245,240,232,0.4);">${Math.round(pct)}%</span>
     </div>
     <div style="height:5px;background:rgba(255,255,255,0.08);border-radius:99px;overflow:hidden;">
       <div style="height:100%;width:${pct}%;background:#C4603A;border-radius:99px;transition:width 0.6s ease;"></div>

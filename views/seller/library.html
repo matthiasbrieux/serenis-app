@@ -244,11 +244,17 @@
     .schema-step { padding: 5px 10px; background: #F0F5F1; border: 1px solid #C5D9CB; border-radius: 6px; font-size: 0.75rem; color: #3D5A47; font-weight: 500; }
     .schema-arrow { color: #9BB5A2; font-size: 0.85rem; }
 
-    /* Script */
-    .script-block { display: flex; flex-direction: column; gap: 6px; }
-    .script-speaker { font-size: 0.68rem; font-weight: 600; letter-spacing: 0.04em; margin-bottom: 1px; color: #999; }
-    .script-line { font-size: 0.82rem; color: #222; padding: 8px 12px; background: #F8F6F2; border-radius: 8px; border-left: 3px solid #E0D8CC; line-height: 1.5; }
-    .script-speaker.vendeur + .script-line { border-color: #3D5A47; background: #F0F5F1; }
+    /* Script — chat bubbles */
+    .script-block { display: flex; flex-direction: column; gap: 10px; padding: 4px 0; }
+    .script-msg { display: flex; flex-direction: column; max-width: 82%; }
+    .script-msg.vendeur { align-self: flex-end; align-items: flex-end; }
+    .script-msg.acheteur { align-self: flex-start; align-items: flex-start; }
+    .script-who { font-size: 0.62rem; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; margin-bottom: 3px; }
+    .script-msg.vendeur .script-who { color: #3D5A47; }
+    .script-msg.acheteur .script-who { color: #999; }
+    .script-bubble { font-size: 0.82rem; line-height: 1.58; padding: 9px 13px; border-radius: 14px; }
+    .script-msg.vendeur .script-bubble { background: #3D5A47; color: #fff; border-bottom-right-radius: 3px; }
+    .script-msg.acheteur .script-bubble { background: #EEE9E2; color: #333; border-bottom-left-radius: 3px; }
 
     /* Tips & warnings */
     .tip-i { font-size: 0.8rem; color: #2D4D38; padding: 7px 10px 7px 12px; background: #EDF5F0; border-left: 3px solid #3D5A47; border-radius: 0 6px 6px 0; margin-bottom: 6px; line-height: 1.5; }
@@ -1945,7 +1951,7 @@ function renderModules() {
       html += `<div class="step-card${done ? ' done' : ''}" id="step-${mi}-${si}">
         <div class="step-hdr" data-mi="${mi}" data-si="${si}">
           <div class="step-chk" data-chk="1" data-mi="${mi}" data-si="${si}">✓</div>
-          <div class="step-tw"><div class="step-t">${step.title}</div><div class="step-m">${step.meta}</div>${step.tag ? `<div class="step-tag">→ ${step.tag}</div>` : ''}</div>
+          <div class="step-tw"><div class="step-t">${step.title.replace(/^◆\s*/, '')}</div><div class="step-m">${step.meta}</div>${step.tag ? `<div class="step-tag">→ ${step.tag}</div>` : ''}</div>
           ${step.speakText ? `<button class="tts-btn" onclick="event.stopPropagation();playStepAudio(${mi},${si},this)"><svg width="9" height="9" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg> Écouter</button>` : ''}
           <div class="step-arr"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></div>
         </div>
@@ -1966,7 +1972,7 @@ function renderModules() {
       }
       if (step.script) {
         html += `<div class="sst"><div class="sst-title">Script</div><div class="script-block">`;
-        step.script.forEach(line => { html += `<div class="script-speaker ${line.speaker}">${line.speaker === 'vendeur' ? '<span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#22c55e;flex-shrink:0;vertical-align:middle;"></span> Vous' : '<span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#f97316;flex-shrink:0;vertical-align:middle;"></span> Acheteur'}</div><div class="script-line">"${line.line}"</div>`; });
+        step.script.forEach(line => { html += `<div class="script-msg ${line.speaker}"><div class="script-who">${line.speaker === 'vendeur' ? 'Vous' : 'Acheteur'}</div><div class="script-bubble">${line.line}</div></div>`; });
         html += `</div></div>`;
       }
       if (step.tips?.length) {
