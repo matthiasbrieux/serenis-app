@@ -564,6 +564,51 @@
     .agent-progress-bar { background:rgba(255,255,255,0.1); border-radius:4px; height:3px; margin-top:22px; overflow:hidden; }
     .agent-progress-fill { height:100%; width:0%; background:#C4785A; border-radius:4px; transition:width .6s ease; }
 
+    /* ── iPhone Slides ── */
+    .iphone-slides { position:absolute; inset:0; z-index:15; display:none; overflow:hidden; border-radius:38px; }
+    .iphone-slides.visible { display:block; }
+    .iphone-slide {
+      position:absolute; inset:0; display:flex; flex-direction:column; justify-content:flex-end;
+      padding:14px 14px 46px;
+      background:linear-gradient(160deg,#1C3028 0%,#2A4535 55%,#111 100%);
+      opacity:0; transition:opacity 0.38s; pointer-events:none;
+    }
+    .iphone-slide.active { opacity:1; pointer-events:auto; }
+    .iphone-slide-deco {
+      position:absolute; inset:0; pointer-events:none;
+      background:radial-gradient(ellipse at 80% 18%,rgba(196,120,90,0.22) 0%,transparent 52%),
+                 radial-gradient(ellipse at 18% 82%,rgba(61,90,71,0.45) 0%,transparent 52%);
+    }
+    .iphone-slide-island-space { height:40px; flex-shrink:0; }
+    .iphone-slide-num {
+      font-size:0.5rem; font-weight:700; letter-spacing:0.14em;
+      text-transform:uppercase; color:rgba(196,120,90,0.9); margin-bottom:8px;
+    }
+    .iphone-slide-title {
+      font-family:'Cormorant Garamond',serif; font-size:1.5rem; font-weight:600;
+      color:#fff; line-height:1.1; margin-bottom:5px;
+    }
+    .iphone-slide-sub {
+      font-size:0.58rem; color:rgba(212,228,216,0.62); font-weight:500;
+      letter-spacing:0.05em; margin-bottom:11px; text-transform:uppercase;
+    }
+    .iphone-slide-text {
+      font-size:0.61rem; color:rgba(255,255,255,0.82); line-height:1.65;
+      margin-bottom:13px; background:rgba(0,0,0,0.28); border-radius:8px;
+      padding:8px 10px; border-left:2px solid rgba(196,120,90,0.55); font-style:italic;
+    }
+    .iphone-slide-dots { display:flex; gap:4px; margin-bottom:10px; }
+    .iphone-slide-dot { height:4px; border-radius:2px; background:rgba(255,255,255,0.22); transition:all 0.25s; width:14px; }
+    .iphone-slide-dot.active { background:#C4785A; width:22px; }
+    .iphone-slide-cta {
+      background:#C4785A; color:#fff; border:none; border-radius:10px;
+      padding:10px 16px; width:100%; font-size:0.72rem; font-weight:700;
+      cursor:pointer; font-family:'DM Sans',sans-serif; transition:background 0.15s;
+    }
+    .iphone-slide-cta:hover { background:#a85a40; }
+    .iphone-slide-kp { display:flex; align-items:flex-start; gap:7px; font-size:0.59rem; color:rgba(255,255,255,0.82); line-height:1.5; margin-bottom:7px; }
+    .iphone-slide-kp-dot { width:5px; height:5px; border-radius:50%; background:#C4785A; flex-shrink:0; margin-top:4px; }
+
   </style>
 </head>
 <body>
@@ -662,6 +707,7 @@
               </div>
               <button class="agent-stop-btn" onclick="stopAgent()">⏹ Arrêter</button>
             </div>
+            <div class="iphone-slides" id="iphoneSlides"></div>
             <button id="soundBtn" style="
               position:absolute; bottom:12px; right:12px; z-index:10;
               width:34px; height:34px; border-radius:50%;
@@ -1559,7 +1605,7 @@ function renderModules() {
       btn.className = 'mod-tab' + (mi === activeModule ? ' active' : '');
       btn.textContent = mod.num + ' · ' + mod.title;
       btn.type = 'button';
-      btn.addEventListener('click', () => { stopAgent(); activeModule = mi; if (mod.mailCat) activeMailCat = mod.mailCat; renderModules(); updateKeyPoints(); updateModuleVideo(); triggerAiModuleMsg(mi); renderMails(); renderChecklists(); });
+      btn.addEventListener('click', () => { stopAgent(); activeModule = mi; if (mod.mailCat) activeMailCat = mod.mailCat; renderModules(); updateKeyPoints(); updateModuleVideo(); showModuleSlides(mi); triggerAiModuleMsg(mi); renderMails(); renderChecklists(); });
       row.appendChild(btn);
     });
 
@@ -1971,6 +2017,49 @@ function stopAgentIntro() {
   if (fill) fill.style.width = '0%';
   if (el) el.textContent = '« Votre dossier vendeur, c’est votre meilleur commercial. Laissez-moi vous expliquer comment le construire. »';
   _agentSubIdx = -1;
+}
+
+// ── iPhone Slides ──
+function showModuleSlides(mi) {
+  const mod = MODULES[mi];
+  const container = document.getElementById('iphoneSlides');
+  if (!container) return;
+  const kps = mod.keyPoints.slice(0, 4);
+  container.innerHTML = `
+    <div class="iphone-slide active">
+      <div class="iphone-slide-deco"></div>
+      <div class="iphone-slide-island-space"></div>
+      <div class="iphone-slide-num">Module ${mod.num}</div>
+      <div class="iphone-slide-title">${mod.title}</div>
+      <div class="iphone-slide-sub">${mod.subtitle}</div>
+      <div class="iphone-slide-text">${mod.aiMsg}</div>
+      <div class="iphone-slide-dots"><div class="iphone-slide-dot active"></div><div class="iphone-slide-dot"></div></div>
+      <button class="iphone-slide-cta" onclick="goToIphoneSlide(1)">Points clés →</button>
+    </div>
+    <div class="iphone-slide">
+      <div class="iphone-slide-deco"></div>
+      <div class="iphone-slide-island-space"></div>
+      <div class="iphone-slide-num">Module ${mod.num} · Ce que vous allez apprendre</div>
+      <div class="iphone-slide-title" style="font-size:1.05rem;margin-bottom:12px;">Points clés</div>
+      <div style="margin-bottom:13px;">${kps.map(k=>`<div class="iphone-slide-kp"><div class="iphone-slide-kp-dot"></div><span>${k}</span></div>`).join('')}</div>
+      <div class="iphone-slide-dots"><div class="iphone-slide-dot"></div><div class="iphone-slide-dot active"></div></div>
+      <button class="iphone-slide-cta" onclick="dismissIphoneSlides()">Commencer →</button>
+    </div>`;
+  container.classList.add('visible');
+}
+
+function goToIphoneSlide(idx) {
+  const container = document.getElementById('iphoneSlides');
+  if (!container) return;
+  container.querySelectorAll('.iphone-slide').forEach((s, i) => {
+    s.classList.toggle('active', i === idx);
+    s.querySelectorAll('.iphone-slide-dot').forEach((d, di) => d.classList.toggle('active', di === idx));
+  });
+}
+
+function dismissIphoneSlides() {
+  const container = document.getElementById('iphoneSlides');
+  if (container) { container.classList.remove('visible'); container.innerHTML = ''; }
 }
 
 // ── Init ──
