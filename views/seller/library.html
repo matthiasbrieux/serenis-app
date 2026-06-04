@@ -5,7 +5,7 @@
   <script>if("scrollRestoration"in history)history.scrollRestoration="manual";</script>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Ma Formation — Vendu Par Moi</title>
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,400&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,400&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/css/style.css">
   <style>
     /* ── Hero wrap (bandeau sombre) ── */
@@ -217,9 +217,8 @@
     .step-tag { font-size: 0.7rem; color: #3D5A47; font-weight: 600; margin-top: 4px; opacity: 0.85; }
     .step-card.open .step-tag { color: rgba(200,235,210,0.9); }
     .step-tw { flex: 1; min-width: 0; }
-    .step-arr { color: #B8CFC0; font-size: 1.1rem; flex-shrink: 0; transition: transform 0.2s, color 0.2s; }
-    .step-card.open .step-arr { color: rgba(255,255,255,0.7); }
-    .step-card.open .step-arr { transform: rotate(90deg); }
+    .step-arr { color: #C8D8CC; flex-shrink: 0; transition: transform 0.2s, color 0.2s; display: flex; align-items: center; }
+    .step-card.open .step-arr { color: rgba(255,255,255,0.6); transform: rotate(90deg); }
     .tts-btn { padding:5px 12px; border-radius:20px; border:1.5px solid #3D5A47; background:#fff; color:#3D5A47; font-size:0.75rem; font-weight:700; cursor:pointer; flex-shrink:0; font-family:'DM Sans',sans-serif; transition:all 0.15s; white-space:nowrap; }
     .tts-btn:hover { background:#3D5A47; color:#fff; }
     .tts-btn.tts-playing { background:#C4603A; border-color:#C4603A; color:#fff; }
@@ -694,6 +693,131 @@
     .iphone-agent-waves.active span:nth-child(4){animation:awb .9s ease-in-out .18s infinite;height:11px;}
     .iphone-agent-waves.active span:nth-child(5){animation:awb .9s ease-in-out .09s infinite;height:7px;}
 
+
+    /* ── Formation — Override typographie & design premium ─────── */
+
+    /* Inter comme police de corps pour la formation */
+    .main-content, .f-hero-wrap, .mod-tabs-wrap, #modContainer, #ckContainer, #mailsList {
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    }
+    .mod-tab, .tts-btn, .coach-ta, .coach-send, .coach-chip, .mail-copy, .step-body,
+    .iphone-agent-listen, .iphone-agent-skip { font-family: 'Inter', system-ui, sans-serif; }
+
+    /* Progress bar — plus sobre et plus large */
+    .lib-progress { margin-bottom: 32px; gap: 14px; }
+    .lib-progress-bar { height: 4px; background: rgba(0,0,0,0.08); border-radius: 100px; }
+    .lib-progress-fill { background: linear-gradient(90deg, #3D5A47, #5a8c6a); }
+    .lib-progress-pct { font-weight: 600; font-size: 0.8rem; color: #3D5A47; }
+
+    /* Phase labels — plus clairs, sans emojis */
+    .mod-phase-hdr { margin: 0 0 10px; }
+    .mod-phase-label {
+      font-size: 0.68rem; font-weight: 700; letter-spacing: 0.09em;
+      text-transform: uppercase; color: #3D5A47;
+      display: flex; align-items: center; gap: 8px;
+      margin-bottom: 4px;
+    }
+    .mod-phase-label::after { height: 1px; background: rgba(61,90,71,0.15); }
+    .mod-phase-label svg { color: #3D5A47; flex-shrink: 0; }
+    .mod-phase-apres .mod-phase-label { color: #8C6800; }
+    .mod-phase-apres .mod-phase-label::after { background: rgba(155,107,10,0.15); }
+    .mod-phase-apres .mod-phase-label svg { color: #9b6b0a; }
+    .mod-phase-desc { font-size: 0.74rem; color: #888; line-height: 1.5; margin-bottom: 12px; }
+
+    /* Module tabs — card avec numéro */
+    .mod-tabs-row { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 8px; }
+    .mod-tab {
+      display: flex; align-items: center; gap: 10px;
+      padding: 12px 14px; border-radius: 12px;
+      border: 1.5px solid #E8E3DB; background: #fff;
+      cursor: pointer; text-align: left;
+      font-size: 0.8rem; font-weight: 500; color: #555;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+      transition: border-color 0.15s, box-shadow 0.15s, color 0.15s, background 0.15s;
+    }
+    .mod-tab-num {
+      width: 26px; height: 26px; border-radius: 7px;
+      background: #F0F5F1; color: #3D5A47;
+      font-weight: 700; font-size: 0.72rem;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0; transition: all 0.15s;
+    }
+    .mod-tab-label { flex: 1; min-width: 0; line-height: 1.3; }
+    .mod-tab:hover { border-color: #3D5A47; color: #3D5A47; box-shadow: 0 2px 10px rgba(61,90,71,0.1); }
+    .mod-tab:hover .mod-tab-num { background: #3D5A47; color: #fff; }
+    .mod-tab.active { background: #3D5A47; color: #fff; border-color: #3D5A47; box-shadow: 0 4px 14px rgba(61,90,71,0.28); }
+    .mod-tab.active .mod-tab-num { background: rgba(255,255,255,0.18); color: #fff; }
+    .mod-phase-apres .mod-tab:hover { border-color: #9b6b0a; color: #9b6b0a; }
+    .mod-phase-apres .mod-tab:hover .mod-tab-num { background: #9b6b0a; color: #fff; }
+    .mod-phase-apres .mod-tab.active { background: #9b6b0a; border-color: #9b6b0a; box-shadow: 0 4px 14px rgba(155,107,10,0.25); }
+    .mod-phase-apres .mod-tab.active .mod-tab-num { background: rgba(255,255,255,0.18); color: #fff; }
+
+    /* Module header — plus aéré */
+    .mod-hdr { padding: 20px 22px; border-radius: 14px; margin-bottom: 16px; }
+    .mod-num { width: 38px; height: 38px; border-radius: 10px; font-size: 0.88rem; }
+    .mod-hdr-title { font-size: 1.05rem; font-weight: 700; letter-spacing: -0.01em; }
+    .mod-hdr-sub { font-size: 0.8rem; margin-top: 3px; }
+
+    /* Step cards — plus modernes */
+    .steps-list { gap: 8px; }
+    .step-card { border-radius: 14px; box-shadow: 0 1px 4px rgba(0,0,0,0.05); transition: box-shadow 0.2s; }
+    .step-card:hover { box-shadow: 0 3px 12px rgba(0,0,0,0.08); }
+    .step-hdr { padding: 16px 20px; transition: background 0.2s; }
+    .step-t { font-size: 0.9rem; font-weight: 700; letter-spacing: -0.01em; text-transform: none; }
+    .step-m { font-size: 0.73rem; color: #999; margin-top: 2px; }
+    .step-tag { font-size: 0.72rem; margin-top: 3px; font-weight: 500; }
+    .step-chk { width: 22px; height: 22px; border-radius: 50%; font-size: 0.6rem; }
+    .step-arr { font-size: 1rem; }
+    .step-body { padding: 0 22px 22px; }
+    .sst-title { font-size: 0.78rem; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; color: #888; margin-bottom: 12px; border-bottom: none !important; padding-bottom: 0 !important; }
+    .sst-title::before { display: none !important; }
+    .sst { padding-top: 20px; border-top: 1px solid #F0ECE6; }
+    .sst:first-child { padding-top: 16px; border-top: none; }
+
+    /* Écouter button — plus fin */
+    .tts-btn {
+      padding: 5px 12px; border-radius: 8px; font-size: 0.72rem;
+      font-weight: 600; display: inline-flex; align-items: center; gap: 5px;
+    }
+
+    /* Section headers — minimalistes */
+    .section-hdr { font-size: 0.65rem; letter-spacing: 0.12em; margin: 44px 0 14px; }
+
+    /* Checklists — amélioration */
+    .ck-hdr { border-radius: 14px 14px 0 0; }
+    .ck-row { padding: 12px 18px; }
+    .ck-label { font-size: 0.82rem; }
+
+    /* CTA block — plus premium */
+    .formation-cta {
+      background: linear-gradient(135deg, #F0F5F1 0%, #EBF3EE 100%);
+      border: 1.5px solid #C5D9CB; border-radius: 16px;
+      padding: 28px 32px; margin-top: 20px;
+      display: flex; align-items: center; justify-content: space-between;
+      gap: 20px; flex-wrap: wrap;
+    }
+
+    /* Pillar icon — cohérent avec la charte */
+    .f-pillar-icon {
+      background: rgba(61,90,71,0.1); color: rgba(212,228,216,0.9);
+      border-radius: 9px;
+    }
+
+    /* Proof bar numbers — Inter */
+    .f-proof-n { font-family: 'Inter', sans-serif; font-size: 1.4rem; font-weight: 700; letter-spacing: -0.02em; }
+
+    /* Mobile */
+    @media (max-width: 640px) {
+      .mod-tabs-row { grid-template-columns: 1fr 1fr; }
+      .step-hdr { padding: 14px 16px; }
+      .step-body { padding: 0 16px 20px; }
+      .mod-hdr { padding: 16px 18px; }
+      .section-hdr { margin: 36px 0 12px; }
+    }
+    @media (max-width: 420px) {
+      .mod-tabs-row { grid-template-columns: 1fr; }
+    }
+
   </style>
 </head>
 <body>
@@ -768,28 +892,28 @@
 
         <div class="f-pillars">
           <div class="f-pillar">
-            <div class="f-pillar-icon">📝</div>
+            <div class="f-pillar-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></div>
             <div class="f-pillar-body">
               <div class="f-pillar-t">Rédiger votre annonce comme un pro</div>
               <div class="f-pillar-s">Titre, texte et structure qui déclenchent des visites qualifiées</div>
             </div>
           </div>
           <div class="f-pillar">
-            <div class="f-pillar-icon">🏠</div>
+            <div class="f-pillar-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></div>
             <div class="f-pillar-body">
               <div class="f-pillar-t">Votre fiche descriptive détaillée — conçue pour vous</div>
               <div class="f-pillar-s">Filtre les visites inutiles avant même le premier contact</div>
             </div>
           </div>
           <div class="f-pillar">
-            <div class="f-pillar-icon">🎯</div>
+            <div class="f-pillar-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg></div>
             <div class="f-pillar-body">
               <div class="f-pillar-t">Qualifier chaque acheteur en 12 questions</div>
               <div class="f-pillar-s">Ne recevez que des acheteurs sérieux et finançables</div>
             </div>
           </div>
           <div class="f-pillar">
-            <div class="f-pillar-icon">💰</div>
+            <div class="f-pillar-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div>
             <div class="f-pillar-body">
               <div class="f-pillar-t">Négocier et conclure au bon prix</div>
               <div class="f-pillar-s">Gérer les offres basses · défendre votre prix sans agence</div>
@@ -827,7 +951,7 @@
                 <div class="wave-bar"></div><div class="wave-bar"></div>
                 <div class="wave-bar"></div><div class="wave-bar"></div>
               </div>
-              <button class="agent-stop-btn" onclick="stopAgent()">⏹ Arrêter</button>
+              <button class="agent-stop-btn" onclick="stopAgent()"><svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><rect x="4" y="4" width="16" height="16" rx="2"/></svg> Arrêter</button>
             </div>
             <div class="iphone-slides" id="iphoneSlides"></div>
             <button id="soundBtn" style="
@@ -1704,8 +1828,8 @@ function renderModules() {
   tabs.innerHTML = ''; container.innerHTML = '';
 
   const phases = [
-    { key:'avant', label:'🛠️ Construire une vente solide', desc:'Objectif : aider le vendeur à construire des bases solides avant de recevoir ses premiers acquéreurs.' },
-    { key:'apres', label:'🏁 Finaliser sa vente sereinement', desc:'Objectif : accompagner le vendeur depuis la préparation des visites jusqu\'à la signature finale.' },
+    { key:'avant', label:'Construire une vente solide', icon:'<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>', desc:'Aider le vendeur à construire des bases solides avant de recevoir ses premiers acquéreurs.' },
+    { key:'apres', label:'Finaliser sa vente sereinement', icon:'<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg>', desc:'Accompagner le vendeur depuis la préparation des visites jusqu\'à la signature finale.' },
   ];
 
   phases.forEach(phase => {
@@ -1720,7 +1844,7 @@ function renderModules() {
 
     const label = document.createElement('div');
     label.className = 'mod-phase-label';
-    label.textContent = phase.label;
+    label.innerHTML = (phase.icon || '') + phase.label;
     hdr.appendChild(label);
 
     const desc = document.createElement('div');
@@ -1736,7 +1860,7 @@ function renderModules() {
     phaseMods.forEach(({ mod, mi }) => {
       const btn = document.createElement('button');
       btn.className = 'mod-tab' + (mi === activeModule ? ' active' : '');
-      btn.textContent = mod.num + ' · ' + mod.title;
+      btn.innerHTML = `<span class="mod-tab-num">${mod.num}</span><span class="mod-tab-label">${mod.title}</span>`;
       btn.type = 'button';
       btn.addEventListener('click', () => { stopAgent(); activeModule = mi; if (mod.mailCat) activeMailCat = mod.mailCat; renderModules(); updateKeyPoints(); updateModuleVideo(); showModuleSlides(mi); triggerAiModuleMsg(mi); renderMails(); renderChecklists(); });
       row.appendChild(btn);
@@ -1760,8 +1884,8 @@ function renderModules() {
         <div class="step-hdr" data-mi="${mi}" data-si="${si}">
           <div class="step-chk" data-chk="1" data-mi="${mi}" data-si="${si}">✓</div>
           <div class="step-tw"><div class="step-t">${step.title}</div><div class="step-m">${step.meta}</div>${step.tag ? `<div class="step-tag">→ ${step.tag}</div>` : ''}</div>
-          ${step.speakText ? `<button class="tts-btn" onclick="event.stopPropagation();playStepAudio(${mi},${si},this)">▶ Écouter</button>` : ''}
-          <div class="step-arr">›</div>
+          ${step.speakText ? `<button class="tts-btn" onclick="event.stopPropagation();playStepAudio(${mi},${si},this)"><svg width="9" height="9" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg> Écouter</button>` : ''}
+          <div class="step-arr"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></div>
         </div>
         <div class="step-body">
           <div class="sst"><div class="sst-title">Explication</div><div class="sst-text">${step.explication}</div></div>`;
