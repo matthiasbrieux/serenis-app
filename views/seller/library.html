@@ -613,6 +613,24 @@
     .agent-progress-bar { background:rgba(255,255,255,0.1); border-radius:4px; height:3px; margin-top:22px; overflow:hidden; }
     .agent-progress-fill { height:100%; width:0%; background:#C4785A; border-radius:4px; transition:width .6s ease; }
 
+    /* ── Annonce Info Checklist ── */
+    .ai-total-bar { display:flex; align-items:center; justify-content:space-between; margin-bottom:12px; padding:10px 14px; background:#EDF5F0; border-radius:10px; border:1.5px solid #C5D9CB; }
+    .ai-total-label { font-size:0.8rem; font-weight:700; color:#1C3028; }
+    .ai-total-count { font-size:0.82rem; font-weight:700; color:#3D5A47; }
+    .ai-section { margin-bottom:10px; border-radius:10px; background:#F4F1EC; overflow:hidden; border:1px solid rgba(0,0,0,0.05); }
+    .ai-section-hdr { display:flex; align-items:center; justify-content:space-between; padding:10px 14px 8px; }
+    .ai-section-hdr-title { font-size:0.85rem; font-weight:700; color:#3D5A47; }
+    .ai-section-counter { font-size:0.7rem; font-weight:600; color:#888; background:rgba(0,0,0,0.08); padding:2px 8px; border-radius:100px; transition:all 0.2s; }
+    .ai-section-counter.done { background:#3D5A47; color:#fff; }
+    .ai-grid { display:grid; grid-template-columns:1fr 1fr; padding:4px 8px 10px; gap:2px; }
+    .ai-item { display:flex; align-items:center; gap:8px; padding:7px 8px; border-radius:8px; cursor:pointer; transition:background 0.12s; font-size:0.8rem; color:#555; user-select:none; }
+    .ai-item:hover { background:rgba(0,0,0,0.05); }
+    .ai-item.ai-checked { color:#1C3028; font-weight:600; }
+    .ai-checkbox { width:18px; height:18px; border-radius:5px; border:1.5px solid #C8DDD0; flex-shrink:0; display:flex; align-items:center; justify-content:center; transition:all 0.15s; background:#fff; }
+    .ai-checkbox svg { display:none; }
+    .ai-item.ai-checked .ai-checkbox { background:#3D5A47; border-color:#3D5A47; }
+    .ai-item.ai-checked .ai-checkbox svg { display:block; }
+
     /* ── iPhone Slides ── */
     .iphone-slides { position:absolute; inset:0; z-index:15; display:none; overflow:hidden; border-radius:38px; }
     .iphone-slides.visible { display:block; }
@@ -1040,7 +1058,7 @@ const MODULES = [
           { title:'Pourquoi l\'annonce est-elle si importante ?',
             body:`<p style="margin:0 0 10px;font-size:0.88rem;">Aujourd'hui, la recherche immobilière se fait principalement en ligne. Les acheteurs comparent plusieurs biens en quelques minutes, filtrent rapidement les annonces et décident en quelques secondes de cliquer ou non.</p><div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;"><div class="nc-tip" style="margin:0;">✅ Attirer des acheteurs qualifiés</div><div class="nc-tip" style="margin:0;">✅ Valoriser votre bien dès le départ</div><div class="nc-tip" style="margin:0;">✅ Réduire le délai de vente</div><div class="nc-tip" style="margin:0;">✅ Éviter les visites non pertinentes</div></div><p style="margin:0;font-size:0.85rem;color:#555;">L'annonce doit donc être claire, structurée et immédiatement compréhensible.</p>` },
           { title:'Les informations essentielles à inclure',
-            body:`<div style="display:flex;flex-direction:column;gap:10px;"><div style="background:#F4F1EC;border-radius:10px;padding:13px 15px;"><div style="font-weight:700;font-size:0.88rem;color:#3D5A47;margin-bottom:7px;">🏡 Caractéristiques du bien</div><div style="display:grid;grid-template-columns:1fr 1fr;gap:4px;font-size:0.84rem;line-height:1.9;color:#444;"><div>• Type de bien</div><div>• Surface habitable (m²)</div><div>• Nombre de pièces</div><div>• Nombre de chambres</div><div>• Étage (si appartement)</div><div>• Année de construction</div></div></div><div style="background:#F4F1EC;border-radius:10px;padding:13px 15px;"><div style="font-weight:700;font-size:0.88rem;color:#3D5A47;margin-bottom:7px;">📍 Localisation</div><div style="display:grid;grid-template-columns:1fr 1fr;gap:4px;font-size:0.84rem;line-height:1.9;color:#444;"><div>• Quartier / secteur</div><div>• Environnement</div><div>• Proximité transports</div><div>• Commerces, écoles</div></div></div><div style="background:#F4F1EC;border-radius:10px;padding:13px 15px;"><div style="font-weight:700;font-size:0.88rem;color:#3D5A47;margin-bottom:7px;">🔑 Atouts du bien</div><div style="display:grid;grid-template-columns:1fr 1fr;gap:4px;font-size:0.84rem;line-height:1.9;color:#444;"><div>• Balcon / terrasse / jardin</div><div>• Cave, parking, garage</div><div>• Exposition et luminosité</div><div>• État général</div><div>• Type de chauffage</div><div>• DPE (classe énergie)</div></div></div><div style="background:#F4F1EC;border-radius:10px;padding:13px 15px;"><div style="font-weight:700;font-size:0.88rem;color:#3D5A47;margin-bottom:7px;">💰 Informations financières</div><div style="display:grid;grid-template-columns:1fr 1fr;gap:4px;font-size:0.84rem;line-height:1.9;color:#444;"><div>• Prix de vente</div><div>• Taxe foncière</div><div>• Charges de copropriété</div><div>• Travaux récents</div></div></div></div>` },
+            body:`<div id="annonceInfoCheck"><div class="ai-total-bar"><span class="ai-total-label">✅ Éléments inclus dans mon annonce</span><span id="aiTotalCounter" class="ai-total-count">0 / 20</span></div><div class="ai-section"><div class="ai-section-hdr"><span class="ai-section-hdr-title">🏡 Caractéristiques du bien</span><span class="ai-section-counter">0/6</span></div><div class="ai-grid"><div class="ai-item" data-key="aic_type_bien" onclick="toggleAnnonceInfo(this)"><div class="ai-checkbox"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><span>Type de bien</span></div><div class="ai-item" data-key="aic_surface" onclick="toggleAnnonceInfo(this)"><div class="ai-checkbox"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><span>Surface habitable (m²)</span></div><div class="ai-item" data-key="aic_pieces" onclick="toggleAnnonceInfo(this)"><div class="ai-checkbox"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><span>Nombre de pièces</span></div><div class="ai-item" data-key="aic_chambres" onclick="toggleAnnonceInfo(this)"><div class="ai-checkbox"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><span>Nombre de chambres</span></div><div class="ai-item" data-key="aic_etage" onclick="toggleAnnonceInfo(this)"><div class="ai-checkbox"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><span>Étage (si appart.)</span></div><div class="ai-item" data-key="aic_annee" onclick="toggleAnnonceInfo(this)"><div class="ai-checkbox"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><span>Année de construction</span></div></div></div><div class="ai-section"><div class="ai-section-hdr"><span class="ai-section-hdr-title">📍 Localisation</span><span class="ai-section-counter">0/4</span></div><div class="ai-grid"><div class="ai-item" data-key="aic_quartier" onclick="toggleAnnonceInfo(this)"><div class="ai-checkbox"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><span>Quartier / secteur</span></div><div class="ai-item" data-key="aic_env" onclick="toggleAnnonceInfo(this)"><div class="ai-checkbox"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><span>Environnement</span></div><div class="ai-item" data-key="aic_transports" onclick="toggleAnnonceInfo(this)"><div class="ai-checkbox"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><span>Proximité transports</span></div><div class="ai-item" data-key="aic_commerces" onclick="toggleAnnonceInfo(this)"><div class="ai-checkbox"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><span>Commerces, écoles</span></div></div></div><div class="ai-section"><div class="ai-section-hdr"><span class="ai-section-hdr-title">🔑 Atouts du bien</span><span class="ai-section-counter">0/6</span></div><div class="ai-grid"><div class="ai-item" data-key="aic_balcon" onclick="toggleAnnonceInfo(this)"><div class="ai-checkbox"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><span>Balcon / terrasse / jardin</span></div><div class="ai-item" data-key="aic_cave" onclick="toggleAnnonceInfo(this)"><div class="ai-checkbox"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><span>Cave, parking, garage</span></div><div class="ai-item" data-key="aic_expo" onclick="toggleAnnonceInfo(this)"><div class="ai-checkbox"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><span>Exposition &amp; luminosité</span></div><div class="ai-item" data-key="aic_etat" onclick="toggleAnnonceInfo(this)"><div class="ai-checkbox"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><span>État général</span></div><div class="ai-item" data-key="aic_chauffage" onclick="toggleAnnonceInfo(this)"><div class="ai-checkbox"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><span>Type de chauffage</span></div><div class="ai-item" data-key="aic_dpe" onclick="toggleAnnonceInfo(this)"><div class="ai-checkbox"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><span>DPE (classe énergie)</span></div></div></div><div class="ai-section"><div class="ai-section-hdr"><span class="ai-section-hdr-title">💰 Informations financières</span><span class="ai-section-counter">0/4</span></div><div class="ai-grid"><div class="ai-item" data-key="aic_prix" onclick="toggleAnnonceInfo(this)"><div class="ai-checkbox"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><span>Prix de vente</span></div><div class="ai-item" data-key="aic_taxe" onclick="toggleAnnonceInfo(this)"><div class="ai-checkbox"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><span>Taxe foncière</span></div><div class="ai-item" data-key="aic_charges" onclick="toggleAnnonceInfo(this)"><div class="ai-checkbox"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><span>Charges de copropriété</span></div><div class="ai-item" data-key="aic_travaux" onclick="toggleAnnonceInfo(this)"><div class="ai-checkbox"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><span>Travaux récents</span></div></div></div></div>` },
           { title:'Comment structurer le texte ?',
             body:`<div style="display:flex;flex-direction:column;gap:0;"><div class="nc-tl"><div class="nc-tl-row"><span class="nc-tl-label">1</span><span><strong>Phrase d'accroche</strong> — type + surface + lieu + 1 atout clé (moins de 60 caractères)</span></div><div class="nc-tl-row"><span class="nc-tl-label">2</span><span><strong>Présentation générale</strong> — description rapide du bien et de son environnement</span></div><div class="nc-tl-row"><span class="nc-tl-label">3</span><span><strong>Description des espaces</strong> — pièces, surfaces, configuration, atouts intérieurs</span></div><div class="nc-tl-row"><span class="nc-tl-label">4</span><span><strong>Localisation & environnement</strong> — quartier, distances, commodités</span></div><div class="nc-tl-row nc-final"><span class="nc-tl-label">5</span><span><strong>Conclusion</strong> — invitation à contacter + informations pratiques</span></div></div></div><div class="nc-tip" style="margin-top:12px;">💡 Mentionnez toujours le DPE — les acheteurs le cherchent systématiquement. Aidez-vous de votre fiche bien Vendu Par Moi pour ne rien oublier.</div>` },
           { title:'Les phrases à ne jamais écrire',
@@ -1779,6 +1797,7 @@ function renderModules() {
     });
     html += `</div>`;
     div.innerHTML = html;
+    initAnnonceInfo();
     container.appendChild(div);
   });
 
@@ -2165,6 +2184,33 @@ function stopAgentIntro() {
   if (fill) fill.style.width = '0%';
   if (el) el.textContent = '« Votre dossier vendeur, c’est votre meilleur commercial. Laissez-moi vous expliquer comment le construire. »';
   _agentSubIdx = -1;
+}
+
+// ── Annonce Info Checklist ──
+function toggleAnnonceInfo(el) {
+  el.classList.toggle('ai-checked');
+  localStorage.setItem(el.dataset.key, el.classList.contains('ai-checked') ? '1' : '0');
+  updateAnnonceInfoCounters();
+}
+function updateAnnonceInfoCounters() {
+  const wrap = document.getElementById('annonceInfoCheck');
+  if (!wrap) return;
+  let total = 0, done = 0;
+  wrap.querySelectorAll('.ai-section').forEach(sec => {
+    const items = sec.querySelectorAll('.ai-item');
+    const checked = sec.querySelectorAll('.ai-item.ai-checked');
+    const counter = sec.querySelector('.ai-section-counter');
+    if (counter) { counter.textContent = `${checked.length}/${items.length}`; counter.classList.toggle('done', checked.length === items.length && items.length > 0); }
+    total += items.length; done += checked.length;
+  });
+  const el = document.getElementById('aiTotalCounter');
+  if (el) el.textContent = `${done} / ${total}`;
+}
+function initAnnonceInfo() {
+  document.querySelectorAll('.ai-item[data-key]').forEach(el => {
+    if (localStorage.getItem(el.dataset.key) === '1') el.classList.add('ai-checked');
+  });
+  updateAnnonceInfoCounters();
 }
 
 // ── iPhone Slides ──
