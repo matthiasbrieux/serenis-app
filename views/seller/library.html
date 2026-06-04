@@ -2062,12 +2062,48 @@ function dismissIphoneSlides() {
   if (container) { container.classList.remove('visible'); container.innerHTML = ''; }
 }
 
+function showWelcomeSlide() {
+  const container = document.getElementById('iphoneSlides');
+  if (!container) return;
+  const benefits = [
+    '6 modules · 17 leçons pratiques',
+    'Scripts de visite & négociation',
+    'Coach IA Alex disponible 24h/24',
+    'Dossier vendeur généré automatiquement',
+  ];
+  container.innerHTML = `
+    <div class="iphone-slide active" style="justify-content:space-between;padding-top:0;">
+      <div class="iphone-slide-deco"></div>
+      <div style="position:relative;z-index:1;">
+        <div class="iphone-slide-island-space"></div>
+        <div style="display:inline-flex;align-items:center;gap:5px;background:rgba(196,120,90,0.18);border:1px solid rgba(196,120,90,0.4);border-radius:100px;padding:3px 10px;margin-bottom:10px;">
+          <svg width="9" height="9" viewBox="0 0 24 24" fill="rgba(196,120,90,0.9)"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          <span style="font-size:0.5rem;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:rgba(196,120,90,0.9);">Vendu Par Moi Academy</span>
+        </div>
+        <div class="iphone-slide-title" style="font-size:1.55rem;">Vendez seul.<br>Vendez bien.</div>
+        <div class="iphone-slide-sub" style="margin-bottom:14px;">La formation complète pour vendre<br>entre particuliers, au bon prix.</div>
+      </div>
+      <div style="position:relative;z-index:1;flex:1;display:flex;flex-direction:column;justify-content:center;gap:7px;margin-bottom:12px;">
+        ${benefits.map(b => `<div class="iphone-slide-kp"><div class="iphone-slide-kp-dot"></div><span>${b}</span></div>`).join('')}
+      </div>
+      <div style="position:relative;z-index:1;">
+        <div style="height:1px;background:rgba(255,255,255,0.1);margin-bottom:10px;"></div>
+        <div style="font-size:0.55rem;color:rgba(255,255,255,0.45);text-align:center;margin-bottom:8px;letter-spacing:0.06em;text-transform:uppercase;">Sélectionnez un module pour commencer</div>
+        <div style="display:flex;justify-content:center;gap:5px;padding-bottom:4px;">
+          ${MODULES.map((m,i)=>`<div style="width:${i===0?'14px':'6px'};height:4px;border-radius:2px;background:${i===0?'#C4785A':'rgba(255,255,255,0.2)'};transition:all 0.25s;"></div>`).join('')}
+        </div>
+      </div>
+    </div>`;
+  container.classList.add('visible');
+}
+
 // ── Init ──
 renderModules();
 renderMails();
 renderChecklists();
 updateKeyPoints();
 updateModuleVideo();
+showWelcomeSlide();
 setTimeout(() => triggerAiModuleMsg(0), 2000);
 // Fiche panel listeners (after modal HTML is in DOM)
 setTimeout(function() {
