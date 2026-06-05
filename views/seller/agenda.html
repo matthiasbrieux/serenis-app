@@ -63,8 +63,12 @@
     .contact-source.manuel { background:#f3e5f5; color:#7b1fa2; }
 
     /* ── Dispo section ────────────────────────────────── */
-    .dispo-card { background:#fff; border:1px solid #e8e0d6; border-radius:14px; padding:24px; }
-    .dispo-card h3 { margin:0 0 4px; font-size:0.95rem; font-weight:700; color:#1A1A16; }
+    .dispo-card { background:#fff; border:1.5px solid #c8ddd0; border-radius:16px; overflow:hidden; box-shadow:0 2px 14px rgba(61,90,71,0.09); }
+    .dispo-card-hdr { background:linear-gradient(135deg,#3D5A47 0%,#4d7260 100%); padding:18px 22px; display:flex; align-items:center; justify-content:space-between; gap:12px; }
+    .dispo-card-hdr-left h3 { margin:0 0 3px; font-size:0.97rem; font-weight:700; color:#fff; }
+    .dispo-card-hdr-left p { margin:0; font-size:0.78rem; color:rgba(255,255,255,0.68); }
+    .dispo-count-badge { background:rgba(255,255,255,0.18); color:#fff; padding:5px 14px; border-radius:20px; font-size:0.8rem; font-weight:700; white-space:nowrap; border:1px solid rgba(255,255,255,0.22); }
+    .dispo-card-body { padding:20px 22px; }
 
     /* ── Below sections ──────────────────────────────── */
     .dash-below-section { margin-bottom:28px; }
@@ -155,22 +159,31 @@
     .day-slot-sub { font-size:0.75rem; color:#888; }
 
     /* ── Availability ─────────────────────────────────── */
-    .avail-month-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:20px; }
-    .avail-month-label { font-family:'Cormorant Garamond',serif; font-size:1.3rem; font-weight:600; color:#1A1A16; }
-    .avail-slot-list { display:flex; flex-direction:column; gap:10px; margin-bottom:20px; }
-    .avail-slot-item { display:flex; align-items:center; gap:14px; padding:14px 16px; background:#fff; border:1px solid #e8e0d6; border-radius:10px; overflow:hidden; }
-    .avail-slot-date { font-weight:600; font-size:0.9rem; color:#1A1A16; flex:1; }
-    .avail-slot-time { font-size:0.84rem; color:#666; background:#f5f0e8; padding:4px 10px; border-radius:6px; }
-    .avail-slot-del { width:30px; height:30px; border-radius:6px; border:1.5px solid #ffd5d5; background:#fff0f0; color:#e74c3c; display:flex; align-items:center; justify-content:center; cursor:pointer; flex-shrink:0; transition:0.15s; }
+    .avail-month-nav { display:flex; align-items:center; justify-content:center; gap:10px; margin-bottom:16px; padding-bottom:14px; border-bottom:1px solid #eaf5ec; }
+    .avail-month-label { font-family:'Cormorant Garamond',serif; font-size:1.25rem; font-weight:600; color:#1A1A16; min-width:150px; text-align:center; }
+    .avail-slot-list { display:flex; flex-direction:column; gap:10px; margin-bottom:18px; }
+    .avail-slot-item { display:flex; align-items:center; gap:14px; padding:14px 16px; background:linear-gradient(135deg,#f0f8f2,#f7fdf8); border:1.5px solid #c8ddd0; border-left:4px solid #3D5A47; border-radius:12px; transition:box-shadow 0.2s,transform 0.2s; }
+    .avail-slot-item:hover { box-shadow:0 4px 16px rgba(61,90,71,0.13); transform:translateY(-1px); }
+    .avail-slot-cal { width:50px; flex-shrink:0; border-radius:9px; overflow:hidden; border:1.5px solid #c8ddd0; box-shadow:0 2px 6px rgba(61,90,71,0.1); }
+    .avail-slot-cal-month { background:#3D5A47; color:#fff; text-align:center; font-size:0.6rem; font-weight:700; text-transform:uppercase; letter-spacing:0.07em; padding:4px 0; }
+    .avail-slot-cal-day { background:#fff; text-align:center; font-family:'Cormorant Garamond',serif; font-size:1.6rem; font-weight:600; color:#1A1A16; line-height:1; padding:6px 0; }
+    .avail-slot-info { flex:1; min-width:0; }
+    .avail-slot-dow { font-size:0.7rem; font-weight:700; color:#3D5A47; text-transform:uppercase; letter-spacing:0.07em; margin-bottom:2px; }
+    .avail-slot-fulldate { font-size:0.88rem; font-weight:600; color:#1A1A16; }
+    .avail-slot-time-badge { display:flex; align-items:center; gap:5px; background:#3D5A47; color:#fff; padding:6px 13px; border-radius:20px; font-size:0.8rem; font-weight:600; white-space:nowrap; flex-shrink:0; }
+    .avail-slot-del { width:28px; height:28px; border-radius:7px; border:1.5px solid #ffd5d5; background:#fff0f0; color:#e74c3c; display:flex; align-items:center; justify-content:center; cursor:pointer; flex-shrink:0; transition:0.15s; }
     .avail-slot-del:hover { background:#e74c3c; color:#fff; border-color:#e74c3c; }
-    .avail-slot-del svg { width:14px; height:14px; stroke:currentColor; pointer-events:none; }
-    @keyframes slotOut { from { opacity:1; transform:translateX(0); max-height:60px; } to { opacity:0; transform:translateX(12px); max-height:0; padding:0; margin:0; } }
+    .avail-slot-del svg { width:12px; height:12px; stroke:currentColor; pointer-events:none; }
+    @keyframes slotOut { from { opacity:1; transform:translateX(0); max-height:80px; } to { opacity:0; transform:translateX(16px); max-height:0; padding:0; margin:0; border:none; } }
     .avail-slot-item.removing { animation:slotOut 0.22s ease forwards; }
-    .avail-add-form { background:#fff; border:1.5px dashed #D4E4D8; border-radius:12px; padding:18px; margin-top:16px; }
-    .avail-add-form h4 { font-size:0.88rem; font-weight:600; color:#1A1A16; margin-bottom:14px; }
-    .avail-form-row { display:flex; gap:10px; align-items:center; flex-wrap:wrap; margin-bottom:10px; }
-    .avail-input { border:1.5px solid #e8e0d6; border-radius:8px; padding:8px 10px; font-size:0.87rem; font-family:'DM Sans',sans-serif; background:#fff; color:#1A1A16; }
-    .avail-input:focus { outline:none; border-color:#3D5A47; }
+    .avail-slot-empty { text-align:center; padding:30px 20px; color:#aaa; border:2px dashed #d8eddf; border-radius:12px; background:#f8fdf9; }
+    .avail-slot-empty svg { margin-bottom:10px; opacity:0.4; }
+    .avail-slot-empty p { font-size:0.84rem; margin:0; line-height:1.6; }
+    .avail-add-form { background:#f8fdf9; border:1.5px dashed #c8ddd0; border-radius:12px; padding:18px; margin-top:4px; }
+    .avail-add-form h4 { font-size:0.88rem; font-weight:700; color:#3D5A47; margin:0 0 14px; display:flex; align-items:center; gap:6px; }
+    .avail-form-row { display:flex; gap:10px; align-items:center; flex-wrap:wrap; margin-bottom:12px; }
+    .avail-input { border:1.5px solid #c8ddd0; border-radius:8px; padding:9px 11px; font-size:0.87rem; font-family:'DM Sans',sans-serif; background:#fff; color:#1A1A16; }
+    .avail-input:focus { outline:none; border-color:#3D5A47; box-shadow:0 0 0 3px rgba(61,90,71,0.1); }
     .avail-input[type=date] { flex:1; min-width:140px; }
     .avail-input[type=time] { width:110px; }
 
@@ -443,34 +456,46 @@
 
         <!-- Disponibilités -->
         <div class="dispo-card">
-          <div class="avail-month-header">
-            <div>
+          <div class="dispo-card-hdr">
+            <div class="dispo-card-hdr-left">
               <h3>Mes disponibilités</h3>
-              <p style="color:#888;font-size:0.81rem;margin:2px 0 0;">Créneaux proposés aux acquéreurs</p>
+              <p>Créneaux proposés aux acquéreurs</p>
             </div>
-            <div style="display:flex;gap:6px;align-items:center;">
+            <span class="dispo-count-badge" id="dispoCountBadge">0 créneau</span>
+          </div>
+          <div class="dispo-card-body">
+            <div class="avail-month-nav">
               <button class="cal-nav" id="availPrev">&#8249;</button>
-              <span class="avail-month-label" id="availMonthLabel" style="padding:0 8px;display:flex;align-items:center;font-size:0.95rem;"></span>
+              <span class="avail-month-label" id="availMonthLabel"></span>
               <button class="cal-nav" id="availNext">&#8250;</button>
             </div>
-          </div>
-          <div class="avail-slot-list" id="availSlotList">
-            <div style="text-align:center;padding:24px;color:#bbb;font-size:0.85rem;border:1.5px dashed #e8e0d6;border-radius:10px;">Aucun créneau pour ce mois</div>
-          </div>
-          <div class="avail-add-form">
-            <h4><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#3D5A47" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:5px;"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Ajouter un créneau</h4>
-            <div class="avail-form-row">
-              <input type="date" class="avail-input" id="availDate">
-              <span style="color:#aaa;font-size:0.85rem;">de</span>
-              <input type="time" class="avail-input" id="availStart" value="09:00">
-              <span style="color:#aaa;font-size:0.85rem;">à</span>
-              <input type="time" class="avail-input" id="availEnd" value="18:00">
+            <div class="avail-slot-list" id="availSlotList">
+              <div class="avail-slot-empty">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#3D5A47" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><line x1="12" y1="14" x2="12" y2="18"/><line x1="10" y1="16" x2="14" y2="16"/></svg>
+                <p>Aucun créneau ce mois-ci.<br>Ajoutez-en un ci-dessous.</p>
+              </div>
             </div>
-            <button id="addAvailSlot" class="btn-primary" style="font-size:0.85rem;padding:9px 20px;">Ajouter ce créneau</button>
-          </div>
-          <div style="margin-top:16px;display:flex;align-items:center;gap:12px;">
-            <button id="saveAgenda" class="btn-primary" style="flex:1;">Enregistrer mes disponibilités</button>
-            <span id="agendaSuccess" class="form-success hidden">Sauvegardé &#10003;</span>
+            <div class="avail-add-form">
+              <h4>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                Ajouter un créneau
+              </h4>
+              <div class="avail-form-row">
+                <input type="date" class="avail-input" id="availDate">
+                <span style="color:#3D5A47;font-size:0.82rem;font-weight:600;">de</span>
+                <input type="time" class="avail-input" id="availStart" value="09:00">
+                <span style="color:#3D5A47;font-size:0.82rem;font-weight:600;">à</span>
+                <input type="time" class="avail-input" id="availEnd" value="18:00">
+              </div>
+              <button id="addAvailSlot" class="btn-primary" style="font-size:0.85rem;padding:9px 20px;">+ Ajouter ce créneau</button>
+            </div>
+            <div style="margin-top:18px;display:flex;align-items:center;gap:12px;">
+              <button id="saveAgenda" class="btn-primary" style="flex:1;padding:13px;font-size:0.91rem;font-weight:700;border-radius:12px;background:linear-gradient(135deg,#3D5A47,#4d7260);box-shadow:0 4px 14px rgba(61,90,71,0.22);">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:6px;"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+                Enregistrer mes disponibilités
+              </button>
+              <span id="agendaSuccess" class="form-success hidden">Sauvegardé &#10003;</span>
+            </div>
           </div>
         </div>
 
@@ -918,20 +943,47 @@ let availSlots=[];
 let availMonth=new Date(); availMonth.setDate(1);
 function availMonthKey(d) { return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0'); }
 
+const DAYS_FR_LONG=['Dimanche','Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi'];
+const MONTHS_SHORT_FR=['jan','fév','mar','avr','mai','juin','juil','août','sep','oct','nov','déc'];
+
 function renderAvailMonth() {
   document.getElementById('availMonthLabel').textContent=MONTHS_FR[availMonth.getMonth()]+' '+availMonth.getFullYear();
   const key=availMonthKey(availMonth);
   const monthSlots=availSlots.filter(s=>s.date.startsWith(key)).sort((a,b)=>a.date.localeCompare(b.date)||a.start.localeCompare(b.start));
   const list=document.getElementById('availSlotList');
-  if (!monthSlots.length) { list.innerHTML=`<div style="text-align:center;padding:28px;color:#bbb;font-size:0.85rem;border:1.5px dashed #e8e0d6;border-radius:10px;">Aucun créneau pour ce mois</div>`; return; }
+
+  // Update count badge
+  const badge=document.getElementById('dispoCountBadge');
+  if(badge){ const n=availSlots.length; badge.textContent=n+' créneau'+(n>1?'x':''); }
+
   const svgX=`<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>`;
+  const svgClock=`<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>`;
+
+  if(!monthSlots.length){
+    list.innerHTML=`<div class="avail-slot-empty">
+      <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#3D5A47" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><line x1="12" y1="14" x2="12" y2="18"/><line x1="10" y1="16" x2="14" y2="16"/></svg>
+      <p>Aucun créneau pour ${MONTHS_FR[availMonth.getMonth()]}.<br>Ajoutez-en un ci-dessous.</p>
+    </div>`;
+    return;
+  }
+
   list.innerHTML=monthSlots.map(s=>{
     const d=new Date(s.date+'T00:00:00');
-    const label=d.toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long'});
+    const dow=DAYS_FR_LONG[d.getDay()];
+    const dayNum=d.getDate();
+    const monthShort=MONTHS_SHORT_FR[d.getMonth()];
+    const fullDate=d.toLocaleDateString('fr-FR',{day:'numeric',month:'long',year:'numeric'});
     const globalIdx=availSlots.indexOf(s);
     return `<div class="avail-slot-item" data-slot-idx="${globalIdx}">
-      <div class="avail-slot-date">${label}</div>
-      <div class="avail-slot-time">${s.start} – ${s.end}</div>
+      <div class="avail-slot-cal">
+        <div class="avail-slot-cal-month">${monthShort}</div>
+        <div class="avail-slot-cal-day">${dayNum}</div>
+      </div>
+      <div class="avail-slot-info">
+        <div class="avail-slot-dow">${dow}</div>
+        <div class="avail-slot-fulldate">${fullDate}</div>
+      </div>
+      <div class="avail-slot-time-badge">${svgClock} ${s.start} – ${s.end}</div>
       <button class="avail-slot-del" data-del-idx="${globalIdx}" title="Supprimer">${svgX}</button>
     </div>`;
   }).join('');
