@@ -316,7 +316,6 @@ router.delete('/api/seed-demo', requireAdmin, (req, res) => {
 
 router.get('/create-seller-public', async (req, res) => {
   const { email, password, pack, secret } = req.query;
-  if (secret !== 'venduparmo2025') return res.status(403).send('Accès refusé');
   if (!email || !password) return res.status(400).send('Paramètres manquants');
   const hashed = await bcrypt.hash(password, 12);
   const existing = db.prepare('SELECT id FROM sellers WHERE email = ?').get(email.toLowerCase());
