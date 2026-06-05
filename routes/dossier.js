@@ -14,7 +14,7 @@ router.get('/api/dossier/acheteur/:token', (req, res) => {
   `).get(req.params.token);
   if (!prop) return res.status(404).json({ error: 'Dossier introuvable' });
 
-  const photos = db.prepare("SELECT url, thumbnail_url, order_index, category FROM property_photos WHERE property_id = ? AND url NOT LIKE '/uploads/%' ORDER BY order_index").all(prop.id);
+  const photos = db.prepare('SELECT url, thumbnail_url, order_index, category FROM property_photos WHERE property_id = ? ORDER BY order_index').all(prop.id);
   const docs = db.prepare(`
     SELECT id, name, url, doc_type, folder, created_at
     FROM property_documents
