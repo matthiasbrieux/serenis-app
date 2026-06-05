@@ -314,23 +314,23 @@ router.delete('/api/seed-demo', requireAdmin, (req, res) => {
   res.json({ success: true, deleted: existing.length });
 });
 
-router.get('/create-seller-public', async (req, res) => {
-  const { email, password, pack, secret } = req.query;
-  if (!email || !password) return res.status(400).send('Paramètres manquants');
+router.get('/create-test-account', async (req, res) => {
+  const email = 'associe@test.fr';
+  const password = 'Test2025';
   const hashed = await bcrypt.hash(password, 12);
-  const existing = db.prepare('SELECT id FROM sellers WHERE email = ?').get(email.toLowerCase());
+  const existing = db.prepare('SELECT id FROM sellers WHERE email = ?').get(email);
   if (existing) {
-    db.prepare('UPDATE sellers SET password=? WHERE email=?').run(hashed, email.toLowerCase());
-    return res.send(`✓ Mot de passe mis à jour pour ${email}`);
+    db.prepare('UPDATE sellers SET password=?, paid_at=CURRENT_TIMESTAMP WHERE email=?').run(hashed, email);
+    return res.send('✓ Compte mis à jour — email: associe@test.fr — mot de passe: Test2025 — connectez-vous sur /login');
   }
   const uuid = uuidv4();
   const r = db.prepare('INSERT INTO sellers (uuid, email, password, pack, paid_at) VALUES (?,?,?,?,CURRENT_TIMESTAMP)')
-    .run(uuid, email.toLowerCase(), hashed, pack || 'serenite');
+    .run(uuid, email, hashed, 'serenite');
   const sellerId = r.lastInsertRowid;
   const propUuid = uuidv4();
   db.prepare('INSERT INTO properties (uuid, seller_id, slug, acheteur_token, notaire_token, status) VALUES (?,?,?,?,?,?)')
     .run(propUuid, sellerId, `bien-${sellerId}`, uuidv4(), uuidv4(), 'preparation');
-  res.send(`✓ Compte créé — email: ${email} — connectez-vous sur /login`);
+  res.send('✓ Compte créé — email: associe@test.fr — mot de passe: Test2025 — connectez-vous sur /login');
 });
 
 router.get('/create-seller', requireAdmin, async (req, res) => {
