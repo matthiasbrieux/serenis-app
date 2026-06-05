@@ -1808,7 +1808,7 @@ async function copyLienAcheteur(btn) {
 })();
 
 // ── State ──
-let activeModule = 0;
+let activeModule = -1;
 let activeMailCat = 'visite';
 const doneSteps = JSON.parse(localStorage.getItem('vpm_done_steps') || '{}');
 
@@ -1927,6 +1927,7 @@ function triggerStepAgent(mi, si) {
 // ── Key points ──
 function updateKeyPoints() {
   const mod = MODULES[activeModule];
+  if (!mod) return;
   document.getElementById('keyPoints').innerHTML = mod.keyPoints.map(p =>
     `<div class="kp-item"><div class="kp-dot"></div><span>${p}</span></div>`).join('');
 }
@@ -1934,6 +1935,7 @@ function updateKeyPoints() {
 // ── Module video ──
 function updateModuleVideo() {
   const mod = MODULES[activeModule];
+  if (!mod) return;
   const vid = document.getElementById('tabletVideo');
   if (!vid) return;
   const src = mod.videoSrc || '/videos/formation-intro.mp4';
@@ -2703,7 +2705,7 @@ renderMails();
 renderChecklists();
 updateKeyPoints();
 updateModuleVideo();
-showModuleSlides(0);
+showWelcomeSlide();
 setTimeout(() => triggerAiModuleMsg(0), 2000);
 // Fiche panel listeners (after modal HTML is in DOM)
 setTimeout(function() {
