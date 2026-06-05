@@ -1870,7 +1870,7 @@
       <style>
         /* ── Photos tab redesign ── */
         .photo-folder { background:#fff; border:1px solid #e8e0d6; border-radius:14px; overflow:hidden; box-shadow:0 1px 4px rgba(0,0,0,0.04); }
-        .photo-folder-head { display:flex; align-items:center; gap:16px; padding:20px 24px; background:#faf8f5; border-bottom:1px solid #ede8e1; }
+        .photo-folder-head { display:flex; align-items:center; gap:16px; padding:20px 24px; background:#faf8f5; border-bottom:1px solid #ede8e1; cursor:pointer; touch-action:manipulation; }
         .photo-folder-num { font-family:'Cormorant Garamond',serif; font-size:1.1rem; font-weight:600; color:#ccc; min-width:28px; }
         .photo-folder-icon { width:40px; height:40px; border-radius:10px; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
         .photo-folder-meta { flex:1; min-width:0; }
@@ -1893,10 +1893,13 @@
           .photo-folder-meta > div:first-child { flex-wrap:wrap; gap:6px; }
           .photo-folder-body { padding:14px 16px; }
         }
-        .photo-upload-zone { display:flex; align-items:center; gap:12px; padding:12px 16px; border-radius:9px; cursor:pointer; margin-bottom:12px; transition:all 0.15s; }
+        .photo-upload-zone { position:relative; display:flex; align-items:center; gap:12px; padding:12px 16px; border-radius:9px; cursor:pointer; margin-bottom:12px; transition:all 0.15s; overflow:hidden; touch-action:manipulation; min-height:52px; }
         .photo-upload-zone:hover { opacity:0.85; }
-        .photo-upload-zone-label { font-size:0.85rem; font-weight:600; }
-        .photo-upload-zone-hint { font-size:0.74rem; color:#bbb; margin-left:auto; letter-spacing:0.02em; }
+        /* L'input file couvre toute la zone — fiable sur iOS Safari (évite le bug display:none) */
+        .photo-upload-zone input[type=file] { position:absolute; inset:0; width:100%; height:100%; opacity:0; cursor:pointer; font-size:16px; }
+        .photo-upload-zone-label { font-size:0.85rem; font-weight:600; pointer-events:none; }
+        .photo-upload-zone-hint { font-size:0.74rem; color:#bbb; margin-left:auto; letter-spacing:0.02em; pointer-events:none; }
+        .photo-upload-zone svg { pointer-events:none; flex-shrink:0; }
         .photo-progress { margin-bottom:10px; }
         .photo-progress-bar-track { border-radius:3px; height:3px; overflow:hidden; }
         .photo-progress-bar-fill { height:100%; width:0%; transition:width 0.3s; border-radius:3px; }
@@ -1933,7 +1936,7 @@
             </div>
             <div class="photo-folder-body">
               <label id="uploadZone-pro" class="photo-upload-zone" style="border:1.5px dashed #e8d8ce;background:#fdfaf8;" onmouseover="this.style.borderColor='#C4785A';this.style.background='#fff8f5';" onmouseout="this.style.borderColor='#e8d8ce';this.style.background='#fdfaf8';">
-                <input type="file" id="photoInput-pro" multiple accept="image/jpeg,image/png,image/webp" style="display:none">
+                <input type="file" id="photoInput-pro" multiple accept="image/jpeg,image/png,image/webp">
                 <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#C4785A" stroke-width="1.8" style="flex-shrink:0;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
                 <span class="photo-upload-zone-label" style="color:#C4785A;">Ajouter des photos</span>
                 <span class="photo-upload-zone-hint">JPG · PNG · WEBP</span>
@@ -1968,7 +1971,7 @@
             </div>
             <div class="photo-folder-body">
               <label id="uploadZone-exterieur" class="photo-upload-zone" style="border:1.5px dashed #c8d8ee;background:#f6f9fd;" onmouseover="this.style.borderColor='#4A72A8';this.style.background='#eef4fb';" onmouseout="this.style.borderColor='#c8d8ee';this.style.background='#f6f9fd';">
-                <input type="file" id="photoInput-exterieur" multiple accept="image/jpeg,image/png,image/webp" style="display:none">
+                <input type="file" id="photoInput-exterieur" multiple accept="image/jpeg,image/png,image/webp">
                 <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#4A72A8" stroke-width="1.8" style="flex-shrink:0;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
                 <span class="photo-upload-zone-label" style="color:#4A72A8;">Ajouter des photos</span>
                 <span class="photo-upload-zone-hint">JPG · PNG · WEBP</span>
@@ -2003,7 +2006,7 @@
             </div>
             <div class="photo-folder-body">
               <label id="uploadZone-decouverte" class="photo-upload-zone" style="border:1.5px dashed #c8ddd0;background:#f6fbf7;" onmouseover="this.style.borderColor='#3D5A47';this.style.background='#eef7f0';" onmouseout="this.style.borderColor='#c8ddd0';this.style.background='#f6fbf7';">
-                <input type="file" id="photoInput-decouverte" multiple accept="image/jpeg,image/png,image/webp" style="display:none">
+                <input type="file" id="photoInput-decouverte" multiple accept="image/jpeg,image/png,image/webp">
                 <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#3D5A47" stroke-width="1.8" style="flex-shrink:0;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
                 <span class="photo-upload-zone-label" style="color:#3D5A47;">Ajouter des photos</span>
                 <span class="photo-upload-zone-hint">JPG · PNG · WEBP</span>
@@ -2038,7 +2041,7 @@
             </div>
             <div class="photo-folder-body">
               <label id="uploadZone-details" class="photo-upload-zone" style="border:1.5px dashed #ddd;background:#fafafa;" onmouseover="this.style.borderColor='#555';this.style.background='#f3f3f3';" onmouseout="this.style.borderColor='#ddd';this.style.background='#fafafa';">
-                <input type="file" id="photoInput-details" multiple accept="image/jpeg,image/png,image/webp" style="display:none">
+                <input type="file" id="photoInput-details" multiple accept="image/jpeg,image/png,image/webp">
                 <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#888" stroke-width="1.8" style="flex-shrink:0;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
                 <span class="photo-upload-zone-label" style="color:#666;">Ajouter des photos</span>
                 <span class="photo-upload-zone-hint">JPG · PNG · WEBP</span>
