@@ -31,6 +31,21 @@
     .chip-extras { display:none;flex-wrap:wrap;gap:6px;width:100%;margin-top:2px; }
     .chip-extras.open { display:flex; }
 
+    /* ── POI suggestions ────────────────────────── */
+    .poi-suggest-btn { display:inline-flex;align-items:center;gap:7px;padding:10px 16px;border:1.5px solid #3D5A47;border-radius:9px;background:#f5faf7;color:#3D5A47;font-family:'DM Sans',sans-serif;font-size:0.84rem;font-weight:600;cursor:pointer;transition:all 0.18s; }
+    .poi-suggest-btn:hover { background:#3D5A47;color:#fff; }
+    .poi-suggest-btn:disabled { opacity:0.55;cursor:wait; }
+    .poi-panel { margin-top:12px;padding:14px 16px;background:#f8f5f0;border-radius:10px;border:1px solid #e8e0d6; }
+    .poi-row { margin-bottom:12px; }
+    .poi-row:last-child { margin-bottom:0; }
+    .poi-row-lbl { font-size:0.68rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:#8C8880;margin-bottom:6px; }
+    .poi-row-chips { display:flex;flex-wrap:wrap;gap:6px; }
+    .poi-chip { padding:6px 13px;border:1.5px solid #3D5A47;border-radius:50px;background:#fff;color:#3D5A47;font-family:'DM Sans',sans-serif;font-size:0.78rem;font-weight:500;cursor:pointer;transition:all 0.15s; }
+    .poi-chip:hover { background:#3D5A47;color:#fff; }
+    .poi-chip.applied { background:#e8f4ec;border-color:#c0ddc9;color:#5a8a6a;cursor:default; }
+    .poi-err { color:#c0392b;font-size:0.82rem; }
+    .poi-empty { color:#aaa;font-size:0.82rem; }
+
     /* ── DPE selector ───────────────────────────── */
     .dpe-group { display:flex;gap:8px;flex-wrap:wrap;margin-top:8px; }
     .dpe-badge {
@@ -1645,6 +1660,14 @@
 
         <!-- Proximité -->
         <div class="section-divider" style="margin-top:32px;"><h3>Proximité et commodités</h3></div>
+        <div style="margin-bottom:18px;">
+          <button type="button" class="poi-suggest-btn" id="poiSuggestBtn" onclick="fetchNearbyPOIs()">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            Suggérer depuis mon adresse
+          </button>
+          <div style="font-size:0.74rem;color:#aaa;margin-top:6px;">Détecte automatiquement écoles, commerces et gare à proximité du bien</div>
+          <div id="poiSuggestPanel" style="display:none;" class="poi-panel"></div>
+        </div>
         <div class="form-group">
           <label>Commerces à proximité</label>
           <input type="text" name="commerces" placeholder="Supermarché 500m, boulangerie 200m, pharmacie 300m...">
@@ -5487,6 +5510,139 @@ initEquipGrid();
 
 // ═══════════════════════════════════════════════════════
 // AUTOSAVE localStorage
+// ── POI Nearby suggestions ───────────────────────────────
+async function fetchNearbyPOIs() {
+  const address = (document.querySelector('[name="address"]') || {}).value || '';
+  const city    = (document.querySelector('[name="city"]')    || {}).value || '';
+  if (!address.trim() && !city.trim()) {
+    alert('Renseignez d\'abord l\'adresse du bien (onglet Informations générales).');
+    return;
+  }
+  const btn   = document.getElementById('poiSuggestBtn');
+  const panel = document.getElementById('poiSuggestPanel');
+  btn.disabled = true;
+  btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/></svg> Recherche en cours…';
+  panel.style.display = 'none';
+  panel.innerHTML = '';
+
+  try {
+    const q = [address.trim(), city.trim(), 'France'].filter(Boolean).join(', ');
+    const geoRes  = await fetch('https://nominatim.openstreetmap.org/search?q=' + encodeURIComponent(q) + '&format=json&limit=1', { headers: { 'Accept-Language': 'fr' } });
+    const geoData = await geoRes.json();
+    if (!geoData.length) {
+      panel.innerHTML = '<div class="poi-err">Adresse introuvable — vérifiez l\'adresse saisie.</div>';
+      panel.style.display = 'block';
+      return;
+    }
+    const lat = parseFloat(geoData[0].lat);
+    const lon = parseFloat(geoData[0].lon);
+
+    const oq = `[out:json][timeout:20];(
+      node(around:1800,${lat},${lon})[amenity=kindergarten];
+      way(around:1800,${lat},${lon})[amenity=kindergarten];
+      node(around:1800,${lat},${lon})[amenity=school];
+      way(around:1800,${lat},${lon})[amenity=school];
+      node(around:1800,${lat},${lon})[amenity=college];
+      way(around:1800,${lat},${lon})[amenity=college];
+      node(around:1800,${lat},${lon})[amenity=university];
+      node(around:1200,${lat},${lon})[shop=supermarket];
+      way(around:1200,${lat},${lon})[shop=supermarket];
+      node(around:900,${lat},${lon})[shop=bakery];
+      node(around:900,${lat},${lon})[amenity=pharmacy];
+      node(around:900,${lat},${lon})[shop=convenience];
+      node(around:900,${lat},${lon})[amenity=marketplace];
+      node(around:2000,${lat},${lon})[railway=station];
+      way(around:2000,${lat},${lon})[railway=station];
+      node(around:2000,${lat},${lon})[railway=halt];
+    );out center;`;
+
+    const ovRes  = await fetch('https://overpass-api.de/api/interpreter', { method: 'POST', body: oq });
+    const ovData = await ovRes.json();
+
+    function mDist(lat2, lon2) {
+      var R = 6371000, d1 = (lat2-lat)*Math.PI/180, d2 = (lon2-lon)*Math.PI/180;
+      var a = Math.sin(d1/2)**2 + Math.cos(lat*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(d2/2)**2;
+      return Math.round(2*R*Math.asin(Math.sqrt(a)));
+    }
+    function fmtD(m) { return m < 1000 ? m+'m' : (m/1000).toFixed(1).replace('.',',')+' km'; }
+    function guessSchoolLevel(tags) {
+      var n = (tags.name||'').toLowerCase();
+      var lvl = (tags['school:FR']||tags['education:level']||tags['isced:level']||'').toLowerCase();
+      if (tags.amenity==='kindergarten') return 'maternelle';
+      if (lvl.includes('ecole maternelle')||lvl.includes('1')||n.includes('maternelle')) return 'maternelle';
+      if (lvl.includes('ecole primaire')||lvl.includes('primaire')||lvl.includes('2')||n.includes('primaire')||n.includes('elémentaire')||n.includes('élémentaire')) return 'primaire';
+      if (n.includes('collège')||n.includes('college')||lvl.includes('college')||lvl.includes('3')) return 'college';
+      if (n.includes('lycée')||n.includes('lycee')||lvl.includes('lycee')||lvl.includes('4')) return 'lycee';
+      if (tags.amenity==='school') return 'primaire';
+      return 'college';
+    }
+
+    var shops = [], schools = {maternelle:[],primaire:[],college:[],lycee:[]}, gares = [];
+    (ovData.elements||[]).forEach(function(el) {
+      var lt = el.lat||(el.center&&el.center.lat), ln = el.lon||(el.center&&el.center.lon);
+      if (!lt||!ln) return;
+      var d = mDist(lt,ln), t = el.tags||{}, n = t.name||'';
+      if (t.amenity==='kindergarten'||t.amenity==='school'||t.amenity==='college'||t.amenity==='university') {
+        var lv = guessSchoolLevel(t);
+        var lbl = (n||(lv==='maternelle'?'École maternelle':lv==='primaire'?'École primaire':lv==='college'?'Collège':'Lycée'))+' — '+fmtD(d);
+        if (!schools[lv].find(function(x){return x.lbl===lbl;})) schools[lv].push({lbl:lbl,d:d});
+      } else if (t.shop==='supermarket') {
+        shops.push({lbl:(n||'Supermarché')+' '+fmtD(d),d:d});
+      } else if (t.shop==='bakery') {
+        shops.push({lbl:(n||'Boulangerie')+' '+fmtD(d),d:d});
+      } else if (t.amenity==='pharmacy') {
+        shops.push({lbl:'Pharmacie '+fmtD(d),d:d});
+      } else if (t.shop==='convenience') {
+        shops.push({lbl:(n||'Commerce')+' '+fmtD(d),d:d});
+      } else if (t.amenity==='marketplace') {
+        shops.push({lbl:'Marché '+fmtD(d),d:d});
+      } else if (t.railway==='station'||t.railway==='halt') {
+        gares.push({lbl:(n?n+' ':'')+fmtD(d),d:d});
+      }
+    });
+
+    shops.sort(function(a,b){return a.d-b.d;});
+    gares.sort(function(a,b){return a.d-b.d;});
+    Object.keys(schools).forEach(function(k){schools[k].sort(function(a,b){return a.d-b.d;});});
+
+    var html = '';
+    if (shops.length) html += buildPoiRow('Commerces', shops.slice(0,6).map(function(s){return s.lbl;}), 'commerces');
+    if (schools.maternelle.length) html += buildPoiRow('École maternelle', schools.maternelle.slice(0,3).map(function(s){return s.lbl;}), 'school_maternelle');
+    if (schools.primaire.length)   html += buildPoiRow('École primaire',   schools.primaire.slice(0,3).map(function(s){return s.lbl;}), 'school_primaire');
+    if (schools.college.length)    html += buildPoiRow('Collège',          schools.college.slice(0,3).map(function(s){return s.lbl;}), 'school_college');
+    if (schools.lycee.length)      html += buildPoiRow('Lycée',            schools.lycee.slice(0,3).map(function(s){return s.lbl;}), 'school_lycee');
+    if (gares.length)              html += buildPoiRow('Gare',             gares.slice(0,3).map(function(s){return'Gare '+s.lbl;}), 'train_station');
+
+    panel.innerHTML = html || '<div class="poi-empty">Aucun résultat trouvé dans un rayon de 2 km.</div>';
+    panel.style.display = 'block';
+  } catch(e) {
+    panel.innerHTML = '<div class="poi-err">Erreur de recherche. Vérifiez votre connexion et réessayez.</div>';
+    panel.style.display = 'block';
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg> Actualiser les suggestions';
+  }
+}
+
+function buildPoiRow(label, items, fieldName) {
+  if (!items.length) return '';
+  var chips = items.map(function(s) {
+    var safe = s.replace(/'/g,'&#39;');
+    return '<button type="button" class="poi-chip" onclick="applySuggest(\''+fieldName+'\',\''+safe+'\',this)">'+s+'</button>';
+  }).join('');
+  return '<div class="poi-row"><div class="poi-row-lbl">'+label+'</div><div class="poi-row-chips">'+chips+'</div></div>';
+}
+
+function applySuggest(fieldName, value, btn) {
+  var input = document.querySelector('[name="'+fieldName+'"]');
+  if (!input) return;
+  var cur = input.value.trim();
+  input.value = cur ? cur+', '+value : value;
+  btn.classList.add('applied');
+  btn.disabled = true;
+  scheduleAutosave();
+}
+
 // ═══════════════════════════════════════════════════════
 const LS_DRAFT_KEY = 'serenis_property_draft';
 let autosaveTimer = null;
