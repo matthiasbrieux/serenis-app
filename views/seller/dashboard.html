@@ -350,7 +350,7 @@
 
     /* ——— Toast ——— */
     .toast {
-      position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%) translateY(20px);
+      position: fixed; bottom: max(28px, calc(env(safe-area-inset-bottom) + 12px)); left: 50%; transform: translateX(-50%) translateY(20px);
       background: #3D5A47; color: #fff;
       padding: 11px 22px; border-radius: 50px;
       font-size: 0.88rem; font-weight: 500;
@@ -406,7 +406,7 @@
     .ps-slot-phot { font-size:0.78rem; color:#8C8880; }
     .ps-slot-rating { font-size:0.78rem; color:#C9A84C; }
     .ps-month-nav { display:flex; align-items:center; gap:12px; margin-bottom:14px; }
-    .ps-month-nav button { background:none; border:1px solid rgba(0,0,0,0.12); border-radius:6px; padding:4px 11px; cursor:pointer; font-size:0.85rem; }
+    .ps-month-nav button { background:none; border:1px solid rgba(0,0,0,0.12); border-radius:6px; padding:4px 11px; cursor:pointer; font-size:0.85rem; min-height:44px; touch-action:manipulation; }
     .ps-month-nav button:hover { background:#e8e0d6; }
     .ps-month-label { font-weight:500; font-size:0.88rem; min-width:130px; }
     .ps-status-badge { display:inline-flex; align-items:center; gap:6px; padding:5px 13px; border-radius:20px; font-size:0.78rem; font-weight:500; }
@@ -525,6 +525,13 @@
       .main-content { padding-left:12px; padding-right:12px; }
       .db-card, .db-card-full { padding:14px 12px; }
       .db-card-band { margin:-14px -12px 14px; }
+    }
+    /* ── iOS zoom fix: inputs in local style block must be ≥16px ── */
+    @media (max-width:768px) {
+      .form-group input, .link-input-group input { font-size: 1rem !important; }
+      .ps-btn { min-height: 44px; touch-action: manipulation; }
+      .ps-btn-primary { min-height: 44px; }
+      .db-pending-confirm, .db-pending-refuse { min-height: 44px; touch-action: manipulation; }
     }
   </style>
 </head>
