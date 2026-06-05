@@ -5965,6 +5965,8 @@ function enterViewMode() {
   vm.style.animation = 'none';
   vm.offsetHeight;
   vm.style.animation = '';
+  // Scroll to top so the tabs and title are visible on mobile
+  window.scrollTo({ top: 0, behavior: 'instant' });
 }
 
 function enterEditMode() {
@@ -5974,11 +5976,14 @@ function enterEditMode() {
   em.style.display = 'block';
   var bar = document.getElementById('editModeBar');
   if (bar) bar.style.display = 'flex';
-  // Focus first visible input
-  setTimeout(function() {
-    var first = em.querySelector('input:not([type=hidden]):not([style*="display:none"])');
-    if (first) first.focus();
-  }, 80);
+  window.scrollTo({ top: 0, behavior: 'instant' });
+  // Focus first visible input — desktop only to avoid mobile keyboard jumping
+  if (!window.matchMedia('(max-width:640px)').matches) {
+    setTimeout(function() {
+      var first = em.querySelector('input:not([type=hidden]):not([style*="display:none"])');
+      if (first) first.focus();
+    }, 80);
+  }
 }
 
 function refreshPreview() {
