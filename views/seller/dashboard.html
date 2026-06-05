@@ -465,6 +465,8 @@
     .db-mail-pre { white-space:pre-wrap; word-break:break-word; overflow-wrap:break-word; font-family:'Inter',system-ui,sans-serif; font-size:0.8rem; color:#333; line-height:1.7; background:#fff; border:1px solid #E8E3DB; border-radius:8px; padding:13px; margin:0 0 10px; max-width:100%; overflow-x:auto; }
     .db-mail-copy { padding:9px 16px; background:#3D5A47; color:#fff; border:none; border-radius:6px; font-size:0.8rem; font-weight:600; cursor:pointer; font-family:inherit; transition:background 0.15s; width:100%; text-align:center; }
     .db-mail-copy:active { background:#2d4535; }
+    .db-mail-sect-lbl { font-size:0.67rem; font-weight:700; text-transform:uppercase; letter-spacing:0.1em; color:#b0a89f; margin:14px 0 8px; display:flex; align-items:center; gap:8px; }
+    .db-mail-sect-lbl::after { content:''; flex:1; height:1px; background:#E8E3DB; }
     .db-empty { color:#b0a89f; font-size:0.84rem; font-style:italic; padding:6px 0; }
 
     /* ── Visites à confirmer ── */
@@ -844,7 +846,7 @@ function renderVisits(visits) {
 }
 
 /* ——— Prêts à l'envoi ——— */
-let _mailCtx = { address: '[ADRESSE DU BIEN]', firstName: '[Votre prénom]', phone: '[Votre téléphone]' };
+let _mailCtx = { address: '[ADRESSE DU BIEN]', firstName: '[Votre prénom]', phone: '[Votre téléphone]', buyerUrl: '[LIEN MON BIEN]', notaireUrl: '[LIEN NOTAIRE]' };
 
 function buildMailBody(template) {
   return template
@@ -852,109 +854,143 @@ function buildMailBody(template) {
     .replace(/\[ADRESSE\]/g, _mailCtx.address)
     .replace(/\[Votre prénom\]/g, _mailCtx.firstName)
     .replace(/\[VOTRE TÉLÉPHONE\]/g, _mailCtx.phone)
-    .replace(/\[Votre téléphone\]/g, _mailCtx.phone);
+    .replace(/\[Votre téléphone\]/g, _mailCtx.phone)
+    .replace(/\[LIEN_ACHETEUR\]/g, _mailCtx.buyerUrl)
+    .replace(/\[LIEN_NOTAIRE\]/g, _mailCtx.notaireUrl);
 }
 
 const READY_MAILS = [
+  { section: 'Avant mes visites' },
   {
-    title: 'Confirmation de visite',
-    body: `Bonjour [Prénom acheteur],
+    title: 'Fiche descriptive de mon bien',
+    body: `Bonjour,
 
-Je confirme notre rendez-vous de visite le [DATE] à [HEURE] au [ADRESSE DU BIEN].
+Suite à votre contact, je vous transmets la fiche descriptive complète de mon bien (photos, description, surface, informations techniques) 🏡
 
-Comptez environ 30 à 45 minutes pour la visite. Si vous avez des questions avant notre rencontre, n'hésitez pas à me contacter.
+[LIEN_ACHETEUR]
 
-À très bientôt,
-[Votre prénom]
-[Votre téléphone]`
-  },
-  {
-    title: 'Rappel de visite (J-1)',
-    body: `Bonjour [Prénom acheteur],
+N'hésitez pas à me contacter pour organiser une visite.
 
-Je vous rappelle que nous avons rendez-vous demain, le [DATE] à [HEURE], pour la visite du bien situé au [ADRESSE].
-
-En cas d'empêchement, merci de me prévenir dès que possible au [VOTRE TÉLÉPHONE].
-
-À demain,
+Cordialement,
 [Votre prénom]`
   },
   {
-    title: 'Suivi après visite — pas de nouvelles',
-    body: `Bonjour [Prénom acheteur],
+    title: 'DPE et diagnostics',
+    body: `Bonjour,
 
-Suite à notre visite du [DATE], je me permets de prendre de vos nouvelles.
+En amont de notre visite, je vous transmets le dossier complet incluant le DPE et l'ensemble des diagnostics obligatoires du bien (performance énergétique, amiante, plomb, électricité…) 🏡
 
-Avez-vous eu le temps de réfléchir au bien ? Je suis disponible pour répondre à vos questions ou organiser une deuxième visite si vous le souhaitez.
+[LIEN_ACHETEUR]
 
-Bien cordialement,
-[Votre prénom]
-[Votre téléphone]`
-  },
-  {
-    title: 'Réponse à une offre d\'achat',
-    body: `Bonjour [Prénom acheteur],
-
-Merci pour votre offre d'achat à [MONTANT OFFERT] €.
-
-Après réflexion, [je l'accepte telle quelle / je vous propose de nous rejoindre à [VOTRE CONTRE-OFFRE] €, ce qui correspond à la juste valeur du bien au regard des travaux déjà réalisés et du marché local].
-
-Je reste disponible pour en discuter.
+N'hésitez pas à me contacter si vous avez des questions avant la visite.
 
 Cordialement,
-[Votre prénom]
-[Votre téléphone]`
+[Votre prénom]`
   },
   {
-    title: 'Invitation à visiter',
-    body: `Bonjour [Prénom acheteur],
+    title: 'Photos professionnelles',
+    body: `Bonjour,
 
-Suite à votre contact, je suis heureux(se) de vous proposer une visite de mon bien situé au [ADRESSE].
+Je vous transmets le lien vers les photos professionnelles de mon bien. N'hésitez pas à les consulter avant notre rendez-vous 🙂
 
-Le bien est disponible aux créneaux suivants :
-— [JOUR 1] à [HEURE]
-— [JOUR 2] à [HEURE]
-— [JOUR 3] à [HEURE]
+[LIEN_ACHETEUR]
 
-Confirmez-moi le créneau qui vous convient et je vous ferai parvenir la fiche complète du bien.
-
-À bientôt,
-[Votre prénom]
-[Votre téléphone]`
+Cordialement,
+[Votre prénom]`
   },
   {
-    title: 'Envoi du dossier complet',
-    body: `Bonjour [Prénom acheteur],
+    title: 'Photos découverte',
+    body: `Bonjour,
 
-Comme convenu, je vous transmets le dossier complet de mon bien :
+Je vous transmets le lien vers les photos de découverte de mon bien (séjour, cuisine, chambres, salle de bain...). N'hésitez pas à les consulter avant notre rendez-vous 🙂
 
-• Fiche descriptive détaillée (surface, charges, exposition, équipements…)
-• Résultats des diagnostics techniques
-• Plan du bien
-• Photos de découverte pièce par pièce
+[LIEN_ACHETEUR]
 
-N'hésitez pas à me poser toutes vos questions. Je reste disponible pour organiser une visite à votre convenance.
+Cordialement,
+[Votre prénom]`
+  },
+  {
+    title: 'Photos extérieur & façade',
+    body: `Bonjour,
 
-Bien cordialement,
-[Votre prénom]
-[Votre téléphone]`
+Je vous transmets le lien vers les photos de la façade et de l'extérieur de mon bien. Vous pourrez ainsi visualiser l'environnement avant notre visite 🙂
+
+[LIEN_ACHETEUR]
+
+Cordialement,
+[Votre prénom]`
+  },
+  {
+    title: 'Photos des détails techniques',
+    body: `Bonjour,
+
+Avant notre visite, je vous transmets les photos techniques du bien (chaudière, compteur, installation électrique...) pour que vous puissiez en prendre connaissance 🙂
+
+[LIEN_ACHETEUR]
+
+Cordialement,
+[Votre prénom]`
+  },
+  {
+    title: 'Toutes les photos',
+    body: `Bonjour,
+
+Suite à votre intérêt pour mon bien, je vous transmets le lien vers l'ensemble de mes photos : photos professionnelles, façade et extérieur, pièces à vivre, ainsi que les photos techniques 🏡
+
+[LIEN_ACHETEUR]
+
+N'hésitez pas à me contacter pour organiser une visite.
+
+Cordialement,
+[Votre prénom]`
+  },
+  { section: 'Après mes visites' },
+  {
+    title: 'Dossier acheteur sérieux',
+    body: `Bonjour [Prénom],
+
+Suite à votre visite et afin de vous aider dans votre réflexion, je vous transmets mes documents complémentaires (entretien chaudière, ramonage, travaux réalisés...) :
+
+[LIEN_ACHETEUR]
+
+N'hésitez pas à me contacter si vous avez des questions. 🙂
+
+Cordialement,
+[Votre prénom]`
+  },
+  {
+    title: 'Dossier notaire complet',
+    body: `Bonjour Maître,
+
+Suite à notre accord sur la vente du bien situé au [ADRESSE DU BIEN], je vous transmets le dossier complet incluant le titre de propriété, les diagnostics, et l'ensemble des documents nécessaires à la rédaction du compromis.
+
+Lien sécurisé : [LIEN_NOTAIRE]
+
+Restant à votre disposition,
+[Votre prénom]`
   }
 ];
+const _MAIL_ITEMS = READY_MAILS.filter(m => !m.section);
 
 function renderMails() {
   const el = document.getElementById('dbMails');
-  el.innerHTML = READY_MAILS.map((m, i) => `
+  let idx = 0;
+  el.innerHTML = READY_MAILS.map(m => {
+    if (m.section) return `<div class="db-mail-sect-lbl">${m.section}</div>`;
+    const i = idx++;
+    const body = buildMailBody(m.body).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    return `
     <div class="db-mail-item" id="dbm${i}">
       <div class="db-mail-hdr" onclick="toggleMail(${i})">
         <div class="db-mail-title">${m.title}</div>
         <svg class="db-mail-arr" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
       </div>
       <div class="db-mail-body">
-        <pre class="db-mail-pre">${buildMailBody(m.body)}</pre>
-        <button class="db-mail-copy" onclick="copyMail(${i}, this)">Copier ce mail</button>
+        <pre class="db-mail-pre">${body}</pre>
+        <button class="db-mail-copy" onclick="copyMail(${i}, this)">Copier ce message</button>
       </div>
-    </div>
-  `).join('');
+    </div>`;
+  }).join('');
 }
 
 function toggleMail(i) {
@@ -962,9 +998,9 @@ function toggleMail(i) {
 }
 
 function copyMail(i, btn) {
-  navigator.clipboard.writeText(buildMailBody(READY_MAILS[i].body)).then(() => {
+  navigator.clipboard.writeText(buildMailBody(_MAIL_ITEMS[i].body)).then(() => {
     btn.textContent = '✓ Copié !';
-    setTimeout(() => btn.textContent = 'Copier ce mail', 2000);
+    setTimeout(() => btn.textContent = 'Copier ce message', 2000);
   });
 }
 
@@ -1015,6 +1051,8 @@ async function loadData() {
     _mailCtx.address = [property.address, property.city].filter(Boolean).join(', ') || '[ADRESSE DU BIEN]';
     _mailCtx.firstName = seller.first_name || '[Votre prénom]';
     _mailCtx.phone = seller.phone || '[Votre téléphone]';
+    _mailCtx.buyerUrl = property.acheteur_url || '[LIEN MON BIEN]';
+    _mailCtx.notaireUrl = property.notaire_url || '[LIEN NOTAIRE]';
     renderMails();
 
     /* Visites à confirmer + disponibilités + visites */
