@@ -729,6 +729,10 @@
       cursor:pointer;transition:all 0.2s;
     }
     .btn-edit-mode:hover { background:#2a4030;transform:translateY(-1px);box-shadow:0 4px 14px rgba(61,90,71,0.25); }
+    @media(max-width:640px) {
+      .preview-mode-bar { flex-direction:column;align-items:flex-start; }
+      .btn-edit-mode { width:100%;justify-content:center;padding:13px 22px;font-size:0.95rem; }
+    }
     .preview-sheet {
       background:#fff;border:1px solid #e0d8cc;border-radius:16px;
       overflow:hidden;box-shadow:0 4px 28px rgba(0,0,0,0.07);
@@ -3133,12 +3137,10 @@ async function loadProperty() {
   updatePrixCoach();
   updateCompletion();
 
-  // Switch to view mode automatically if property has basic data
-  if (p.type && p.address && p.price) {
-    var emb = document.getElementById('editModeBar');
-    if (emb) emb.style.display = 'flex';
-    enterViewMode();
-  }
+  // Switch to view mode automatically — the property record exists so it has been saved at least once
+  var emb = document.getElementById('editModeBar');
+  if (emb) emb.style.display = 'flex';
+  enterViewMode();
 }
 
 // ── Form save ─────────────────────────────────────────
