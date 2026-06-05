@@ -245,7 +245,7 @@ function render(p, ph, docs) {
   const acheteurDocs = docs.filter(d => d.folder === 'acheteur_serieux');
 
   const mainPhoto = ph.length
-    ? `<img id="mainPhoto" src="${ph[0].url}" alt="Photo principale" onclick="lbOpen(currentPhotoIdx)">`
+    ? `<img id="mainPhoto" src="${ph[0].url}" alt="Photo principale" onclick="lbOpen(currentPhotoIdx)" onerror="this.style.display='none';document.getElementById('noPhotoPlaceholder').style.display='flex';">`
     : `<div style="display:flex;align-items:center;justify-content:center;height:100%;color:#aaa;">Aucune photo</div>`;
 
   // Group photos by category
@@ -255,7 +255,7 @@ function render(p, ph, docs) {
     if (!byCategory[cat]) byCategory[cat] = [];
     byCategory[cat].push(img);
   });
-  const orderedCats = [...CATEGORY_ORDER, ...Object.keys(byCategory).filter(c => !CATEGORY_ORDER.includes(c))].filter(c => byCategory[c]?.length);
+  const orderedCats = [...CATEGORY_ORDER, ...Object.keys(byCategory).filter(c => !CATEGORY_ORDER.includes(c))].filter(c => byCategory[c] && byCategory[c].length);
 
   let photoStrip = '';
   if (ph.length > 1) {
@@ -264,17 +264,45 @@ function render(p, ph, docs) {
       const label = CATEGORY_LABELS[cat] || cat;
       const thumbs = imgs.map(img => {
         const idx = ph.indexOf(img);
-        return `<img src="${img.thumbnail_url || img.url}" class="${idx===0?'active':''}" onclick="lbOpen(${idx})" alt="">`;
+        return `<img src="${img.thumbnail_url || img.url}" class="${idx===0?'active':''}" onclick="lbOpen(${idx})" alt="" onerror="this.style.display='none'">`;
       }).join('');
-      return `<div class="photo-cat-label">${label}</div><div class="photo-cat-strip">${thumbs}</div>`;
+      return `<div class="photo-cat-label photo-cat-section">${label}</div><div class="photo-cat-strip photo-cat-section">${thumbs}</div>`;
     }).join('');
     photoStrip = `<div class="photo-categories">${catSections}</div>`;
   }
 
-  // Init lightbox strip after DOM render (deferred)
+  // Init lightbox strip after DOM render + clean up broken images
   setTimeout(function() {
     const strip = document.getElementById('phLbStrip');
     if (strip) strip.innerHTML = lbBuildStrip();
+
+    // After a short delay, hide category sections where all images failed to load
+    setTimeout(function() {
+      document.querySelectorAll('.photo-cat-strip').forEach(function(strip) {
+        var imgs = strip.querySelectorAll('img');
+        var allHidden = imgs.length > 0 && Array.from(imgs).every(function(img) { return img.style.display === 'none'; });
+        if (allHidden) {
+          strip.style.display = 'none';
+          var prev = strip.previousElementSibling;
+          if (prev && prev.classList.contains('photo-cat-section')) prev.style.display = 'none';
+        }
+      });
+      // If main photo failed, try first working photo
+      var mainImg = document.getElementById('mainPhoto');
+      if (mainImg && mainImg.style.display === 'none') {
+        for (var i = 1; i < photos.length; i++) {
+          if (photos[i] && photos[i].url) {
+            var testImg = new Image();
+            testImg.onload = (function(url) { return function() {
+              var m = document.getElementById('mainPhoto');
+              if (m) { m.src = url; m.style.display = ''; document.getElementById('noPhotoPlaceholder').style.display = 'none'; }
+            }; })(photos[i].url);
+            testImg.src = photos[i].url;
+            break;
+          }
+        }
+      }
+    }, 1500);
   }, 0);
 
   const dpeHtml = p.dpe_class ? `
@@ -363,7 +391,7 @@ function render(p, ph, docs) {
   ].filter(Boolean).join('');
 
   function docHtml(doc) {
-    const ext = doc.name?.split('.').pop()?.toLowerCase() || '';
+    const ext = doc.name ? doc.name.split('.').pop().toLowerCase() : '';
     const isPdf = ext === 'pdf';
     return `<a href="${doc.url}" target="_blank" class="doc-item">
       <div class="doc-icon ${isPdf ? 'pdf' : 'img'}">${isPdf ? '📄' : '🖼️'}</div>
@@ -449,7 +477,7 @@ function render(p, ph, docs) {
   document.getElementById('content').innerHTML = `
     ${scoreHtml}
     <div class="hero">
-      <div class="hero-photos" id="heroPhotos" onclick="lbOpen(currentPhotoIdx)">${mainPhoto}<div class="photo-count">${ph.length} photo${ph.length>1?'s':''}</div>${ph.length>1?'<div class="expand-hint">⛶ Voir toutes les photos</div>':''}</div>
+      <div class="hero-photos" id="heroPhotos" onclick="lbOpen(currentPhotoIdx)">${mainPhoto}<div id="noPhotoPlaceholder" style="display:none;align-items:center;justify-content:center;height:100%;color:#aaa;font-size:0.9rem;">Photo non disponible</div><div class="photo-count">${ph.length} photo${ph.length>1?'s':''}</div>${ph.length>1?'<div class="expand-hint">⛶ Voir toutes les photos</div>':''}</div>
       ${photoStrip}
       <div class="hero-info">
         <div class="prop-type-badge">${typeLabel}</div>
