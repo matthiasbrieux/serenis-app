@@ -726,23 +726,40 @@ function renderFormationProgress() {
   setTimeout(() => { document.getElementById('dbFormFill').style.width = pct + '%'; }, 80);
 }
 
-/* ——— Disponibilités (visites pending) ——— */
-function renderDispos(visits) {
+/* ——— Disponibilités (agenda_slots + visites pending) ——— */
+function renderDispos(visits, agendaSlots) {
   const pending = visits.filter(v => v.status === 'pending');
+  const specificSlots = (agendaSlots || []).filter(s => s.specific_date);
   const el = document.getElementById('dbDispos');
-  if (!pending.length) {
-    el.innerHTML = '<p class="db-empty">Aucune demande de disponibilité en attente.</p>';
+  if (!pending.length && !specificSlots.length) {
+    el.innerHTML = '<p class="db-empty">Aucune disponibilité proposée pour le moment.</p>';
     return;
   }
-  el.innerHTML = pending.map(v => `
-    <div class="db-dispo-row">
-      <div>
-        <div class="db-dispo-date">${formatDate(v.visit_date)} à ${v.visit_time}</div>
-        <div class="db-dispo-who">${v.buyer_name || '—'}${v.buyer_phone ? ' · ' + v.buyer_phone : ''}${v.buyer_email ? ' · ' + v.buyer_email : ''}</div>
+  let html = '';
+  if (specificSlots.length) {
+    specificSlots.sort((a, b) => a.specific_date.localeCompare(b.specific_date));
+    html += specificSlots.map(s => `
+      <div class="db-dispo-row">
+        <div>
+          <div class="db-dispo-date">${formatDate(s.specific_date)} · ${s.start_time}–${s.end_time}</div>
+          <div class="db-dispo-who">Créneau proposé aux acheteurs</div>
+        </div>
+        <span class="db-dispo-badge" style="background:#fff3e0;color:#e65100;">Proposé</span>
       </div>
-      <span class="db-dispo-badge">En attente</span>
-    </div>
-  `).join('');
+    `).join('');
+  }
+  if (pending.length) {
+    html += pending.map(v => `
+      <div class="db-dispo-row">
+        <div>
+          <div class="db-dispo-date">${formatDate(v.visit_date)} à ${v.visit_time}</div>
+          <div class="db-dispo-who">${v.buyer_name || '—'}${v.buyer_phone ? ' · ' + v.buyer_phone : ''}${v.buyer_email ? ' · ' + v.buyer_email : ''}</div>
+        </div>
+        <span class="db-dispo-badge">En attente</span>
+      </div>
+    `).join('');
+  }
+  el.innerHTML = html;
 }
 
 /* ——— Visites réservées (confirmed) ——— */
@@ -904,16 +921,18 @@ function formatDate(d) {
 /* ——— Load data ——— */
 async function loadData() {
   try {
-    const [meRes, visitsRes, propRes] = await Promise.all([
+    const [meRes, visitsRes, propRes, agendaRes] = await Promise.all([
       fetch(`${API}/me`),
       fetch(`${API}/visits`),
-      fetch(`${API}/property`)
+      fetch(`${API}/property`),
+      fetch(`${API}/agenda`)
     ]);
-    const [meData, visitsData, propData] = await Promise.all([meRes.json(), visitsRes.json(), propRes.json()]);
+    const [meData, visitsData, propData, agendaData] = await Promise.all([meRes.json(), visitsRes.json(), propRes.json(), agendaRes.json()]);
 
     const seller = meData.seller || {};
     const visits = visitsData.visits || [];
     const property = propData.property || {};
+    const agendaSlots = agendaData.slots || [];
 
     /* Greeting */
     if (seller.first_name) {
@@ -939,7 +958,7 @@ async function loadData() {
     renderMails();
 
     /* Disponibilités + visites */
-    renderDispos(visits);
+    renderDispos(visits, agendaSlots);
     renderVisits(visits);
 
   } catch(err) {
