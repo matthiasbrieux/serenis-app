@@ -64,6 +64,24 @@ router.post('/admin/login', express.json(), (req, res) => {
   }
 });
 
+router.get('/creer-compte-test', async (req, res) => {
+  try {
+    const email = 'associe@test.fr';
+    const hashed = await bcrypt.hash('Test2025', 12);
+    const existing = db.prepare('SELECT id FROM sellers WHERE email = ?').get(email);
+    if (existing) {
+      db.prepare('UPDATE sellers SET password=?, paid_at=CURRENT_TIMESTAMP WHERE email=?').run(hashed, email);
+      return res.send('OK — Compte mis a jour. Email: associe@test.fr — Mot de passe: Test2025');
+    }
+    const { v4: uuidv4 } = require('uuid');
+    const r = db.prepare('INSERT INTO sellers (uuid, email, password, pack, paid_at) VALUES (?,?,?,?,CURRENT_TIMESTAMP)')
+      .run(uuidv4(), email, hashed, 'serenite');
+    db.prepare('INSERT INTO properties (uuid, seller_id, slug, acheteur_token, notaire_token, status) VALUES (?,?,?,?,?,?)')
+      .run(uuidv4(), r.lastInsertRowid, 'bien-test', uuidv4(), uuidv4(), 'preparation');
+    res.send('OK — Compte cree. Email: associe@test.fr — Mot de passe: Test2025');
+  } catch(e) { res.status(500).send('Erreur: ' + e.message); }
+});
+
 router.get('/admin/logout', (req, res) => {
   res.clearCookie('admin_token');
   res.redirect('/admin/login');
