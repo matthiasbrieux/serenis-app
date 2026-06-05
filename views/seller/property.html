@@ -21,6 +21,16 @@
     .chip-option.active { background:#3D5A47;border-color:#3D5A47;color:#fff; }
     .chip-option .chip-icon { font-size:1.1rem; }
 
+    /* ── Chip extras (collapsed) ──────────────────────── */
+    .chip-btn-more {
+      padding:8px 14px;border:2px dashed #bbb;border-radius:50px;
+      background:#fff;font-family:'DM Sans',sans-serif;font-size:0.85rem;
+      font-weight:500;color:#888;cursor:pointer;transition:all 0.18s;
+    }
+    .chip-btn-more:hover,.chip-btn-more.open { border-color:#3D5A47;color:#3D5A47; }
+    .chip-extras { display:none;flex-wrap:wrap;gap:6px;width:100%;margin-top:2px; }
+    .chip-extras.open { display:flex; }
+
     /* ── DPE selector ───────────────────────────── */
     .dpe-group { display:flex;gap:8px;flex-wrap:wrap;margin-top:8px; }
     .dpe-badge {
@@ -1080,36 +1090,39 @@
           <input type="hidden" name="heating_type" id="field-heating_type">
           <input type="hidden" name="heating_details" id="field-heating_details">
           <div class="chip-group" data-multi="true" data-field="heating_type" style="gap:6px;">
-            <button type="button" class="chip-option" data-value="Aérothermie">Aérothermie</button>
-            <button type="button" class="chip-option" data-value="Aucun">Aucun</button>
-            <button type="button" class="chip-option" data-value="Bois">Bois</button>
-            <button type="button" class="chip-option" data-value="Bois + Électrique">Bois + Élec.</button>
-            <button type="button" class="chip-option" data-value="Charbon">Charbon</button>
-            <button type="button" class="chip-option" data-value="Chaudière à granulés">Chaudière granulés</button>
-            <button type="button" class="chip-option" data-value="Chauffage urbain">Chauffage urbain</button>
-            <button type="button" class="chip-option" data-value="Chauffe-eau thermodynamique">Chauffe-eau thermo.</button>
-            <button type="button" class="chip-option" data-value="Climatisation réversible">Clim. réversible</button>
-            <button type="button" class="chip-option" data-value="Climatisation réversible + électrique">Clim. réversible + Élec.</button>
-            <button type="button" class="chip-option" data-value="Électrique">Électrique</button>
-            <button type="button" class="chip-option" data-value="Éolienne">Éolienne</button>
-            <button type="button" class="chip-option" data-value="Fuel">Fuel</button>
-            <button type="button" class="chip-option" data-value="Fuel + électrique">Fuel + Élec.</button>
             <button type="button" class="chip-option" data-value="Gaz">Gaz</button>
-            <button type="button" class="chip-option" data-value="Gaz + chauffe-eau solaire">Gaz + CES</button>
-            <button type="button" class="chip-option" data-value="Gaz + chauffe-eau thermodynamique">Gaz + CET</button>
-            <button type="button" class="chip-option" data-value="Gaz + Pompe à chaleur">Gaz + PAC</button>
-            <button type="button" class="chip-option" data-value="Gaz de ville">Gaz de ville</button>
-            <button type="button" class="chip-option" data-value="Géothermie">Géothermie</button>
-            <button type="button" class="chip-option" data-value="Mixte">Mixte</button>
-            <button type="button" class="chip-option" data-value="Panneaux solaires">Panneaux solaires</button>
-            <button type="button" class="chip-option" data-value="Poêle à granulés">Poêle granulés</button>
-            <button type="button" class="chip-option" data-value="Poêle hybride bois et granulés">Poêle hybride</button>
+            <button type="button" class="chip-option" data-value="Électrique">Électrique</button>
             <button type="button" class="chip-option" data-value="Pompe à chaleur">Pompe à chaleur</button>
-            <button type="button" class="chip-option" data-value="Pompe à chaleur air/air">PAC air/air</button>
-            <button type="button" class="chip-option" data-value="Pompe à chaleur air/eau">PAC air/eau</button>
-            <button type="button" class="chip-option" data-value="Pompe à chaleur + fuel">PAC + Fuel</button>
-            <button type="button" class="chip-option" data-value="Pompe à chaleur + chauffe-eau thermodynamique">PAC + CET</button>
-            <button type="button" class="chip-option" data-value="Autres">Autres</button>
+            <button type="button" class="chip-btn-more" onclick="toggleChipExtras(this,'extras-heating_type')">Autres ▾</button>
+            <div class="chip-extras" id="extras-heating_type">
+              <button type="button" class="chip-option" data-value="Aérothermie">Aérothermie</button>
+              <button type="button" class="chip-option" data-value="Aucun">Aucun</button>
+              <button type="button" class="chip-option" data-value="Bois">Bois</button>
+              <button type="button" class="chip-option" data-value="Bois + Électrique">Bois + Élec.</button>
+              <button type="button" class="chip-option" data-value="Charbon">Charbon</button>
+              <button type="button" class="chip-option" data-value="Chaudière à granulés">Chaudière granulés</button>
+              <button type="button" class="chip-option" data-value="Chauffage urbain">Chauffage urbain</button>
+              <button type="button" class="chip-option" data-value="Chauffe-eau thermodynamique">Chauffe-eau thermo.</button>
+              <button type="button" class="chip-option" data-value="Climatisation réversible">Clim. réversible</button>
+              <button type="button" class="chip-option" data-value="Climatisation réversible + électrique">Clim. réversible + Élec.</button>
+              <button type="button" class="chip-option" data-value="Éolienne">Éolienne</button>
+              <button type="button" class="chip-option" data-value="Fuel">Fuel</button>
+              <button type="button" class="chip-option" data-value="Fuel + électrique">Fuel + Élec.</button>
+              <button type="button" class="chip-option" data-value="Gaz + chauffe-eau solaire">Gaz + CES</button>
+              <button type="button" class="chip-option" data-value="Gaz + chauffe-eau thermodynamique">Gaz + CET</button>
+              <button type="button" class="chip-option" data-value="Gaz + Pompe à chaleur">Gaz + PAC</button>
+              <button type="button" class="chip-option" data-value="Gaz de ville">Gaz de ville</button>
+              <button type="button" class="chip-option" data-value="Géothermie">Géothermie</button>
+              <button type="button" class="chip-option" data-value="Mixte">Mixte</button>
+              <button type="button" class="chip-option" data-value="Panneaux solaires">Panneaux solaires</button>
+              <button type="button" class="chip-option" data-value="Poêle à granulés">Poêle granulés</button>
+              <button type="button" class="chip-option" data-value="Poêle hybride bois et granulés">Poêle hybride</button>
+              <button type="button" class="chip-option" data-value="Pompe à chaleur air/air">PAC air/air</button>
+              <button type="button" class="chip-option" data-value="Pompe à chaleur air/eau">PAC air/eau</button>
+              <button type="button" class="chip-option" data-value="Pompe à chaleur + fuel">PAC + Fuel</button>
+              <button type="button" class="chip-option" data-value="Pompe à chaleur + chauffe-eau thermodynamique">PAC + CET</button>
+              <button type="button" class="chip-option" data-value="Autres">Autres</button>
+            </div>
           </div>
 
           <!-- Détails année par système sélectionné -->
@@ -1382,23 +1395,26 @@
           <div class="chip-group" data-multi="true" data-field="toiture_couverture">
             <button type="button" class="chip-option" data-value="Tuiles terre cuite">Tuiles terre cuite</button>
             <button type="button" class="chip-option" data-value="Tuiles béton">Tuiles béton</button>
-            <button type="button" class="chip-option" data-value="Tuile Alsacienne">Tuile Alsacienne</button>
             <button type="button" class="chip-option" data-value="Ardoises naturelles">Ardoises naturelles</button>
-            <button type="button" class="chip-option" data-value="Ardoises synthétiques">Ardoises synthétiques</button>
-            <button type="button" class="chip-option" data-value="Ardoises & Fibrociment">Ardoises & Fibrociment</button>
-            <button type="button" class="chip-option" data-value="Ardoises Mixtes">Ardoises Mixtes</button>
-            <button type="button" class="chip-option" data-value="Lauze">Lauze</button>
-            <button type="button" class="chip-option" data-value="Bac acier">Bac acier</button>
-            <button type="button" class="chip-option" data-value="Zinc">Zinc</button>
-            <button type="button" class="chip-option" data-value="Cuivre">Cuivre</button>
-            <button type="button" class="chip-option" data-value="Fibrociment">Fibrociment</button>
-            <button type="button" class="chip-option" data-value="Chaume">Chaume</button>
-            <button type="button" class="chip-option" data-value="Colombages">Colombages</button>
-            <button type="button" class="chip-option" data-value="Eternite">Eternite</button>
-            <button type="button" class="chip-option" data-value="Shingle">Shingle</button>
-            <button type="button" class="chip-option" data-value="Tôle">Tôle</button>
-            <button type="button" class="chip-option" data-value="Terrasse plate">Terrasse plate</button>
-            <button type="button" class="chip-option" data-value="Autre">Autre</button>
+            <button type="button" class="chip-btn-more" onclick="toggleChipExtras(this,'extras-toiture_couverture')">Autres ▾</button>
+            <div class="chip-extras" id="extras-toiture_couverture">
+              <button type="button" class="chip-option" data-value="Tuile Alsacienne">Tuile Alsacienne</button>
+              <button type="button" class="chip-option" data-value="Ardoises synthétiques">Ardoises synthétiques</button>
+              <button type="button" class="chip-option" data-value="Ardoises & Fibrociment">Ardoises & Fibrociment</button>
+              <button type="button" class="chip-option" data-value="Ardoises Mixtes">Ardoises Mixtes</button>
+              <button type="button" class="chip-option" data-value="Lauze">Lauze</button>
+              <button type="button" class="chip-option" data-value="Bac acier">Bac acier</button>
+              <button type="button" class="chip-option" data-value="Zinc">Zinc</button>
+              <button type="button" class="chip-option" data-value="Cuivre">Cuivre</button>
+              <button type="button" class="chip-option" data-value="Fibrociment">Fibrociment</button>
+              <button type="button" class="chip-option" data-value="Chaume">Chaume</button>
+              <button type="button" class="chip-option" data-value="Colombages">Colombages</button>
+              <button type="button" class="chip-option" data-value="Eternite">Eternite</button>
+              <button type="button" class="chip-option" data-value="Shingle">Shingle</button>
+              <button type="button" class="chip-option" data-value="Tôle">Tôle</button>
+              <button type="button" class="chip-option" data-value="Terrasse plate">Terrasse plate</button>
+              <button type="button" class="chip-option" data-value="Autre">Autre</button>
+            </div>
           </div>
         </div>
 
@@ -1431,21 +1447,24 @@
           <div style="font-size:0.78rem;color:#888;margin-bottom:8px;">Sélection multiple possible — ex : PVC double vitrage + Alu sur véranda</div>
           <input type="hidden" name="fenetres_type" id="field-fenetres_type">
           <div class="chip-group" data-multi="true" data-field="fenetres_type">
-            <button type="button" class="chip-option" data-value="Aluminium">Aluminium</button>
-            <button type="button" class="chip-option" data-value="Aluminium Double Vitrage">Alu Double Vitrage</button>
-            <button type="button" class="chip-option" data-value="Aluminium Simple Vitrage">Alu Simple Vitrage</button>
-            <button type="button" class="chip-option" data-value="Bois double vitrage">Bois DV</button>
-            <button type="button" class="chip-option" data-value="Bois simple vitrage">Bois SV</button>
-            <button type="button" class="chip-option" data-value="Double vitrage">Double vitrage</button>
-            <button type="button" class="chip-option" data-value="Mixte alu et PVC">Mixte alu et PVC</button>
-            <button type="button" class="chip-option" data-value="Mixte Bois - PVC">Mixte Bois - PVC</button>
-            <button type="button" class="chip-option" data-value="Mixte Bois et Alu">Mixte Bois et Alu</button>
-            <button type="button" class="chip-option" data-value="PVC">P.V.C.</button>
             <button type="button" class="chip-option" data-value="PVC Double Vitrage">PVC Double Vitrage</button>
-            <button type="button" class="chip-option" data-value="PVC Simple Vitrage">PVC Simple Vitrage</button>
-            <button type="button" class="chip-option" data-value="Simple et double vitrage">Simple et double</button>
-            <button type="button" class="chip-option" data-value="Survitrage">Survitrage</button>
-            <button type="button" class="chip-option" data-value="Triple Vitrage">Triple Vitrage</button>
+            <button type="button" class="chip-option" data-value="Aluminium Double Vitrage">Alu Double Vitrage</button>
+            <button type="button" class="chip-option" data-value="Bois double vitrage">Bois DV</button>
+            <button type="button" class="chip-btn-more" onclick="toggleChipExtras(this,'extras-fenetres_type')">Autres ▾</button>
+            <div class="chip-extras" id="extras-fenetres_type">
+              <button type="button" class="chip-option" data-value="Aluminium">Aluminium</button>
+              <button type="button" class="chip-option" data-value="Aluminium Simple Vitrage">Alu Simple Vitrage</button>
+              <button type="button" class="chip-option" data-value="Bois simple vitrage">Bois SV</button>
+              <button type="button" class="chip-option" data-value="Double vitrage">Double vitrage</button>
+              <button type="button" class="chip-option" data-value="Mixte alu et PVC">Mixte alu et PVC</button>
+              <button type="button" class="chip-option" data-value="Mixte Bois - PVC">Mixte Bois - PVC</button>
+              <button type="button" class="chip-option" data-value="Mixte Bois et Alu">Mixte Bois et Alu</button>
+              <button type="button" class="chip-option" data-value="PVC">P.V.C.</button>
+              <button type="button" class="chip-option" data-value="PVC Simple Vitrage">PVC Simple Vitrage</button>
+              <button type="button" class="chip-option" data-value="Simple et double vitrage">Simple et double</button>
+              <button type="button" class="chip-option" data-value="Survitrage">Survitrage</button>
+              <button type="button" class="chip-option" data-value="Triple Vitrage">Triple Vitrage</button>
+            </div>
           </div>
           <!-- Upload facture fenêtres -->
           <div style="margin-top:12px;">
@@ -1464,20 +1483,23 @@
           <div style="font-size:0.78rem;color:#888;margin-bottom:8px;">Sélection multiple possible — ex : battants + roulants électriques</div>
           <input type="hidden" name="volets_type" id="field-volets_type">
           <div class="chip-group" data-multi="true" data-field="volets_type">
-            <button type="button" class="chip-option" data-value="Aluminium">Aluminium</button>
             <button type="button" class="chip-option" data-value="Bois">Bois</button>
-            <button type="button" class="chip-option" data-value="Électrique Métallique">Élec. Métallique</button>
-            <button type="button" class="chip-option" data-value="Électrique PVC">Élec. PVC</button>
-            <button type="button" class="chip-option" data-value="Métallique">Métallique</button>
-            <button type="button" class="chip-option" data-value="Mixte manuels-électriques">Mixte manuels-élec.</button>
-            <button type="button" class="chip-option" data-value="Mixte roulants-bois">Mixte roulants-bois</button>
-            <button type="button" class="chip-option" data-value="Pliants">Pliants</button>
-            <button type="button" class="chip-option" data-value="PVC">PVC</button>
-            <button type="button" class="chip-option" data-value="PVC Roulant">PVC Roulant</button>
-            <button type="button" class="chip-option" data-value="Roulants">Roulants</button>
             <button type="button" class="chip-option" data-value="Roulants électriques">Roulants électriques</button>
-            <button type="button" class="chip-option" data-value="Solaires">Solaires</button>
             <button type="button" class="chip-option" data-value="Sans">Sans</button>
+            <button type="button" class="chip-btn-more" onclick="toggleChipExtras(this,'extras-volets_type')">Autres ▾</button>
+            <div class="chip-extras" id="extras-volets_type">
+              <button type="button" class="chip-option" data-value="Aluminium">Aluminium</button>
+              <button type="button" class="chip-option" data-value="Électrique Métallique">Élec. Métallique</button>
+              <button type="button" class="chip-option" data-value="Électrique PVC">Élec. PVC</button>
+              <button type="button" class="chip-option" data-value="Métallique">Métallique</button>
+              <button type="button" class="chip-option" data-value="Mixte manuels-électriques">Mixte manuels-élec.</button>
+              <button type="button" class="chip-option" data-value="Mixte roulants-bois">Mixte roulants-bois</button>
+              <button type="button" class="chip-option" data-value="Pliants">Pliants</button>
+              <button type="button" class="chip-option" data-value="PVC">PVC</button>
+              <button type="button" class="chip-option" data-value="PVC Roulant">PVC Roulant</button>
+              <button type="button" class="chip-option" data-value="Roulants">Roulants</button>
+              <button type="button" class="chip-option" data-value="Solaires">Solaires</button>
+            </div>
           </div>
         </div>
 
@@ -2719,6 +2741,15 @@ document.addEventListener('click', function(e) {
   scheduleAutosave();
 });
 
+// ── Chip extras toggle ───────────────────────────────
+function toggleChipExtras(btn, extrasId) {
+  var extras = document.getElementById(extrasId);
+  if (!extras) return;
+  var isOpen = extras.classList.toggle('open');
+  btn.textContent = isOpen ? 'Réduire ▴' : 'Autres ▾';
+  btn.classList.toggle('open', isOpen);
+}
+
 // ── Type cards ───────────────────────────────────────
 function selectType(val) {
   document.querySelectorAll('.type-card').forEach(c => c.classList.remove('active'));
@@ -2945,6 +2976,18 @@ async function loadProperty() {
       } catch(e) {}
     }
   }
+  // Auto-expand chip extras if a saved value is inside
+  document.querySelectorAll('.chip-extras').forEach(function(extras) {
+    if (extras.querySelector('.chip-option.active')) {
+      extras.classList.add('open');
+      var btn = extras.previousElementSibling;
+      if (btn && btn.classList.contains('chip-btn-more')) {
+        btn.textContent = 'Réduire ▴';
+        btn.classList.add('open');
+      }
+    }
+  });
+
   var yrSlider = document.getElementById('yearSlider');
   if (yrSlider && p.year_built) { yrSlider.value = p.year_built; yrSlider.dispatchEvent(new Event('input')); }
 
