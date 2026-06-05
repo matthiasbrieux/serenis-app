@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vendu Par Moi — Document de présentation</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Inter', sans-serif; color: #1a1a1a; background: #fff; font-size: 10pt; line-height: 1.6; }
+
+    @media print {
+      body { font-size: 9.5pt; }
+      .page-break { page-break-before: always; }
+      .no-print { display: none; }
+      @page { margin: 18mm 16mm; size: A4; }
+    }
+
+    .no-print {
+      position: fixed; top: 20px; right: 20px; z-index: 100;
+      background: #3D5A47; color: #fff; border: none; padding: 12px 24px;
+      border-radius: 8px; font-family: 'Inter', sans-serif; font-size: 0.9rem;
+      font-weight: 600; cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    }
+    .no-print:hover { background: #2d4535; }
+
+    /* COVER */
+    .cover {
+      min-height: 100vh;
+      display: flex; flex-direction: column; justify-content: space-between;
+      padding: 60px 64px;
+      background: linear-gradient(160deg, #1C3028 0%, #3D5A47 60%, #4d7060 100%);
+      color: #fff;
+    }
+    .cover-logo { font-family: 'Cormorant Garamond', serif; font-size: 2.2rem; letter-spacing: 0.02em; }
+    .cover-logo em { color: #C4785A; font-style: normal; }
+    .cover-center { flex: 1; display: flex; flex-direction: column; justify-content: center; }
+    .cover-tag { display: inline-block; background: rgba(196,120,90,0.25); border: 1px solid rgba(196,120,90,0.5); color: #f0b89a; font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.12em; padding: 5px 14px; border-radius: 20px; margin-bottom: 28px; }
+    .cover-title { font-family: 'Cormorant Garamond', serif; font-size: 3.6rem; font-weight: 700; line-height: 1.1; margin-bottom: 20px; }
+    .cover-title em { color: #C4785A; font-style: italic; }
+    .cover-sub { font-size: 1.05rem; color: rgba(255,255,255,0.72); max-width: 520px; line-height: 1.7; margin-bottom: 48px; }
+    .cover-stats { display: flex; gap: 40px; }
+    .cover-stat-val { font-family: 'Cormorant Garamond', serif; font-size: 2.4rem; font-weight: 700; color: #C4785A; }
+    .cover-stat-lbl { font-size: 0.75rem; color: rgba(255,255,255,0.6); text-transform: uppercase; letter-spacing: 0.06em; margin-top: 2px; }
+    .cover-footer { display: flex; align-items: center; justify-content: space-between; padding-top: 32px; border-top: 1px solid rgba(255,255,255,0.15); }
+    .cover-footer-url { font-size: 0.82rem; color: rgba(255,255,255,0.5); }
+    .cover-footer-date { font-size: 0.78rem; color: rgba(255,255,255,0.4); }
+
+    /* CONTENT */
+    .content { max-width: 760px; margin: 0 auto; padding: 64px 40px; }
+
+    h1.section-title {
+      font-family: 'Cormorant Garamond', serif; font-size: 2rem; font-weight: 700;
+      color: #1C3028; margin-bottom: 8px;
+    }
+    .section-rule { width: 48px; height: 3px; background: #C4785A; border-radius: 2px; margin-bottom: 28px; }
+
+    h2.block-title {
+      font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em;
+      color: #3D5A47; margin-bottom: 16px;
+    }
+
+    p { color: #444; margin-bottom: 14px; line-height: 1.75; }
+    p:last-child { margin-bottom: 0; }
+
+    .intro-box {
+      background: linear-gradient(135deg, #f5f0e8, #ede8e0);
+      border-left: 4px solid #C4785A;
+      border-radius: 0 12px 12px 0;
+      padding: 22px 26px; margin-bottom: 40px;
+      font-size: 1.05rem; color: #2a2a2a; line-height: 1.75;
+    }
+    .intro-box strong { color: #1C3028; }
+
+    /* FEATURES GRID */
+    .features { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin: 28px 0; }
+    .feature-card {
+      border: 1.5px solid #e8e0d6; border-radius: 14px; padding: 20px 22px;
+      background: #fdfcfa;
+    }
+    .feature-icon { width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; margin-bottom: 12px; }
+    .feature-title { font-weight: 700; font-size: 0.92rem; color: #1a1a1a; margin-bottom: 6px; }
+    .feature-desc { font-size: 0.82rem; color: #666; line-height: 1.6; }
+
+    /* MODULE LIST */
+    .module-list { display: flex; flex-direction: column; gap: 10px; margin: 20px 0; }
+    .module-item {
+      display: flex; align-items: flex-start; gap: 16px;
+      background: #f8f5f0; border-radius: 12px; padding: 16px 20px;
+    }
+    .module-num {
+      width: 32px; height: 32px; border-radius: 50%; background: #3D5A47; color: #fff;
+      font-weight: 700; font-size: 0.78rem; display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .module-info-title { font-weight: 600; font-size: 0.9rem; color: #1a1a1a; margin-bottom: 3px; }
+    .module-info-desc { font-size: 0.78rem; color: #777; line-height: 1.55; }
+
+    /* SECTION DIVIDER */
+    .section-divider { border: none; border-top: 1.5px solid #ece8e0; margin: 48px 0; }
+
+    /* VALUE PROPS */
+    .value-row { display: flex; gap: 16px; margin: 20px 0; }
+    .value-item { flex: 1; text-align: center; padding: 22px 16px; background: #f5f0e8; border-radius: 14px; }
+    .value-item-num { font-family: 'Cormorant Garamond', serif; font-size: 2.2rem; font-weight: 700; color: #C4785A; }
+    .value-item-lbl { font-size: 0.74rem; color: #888; margin-top: 4px; text-transform: uppercase; letter-spacing: 0.05em; }
+
+    /* PACK TABLE */
+    .pack-table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+    .pack-table th { background: #1C3028; color: #fff; padding: 12px 16px; text-align: left; font-size: 0.8rem; font-weight: 600; letter-spacing: 0.04em; }
+    .pack-table th:first-child { border-radius: 10px 0 0 0; }
+    .pack-table th:last-child { border-radius: 0 10px 0 0; }
+    .pack-table td { padding: 11px 16px; font-size: 0.82rem; border-bottom: 1px solid #ece8e0; color: #444; }
+    .pack-table tr:last-child td { border-bottom: none; }
+    .pack-table tr:nth-child(even) td { background: #faf8f5; }
+    .badge-incl { background: #e8f4ec; color: #2e7d32; font-size: 0.7rem; font-weight: 700; padding: 2px 8px; border-radius: 20px; }
+    .badge-opt { background: #fef3cd; color: #856404; font-size: 0.7rem; font-weight: 700; padding: 2px 8px; border-radius: 20px; }
+
+    /* TECH */
+    .tech-pills { display: flex; flex-wrap: wrap; gap: 8px; margin: 16px 0; }
+    .tech-pill { background: #1C3028; color: #e0eae3; font-size: 0.75rem; font-weight: 600; padding: 5px 14px; border-radius: 20px; }
+
+    /* CONCLUSION */
+    .conclusion-box {
+      background: linear-gradient(135deg, #1C3028, #3D5A47);
+      border-radius: 16px; padding: 36px 40px; color: #fff; margin-top: 40px;
+    }
+    .conclusion-box h2 { font-family: 'Cormorant Garamond', serif; font-size: 1.9rem; margin-bottom: 14px; }
+    .conclusion-box p { color: rgba(255,255,255,0.78); font-size: 0.92rem; line-height: 1.75; margin-bottom: 12px; }
+    .conclusion-contact { display: flex; gap: 24px; margin-top: 24px; flex-wrap: wrap; }
+    .conclusion-contact-item { font-size: 0.82rem; color: rgba(255,255,255,0.7); }
+    .conclusion-contact-item strong { color: #fff; display: block; font-size: 0.92rem; }
+  </style>
+</head>
+<body>
+
+<button class="no-print" onclick="window.print()">⬇ Imprimer / Enregistrer en PDF</button>
+
+<!-- COUVERTURE -->
+<div class="cover">
+  <div class="cover-logo">Vendu Par <em>Moi</em></div>
+  <div class="cover-center">
+    <div class="cover-tag">Document de présentation · Confidentiel</div>
+    <div class="cover-title">La plateforme qui révolutionne<br>la <em>vente immobilière</em><br>entre particuliers</div>
+    <div class="cover-sub">Un outil complet pour permettre aux propriétaires de vendre leur bien sans agence, avec tout l'accompagnement d'un professionnel de l'immobilier.</div>
+    <div class="cover-stats">
+      <div>
+        <div class="cover-stat-val">6</div>
+        <div class="cover-stat-lbl">Modules de formation</div>
+      </div>
+      <div>
+        <div class="cover-stat-val">100%</div>
+        <div class="cover-stat-lbl">Digitalisé</div>
+      </div>
+      <div>
+        <div class="cover-stat-val">0€</div>
+        <div class="cover-stat-lbl">Frais d'agence</div>
+      </div>
+    </div>
+  </div>
+  <div class="cover-footer">
+    <div class="cover-footer-url">serenis-app.onrender.com</div>
+    <div class="cover-footer-date">Juin 2026 — Document interne</div>
+  </div>
+</div>
+
+<!-- CONTENU -->
+<div class="content">
+
+  <!-- CONCEPT -->
+  <h1 class="section-title">Le concept</h1>
+  <div class="section-rule"></div>
+
+  <div class="intro-box">
+    <strong>Vendu Par Moi</strong> est une plateforme SaaS qui accompagne les propriétaires vendeurs de A à Z dans la vente de leur bien immobilier <strong>sans agence</strong>. L'outil combine formation vidéo, coaching IA, outils professionnels et dossiers numériques pour transformer chaque propriétaire en vendeur efficace.
+  </div>
+
+  <h2 class="block-title">Le problème que l'on résout</h2>
+  <p>En France, les frais d'agence immobilière représentent en moyenne <strong>4 à 6% du prix de vente</strong> — soit 12 000€ à 18 000€ sur un bien à 300 000€. Pourtant, 30% des ventes se font déjà entre particuliers, souvent sans aucun accompagnement ni structure, ce qui génère des délais, des erreurs et des ventes ratées.</p>
+  <p>Vendu Par Moi comble ce vide : il offre aux vendeurs particuliers les mêmes outils et connaissances qu'un agent immobilier professionnel, à une fraction du coût.</p>
+
+  <div class="value-row">
+    <div class="value-item">
+      <div class="value-item-num">12 000€</div>
+      <div class="value-item-lbl">économisés en moyenne</div>
+    </div>
+    <div class="value-item">
+      <div class="value-item-num">6 sem.</div>
+      <div class="value-item-lbl">délai moyen de vente</div>
+    </div>
+    <div class="value-item">
+      <div class="value-item-num">100%</div>
+      <div class="value-item-lbl">accompagnement vendeur</div>
+    </div>
+  </div>
+
+  <hr class="section-divider">
+
+  <!-- FONCTIONNALITÉS -->
+  <h1 class="section-title">Les fonctionnalités</h1>
+  <div class="section-rule"></div>
+
+  <div class="features">
+
+    <div class="feature-card">
+      <div class="feature-icon" style="background:#e8f4ec;">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#3D5A47" stroke-width="1.8"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+      </div>
+      <div class="feature-title">Formation complète — 6 modules</div>
+      <div class="feature-desc">Parcours pédagogique structuré avec scripts de vente, check-lists, tableaux et coaching audio. Points clés, étapes détaillées et scripts dialogue vendeur/acheteur.</div>
+    </div>
+
+    <div class="feature-card">
+      <div class="feature-icon" style="background:#fef3e2;">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#C4785A" stroke-width="1.8"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+      </div>
+      <div class="feature-title">Agenda de visites</div>
+      <div class="feature-desc">Gestion des créneaux de disponibilité, réservation en ligne par les acheteurs, confirmation automatique par email et SMS, suivi des visites.</div>
+    </div>
+
+    <div class="feature-card">
+      <div class="feature-icon" style="background:#f0ebf8;">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="1.8"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+      </div>
+      <div class="feature-title">Coach IA immersif</div>
+      <div class="feature-desc">Assistant IA personnalisé (Coach VPM) avec avatar, bulles de conversation, suggestions contextuelles et accompagnement audio pour chaque module.</div>
+    </div>
+
+    <div class="feature-card">
+      <div class="feature-icon" style="background:#e8f4ec;">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#3D5A47" stroke-width="1.8"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+      </div>
+      <div class="feature-title">Dossier acheteur numérique</div>
+      <div class="feature-desc">Génération d'un lien sécurisé partageable contenant : photos, description complète, DPE, diagnostics, documents et formulaire de réservation de visite.</div>
+    </div>
+
+    <div class="feature-card">
+      <div class="feature-icon" style="background:#fef3e2;">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#C4785A" stroke-width="1.8"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+      </div>
+      <div class="feature-title">Guide photos professionnel</div>
+      <div class="feature-desc">Conseils pièce par pièce pour réaliser des photos d'annonce professionnelles avec un smartphone. Angle, lumière, mise en scène et exemples avant/après.</div>
+    </div>
+
+    <div class="feature-card">
+      <div class="feature-icon" style="background:#e8f4ec;">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#3D5A47" stroke-width="1.8"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+      </div>
+      <div class="feature-title">Dashboard vendeur</div>
+      <div class="feature-desc">Tableau de bord centralisé : score de dossier, statistiques de vues, contacts acheteurs, visites planifiées, alertes et progression globale.</div>
+    </div>
+
+    <div class="feature-card">
+      <div class="feature-icon" style="background:#fef3e2;">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#C4785A" stroke-width="1.8"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+      </div>
+      <div class="feature-title">Fiche bien & Prêt à envoyer</div>
+      <div class="feature-desc">Saisie complète du bien (surface, pièces, DPE, travaux, équipements) et génération de messages pré-rédigés avec lien personnalisé pour chaque type d'acheteur.</div>
+    </div>
+
+    <div class="feature-card">
+      <div class="feature-icon" style="background:#f0ebf8;">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="1.8"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+      </div>
+      <div class="feature-title">Mails types & CRM intégré</div>
+      <div class="feature-desc">Bibliothèque de mails pré-rédigés pour chaque étape (contact acheteur, confirmation visite, offre, compromis). Notifications SMS et email automatiques.</div>
+    </div>
+
+  </div>
+
+  <hr class="section-divider page-break">
+
+  <!-- FORMATION DETAIL -->
+  <h1 class="section-title">La formation — 6 modules</h1>
+  <div class="section-rule"></div>
+  <p>Le cœur de la plateforme est un parcours pédagogique complet en 6 modules, accessible depuis un iPhone simulé intégré dans l'interface. Chaque module contient des étapes détaillées, des scripts dialogue, des tableaux comparatifs et des check-lists.</p>
+
+  <div class="module-list">
+    <div class="module-item">
+      <div class="module-num">01</div>
+      <div>
+        <div class="module-info-title">Estimer son bien</div>
+        <div class="module-info-desc">Méthodes d'estimation (DVF, agences, MeilleursAgents), calcul du prix au m², impact du DPE, stratégie de prix dès le départ.</div>
+      </div>
+    </div>
+    <div class="module-item">
+      <div class="module-num">02</div>
+      <div>
+        <div class="module-info-title">Préparer sa vente</div>
+        <div class="module-info-desc">Documents à réunir, diagnostics obligatoires, constitution du dossier vendeur, dossier acheteur sérieux, organisation avant publication.</div>
+      </div>
+    </div>
+    <div class="module-item">
+      <div class="module-num">03</div>
+      <div>
+        <div class="module-info-title">Annonce & Photos</div>
+        <div class="module-info-desc">Rédaction d'annonce professionnelle, prise de photos avec smartphone, visite virtuelle, publication sur les portails immobiliers.</div>
+      </div>
+    </div>
+    <div class="module-item">
+      <div class="module-num">04</div>
+      <div>
+        <div class="module-info-title">Préparer sa visite</div>
+        <div class="module-info-desc">Qualification de l'acheteur avant visite, check-list de préparation, créneaux optimaux, confirmation par SMS avec adresse exacte.</div>
+      </div>
+    </div>
+    <div class="module-item">
+      <div class="module-num">05</div>
+      <div>
+        <div class="module-info-title">Les visites</div>
+        <div class="module-info-desc">Comportement pendant la visite, guide pièce par pièce, gestion des silences, réponses aux questions pièges, posture du vendeur.</div>
+      </div>
+    </div>
+    <div class="module-item">
+      <div class="module-num">06</div>
+      <div>
+        <div class="module-info-title">Négocier & Conclure</div>
+        <div class="module-info-desc">Réception et réponse aux offres, contre-propositions, compromis de vente, DDT, rôle du notaire, délais et acte définitif.</div>
+      </div>
+    </div>
+  </div>
+
+  <hr class="section-divider">
+
+  <!-- TECH -->
+  <h1 class="section-title">Stack technique</h1>
+  <div class="section-rule"></div>
+  <p>La plateforme est développée avec des technologies éprouvées, légères et performantes, permettant un déploiement rapide et une maintenance simplifiée.</p>
+
+  <div class="tech-pills">
+    <span class="tech-pill">Node.js + Express</span>
+    <span class="tech-pill">SQLite (better-sqlite3)</span>
+    <span class="tech-pill">Cloudinary (médias)</span>
+    <span class="tech-pill">HTML / CSS / JS Vanilla</span>
+    <span class="tech-pill">Render (hébergement)</span>
+    <span class="tech-pill">Twilio (SMS)</span>
+    <span class="tech-pill">Nodemailer (emails)</span>
+    <span class="tech-pill">Stripe (paiements)</span>
+    <span class="tech-pill">API Claude (IA coaching)</span>
+  </div>
+
+  <p style="margin-top: 18px;">Architecture <strong>monolithique simple</strong> — une seule base de code, zéro dépendance externe complexe. La base de données SQLite peut être migrée vers PostgreSQL pour la montée en charge. L'IA coaching utilise l'API Anthropic Claude pour des réponses contextualisées à chaque étape de la vente.</p>
+
+  <hr class="section-divider page-break">
+
+  <!-- MODÈLE ÉCO -->
+  <h1 class="section-title">Modèle économique</h1>
+  <div class="section-rule"></div>
+  <p>Vendu Par Moi fonctionne sur un modèle <strong>SaaS à accès unique</strong> — le vendeur paye une fois pour accéder à toute la plateforme pendant la durée de sa vente. Pas d'abonnement, pas de commission sur la vente.</p>
+
+  <table class="pack-table">
+    <thead>
+      <tr>
+        <th>Pack</th>
+        <th>Ce qui est inclus</th>
+        <th>Cible</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Essentiel</strong></td>
+        <td>Formation 6 modules · Dossier acheteur · Mails types</td>
+        <td>Vendeurs autonomes</td>
+      </tr>
+      <tr>
+        <td><strong>Confort</strong></td>
+        <td>Essentiel + Agenda visites · Guide photos · Coach IA</td>
+        <td>Vendeurs accompagnés</td>
+      </tr>
+      <tr>
+        <td><strong>Premium</strong></td>
+        <td>Confort + Coaching vidéo · Relecture annonce · Priorité support</td>
+        <td>Vendeurs exigeants</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <p>Le positionnement prix cible <strong>10x moins cher qu'une agence</strong> tout en offrant un niveau d'accompagnement comparable. La marge brute est élevée (SaaS) avec des coûts variables limités aux APIs tierces.</p>
+
+  <hr class="section-divider">
+
+  <!-- ROADMAP -->
+  <h1 class="section-title">Prochaines étapes</h1>
+  <div class="section-rule"></div>
+
+  <div class="features" style="grid-template-columns: 1fr 1fr 1fr;">
+    <div class="feature-card" style="grid-column: 1;">
+      <div class="feature-title" style="color:#3D5A47;">Court terme</div>
+      <div class="feature-desc" style="margin-top: 10px;">
+        · Re-upload photos/documents sur Cloudinary<br>
+        · Tests complets mobile (iPhone/Android)<br>
+        · Premiers vendeurs bêta<br>
+        · Collecte de feedback
+      </div>
+    </div>
+    <div class="feature-card" style="grid-column: 2;">
+      <div class="feature-title" style="color:#C4785A;">Moyen terme</div>
+      <div class="feature-desc" style="margin-top: 10px;">
+        · Portail de publication d'annonces<br>
+        · Intégration Leboncoin/SeLoger<br>
+        · Application mobile native<br>
+        · Migration PostgreSQL
+      </div>
+    </div>
+    <div class="feature-card" style="grid-column: 3;">
+      <div class="feature-title" style="color:#7c3aed;">Long terme</div>
+      <div class="feature-desc" style="margin-top: 10px;">
+        · Marketplace acheteurs/vendeurs<br>
+        · Partenariats notaires<br>
+        · Extension géographique<br>
+        · Levée de fonds
+      </div>
+    </div>
+  </div>
+
+  <!-- CONCLUSION -->
+  <div class="conclusion-box">
+    <h2>On construit quelque chose de sérieux.</h2>
+    <p>Vendu Par Moi n'est pas un simple site vitrine — c'est une plateforme fonctionnelle, testée, avec une vraie formation pédagogique, des outils professionnels et une UX pensée pour des propriétaires non-experts.</p>
+    <p>Le marché de la vente entre particuliers représente plusieurs milliards d'euros de commissions évitables chaque année en France. Nous sommes positionnés pour en capter une part significative avec le bon accompagnement.</p>
+    <div class="conclusion-contact">
+      <div class="conclusion-contact-item">
+        <strong>Plateforme</strong>
+        serenis-app.onrender.com
+      </div>
+      <div class="conclusion-contact-item">
+        <strong>Contact</strong>
+        matthiasbrieux260598@gmail.com
+      </div>
+      <div class="conclusion-contact-item">
+        <strong>Statut</strong>
+        MVP fonctionnel · Bêta ouverte
+      </div>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>

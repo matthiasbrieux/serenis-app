@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vendu Par Moi — Flyer</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    @media print {
+      html, body { width: 210mm; height: 297mm; }
+      .page { width: 210mm; min-height: 297mm; page-break-after: avoid; }
+      .no-print { display: none; }
+      @page { margin: 0; size: A4 portrait; }
+    }
+
+    body { font-family: 'Inter', sans-serif; background: #eee; display: flex; flex-direction: column; align-items: center; padding: 30px 20px 60px; gap: 30px; }
+
+    .no-print {
+      background: #3D5A47; color: #fff; border: none; padding: 12px 28px;
+      border-radius: 8px; font-family: 'Inter', sans-serif; font-size: 0.9rem;
+      font-weight: 600; cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+      margin-bottom: 10px;
+    }
+    .no-print:hover { background: #2d4535; }
+
+    /* FLYER RECTO */
+    .page {
+      width: 210mm; min-height: 297mm;
+      background: #fff;
+      display: flex; flex-direction: column;
+      overflow: hidden; box-shadow: 0 8px 40px rgba(0,0,0,0.18);
+    }
+
+    /* TOP BAND */
+    .top-band {
+      background: linear-gradient(135deg, #1C3028 0%, #3D5A47 100%);
+      padding: 36px 44px 32px;
+      color: #fff;
+      position: relative;
+      overflow: hidden;
+    }
+    .top-band::after {
+      content: '';
+      position: absolute; bottom: -1px; left: 0; right: 0; height: 40px;
+      background: #fff;
+      clip-path: ellipse(55% 100% at 50% 100%);
+    }
+    .logo { font-family: 'Cormorant Garamond', serif; font-size: 1.9rem; letter-spacing: 0.02em; margin-bottom: 18px; }
+    .logo em { color: #C4785A; font-style: normal; }
+    .headline { font-family: 'Cormorant Garamond', serif; font-size: 2.9rem; font-weight: 700; line-height: 1.08; margin-bottom: 14px; }
+    .headline em { color: #f0b89a; font-style: italic; }
+    .subhead { font-size: 0.88rem; color: rgba(255,255,255,0.72); max-width: 400px; line-height: 1.6; }
+
+    /* SAVING BADGE */
+    .saving-badge {
+      position: absolute; top: 32px; right: 40px;
+      width: 100px; height: 100px; border-radius: 50%;
+      background: #C4785A;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      box-shadow: 0 4px 20px rgba(196,120,90,0.5);
+    }
+    .saving-badge-val { font-family: 'Cormorant Garamond', serif; font-size: 1.7rem; font-weight: 700; color: #fff; line-height: 1; }
+    .saving-badge-lbl { font-size: 0.55rem; font-weight: 700; color: rgba(255,255,255,0.85); text-transform: uppercase; letter-spacing: 0.08em; text-align: center; margin-top: 3px; }
+
+    /* BODY */
+    .body { flex: 1; padding: 36px 44px 28px; }
+
+    /* PROBLEM */
+    .problem-box {
+      background: #fef8f4; border-left: 4px solid #C4785A;
+      border-radius: 0 12px 12px 0; padding: 16px 20px; margin-bottom: 28px;
+      font-size: 0.88rem; color: #3a2a20; line-height: 1.65;
+    }
+    .problem-box strong { color: #C4785A; font-size: 1rem; display: block; margin-bottom: 4px; }
+
+    /* FEATURES */
+    .features-title {
+      font-family: 'Cormorant Garamond', serif; font-size: 1.45rem; font-weight: 700;
+      color: #1C3028; margin-bottom: 18px;
+    }
+    .feat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 28px; }
+    .feat { display: flex; align-items: flex-start; gap: 12px; padding: 14px 16px; background: #f8f5f0; border-radius: 12px; }
+    .feat-ico { width: 36px; height: 36px; border-radius: 9px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .feat-text-title { font-weight: 700; font-size: 0.82rem; color: #1a1a1a; margin-bottom: 2px; }
+    .feat-text-desc { font-size: 0.72rem; color: #777; line-height: 1.5; }
+
+    /* STEPS */
+    .steps-title { font-family: 'Cormorant Garamond', serif; font-size: 1.3rem; font-weight: 700; color: #1C3028; margin-bottom: 14px; }
+    .steps { display: flex; gap: 0; margin-bottom: 28px; position: relative; }
+    .steps::before { content: ''; position: absolute; top: 18px; left: 18px; right: 18px; height: 2px; background: #e0ead8; z-index: 0; }
+    .step { flex: 1; text-align: center; position: relative; z-index: 1; }
+    .step-dot { width: 36px; height: 36px; border-radius: 50%; background: #3D5A47; color: #fff; font-weight: 700; font-size: 0.82rem; display: flex; align-items: center; justify-content: center; margin: 0 auto 8px; box-shadow: 0 2px 8px rgba(61,90,71,0.3); }
+    .step-label { font-size: 0.68rem; font-weight: 600; color: #3D5A47; text-transform: uppercase; letter-spacing: 0.06em; line-height: 1.4; }
+
+    /* TESTIMONIAL */
+    .testimonial {
+      background: linear-gradient(135deg, #1C3028, #3D5A47);
+      border-radius: 14px; padding: 20px 22px; margin-bottom: 24px; color: #fff;
+      position: relative;
+    }
+    .testimonial::before { content: '"'; font-family: 'Cormorant Garamond', serif; font-size: 5rem; color: rgba(255,255,255,0.15); position: absolute; top: -8px; left: 16px; line-height: 1; }
+    .testimonial-text { font-size: 0.85rem; color: rgba(255,255,255,0.88); line-height: 1.65; font-style: italic; padding-left: 32px; margin-bottom: 10px; }
+    .testimonial-author { font-size: 0.72rem; color: rgba(255,255,255,0.55); padding-left: 32px; }
+
+    /* CTA */
+    .cta-strip {
+      background: #C4785A; border-radius: 14px; padding: 20px 26px;
+      display: flex; align-items: center; justify-content: space-between; gap: 16px;
+    }
+    .cta-left h3 { font-family: 'Cormorant Garamond', serif; font-size: 1.3rem; color: #fff; margin-bottom: 4px; }
+    .cta-left p { font-size: 0.78rem; color: rgba(255,255,255,0.8); }
+    .cta-right { text-align: right; flex-shrink: 0; }
+    .cta-url { font-weight: 800; font-size: 0.9rem; color: #fff; display: block; }
+    .cta-url-sub { font-size: 0.68rem; color: rgba(255,255,255,0.7); }
+
+    /* FOOTER */
+    .flyer-footer {
+      background: #1C3028; padding: 14px 44px;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .footer-logo { font-family: 'Cormorant Garamond', serif; font-size: 1.05rem; color: rgba(255,255,255,0.7); }
+    .footer-logo em { color: #C4785A; font-style: normal; }
+    .footer-tagline { font-size: 0.7rem; color: rgba(255,255,255,0.4); }
+    .footer-contact { font-size: 0.72rem; color: rgba(255,255,255,0.55); text-align: right; }
+
+    /* ── PAGE 2 : VERSO ── */
+    .page2 {
+      width: 210mm; min-height: 297mm;
+      background: linear-gradient(160deg, #1C3028 0%, #2a4535 100%);
+      display: flex; flex-direction: column;
+      overflow: hidden; box-shadow: 0 8px 40px rgba(0,0,0,0.18);
+      color: #fff;
+    }
+    .p2-header { padding: 44px 48px 32px; border-bottom: 1px solid rgba(255,255,255,0.1); }
+    .p2-logo { font-family: 'Cormorant Garamond', serif; font-size: 1.6rem; margin-bottom: 10px; }
+    .p2-logo em { color: #C4785A; font-style: normal; }
+    .p2-title { font-family: 'Cormorant Garamond', serif; font-size: 2.2rem; font-weight: 700; line-height: 1.2; }
+    .p2-title em { color: #f0b89a; font-style: italic; }
+    .p2-body { flex: 1; padding: 36px 48px; }
+    .p2-section-title { font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.12em; font-weight: 700; color: rgba(255,255,255,0.4); margin-bottom: 20px; }
+
+    .module-row { display: flex; align-items: center; gap: 16px; padding: 14px 0; border-bottom: 1px solid rgba(255,255,255,0.08); }
+    .module-row:last-child { border-bottom: none; }
+    .mod-num { width: 38px; height: 38px; border-radius: 50%; background: rgba(196,120,90,0.2); border: 1.5px solid rgba(196,120,90,0.4); color: #f0b89a; font-weight: 700; font-size: 0.78rem; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .mod-title { font-weight: 600; font-size: 0.92rem; color: #fff; margin-bottom: 3px; }
+    .mod-sub { font-size: 0.73rem; color: rgba(255,255,255,0.5); line-height: 1.5; }
+
+    .p2-divider { border: none; border-top: 1px solid rgba(255,255,255,0.1); margin: 32px 0; }
+
+    .p2-included-title { font-family: 'Cormorant Garamond', serif; font-size: 1.4rem; margin-bottom: 16px; color: #e0eae3; }
+    .p2-included-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .p2-incl-item { display: flex; align-items: center; gap: 10px; padding: 10px 14px; background: rgba(255,255,255,0.06); border-radius: 10px; border: 1px solid rgba(255,255,255,0.08); }
+    .p2-incl-check { width: 22px; height: 22px; border-radius: 50%; background: rgba(61,90,71,0.5); border: 1.5px solid #3D5A47; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .p2-incl-text { font-size: 0.78rem; color: rgba(255,255,255,0.8); }
+
+    .p2-footer {
+      padding: 28px 48px; background: rgba(0,0,0,0.2);
+      border-top: 1px solid rgba(255,255,255,0.08);
+    }
+    .p2-cta-big { font-family: 'Cormorant Garamond', serif; font-size: 1.8rem; font-weight: 700; color: #C4785A; margin-bottom: 6px; }
+    .p2-cta-sub { font-size: 0.8rem; color: rgba(255,255,255,0.55); margin-bottom: 18px; }
+    .p2-contact-row { display: flex; gap: 32px; }
+    .p2-contact-item strong { display: block; font-size: 0.8rem; color: #fff; margin-bottom: 2px; }
+    .p2-contact-item span { font-size: 0.73rem; color: rgba(255,255,255,0.5); }
+  </style>
+</head>
+<body>
+
+<button class="no-print" onclick="window.print()">⬇ Imprimer / Enregistrer en PDF</button>
+
+<!-- ══ RECTO ══ -->
+<div class="page">
+
+  <div class="top-band">
+    <div class="logo">Vendu Par <em>Moi</em></div>
+    <div class="headline">Vendez votre bien<br>sans agence.<br><em>Économisez des milliers.</em></div>
+    <div class="subhead">La première plateforme qui vous accompagne comme un agent immobilier — sans en payer un.</div>
+    <div class="saving-badge">
+      <div class="saving-badge-val">15k€</div>
+      <div class="saving-badge-lbl">économisés<br>en moyenne</div>
+    </div>
+  </div>
+
+  <div class="body">
+
+    <div class="problem-box">
+      <strong>Le saviez-vous ?</strong>
+      En France, les frais d'agence représentent <strong>4 à 6% du prix de vente</strong> — soit plus de 15 000€ pour un appartement à 300 000€. Avec Vendu Par Moi, vous gardez cet argent dans votre poche.
+    </div>
+
+    <div class="features-title">Tout ce dont vous avez besoin pour vendre</div>
+
+    <div class="feat-grid">
+      <div class="feat">
+        <div class="feat-ico" style="background:#e8f4ec;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#3D5A47" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+        </div>
+        <div>
+          <div class="feat-text-title">Formation complète</div>
+          <div class="feat-text-desc">6 modules · Scripts · Check-lists · Méthodes pros</div>
+        </div>
+      </div>
+      <div class="feat">
+        <div class="feat-ico" style="background:#fef3e2;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#C4785A" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        </div>
+        <div>
+          <div class="feat-text-title">Agenda de visites</div>
+          <div class="feat-text-desc">Réservation en ligne · Confirmations SMS/email auto</div>
+        </div>
+      </div>
+      <div class="feat">
+        <div class="feat-ico" style="background:#e8f4ec;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#3D5A47" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+        </div>
+        <div>
+          <div class="feat-text-title">Dossier acheteur pro</div>
+          <div class="feat-text-desc">Lien partageable · Photos · Diagnostics · DPE</div>
+        </div>
+      </div>
+      <div class="feat">
+        <div class="feat-ico" style="background:#fef3e2;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#C4785A" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        </div>
+        <div>
+          <div class="feat-text-title">Coach IA personnel</div>
+          <div class="feat-text-desc">Conseils en temps réel · Mails types · Scripts</div>
+        </div>
+      </div>
+      <div class="feat">
+        <div class="feat-ico" style="background:#e8f4ec;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#3D5A47" stroke-width="2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+        </div>
+        <div>
+          <div class="feat-text-title">Guide photos pro</div>
+          <div class="feat-text-desc">Conseils pièce par pièce avec votre smartphone</div>
+        </div>
+      </div>
+      <div class="feat">
+        <div class="feat-ico" style="background:#fef3e2;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#C4785A" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+        </div>
+        <div>
+          <div class="feat-text-title">Tableau de bord</div>
+          <div class="feat-text-desc">Vues · Contacts · Statistiques en temps réel</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="steps-title">Comment ça marche ?</div>
+    <div class="steps">
+      <div class="step">
+        <div class="step-dot">1</div>
+        <div class="step-label">Je crée<br>mon espace</div>
+      </div>
+      <div class="step">
+        <div class="step-dot">2</div>
+        <div class="step-label">Je suis<br>la formation</div>
+      </div>
+      <div class="step">
+        <div class="step-dot">3</div>
+        <div class="step-label">J'envoie mon<br>dossier acheteur</div>
+      </div>
+      <div class="step">
+        <div class="step-dot">4</div>
+        <div class="step-label">Je gère mes<br>visites</div>
+      </div>
+      <div class="step">
+        <div class="step-dot">5</div>
+        <div class="step-label">Je signe<br>chez le notaire</div>
+      </div>
+    </div>
+
+    <div class="testimonial">
+      <div class="testimonial-text">Grâce à Vendu Par Moi, j'ai vendu mon appartement en 5 semaines sans agence. Le dossier acheteur numérique a vraiment fait la différence — les acheteurs arrivaient déjà convaincus à la visite.</div>
+      <div class="testimonial-author">— Propriétaire, Lyon · Bien vendu à 285 000€</div>
+    </div>
+
+    <div class="cta-strip">
+      <div class="cta-left">
+        <h3>Commencez gratuitement aujourd'hui</h3>
+        <p>Accès immédiat · Sans engagement · 100% en ligne</p>
+      </div>
+      <div class="cta-right">
+        <span class="cta-url">venduparmo.fr</span>
+        <span class="cta-url-sub">ou scannez le QR code →</span>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="flyer-footer">
+    <div class="footer-logo">Vendu Par <em>Moi</em></div>
+    <div class="footer-tagline">La vente immobilière entre particuliers, enfin professionnelle.</div>
+    <div class="footer-contact">contact@venduparmo.fr</div>
+  </div>
+
+</div>
+
+<!-- ══ VERSO ══ -->
+<div class="page2">
+
+  <div class="p2-header">
+    <div class="p2-logo">Vendu Par <em>Moi</em></div>
+    <div class="p2-title">La formation qui vous donne<br>les clés de <em>votre vente</em></div>
+  </div>
+
+  <div class="p2-body">
+
+    <div class="p2-section-title">Programme — 6 modules complets</div>
+
+    <div class="module-row">
+      <div class="mod-num">01</div>
+      <div>
+        <div class="mod-title">Estimer son bien</div>
+        <div class="mod-sub">Prix au m², DVF, agences comparatives, impact DPE — trouver le juste prix dès le départ</div>
+      </div>
+    </div>
+    <div class="module-row">
+      <div class="mod-num">02</div>
+      <div>
+        <div class="mod-title">Préparer sa vente</div>
+        <div class="mod-sub">Documents, diagnostics, dossier acheteur et notaire — tout rassembler avant de publier</div>
+      </div>
+    </div>
+    <div class="module-row">
+      <div class="mod-num">03</div>
+      <div>
+        <div class="mod-title">Annonce & Photos</div>
+        <div class="mod-sub">Rédiger une annonce qui accroche, réussir ses photos avec un smartphone, publier sur les bons portails</div>
+      </div>
+    </div>
+    <div class="module-row">
+      <div class="mod-num">04</div>
+      <div>
+        <div class="mod-title">Préparer sa visite</div>
+        <div class="mod-sub">Qualifier l'acheteur avant d'ouvrir votre porte, préparer l'accueil, confirmer avec les bons messages</div>
+      </div>
+    </div>
+    <div class="module-row">
+      <div class="mod-num">05</div>
+      <div>
+        <div class="mod-title">Les visites</div>
+        <div class="mod-sub">Se comporter en professionnel, guider sans vendre, répondre aux questions pièges, gérer les silences</div>
+      </div>
+    </div>
+    <div class="module-row">
+      <div class="mod-num">06</div>
+      <div>
+        <div class="mod-title">Négocier & Conclure</div>
+        <div class="mod-sub">Recevoir et répondre à une offre, contre-proposer, signer le compromis, accompagnement jusqu'au notaire</div>
+      </div>
+    </div>
+
+    <div class="p2-divider"></div>
+
+    <div class="p2-included-title">Tout inclus dans votre espace vendeur</div>
+    <div class="p2-included-grid">
+      <div class="p2-incl-item">
+        <div class="p2-incl-check"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#6dbf8a" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
+        <div class="p2-incl-text">Formation vidéo 6 modules</div>
+      </div>
+      <div class="p2-incl-item">
+        <div class="p2-incl-check"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#6dbf8a" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
+        <div class="p2-incl-text">Scripts dialogue vendeur/acheteur</div>
+      </div>
+      <div class="p2-incl-item">
+        <div class="p2-incl-check"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#6dbf8a" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
+        <div class="p2-incl-text">Dossier acheteur numérique</div>
+      </div>
+      <div class="p2-incl-item">
+        <div class="p2-incl-check"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#6dbf8a" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
+        <div class="p2-incl-text">Agenda de visites en ligne</div>
+      </div>
+      <div class="p2-incl-item">
+        <div class="p2-incl-check"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#6dbf8a" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
+        <div class="p2-incl-text">Coach IA personnalisé</div>
+      </div>
+      <div class="p2-incl-item">
+        <div class="p2-incl-check"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#6dbf8a" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
+        <div class="p2-incl-text">Mails types prêts à envoyer</div>
+      </div>
+      <div class="p2-incl-item">
+        <div class="p2-incl-check"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#6dbf8a" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
+        <div class="p2-incl-text">Notifications SMS automatiques</div>
+      </div>
+      <div class="p2-incl-item">
+        <div class="p2-incl-check"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#6dbf8a" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
+        <div class="p2-incl-text">Guide photos smartphone</div>
+      </div>
+      <div class="p2-incl-item">
+        <div class="p2-incl-check"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#6dbf8a" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
+        <div class="p2-incl-text">Check-lists à chaque étape</div>
+      </div>
+      <div class="p2-incl-item">
+        <div class="p2-incl-check"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#6dbf8a" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
+        <div class="p2-incl-text">Suivi des statistiques en temps réel</div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="p2-footer">
+    <div class="p2-cta-big">Prêt à vendre sans agence ?</div>
+    <div class="p2-cta-sub">Rejoignez des centaines de propriétaires qui ont repris le contrôle de leur vente.</div>
+    <div class="p2-contact-row">
+      <div class="p2-contact-item">
+        <strong>Site web</strong>
+        <span>venduparmo.fr</span>
+      </div>
+      <div class="p2-contact-item">
+        <strong>Email</strong>
+        <span>contact@venduparmo.fr</span>
+      </div>
+      <div class="p2-contact-item">
+        <strong>Accès immédiat</strong>
+        <span>Inscription en 2 minutes</span>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+</body>
+</html>
