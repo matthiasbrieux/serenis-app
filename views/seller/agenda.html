@@ -336,15 +336,24 @@
     .page-header h1 { font-size:1.5rem; font-weight:700; color:#1A1A16; margin:0 0 4px; }
     .page-header-sub { font-size:0.87rem; color:#888; }
 
-    /* ── iOS mobile fixes ── */
+    /* ── iOS mobile fixes (layout breakpoint) ── */
     @media (max-width:768px) {
-      .modal-field input, .modal-field select, .modal-field textarea { font-size: 1rem !important; }
-      .visit-notes-input { font-size: 1rem !important; }
       .btn-primary-modal, .btn-secondary-modal { min-height: 44px; touch-action: manipulation; }
-      .modal-close { min-width: 44px; min-height: 44px; }
       .add-btn, .add-btn-sec { min-height: 44px; }
       .sc-btn-copy, .sc-btn-copy-phrase { min-height: 44px; }
       .toast { bottom: max(28px, calc(env(safe-area-inset-bottom) + 12px)); right: max(28px, env(safe-area-inset-right)); }
+    }
+    /* Touch devices — applies portrait AND landscape */
+    @media (pointer: coarse) {
+      /* Prevent iOS auto-zoom on focus (requires ≥16px font-size) */
+      .modal-field input, .modal-field select, .modal-field textarea { font-size: 1rem !important; }
+      .visit-notes-input { font-size: 1rem !important; }
+      .avail-input { font-size: 1rem !important; }
+      #bookingLink { font-size: 1rem !important; }
+      /* Touch target minimums (44×44px per Apple HIG) */
+      .modal-close { min-width: 44px; min-height: 44px; }
+      .cal-nav { width:44px; height:44px; }
+      .avail-slot-del { min-width:44px; min-height:44px; }
     }
   </style>
 </head>
