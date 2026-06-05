@@ -25,7 +25,7 @@
     .main { margin-left:240px; display:flex; flex-direction:column; min-height:100vh; }
 
     /* Top bar */
-    .topbar { background:#fff; border-bottom:1px solid #e8e3db; padding:0 32px; height:64px; display:flex; align-items:center; gap:20px; position:sticky; top:0; z-index:50; }
+    .topbar { background:#fff; border-bottom:1px solid #e8e3db; padding:0 32px; height:64px; display:flex; align-items:center; gap:20px; position:sticky; top:0; z-index:50; overflow:hidden; }
     .topbar-title { font-family:'Cormorant Garamond',serif; font-size:1.3rem; color:#1a1a1a; font-weight:600; flex:1; }
     .topbar-sub { font-size:0.8rem; color:#888; margin-top:1px; }
     .progress-container { display:flex; align-items:center; gap:12px; }
@@ -100,8 +100,8 @@
     .badge-optional { background:#f0f5f1; color:#3D5A47; }
     .badge-done { background:#ecfdf5; color:#059669; }
 
-    /* Upload input hidden */
-    input[type="file"] { display:none; }
+    /* Per-angle file input overlay — fiable iOS Safari (évite le bug display:none + .click()) */
+    .angle-input-overlay { position:absolute; inset:0; width:100%; height:100%; opacity:0; cursor:pointer; font-size:16px; z-index:2; }
 
     /* Next room button */
     .next-room-wrap { border-top:1px solid #e8e3db; padding-top:24px; display:flex; gap:12px; align-items:center; }
@@ -130,11 +130,27 @@
     @keyframes spin { to { transform:rotate(360deg); } }
 
     @media(max-width:900px) {
-      .main { margin-left:0; }
       .guide-layout { grid-template-columns:1fr; }
-      .room-list { position:static; height:auto; border-right:none; border-bottom:1px solid #e8e3db; }
-      .room-content { padding:20px 16px 60px; }
-      .topbar { padding:0 16px; }
+      .room-list { position:static; height:auto; max-height:200px; overflow-y:auto; border-right:none; border-bottom:1px solid #e8e3db; }
+      .room-content { padding:20px 16px 80px; }
+      /* On touch devices the overlay only shows on hover — always show it slightly */
+      .angle-photo-area .angle-overlay { background:rgba(0,0,0,0.22); }
+      .angle-photo-area .overlay-btn { opacity:1; }
+    }
+
+    @media(max-width:768px) {
+      .topbar { padding:0 12px; gap:8px; }
+      .topbar-sub { display:none; }
+      .progress-track { width:90px; }
+      .toast { bottom:max(20px, env(safe-area-inset-bottom, 20px)); left:max(16px, env(safe-area-inset-left, 16px)); right:max(16px, env(safe-area-inset-right, 16px)); width:auto; }
+    }
+
+    @media(pointer:coarse) {
+      .room-item { min-height:48px; touch-action:manipulation; }
+      .room-add-btn { min-height:44px; touch-action:manipulation; }
+      .btn-skip, .btn-done-room, .btn-next { min-height:44px; touch-action:manipulation; }
+      .overlay-btn { min-height:44px; padding:8px 14px; touch-action:manipulation; }
+      .angle-photo-area { touch-action:manipulation; }
     }
   </style>
   <style id="embed-style"></style>
@@ -208,7 +224,6 @@
 </div>
 
 <div class="toast" id="toast"></div>
-<input type="file" id="fileInput" accept="image/*" multiple>
 
 <script src="/js/seller-nav.js"></script>
 <script>
@@ -468,14 +483,20 @@ function selectRoom(roomId) {
   const content = document.getElementById('roomContent');
   content.innerHTML = renderRoomContent(room);
 
-  // Wire up upload zones
+  // Wire up per-angle file inputs and drag-and-drop
   room.angles.forEach(angle => {
+    const input = document.getElementById(`ai-${roomId}-${angle.id}`);
+    if (input) {
+      input.addEventListener('change', () => handleFiles(input.files, roomId, angle.id));
+    }
     const zone = document.getElementById(`zone-${roomId}-${angle.id}`);
     if (zone) {
-      zone.addEventListener('click', () => triggerUpload(roomId, angle.id));
-      zone.addEventListener('dragover', e => { e.preventDefault(); zone.classList.add('drag-over'); });
-      zone.addEventListener('dragleave', () => zone.classList.remove('drag-over'));
-      zone.addEventListener('drop', e => { e.preventDefault(); zone.classList.remove('drag-over'); handleFiles(e.dataTransfer.files, roomId, angle.id); });
+      const area = zone.closest('.angle-photo-area');
+      if (area) {
+        area.addEventListener('dragover', e => { e.preventDefault(); zone.classList.add('drag-over'); });
+        area.addEventListener('dragleave', () => zone.classList.remove('drag-over'));
+        area.addEventListener('drop', e => { e.preventDefault(); zone.classList.remove('drag-over'); handleFiles(e.dataTransfer.files, roomId, angle.id); });
+      }
     }
   });
 }
@@ -491,9 +512,10 @@ function renderRoomContent(room) {
       photoAreaHtml = `
         <div class="angle-photo-area">
           <img src="${photo.thumb || photo.url}" alt="${angle.label}" loading="lazy">
-          <div class="angle-overlay">
-            <button class="overlay-btn" onclick="triggerUpload('${room.id}','${angle.id}')"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="vertical-align:middle;margin-right:3px;"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>Remplacer</button>
-            <button class="overlay-btn del" onclick="deletePhoto('${room.id}','${angle.id}','${photo.cid}')"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg></button>
+          <input type="file" id="ai-${room.id}-${angle.id}" class="angle-input-overlay" accept="image/*">
+          <div class="angle-overlay" style="pointer-events:none;">
+            <label for="ai-${room.id}-${angle.id}" class="overlay-btn" style="cursor:pointer;pointer-events:auto;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="vertical-align:middle;margin-right:3px;"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>Remplacer</label>
+            <button class="overlay-btn del" onclick="deletePhoto('${room.id}','${angle.id}','${photo.cid}')" style="pointer-events:auto;position:relative;z-index:3;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg></button>
           </div>
           <div class="uploading-overlay" id="ov-${room.id}-${angle.id}">
             <div class="upload-spinner"></div>
@@ -503,10 +525,11 @@ function renderRoomContent(room) {
     } else {
       photoAreaHtml = `
         <div class="angle-photo-area">
-          <div class="angle-upload-zone" id="zone-${room.id}-${angle.id}">
+          <div class="angle-upload-zone" id="zone-${room.id}-${angle.id}" style="pointer-events:none;">
             <div class="upload-icon"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="opacity:0.4;"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg></div>
-            <div class="upload-text"><strong>${angle.label}</strong>Cliquer ou glisser une photo</div>
+            <div class="upload-text"><strong>${angle.label}</strong>Appuyer ou glisser une photo</div>
           </div>
+          <input type="file" id="ai-${room.id}-${angle.id}" class="angle-input-overlay" accept="image/*">
           <div class="uploading-overlay" id="ov-${room.id}-${angle.id}">
             <div class="upload-spinner"></div>
             <div style="font-size:0.75rem;color:#3D5A47;font-weight:600;">Upload…</div>
@@ -565,15 +588,6 @@ function renderRoomContent(room) {
 }
 
 // ── Upload ───────────────────────────────────────────────────────
-let pendingUpload = null; // { roomId, angleId }
-
-function triggerUpload(roomId, angleId) {
-  pendingUpload = { roomId, angleId };
-  const input = document.getElementById('fileInput');
-  input.value = '';
-  input.onchange = () => handleFiles(input.files, roomId, angleId);
-  input.click();
-}
 
 async function handleFiles(files, roomId, angleId) {
   if (!files || !files.length) return;
