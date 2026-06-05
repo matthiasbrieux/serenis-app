@@ -467,6 +467,25 @@
     .db-mail-copy:active { background:#2d4535; }
     .db-empty { color:#b0a89f; font-size:0.84rem; font-style:italic; padding:6px 0; }
 
+    /* ── Visites à confirmer ── */
+    .db-pending-card { background:#fff; border-radius:14px; overflow:hidden; box-shadow:0 2px 10px rgba(245,127,23,0.15); margin-bottom:14px; border:1.5px solid #f5a623; }
+    .db-pending-hdr { background:linear-gradient(135deg,#f57f17,#f5a623); padding:14px 20px; display:flex; align-items:center; justify-content:space-between; gap:10px; }
+    .db-pending-hdr-title { font-size:0.72rem; font-weight:700; text-transform:uppercase; letter-spacing:0.1em; color:#fff; display:flex; align-items:center; gap:7px; }
+    .db-pending-count { background:rgba(255,255,255,0.25); color:#fff; padding:3px 11px; border-radius:20px; font-size:0.75rem; font-weight:700; border:1px solid rgba(255,255,255,0.3); }
+    .db-pending-body { padding:16px 20px; display:flex; flex-direction:column; gap:10px; }
+    .db-pending-item { padding:14px 16px; border:1.5px solid #fde8c2; border-left:4px solid #f57f17; border-radius:10px; background:#fffdf7; }
+    .db-pending-top { display:flex; justify-content:space-between; align-items:flex-start; gap:10px; margin-bottom:10px; }
+    .db-pending-name { font-weight:700; font-size:0.9rem; color:#1C1C1A; }
+    .db-pending-contact { font-size:0.75rem; color:#8C8880; margin-top:3px; word-break:break-word; }
+    .db-pending-when { font-size:0.84rem; font-weight:700; color:#f57f17; white-space:nowrap; text-align:right; flex-shrink:0; line-height:1.5; }
+    .db-pending-actions { display:flex; gap:8px; }
+    .db-pending-confirm { flex:1; padding:9px 14px; background:#3D5A47; color:#fff; border:none; border-radius:8px; font-size:0.82rem; font-weight:700; cursor:pointer; font-family:inherit; transition:background 0.15s; }
+    .db-pending-confirm:hover { background:#2d4535; }
+    .db-pending-confirm:disabled { opacity:0.6; cursor:not-allowed; }
+    .db-pending-refuse { flex:1; padding:9px 14px; background:#fff; color:#e74c3c; border:1.5px solid #ffd5d5; border-radius:8px; font-size:0.82rem; font-weight:700; cursor:pointer; font-family:inherit; transition:all 0.15s; }
+    .db-pending-refuse:hover { background:#fdf2f2; border-color:#e74c3c; }
+    .db-pending-refuse:disabled { opacity:0.6; cursor:not-allowed; }
+
     /* ── Mobile : calibrage iPhone ── */
     @media (max-width:900px) {
       .sidebar { transform:translateX(-100%); }
@@ -601,6 +620,18 @@
 
     </div>
 
+    <!-- Visites à confirmer (urgent, masqué si vide) -->
+    <div class="db-pending-card" id="dbPendingCard" style="display:none;">
+      <div class="db-pending-hdr">
+        <div class="db-pending-hdr-title">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          Visites à confirmer
+        </div>
+        <span class="db-pending-count" id="dbPendingCount">0</span>
+      </div>
+      <div class="db-pending-body" id="dbPending"></div>
+    </div>
+
     <!-- Mes disponibilités demandées -->
     <div class="db-card-full">
       <div class="db-card-hdr2">
@@ -726,40 +757,69 @@ function renderFormationProgress() {
   setTimeout(() => { document.getElementById('dbFormFill').style.width = pct + '%'; }, 80);
 }
 
-/* ——— Disponibilités (agenda_slots + visites pending) ——— */
-function renderDispos(visits, agendaSlots) {
+/* ——— Visites à confirmer (pending) ——— */
+async function confirmVisit(id, action) {
+  const status = action === 'confirm' ? 'confirmed' : 'cancelled';
+  const btns = document.querySelectorAll(`[data-visit-id="${id}"]`);
+  btns.forEach(b => b.disabled = true);
+  try {
+    const res = await fetch(`/api/visits/${id}/status`, {
+      method: 'PUT',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({status})
+    });
+    if (!res.ok) { window.showToast('Erreur serveur', 'error'); btns.forEach(b => b.disabled = false); return; }
+    window.showToast(action === 'confirm' ? 'Visite confirmée ✓' : 'Visite refusée');
+    loadData();
+  } catch(e) {
+    window.showToast('Erreur réseau', 'error');
+    btns.forEach(b => b.disabled = false);
+  }
+}
+
+function renderPending(visits) {
   const pending = visits.filter(v => v.status === 'pending');
+  const card = document.getElementById('dbPendingCard');
+  const el = document.getElementById('dbPending');
+  const countEl = document.getElementById('dbPendingCount');
+  if (!pending.length) { card.style.display = 'none'; return; }
+  card.style.display = 'block';
+  if (countEl) countEl.textContent = pending.length;
+  el.innerHTML = pending.map(v => `
+    <div class="db-pending-item">
+      <div class="db-pending-top">
+        <div>
+          <div class="db-pending-name">${v.buyer_name || '—'}</div>
+          <div class="db-pending-contact">${[v.buyer_phone, v.buyer_email].filter(Boolean).join(' · ') || 'Coordonnées non renseignées'}</div>
+        </div>
+        <div class="db-pending-when">${formatDate(v.visit_date)}<br>${v.visit_time || ''}</div>
+      </div>
+      <div class="db-pending-actions">
+        <button class="db-pending-confirm" data-visit-id="${v.id}" onclick="confirmVisit(${v.id},'confirm')">✓ Confirmer</button>
+        <button class="db-pending-refuse" data-visit-id="${v.id}" onclick="confirmVisit(${v.id},'refuse')">✗ Refuser</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+/* ——— Disponibilités (agenda_slots uniquement) ——— */
+function renderDispos(visits, agendaSlots) {
   const specificSlots = (agendaSlots || []).filter(s => s.specific_date);
   const el = document.getElementById('dbDispos');
-  if (!pending.length && !specificSlots.length) {
+  if (!specificSlots.length) {
     el.innerHTML = '<p class="db-empty">Aucune disponibilité proposée pour le moment.</p>';
     return;
   }
-  let html = '';
-  if (specificSlots.length) {
-    specificSlots.sort((a, b) => a.specific_date.localeCompare(b.specific_date));
-    html += specificSlots.map(s => `
-      <div class="db-dispo-row">
-        <div>
-          <div class="db-dispo-date">${formatDate(s.specific_date)} · ${s.start_time}–${s.end_time}</div>
-          <div class="db-dispo-who">Créneau proposé aux acheteurs</div>
-        </div>
-        <span class="db-dispo-badge" style="background:#fff3e0;color:#e65100;">Proposé</span>
+  specificSlots.sort((a, b) => a.specific_date.localeCompare(b.specific_date));
+  el.innerHTML = specificSlots.map(s => `
+    <div class="db-dispo-row">
+      <div>
+        <div class="db-dispo-date">${formatDate(s.specific_date)} · ${s.start_time}–${s.end_time}</div>
+        <div class="db-dispo-who">Créneau proposé aux acheteurs</div>
       </div>
-    `).join('');
-  }
-  if (pending.length) {
-    html += pending.map(v => `
-      <div class="db-dispo-row">
-        <div>
-          <div class="db-dispo-date">${formatDate(v.visit_date)} à ${v.visit_time}</div>
-          <div class="db-dispo-who">${v.buyer_name || '—'}${v.buyer_phone ? ' · ' + v.buyer_phone : ''}${v.buyer_email ? ' · ' + v.buyer_email : ''}</div>
-        </div>
-        <span class="db-dispo-badge">En attente</span>
-      </div>
-    `).join('');
-  }
-  el.innerHTML = html;
+      <span class="db-dispo-badge" style="background:#e8f5e9;color:#2e7d32;">Proposé</span>
+    </div>
+  `).join('');
 }
 
 /* ——— Visites réservées (confirmed) ——— */
@@ -957,7 +1017,8 @@ async function loadData() {
     _mailCtx.phone = seller.phone || '[Votre téléphone]';
     renderMails();
 
-    /* Disponibilités + visites */
+    /* Visites à confirmer + disponibilités + visites */
+    renderPending(visits);
     renderDispos(visits, agendaSlots);
     renderVisits(visits);
 
