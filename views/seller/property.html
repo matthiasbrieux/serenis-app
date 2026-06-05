@@ -570,6 +570,18 @@
     .photo-scroll-nav.prev { left: 6px; }
     .photo-scroll-nav.next { right: 6px; }
 
+    /* ── Photo grid mobile ──────────────────────────────── */
+    @media(max-width:640px) {
+      .photo-scroll-outer { height:auto !important; overflow:visible !important; background:transparent; border-radius:0; margin-top:8px; }
+      .photo-scroll-outer::after { display:none; }
+      .photo-scroll-track { flex-wrap:wrap !important; height:auto !important; overflow:visible !important; cursor:default !important; gap:6px !important; padding:0 !important; }
+      .photo-scroll-nav { display:none !important; }
+      .photo-scroll-item { width:calc(50% - 3px) !important; height:100px !important; flex-shrink:unset !important; }
+      .photo-scroll-item:hover img { transform:none; }
+      .photo-scroll-del { opacity:1 !important; }
+      .photo-drag-handle { display:none !important; }
+    }
+
     /* ── Lightbox ────────────────────────────────────── */
     .lightbox-overlay {
       position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:9000;
@@ -3305,6 +3317,13 @@ async function uploadPhotos(files, category) {
   const input = document.getElementById('photoInput-' + category);
   if (input) input.value = '';
 
+  // Auto-expand the folder so photos are immediately visible after upload
+  const grid = document.getElementById('grid-' + category);
+  if (grid) {
+    const folder = grid.closest('.photo-folder');
+    if (folder) folder.classList.remove('collapsed');
+  }
+
   const progress = document.getElementById('progress-' + category);
   const bar = document.getElementById('progressBar-' + category);
   const text = document.getElementById('progressText-' + category);
@@ -3542,6 +3561,8 @@ async function savePhotoOrder(photos) {
 
 function initScrollCarousel(track) {
   if (!track) return;
+  // On mobile, photos display as a wrapping grid — no carousel needed
+  if (window.matchMedia('(max-width:640px)').matches) return;
 
   // Duplicate items for seamless infinite loop (3+ photos only)
   const origItems = Array.from(track.querySelectorAll('.photo-scroll-item'));
