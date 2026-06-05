@@ -974,16 +974,24 @@ function persistAvail() {
 document.getElementById('saveAgenda').addEventListener('click',async()=>{
   const btn=document.getElementById('saveAgenda');
   btn.textContent='Enregistrement…'; btn.disabled=true;
-  localStorage.setItem('avail_slots_v2',JSON.stringify(availSlots));
+  try { localStorage.setItem('avail_slots_v2',JSON.stringify(availSlots)); } catch(e) {}
   try {
     const res=await fetch('/api/agenda',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({slots:availSlots.map(s=>({date:s.date,start:s.start,end:s.end}))})});
-    const data=await res.json();
-    if (data.success) {
-      showToast('Disponibilités enregistrées ✓');
-      const ok=document.getElementById('agendaSuccess');
-      ok.classList.remove('hidden'); setTimeout(()=>ok.classList.add('hidden'),3000);
+    if (!res.ok) {
+      showToast('Erreur serveur ('+res.status+') — réessayez','error');
+    } else {
+      const data=await res.json();
+      if (data.success) {
+        showToast('Disponibilités enregistrées ✓');
+        const ok=document.getElementById('agendaSuccess');
+        ok.classList.remove('hidden'); setTimeout(()=>ok.classList.add('hidden'),3000);
+      } else {
+        showToast(data.error||'Sauvegarde échouée — réessayez','error');
+      }
     }
-  } catch(e) { showToast('Erreur de sauvegarde','error'); }
+  } catch(e) {
+    showToast('Erreur réseau — actualisez la page et réessayez','error');
+  }
   btn.textContent='Enregistrer mes disponibilités'; btn.disabled=false;
 });
 

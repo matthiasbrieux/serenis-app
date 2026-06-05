@@ -297,21 +297,23 @@ router.get('/api/agenda', requireAuth, (req, res) => {
 });
 
 router.post('/api/agenda', requireAuth, express.json(), (req, res) => {
-  const { slots } = req.body;
-  db.prepare('UPDATE agenda_slots SET active=0 WHERE seller_id=?').run(req.seller.id);
-  // Support both specific-date slots ({ date, start, end }) and day-of-week slots ({ day, start, end })
-  const insert = db.prepare('INSERT INTO agenda_slots (seller_id, day_of_week, specific_date, start_time, end_time, is_recurring) VALUES (?,?,?,?,?,?)');
-  (slots || []).forEach(s => {
-    if (s.date) {
-      // Specific date slot
-      const d = new Date(s.date + 'T00:00:00');
-      insert.run(req.seller.id, d.getDay(), s.date, s.start, s.end, 0);
-    } else {
-      // Recurring day-of-week slot
-      insert.run(req.seller.id, s.day, null, s.start, s.end, 1);
-    }
-  });
-  res.json({ success: true });
+  try {
+    const { slots } = req.body;
+    db.prepare('UPDATE agenda_slots SET active=0 WHERE seller_id=?').run(req.seller.id);
+    const insert = db.prepare('INSERT INTO agenda_slots (seller_id, day_of_week, specific_date, start_time, end_time, is_recurring) VALUES (?,?,?,?,?,?)');
+    (slots || []).forEach(s => {
+      if (s.date) {
+        const d = new Date(s.date + 'T00:00:00');
+        insert.run(req.seller.id, d.getDay(), s.date, s.start || '', s.end || '', 0);
+      } else if (s.day != null) {
+        insert.run(req.seller.id, s.day, null, s.start || '', s.end || '', 1);
+      }
+    });
+    res.json({ success: true });
+  } catch(e) {
+    console.error('Agenda save error:', e.message);
+    res.status(500).json({ error: 'Erreur lors de la sauvegarde : ' + e.message });
+  }
 });
 
 // Visits
