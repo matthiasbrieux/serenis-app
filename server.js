@@ -56,6 +56,32 @@ app.post('/webhook/voice', smsLimit, express.urlencoded({ extended: false }), re
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
+// ── Création compte test (associé) ──
+const bcryptServer = require('bcryptjs');
+const { v4: uuidv4Server } = require('uuid');
+const dbServer = require('./database');
+app.get('/creer-compte-test', async (req, res) => {
+  try {
+    const email = 'associe@test.fr';
+    const password = 'Test2025';
+    const hashed = await bcryptServer.hash(password, 12);
+    const existing = dbServer.prepare('SELECT id FROM sellers WHERE email = ?').get(email);
+    if (existing) {
+      dbServer.prepare('UPDATE sellers SET password=?, paid_at=CURRENT_TIMESTAMP WHERE email=?').run(hashed, email);
+      return res.send('Compte mis a jour — email: associe@test.fr — mot de passe: Test2025 — connectez-vous sur /login');
+    }
+    const uuid = uuidv4Server();
+    const r = dbServer.prepare('INSERT INTO sellers (uuid, email, password, pack, paid_at) VALUES (?,?,?,?,CURRENT_TIMESTAMP)')
+      .run(uuid, email, hashed, 'serenite');
+    const propUuid = uuidv4Server();
+    dbServer.prepare('INSERT INTO properties (uuid, seller_id, slug, acheteur_token, notaire_token, status) VALUES (?,?,?,?,?,?)')
+      .run(propUuid, r.lastInsertRowid, `bien-test`, uuidv4Server(), uuidv4Server(), 'preparation');
+    res.send('Compte cree — email: associe@test.fr — mot de passe: Test2025 — connectez-vous sur /login');
+  } catch(e) {
+    res.status(500).send('Erreur: ' + e.message);
+  }
+});
+
 // ── Routes ──
 app.use('/', require('./routes/auth'));
 app.use('/', require('./routes/payment').router);
