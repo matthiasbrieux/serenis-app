@@ -2235,27 +2235,33 @@ async function sendMsg(text) {
 }
 
 // ── Events ──
-document.addEventListener('click', function(e) {
+// Shared handler logic (used by both click and touchend for iOS Safari compatibility)
+let _lastTouchHandled = 0;
+function handleInteractionEvent(e) {
+  const isTouchEnd = e.type === 'touchend';
+  // Debounce: if touchend fired, block click from firing within 400ms
+  if (e.type === 'click' && Date.now() - _lastTouchHandled < 400) return;
+  if (isTouchEnd) _lastTouchHandled = Date.now();
+
   const fl = e.target.closest('.fiche-link');
-  if (fl) { e.stopPropagation(); openFiche(fl.dataset.fiche); return; }
+  if (fl) { e.stopPropagation(); if (isTouchEnd && e.cancelable) e.preventDefault(); openFiche(fl.dataset.fiche); return; }
   const cm = e.target.closest('[data-copy-mail]');
   if (cm) { navigator.clipboard.writeText(FICHE_MAILS[cm.dataset.copyMail] || ''); cm.textContent = '✓ Copié !'; setTimeout(() => cm.textContent = 'Copier ce modèle', 2000); return; }
   const chk = e.target.closest('[data-chk]');
   if (chk) {
     e.stopPropagation();
+    if (isTouchEnd && e.cancelable) e.preventDefault();
     const mi = +chk.dataset.mi, si = +chk.dataset.si, key = `${mi}_${si}`;
     doneSteps[key] = !doneSteps[key];
     localStorage.setItem('vpm_done_steps', JSON.stringify(doneSteps));
     document.getElementById(`step-${mi}-${si}`)?.classList.toggle('done', !!doneSteps[key]);
     updateProgress();
-    // Refresh just this module's tab progress bar
     const fill = document.getElementById(`mod-tab-prog-${mi}`);
     if (fill) {
       const tot = MODULES[mi].steps.length;
       const dn = MODULES[mi].steps.filter((_, si2) => doneSteps[`${mi}_${si2}`]).length;
       fill.style.width = Math.round(dn / tot * 100) + '%';
     }
-    // Celebrate if just completed the whole module
     if (doneSteps[key] && !celebratedModules.has(mi)) {
       const allDone = MODULES[mi].steps.every((_, si2) => doneSteps[`${mi}_${si2}`]);
       if (allDone) setTimeout(() => showCelebration(mi), 500);
@@ -2264,6 +2270,7 @@ document.addEventListener('click', function(e) {
   }
   const hdr = e.target.closest('.step-hdr[data-mi]');
   if (hdr) {
+    if (isTouchEnd && e.cancelable) e.preventDefault();
     const card = document.getElementById(`step-${hdr.dataset.mi}-${hdr.dataset.si}`);
     const wasOpen = card?.classList.contains('open');
     card?.classList.toggle('open');
@@ -2275,7 +2282,9 @@ document.addEventListener('click', function(e) {
   if (ab) { document.getElementById('coachInput').value = `J'ai une question sur "${ab.dataset.step}" — `; document.getElementById('coachInput').focus(); document.getElementById('coachPanel').classList.add('open'); }
   const chip = e.target.closest('.coach-chip');
   if (chip) sendMsg(chip.dataset.q);
-});
+}
+document.addEventListener('click', handleInteractionEvent);
+document.addEventListener('touchend', handleInteractionEvent, { passive: false });
 
 /* ── Célébration ── */
 const celebratedModules = new Set(JSON.parse(localStorage.getItem('vpm_celebrated') || '[]'));
