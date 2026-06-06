@@ -1043,6 +1043,42 @@ router.get('/api/mes-offres', requireAuth, (req, res) => {
   res.json({ offers });
 });
 
+// Alias GET /api/offers → /api/mes-offres (compatibilité frontend)
+router.get('/api/offers', requireAuth, (req, res) => {
+  const property = db.prepare('SELECT id FROM properties WHERE seller_id = ?').get(req.seller.id);
+  if (!property) return res.json({ offers: [] });
+  const offers = db.prepare('SELECT * FROM offers WHERE property_id = ? ORDER BY created_at DESC').all(property.id);
+  res.json({ offers });
+});
+
+// Contre-proposition
+router.post('/api/offers/:id/counter', requireAuth, express.json(), (req, res) => {
+  const { counter_amount } = req.body;
+  if (!counter_amount || Number(counter_amount) <= 0) return res.status(400).json({ error: 'Montant invalide' });
+  const offer = db.prepare('SELECT o.* FROM offers o JOIN properties p ON p.id = o.property_id WHERE o.id = ? AND p.seller_id = ?').get(req.params.id, req.seller.id);
+  if (!offer) return res.status(403).json({ error: 'Offre introuvable' });
+  db.prepare('UPDATE offers SET status=?, counter_amount=?, responded_at=CURRENT_TIMESTAMP WHERE id=?').run('countered', Number(counter_amount), offer.id);
+  res.json({ success: true });
+});
+
+// Mise à jour statut (acceptée / refusée)
+router.put('/api/offers/:id/status', requireAuth, express.json(), (req, res) => {
+  const { status } = req.body;
+  if (!['accepted', 'refused', 'pending'].includes(status)) return res.status(400).json({ error: 'Statut invalide' });
+  const offer = db.prepare('SELECT o.* FROM offers o JOIN properties p ON p.id = o.property_id WHERE o.id = ? AND p.seller_id = ?').get(req.params.id, req.seller.id);
+  if (!offer) return res.status(403).json({ error: 'Offre introuvable' });
+  db.prepare('UPDATE offers SET status=?, responded_at=CURRENT_TIMESTAMP WHERE id=?').run(status, offer.id);
+  res.json({ success: true });
+});
+
+// Suppression offre
+router.delete('/api/offers/:id', requireAuth, (req, res) => {
+  const offer = db.prepare('SELECT o.* FROM offers o JOIN properties p ON p.id = o.property_id WHERE o.id = ? AND p.seller_id = ?').get(req.params.id, req.seller.id);
+  if (!offer) return res.status(403).json({ error: 'Offre introuvable' });
+  db.prepare('DELETE FROM offers WHERE id = ?').run(offer.id);
+  res.json({ success: true });
+});
+
 router.put('/api/offres/:id/repondre', requireAuth, express.json(), (req, res) => {
   const { status, seller_response } = req.body;
   if (!['accepted', 'refused', 'counter'].includes(status)) return res.json({ error: 'Statut invalide' });

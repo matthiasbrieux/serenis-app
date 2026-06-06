@@ -460,6 +460,9 @@ try { db.exec("ALTER TABLE properties ADD COLUMN diagnostics_in_dossier INTEGER 
 try { db.exec("ALTER TABLE properties ADD COLUMN plan_docs_visible INTEGER DEFAULT 1"); } catch(e) {}
 try { db.exec("ALTER TABLE properties ADD COLUMN acheteur_docs_visible INTEGER DEFAULT 1"); } catch(e) {}
 
+// ── Contre-proposition offres ─────────────────────────────────
+try { db.exec("ALTER TABLE offers ADD COLUMN counter_amount INTEGER"); } catch(e) {}
+
 // Grandfathering : les comptes existants ayant déjà payé sont considérés comme ayant signé
 // (évite de bloquer des clients réels lors du déploiement de cette nouvelle contrainte)
 try {
