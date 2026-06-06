@@ -185,6 +185,42 @@
       </div>
     </div>
 
+    <!-- ── SMS prêt à l'envoi ── -->
+    <div style="background:#fff;border:1.5px solid #e8e3db;border-radius:16px;overflow:hidden;margin-bottom:24px;" id="offreLinkCard">
+      <div style="background:#3D5A47;padding:14px 22px;display:flex;align-items:center;gap:10px;">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#D4E4D8" stroke-width="2" stroke-linecap="round"><polyline points="22 2 11 13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+        <span style="font-size:0.82rem;font-weight:700;color:#D4E4D8;text-transform:uppercase;letter-spacing:0.07em;">SMS prêt à l'envoi — Inviter à soumettre une offre</span>
+      </div>
+      <div style="padding:20px 22px;">
+        <div style="display:flex;align-items:flex-start;gap:16px;flex-wrap:wrap;">
+
+          <!-- Lien à copier -->
+          <div style="flex:1;min-width:260px;">
+            <div style="font-size:0.72rem;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:8px;">Votre lien d'offre</div>
+            <div style="display:flex;gap:8px;align-items:center;" id="offreLinkBox">
+              <input type="text" id="offreLinkInput" readonly style="flex:1;background:#F5F0E8;font-size:0.8rem;padding:9px 12px;border:1.5px solid #e8e0d6;border-radius:8px;font-family:'DM Sans',sans-serif;color:#3D5A47;outline:none;" placeholder="Chargement…">
+              <button onclick="copyOffreLink()" style="padding:9px 14px;background:#3D5A47;color:#fff;border:none;border-radius:8px;font-size:0.82rem;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;white-space:nowrap;min-height:38px;">Copier</button>
+            </div>
+            <div style="font-size:0.76rem;color:#aaa;margin-top:6px;">L'acheteur remplit le formulaire en ligne — l'offre apparaît ici automatiquement.</div>
+          </div>
+
+          <!-- SMS prêt à envoyer -->
+          <div style="flex:1;min-width:260px;">
+            <div style="font-size:0.72rem;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:8px;">Message prêt à l'envoi</div>
+            <div id="smsPreview" style="background:#F5F0E8;border:1.5px solid #e8e0d6;border-radius:10px;padding:12px 14px;font-size:0.82rem;color:#444;line-height:1.6;min-height:70px;">Chargement…</div>
+            <div style="display:flex;gap:8px;margin-top:10px;">
+              <a id="smsSendBtn" href="#" style="flex:1;display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:9px 14px;background:#3D5A47;color:#fff;border-radius:8px;font-size:0.82rem;font-weight:600;text-decoration:none;min-height:38px;">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                Envoyer par SMS
+              </a>
+              <button onclick="copySmsText()" style="padding:9px 14px;background:#fff;border:1.5px solid #e8e0d6;border-radius:8px;font-size:0.82rem;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;color:#555;min-height:38px;">Copier le texte</button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
     <div class="stats-row" id="statsRow">
       <div class="stat-card"><div class="stat-n" id="st-total">—</div><div class="stat-l">Offres reçues</div></div>
       <div class="stat-card"><div class="stat-n" id="st-pending" style="color:#C4785A;">—</div><div class="stat-l">En attente</div></div>
@@ -474,7 +510,41 @@ function showToast(msg, type) {
   t._t = setTimeout(() => { t.className = 'toast'; }, 2500);
 }
 
+let offreLinkUrl = '';
+
+async function loadOffreLink() {
+  try {
+    const res = await fetch('/api/offre-link');
+    const data = await res.json();
+    if (data.url) {
+      offreLinkUrl = data.url;
+      document.getElementById('offreLinkInput').value = data.url;
+      const smsText = `Bonjour, suite à votre visite de mon bien, voici le lien pour soumettre votre offre d'achat en ligne : ${data.url} — Je la traiterai dans les meilleurs délais.`;
+      document.getElementById('smsPreview').textContent = smsText;
+      document.getElementById('smsSendBtn').href = `sms:?&body=${encodeURIComponent(smsText)}`;
+    } else {
+      const card = document.getElementById('offreLinkCard');
+      if (card) card.style.display = 'none';
+    }
+  } catch(e) {
+    const card = document.getElementById('offreLinkCard');
+    if (card) card.style.display = 'none';
+  }
+}
+
+function copyOffreLink() {
+  if (!offreLinkUrl) return;
+  navigator.clipboard.writeText(offreLinkUrl).then(() => showToast('Lien copié !', 'success'));
+}
+
+function copySmsText() {
+  const text = document.getElementById('smsPreview')?.textContent;
+  if (!text) return;
+  navigator.clipboard.writeText(text).then(() => showToast('Texte copié !', 'success'));
+}
+
 load();
+loadOffreLink();
 </script>
 </body>
 </html>

@@ -159,4 +159,76 @@ router.get('/dossier/notaire/:token', (req, res) => {
   res.sendFile('dossier-notaire.html', { root: './views/public' });
 });
 
+// ── Soumettre une offre d'achat (public, via lien vendeur) ────
+router.get('/soumettre-offre/:token', (req, res) => {
+  res.sendFile('soumettre-offre.html', { root: './views/public' });
+});
+
+// Info minimale du bien (pour pré-remplir la page offre)
+router.get('/api/soumettre-offre/:token/info', (req, res) => {
+  const prop = db.prepare(`
+    SELECT p.id, p.address, p.city, p.postal_code, p.price, p.type, p.surface_habitable
+    FROM properties p
+    WHERE p.acheteur_token = ?
+  `).get(req.params.token);
+  if (!prop) return res.status(404).json({ error: 'Bien introuvable' });
+  res.json({ property: prop });
+});
+
+// Soumission de l'offre par l'acheteur (sans authentification)
+router.post('/api/soumettre-offre/:token', express.json(), async (req, res) => {
+  try {
+    const prop = db.prepare(`
+      SELECT p.id, p.seller_id, p.address, p.city, p.price
+      FROM properties p
+      WHERE p.acheteur_token = ?
+    `).get(req.params.token);
+    if (!prop) return res.status(404).json({ error: 'Bien introuvable' });
+
+    const { firstName, lastName, email, phone, amount, validity_days, conditions, message } = req.body;
+    if (!firstName || !lastName || !email || !amount) {
+      return res.status(400).json({ error: 'Champs obligatoires manquants' });
+    }
+    const amountInt = parseInt(amount, 10);
+    if (!amountInt || amountInt < 1) {
+      return res.status(400).json({ error: 'Montant invalide' });
+    }
+
+    const buyer_name = `${firstName.trim()} ${lastName.trim()}`;
+    const fullNote = [
+      conditions ? `Conditions : ${conditions}` : '',
+      message ? `Message : ${message}` : ''
+    ].filter(Boolean).join('\n');
+
+    const result = db.prepare(`
+      INSERT INTO offers (uuid, property_id, seller_id, buyer_name, buyer_email, buyer_phone, amount, conditions, validity_days, status)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending')
+    `).run(uuidv4(), prop.id, prop.seller_id, buyer_name, email.trim(), phone?.trim() || null,
+           amountInt, fullNote || null, validity_days || 10);
+
+    // Notification interne au vendeur
+    try {
+      db.prepare(`
+        INSERT INTO notifications (seller_id, type, title, body, link)
+        VALUES (?, 'offer', ?, ?, '/mes-offres')
+      `).run(prop.seller_id,
+             `Nouvelle offre de ${buyer_name}`,
+             `${Number(amountInt).toLocaleString('fr-FR')} € pour ${prop.city || prop.address || 'votre bien'}`);
+    } catch(e) {}
+
+    res.json({ success: true, id: result.lastInsertRowid });
+  } catch(e) {
+    console.error('Offre soumission error:', e.message);
+    res.status(500).json({ error: 'Erreur serveur' });
+  }
+});
+
+// Lien de soumission d'offre pour le vendeur (retourne l'URL avec acheteur_token)
+router.get('/api/offre-link', requireAuth, (req, res) => {
+  const prop = db.prepare('SELECT acheteur_token, city, address FROM properties WHERE seller_id = ?').get(req.seller.id);
+  if (!prop || !prop.acheteur_token) return res.json({ url: null });
+  const base = process.env.BASE_URL || `${req.protocol}://${req.get('host')}`;
+  res.json({ url: `${base}/soumettre-offre/${prop.acheteur_token}` });
+});
+
 module.exports = router;
