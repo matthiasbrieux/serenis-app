@@ -355,6 +355,97 @@
       .cal-nav { width:44px; height:44px; }
       .avail-slot-del { min-width:44px; min-height:44px; }
     }
+
+    /* ── AMÉLIORATIONS MOBILE 375px ─────────────────────── */
+    @media (max-width:480px) {
+      /* Header */
+      .page-header > div { flex-direction: column; align-items: stretch !important; }
+      .page-header > div > div:last-child { display: flex; flex-direction: column; gap: 8px; }
+      .page-header > div > div:last-child button { width: 100%; justify-content: center; }
+
+      /* Stats en 2 colonnes serrées */
+      .agenda-stats { grid-template-columns: repeat(2,1fr); gap: 8px; }
+      .stat-card-agenda { padding: 12px 10px; gap: 8px; }
+      .stat-card-agenda .stat-val { font-size: 1.6rem; }
+
+      /* Calendrier : cellules minimum 44px */
+      .cal-cell { min-height: 44px; font-size: 0.82rem; }
+      .calendar-card { padding: 16px 12px; }
+      .cal-grid { gap: 2px; }
+
+      /* Visites grid en colonne unique */
+      .visits-grid { grid-template-columns: 1fr; }
+
+      /* Boutons d'action visite */
+      .visit-actions { flex-direction: column; gap: 8px; }
+      .btn-confirm, .btn-refuse { flex: none; width: 100%; min-height: 48px; font-size: 0.95rem; }
+      .btn-cancel-sm { width: 100%; min-height: 44px; }
+
+      /* Disponibilités */
+      .avail-slot-item { gap: 10px; padding: 12px; }
+      .avail-slot-time-badge { font-size: 0.75rem; padding: 5px 10px; }
+      .dispo-card-body { padding: 14px; }
+
+      /* Modèles de mails */
+      .mc-tabs { padding: 12px; gap: 6px; }
+      .mc-cards { padding: 12px; }
+      .mc-card-hdr { padding: 14px 12px; }
+      .mc-card-body { padding: 14px 12px; }
+      .mc-copy-btn { width: 100%; justify-content: center; padding: 12px; min-height: 44px; font-size: 0.88rem; }
+
+      /* Table acquéreurs scroll horizontal */
+      .contacts-table { font-size: 0.78rem; }
+      .contacts-table td, .contacts-table thead th { padding: 8px 10px; }
+
+      /* Section title */
+      .section-header-bar { flex-direction: column; align-items: stretch; }
+      .section-header-bar > button, .section-header-bar > .add-btn-sec { width: 100%; justify-content: center; }
+
+      /* Sidebar sidebar-section */
+      .vc-confirm, .vc-refuse, .vc-cancel { min-height: 44px; font-size: 0.88rem; }
+    }
+
+    /* ── Badges statut améliorés ─────────────────────────── */
+    .vbadge { padding: 4px 12px; border-radius: 20px; font-size: 0.73rem; font-weight: 700; letter-spacing: 0.03em; }
+    .vbadge-confirmed { background: #e8f5e9; color: #2e7d32; border: 1px solid #c8e6c9; }
+    .vbadge-pending   { background: #fff3e0; color: #e65100; border: 1px solid #ffe0b2; }
+    .vbadge-cancelled { background: #f5f5f5; color: #757575; border: 1px solid #e0e0e0; }
+    .vbadge-done      { background: #e3f2fd; color: #1565c0; border: 1px solid #bbdefb; }
+
+    /* ── Créneaux : visuels récurrents vs ponctuels ──────── */
+    .avail-slot-item.recurrent {
+      background: linear-gradient(135deg,#f0f8f2,#e8f5eb);
+      border-left-color: #4a6e55;
+      border-style: solid;
+    }
+    .avail-slot-item.recurrent .avail-slot-cal-month { background: #4a6e55; }
+    .recurrent-badge {
+      display: inline-flex; align-items: center; gap: 4px;
+      background: #4a6e55; color: #fff;
+      font-size: 0.62rem; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.06em; padding: 2px 7px; border-radius: 10px;
+      margin-top: 3px;
+    }
+    .ponctuel-badge {
+      display: inline-flex; align-items: center; gap: 4px;
+      background: #C4785A; color: #fff;
+      font-size: 0.62rem; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.06em; padding: 2px 7px; border-radius: 10px;
+      margin-top: 3px;
+    }
+
+    /* ── État vide amélioré ──────────────────────────────── */
+    .empty-visits-cta {
+      text-align: center; padding: 40px 24px;
+      background: #fff; border: 2px dashed #c8ddd0; border-radius: 16px;
+      animation: fadeInEmpty 0.4s ease;
+    }
+    @keyframes fadeInEmpty { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+    .empty-visits-cta .empty-icon { font-size: 2.5rem; margin-bottom: 12px; }
+    .empty-visits-cta h3 { font-family: 'Cormorant Garamond', serif; font-size: 1.3rem; font-weight: 600; color: #1A1A16; margin: 0 0 8px; }
+    .empty-visits-cta p { font-size: 0.88rem; color: #888; line-height: 1.6; margin: 0 0 20px; max-width: 300px; margin-left: auto; margin-right: auto; }
+    .empty-visits-actions { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+    @media (max-width: 400px) { .empty-visits-actions { flex-direction: column; align-items: stretch; } .empty-visits-actions button { justify-content: center; } }
   </style>
 </head>
 <body>
@@ -556,11 +647,23 @@
           <div class="sidebar-body" id="pendingList"></div>
         </div>
 
-        <!-- État vide visites -->
-        <div id="visitsEmpty" style="display:none;background:#fff;border:1.5px dashed #e8e0d6;border-radius:14px;padding:32px 20px;text-align:center;color:#bbb;">
-          <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#ddd" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom:10px;"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-          <p style="font-size:0.87rem;line-height:1.5;margin:0;">Aucune visite pour le moment.<br>Programmez-en une ou partagez votre lien.</p>
-          <button class="add-btn" onclick="openModal('addVisitOverlay')" style="margin-top:14px;">+ Programmer une visite</button>
+        <!-- État vide visites (amélioré) -->
+        <div id="visitsEmpty" style="display:none;">
+          <div class="empty-visits-cta">
+            <div class="empty-icon">🏠</div>
+            <h3>Pas encore de visite</h3>
+            <p>Dès qu'un acquéreur réservera un créneau ou que vous programmerez une visite, elle apparaîtra ici.</p>
+            <div class="empty-visits-actions">
+              <button class="add-btn" onclick="openModal('addVisitOverlay')">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                Programmer une visite
+              </button>
+              <button class="add-btn-sec" onclick="document.getElementById('availDate').focus();document.getElementById('availDate').scrollIntoView({behavior:'smooth',block:'center'});">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                Configurer mes créneaux
+              </button>
+            </div>
+          </div>
         </div>
 
         <!-- Prochaines visites confirmées -->
@@ -753,8 +856,13 @@ function updateStats() {
 // ── Visit rendering ───────────────────────────────────
 function initials(name) { return (name||'?').split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2); }
 function badgeHtml(status) {
-  const map = { confirmed:['vbadge-confirmed','Confirmée'], pending:['vbadge-pending','En attente'], cancelled:['vbadge-cancelled','Annulée'] };
-  const [cls,label] = map[status] || map.pending;
+  const map = {
+    confirmed: ['vbadge-confirmed', '✓ Confirmée'],
+    pending:   ['vbadge-pending',   '⏳ En attente'],
+    cancelled: ['vbadge-cancelled', 'Annulée'],
+    done:      ['vbadge-done',      '✔ Faite'],
+  };
+  const [cls, label] = map[status] || map.pending;
   return `<span class="vbadge ${cls}">${label}</span>`;
 }
 function formatDate(dateStr) {
@@ -777,26 +885,28 @@ function buildVisitCardHtml(v) {
   const svgCal = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>`;
   const svgClock = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>`;
   const svgPhone = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.41a2 2 0 0 1 2-2.18h3a2 2 0 0 1 2 1.72 12.13 12.13 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.13 12.13 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>`;
+  const statusColors = { confirmed:'#e8f5e9', pending:'#fff3e0', cancelled:'#f5f5f5', done:'#e3f2fd' };
+  const cardBg = statusColors[v.status] || '#fff';
   return `
-  <div class="visit-card${v.status==='pending'?' pending-card':''}" id="vcard-${v.id}">
+  <div class="visit-card${v.status==='pending'?' pending-card':''}" id="vcard-${v.id}" style="border-left:4px solid ${v.status==='confirmed'?'#2e7d32':v.status==='pending'?'#f57f17':v.status==='done'?'#1565c0':'#bbb'};">
     <div class="visit-card-header">
-      <div style="display:flex;align-items:center;gap:12px;">
-        <div class="visit-avatar">${initials(v.buyer_name)}</div>
-        <div class="visit-info">
-          <div class="visit-name">${v.buyer_name||'Acquéreur'}</div>
-          <div class="visit-meta">${v.buyer_email||''}</div>
+      <div style="display:flex;align-items:center;gap:12px;flex:1;min-width:0;">
+        <div class="visit-avatar" style="background:${v.status==='confirmed'?'linear-gradient(135deg,#2e7d32,#4CAF50)':v.status==='pending'?'linear-gradient(135deg,#e65100,#FF9800)':'linear-gradient(135deg,#757575,#9E9E9E)'};">${initials(v.buyer_name)}</div>
+        <div class="visit-info" style="min-width:0;">
+          <div class="visit-name" style="font-size:1rem;">${v.buyer_name||'Acquéreur'}</div>
+          <div class="visit-meta" style="font-size:0.78rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${v.buyer_email||''}</div>
         </div>
       </div>
       ${badgeHtml(v.status)}
     </div>
-    <div class="visit-details">
-      <div class="visit-detail-row"><span class="visit-detail-icon">${svgCal}</span>${formatDate(v.visit_date)}</div>
-      <div class="visit-detail-row"><span class="visit-detail-icon">${svgClock}</span>${v.visit_time||'—'}</div>
+    <div class="visit-details" style="background:${cardBg};border-radius:8px;padding:10px 12px;margin-bottom:12px;">
+      <div class="visit-detail-row" style="font-weight:600;"><span class="visit-detail-icon">${svgCal}</span>${formatDate(v.visit_date)}</div>
+      <div class="visit-detail-row"><span class="visit-detail-icon">${svgClock}</span><strong>${v.visit_time||'—'}</strong></div>
       ${v.buyer_phone?`<div class="visit-detail-row"><span class="visit-detail-icon">${svgPhone}</span>${phoneLinkHtml}</div>`:''}
     </div>
     ${v.status==='pending'?`
     <div class="visit-actions">
-      <button class="btn-confirm" onclick="changeVisitStatus(${v.id},'confirmed')">✓ Confirmer</button>
+      <button class="btn-confirm" onclick="changeVisitStatus(${v.id},'confirmed')">✓ Confirmer la visite</button>
       <button class="btn-refuse" onclick="changeVisitStatus(${v.id},'cancelled')">Refuser</button>
     </div>`:''}
     ${v.status!=='cancelled'&&v.buyer_phone?`
@@ -998,7 +1108,14 @@ function renderAvailMonth() {
     const monthShort=MONTHS_SHORT_FR[d.getMonth()];
     const fullDate=d.toLocaleDateString('fr-FR',{day:'numeric',month:'long',year:'numeric'});
     const globalIdx=availSlots.indexOf(s);
-    return `<div class="avail-slot-item" data-slot-idx="${globalIdx}">
+    // Distinguer récurrent (lundi/mardi/etc.) vs ponctuel
+    const isWeekend = d.getDay()===0||d.getDay()===6;
+    const isRecurrent = s.recurrent || false;
+    const slotClass = isRecurrent ? 'avail-slot-item recurrent' : 'avail-slot-item';
+    const slotTypeBadge = isRecurrent
+      ? `<span class="recurrent-badge">↻ Récurrent</span>`
+      : `<span class="ponctuel-badge">${isWeekend?'📅 Week-end':'📌 Ponctuel'}</span>`;
+    return `<div class="${slotClass}" data-slot-idx="${globalIdx}">
       <div class="avail-slot-cal">
         <div class="avail-slot-cal-month">${monthShort}</div>
         <div class="avail-slot-cal-day">${dayNum}</div>
@@ -1006,6 +1123,7 @@ function renderAvailMonth() {
       <div class="avail-slot-info">
         <div class="avail-slot-dow">${dow}</div>
         <div class="avail-slot-fulldate">${fullDate}</div>
+        ${slotTypeBadge}
       </div>
       <div class="avail-slot-time-badge">${svgClock} ${s.start} – ${s.end}</div>
       <button class="avail-slot-del" data-del-idx="${globalIdx}" title="Supprimer">${svgX}</button>
@@ -1267,10 +1385,16 @@ function renderMcCards() {
         <div class="mc-objet">Objet</div>
         <div class="mc-objet-val">${m.objet}</div>
         <div class="mc-mail-text">${corps}</div>
-        <button class="mc-copy-btn" onclick="copyMcMail(${i},'${encodeURIComponent(corps)}','${encodeURIComponent(m.objet)}')">
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
-          Copier le corps du mail
-        </button>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
+          <button class="mc-copy-btn" onclick="copyMcMail(${i},'${encodeURIComponent(corps)}','${encodeURIComponent(m.objet)}')">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+            Copier le corps
+          </button>
+          <button class="mc-copy-btn" style="background:#5a7a65;" onclick="copyMcSubject(${i},'${encodeURIComponent(m.objet)}')">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+            Copier l'objet
+          </button>
+        </div>
       </div>
     </div>`;
   }).join('');
@@ -1284,10 +1408,25 @@ function toggleMcCard(idx) {
 function copyMcMail(idx,bodyEnc,subjectEnc) {
   const body=decodeURIComponent(bodyEnc);
   navigator.clipboard.writeText(body).then(()=>{
-    const btn=document.querySelector(`#mc-card-${idx} .mc-copy-btn`);
-    if (btn) { btn.textContent='✓ Copié !'; btn.classList.add('copied'); setTimeout(()=>{ btn.innerHTML='<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Copier le corps du mail'; btn.classList.remove('copied'); },2000); }
+    const btns=document.querySelectorAll(`#mc-card-${idx} .mc-copy-btn`);
+    const btn=btns[0];
+    if (btn) { btn.textContent='✓ Copié !'; btn.classList.add('copied'); setTimeout(()=>{ btn.innerHTML='<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Copier le corps'; btn.classList.remove('copied'); },2000); }
     showToast('Corps du mail copié ✓');
   }).catch(()=>showToast('Erreur copie','error'));
+}
+
+function copyMcSubject(idx, subjectEnc) {
+  const subject = decodeURIComponent(subjectEnc);
+  navigator.clipboard.writeText(subject).then(() => {
+    const btns = document.querySelectorAll(`#mc-card-${idx} .mc-copy-btn`);
+    const btn = btns[1];
+    if (btn) {
+      const orig = btn.innerHTML;
+      btn.textContent = '✓ Objet copié !'; btn.classList.add('copied');
+      setTimeout(() => { btn.innerHTML = orig; btn.classList.remove('copied'); }, 2000);
+    }
+    showToast('Objet du mail copié ✓');
+  }).catch(() => showToast('Erreur copie', 'error'));
 }
 
 // ── Notifications ─────────────────────────────────────
