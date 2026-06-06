@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <script>if("scrollRestoration"in history)history.scrollRestoration="manual";</script>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Mes contacts acheteurs — Vendu Par Moi</title>
+  <title>Mes offres d'achat — Vendu Par Moi</title>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
   <link rel="manifest" href="/manifest.json">
   <link rel="stylesheet" href="/css/style.css">
@@ -34,67 +34,112 @@
     .stat-n { font-family:'Cormorant Garamond',serif;font-size:2rem;font-weight:600;color:#3D5A47;line-height:1; }
     .stat-l { font-size:0.75rem;color:#888;margin-top:4px; }
 
-    /* Filters */
-    .filters { display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap;align-items:center; }
-    .filter-btn { padding:7px 16px;border-radius:20px;border:1.5px solid #e8e3db;background:#fff;font-size:0.8rem;font-weight:600;cursor:pointer;color:#555;font-family:'DM Sans',sans-serif;transition:all 0.15s; }
-    .filter-btn:hover { border-color:#3D5A47;color:#3D5A47; }
-    .filter-btn.active { background:#3D5A47;border-color:#3D5A47;color:#fff; }
-    .search-input { flex:1;min-width:160px;padding:8px 14px;border:1.5px solid #e8e3db;border-radius:20px;font-size:0.85rem;font-family:'DM Sans',sans-serif;background:#fff;outline:none; }
-    .search-input:focus { border-color:#3D5A47; }
+    /* Section headers */
+    .section-header { display:flex;align-items:center;gap:10px;margin:28px 0 14px; }
+    .section-header-line { flex:1;height:1px;background:#e8e3db; }
+    .section-header-title { font-size:0.75rem;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:0.07em;white-space:nowrap; }
 
-    /* Contact cards */
-    .contacts-list { display:flex;flex-direction:column;gap:12px; }
-    .contact-card { background:#fff;border:1.5px solid #e8e3db;border-radius:14px;padding:20px 24px;transition:all 0.18s;position:relative; }
-    .contact-card:hover { border-color:#c5d9cb;box-shadow:0 4px 20px rgba(0,0,0,0.07); }
-    .contact-card.new-contact { border-left:4px solid #C4785A; }
-    .contact-card.qualified { border-left:4px solid #3D5A47; }
-    .contact-card.visited { border-left:4px solid #059669; }
-    .contact-card.not_interested { border-left:4px solid #aaa;opacity:0.7; }
+    /* Offer cards */
+    .offers-list { display:flex;flex-direction:column;gap:14px; }
 
-    .contact-top { display:flex;align-items:flex-start;gap:16px;margin-bottom:14px; }
-    .contact-avatar { width:44px;height:44px;border-radius:50%;background:#3D5A47;color:#fff;display:flex;align-items:center;justify-content:center;font-size:1.1rem;font-weight:700;flex-shrink:0;font-family:'DM Sans',sans-serif; }
-    .contact-main { flex:1;min-width:0; }
-    .contact-name { font-size:0.97rem;font-weight:700;color:#1a1a1a;margin-bottom:2px; }
-    .contact-meta { font-size:0.78rem;color:#888;display:flex;gap:12px;flex-wrap:wrap; }
-    .contact-meta a { color:#C4785A;text-decoration:none; }
-    .contact-meta a:hover { text-decoration:underline; }
+    .offer-card { background:#fff;border:1.5px solid #e8e3db;border-radius:16px;overflow:hidden;transition:all 0.18s;position:relative; }
+    .offer-card:hover { border-color:#c5d9cb;box-shadow:0 6px 24px rgba(0,0,0,0.08); }
+    .offer-card.status-pending { border-left:4px solid #C4785A; }
+    .offer-card.status-accepted { border-left:4px solid #3D5A47; }
+    .offer-card.status-refused { border-left:4px solid #aaa;opacity:0.75; }
+    .offer-card.status-countered { border-left:4px solid #1a73e8; }
 
-    .contact-badges { display:flex;gap:6px;align-items:center;flex-shrink:0;flex-wrap:wrap; }
-    .badge { display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:20px;font-size:0.72rem;font-weight:700; }
-    .badge-new { background:#fff3e0;color:#e65100; }
-    .badge-qualified { background:#e8f4ec;color:#2e7d32; }
-    .badge-visited { background:#e8f0fe;color:#1a73e8; }
-    .badge-not_interested { background:#f5f5f5;color:#888; }
-    .badge-source { background:#f0f0ed;color:#666; }
+    /* Card main body */
+    .offer-body { padding:22px 24px 18px; }
 
-    /* Visit info */
-    .visit-tag { display:inline-flex;align-items:center;gap:6px;padding:5px 12px;border-radius:8px;background:#f0f5f1;font-size:0.78rem;color:#3D5A47;font-weight:500;margin-top:8px; }
+    /* Top row: avatar + identity + new badge */
+    .offer-top { display:flex;align-items:flex-start;gap:16px;margin-bottom:16px; }
+    .offer-avatar { width:46px;height:46px;border-radius:50%;background:#3D5A47;color:#fff;display:flex;align-items:center;justify-content:center;font-size:1.1rem;font-weight:700;flex-shrink:0;font-family:'DM Sans',sans-serif; }
+    .offer-identity { flex:1;min-width:0; }
+    .offer-name { font-size:1rem;font-weight:700;color:#1a1a1a;margin-bottom:3px; }
+    .offer-meta { font-size:0.78rem;color:#888;display:flex;gap:10px;flex-wrap:wrap; }
+    .offer-meta a { color:#C4785A;text-decoration:none; }
+    .offer-meta a:hover { text-decoration:underline; }
+    .offer-badges { display:flex;gap:6px;align-items:center;flex-shrink:0;flex-wrap:wrap; }
+
+    /* Badges */
+    .badge { display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:20px;font-size:0.72rem;font-weight:700; }
+    .badge-new-offer { background:#3D5A47;color:#fff;font-size:0.75rem;padding:5px 12px;box-shadow:0 2px 8px rgba(61,90,71,0.25); }
+    .badge-pending { background:#fff3e0;color:#e65100; }
+    .badge-accepted { background:#e8f4ec;color:#2e7d32; }
+    .badge-refused { background:#f5f5f5;color:#888; }
+    .badge-countered { background:#e8f0fe;color:#1a73e8; }
+
+    /* Amount — the star of the page */
+    .offer-amount-row { display:flex;align-items:center;gap:16px;margin-bottom:14px;flex-wrap:wrap; }
+    .offer-amount { font-family:'Cormorant Garamond',serif;font-size:2.2rem;font-weight:600;color:#3D5A47;line-height:1; }
+    .offer-amount-label { font-size:0.78rem;color:#888;margin-top:4px; }
+    .offer-vs-price { display:flex;flex-direction:column; }
+    .offer-vs-price .vs-label { font-size:0.72rem;color:#aaa;margin-bottom:2px; }
+    .offer-vs-price .vs-value { font-size:0.88rem;color:#555;font-weight:500; }
+    .offer-diff { display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:20px;font-size:0.78rem;font-weight:700; }
+    .offer-diff.positive { background:#e8f4ec;color:#2e7d32; }
+    .offer-diff.negative { background:#fef2f2;color:#dc2626; }
+    .offer-diff.neutral { background:#f0f0ed;color:#666; }
+
+    /* Conditions */
+    .offer-conditions { display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px; }
+    .cond-tag { display:inline-flex;align-items:center;gap:5px;padding:5px 11px;border-radius:8px;background:#F5F0E8;font-size:0.76rem;color:#555;font-weight:500; }
 
     /* Notes */
-    .notes-row { margin-top:12px;display:flex;gap:8px;align-items:flex-start; }
-    .notes-input { flex:1;border:1.5px solid #e8e3db;border-radius:8px;padding:8px 12px;font-size:0.82rem;font-family:'DM Sans',sans-serif;resize:none;outline:none;min-height:36px;color:#333; }
-    .notes-input:focus { border-color:#3D5A47; }
-    .btn-save-note { background:#3D5A47;border:none;border-radius:8px;padding:8px 14px;color:#fff;font-size:0.78rem;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;white-space:nowrap;transition:all 0.15s; }
-    .btn-save-note:hover { background:#2e4435; }
+    .offer-note { background:#FAFAF8;border-radius:8px;padding:10px 14px;font-size:0.82rem;color:#555;line-height:1.6;margin-bottom:14px;border-left:3px solid #e8e3db; }
 
-    /* Status actions */
-    .contact-actions { display:flex;gap:6px;margin-top:10px;flex-wrap:wrap; }
-    .action-btn { padding:5px 12px;border-radius:6px;border:1.5px solid #e8e3db;background:#fff;font-size:0.75rem;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;color:#555;transition:all 0.15s; }
-    .action-btn:hover { border-color:#3D5A47;color:#3D5A47; }
-    .action-btn.active { background:#3D5A47;border-color:#3D5A47;color:#fff; }
-    .action-btn.danger { color:#dc2626; }
-    .action-btn.danger:hover { border-color:#dc2626; }
+    /* Actions bar */
+    .offer-actions { border-top:1px solid #f0ece6;background:#FAFAF8;padding:14px 24px;display:flex;gap:8px;align-items:center;flex-wrap:wrap; }
+    .btn-accept { padding:10px 22px;background:#3D5A47;border:none;border-radius:8px;color:#fff;font-size:0.85rem;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all 0.15s;display:flex;align-items:center;gap:6px;min-height:44px; }
+    .btn-accept:hover { background:#2e4435;transform:translateY(-1px); }
+    .btn-refuse { padding:10px 18px;background:#fff;border:1.5px solid #C4785A;border-radius:8px;color:#C4785A;font-size:0.85rem;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all 0.15s;display:flex;align-items:center;gap:6px;min-height:44px; }
+    .btn-refuse:hover { background:#fdf5f1;transform:translateY(-1px); }
+    .btn-counter { padding:10px 18px;background:#fff;border:1.5px solid #e8e3db;border-radius:8px;color:#555;font-size:0.85rem;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all 0.15s;display:flex;align-items:center;gap:6px;min-height:44px; }
+    .btn-counter:hover { border-color:#3D5A47;color:#3D5A47;transform:translateY(-1px); }
+    .btn-icon-only { width:44px;height:44px;display:flex;align-items:center;justify-content:center;background:#fff;border:1.5px solid #e8e3db;border-radius:8px;cursor:pointer;color:#aaa;transition:all 0.15s;flex-shrink:0;margin-left:auto; }
+    .btn-icon-only:hover { border-color:#dc2626;color:#dc2626; }
+
+    /* Past offers section — visually muted */
+    .offers-past .offer-card { opacity:0.7; }
+    .offers-past .offer-card:hover { opacity:1; }
+
+    /* Counter-offer input area */
+    .counter-panel { display:none;padding:14px 24px;border-top:1px solid #f0ece6;background:#fff; }
+    .counter-panel.open { display:block;animation:slideDown 0.2s ease; }
+    @keyframes slideDown { from{opacity:0;transform:translateY(-6px)} to{opacity:1;transform:none} }
+    .counter-panel label { display:block;font-size:0.75rem;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:6px; }
+    .counter-input-row { display:flex;gap:8px;align-items:center;flex-wrap:wrap; }
+    .counter-input { flex:1;min-width:140px;padding:10px 14px;border:1.5px solid #e8e3db;border-radius:8px;font-size:0.9rem;font-family:'DM Sans',sans-serif;outline:none;color:#333; }
+    .counter-input:focus { border-color:#3D5A47; }
+    .btn-send-counter { padding:10px 18px;background:#C4785A;border:none;border-radius:8px;color:#fff;font-size:0.85rem;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;white-space:nowrap;min-height:44px; }
+    .btn-send-counter:hover { background:#b06548; }
 
     /* Empty state */
-    .empty { text-align:center;padding:80px 20px;color:#aaa; }
-    .empty-icon { font-size:3rem;margin-bottom:16px; }
-    .empty-title { font-size:1rem;font-weight:600;color:#888;margin-bottom:8px; }
-    .empty-sub { font-size:0.85rem;line-height:1.6;max-width:360px;margin:0 auto; }
+    .empty-state { text-align:center;padding:80px 20px; }
+    .empty-state-icon { width:72px;height:72px;border-radius:50%;background:#fff;border:2px solid #e8e3db;display:flex;align-items:center;justify-content:center;margin:0 auto 20px;color:#ccc; }
+    .empty-state-title { font-family:'Cormorant Garamond',serif;font-size:1.5rem;font-weight:600;color:#1a1a1a;margin-bottom:10px; }
+    .empty-state-sub { font-size:0.88rem;color:#888;line-height:1.7;max-width:400px;margin:0 auto 24px; }
+    .empty-state-tips { display:flex;flex-direction:column;gap:10px;max-width:380px;margin:0 auto;text-align:left; }
+    .empty-tip { display:flex;align-items:flex-start;gap:12px;background:#fff;border-radius:10px;padding:12px 14px;font-size:0.82rem;color:#555;line-height:1.55; }
+    .empty-tip-num { width:24px;height:24px;border-radius:50%;background:#3D5A47;color:#fff;font-size:0.7rem;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px; }
 
     /* Toast */
     .toast { position:fixed;bottom:24px;right:24px;background:#1a1a16;color:#fff;padding:12px 20px;border-radius:10px;font-size:0.88rem;z-index:9999;opacity:0;transform:translateY(8px);transition:all 0.3s;pointer-events:none; }
     .toast.show { opacity:1;transform:none; }
     .toast.success { background:#059669; }
+    .toast.error { background:#dc2626; }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .loading-spinner { animation: spin 0.8s linear infinite; }
+
+    @media(max-width:600px) {
+      .offer-amount { font-size:1.8rem; }
+      .offer-body { padding:16px 16px 14px; }
+      .offer-actions { padding:12px 16px; }
+      .btn-accept, .btn-refuse, .btn-counter { padding:10px 14px; font-size:0.8rem; }
+      .counter-panel { padding:12px 16px; }
+    }
   </style>
 </head>
 <body>
@@ -111,10 +156,11 @@
       <a href="/dashboard" class="sidebar-item"><span style="display:inline-flex;vertical-align:middle;margin-right:6px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></span>Dashboard</a>
       <a href="/ma-formation" class="sidebar-item"><span style="display:inline-flex;vertical-align:middle;margin-right:6px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg></span>Ma formation</a>
       <a href="/mon-bien" class="sidebar-item"><span style="display:inline-flex;vertical-align:middle;margin-right:6px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></span>Mon bien</a>
-      <a href="/mon-guide-photos" class="sidebar-item"><span style="display:inline-flex;vertical-align:middle;margin-right:6px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg></span>Guide photos</a>      <a href="/mon-agenda" class="sidebar-item"><span style="display:inline-flex;vertical-align:middle;margin-right:6px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span>Mon agenda</a>
+      <a href="/mon-guide-photos" class="sidebar-item"><span style="display:inline-flex;vertical-align:middle;margin-right:6px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg></span>Guide photos</a>
+      <a href="/mon-agenda" class="sidebar-item"><span style="display:inline-flex;vertical-align:middle;margin-right:6px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span>Mon agenda</a>
       <a href="/ma-bibliotheque" class="sidebar-item"><span style="display:inline-flex;vertical-align:middle;margin-right:6px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></span>Bibliothèque</a>
       <a href="/mes-publications" class="sidebar-item"><span style="display:inline-flex;vertical-align:middle;margin-right:6px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="2"/><path d="M16.24 7.76a6 6 0 0 1 0 8.49m-8.48-.01a6 6 0 0 1 0-8.49m11.31-2.82a10 10 0 0 1 0 14.14m-14.14 0a10 10 0 0 1 0-14.14"/></svg></span>Publications</a>
-      <a href="/mes-offres" class="sidebar-item active"><span style="display:inline-flex;vertical-align:middle;margin-right:6px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></span>Mes contacts</a>
+      <a href="/mes-offres" class="sidebar-item active"><span style="display:inline-flex;vertical-align:middle;margin-right:6px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg></span>Mes offres</a>
       <a href="/coach-ia" class="sidebar-item"><span style="display:inline-flex;vertical-align:middle;margin-right:6px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="11" width="18" height="10" rx="2"/><path d="M12 3v8"/><circle cx="12" cy="3" r="1"/><circle cx="8" cy="16" r="1" fill="currentColor"/><circle cx="16" cy="16" r="1" fill="currentColor"/></svg></span>Coach IA</a>
     </div>
     <div class="sidebar-footer"><a href="/logout">Déconnexion →</a></div>
@@ -123,212 +169,298 @@
   <div class="main">
     <div class="page-hdr">
       <div>
-        <h1><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="vertical-align:middle;margin-right:6px;"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>Mes contacts acheteurs</h1>
-        <div class="page-hdr-sub">Tous les acheteurs ayant demandé votre dossier — à contacter directement pour organiser visites et négociation</div>
+        <h1><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="vertical-align:middle;margin-right:6px;"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>Mes offres d'achat</h1>
+        <div class="page-hdr-sub">Les offres reçues sur votre bien — traitez-les rapidement pour avancer</div>
       </div>
-      <a href="/api/connect/contacts/export.csv" style="display:inline-flex;align-items:center;gap:6px;padding:9px 16px;background:#fff;border:1.5px solid #e8e3db;border-radius:8px;color:#555;font-size:0.82rem;font-weight:600;text-decoration:none;white-space:nowrap;transition:all .15s;" onmouseenter="this.style.borderColor='#3D5A47';this.style.color='#3D5A47'" onmouseleave="this.style.borderColor='#e8e3db';this.style.color='#555'">⬇ Exporter CSV</a>
     </div>
 
     <div class="stats-row" id="statsRow">
-      <div class="stat-card"><div class="stat-n" id="st-total">—</div><div class="stat-l">Contacts total</div></div>
-      <div class="stat-card"><div class="stat-n" id="st-new" style="color:#C4785A;">—</div><div class="stat-l">Nouveaux</div></div>
-      <div class="stat-card"><div class="stat-n" id="st-qualified" style="color:#3D5A47;">—</div><div class="stat-l">Qualifiés</div></div>
-      <div class="stat-card"><div class="stat-n" id="st-visited" style="color:#1a73e8;">—</div><div class="stat-l">Visites réalisées</div></div>
+      <div class="stat-card"><div class="stat-n" id="st-total">—</div><div class="stat-l">Offres reçues</div></div>
+      <div class="stat-card"><div class="stat-n" id="st-pending" style="color:#C4785A;">—</div><div class="stat-l">En attente</div></div>
+      <div class="stat-card"><div class="stat-n" id="st-accepted" style="color:#3D5A47;">—</div><div class="stat-l">Acceptées</div></div>
+      <div class="stat-card"><div class="stat-n" id="st-best">—</div><div class="stat-l">Meilleure offre</div></div>
     </div>
 
-    <!-- Rappel Loi Hoguet -->
-    <div style="background:#fff3e0;border:1px solid #ffe0b2;border-radius:10px;padding:12px 16px;margin-bottom:20px;font-size:0.82rem;color:#e65100;display:flex;gap:10px;align-items:flex-start;">
-      <span style="flex-shrink:0;font-size:1rem;">ℹ️</span>
-      <span>Ces contacts vous ont demandé votre dossier via le numéro Vendu Par Moi ou l'espace acheteur. <strong>Prenez contact directement avec eux</strong> pour organiser visites, négociation et compromis. Vendu Par Moi est votre outil d'organisation — pas un intermédiaire.</span>
-    </div>
-
-    <div class="filters">
-      <input type="text" class="search-input" id="searchInput" placeholder="Rechercher un contact…" oninput="filterContacts()">
-      <button class="filter-btn active" onclick="setFilter('all', this)">Tous</button>
-      <button class="filter-btn" onclick="setFilter('new', this)">Nouveaux</button>
-      <button class="filter-btn" onclick="setFilter('qualified', this)">Qualifiés</button>
-      <button class="filter-btn" onclick="setFilter('visited', this)">Visités</button>
-      <button class="filter-btn" onclick="setFilter('not_interested', this)">Non retenus</button>
-    </div>
-
-    <div class="contacts-list" id="contactsList">
-      <div class="empty">
-        <div class="loading-spinner" style="width:32px;height:32px;border:3px solid #e0e0d8;border-top-color:#3D5A47;border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 16px;"></div>
-        <div style="color:#888;">Chargement…</div>
+    <!-- Offres actives -->
+    <div id="activeSection" style="display:none">
+      <div class="section-header">
+        <span class="section-header-title">Offres en attente de décision</span>
+        <div class="section-header-line"></div>
       </div>
+      <div class="offers-list" id="activeOffers"></div>
+    </div>
+
+    <!-- État vide / Pas encore d'offres -->
+    <div id="emptyState" style="display:none">
+      <div class="empty-state">
+        <div class="empty-state-icon">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+        </div>
+        <div class="empty-state-title">Votre première offre arrive bientôt</div>
+        <div class="empty-state-sub">Les offres arrivent après les visites. Continuez à qualifier vos acheteurs et à organiser des visites de qualité — les propositions sérieuses suivront.</div>
+        <div class="empty-state-tips">
+          <div class="empty-tip"><div class="empty-tip-num">1</div><div>Publiez votre annonce sur plusieurs plateformes pour maximiser la visibilité</div></div>
+          <div class="empty-tip"><div class="empty-tip-num">2</div><div>Qualifiez vos acheteurs avant la visite — un acheteur financé vaut 10 curieux</div></div>
+          <div class="empty-tip"><div class="empty-tip-num">3</div><div>Après chaque visite, relancez sous 48h avec un message de votre bibliothèque</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Offres passées (acceptées / refusées) -->
+    <div id="pastSection" style="display:none">
+      <div class="section-header">
+        <span class="section-header-title">Historique des offres</span>
+        <div class="section-header-line"></div>
+      </div>
+      <div class="offers-list offers-past" id="pastOffers"></div>
+    </div>
+
+    <!-- Chargement -->
+    <div id="loadingState" style="text-align:center;padding:60px 20px;">
+      <div class="loading-spinner" style="width:32px;height:32px;border:3px solid #e0e0d8;border-top-color:#3D5A47;border-radius:50%;margin:0 auto 16px;"></div>
+      <div style="color:#888;font-size:0.88rem;">Chargement…</div>
     </div>
   </div>
 </div>
 
 <div class="toast" id="toast"></div>
 
-<style>
-@keyframes spin { to { transform: rotate(360deg); } }
-.loading-spinner { animation: spin 0.8s linear infinite; }
-</style>
-
 <script src="/js/seller-nav.js"></script>
 <script>
-let allContacts = [];
-let allVisits = [];
-let activeFilter = 'all';
+let allOffers = [];
+let listingPrice = 0;
 
-const STATUS_BADGE = {
-  new: '<span class="badge badge-new"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg> Nouveau</span>',
-  qualified: '<span class="badge badge-qualified"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> Qualifié</span>',
-  visited: '<span class="badge badge-visited"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg> Visité</span>',
-  not_interested: '<span class="badge badge-not_interested"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg> Non retenu</span>',
-};
-const SOURCE_LABEL = {
-  sms: '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="vertical-align:middle;margin-right:3px;"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>SMS',
-  email: '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="vertical-align:middle;margin-right:3px;"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>Email',
-  manuel: '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="vertical-align:middle;margin-right:3px;"><path d="M18 11V6a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v0M14 10V4a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v2M10 10.5V6a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v8"/><path d="M18 8a2 2 0 1 1 4 0v6a8 8 0 0 1-8 8h-2c-2.8 0-4.5-.86-5.99-2.34l-3.6-3.6a2 2 0 0 1 2.83-2.82L7 15"/></svg>Manuel',
-  form: '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="vertical-align:middle;margin-right:3px;"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>Formulaire',
-};
+// Formater un montant en euros
+function formatPrice(n) {
+  if (!n) return '—';
+  return Number(n).toLocaleString('fr-FR', { style:'currency', currency:'EUR', maximumFractionDigits:0 });
+}
+
+// Diff par rapport au prix affiché
+function priceDiff(offer, listing) {
+  if (!offer || !listing) return '';
+  const diff = offer - listing;
+  const pct = Math.round((diff / listing) * 100);
+  if (diff === 0) return '<span class="offer-diff neutral">= Prix affiché</span>';
+  if (diff > 0) return `<span class="offer-diff positive">+${formatPrice(diff)} (+${pct}%)</span>`;
+  return `<span class="offer-diff negative">${formatPrice(diff)} (${pct}%)</span>`;
+}
 
 async function load() {
   try {
-    const r = await fetch('/api/connect/overview');
+    // Charger le prix du bien si dispo
+    try {
+      const propRes = await fetch('/api/property');
+      const propData = await propRes.json();
+      listingPrice = propData.price || propData.asking_price || 0;
+    } catch(e) {}
+
+    const r = await fetch('/api/offers');
     const data = await r.json();
-    allContacts = data.contacts || [];
-    allVisits = data.visits || [];
+    allOffers = data.offers || [];
 
-    document.getElementById('st-total').textContent = allContacts.length;
-    document.getElementById('st-new').textContent = allContacts.filter(c => c.status === 'new' || !c.status).length;
-    document.getElementById('st-qualified').textContent = allContacts.filter(c => c.status === 'qualified').length;
-    document.getElementById('st-visited').textContent = allVisits.filter(v => v.status === 'done').length;
-
-    renderContacts();
+    document.getElementById('loadingState').style.display = 'none';
+    renderOffers();
   } catch(e) {
-    document.getElementById('contactsList').innerHTML = `<div class="empty"><div class="empty-icon"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div><div class="empty-title">Erreur de chargement</div></div>`;
+    document.getElementById('loadingState').innerHTML = `
+      <div style="text-align:center;padding:60px 20px;color:#888;">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#ccc" stroke-width="1.4" style="margin-bottom:12px;display:block;margin-left:auto;margin-right:auto;"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+        Impossible de charger les offres — vérifiez votre connexion
+      </div>`;
   }
 }
 
-function getContactVisits(contact) {
-  if (!contact.buyer_phone && !contact.buyer_email) return [];
-  return allVisits.filter(v =>
-    (contact.buyer_phone && v.buyer_phone === contact.buyer_phone) ||
-    (contact.buyer_email && v.buyer_email === contact.buyer_email)
-  );
-}
+function renderOffers() {
+  const active = allOffers.filter(o => (o.status || 'pending') === 'pending' || (o.status || 'pending') === 'countered');
+  const past = allOffers.filter(o => o.status === 'accepted' || o.status === 'refused');
 
-function setFilter(f, btn) {
-  activeFilter = f;
-  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-  renderContacts();
-}
+  // Stats
+  document.getElementById('st-total').textContent = allOffers.length || '0';
+  document.getElementById('st-pending').textContent = active.length || '0';
+  document.getElementById('st-accepted').textContent = past.filter(o => o.status === 'accepted').length || '0';
+  const amounts = allOffers.map(o => Number(o.amount)).filter(Boolean);
+  document.getElementById('st-best').textContent = amounts.length ? formatPrice(Math.max(...amounts)) : '—';
 
-function filterContacts() { renderContacts(); }
-
-function renderContacts() {
-  const search = (document.getElementById('searchInput')?.value || '').toLowerCase();
-  let filtered = allContacts.filter(c => {
-    if (activeFilter !== 'all' && (c.status || 'new') !== activeFilter) return false;
-    if (search) {
-      const hay = [c.buyer_name, c.buyer_phone, c.buyer_email, c.notes].filter(Boolean).join(' ').toLowerCase();
-      if (!hay.includes(search)) return false;
-    }
-    return true;
-  });
-  // Sort: newest first
-  filtered.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
-
-  const list = document.getElementById('contactsList');
-  if (!filtered.length) {
-    const isEmpty = !allContacts.length;
-    list.innerHTML = `<div class="empty">
-      <div class="empty-icon">${isEmpty ? '<svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#ccc" stroke-width="1.4"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>' : '<svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#ccc" stroke-width="1.4"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>'}</div>
-      <div class="empty-title">${isEmpty ? 'Aucun contact pour l\'instant' : 'Aucun contact ne correspond'}</div>
-      <div class="empty-sub">${isEmpty ? 'Dès qu\'un acheteur enverra un SMS à votre numéro Vendu Par Moi ou accèdera à votre dossier, son contact apparaîtra ici.' : 'Essayez un autre filtre ou terme de recherche.'}</div>
-    </div>`;
+  if (!allOffers.length) {
+    document.getElementById('emptyState').style.display = 'block';
+    document.getElementById('activeSection').style.display = 'none';
+    document.getElementById('pastSection').style.display = 'none';
     return;
   }
 
-  list.innerHTML = filtered.map(c => buildCard(c)).join('');
+  document.getElementById('emptyState').style.display = 'none';
+
+  if (active.length) {
+    document.getElementById('activeSection').style.display = 'block';
+    document.getElementById('activeOffers').innerHTML = active
+      .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
+      .map(o => buildOfferCard(o, true)).join('');
+  } else {
+    document.getElementById('activeSection').style.display = 'none';
+  }
+
+  if (past.length) {
+    document.getElementById('pastSection').style.display = 'block';
+    document.getElementById('pastOffers').innerHTML = past
+      .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
+      .map(o => buildOfferCard(o, false)).join('');
+  } else {
+    document.getElementById('pastSection').style.display = 'none';
+  }
 }
 
-function buildCard(c) {
-  const status = c.status || 'new';
-  const date = new Date(c.created_at).toLocaleDateString('fr-FR', { day:'2-digit', month:'short', year:'numeric' });
-  const initials = (c.buyer_name || '?').split(' ').map(w => w[0]).slice(0,2).join('').toUpperCase();
-  const visits = getContactVisits(c);
-  const visitTags = visits.map(v => {
-    const vDate = new Date(v.visit_date).toLocaleDateString('fr-FR', { day:'2-digit', month:'short' });
-    const statusEmoji = {
-      confirmed: '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>',
-      pending: '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>',
-      cancelled: '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>',
-      done: '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>',
-    };
-    return `<span class="visit-tag">${statusEmoji[v.status] || '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>'} Visite ${vDate} à ${v.visit_time} — ${v.status}</span>`;
-  }).join('');
+function buildOfferCard(o, isActive) {
+  const status = o.status || 'pending';
+  const initials = (o.buyer_name || '?').split(' ').map(w => w[0]).slice(0,2).join('').toUpperCase();
+  const date = new Date(o.created_at).toLocaleDateString('fr-FR', { day:'2-digit', month:'short', year:'numeric' });
+
+  const BADGE_HTML = {
+    pending: '<span class="badge badge-new-offer"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="vertical-align:middle;margin-right:3px;"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>Nouvelle offre</span>',
+    countered: '<span class="badge badge-countered">Contre-proposition</span>',
+    accepted: '<span class="badge badge-accepted"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="vertical-align:middle;margin-right:3px;"><polyline points="20 6 9 17 4 12"/></svg>Acceptée</span>',
+    refused: '<span class="badge badge-refused">Refusée</span>',
+  };
+
+  const conditionTags = [];
+  if (o.financing === 'cash') conditionTags.push('<span class="cond-tag"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg> Comptant</span>');
+  if (o.financing === 'loan') conditionTags.push('<span class="cond-tag"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg> Financement bancaire</span>');
+  if (o.loan_approved) conditionTags.push('<span class="cond-tag" style="color:#2e7d32;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="20 6 9 17 4 12"/></svg> Accord bancaire obtenu</span>');
+  if (o.suspensive_condition) conditionTags.push('<span class="cond-tag">Condition suspensive</span>');
+  if (o.deadline) {
+    const dl = new Date(o.deadline).toLocaleDateString('fr-FR', { day:'2-digit', month:'short' });
+    conditionTags.push(`<span class="cond-tag"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/></svg> Réponse attendue avant le ${dl}</span>`);
+  }
+
+  const actionsHtml = isActive ? `
+    <div class="offer-actions">
+      <button class="btn-accept" onclick="setOfferStatus(${o.id},'accepted')">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+        Accepter l'offre
+      </button>
+      <button class="btn-counter" onclick="toggleCounter(${o.id})">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M17 1l4 4-4 4"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><path d="M7 23l-4-4 4-4"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>
+        Contre-proposer
+      </button>
+      <button class="btn-refuse" onclick="setOfferStatus(${o.id},'refused')">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        Refuser
+      </button>
+      <button class="btn-icon-only" title="Supprimer" onclick="deleteOffer(${o.id})">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+      </button>
+    </div>
+    <div class="counter-panel" id="counter-${o.id}">
+      <label>Votre contre-proposition</label>
+      <div class="counter-input-row">
+        <input type="number" class="counter-input" id="counter-val-${o.id}" placeholder="Ex: 285000" min="0" step="500">
+        <button class="btn-send-counter" onclick="sendCounter(${o.id})">Envoyer la contre-proposition</button>
+      </div>
+    </div>` : `
+    <div class="offer-actions" style="gap:6px;">
+      <span style="font-size:0.78rem;color:#888;">${status === 'accepted' ? 'Offre acceptée — en cours de compromis' : 'Offre refusée'}</span>
+      <button class="btn-icon-only" title="Supprimer" onclick="deleteOffer(${o.id})" style="margin-left:auto;">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+      </button>
+    </div>`;
 
   return `
-  <div class="contact-card ${status}" id="card-${c.id}">
-    <div class="contact-top">
-      <div class="contact-avatar">${initials}</div>
-      <div class="contact-main">
-        <div class="contact-name">${c.buyer_name || 'Contact anonyme'}</div>
-        <div class="contact-meta">
-          ${c.buyer_phone ? `<span><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="vertical-align:middle;margin-right:2px;"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 13.1 19.79 19.79 0 0 1 1.61 4.48 2 2 0 0 1 3.6 2.28h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L7.91 9.91a16 16 0 0 0 6.06 6.06l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg><a href="tel:${c.buyer_phone}">${c.buyer_phone}</a></span>` : ''}
-          ${c.buyer_email ? `<span><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="vertical-align:middle;margin-right:2px;"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg><a href="mailto:${c.buyer_email}">${c.buyer_email}</a></span>` : ''}
-          <span><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="vertical-align:middle;margin-right:2px;"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>${date}</span>
-          ${c.source ? `<span>${SOURCE_LABEL[c.source] || c.source}</span>` : ''}
+  <div class="offer-card status-${status}" id="offer-${o.id}">
+    <div class="offer-body">
+      <div class="offer-top">
+        <div class="offer-avatar">${initials}</div>
+        <div class="offer-identity">
+          <div class="offer-name">${o.buyer_name || 'Acheteur anonyme'}</div>
+          <div class="offer-meta">
+            ${o.buyer_phone ? `<span><a href="tel:${o.buyer_phone}">${o.buyer_phone}</a></span>` : ''}
+            ${o.buyer_email ? `<span><a href="mailto:${o.buyer_email}">${o.buyer_email}</a></span>` : ''}
+            <span>${date}</span>
+          </div>
+        </div>
+        <div class="offer-badges">
+          ${BADGE_HTML[status] || BADGE_HTML.pending}
         </div>
       </div>
-      <div class="contact-badges">
-        ${STATUS_BADGE[status] || STATUS_BADGE.new}
+
+      <div class="offer-amount-row">
+        <div>
+          <div class="offer-amount">${formatPrice(o.amount)}</div>
+          <div class="offer-amount-label">Montant proposé</div>
+        </div>
+        ${listingPrice ? `<div class="offer-vs-price">
+          <span class="vs-label">Prix affiché</span>
+          <span class="vs-value">${formatPrice(listingPrice)}</span>
+        </div>
+        ${priceDiff(o.amount, listingPrice)}` : ''}
       </div>
+
+      ${conditionTags.length ? `<div class="offer-conditions">${conditionTags.join('')}</div>` : ''}
+      ${o.message ? `<div class="offer-note">${o.message}</div>` : ''}
     </div>
 
-    ${visitTags ? `<div style="display:flex;gap:6px;flex-wrap:wrap;">${visitTags}</div>` : ''}
-
-    <div class="notes-row">
-      <textarea class="notes-input" id="notes-${c.id}" placeholder="Notes personnelles (budget, situation, retour visite…)" rows="2">${c.notes || ''}</textarea>
-      <button class="btn-save-note" onclick="saveNote(${c.id})">Sauver</button>
-    </div>
-
-    <div class="contact-actions">
-      <button class="action-btn ${status==='new'?'active':''}" onclick="setStatus(${c.id},'new')"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="vertical-align:middle;margin-right:3px;"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>Nouveau</button>
-      <button class="action-btn ${status==='qualified'?'active':''}" onclick="setStatus(${c.id},'qualified')"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="vertical-align:middle;margin-right:3px;"><polyline points="20 6 9 17 4 12"/></svg>Qualifié</button>
-      <button class="action-btn ${status==='visited'?'active':''}" onclick="setStatus(${c.id},'visited')"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="vertical-align:middle;margin-right:3px;"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>Visité</button>
-      <button class="action-btn ${status==='not_interested'?'active':''}" onclick="setStatus(${c.id},'not_interested')"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="vertical-align:middle;margin-right:3px;"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>Non retenu</button>
-      <button class="action-btn danger" style="margin-left:auto;" onclick="deleteContact(${c.id})"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg></button>
-    </div>
+    ${actionsHtml}
   </div>`;
 }
 
-async function saveNote(id) {
-  const notes = document.getElementById(`notes-${id}`)?.value || '';
-  await fetch(`/api/connect/contacts/${id}/notes`, {
-    method:'PUT', headers:{'Content-Type':'application/json'},
-    body: JSON.stringify({ notes })
-  });
-  showToast('Note sauvegardée');
+function toggleCounter(id) {
+  const panel = document.getElementById(`counter-${id}`);
+  panel.classList.toggle('open');
+  if (panel.classList.contains('open')) {
+    document.getElementById(`counter-val-${id}`)?.focus();
+  }
 }
 
-async function setStatus(id, status) {
-  await fetch(`/api/connect/contacts/${id}/status`, {
-    method:'PUT', headers:{'Content-Type':'application/json'},
-    body: JSON.stringify({ status })
-  });
-  const c = allContacts.find(x => x.id === id);
-  if (c) { c.status = status; renderContacts(); }
+async function sendCounter(id) {
+  const val = document.getElementById(`counter-val-${id}`)?.value;
+  if (!val || Number(val) <= 0) { showToast('Entrez un montant valide', 'error'); return; }
+  try {
+    await fetch(`/api/offers/${id}/counter`, {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ counter_amount: Number(val) })
+    });
+    showToast('Contre-proposition envoyée');
+    // Update local state
+    const o = allOffers.find(x => x.id === id);
+    if (o) { o.status = 'countered'; o.counter_amount = Number(val); }
+    renderOffers();
+  } catch(e) {
+    showToast('Erreur lors de l\'envoi', 'error');
+  }
 }
 
-async function deleteContact(id) {
-  if (!confirm('Supprimer ce contact ?')) return;
-  await fetch(`/api/connect/contacts/${id}`, { method:'DELETE' });
-  allContacts = allContacts.filter(c => c.id !== id);
-  renderContacts();
-  showToast('Contact supprimé');
+async function setOfferStatus(id, status) {
+  try {
+    await fetch(`/api/offers/${id}/status`, {
+      method:'PUT', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ status })
+    });
+    const o = allOffers.find(x => x.id === id);
+    if (o) { o.status = status; }
+    renderOffers();
+    const labels = { accepted:'Offre acceptée !', refused:'Offre refusée', countered:'Contre-proposition envoyée' };
+    showToast(labels[status] || 'Mis à jour');
+  } catch(e) {
+    showToast('Erreur réseau', 'error');
+  }
 }
 
-function showToast(msg) {
+async function deleteOffer(id) {
+  if (!confirm('Supprimer cette offre ?')) return;
+  try {
+    await fetch(`/api/offers/${id}`, { method:'DELETE' });
+    allOffers = allOffers.filter(o => o.id !== id);
+    renderOffers();
+    showToast('Offre supprimée');
+  } catch(e) {
+    showToast('Erreur réseau', 'error');
+  }
+}
+
+function showToast(msg, type) {
   const t = document.getElementById('toast');
-  t.textContent = msg; t.className = 'toast show success';
-  clearTimeout(t._t); t._t = setTimeout(() => { t.className = 'toast'; }, 2500);
+  t.textContent = msg;
+  t.className = 'toast show' + (type === 'error' ? ' error' : ' success');
+  clearTimeout(t._t);
+  t._t = setTimeout(() => { t.className = 'toast'; }, 2500);
 }
 
 load();
