@@ -3476,15 +3476,13 @@ PHOTO_CATS.forEach(cat => {
   zone.addEventListener('dragover', (e) => { e.preventDefault(); zone.classList.add('drag-over'); });
   zone.addEventListener('dragleave', () => zone.classList.remove('drag-over'));
   zone.addEventListener('drop', (e) => { e.preventDefault(); zone.classList.remove('drag-over'); uploadPhotos(e.dataTransfer.files, cat); });
-  input.addEventListener('change', () => { uploadPhotos(input.files, cat); });
+  input.addEventListener('change', () => { const filesToUpload = Array.from(input.files); input.value = ''; uploadPhotos(filesToUpload, cat); });
 });
 
 async function uploadPhotos(files, category) {
   if (!files || !files.length) return;
   if (_uploadLock[category]) return;
   _uploadLock[category] = true;
-  const input = document.getElementById('photoInput-' + category);
-  if (input) input.value = '';
 
   // Auto-expand the folder so photos are immediately visible after upload
   const grid = document.getElementById('grid-' + category);
@@ -3530,6 +3528,7 @@ async function uploadPhotos(files, category) {
   }
   text.textContent = 'Enregistré ✓';
   setTimeout(() => progress.classList.add('hidden'), 2000);
+  if (typeof refreshPreview === 'function') refreshPreview();
 }
 
 function renderPhotos(photos) {
