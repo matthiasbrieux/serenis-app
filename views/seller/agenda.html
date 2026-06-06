@@ -195,6 +195,21 @@
     .day-slot-dot { width:10px; height:10px; border-radius:50%; flex-shrink:0; }
     .day-slot-time { font-weight:700; font-size:0.88rem; min-width:44px; }
     .day-slot-info { flex:1; }
+    /* ── Panneau détail jour ── */
+    .cal-detail-card { background:#fff; border-radius:14px; border:1.5px solid #e8e0d6; padding:16px 18px; margin-bottom:14px; animation:fadeUp 0.18s ease; }
+    .cal-detail-card.type-visit { border-color:#b8d8c2; background:linear-gradient(135deg,#f0f8f2,#e8f5eb); }
+    .cal-detail-card.type-eve { border-color:#f5c842; background:linear-gradient(135deg,#fffdf0,#fff8d6); }
+    .cal-detail-date { font-size:0.72rem; font-weight:700; text-transform:uppercase; letter-spacing:0.08em; color:#999; margin-bottom:10px; }
+    .cal-detail-visit { display:flex; align-items:center; gap:12px; margin-bottom:12px; }
+    .cal-detail-avatar { width:42px; height:42px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:0.88rem; font-weight:700; color:#fff; flex-shrink:0; }
+    .cal-detail-name { font-weight:700; font-size:0.95rem; color:#1a1a1a; }
+    .cal-detail-time { font-size:0.82rem; color:#3D5A47; font-weight:600; margin-top:2px; }
+    .cal-detail-msg { font-size:0.84rem; color:#555; line-height:1.5; margin-bottom:12px; }
+    .cal-detail-btn { display:flex; align-items:center; justify-content:center; gap:7px; width:100%; padding:11px; border:none; border-radius:10px; font-family:'DM Sans',sans-serif; font-size:0.86rem; font-weight:700; cursor:pointer; transition:0.15s; }
+    .cal-detail-btn.btn-green { background:#3D5A47; color:#fff; }
+    .cal-detail-btn.btn-green:hover { background:#2a4030; }
+    .cal-detail-btn.btn-orange { background:linear-gradient(135deg,#b45309,#C4785A); color:#fff; }
+    .cal-detail-btn.btn-orange:hover { background:#9a3e00; }
     .day-slot-name { font-size:0.87rem; font-weight:600; color:#1A1A16; }
     .day-slot-sub { font-size:0.75rem; color:#888; }
 
@@ -615,6 +630,9 @@
           </div>
           <div class="cal-grid" id="calGrid" style="margin-top:4px;"></div>
         </div>
+
+        <!-- Détail jour sélectionné -->
+        <div id="calDayDetail" style="display:none;"></div>
 
         <!-- Disponibilités -->
         <div class="dispo-card">
@@ -1231,7 +1249,80 @@ function renderCalendar() {
   if (calSelected) renderDayDetail(calSelected);
 }
 
-function selectCalDay(dateStr) { calSelected=dateStr; renderCalendar(); }
+function selectCalDay(dateStr) {
+  calSelected = calSelected === dateStr ? null : dateStr;
+  renderCalendar();
+}
+
+function renderDayDetail(dateStr) {
+  const el = document.getElementById('calDayDetail');
+  if (!el) return;
+  const dayVisits = allVisits.filter(v => v.visit_date === dateStr && v.status === 'confirmed');
+
+  // Vérifier si c'est la veille d'une visite
+  const nextDay = new Date(dateStr + 'T12:00:00');
+  nextDay.setDate(nextDay.getDate() + 1);
+  const nextDateStr = nextDay.toISOString().split('T')[0];
+  const nextVisits = allVisits.filter(v => v.visit_date === nextDateStr && v.status === 'confirmed');
+
+  const JOURS = ['dimanche','lundi','mardi','mercredi','jeudi','vendredi','samedi'];
+  const MOIS = ['janvier','février','mars','avril','mai','juin','juillet','août','septembre','octobre','novembre','décembre'];
+  const d = new Date(dateStr + 'T12:00:00');
+  const dateLabel = `${JOURS[d.getDay()]} ${d.getDate()} ${MOIS[d.getMonth()]}`;
+
+  if (!dayVisits.length && !nextVisits.length) { el.style.display='none'; return; }
+  el.style.display = 'block';
+
+  let html = '';
+
+  // Visites ce jour-là (case verte)
+  dayVisits.forEach(v => {
+    const ini = initials(v.buyer_name);
+    const time = v.visit_time ? v.visit_time.slice(0,5).replace(':','h') : '—';
+    html += `
+    <div class="cal-detail-card type-visit">
+      <div class="cal-detail-date">📅 ${dateLabel}</div>
+      <div class="cal-detail-visit">
+        <div class="cal-detail-avatar" style="background:linear-gradient(135deg,#2e7d32,#4CAF50);">${ini}</div>
+        <div>
+          <div class="cal-detail-name">${v.buyer_name || 'Acquéreur'}</div>
+          <div class="cal-detail-time">Visite à ${time}${v.buyer_phone ? ' · ' + v.buyer_phone : ''}</div>
+        </div>
+      </div>
+      <button class="cal-detail-btn btn-green" onclick="sendReminder(${v.id})">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.41a2 2 0 0 1 2-2.18h3a2 2 0 0 1 2 1.72 12.13 12.13 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.13 12.13 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+        Rappel SMS pour cette visite
+      </button>
+    </div>`;
+  });
+
+  // Veille d'une visite (case orange)
+  nextVisits.forEach(v => {
+    const ini = initials(v.buyer_name);
+    const prenom = (v.buyer_name || '').split(' ')[0] || 'votre client';
+    const nextD = new Date(nextDateStr + 'T12:00:00');
+    const nextLabel = `${JOURS[nextD.getDay()]} ${nextD.getDate()} ${MOIS[nextD.getMonth()]}`;
+    const time = v.visit_time ? v.visit_time.slice(0,5).replace(':','h') : '—';
+    html += `
+    <div class="cal-detail-card type-eve">
+      <div class="cal-detail-date">🔔 Rappel à envoyer aujourd'hui</div>
+      <div class="cal-detail-visit">
+        <div class="cal-detail-avatar" style="background:linear-gradient(135deg,#b45309,#C4785A);">${ini}</div>
+        <div>
+          <div class="cal-detail-name">${v.buyer_name || 'Acquéreur'}</div>
+          <div class="cal-detail-time">Visite demain ${nextLabel} à ${time}</div>
+        </div>
+      </div>
+      <div class="cal-detail-msg">Envoyez un rappel SMS à <strong>${prenom}</strong> pour lui confirmer la visite de demain.</div>
+      <button class="cal-detail-btn btn-orange" onclick="sendReminder(${v.id})">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.41a2 2 0 0 1 2-2.18h3a2 2 0 0 1 2 1.72 12.13 12.13 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.13 12.13 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+        Rappeler la visite de demain à ${prenom}
+      </button>
+    </div>`;
+  });
+
+  el.innerHTML = html;
+}
 
 document.getElementById('calPrev').addEventListener('click',()=>{ calDate=new Date(calDate.getFullYear(),calDate.getMonth()-1); renderCalendar(); });
 document.getElementById('calNext').addEventListener('click',()=>{ calDate=new Date(calDate.getFullYear(),calDate.getMonth()+1); renderCalendar(); });
