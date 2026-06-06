@@ -304,10 +304,10 @@
     <div class="sms-modal-label">Message prêt à envoyer</div>
     <div class="sms-modal-preview" id="smsModalText"></div>
     <div class="sms-modal-actions">
-      <a class="sms-modal-btn-send" id="smsModalBtn" href="#">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-        Envoyer le SMS
-      </a>
+      <button class="sms-modal-btn-send" id="smsModalBtn" onclick="copySmsCounter(this)">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+        Copier le SMS
+      </button>
       <button class="sms-modal-btn-close" onclick="closeSmsModal()">Fermer</button>
     </div>
   </div>
@@ -525,16 +525,17 @@ function openSmsCounterModal(offer, counterAmount) {
   document.getElementById('smsModalSub').textContent = phone
     ? `Notifiez ${offer.buyer_name || 'l\'acquéreur'} (${phone}) par SMS`
     : `Notifiez ${offer.buyer_name || 'l\'acquéreur'} par SMS`;
-  const smsBtn = document.getElementById('smsModalBtn');
-  if (phone) {
-    smsBtn.href = `sms:${phone}?&body=${encodeURIComponent(smsText)}`;
-    smsBtn.style.opacity = '1';
-    smsBtn.style.pointerEvents = '';
-  } else {
-    smsBtn.href = `sms:?&body=${encodeURIComponent(smsText)}`;
-    smsBtn.style.opacity = '0.5';
-  }
   document.getElementById('smsCounterModal').classList.add('open');
+}
+
+function copySmsCounter(btn) {
+  const text = document.getElementById('smsModalText').textContent;
+  navigator.clipboard.writeText(text).then(() => {
+    const orig = btn.innerHTML;
+    btn.innerHTML = '✓ Copié !';
+    btn.style.background = '#059669';
+    setTimeout(() => { btn.innerHTML = orig; btn.style.background = ''; }, 2500);
+  });
 }
 
 function closeSmsModal() {
