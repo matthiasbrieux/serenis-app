@@ -800,6 +800,32 @@
   </div>
 </div>
 
+<!-- ── Modal: Rappel SMS ── -->
+<div class="modal-overlay" id="rappelSmsOverlay">
+  <div class="modal confirm-sms-modal">
+    <div class="confirm-sms-check" style="background:linear-gradient(135deg,#b45309,#C4785A);">
+      <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+    </div>
+    <div class="confirm-sms-title">Rappel de visite</div>
+    <div class="confirm-sms-buyer" id="rappelSmsBuyer">
+      <div class="confirm-sms-buyer-avatar" id="rappelSmsBuyerAvatar" style="background:linear-gradient(135deg,#b45309,#C4785A);"></div>
+      <div class="confirm-sms-buyer-info">
+        <div class="confirm-sms-buyer-name" id="rappelSmsBuyerName"></div>
+        <div id="rappelSmsBuyerPhone"></div>
+      </div>
+    </div>
+    <div class="confirm-sms-preview" id="rappelSmsText"></div>
+    <a class="confirm-sms-btn-sms" id="rappelSmsSendBtn" href="#" style="background:linear-gradient(135deg,#b45309,#C4785A);box-shadow:0 4px 14px rgba(196,120,90,0.3);">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.41a2 2 0 0 1 2-2.18h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+      Envoyer le SMS
+    </a>
+    <button class="confirm-sms-copy" id="rappelSmsCopyBtn" onclick="copyRappelSms(this)">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:middle;margin-right:5px;"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>Copier le SMS
+    </button>
+    <button class="confirm-sms-close" onclick="closeModal('rappelSmsOverlay')">Fermer</button>
+  </div>
+</div>
+
 <div class="modal-overlay" id="addVisitOverlay">
   <div class="modal">
     <div class="modal-header">
@@ -1145,11 +1171,11 @@ function docopySmsRappel(id) {
   });
 }
 
-async function sendReminder(id) {
+function sendReminder(id) {
   const v = allVisits.find(v=>v.id===id);
   if (!v) return;
-  const btn = document.getElementById('btn-reminder-'+id);
   const prenom = (v.buyer_name||'').split(' ')[0] || 'Madame/Monsieur';
+  const initiales = (v.buyer_name||'?').split(' ').map(n=>n[0]).join('').toUpperCase().slice(0,2);
   const [yr,mo,dy] = (v.visit_date||'').split('-');
   const d = yr ? new Date(Number(yr),Number(mo)-1,Number(dy)) : null;
   const JOURS=['dimanche','lundi','mardi','mercredi','jeudi','vendredi','samedi'];
@@ -1157,17 +1183,49 @@ async function sendReminder(id) {
   const dateLabel = d ? `${JOURS[d.getDay()]} ${Number(dy)} ${MOIS[d.getMonth()]}` : v.visit_date;
   const [h,m] = (v.visit_time||'').split(':');
   const time = m&&m!=='00' ? `${h}h${m}` : `${h}h`;
-  const adresseText = _propertyAddress ? ` Voici l'adresse de mon bien : ${_propertyAddress}.` : '';
-  const smsText = `Bonjour ${prenom}, je vous rappelle notre visite prévue pour le ${dateLabel} à ${time}. N'hésitez pas à me prévenir si vous avez un empêchement.${adresseText}`;
-  try {
-    await navigator.clipboard.writeText(smsText);
-    v.reminder_sent = 1;
-    if (btn) { btn.className='btn-sms-reminder sent'; btn.innerHTML='✓ Rappel copié'; btn.disabled=false; }
-    showToast('SMS copié — collez-le dans votre messagerie');
-    fetch(`/api/visits/${id}/reminder`,{method:'POST'}).catch(()=>{});
-  } catch(e) {
-    showToast('Erreur de copie — réessayez','error');
+  const adresseText = _propertyAddress ? ` L'adresse de mon bien : ${_propertyAddress}.` : '';
+  const smsText = `Bonjour ${prenom}, je vous rappelle notre visite prévue demain ${dateLabel} à ${time}.${adresseText} N'hésitez pas à me prévenir si vous avez un empêchement. À demain !`;
+
+  document.getElementById('rappelSmsBuyerAvatar').textContent = initiales;
+  document.getElementById('rappelSmsBuyerName').textContent = v.buyer_name || '—';
+  const phoneEl = document.getElementById('rappelSmsBuyerPhone');
+  if (v.buyer_phone) {
+    phoneEl.className = 'confirm-sms-buyer-phone';
+    phoneEl.textContent = v.buyer_phone;
+  } else {
+    phoneEl.className = 'confirm-sms-buyer-nophone';
+    phoneEl.textContent = 'Téléphone non renseigné';
   }
+  document.getElementById('rappelSmsText').textContent = smsText;
+  const sendBtn = document.getElementById('rappelSmsSendBtn');
+  if (v.buyer_phone) {
+    sendBtn.href = `sms:${v.buyer_phone}?&body=${encodeURIComponent(smsText)}`;
+    sendBtn.style.display = '';
+  } else {
+    sendBtn.style.display = 'none';
+  }
+  document.getElementById('rappelSmsOverlay').classList.add('active');
+  document.getElementById('rappelSmsOverlay')._visitId = id;
+}
+
+function copyRappelSms(btn) {
+  const text = document.getElementById('rappelSmsText').textContent;
+  const id = document.getElementById('rappelSmsOverlay')._visitId;
+  navigator.clipboard.writeText(text).then(() => {
+    btn.textContent = '✓ SMS copié !';
+    btn.classList.add('copied');
+    setTimeout(() => {
+      btn.innerHTML = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:middle;margin-right:5px;"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>Copier le SMS';
+      btn.classList.remove('copied');
+    }, 2500);
+    if (id) {
+      const v = allVisits.find(v=>v.id===id);
+      if (v) v.reminder_sent = 1;
+      const reminderBtn = document.getElementById('btn-reminder-'+id);
+      if (reminderBtn) { reminderBtn.className='btn-sms-reminder sent'; reminderBtn.innerHTML='✓ Rappel copié'; }
+      fetch(`/api/visits/${id}/reminder`,{method:'POST'}).catch(()=>{});
+    }
+  });
 }
 
 async function saveNotes(id) {
