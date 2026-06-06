@@ -1144,7 +1144,9 @@ function sendReminder(id) {
   const [h,m] = (v.visit_time||'').split(':');
   const time = m&&m!=='00' ? `${h}h${m}` : `${h}h`;
   const adresseText = _propertyAddress ? ` L'adresse de mon bien : ${_propertyAddress}.` : '';
-  const smsText = `Bonjour ${prenom}, je vous rappelle notre visite prévue demain ${dateLabel} à ${time}.${adresseText} N'hésitez pas à me prévenir si vous avez un empêchement. À demain !`;
+  const sellerPrenom = (_data&&_data.seller&&_data.seller.first_name) || '';
+  const signature = sellerPrenom ? ` ${sellerPrenom}` : '';
+  const smsText = `Bonjour ${prenom}, je vous rappelle notre visite prévue demain ${dateLabel} à ${time}.${adresseText} N'hésitez pas à me prévenir si vous avez un empêchement. À demain !${signature}`;
 
   document.getElementById('rappelSmsBuyerAvatar').textContent = initiales;
   document.getElementById('rappelSmsBuyerName').textContent = v.buyer_name || '—';
@@ -1171,7 +1173,7 @@ function sendReminder(id) {
 function copyRappelSms(btn) {
   const text = document.getElementById('rappelSmsText').textContent;
   const id = document.getElementById('rappelSmsOverlay')._visitId;
-  navigator.clipboard.writeText(text).then(() => {
+  function onCopied() {
     btn.textContent = '✓ SMS copié !';
     btn.classList.add('copied');
     setTimeout(() => {
@@ -1185,7 +1187,14 @@ function copyRappelSms(btn) {
       if (reminderBtn) { reminderBtn.className='btn-sms-reminder sent'; reminderBtn.innerHTML='✓ Rappel copié'; }
       fetch(`/api/visits/${id}/reminder`,{method:'POST'}).catch(()=>{});
     }
-  });
+  }
+  if (navigator.clipboard && window.isSecureContext) {
+    navigator.clipboard.writeText(text).then(onCopied).catch(() => {
+      const ta=document.createElement('textarea'); ta.value=text; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta); onCopied();
+    });
+  } else {
+    const ta=document.createElement('textarea'); ta.value=text; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta); onCopied();
+  }
 }
 
 async function saveNotes(id) {
@@ -1466,7 +1475,7 @@ function renderNotifSidebar() {
 
 // ── Modals ─────────────────────────────────────────────
 function openModal(id) { document.getElementById(id).classList.add('open'); document.body.style.overflow='hidden'; }
-function closeModal(id) { document.getElementById(id).classList.remove('open'); document.body.style.overflow=''; }
+function closeModal(id) { const el=document.getElementById(id); el.classList.remove('open'); el.classList.remove('active'); document.body.style.overflow=''; }
 document.querySelectorAll('.modal-overlay').forEach(o=>{ o.addEventListener('click',e=>{ if(e.target===o) closeModal(o.id); }); });
 
 function openAddVisit() {
