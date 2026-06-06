@@ -885,6 +885,199 @@
       .dpe-bar-row:nth-child(6) .dpe-bar-fill { width:88% !important; }
       .dpe-bar-row:nth-child(7) .dpe-bar-fill { width:100% !important; }
     }
+
+    /* ═══════════════════════════════════════════════════
+       AMÉLIORATIONS MOBILES — property.html
+    ════════════════════════════════════════════════════ */
+
+    /* ── 1. Tabs navigation mobile : scroll horizontal ── */
+    .tabs-row {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      flex-wrap: nowrap;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+      padding-bottom: 4px;
+      /* scroll-snap pour aligner le tab actif */
+      scroll-snap-type: x mandatory;
+    }
+    .tabs-row::-webkit-scrollbar { display: none; }
+    .tabs-row .tab-btn {
+      flex-shrink: 0;
+      scroll-snap-align: start;
+    }
+
+    /* ── 2. Formulaires mobile : font-size 16px (évite le zoom iOS) ── */
+    @media(max-width:768px) {
+      .form-group input,
+      .form-group select,
+      .form-group textarea,
+      #propertyForm input[type="text"],
+      #propertyForm input[type="number"],
+      #propertyForm input[type="email"],
+      #propertyForm select,
+      #propertyForm textarea,
+      .room-surface-input,
+      .stepper-input,
+      #equipCustom,
+      #aiDescText {
+        font-size: 16px !important;
+      }
+      /* Labels toujours au-dessus sur mobile */
+      .form-group label {
+        display: block;
+        width: 100%;
+      }
+      /* form-grid-2 et form-grid-3 : 1 colonne sur très petit écran */
+      .form-grid-2,
+      .form-grid-3 {
+        grid-template-columns: 1fr !important;
+      }
+    }
+
+    /* ── 3. Section Mes envois : lisibilité et anti-débordement ── */
+    @media(max-width:640px) {
+      .ev-msg-text {
+        font-size: 0.85rem !important;
+        line-height: 1.7 !important;
+        word-break: break-word;
+        overflow-wrap: break-word;
+      }
+      .ev-link-row {
+        flex-direction: column;
+        gap: 8px;
+      }
+      .ev-link-row .ev-link-input {
+        width: 100%;
+      }
+      .ev-link-row .ev-copy-btn {
+        width: 100%;
+        text-align: center;
+        min-height: 44px;
+        font-size: 0.88rem !important;
+      }
+      .ev-card-btn {
+        padding: 12px 14px;
+        gap: 10px;
+      }
+      .ev-card-ico {
+        width: 32px;
+        height: 32px;
+        flex-shrink: 0;
+      }
+      .ev-card-ttl {
+        font-size: 0.85rem !important;
+      }
+      .ev-card-sub {
+        font-size: 0.7rem !important;
+        white-space: normal;
+      }
+      .ev-msg-btn {
+        min-height: 44px;
+        width: 100%;
+        justify-content: center;
+        font-size: 0.85rem !important;
+      }
+      .ev-msg-box {
+        padding: 10px 12px;
+      }
+    }
+
+    /* ── 4. Bouton Sauvegarder sticky sur mobile ── */
+    @media(max-width:768px) {
+      .save-action-bar {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        z-index: 500;
+        background: rgba(245,240,232,0.97);
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+        padding: 12px 16px max(12px, env(safe-area-inset-bottom));
+        border-top: 1px solid #e8e3db;
+        box-shadow: 0 -4px 20px rgba(0,0,0,0.08);
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        flex-wrap: wrap;
+      }
+      /* Ajoute une marge en bas du formulaire pour que le contenu ne soit pas caché derrière la barre sticky */
+      #propertyForm {
+        padding-bottom: 80px;
+      }
+    }
+    @media(min-width:769px) {
+      .save-action-bar {
+        display: flex;
+        gap: 12px;
+        align-items: center;
+        margin-top: 32px;
+        flex-wrap: wrap;
+      }
+    }
+
+    /* ── 5. Spinner de sauvegarde ── */
+    @keyframes vpm-spin { from{transform:rotate(0deg)} to{transform:rotate(360deg)} }
+    .btn-save-spinner {
+      display: none;
+      width: 14px;
+      height: 14px;
+      border: 2px solid rgba(255,255,255,0.4);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: vpm-spin 0.7s linear infinite;
+      flex-shrink: 0;
+    }
+    .btn-primary.saving .btn-save-spinner { display: inline-block; }
+    .btn-primary.saving .btn-save-text { opacity: 0.7; }
+    .btn-primary.saved { background: #2e7d32 !important; }
+    @media(max-width:768px) {
+      .save-action-bar .btn-primary {
+        flex: 1;
+        min-width: 0;
+        justify-content: center;
+        padding: 14px 20px;
+        font-size: 0.95rem;
+      }
+      .save-action-bar .autosave-badge {
+        font-size: 0.72rem;
+      }
+    }
+
+    /* ── 6. Barre de complétion plus visible ── */
+    .form-completion {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      background: rgba(245,240,232,0.97);
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+      border-radius: 10px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+      padding: 14px 18px;
+      margin-bottom: 28px;
+    }
+    @media(max-width:640px) {
+      .form-completion {
+        border-radius: 0;
+        margin-left: -16px;
+        margin-right: -16px;
+        padding: 12px 16px;
+      }
+    }
+
+    /* ── 7. Upload photos : zones cliquables min 44px ── */
+    @media(max-width:640px) {
+      .photo-upload-zone {
+        min-height: 56px !important;
+        padding: 14px 16px;
+      }
+      .photo-folder-head {
+        min-height: 56px;
+      }
+    }
   </style>
 </head>
 <body>
@@ -1849,8 +2042,11 @@
           </div>
         </div>
 
-        <div style="display:flex;gap:12px;align-items:center;margin-top:32px;flex-wrap:wrap;">
-          <button type="submit" class="btn-primary">Sauvegarder la fiche</button>
+        <div class="save-action-bar">
+          <button type="submit" class="btn-primary" id="btnSave" style="display:inline-flex;align-items:center;gap:8px;">
+            <span class="btn-save-spinner" id="saveSpinner"></span>
+            <span class="btn-save-text">Sauvegarder la fiche</span>
+          </button>
           <button type="button" onclick="exportJSON()" style="padding:11px 20px;border-radius:8px;border:2px solid #e8e0d6;background:#fff;font-family:'DM Sans',sans-serif;font-size:0.88rem;font-weight:600;color:#555;cursor:pointer;transition:0.15s;" onmouseover="this.style.borderColor='#3D5A47';this.style.color='#3D5A47'" onmouseout="this.style.borderColor='#e8e0d6';this.style.color='#555'">
             ↓ Export JSON
           </button>
@@ -2706,6 +2902,8 @@ document.querySelectorAll('.tab-btn').forEach(btn => {
     btn.classList.add('active');
     document.getElementById('tab-' + btn.dataset.tab).classList.remove('hidden');
     if (btn.dataset.tab === 'fiche') generateFiche();
+    // Scroller vers le tab actif sur mobile (scroll-into-view dans la tabs-row)
+    try { btn.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' }); } catch(e) {}
   });
 });
 
@@ -3116,9 +3314,15 @@ document.getElementById('propertyForm').addEventListener('submit', async (e) => 
   data.rooms_detail = JSON.stringify(roomsList);
   data.travaux_recents = JSON.stringify(travauxList);
 
-  const btn = e.target.querySelector('button[type="submit"]');
-  const origTxt = btn.textContent;
-  btn.textContent = '● Sauvegarde...'; btn.disabled = true;
+  const btn = document.getElementById('btnSave') || e.target.querySelector('button[type="submit"]');
+  const saveTextEl = btn.querySelector('.btn-save-text');
+  const spinnerEl = btn.querySelector('.btn-save-spinner');
+  const origTxt = saveTextEl ? saveTextEl.textContent : btn.textContent;
+  // Afficher le spinner
+  if (saveTextEl) saveTextEl.textContent = 'Sauvegarde...';
+  else btn.textContent = '● Sauvegarde...';
+  btn.classList.add('saving');
+  btn.disabled = true;
 
   // Optimistic UI — show success immediately
   const badge = document.getElementById('autosaveBadge');
@@ -3134,21 +3338,33 @@ document.getElementById('propertyForm').addEventListener('submit', async (e) => 
       document.getElementById('saveSuccess').classList.remove('hidden');
       setTimeout(() => document.getElementById('saveSuccess').classList.add('hidden'), 3000);
       showToast('Fiche sauvegardée ✓');
+      // Feedback visuel "saved"
+      btn.classList.remove('saving');
+      btn.classList.add('saved');
+      if (saveTextEl) saveTextEl.textContent = '✓ Sauvegardé';
+      setTimeout(() => {
+        btn.classList.remove('saved');
+        if (saveTextEl) saveTextEl.textContent = origTxt;
+      }, 2500);
       if (badge) { const t = new Date().toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'}); badge.textContent = '✓ Sauvegardé à ' + t; badge.className = 'autosave-badge saved'; }
       var emb = document.getElementById('editModeBar');
       if (emb) emb.style.display = 'flex';
       enterViewMode();
     } else {
+      btn.classList.remove('saving');
+      if (saveTextEl) saveTextEl.textContent = origTxt;
       const errEl = document.getElementById('saveError');
       if (errEl) { errEl.textContent = result.error || 'Erreur de sauvegarde'; errEl.classList.remove('hidden'); }
       showToast(result.error || 'Erreur de sauvegarde', 'error');
       if (badge) { badge.textContent = '⚠ Erreur'; badge.className = 'autosave-badge saving'; }
     }
   } catch(err) {
+    btn.classList.remove('saving');
+    if (saveTextEl) saveTextEl.textContent = origTxt;
     showToast('Erreur réseau — vérifiez votre connexion', 'error');
     if (badge) { badge.textContent = '⚠ Hors ligne'; badge.className = 'autosave-badge saving'; }
   }
-  btn.textContent = origTxt; btn.disabled = false;
+  btn.disabled = false;
 });
 
 // ── Photo upload — 3 dossiers distincts ──────────────
