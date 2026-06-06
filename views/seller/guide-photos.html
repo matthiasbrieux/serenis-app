@@ -129,13 +129,43 @@
     .upload-spinner { width:28px; height:28px; border:3px solid #e8e3db; border-top-color:#3D5A47; border-radius:50%; animation:spin 0.8s linear infinite; }
     @keyframes spin { to { transform:rotate(360deg); } }
 
+    /* Bandeau règles d'or — affiché en haut du contenu sur mobile */
+    .golden-rules { display:none; background:linear-gradient(135deg,#2e4435,#3D5A47); border-radius:12px; padding:14px 16px; margin-bottom:20px; }
+    .golden-rules-title { font-size:0.72rem; font-weight:700; color:rgba(212,228,216,0.6); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:10px; }
+    .golden-rule { display:flex; align-items:flex-start; gap:10px; margin-bottom:8px; }
+    .golden-rule:last-child { margin-bottom:0; }
+    .gr-icon { font-size:1.1rem; flex-shrink:0; line-height:1; }
+    .gr-text { font-size:0.83rem; color:#D4E4D8; line-height:1.45; }
+    .gr-text strong { color:#fff; font-weight:700; }
+
     @media(max-width:900px) {
       .guide-layout { grid-template-columns:1fr; }
-      .room-list { position:static; height:auto; max-height:200px; overflow-y:auto; border-right:none; border-bottom:1px solid #e8e3db; }
-      .room-content { padding:20px 16px 80px; }
+      .room-list { position:static; height:auto; max-height:180px; overflow-y:auto; border-right:none; border-bottom:1px solid #e8e3db; }
+      .room-content { padding:16px 14px 80px; }
+      .angles-grid { grid-template-columns:1fr 1fr; gap:10px; }
+      .angle-card { border-radius:10px; }
+      .angle-info { padding:8px 10px; }
+      .angle-name { font-size:0.8rem; }
+      .angle-hint { font-size:0.68rem; }
+      .room-header { margin-bottom:16px; }
+      .room-header-top { gap:8px; }
+      .room-big-icon { font-size:1.6rem; }
+      .room-title { font-size:1.35rem; }
+      .room-desc { font-size:0.82rem; }
+      .tip-banner { padding:10px 13px; font-size:0.8rem; margin-bottom:18px; }
+      .golden-rules { display:block; }
       /* On touch devices the overlay only shows on hover — always show it slightly */
       .angle-photo-area .angle-overlay { background:rgba(0,0,0,0.22); }
       .angle-photo-area .overlay-btn { opacity:1; }
+      .btn-next { font-size:0.85rem; padding:10px 16px; }
+      .next-room-wrap { padding-top:18px; gap:10px; }
+    }
+
+    @media(max-width:480px) {
+      .room-content { padding:14px 12px 80px; }
+      .angles-grid { gap:8px; }
+      .completion-banner { padding:20px 16px; }
+      .completion-banner h2 { font-size:1.4rem; }
     }
 
     @media(max-width:768px) {
@@ -232,7 +262,7 @@ const ALL_ROOMS = [
   {
     id: 'entree', label: 'Entrée', icon: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="2" width="18" height="20" rx="2"/><line x1="15" y1="2" x2="15" y2="22"/><circle cx="17.5" cy="12" r="1" fill="currentColor"/></svg>', required: true,
     desc: "La première impression compte. L'acheteur doit visualiser l'arrivée dans le bien.",
-    tip: "Placez-vous depuis la porte d'entrée. Montrez la circulation vers le reste du logement.",
+    tip: "x0.5 obligatoire. Placez-vous depuis la porte d'entrée, volets ouverts. Montrez la circulation vers le reste du logement.",
     angles: [
       { id: 'porte', label: 'Depuis la porte', hint: 'Vue vers l\'intérieur à l\'ouverture', required: true },
       { id: 'interieur', label: 'Depuis l\'intérieur', hint: 'Vue vers la porte depuis le couloir', required: true },
@@ -241,7 +271,7 @@ const ALL_ROOMS = [
   {
     id: 'sejour', label: 'Séjour / Salon', icon: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20 9V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v3"/><path d="M2 11a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5H2z"/><path d="M4 16v2M20 16v2"/></svg>', required: true,
     desc: "La pièce centrale de vie. C'est souvent la première image qui convainc.",
-    tip: "Reculez au maximum dans chaque coin. Montrez la lumière naturelle. Photographiez aux 4 coins opposés pour une vue complète.",
+    tip: "x0.5 obligatoire — volets grands ouverts, lumières allumées. Reculez jusqu'au mur, visez légèrement vers le bas. Photographiez depuis chaque coin opposé.",
     angles: [
       { id: 'entree', label: 'Depuis l\'entrée', hint: 'Vue d\'ensemble à l\'entrée de la pièce', required: true },
       { id: 'gauche', label: 'Angle gauche', hint: 'Vue depuis le coin gauche vers le coin opposé', required: true },
@@ -252,7 +282,7 @@ const ALL_ROOMS = [
   {
     id: 'cuisine', label: 'Cuisine', icon: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"/><path d="M7 2v20"/><path d="M21 15V2a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3zm0 0v7"/></svg>', required: true,
     desc: "La cuisine est un critère décisif. Montrez l'équipement, la superficie et la luminosité.",
-    tip: "Rangez et nettoyez avant. Montrez le plan de travail et les équipements. Photographiez depuis l'entrée et depuis le coin opposé.",
+    tip: "x0.5 — volets ouverts, lumière allumée. Rangez et nettoyez le plan de travail. Photographiez depuis l'entrée puis depuis le coin opposé.",
     angles: [
       { id: 'entree', label: 'Depuis l\'entrée', hint: 'Vue d\'ensemble à l\'entrée', required: true },
       { id: 'plan', label: 'Plan de travail', hint: 'Équipements et espace de travail', required: true },
@@ -271,7 +301,7 @@ const ALL_ROOMS = [
   {
     id: 'chambre1', label: 'Chambre principale', icon: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M2 4v16M2 8h20v12H2M2 4h20v4"/><rect x="6" y="4" width="5" height="4"/></svg>', required: true,
     desc: "Montrez l'espace, la lumière et le rangement. C'est souvent la chambre qui fait ou défait une décision.",
-    tip: "Faites le lit. Photographiez depuis la porte et depuis chaque coin. Montrez les fenêtres et la vue si elle est agréable.",
+    tip: "x0.5 — volets ouverts, stores levés. Faites le lit. Photographiez depuis la porte puis depuis le coin opposé. Montrez la fenêtre sur une photo.",
     angles: [
       { id: 'porte', label: 'Depuis la porte', hint: 'Vue d\'ensemble à l\'entrée', required: true },
       { id: 'lit', label: 'Vue du lit', hint: 'Montrez la tête de lit et l\'espace', required: true },
@@ -307,7 +337,7 @@ const ALL_ROOMS = [
   {
     id: 'sdb', label: 'Salle de bains', icon: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/></svg>', required: true,
     desc: "Première source de doute pour l'acheteur. Montrez tout, proprement.",
-    tip: "Nettoyez et rangez. Retirez les objets personnels. Photographiez depuis le coin le plus large.",
+    tip: "x0.5 depuis le coin le plus large. Nettoyez, rangez, retirez les objets personnels. Ouvrez la fenêtre ou allumez si pas de fenêtre.",
     angles: [
       { id: 'ensemble', label: 'Vue d\'ensemble', hint: 'Depuis le coin le plus large', required: true },
       { id: 'douche', label: 'Douche / Baignoire', hint: 'Le point central de la salle', required: true },
@@ -559,6 +589,22 @@ function renderRoomContent(room) {
     : `<button class="btn-next" onclick="window.location.href='/mon-bien'"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="vertical-align:middle;margin-right:5px;"><polyline points="20 6 9 17 4 12"/></svg>Terminer et retourner à ma fiche →</button>`;
 
   return `
+    <div class="golden-rules">
+      <div class="golden-rules-title">3 règles d'or pour toutes les pièces</div>
+      <div class="golden-rule">
+        <div class="gr-icon">📱</div>
+        <div class="gr-text"><strong>x0.5 — ultra grand-angle</strong> obligatoire. Sur iPhone : appuyez sur "0.5×" avant de déclencher. Sur Android : bouton "Grand angle" ou 0.5×. Chaque pièce paraîtra plus grande.</div>
+      </div>
+      <div class="golden-rule">
+        <div class="gr-icon">🪟</div>
+        <div class="gr-text"><strong>Volets ouverts, stores levés, lumières allumées.</strong> Lumière naturelle au maximum. Une pièce lumineuse se vend plus vite.</div>
+      </div>
+      <div class="golden-rule">
+        <div class="gr-icon">📐</div>
+        <div class="gr-text"><strong>Reculez jusqu'au coin opposé</strong> et visez légèrement vers le bas. Plus vous êtes loin, plus la pièce paraît grande.</div>
+      </div>
+    </div>
+
     <div class="room-header">
       <div class="room-header-top">
         <div class="room-title-wrap">
