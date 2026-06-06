@@ -866,9 +866,10 @@ function bibRender() {
             btn.style.animation = '';
           }, 2200);
         };
+        var bodyToSend = tpl.body.replace(/\[NOM\]/g, window._bibSellerPrenom || '[NOM]');
         if (navigator.clipboard && navigator.clipboard.writeText) {
-          navigator.clipboard.writeText(tpl.body).then(doCopy).catch(function() { fallbackCopy(tpl.body); doCopy(); });
-        } else { fallbackCopy(tpl.body); doCopy(); }
+          navigator.clipboard.writeText(bodyToSend).then(doCopy).catch(function() { fallbackCopy(bodyToSend); doCopy(); });
+        } else { fallbackCopy(bodyToSend); doCopy(); }
       };
     })(t, copyBtn));
 
@@ -961,6 +962,9 @@ function bibRenderCats() {
 
 bibRenderCats();
 bibRender();
+
+window._bibSellerPrenom = '';
+fetch('/api/me').then(r=>r.json()).then(d=>{ if(d.seller&&d.seller.first_name) window._bibSellerPrenom = d.seller.first_name; }).catch(()=>{});
 </script>
 <script src="/js/seller-nav.js"></script>
 </body>
