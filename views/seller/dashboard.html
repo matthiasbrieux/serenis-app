@@ -482,6 +482,9 @@
     .db-visit-name { font-weight:700; font-size:0.88rem; color:#1C1C1A; }
     .db-visit-contact { font-size:0.75rem; color:#8C8880; margin-top:3px; word-break:break-word; }
     .db-visit-date { font-size:0.82rem; font-weight:600; color:#3D5A47; white-space:nowrap; text-align:right; flex-shrink:0; }
+    .db-visit-sms-btn { display:flex; align-items:center; gap:6px; margin-top:10px; padding:8px 14px; background:#3D5A47; color:#fff; border:none; border-radius:8px; font-size:0.78rem; font-weight:600; cursor:pointer; font-family:inherit; transition:background 0.15s; width:100%; justify-content:center; }
+    .db-visit-sms-btn:active, .db-visit-sms-btn:hover { background:#2d4535; }
+    .db-visit-sms-btn.copied { background:#2d4535; }
     .db-mail-item { border:1.5px solid #E8E3DB; border-radius:10px; margin-bottom:8px; overflow:hidden; }
     .db-mail-hdr { display:flex; align-items:center; justify-content:space-between; padding:13px 16px; cursor:pointer; user-select:none; background:#fff; gap:10px; -webkit-tap-highlight-color:transparent; }
     .db-mail-hdr:active { background:#F0F8F2; }
@@ -910,9 +913,6 @@
           <line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>
         </svg>Mon agenda
       </a>
-      <a href="/mes-acheteurs" class="sidebar-item">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>Mes acheteurs
-      </a>
       <a href="/ma-bibliotheque" class="sidebar-item">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg> Ma bibliothèque
       </a>
@@ -1018,6 +1018,16 @@
       <div class="db-pending-body" id="dbPending"></div>
     </div>
 
+    <!-- Mes visites réservées -->
+    <div class="db-card-full">
+      <div class="db-card-band db-band--visites">
+        <div class="db-card-band-ico"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
+        Mes visites réservées
+        <span id="dbVisitsCount" style="display:none;margin-left:auto;background:rgba(255,255,255,0.25);color:#fff;padding:3px 11px;border-radius:20px;font-size:0.75rem;font-weight:700;border:1px solid rgba(255,255,255,0.3);font-family:'DM Sans','Inter',sans-serif;"></span>
+      </div>
+      <div id="dbVisits"></div>
+    </div>
+
     <!-- Mes disponibilités demandées -->
     <div class="db-card-full">
       <div class="db-card-band db-band--dispos">
@@ -1030,16 +1040,6 @@
         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><line x1="12" y1="14" x2="12" y2="18"/><line x1="10" y1="16" x2="14" y2="16"/></svg>
         Proposer d'autres disponibilités
       </a>
-    </div>
-
-    <!-- Mes visites réservées -->
-    <div class="db-card-full">
-      <div class="db-card-band db-band--visites">
-        <div class="db-card-band-ico"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
-        Mes visites réservées
-        <span id="dbVisitsCount" style="display:none;margin-left:auto;background:rgba(255,255,255,0.25);color:#fff;padding:3px 11px;border-radius:20px;font-size:0.75rem;font-weight:700;border:1px solid rgba(255,255,255,0.3);font-family:'DM Sans','Inter',sans-serif;"></span>
-      </div>
-      <div id="dbVisits"></div>
     </div>
 
     <!-- Lien de réservation de visite -->
@@ -1341,7 +1341,7 @@ function renderMissions(visits, agendaSlots, property) {
       iconClass: 'mission-ico--green',
       title: 'Votre dossier est complet — bravo !',
       sub: 'Continuez à suivre vos visites et contacts acheteurs',
-      href: '/mes-acheteurs',
+      href: '/mon-agenda',
     });
   }
 
@@ -1477,8 +1477,39 @@ function renderVisits(visits) {
         </div>
         <div class="db-visit-date">${formatDate(v.visit_date)}<br>${v.visit_time}</div>
       </div>
+      <button class="db-visit-sms-btn" onclick="copyVisitConfirmSms(${v.id}, this)">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        Copier SMS de confirmation
+      </button>
     </div>
   `).join('');
+}
+
+function copyVisitConfirmSms(visitId, btn) {
+  const confirmed = (window._allVisits || []).filter(v => v.status === 'confirmed');
+  const v = confirmed.find(v => v.id === visitId);
+  if (!v) return;
+  const days = ['dimanche','lundi','mardi','mercredi','jeudi','vendredi','samedi'];
+  const months = ['janvier','février','mars','avril','mai','juin','juillet','août','septembre','octobre','novembre','décembre'];
+  let dateStr = v.visit_date;
+  const parts = v.visit_date ? v.visit_date.split('-') : [];
+  if (parts.length === 3) {
+    const d = new Date(v.visit_date);
+    dateStr = `${days[d.getDay()]} ${parseInt(parts[2])} ${months[parseInt(parts[1])-1]} ${parts[0]}`;
+  }
+  const address = _mailCtx.address || '';
+  const sellerName = _mailCtx.firstName || '';
+  const buyerFirstName = (v.buyer_name || '').split(' ')[0];
+  const time = v.visit_time ? v.visit_time.replace(':', 'h') : '';
+  const sms = `Bonjour ${buyerFirstName}, je vous confirme notre visite prévue le ${dateStr} à ${time}${address ? ' au ' + address : ''}. À bientôt ! ${sellerName}`;
+  navigator.clipboard.writeText(sms).then(() => {
+    btn.textContent = '✓ SMS copié !';
+    btn.classList.add('copied');
+    setTimeout(() => {
+      btn.innerHTML = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg> Copier SMS de confirmation';
+      btn.classList.remove('copied');
+    }, 2500);
+  });
 }
 
 /* ——— Prêts à l'envoi ——— */
@@ -1724,6 +1755,7 @@ async function loadData() {
     renderPendingOffers(offersData.offers || []);
 
     /* Visites à confirmer + disponibilités + visites */
+    window._allVisits = visits;
     renderPending(visits);
     renderDispos(visits, agendaSlots);
     renderVisits(visits);

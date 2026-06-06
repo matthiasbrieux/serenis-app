@@ -330,6 +330,24 @@
     .btn-secondary-modal { padding:11px 20px; background:#f5f0e8; color:#666; border:none; border-radius:10px; font-family:'DM Sans',sans-serif; font-size:0.9rem; font-weight:600; cursor:pointer; }
     .btn-secondary-modal:hover { background:#e8e0d6; }
 
+    /* ── Modal confirmation SMS ───────────────────────── */
+    .confirm-sms-modal { max-width:480px; text-align:center; }
+    .confirm-sms-check { width:56px; height:56px; border-radius:50%; background:linear-gradient(135deg,#2e7d32,#4CAF50); display:flex; align-items:center; justify-content:center; margin:0 auto 16px; box-shadow:0 4px 18px rgba(46,125,50,0.3); }
+    .confirm-sms-title { font-family:'Cormorant Garamond',serif; font-size:1.4rem; font-weight:700; color:#1a1a1a; margin-bottom:16px; }
+    .confirm-sms-buyer { display:flex; align-items:center; gap:12px; background:#f0f5f1; border:1.5px solid #c8ddd0; border-radius:12px; padding:13px 16px; margin-bottom:16px; text-align:left; }
+    .confirm-sms-buyer-avatar { width:40px; height:40px; border-radius:50%; background:linear-gradient(135deg,#2e7d32,#4CAF50); color:#fff; display:flex; align-items:center; justify-content:center; font-size:0.85rem; font-weight:700; flex-shrink:0; }
+    .confirm-sms-buyer-info { flex:1; min-width:0; }
+    .confirm-sms-buyer-name { font-size:0.92rem; font-weight:700; color:#1a1a1a; }
+    .confirm-sms-buyer-phone { font-size:0.82rem; color:#3D5A47; font-weight:600; margin-top:2px; }
+    .confirm-sms-buyer-nophone { font-size:0.78rem; color:#aaa; margin-top:2px; font-style:italic; }
+    .confirm-sms-preview { background:#f5f0e8; border:1.5px solid #e0d8cc; border-radius:12px; padding:15px 17px; font-size:0.87rem; color:#2d2d2d; line-height:1.65; text-align:left; margin-bottom:16px; white-space:pre-wrap; word-break:break-word; }
+    .confirm-sms-btn-sms { display:flex; align-items:center; justify-content:center; gap:8px; width:100%; padding:13px; background:linear-gradient(135deg,#2e7d32,#3D5A47); color:#fff; border:none; border-radius:11px; font-family:'DM Sans',sans-serif; font-size:0.92rem; font-weight:700; cursor:pointer; transition:0.18s; box-shadow:0 4px 14px rgba(46,125,50,0.25); margin-bottom:10px; text-decoration:none; }
+    .confirm-sms-btn-sms:hover { background:linear-gradient(135deg,#256628,#2e4435); transform:translateY(-1px); }
+    .confirm-sms-copy { width:100%; padding:11px; background:#f0f5f1; color:#3D5A47; border:1.5px solid #c8ddd0; border-radius:11px; font-family:'DM Sans',sans-serif; font-size:0.88rem; font-weight:600; cursor:pointer; transition:0.18s; margin-bottom:12px; }
+    .confirm-sms-copy:hover { background:#e0ede5; }
+    .confirm-sms-copy.copied { background:#ecfdf5; color:#059669; border-color:#a7f3d0; }
+    .confirm-sms-close { font-size:0.82rem; color:#bbb; background:none; border:none; cursor:pointer; font-family:'DM Sans',sans-serif; text-decoration:underline; }
+
     /* ── Buttons ──────────────────────────────────────── */
     .add-btn { display:inline-flex; align-items:center; gap:6px; padding:8px 16px; background:#3D5A47; color:#fff; border:none; border-radius:8px; font-family:'DM Sans',sans-serif; font-size:0.83rem; font-weight:600; cursor:pointer; transition:0.15s; }
     .add-btn:hover { background:#2a4030; }
@@ -511,9 +529,6 @@
       </a>
       <a href="/mon-agenda" class="sidebar-item active">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg> Mon agenda
-      </a>
-      <a href="/mes-acheteurs" class="sidebar-item">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>Mes acheteurs
       </a>
       <a href="/ma-bibliotheque" class="sidebar-item">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg> Ma bibliothèque
@@ -760,6 +775,31 @@
   </main>
 </div>
 <!-- ── Modal: Programmer une visite ── -->
+<div class="modal-overlay" id="confirmSmsOverlay">
+  <div class="modal confirm-sms-modal">
+    <div class="confirm-sms-check">
+      <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+    </div>
+    <div class="confirm-sms-title">Visite confirmée ✓</div>
+    <div class="confirm-sms-buyer" id="confirmSmsBuyer">
+      <div class="confirm-sms-buyer-avatar" id="confirmSmsBuyerAvatar"></div>
+      <div class="confirm-sms-buyer-info">
+        <div class="confirm-sms-buyer-name" id="confirmSmsBuyerName"></div>
+        <div id="confirmSmsBuyerPhone"></div>
+      </div>
+    </div>
+    <div class="confirm-sms-preview" id="confirmSmsText"></div>
+    <a class="confirm-sms-btn-sms" id="confirmSmsSendBtn" href="#">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.41a2 2 0 0 1 2-2.18h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+      Envoyer le SMS
+    </a>
+    <button class="confirm-sms-copy" id="confirmSmsCopyBtn" onclick="copyConfirmSms(this)">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:middle;margin-right:5px;"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>Copier le SMS
+    </button>
+    <button class="confirm-sms-close" onclick="closeModal('confirmSmsOverlay')">Fermer</button>
+  </div>
+</div>
+
 <div class="modal-overlay" id="addVisitOverlay">
   <div class="modal">
     <div class="modal-header">
@@ -885,7 +925,7 @@ function buildVisitCardHtml(v) {
     ${v.status!=='cancelled'&&v.buyer_phone?`
     <div style="display:flex;align-items:center;justify-content:space-between;margin-top:8px;gap:8px;flex-wrap:wrap;">
       <button class="btn-sms-reminder${v.reminder_sent?' sent':''}" id="btn-reminder-${v.id}" onclick="sendReminder(${v.id})">
-        ${svgPhone} ${v.reminder_sent?'Rappel envoyé':'Envoyer rappel SMS'}
+        ${svgPhone} ${v.reminder_sent?'Rappel copié':'Copier rappel SMS'}
       </button>
       ${v.status==='confirmed'?`<button class="btn-cancel-sm" onclick="if(confirm('Annuler cette visite ?')) changeVisitStatus(${v.id},'cancelled')">Annuler</button>`:''}
     </div>`:(v.status==='confirmed'?`<div style="display:flex;justify-content:flex-end;margin-top:8px;"><button class="btn-cancel-sm" onclick="if(confirm('Annuler cette visite ?')) changeVisitStatus(${v.id},'cancelled')">Annuler la visite</button></div>`:'')}
@@ -1014,9 +1054,75 @@ async function changeVisitStatus(id, status) {
       const v = allVisits.find(v=>v.id===id);
       if (v) v.status=status;
       renderVisits(); updateStats(); renderCalendar();
-      showToast(status==='confirmed'?'Visite confirmée ✓':'Visite annulée');
+      if (status==='confirmed') {
+        openConfirmSmsModal(id);
+      } else {
+        showToast('Visite annulée');
+      }
     } else { showToast(data.error||'Erreur','error'); }
   } catch(e) { showToast('Erreur réseau','error'); }
+}
+
+function openConfirmSmsModal(id) {
+  const v = allVisits.find(v=>v.id===id);
+  if (!v) return;
+  const prenom = (v.buyer_name||'').split(' ')[0] || 'Madame/Monsieur';
+  const [yr,mo,dy] = (v.visit_date||'').split('-');
+  const d = yr ? new Date(Number(yr),Number(mo)-1,Number(dy)) : null;
+  const JOURS=['dimanche','lundi','mardi','mercredi','jeudi','vendredi','samedi'];
+  const MOIS=['janvier','février','mars','avril','mai','juin','juillet','août','septembre','octobre','novembre','décembre'];
+  const dateLabel = d ? `${JOURS[d.getDay()]} ${Number(dy)} ${MOIS[d.getMonth()]}` : v.visit_date;
+  const [h,m] = (v.visit_time||'').split(':');
+  const time = m&&m!=='00' ? `${h}h${m}` : `${h}h`;
+  const adresseText = _propertyAddress ? `\n\nAdresse : ${_propertyAddress}` : '';
+  const sms = `Bonjour ${prenom}, c'est confirmé ! On se retrouve le ${dateLabel} à ${time}.${adresseText}\n\nÀ très bientôt !`;
+
+  // Buyer info
+  document.getElementById('confirmSmsBuyerAvatar').textContent = initials(v.buyer_name);
+  document.getElementById('confirmSmsBuyerName').textContent = v.buyer_name || 'Acquéreur';
+  const phoneEl = document.getElementById('confirmSmsBuyerPhone');
+  if (v.buyer_phone) {
+    phoneEl.className = 'confirm-sms-buyer-phone';
+    phoneEl.textContent = v.buyer_phone;
+  } else {
+    phoneEl.className = 'confirm-sms-buyer-nophone';
+    phoneEl.textContent = 'Aucun numéro renseigné';
+  }
+
+  // SMS text
+  document.getElementById('confirmSmsText').textContent = sms;
+
+  // "Envoyer le SMS" button — ouvre l'app SMS native avec numéro + message pré-remplis
+  const sendBtn = document.getElementById('confirmSmsSendBtn');
+  if (v.buyer_phone) {
+    sendBtn.href = `sms:${v.buyer_phone}?&body=${encodeURIComponent(sms)}`;
+    sendBtn.style.display = '';
+  } else {
+    sendBtn.style.display = 'none';
+  }
+
+  // Reset copy button
+  const copyBtn = document.getElementById('confirmSmsCopyBtn');
+  if (copyBtn) {
+    copyBtn.innerHTML = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:middle;margin-right:5px;"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>Copier le SMS';
+    copyBtn.classList.remove('copied');
+  }
+
+  document.getElementById('confirmSmsOverlay').classList.add('open');
+}
+
+function copyConfirmSms(btn) {
+  const text = document.getElementById('confirmSmsText')?.textContent;
+  if (!text) return;
+  navigator.clipboard.writeText(text).then(() => {
+    btn.innerHTML = '✓ SMS copié !';
+    btn.classList.add('copied');
+    showToast('SMS copié — collez-le dans votre messagerie');
+    setTimeout(() => {
+      btn.innerHTML = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:middle;margin-right:5px;"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>Copier le SMS';
+      btn.classList.remove('copied');
+    }, 3000);
+  });
 }
 
 function copySmsRappel(btn, id, text) {
@@ -1040,23 +1146,27 @@ function docopySmsRappel(id) {
 }
 
 async function sendReminder(id) {
+  const v = allVisits.find(v=>v.id===id);
+  if (!v) return;
   const btn = document.getElementById('btn-reminder-'+id);
-  if (btn) { btn.disabled=true; btn.textContent='Envoi…'; }
+  const prenom = (v.buyer_name||'').split(' ')[0] || 'Madame/Monsieur';
+  const [yr,mo,dy] = (v.visit_date||'').split('-');
+  const d = yr ? new Date(Number(yr),Number(mo)-1,Number(dy)) : null;
+  const JOURS=['dimanche','lundi','mardi','mercredi','jeudi','vendredi','samedi'];
+  const MOIS=['janvier','février','mars','avril','mai','juin','juillet','août','septembre','octobre','novembre','décembre'];
+  const dateLabel = d ? `${JOURS[d.getDay()]} ${Number(dy)} ${MOIS[d.getMonth()]}` : v.visit_date;
+  const [h,m] = (v.visit_time||'').split(':');
+  const time = m&&m!=='00' ? `${h}h${m}` : `${h}h`;
+  const adresseText = _propertyAddress ? ` Voici l'adresse de mon bien : ${_propertyAddress}.` : '';
+  const smsText = `Bonjour ${prenom}, je vous rappelle notre visite prévue pour le ${dateLabel} à ${time}. N'hésitez pas à me prévenir si vous avez un empêchement.${adresseText}`;
   try {
-    const res = await fetch(`/api/visits/${id}/reminder`,{method:'POST'});
-    const data = await res.json();
-    if (data.success) {
-      const v = allVisits.find(v=>v.id===id);
-      if (v) v.reminder_sent=1;
-      if (btn) { btn.className='btn-sms-reminder sent'; btn.innerHTML='✓ Rappel envoyé'; btn.disabled=false; }
-      showToast('Rappel SMS envoyé');
-    } else {
-      if (btn) { btn.disabled=false; btn.textContent='Envoyer rappel SMS'; }
-      showToast(data.error||'Erreur envoi SMS','error');
-    }
+    await navigator.clipboard.writeText(smsText);
+    v.reminder_sent = 1;
+    if (btn) { btn.className='btn-sms-reminder sent'; btn.innerHTML='✓ Rappel copié'; btn.disabled=false; }
+    showToast('SMS copié — collez-le dans votre messagerie');
+    fetch(`/api/visits/${id}/reminder`,{method:'POST'}).catch(()=>{});
   } catch(e) {
-    if (btn) { btn.disabled=false; btn.textContent='Envoyer rappel SMS'; }
-    showToast('Erreur réseau','error');
+    showToast('Erreur de copie — réessayez','error');
   }
 }
 

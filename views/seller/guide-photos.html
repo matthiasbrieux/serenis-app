@@ -13,15 +13,15 @@
   <meta name="apple-mobile-web-app-title" content="VPM"/>
   <script>if("scrollRestoration"in history)history.scrollRestoration="manual";</script>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Guide Photos Immersives — Vendu Par Moi</title>
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <title>Mon guide photos — Vendu Par Moi</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/css/style.css">
   <style>
     *, *::before, *::after { box-sizing: border-box; }
-    body { font-family: 'DM Sans', sans-serif; background: #F5F0E8; margin: 0; }
+    body { font-family: 'DM Sans', sans-serif; background: #EDE8DF; margin: 0; }
     .app-layout { display: flex; min-height: 100vh; }
 
-    /* Sidebar */
+    /* ── Sidebar ── */
     .sidebar { width:240px;min-height:100vh;background:#3D5A47;display:flex;flex-direction:column;position:fixed;top:0;left:0;bottom:0;z-index:100; }
     .sidebar-nav { flex:1;padding:16px 0;display:flex;flex-direction:column;gap:2px;overflow-y:auto; }
     .sidebar-item { display:flex;align-items:center;gap:11px;padding:10px 24px;color:rgba(212,228,216,0.7);text-decoration:none;font-size:0.88rem;font-weight:400;transition:all 0.2s; }
@@ -30,166 +30,547 @@
     .sidebar-footer { padding:20px 24px;border-top:1px solid rgba(212,228,216,0.12); }
     .sidebar-footer a { color:rgba(212,228,216,0.4);font-size:0.78rem;text-decoration:none; }
 
-    /* Main */
+    /* ── Main layout ── */
     .main { margin-left:240px; display:flex; flex-direction:column; min-height:100vh; }
 
-    /* Top bar */
-    .topbar { background:#fff; border-bottom:1px solid #e8e3db; padding:0 32px; height:64px; display:flex; align-items:center; gap:20px; position:sticky; top:0; z-index:50; overflow:hidden; }
-    .topbar-title { font-family:'Cormorant Garamond',serif; font-size:1.3rem; color:#1a1a1a; font-weight:600; flex:1; }
-    .topbar-sub { font-size:0.8rem; color:#888; margin-top:1px; }
-    .progress-container { display:flex; align-items:center; gap:12px; }
-    .progress-track { width:160px; height:8px; background:#e8e3db; border-radius:4px; overflow:hidden; }
-    .progress-fill { height:100%; background:linear-gradient(90deg, #3D5A47, #5a8a6a); border-radius:4px; transition:width 0.5s cubic-bezier(0.34,1.56,0.64,1); }
-    .progress-label { font-size:0.82rem; font-weight:600; color:#3D5A47; white-space:nowrap; }
+    /* ── Top bar ── */
+    .topbar {
+      background:#fff;
+      border-bottom: 1px solid rgba(0,0,0,0.06);
+      padding: 0 36px;
+      height: 72px;
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      box-shadow: 0 2px 16px rgba(0,0,0,0.05);
+    }
+    .topbar-icon-wrap {
+      width: 40px; height: 40px;
+      background: linear-gradient(135deg, #3D5A47, #5a8a6a);
+      border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .topbar-info { flex: 1; }
+    .topbar-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.35rem;
+      color: #1a1a1a;
+      font-weight: 700;
+      line-height: 1.2;
+    }
+    .topbar-sub { font-size: 0.75rem; color: #999; margin-top: 2px; }
+    .topbar-sub a { color: #3D5A47; font-weight: 600; text-decoration: underline; }
+    .topbar-sub strong { color: #3D5A47; }
 
-    /* Layout: room list + content */
-    .guide-layout { display:grid; grid-template-columns:260px 1fr; flex:1; }
+    .progress-container { display: flex; align-items: center; gap: 14px; flex-shrink: 0; }
+    .progress-wrap { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; }
+    .progress-label { font-size: 0.8rem; font-weight: 700; color: #3D5A47; }
+    .progress-sub { font-size: 0.68rem; color: #bbb; }
+    .progress-track {
+      width: 180px; height: 10px;
+      background: #e8e3db;
+      border-radius: 10px;
+      overflow: hidden;
+    }
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #3D5A47, #6aab7a);
+      border-radius: 10px;
+      transition: width 0.6s cubic-bezier(0.34,1.56,0.64,1);
+      position: relative;
+    }
+    .progress-fill::after {
+      content: '';
+      position: absolute;
+      top: 0; left: -60px; right: -60px;
+      height: 100%;
+      background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.3) 50%, transparent 100%);
+      animation: shimmer 2s ease-in-out infinite;
+    }
+    @keyframes shimmer { 0%,100%{transform:translateX(-100%)} 50%{transform:translateX(100%)} }
 
-    /* Room list */
-    .room-list { background:#fff; border-right:1px solid #e8e3db; padding:20px 0; overflow-y:auto; position:sticky; top:64px; height:calc(100vh - 64px); }
-    .room-list-header { padding:0 20px 12px; font-size:0.7rem; font-weight:700; color:#aaa; text-transform:uppercase; letter-spacing:0.08em; }
-    .room-item { display:flex; align-items:center; gap:10px; padding:10px 20px; cursor:pointer; transition:all 0.15s; border-left:3px solid transparent; }
-    .room-item:hover { background:#f8f5f0; }
-    .room-item.active { background:#f0f5f1; border-left-color:#3D5A47; }
-    .room-item-icon { font-size:1.3rem; width:32px; text-align:center; flex-shrink:0; }
-    .room-item-info { flex:1; min-width:0; }
-    .room-item-name { font-size:0.88rem; font-weight:600; color:#1a1a1a; }
-    .room-item-count { font-size:0.72rem; color:#aaa; margin-top:1px; }
-    .room-status { width:22px; height:22px; border-radius:50%; border:2px solid #e8e3db; display:flex; align-items:center; justify-content:center; font-size:0.7rem; flex-shrink:0; transition:all 0.3s; }
-    .room-status.partial { border-color:#C4785A; background:#fff9f5; color:#C4785A; }
-    .room-status.done { border-color:#3D5A47; background:#3D5A47; color:#fff; }
-    .room-add-btn { margin:12px 20px 0; padding:8px 0; border:1.5px dashed #ddd; border-radius:8px; background:none; cursor:pointer; font-size:0.8rem; color:#aaa; width:calc(100% - 40px); font-family:'DM Sans',sans-serif; transition:all 0.15s; }
-    .room-add-btn:hover { border-color:#3D5A47; color:#3D5A47; }
+    /* ── Content layout ── */
+    .guide-layout { display: grid; grid-template-columns: 280px 1fr; flex: 1; }
 
-    /* Main content */
-    .room-content { padding:32px 36px 60px; }
-    .room-header { margin-bottom:28px; }
-    .room-header-top { display:flex; align-items:flex-start; justify-content:space-between; gap:16px; margin-bottom:8px; }
-    .room-title-wrap { display:flex; align-items:center; gap:12px; }
-    .room-big-icon { font-size:2.2rem; }
-    .room-title { font-family:'Cormorant Garamond',serif; font-size:1.8rem; color:#1a1a1a; margin:0; }
-    .room-desc { font-size:0.87rem; color:#666; line-height:1.65; }
-    .btn-skip { background:none; border:1.5px solid #e8e3db; border-radius:8px; padding:8px 16px; font-size:0.8rem; color:#999; cursor:pointer; font-family:'DM Sans',sans-serif; transition:all 0.15s; }
-    .btn-skip:hover { border-color:#aaa; color:#555; }
-    .btn-done-room { background:#3D5A47; border:none; border-radius:8px; padding:8px 18px; font-size:0.8rem; font-weight:600; color:#fff; cursor:pointer; font-family:'DM Sans',sans-serif; transition:all 0.15s; }
-    .btn-done-room:hover { background:#2e4435; }
+    /* ── Room list ── */
+    .room-list {
+      background: #FDFCF8;
+      border-right: 1px solid #e8e3db;
+      padding: 24px 0 20px;
+      overflow-y: auto;
+      position: sticky;
+      top: 72px;
+      height: calc(100vh - 72px);
+    }
+    .room-list-header {
+      padding: 0 20px 14px;
+      font-size: 0.65rem;
+      font-weight: 700;
+      color: #bbb;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+    }
+    .room-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 16px 10px 20px;
+      cursor: pointer;
+      transition: all 0.18s;
+      border-left: 3px solid transparent;
+      position: relative;
+    }
+    .room-item:hover { background: rgba(61,90,71,0.04); }
+    .room-item.active {
+      background: linear-gradient(90deg, rgba(61,90,71,0.08) 0%, rgba(61,90,71,0.02) 100%);
+      border-left-color: #3D5A47;
+    }
+    .room-item-icon-pill {
+      width: 34px; height: 34px;
+      border-radius: 10px;
+      background: rgba(61,90,71,0.07);
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+      transition: background 0.18s;
+      color: #3D5A47;
+    }
+    .room-item.active .room-item-icon-pill { background: rgba(61,90,71,0.15); }
+    .room-item-info { flex: 1; min-width: 0; }
+    .room-item-name { font-size: 0.86rem; font-weight: 600; color: #1a1a1a; }
+    .room-item-count { font-size: 0.7rem; color: #aaa; margin-top: 1px; }
+    .room-item.active .room-item-name { color: #3D5A47; }
+    .room-status {
+      width: 22px; height: 22px;
+      border-radius: 50%;
+      border: 2px solid #e8e3db;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.7rem;
+      flex-shrink: 0;
+      transition: all 0.3s;
+    }
+    .room-status.partial { border-color: #C4785A; background: #fff9f5; color: #C4785A; font-size: 0.65rem; }
+    .room-status.done { border-color: #3D5A47; background: #3D5A47; color: #fff; }
+    .room-list-divider { height: 1px; background: #f0ece5; margin: 12px 20px; }
+    .room-add-btn {
+      margin: 14px 20px 0;
+      padding: 10px 0;
+      border: 1.5px dashed #d0cbc3;
+      border-radius: 10px;
+      background: none;
+      cursor: pointer;
+      font-size: 0.8rem;
+      color: #bbb;
+      width: calc(100% - 40px);
+      font-family: 'DM Sans', sans-serif;
+      transition: all 0.18s;
+    }
+    .room-add-btn:hover { border-color: #3D5A47; color: #3D5A47; background: rgba(61,90,71,0.03); }
 
-    /* Tip banner */
-    .tip-banner { display:flex; gap:12px; align-items:flex-start; padding:14px 18px; background:#f0f7f2; border-radius:10px; border-left:3px solid #3D5A47; margin-bottom:28px; font-size:0.83rem; color:#2a4030; line-height:1.65; }
-    .tip-icon { font-size:1.1rem; flex-shrink:0; margin-top:1px; }
+    /* ── Room content area ── */
+    .room-content { padding: 32px 40px 80px; }
 
-    /* Angles grid */
-    .angles-grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(220px, 1fr)); gap:16px; margin-bottom:32px; }
-    .angle-card { background:#fff; border:1.5px solid #e8e3db; border-radius:14px; overflow:hidden; transition:all 0.2s; position:relative; }
-    .angle-card:hover { border-color:#c5d9cb; box-shadow:0 4px 20px rgba(0,0,0,0.07); }
-    .angle-card.has-photo { border-color:#3D5A47; }
-    .angle-card.optional { border-style:dashed; }
+    /* ── Room header card ── */
+    .room-header-card {
+      background: #fff;
+      border-radius: 20px;
+      padding: 28px 28px 24px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 16px rgba(0,0,0,0.05), 0 0 0 1px rgba(0,0,0,0.04);
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 20px;
+    }
+    .room-header-left { display: flex; align-items: flex-start; gap: 18px; flex: 1; min-width: 0; }
+    .room-icon-circle {
+      width: 54px; height: 54px;
+      border-radius: 16px;
+      background: linear-gradient(135deg, #2e4435, #3D5A47);
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+      color: #fff;
+      box-shadow: 0 4px 14px rgba(61,90,71,0.3);
+    }
+    .room-title-block { flex: 1; min-width: 0; }
+    .room-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 2rem;
+      color: #1a1a1a;
+      font-weight: 700;
+      margin: 0 0 6px;
+      line-height: 1.15;
+    }
+    .room-desc { font-size: 0.86rem; color: #777; line-height: 1.65; }
+    .room-completion-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 0.72rem;
+      font-weight: 700;
+      margin-top: 10px;
+    }
+    .room-completion-pill.complete { background: #ecfdf5; color: #059669; }
+    .room-completion-pill.partial { background: #fff8f0; color: #C4785A; }
+    .room-completion-pill.empty { background: #f5f5f5; color: #999; }
+    .btn-skip {
+      background: none;
+      border: 1.5px solid #e0dbd3;
+      border-radius: 10px;
+      padding: 9px 18px;
+      font-size: 0.8rem;
+      color: #aaa;
+      cursor: pointer;
+      font-family: 'DM Sans', sans-serif;
+      transition: all 0.18s;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+    .btn-skip:hover { border-color: #3D5A47; color: #3D5A47; }
 
-    .angle-photo-area { aspect-ratio:4/3; position:relative; overflow:hidden; background:#f8f5f0; cursor:pointer; }
-    .angle-photo-area img { width:100%; height:100%; object-fit:cover; display:block; transition:transform 0.3s; }
-    .angle-photo-area:hover img { transform:scale(1.03); }
-    .angle-upload-zone { width:100%; height:100%; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:8px; cursor:pointer; transition:background 0.15s; }
-    .angle-upload-zone:hover { background:#edf5f0; }
-    .angle-upload-zone.drag-over { background:#dff0e5; border-color:#3D5A47; }
-    .upload-icon { font-size:2rem; opacity:0.4; }
-    .upload-text { font-size:0.78rem; color:#aaa; text-align:center; line-height:1.4; }
-    .upload-text strong { display:block; color:#888; font-size:0.82rem; }
+    /* ── Pro tip banner ── */
+    .tip-banner {
+      background: linear-gradient(135deg, #1e3328 0%, #2e4d3a 50%, #3D5A47 100%);
+      border-radius: 18px;
+      padding: 22px 24px;
+      display: flex;
+      gap: 18px;
+      align-items: flex-start;
+      margin-bottom: 28px;
+      box-shadow: 0 6px 28px rgba(61,90,71,0.22), 0 0 0 1px rgba(255,255,255,0.05) inset;
+      position: relative;
+      overflow: hidden;
+    }
+    .tip-banner::before {
+      content: '';
+      position: absolute;
+      top: -30px; right: -30px;
+      width: 120px; height: 120px;
+      background: rgba(255,255,255,0.04);
+      border-radius: 50%;
+    }
+    .tip-icon-box {
+      width: 40px; height: 40px;
+      background: rgba(196,120,90,0.3);
+      border: 1.5px solid rgba(196,120,90,0.5);
+      border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+      color: #f0a882;
+    }
+    .tip-content { flex: 1; }
+    .tip-label {
+      font-size: 0.65rem;
+      font-weight: 700;
+      color: rgba(196,120,90,0.9);
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      margin-bottom: 6px;
+    }
+    .tip-text { font-size: 0.87rem; color: #c8ddd0; line-height: 1.7; }
+    .tip-text strong { color: #fff; font-weight: 700; }
 
-    .angle-overlay { position:absolute; inset:0; background:rgba(0,0,0,0); transition:background 0.2s; display:flex; align-items:center; justify-content:center; gap:8px; }
-    .angle-photo-area:hover .angle-overlay { background:rgba(0,0,0,0.35); }
-    .overlay-btn { background:rgba(255,255,255,0.92); border:none; border-radius:6px; padding:6px 12px; font-size:0.75rem; font-weight:600; cursor:pointer; font-family:'DM Sans',sans-serif; opacity:0; transition:opacity 0.2s; }
+    /* ── Golden rules (horizontal strip, always visible) ── */
+    .golden-rules-strip {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-bottom: 28px;
+    }
+    .golden-rule-card {
+      background: #fff;
+      border-radius: 14px;
+      padding: 16px 18px;
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+      border: 1px solid rgba(0,0,0,0.05);
+    }
+    .gr-icon-wrap {
+      width: 36px; height: 36px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, #f0f5f1, #e0ede5);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.1rem;
+      flex-shrink: 0;
+    }
+    .gr-body { flex: 1; }
+    .gr-title { font-size: 0.78rem; font-weight: 700; color: #1a1a1a; margin-bottom: 3px; }
+    .gr-desc { font-size: 0.72rem; color: #888; line-height: 1.5; }
+
+    /* ── Section label ── */
+    .section-label {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+    .section-label-text {
+      font-size: 0.65rem;
+      font-weight: 700;
+      color: #aaa;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+    }
+    .section-label-count {
+      background: #3D5A47;
+      color: #fff;
+      font-size: 0.65rem;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 20px;
+    }
+    .section-label-line { flex: 1; height: 1px; background: #e8e3db; }
+
+    /* ── Angles grid ── */
+    .angles-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 18px;
+      margin-bottom: 36px;
+    }
+    .angle-card {
+      background: #fff;
+      border: none;
+      border-radius: 18px;
+      overflow: hidden;
+      transition: all 0.25s cubic-bezier(0.34,1.1,0.64,1);
+      position: relative;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.07), 0 0 0 1px rgba(0,0,0,0.04);
+    }
+    .angle-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 10px 36px rgba(0,0,0,0.12), 0 0 0 1.5px #c5d9cb;
+    }
+    .angle-card.has-photo {
+      box-shadow: 0 4px 24px rgba(61,90,71,0.18), 0 0 0 2px #3D5A47;
+    }
+    .angle-card.has-photo:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 12px 40px rgba(61,90,71,0.22), 0 0 0 2px #3D5A47;
+    }
+    .angle-card.optional { opacity: 0.85; }
+    .angle-card.optional:hover { opacity: 1; }
+
+    .angle-photo-area {
+      aspect-ratio: 4/3;
+      position: relative;
+      overflow: hidden;
+      background: linear-gradient(135deg, #f5f2ed, #ede9e1);
+      cursor: pointer;
+    }
+    .angle-photo-area img { width:100%; height:100%; object-fit:cover; display:block; transition:transform 0.4s ease; }
+    .angle-photo-area:hover img { transform:scale(1.05); }
+    .angle-upload-zone {
+      width:100%; height:100%;
+      display:flex; flex-direction:column; align-items:center; justify-content:center;
+      gap:10px; cursor:pointer; transition:background 0.18s;
+    }
+    .angle-upload-zone:hover { background:rgba(61,90,71,0.05); }
+    .angle-upload-zone.drag-over { background:#dff0e5; }
+    .upload-icon { font-size:2rem; opacity:0.35; }
+    .upload-text { font-size:0.77rem; color:#bbb; text-align:center; line-height:1.5; }
+    .upload-text strong { display:block; color:#999; font-size:0.82rem; font-weight:600; margin-bottom:2px; }
+
+    .angle-overlay {
+      position:absolute; inset:0;
+      background:rgba(0,0,0,0);
+      transition:background 0.2s;
+      display:flex; align-items:center; justify-content:center; gap:8px;
+    }
+    .angle-photo-area:hover .angle-overlay { background:rgba(0,0,0,0.4); }
+    .overlay-btn {
+      background:rgba(255,255,255,0.95);
+      border:none; border-radius:8px;
+      padding:7px 14px;
+      font-size:0.76rem; font-weight:600;
+      cursor:pointer;
+      font-family:'DM Sans',sans-serif;
+      opacity:0; transition:opacity 0.2s;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    }
     .angle-photo-area:hover .overlay-btn { opacity:1; }
     .overlay-btn.del { color:#dc2626; }
 
-    .angle-info { padding:12px 14px; }
-    .angle-name { font-size:0.85rem; font-weight:600; color:#1a1a1a; }
-    .angle-hint { font-size:0.73rem; color:#999; margin-top:2px; line-height:1.4; }
-    .angle-badge { display:inline-block; margin-top:6px; padding:2px 8px; border-radius:20px; font-size:0.65rem; font-weight:700; }
+    .angle-info { padding:14px 16px 16px; }
+    .angle-name { font-size:0.88rem; font-weight:700; color:#1a1a1a; margin-bottom:3px; }
+    .angle-hint { font-size:0.73rem; color:#aaa; line-height:1.45; margin-bottom:8px; }
+    .angle-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 3px 10px;
+      border-radius: 20px;
+      font-size: 0.67rem;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+    }
     .badge-required { background:#fef3f2; color:#dc2626; }
     .badge-optional { background:#f0f5f1; color:#3D5A47; }
     .badge-done { background:#ecfdf5; color:#059669; }
 
-    /* Per-angle file input overlay — fiable iOS Safari (évite le bug display:none + .click()) */
     .angle-input-overlay { position:absolute; inset:0; width:100%; height:100%; opacity:0; cursor:pointer; font-size:16px; z-index:2; }
 
-    /* Next room button */
-    .next-room-wrap { border-top:1px solid #e8e3db; padding-top:24px; display:flex; gap:12px; align-items:center; }
-    .btn-next { background:#3D5A47; border:none; border-radius:10px; padding:12px 24px; font-size:0.92rem; font-weight:600; color:#fff; cursor:pointer; font-family:'DM Sans',sans-serif; transition:all 0.15s; }
-    .btn-next:hover { background:#2e4435; }
-    .btn-next:disabled { background:#ccc; cursor:not-allowed; }
-    .next-hint { font-size:0.8rem; color:#aaa; }
-
-    /* Completion banner */
-    .completion-banner { display:none; background:linear-gradient(135deg,#3D5A47,#2a4030); border-radius:16px; padding:32px; text-align:center; color:#fff; margin-bottom:32px; }
-    .completion-banner.show { display:block; }
-    .completion-banner h2 { font-family:'Cormorant Garamond',serif; font-size:1.8rem; margin:0 0 8px; }
-    .completion-banner p { color:#D4E4D8; font-size:0.9rem; margin:0 0 20px; }
-    .completion-banner a { display:inline-block; background:#C4785A; color:#fff; padding:12px 28px; border-radius:8px; text-decoration:none; font-weight:600; font-size:0.9rem; }
-
-    /* Toast */
-    .toast { position:fixed; bottom:24px; right:24px; background:#1a1a16; color:#fff; padding:12px 20px; border-radius:10px; font-size:0.88rem; z-index:9999; opacity:0; transform:translateY(8px); transition:all 0.3s; pointer-events:none; }
-    .toast.show { opacity:1; transform:none; }
-    .toast.success { background:#059669; }
-    .toast.error { background:#dc2626; }
-
-    /* Uploading overlay */
-    .uploading-overlay { position:absolute; inset:0; background:rgba(255,255,255,0.85); display:none; align-items:center; justify-content:center; flex-direction:column; gap:8px; }
-    .uploading-overlay.show { display:flex; }
-    .upload-spinner { width:28px; height:28px; border:3px solid #e8e3db; border-top-color:#3D5A47; border-radius:50%; animation:spin 0.8s linear infinite; }
-    @keyframes spin { to { transform:rotate(360deg); } }
-
-    /* Bandeau règles d'or — affiché en haut du contenu sur mobile */
-    .golden-rules { display:none; background:linear-gradient(135deg,#2e4435,#3D5A47); border-radius:12px; padding:14px 16px; margin-bottom:20px; }
-    .golden-rules-title { font-size:0.72rem; font-weight:700; color:rgba(212,228,216,0.6); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:10px; }
-    .golden-rule { display:flex; align-items:flex-start; gap:10px; margin-bottom:8px; }
-    .golden-rule:last-child { margin-bottom:0; }
-    .gr-icon { font-size:1.1rem; flex-shrink:0; line-height:1; }
-    .gr-text { font-size:0.83rem; color:#D4E4D8; line-height:1.45; }
-    .gr-text strong { color:#fff; font-weight:700; }
-
-    @media(max-width:900px) {
-      .guide-layout { grid-template-columns:1fr; }
-      .room-list { position:static; height:auto; max-height:180px; overflow-y:auto; border-right:none; border-bottom:1px solid #e8e3db; }
-      .room-content { padding:16px 14px 80px; }
-      .angles-grid { grid-template-columns:1fr 1fr; gap:10px; }
-      .angle-card { border-radius:10px; }
-      .angle-info { padding:8px 10px; }
-      .angle-name { font-size:0.8rem; }
-      .angle-hint { font-size:0.68rem; }
-      .room-header { margin-bottom:16px; }
-      .room-header-top { gap:8px; }
-      .room-big-icon { font-size:1.6rem; }
-      .room-title { font-size:1.35rem; }
-      .room-desc { font-size:0.82rem; }
-      .tip-banner { padding:10px 13px; font-size:0.8rem; margin-bottom:18px; }
-      .golden-rules { display:block; }
-      /* On touch devices the overlay only shows on hover — always show it slightly */
-      .angle-photo-area .angle-overlay { background:rgba(0,0,0,0.22); }
-      .angle-photo-area .overlay-btn { opacity:1; }
-      .btn-next { font-size:0.85rem; padding:10px 16px; }
-      .next-room-wrap { padding-top:18px; gap:10px; }
+    /* ── Next room bar ── */
+    .next-room-wrap {
+      border-top: 1.5px solid #e8e3db;
+      padding-top: 28px;
+      display: flex;
+      gap: 14px;
+      align-items: center;
     }
+    .btn-next {
+      background: linear-gradient(135deg, #2e4435, #3D5A47);
+      border: none;
+      border-radius: 12px;
+      padding: 14px 28px;
+      font-size: 0.92rem;
+      font-weight: 700;
+      color: #fff;
+      cursor: pointer;
+      font-family: 'DM Sans', sans-serif;
+      transition: all 0.2s;
+      box-shadow: 0 4px 16px rgba(61,90,71,0.3);
+      letter-spacing: 0.01em;
+    }
+    .btn-next:hover {
+      background: linear-gradient(135deg, #253b2e, #2e4435);
+      transform: translateY(-1px);
+      box-shadow: 0 6px 22px rgba(61,90,71,0.35);
+    }
+    .btn-next:disabled { background:#ccc; box-shadow:none; transform:none; cursor:not-allowed; }
+    .next-hint { font-size: 0.78rem; color: #aaa; display: flex; align-items: center; gap: 5px; }
+    .next-hint.done { color: #059669; font-weight: 600; }
 
+    /* ── Completion banner ── */
+    .completion-banner {
+      display: none;
+      background: linear-gradient(135deg, #1e3328, #2e4d3a, #3D5A47);
+      border-radius: 22px;
+      padding: 44px 40px;
+      text-align: center;
+      color: #fff;
+      margin-bottom: 36px;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 12px 48px rgba(61,90,71,0.35);
+    }
+    .completion-banner.show { display: block; }
+    .completion-banner::before {
+      content: '';
+      position: absolute;
+      top: -60px; left: -60px;
+      width: 200px; height: 200px;
+      background: rgba(255,255,255,0.04);
+      border-radius: 50%;
+    }
+    .completion-banner::after {
+      content: '';
+      position: absolute;
+      bottom: -40px; right: -40px;
+      width: 160px; height: 160px;
+      background: rgba(196,120,90,0.08);
+      border-radius: 50%;
+    }
+    .completion-star { font-size: 3rem; margin-bottom: 16px; display: block; position: relative; z-index: 1; }
+    .completion-banner h2 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 2.4rem;
+      font-weight: 700;
+      margin: 0 0 10px;
+      position: relative; z-index: 1;
+    }
+    .completion-banner p { color: #9dc4aa; font-size: 0.92rem; margin: 0 0 28px; position: relative; z-index: 1; line-height: 1.6; }
+    .completion-banner a {
+      display: inline-block;
+      background: #C4785A;
+      color: #fff;
+      padding: 14px 32px;
+      border-radius: 12px;
+      text-decoration: none;
+      font-weight: 700;
+      font-size: 0.92rem;
+      position: relative; z-index: 1;
+      box-shadow: 0 4px 16px rgba(196,120,90,0.4);
+      transition: all 0.2s;
+    }
+    .completion-banner a:hover { background: #b36a4d; transform: translateY(-2px); }
+
+    /* ── Toast ── */
+    .toast {
+      position: fixed; bottom: 28px; right: 28px;
+      background: #1a1a1a; color: #fff;
+      padding: 13px 22px; border-radius: 12px;
+      font-size: 0.88rem; z-index: 9999;
+      opacity: 0; transform: translateY(10px);
+      transition: all 0.3s cubic-bezier(0.34,1.56,0.64,1);
+      pointer-events: none;
+      box-shadow: 0 8px 28px rgba(0,0,0,0.25);
+    }
+    .toast.show { opacity: 1; transform: none; }
+    .toast.success { background: #059669; }
+    .toast.error { background: #dc2626; }
+
+    /* ── Upload spinner ── */
+    .uploading-overlay {
+      position: absolute; inset: 0;
+      background: rgba(255,255,255,0.88);
+      display: none; align-items: center; justify-content: center;
+      flex-direction: column; gap: 8px;
+      backdrop-filter: blur(2px);
+    }
+    .uploading-overlay.show { display: flex; }
+    .upload-spinner {
+      width: 28px; height: 28px;
+      border: 3px solid #e8e3db;
+      border-top-color: #3D5A47;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── Responsive ── */
+    @media(max-width:900px) {
+      .guide-layout { grid-template-columns: 1fr; }
+      .room-list { position:static; height:auto; max-height:200px; overflow-y:auto; border-right:none; border-bottom:1px solid #e8e3db; padding:16px 0; }
+      .room-content { padding:18px 16px 80px; }
+      .angles-grid { grid-template-columns:1fr 1fr; gap:12px; }
+      .golden-rules-strip { grid-template-columns:1fr; gap:8px; }
+      .room-header-card { padding:18px; }
+      .room-icon-circle { width:44px; height:44px; border-radius:12px; }
+      .room-title { font-size:1.5rem; }
+      .tip-banner { padding:16px 18px; }
+      .room-content { padding:16px 14px 80px; }
+    }
+    @media(max-width:768px) {
+      .topbar { padding:0 14px; height:60px; }
+      .topbar-sub { display:none; }
+      .progress-track { width:100px; }
+      .topbar-icon-wrap { width:34px; height:34px; border-radius:10px; }
+      .toast { bottom:max(20px,env(safe-area-inset-bottom,20px)); left:max(16px,env(safe-area-inset-left,16px)); right:max(16px,env(safe-area-inset-right,16px)); width:auto; }
+    }
     @media(max-width:480px) {
       .room-content { padding:14px 12px 80px; }
-      .angles-grid { gap:8px; }
-      .completion-banner { padding:20px 16px; }
-      .completion-banner h2 { font-size:1.4rem; }
+      .angles-grid { gap:10px; }
+      .completion-banner { padding:28px 20px; }
+      .completion-banner h2 { font-size:1.7rem; }
+      .next-room-wrap { flex-direction:column; align-items:stretch; }
+      .btn-next { text-align:center; }
     }
-
-    @media(max-width:768px) {
-      .topbar { padding:0 12px; gap:8px; }
-      .topbar-sub { display:none; }
-      .progress-track { width:90px; }
-      .toast { bottom:max(20px, env(safe-area-inset-bottom, 20px)); left:max(16px, env(safe-area-inset-left, 16px)); right:max(16px, env(safe-area-inset-right, 16px)); width:auto; }
-    }
-
     @media(pointer:coarse) {
-      .room-item { min-height:48px; touch-action:manipulation; }
-      .room-add-btn { min-height:44px; touch-action:manipulation; }
-      .btn-skip, .btn-done-room, .btn-next { min-height:44px; touch-action:manipulation; }
-      .overlay-btn { min-height:44px; padding:8px 14px; touch-action:manipulation; }
-      .angle-photo-area { touch-action:manipulation; }
+      .room-item { min-height:50px; touch-action:manipulation; }
+      .room-add-btn { min-height:46px; touch-action:manipulation; }
+      .btn-skip, .btn-next { min-height:46px; touch-action:manipulation; }
+      .overlay-btn { min-height:44px; padding:8px 14px; touch-action:manipulation; opacity:1; }
+      .angle-photo-area .angle-overlay { background:rgba(0,0,0,0.25); }
+      .angle-photo-area .overlay-btn { opacity:1; }
+      .angle-card:hover { transform:none; }
     }
   </style>
   <style id="embed-style"></style>
@@ -220,14 +601,12 @@
       <a href="/dashboard" class="sidebar-item"><span style="display:inline-flex;vertical-align:middle;margin-right:6px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></span> Mon espace vendeur</a>
       <a href="/ma-formation" class="sidebar-item"><span style="display:inline-flex;vertical-align:middle;margin-right:6px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg></span>Ma formation</a>
       <a href="/mon-bien" class="sidebar-item"><span style="display:inline-flex;vertical-align:middle;margin-right:6px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></span>Mon bien</a>
-      <a href="/mon-guide-photos" class="sidebar-item active"><span style="display:inline-flex;vertical-align:middle;margin-right:6px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg></span> Mon guide photos</a>      <a href="/mon-agenda" class="sidebar-item"><span style="display:inline-flex;vertical-align:middle;margin-right:6px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span>Mon agenda</a>
-      <a href="/mes-acheteurs" class="sidebar-item">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>Mes acheteurs
-      </a>
+      <a href="/mon-guide-photos" class="sidebar-item active"><span style="display:inline-flex;vertical-align:middle;margin-right:6px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg></span> Mon guide photos</a>
+      <a href="/mon-agenda" class="sidebar-item"><span style="display:inline-flex;vertical-align:middle;margin-right:6px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span>Mon agenda</a>
       <a href="/ma-bibliotheque" class="sidebar-item"><span style="display:inline-flex;vertical-align:middle;margin-right:6px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></span>Bibliothèque</a>
       <a href="/mes-publications" class="sidebar-item"><span style="display:inline-flex;vertical-align:middle;margin-right:6px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="2"/><path d="M16.24 7.76a6 6 0 0 1 0 8.49m-8.48-.01a6 6 0 0 1 0-8.49m11.31-2.82a10 10 0 0 1 0 14.14m-14.14 0a10 10 0 0 1 0-14.14"/></svg></span>Publications</a>
       <a href="/mes-offres" class="sidebar-item">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>Mes offres
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="margin-right:6px;"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>Mes offres
       </a>
       <a href="/coach-ia" class="sidebar-item"><span style="display:inline-flex;vertical-align:middle;margin-right:6px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="11" width="18" height="10" rx="2"/><path d="M12 3v8"/><circle cx="12" cy="3" r="1"/><circle cx="8" cy="16" r="1" fill="currentColor"/><circle cx="16" cy="16" r="1" fill="currentColor"/></svg></span>Coach IA</a>
     </div>
@@ -239,13 +618,18 @@
   <div class="main">
     <!-- Top bar -->
     <div class="topbar">
-      <div style="flex:1;">
-        <div class="topbar-title"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="vertical-align:middle;margin-right:6px;"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>Guide photos immersives</div>
-        <div class="topbar-sub">Ces photos sont <strong style="color:#3D5A47;">automatiquement synchronisées</strong> dans <a href="/mon-bien?tab=photos&section=section-photos-decouverte" style="color:#3D5A47;font-weight:600;text-decoration:underline;">Mes photos → Photos immersives</a></div>
+      <div class="topbar-icon-wrap">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+      </div>
+      <div class="topbar-info">
+        <div class="topbar-title">Mon guide photos immersives</div>
+        <div class="topbar-sub">Photos <strong>synchronisées automatiquement</strong> dans <a href="/mon-bien?tab=photos&section=section-photos-decouverte">Mes photos → Photos immersives</a></div>
       </div>
       <div class="progress-container">
-        <div class="progress-track"><div class="progress-fill" id="globalProgressFill" style="width:0%"></div></div>
-        <div class="progress-label" id="globalProgressLabel">0 / 0 pièces</div>
+        <div class="progress-wrap">
+          <div class="progress-label" id="globalProgressLabel">0 / 0 pièces</div>
+          <div class="progress-track"><div class="progress-fill" id="globalProgressFill" style="width:0%"></div></div>
+        </div>
       </div>
     </div>
 
@@ -254,14 +638,18 @@
       <div class="room-list">
         <div class="room-list-header">Pièces à photographier</div>
         <div id="roomList"></div>
+        <div class="room-list-divider"></div>
         <button class="room-add-btn" onclick="addOptionalRoom()">+ Ajouter une pièce</button>
       </div>
 
       <!-- Room content -->
       <div class="room-content" id="roomContent">
-        <div style="text-align:center;padding:80px 20px;color:#aaa;">
-          <div style="font-size:3rem;margin-bottom:16px;"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#ccc" stroke-width="1.5"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg></div>
-          <div style="font-size:1rem;font-weight:600;color:#888;margin-bottom:8px;">Chargement du guide…</div>
+        <div style="text-align:center;padding:100px 20px;color:#ccc;">
+          <div style="margin-bottom:20px;">
+            <svg width="52" height="52" viewBox="0 0 24 24" fill="none" stroke="#d0cbc3" stroke-width="1.3"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+          </div>
+          <div style="font-size:1.1rem;font-weight:600;color:#bbb;margin-bottom:6px;font-family:'Cormorant Garamond',serif;">Chargement du guide…</div>
+          <div style="font-size:0.8rem;color:#ccc;">Votre guide photo personnalisé se prépare</div>
         </div>
       </div>
     </div>
@@ -416,7 +804,7 @@ const ALL_ROOMS = [
 
 const REQUIRED_ROOMS = ALL_ROOMS.filter(r => r.required).map(r => r.id);
 
-let photosByRoom = {}; // { roomId: { angleId: { url, thumb, cid } } }
+let photosByRoom = {};
 let activeRoomId = null;
 let visibleRooms = [];
 let propertyType = 'maison';
@@ -427,22 +815,17 @@ async function init() {
     const data = await fetch('/api/guide-photos').then(r => r.json());
     propertyType = data.property?.type?.toLowerCase() || 'maison';
 
-    // Build visible rooms based on property type
     visibleRooms = ALL_ROOMS.filter(r => {
       if (r.required) return true;
-      // Show optional rooms for maison by default
       const maisonExtra = ['garage','jardin','terrasse','buanderie','salle_manger'];
       if (propertyType === 'maison' && maisonExtra.includes(r.id)) return true;
       return false;
     }).map(r => ({ ...r }));
 
-    // Add bedrooms based on rooms_count
     const roomsCount = parseInt(data.property?.rooms_count) || 3;
-    // chambre2 visible if >= 2 rooms, chambre3 if >= 3
     if (roomsCount >= 2) { const r = ALL_ROOMS.find(x => x.id === 'chambre2'); if (r && !visibleRooms.find(x => x.id === 'chambre2')) visibleRooms.push({ ...r }); }
     if (roomsCount >= 3) { const r = ALL_ROOMS.find(x => x.id === 'chambre3'); if (r && !visibleRooms.find(x => x.id === 'chambre3')) visibleRooms.push({ ...r }); }
 
-    // Organize existing photos
     (data.photos || []).forEach(p => {
       if (!p.room) return;
       if (!photosByRoom[p.room]) photosByRoom[p.room] = {};
@@ -481,10 +864,10 @@ function renderRoomList() {
     div.className = 'room-item' + (room.id === activeRoomId ? ' active' : '');
     div.dataset.roomId = room.id;
     div.innerHTML = `
-      <div class="room-item-icon">${room.icon}</div>
+      <div class="room-item-icon-pill">${room.icon}</div>
       <div class="room-item-info">
         <div class="room-item-name">${room.label}</div>
-        <div class="room-item-count">${comp.covered}/${comp.total} angle${comp.total > 1 ? 's' : ''}</div>
+        <div class="room-item-count">${comp.covered}/${comp.total} photo${comp.total > 1 ? 's' : ''}</div>
       </div>
       ${statusHtml}
     `;
@@ -506,9 +889,11 @@ function updateGlobalProgress() {
     const banner = document.createElement('div');
     banner.className = 'completion-banner show';
     banner.innerHTML = `
-      <div style="font-size:2.5rem;margin-bottom:12px;color:#C4785A;"><svg width="36" height="36" viewBox="0 0 24 24" fill="currentColor" stroke="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></div>
+      <span class="completion-star">
+        <svg width="44" height="44" viewBox="0 0 24 24" fill="#C4785A" stroke="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+      </span>
       <h2>Guide photos complété !</h2>
-      <p>Toutes vos photos immersives sont prêtes. Votre dossier acquéreur est maintenant complet.</p>
+      <p>Félicitations — toutes vos photos immersives sont prêtes.<br>Votre dossier acquéreur est maintenant complet et prêt à convaincre.</p>
       <a href="/mon-bien">Retour à ma fiche bien →</a>
     `;
     document.getElementById('roomContent').prepend(banner);
@@ -528,7 +913,6 @@ function selectRoom(roomId) {
   const content = document.getElementById('roomContent');
   content.innerHTML = renderRoomContent(room);
 
-  // Wire up per-angle file inputs and drag-and-drop
   room.angles.forEach(angle => {
     const input = document.getElementById(`ai-${roomId}-${angle.id}`);
     if (input) {
@@ -549,6 +933,15 @@ function selectRoom(roomId) {
 function renderRoomContent(room) {
   const photos = photosByRoom[room.id] || {};
   const comp = getRoomCompletion(room);
+  const idx = visibleRooms.findIndex(r => r.id === room.id);
+  const next = visibleRooms[idx + 1];
+
+  const requiredCount = room.angles.filter(a => a.required).length;
+  const doneCount = room.angles.filter(a => photos[a.id]).length;
+
+  let pillClass = 'empty', pillText = `0 / ${room.angles.length} photo${room.angles.length>1?'s':''}`;
+  if (comp.done) { pillClass='complete'; pillText=`<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="vertical-align:middle;margin-right:3px;"><polyline points="20 6 9 17 4 12"/></svg>Pièce complète`; }
+  else if (doneCount>0) { pillClass='partial'; pillText=`${doneCount} / ${room.angles.length} photo${room.angles.length>1?'s':''}`;  }
 
   const anglesHtml = room.angles.map(angle => {
     const photo = photos[angle.id];
@@ -571,7 +964,7 @@ function renderRoomContent(room) {
       photoAreaHtml = `
         <div class="angle-photo-area">
           <div class="angle-upload-zone" id="zone-${room.id}-${angle.id}" style="pointer-events:none;">
-            <div class="upload-icon"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="opacity:0.4;"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg></div>
+            <div class="upload-icon"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="opacity:0.3;"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg></div>
             <div class="upload-text"><strong>${angle.label}</strong>Appuyer ou glisser une photo</div>
           </div>
           <input type="file" id="ai-${room.id}-${angle.id}" class="angle-input-overlay" accept="image/*">
@@ -583,7 +976,9 @@ function renderRoomContent(room) {
     }
 
     const badgeClass = photo ? 'badge-done' : angle.required ? 'badge-required' : 'badge-optional';
-    const badgeText = photo ? '<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> Fait' : angle.required ? 'Obligatoire' : 'Optionnel';
+    const badgeText = photo
+      ? '<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> Fait'
+      : angle.required ? 'Obligatoire' : 'Optionnel';
 
     return `
       <div class="angle-card ${photo ? 'has-photo' : ''} ${!angle.required ? 'optional' : ''}">
@@ -596,63 +991,80 @@ function renderRoomContent(room) {
       </div>`;
   }).join('');
 
-  // Find current room index and next room
-  const idx = visibleRooms.findIndex(r => r.id === room.id);
-  const next = visibleRooms[idx + 1];
   const nextBtn = next
-    ? `<button class="btn-next" onclick="selectRoom('${next.id}')">Pièce suivante : ${next.icon} ${next.label} →</button>`
-    : `<button class="btn-next" onclick="window.location.href='/mon-bien'"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="vertical-align:middle;margin-right:5px;"><polyline points="20 6 9 17 4 12"/></svg>Terminer et retourner à ma fiche →</button>`;
+    ? `<button class="btn-next" onclick="selectRoom('${next.id}')">Pièce suivante : ${next.label} →</button>`
+    : `<button class="btn-next" onclick="window.location.href='/mon-bien'"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="vertical-align:middle;margin-right:6px;"><polyline points="20 6 9 17 4 12"/></svg>Terminer et retourner à ma fiche →</button>`;
+
+  const nextHintClass = comp.done ? 'next-hint done' : 'next-hint';
+  const nextHintText = comp.done
+    ? `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> ${room.label} complète`
+    : `${comp.coveredRequired}/${comp.required} angles obligatoires`;
 
   return `
-    <div class="golden-rules">
-      <div class="golden-rules-title">3 règles d'or pour toutes les pièces</div>
-      <div class="golden-rule">
-        <div class="gr-icon">📱</div>
-        <div class="gr-text"><strong>x0.5 — ultra grand-angle</strong> obligatoire. Sur iPhone : appuyez sur "0.5×" avant de déclencher. Sur Android : bouton "Grand angle" ou 0.5×. Chaque pièce paraîtra plus grande.</div>
-      </div>
-      <div class="golden-rule">
-        <div class="gr-icon">🪟</div>
-        <div class="gr-text"><strong>Volets ouverts, stores levés, lumières allumées.</strong> Lumière naturelle au maximum. Une pièce lumineuse se vend plus vite.</div>
-      </div>
-      <div class="golden-rule">
-        <div class="gr-icon">📐</div>
-        <div class="gr-text"><strong>Reculez jusqu'au coin opposé</strong> et visez légèrement vers le bas. Plus vous êtes loin, plus la pièce paraît grande.</div>
-      </div>
-    </div>
-
-    <div class="room-header">
-      <div class="room-header-top">
-        <div class="room-title-wrap">
-          <div class="room-big-icon">${room.icon}</div>
-          <div>
-            <h1 class="room-title">${room.label}</h1>
-            <div class="room-desc">${room.desc}</div>
-          </div>
-        </div>
-        <div style="display:flex;gap:8px;flex-shrink:0;">
-          ${idx < visibleRooms.length - 1 ? `<button class="btn-skip" onclick="selectRoom('${visibleRooms[idx+1]?.id}')">Passer →</button>` : ''}
+    <div class="room-header-card">
+      <div class="room-header-left">
+        <div class="room-icon-circle">${room.icon}</div>
+        <div class="room-title-block">
+          <h1 class="room-title">${room.label}</h1>
+          <div class="room-desc">${room.desc}</div>
+          <div class="room-completion-pill ${pillClass}">${pillText}</div>
         </div>
       </div>
+      ${idx < visibleRooms.length - 1 ? `<button class="btn-skip" onclick="selectRoom('${visibleRooms[idx+1]?.id}')">Passer →</button>` : ''}
     </div>
 
     <div class="tip-banner">
-      <div class="tip-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><line x1="9" y1="18" x2="15" y2="18"/><line x1="10" y1="22" x2="14" y2="22"/><path d="M15.09 14c.18-.98.65-1.74 1.41-2.5A4.65 4.65 0 0 0 18 8 6 6 0 0 0 6 8c0 1 .23 2.23 1.5 3.5A4.61 4.61 0 0 1 8.91 14"/></svg></div>
-      <div>${room.tip}</div>
+      <div class="tip-icon-box">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><line x1="9" y1="18" x2="15" y2="18"/><line x1="10" y1="22" x2="14" y2="22"/><path d="M15.09 14c.18-.98.65-1.74 1.41-2.5A4.65 4.65 0 0 0 18 8 6 6 0 0 0 6 8c0 1 .23 2.23 1.5 3.5A4.61 4.61 0 0 1 8.91 14"/></svg>
+      </div>
+      <div class="tip-content">
+        <div class="tip-label">Conseil pro</div>
+        <div class="tip-text">${room.tip}</div>
+      </div>
+    </div>
+
+    <div class="golden-rules-strip">
+      <div class="golden-rule-card">
+        <div class="gr-icon-wrap">📱</div>
+        <div class="gr-body">
+          <div class="gr-title">Mode x0.5 obligatoire</div>
+          <div class="gr-desc">Sur iPhone appuyez sur "0.5×", sur Android utilisez le grand-angle. Chaque pièce paraîtra plus grande.</div>
+        </div>
+      </div>
+      <div class="golden-rule-card">
+        <div class="gr-icon-wrap">🪟</div>
+        <div class="gr-body">
+          <div class="gr-title">Lumière maximale</div>
+          <div class="gr-desc">Volets ouverts, stores levés, toutes les lumières allumées. Une pièce lumineuse se vend plus vite.</div>
+        </div>
+      </div>
+      <div class="golden-rule-card">
+        <div class="gr-icon-wrap">📐</div>
+        <div class="gr-body">
+          <div class="gr-title">Reculez au maximum</div>
+          <div class="gr-desc">Jusqu'au coin opposé, visez légèrement vers le bas. Plus vous êtes loin, plus la pièce paraît grande.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-label">
+      <div class="section-label-text">Angles à photographier</div>
+      <div class="section-label-count">${requiredCount} obligatoire${requiredCount>1?'s':''}</div>
+      <div class="section-label-line"></div>
     </div>
 
     <div class="angles-grid">${anglesHtml}</div>
 
     <div class="next-room-wrap">
       ${nextBtn}
-      <div class="next-hint">${comp.done ? `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="vertical-align:middle;margin-right:3px;"><polyline points="20 6 9 17 4 12"/></svg>${room.label} complète` : `${comp.coveredRequired}/${comp.required} angles obligatoires`}</div>
+      <div class="${nextHintClass}">${nextHintText}</div>
     </div>`;
 }
 
 // ── Upload ───────────────────────────────────────────────────────
-
 async function handleFiles(files, roomId, angleId) {
   if (!files || !files.length) return;
-  const file = files[0]; // one photo per angle slot
+  const file = files[0];
 
   const ov = document.getElementById(`ov-${roomId}-${angleId}`);
   if (ov) ov.classList.add('show');
@@ -671,7 +1083,6 @@ async function handleFiles(files, roomId, angleId) {
     const inserted = data.photos?.[0];
     if (!inserted) throw new Error('Aucune photo retournée');
 
-    // If there was an existing photo for this angle, delete it first
     const existing = photosByRoom[roomId]?.[angleId];
     if (existing) {
       await fetch(`/api/guide-photos/${existing.cid}`, { method: 'DELETE' }).catch(() => {});
@@ -706,9 +1117,7 @@ async function deletePhoto(roomId, angleId, cid) {
 function addOptionalRoom() {
   const available = ALL_ROOMS.filter(r => !visibleRooms.find(v => v.id === r.id));
   if (!available.length) { showToast('Toutes les pièces sont déjà ajoutées', 'success'); return; }
-
-  const list = available.map(r => `${r.icon} ${r.label}`).join('\n');
-  const choice = prompt(`Quelle pièce ajouter ?\n\n${available.map((r, i) => `${i+1}. ${r.icon} ${r.label}`).join('\n')}\n\nEntrez le numéro :`);
+  const choice = prompt(`Quelle pièce ajouter ?\n\n${available.map((r, i) => `${i+1}. ${r.label}`).join('\n')}\n\nEntrez le numéro :`);
   const idx = parseInt(choice) - 1;
   if (isNaN(idx) || idx < 0 || idx >= available.length) return;
   visibleRooms.push({ ...available[idx] });

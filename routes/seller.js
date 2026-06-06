@@ -689,39 +689,11 @@ router.put('/api/visits/:id/notes', requireAuth, express.json(), (req, res) => {
   res.json({ success: true });
 });
 
-router.post('/api/visits/:id/reminder', requireAuth, async (req, res) => {
-  const visit = db.prepare('SELECT * FROM visits WHERE id=? AND seller_id=?').get(req.params.id, req.seller.id);
+router.post('/api/visits/:id/reminder', requireAuth, (req, res) => {
+  const visit = db.prepare('SELECT id FROM visits WHERE id=? AND seller_id=?').get(req.params.id, req.seller.id);
   if (!visit) return res.status(404).json({ error: 'Visite introuvable' });
-  if (!visit.buyer_phone) return res.status(400).json({ error: 'Aucun numéro de téléphone pour cet acheteur' });
-
-  const seller = db.prepare('SELECT twilio_number, first_name FROM sellers WHERE id=?').get(req.seller.id);
-  if (!seller?.twilio_number) return res.status(400).json({ error: 'Numéro Twilio non configuré — publiez votre bien d\'abord' });
-
-  // Formater la date en français
-  const [year, month, day] = visit.visit_date.split('-');
-  const dateObj = new Date(Number(year), Number(month) - 1, Number(day));
-  const JOURS = ['dimanche','lundi','mardi','mercredi','jeudi','vendredi','samedi'];
-  const MOIS = ['janvier','février','mars','avril','mai','juin','juillet','août','septembre','octobre','novembre','décembre'];
-  const dateStr = `${JOURS[dateObj.getDay()]} ${day} ${MOIS[dateObj.getMonth()]}`;
-
-  // Heure au format lisible
-  const [h, m] = (visit.visit_time || '').split(':');
-  const heureStr = m && m !== '00' ? `${h}h${m}` : `${h}h`;
-
-  // Prénom acheteur (premier mot du nom)
-  const prenom = (visit.buyer_name || '').split(' ')[0];
-
-  const body = `Bonjour ${prenom}, je me permets de vous rappeler notre visite du ${dateStr} à ${heureStr}. Pouvez-vous me confirmer votre présence ? Merci.`;
-
-  try {
-    const twilio = require('twilio')(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN);
-    await twilio.messages.create({ from: seller.twilio_number, to: visit.buyer_phone, body });
-    db.prepare("UPDATE visits SET reminder_sent=1 WHERE id=?").run(visit.id);
-    res.json({ success: true, message: body });
-  } catch(e) {
-    console.error('SMS reminder error:', e.message);
-    res.status(500).json({ error: 'Échec envoi SMS — vérifiez les credentials Twilio', detail: e.message });
-  }
+  db.prepare('UPDATE visits SET reminder_sent=1 WHERE id=?').run(visit.id);
+  res.json({ success: true });
 });
 
 router.post('/api/connect/contacts', requireAuth, express.json(), (req, res) => {
@@ -1092,7 +1064,7 @@ router.put('/api/offres/:id/repondre', requireAuth, express.json(), (req, res) =
 });
 
 // ── Pipeline acheteurs ────────────────────────────────────────
-router.get('/mes-acheteurs', requireAuth, (req, res) => res.sendFile('pipeline.html', { root: './views/seller' }));
+router.get('/mes-acheteurs', requireAuth, (req, res) => res.redirect('/mon-agenda'));
 
 router.get('/api/pipeline', requireAuth, (req, res) => {
   const contacts = db.prepare('SELECT * FROM buyer_contacts WHERE seller_id=? ORDER BY created_at DESC').all(req.seller.id);
