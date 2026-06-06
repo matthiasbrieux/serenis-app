@@ -64,17 +64,20 @@
     .col-title { font-size:0.82rem; font-weight:700; color:#1a1a1a; flex:1; }
     .col-count { background:#f0ebe3; color:#888; border-radius:20px; padding:2px 8px; font-size:0.7rem; font-weight:700; }
     .col-cards { padding:10px 10px; display:flex; flex-direction:column; gap:8px; min-height:100px; }
-    .col-cards.drag-over { background:#f0f7f2; border-radius:8px; }
+    .col-cards.drag-over { background:#e8f2ec; border-radius:8px; }
+    .pipeline-col.can-drop { border:2px dashed rgba(74,138,90,0.35); }
+    .pipeline-col.drag-over-col { border:2px dashed #3D5A47; background:#f0f7f2; }
+    .pipeline-col.drag-over-col .col-head { background:#e8f2ec; }
 
     /* Buyer card */
     .buyer-card { background:#fff; border:1.5px solid #e8e3db; border-radius:10px; padding:12px 13px; cursor:pointer; transition:all 0.2s; position:relative; }
     .buyer-card:hover { border-color:#c5d9cb; box-shadow:0 3px 14px rgba(0,0,0,0.07); transform:translateY(-1px); }
     .buyer-card.dragging { opacity:0.5; transform:rotate(2deg); }
-    .buyer-card[data-stage="new"] { border-left:3px solid #C4785A; }
-    .buyer-card[data-stage="qualified"] { border-left:3px solid #4a8a5a; }
-    .buyer-card[data-stage="visit_planned"] { border-left:3px solid #3D5A47; }
-    .buyer-card[data-stage="visit_done"] { border-left:3px solid #2e4435; }
-    .buyer-card[data-stage="offer_received"] { border-left:3px solid #C4603A; }
+    .buyer-card[data-stage="new"] { border-left:3px solid #C4785A; background:linear-gradient(160deg,#fffaf7 0%,#fff 60%); }
+    .buyer-card[data-stage="qualified"] { border-left:3px solid #6a9870; background:linear-gradient(160deg,#f5faf6 0%,#fff 60%); }
+    .buyer-card[data-stage="visit_planned"] { border-left:3px solid #4a6e55; background:linear-gradient(160deg,#f0f7f2 0%,#fff 60%); }
+    .buyer-card[data-stage="visit_done"] { border-left:3px solid #3D5A47; background:linear-gradient(160deg,#eaf3ed 0%,#fff 60%); }
+    .buyer-card[data-stage="offer_received"] { border-left:3px solid #2e4435; background:linear-gradient(160deg,#e2ede7 0%,#fff 60%); }
 
     .card-top { display:flex; align-items:flex-start; gap:9px; margin-bottom:7px; }
     .card-avatar { width:32px; height:32px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:0.8rem; font-weight:700; color:#fff; flex-shrink:0; }
@@ -104,10 +107,21 @@
     .move-btn.fwd { background:#3D5A47; color:#fff; border-color:#3D5A47; }
     .move-btn:disabled { opacity:0.3; pointer-events:none; }
 
-    /* Empty state */
+    /* Empty state col */
     .col-empty { text-align:center; padding:24px 16px; color:#ccc; }
     .col-empty-icon { font-size:1.8rem; margin-bottom:6px; opacity:0.5; }
     .col-empty-text { font-size:0.75rem; color:#bbb; line-height:1.5; }
+
+    /* Global empty state */
+    .pipeline-empty-state { display:flex; flex-direction:column; align-items:center; justify-content:center; padding:72px 32px; text-align:center; grid-column:1/-1; }
+    .pipeline-empty-icon { font-size:3.5rem; margin-bottom:20px; }
+    .pipeline-empty-title { font-family:'Cormorant Garamond',serif; font-size:1.8rem; color:#3D5A47; margin-bottom:10px; font-weight:600; }
+    .pipeline-empty-sub { font-size:0.92rem; color:#888; line-height:1.7; max-width:400px; margin-bottom:28px; }
+    .pipeline-empty-actions { display:flex; gap:12px; flex-wrap:wrap; justify-content:center; }
+    .btn-empty-primary { background:#3D5A47; color:#fff; border:none; border-radius:10px; padding:13px 24px; font-size:0.9rem; font-weight:600; cursor:pointer; font-family:'DM Sans',sans-serif; transition:background 0.15s; }
+    .btn-empty-primary:hover { background:#2e4435; }
+    .btn-empty-secondary { background:#fff; color:#3D5A47; border:1.5px solid #c5d9cb; border-radius:10px; padding:13px 24px; font-size:0.9rem; font-weight:600; cursor:pointer; font-family:'DM Sans',sans-serif; transition:all 0.15s; }
+    .btn-empty-secondary:hover { background:#f0f7f2; }
 
     /* Not retained section */
     .archived-section { margin:0 28px 32px; }
@@ -197,6 +211,24 @@
       .card-move { display:flex; }
       .card-actions .card-btn:not(.primary):not(.danger) { display:none; }
     }
+    /* Delete confirm modal */
+    .delete-confirm-overlay { position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:700; display:none; align-items:center; justify-content:center; padding:16px; }
+    .delete-confirm-overlay.open { display:flex; }
+    .delete-confirm-box { background:#fff; border-radius:16px; padding:32px 28px; max-width:360px; width:100%; text-align:center; }
+    .delete-confirm-icon { font-size:2.2rem; margin-bottom:12px; }
+    .delete-confirm-title { font-size:1.05rem; font-weight:700; color:#1a1a1a; margin-bottom:6px; }
+    .delete-confirm-sub { font-size:0.85rem; color:#888; margin-bottom:24px; line-height:1.5; }
+    .delete-confirm-actions { display:flex; gap:10px; }
+    .btn-delete-cancel { flex:1; background:none; border:1.5px solid #e8e3db; border-radius:8px; padding:11px; font-size:0.88rem; font-weight:600; color:#888; cursor:pointer; font-family:'DM Sans',sans-serif; transition:all 0.15s; }
+    .btn-delete-cancel:hover { background:#f8f5f0; }
+    .btn-delete-confirm { flex:1; background:#dc2626; color:#fff; border:none; border-radius:8px; padding:11px; font-size:0.88rem; font-weight:600; cursor:pointer; font-family:'DM Sans',sans-serif; transition:background 0.15s; }
+    .btn-delete-confirm:hover { background:#b91c1c; }
+
+    /* Tooltip */
+    .has-tooltip { position:relative; cursor:default; }
+    .has-tooltip .tooltip-text { position:absolute; bottom:calc(100% + 7px); left:50%; transform:translateX(-50%); background:#1a1a1a; color:#fff; font-size:0.72rem; padding:5px 10px; border-radius:6px; white-space:nowrap; pointer-events:none; opacity:0; transition:opacity 0.18s; z-index:200; }
+    .has-tooltip:hover .tooltip-text { opacity:1; }
+
     @media(max-width:768px) {
       .main { margin-left:0; }
       .topbar { padding:0 16px; gap:10px; }
@@ -208,6 +240,7 @@
       .pipeline-wrap { padding:16px 16px 60px; }
       .archived-section { margin:0 16px 32px; }
       .detail-panel { width:100%; }
+      .detail-close { width:44px; height:44px; font-size:1.2rem; }
       .toast { bottom:max(16px, env(safe-area-inset-bottom, 16px)); left:16px; right:16px; width:auto; }
     }
     @media(max-width:480px) {
@@ -358,6 +391,19 @@
   </div>
 </div>
 
+<!-- Delete confirm modal -->
+<div class="delete-confirm-overlay" id="deleteConfirmModal">
+  <div class="delete-confirm-box">
+    <div class="delete-confirm-icon">🗑</div>
+    <div class="delete-confirm-title">Supprimer cet acheteur ?</div>
+    <div class="delete-confirm-sub"><strong id="deleteConfirmName"></strong><br>Cette action est irréversible.</div>
+    <div class="delete-confirm-actions">
+      <button class="btn-delete-cancel" onclick="closeDeleteConfirm()">Annuler</button>
+      <button class="btn-delete-confirm" onclick="executeDelete()">Supprimer</button>
+    </div>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <script src="/js/seller-nav.js"></script>
@@ -484,6 +530,20 @@ function setTab(stageId) {
 
 function renderBoard() {
   const board = document.getElementById('pipelineBoard');
+  const activeContacts = allContacts.filter(c => c.status !== 'not_retained');
+  if (activeContacts.length === 0) {
+    const durl = dossierToken ? dossierUrl(dossierToken) : null;
+    board.innerHTML = `<div class="pipeline-empty-state">
+      <div class="pipeline-empty-icon">👥</div>
+      <div class="pipeline-empty-title">Votre pipeline est vide</div>
+      <div class="pipeline-empty-sub">Ajoutez votre premier acheteur ou partagez votre dossier pour commencer à recevoir des contacts.</div>
+      <div class="pipeline-empty-actions">
+        <button class="btn-empty-primary" onclick="openAddModal()">+ Ajouter un acheteur</button>
+        ${durl ? `<button class="btn-empty-secondary" onclick="copyToClipboard('${durl}')">📋 Copier le lien dossier</button>` : ''}
+      </div>
+    </div>`;
+    return;
+  }
   board.innerHTML = STAGES.map(s => {
     const cards = allContacts.filter(c => c.status === s.id);
     const isFirst = STAGES.indexOf(s) === 0;
@@ -570,25 +630,35 @@ function onDragStart(e, id) {
   e.dataTransfer.effectAllowed = 'move';
   e.currentTarget.classList.add('dragging');
   setTimeout(() => e.currentTarget.classList.remove('dragging'), 10);
+  document.querySelectorAll('.pipeline-col').forEach(col => col.classList.add('can-drop'));
 }
 
 function onDragOver(e) {
   e.preventDefault();
   e.dataTransfer.dropEffect = 'move';
+  document.querySelectorAll('.pipeline-col').forEach(col => col.classList.remove('drag-over-col'));
+  e.currentTarget.classList.add('drag-over-col');
   e.currentTarget.querySelector('.col-cards')?.classList.add('drag-over');
 }
 
 function onDrop(e, stageId) {
   e.preventDefault();
-  e.currentTarget.querySelector('.col-cards')?.classList.remove('drag-over');
+  document.querySelectorAll('.pipeline-col').forEach(col => {
+    col.classList.remove('can-drop', 'drag-over-col');
+    col.querySelector('.col-cards')?.classList.remove('drag-over');
+  });
   if (dragId !== null) {
     moveContact(dragId, stageId);
     dragId = null;
   }
 }
 
-document.addEventListener('dragleave', e => {
-  e.currentTarget?.querySelector?.('.col-cards.drag-over')?.classList.remove('drag-over');
+document.addEventListener('dragend', () => {
+  document.querySelectorAll('.pipeline-col').forEach(col => {
+    col.classList.remove('can-drop', 'drag-over-col');
+    col.querySelector('.col-cards')?.classList.remove('drag-over');
+  });
+  dragId = null;
 });
 
 // ── Move contact ─────────────────────────────────────────────
@@ -695,10 +765,11 @@ function renderDetailContent(c) {
       <div class="detail-section-title">Avancer dans le pipeline</div>
       <div class="stage-selector">
         ${STAGES.map((s, i) => `
-          <div class="stage-option ${c.status === s.id ? 'active' : ''}" onclick="moveContact(${c.id}, '${s.id}')">
+          <div class="stage-option has-tooltip ${c.status === s.id ? 'active' : ''}" onclick="moveContact(${c.id}, '${s.id}')">
             <div class="stage-option-dot" style="background:${s.color};"></div>
             <span class="stage-option-label">${s.icon} ${s.label}</span>
             ${i <= stageIdx ? '' : '<span class="stage-option-desc">→ Déplacer ici</span>'}
+            <span class="tooltip-text">${s.desc}</span>
           </div>`).join('')}
         <div class="stage-option ${c.status === 'not_retained' ? 'active' : ''}" onclick="moveContact(${c.id}, 'not_retained')" style="${c.status === 'not_retained' ? '' : 'opacity:0.5;'}">
           <div class="stage-option-dot" style="background:#bbb;"></div>
@@ -768,11 +839,25 @@ function copyToClipboard(text) {
 }
 
 // ── Delete ───────────────────────────────────────────────────
+let deleteTargetId = null;
+
 function confirmDelete(id) {
   const c = allContacts.find(c => c.id === id);
-  const name = c?.buyer_name || 'cet acheteur';
-  if (!confirm(`Supprimer ${name} ? Cette action est irréversible.`)) return;
-  deleteContact(id);
+  deleteTargetId = id;
+  document.getElementById('deleteConfirmName').textContent = c?.buyer_name || 'cet acheteur';
+  document.getElementById('deleteConfirmModal').classList.add('open');
+}
+
+function closeDeleteConfirm() {
+  document.getElementById('deleteConfirmModal').classList.remove('open');
+  deleteTargetId = null;
+}
+
+function executeDelete() {
+  if (deleteTargetId !== null) {
+    deleteContact(deleteTargetId);
+    closeDeleteConfirm();
+  }
 }
 
 async function deleteContact(id) {
@@ -859,7 +944,11 @@ document.getElementById('addModal').addEventListener('click', function(e) {
 });
 
 document.addEventListener('keydown', e => {
-  if (e.key === 'Escape') { closeDetail(); closeAddModal(); }
+  if (e.key === 'Escape') { closeDetail(); closeAddModal(); closeDeleteConfirm(); }
+});
+
+document.getElementById('deleteConfirmModal').addEventListener('click', function(e) {
+  if (e.target === this) closeDeleteConfirm();
 });
 
 // ── Init ─────────────────────────────────────────────────────
