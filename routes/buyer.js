@@ -136,20 +136,20 @@ router.post('/api/bien/:slug/reserver', publicFormLimit, async (req, res) => {
 
   db.prepare(`
     INSERT INTO visits (property_id, seller_id, buyer_name, buyer_email, buyer_phone, visit_date, visit_time, status)
-    VALUES (?,?,?,?,?,?,?,'pending')
+    VALUES (?,?,?,?,?,?,?,'confirmed')
   `).run(property.id, property.seller_id, buyer_name, buyer_email, buyer_phone || '', visit_date, visit_time);
 
   const seller = db.prepare('SELECT email, phone, first_name FROM sellers WHERE id = ?').get(property.seller_id);
 
-  db.prepare("INSERT INTO notifications (seller_id, type, title, body) VALUES (?,'visit_request',?,?)")
-    .run(property.seller_id, 'Nouvelle demande de visite', `${buyer_name} — ${visit_date} à ${visit_time}`);
+  db.prepare("INSERT INTO notifications (seller_id, type, title, body) VALUES (?,'visit_confirmed',?,?)")
+    .run(property.seller_id, 'Nouvelle visite confirmée', `${buyer_name} — ${visit_date} à ${visit_time}`);
 
   try {
-    await sendVisitRequestReceived(buyer_email, buyer_name, property, visit_date, visit_time);
+    await sendVisitConfirmation(buyer_email, buyer_name, property, visit_date, visit_time, false);
     if (seller.email) await sendNewVisitRequest({ sellerEmail: seller.email, buyerName: buyer_name, visitDate: `${visit_date} à ${visit_time}`, notes: '' });
     if (seller.phone) {
       await sendSmsNotification(seller.phone,
-        `Nouvelle demande de visite sur votre bien.\nDate : ${visit_date} à ${visit_time}\nAcquéreur : ${buyer_name} — ${buyer_email}\nConnectez-vous pour confirmer.`
+        `📅 Visite confirmée !\n${visit_date} à ${visit_time}\nAcquéreur : ${buyer_name} — ${buyer_email}`
       );
     }
   } catch (e) {

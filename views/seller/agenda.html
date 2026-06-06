@@ -574,11 +574,11 @@
     <!-- Stats -->
     <!-- Stats -->
     <div class="agenda-stats">
-      <div class="stat-card-agenda urgent">
-        <div class="stat-icon" style="background:#fff8e1;">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#f57f17" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+      <div class="stat-card-agenda">
+        <div class="stat-icon" style="background:#f0f5ff;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#3d5a8a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
         </div>
-        <div><div class="stat-val" id="statPending">0</div><div class="stat-lbl">À confirmer</div></div>
+        <div><div class="stat-val" id="statPending">0</div><div class="stat-lbl">À venir</div></div>
       </div>
       <div class="stat-card-agenda">
         <div class="stat-icon" style="background:#e8f5e9;">
@@ -683,17 +683,6 @@
       <!-- ── Sidebar actions (droite) ──────────────────── -->
       <aside class="dash-sidebar">
 
-        <!-- URGENT: À confirmer -->
-        <div class="sidebar-section" id="pendingSection" style="display:none;">
-          <div class="sidebar-section-title urgent-title">
-            <span style="display:flex;align-items:center;gap:6px;">
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-              À confirmer
-            </span>
-            <span class="count-chip" id="pendingCountBadge">0</span>
-          </div>
-          <div class="sidebar-body" id="pendingList"></div>
-        </div>
 
         <!-- État vide visites (amélioré) -->
         <div id="visitsEmpty" style="display:none;">
@@ -763,8 +752,7 @@
       </div>
       <div class="notif-pills">
         <button class="notif-pill active" data-tab="all" onclick="notifSwitchTab('all')">Tout</button>
-        <button class="notif-pill" data-tab="pending" onclick="notifSwitchTab('pending')">À confirmer</button>
-        <button class="notif-pill" data-tab="confirmed" onclick="notifSwitchTab('confirmed')">Confirmées</button>
+        <button class="notif-pill" data-tab="confirmed" onclick="notifSwitchTab('confirmed')">Visites</button>
         <button class="notif-pill" data-tab="reminder" onclick="notifSwitchTab('reminder')">Rappels</button>
       </div>
       <div id="notif-content">
@@ -775,31 +763,6 @@
   </main>
 </div>
 <!-- ── Modal: Programmer une visite ── -->
-<div class="modal-overlay" id="confirmSmsOverlay">
-  <div class="modal confirm-sms-modal">
-    <div class="confirm-sms-check">
-      <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-    </div>
-    <div class="confirm-sms-title">Visite confirmée ✓</div>
-    <div class="confirm-sms-buyer" id="confirmSmsBuyer">
-      <div class="confirm-sms-buyer-avatar" id="confirmSmsBuyerAvatar"></div>
-      <div class="confirm-sms-buyer-info">
-        <div class="confirm-sms-buyer-name" id="confirmSmsBuyerName"></div>
-        <div id="confirmSmsBuyerPhone"></div>
-      </div>
-    </div>
-    <div class="confirm-sms-preview" id="confirmSmsText"></div>
-    <a class="confirm-sms-btn-sms" id="confirmSmsSendBtn" href="#">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.41a2 2 0 0 1 2-2.18h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
-      Envoyer le SMS
-    </a>
-    <button class="confirm-sms-copy" id="confirmSmsCopyBtn" onclick="copyConfirmSms(this)">
-      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:middle;margin-right:5px;"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>Copier le SMS
-    </button>
-    <button class="confirm-sms-close" onclick="closeModal('confirmSmsOverlay')">Fermer</button>
-  </div>
-</div>
-
 <!-- ── Modal: Rappel SMS ── -->
 <div class="modal-overlay" id="rappelSmsOverlay">
   <div class="modal confirm-sms-modal">
@@ -884,10 +847,10 @@ let _propertyAddress = '';
 // ── Stats ─────────────────────────────────────────────
 function updateStats() {
   const today = new Date().toISOString().split('T')[0];
-  const pending = allVisits.filter(v => v.status === 'pending');
+  const upcoming = allVisits.filter(v => v.status === 'confirmed' && v.visit_date >= today);
   const confirmed = allVisits.filter(v => v.status === 'confirmed');
   const todayV = allVisits.filter(v => v.visit_date === today && v.status !== 'cancelled');
-  document.getElementById('statPending').textContent = pending.length;
+  document.getElementById('statPending').textContent = upcoming.length;
   document.getElementById('statConfirmed').textContent = confirmed.length;
   document.getElementById('statToday').textContent = todayV.length;
 }
@@ -943,18 +906,13 @@ function buildVisitCardHtml(v) {
       <div class="visit-detail-row"><span class="visit-detail-icon">${svgClock}</span><strong>${v.visit_time||'—'}</strong></div>
       ${v.buyer_phone?`<div class="visit-detail-row"><span class="visit-detail-icon">${svgPhone}</span>${phoneLinkHtml}</div>`:''}
     </div>
-    ${v.status==='pending'?`
-    <div class="visit-actions">
-      <button class="btn-confirm" onclick="changeVisitStatus(${v.id},'confirmed')">✓ Confirmer la visite</button>
-      <button class="btn-refuse" onclick="changeVisitStatus(${v.id},'cancelled')">Refuser</button>
-    </div>`:''}
-    ${v.status!=='cancelled'&&v.buyer_phone?`
+    ${v.status!=='cancelled'?`
     <div style="display:flex;align-items:center;justify-content:space-between;margin-top:8px;gap:8px;flex-wrap:wrap;">
       <button class="btn-sms-reminder${v.reminder_sent?' sent':''}" id="btn-reminder-${v.id}" onclick="sendReminder(${v.id})">
-        ${svgPhone} ${v.reminder_sent?'Rappel copié':'Copier rappel SMS'}
+        ${svgPhone} ${v.reminder_sent?'Rappel copié':'Rappel SMS'}
       </button>
-      ${v.status==='confirmed'?`<button class="btn-cancel-sm" onclick="if(confirm('Annuler cette visite ?')) changeVisitStatus(${v.id},'cancelled')">Annuler</button>`:''}
-    </div>`:(v.status==='confirmed'?`<div style="display:flex;justify-content:flex-end;margin-top:8px;"><button class="btn-cancel-sm" onclick="if(confirm('Annuler cette visite ?')) changeVisitStatus(${v.id},'cancelled')">Annuler la visite</button></div>`:'')}
+      <button class="btn-cancel-sm" onclick="if(confirm('Annuler cette visite ?')) changeVisitStatus(${v.id},'cancelled')">Annuler</button>
+    </div>`:''}
     <div class="visit-notes-wrap">
       <textarea class="visit-notes-input" rows="2" placeholder="Notes post-visite…" id="notes-${v.id}" onblur="saveNotes(${v.id})">${v.notes||''}</textarea>
       <div class="visit-notes-saved" id="notes-saved-${v.id}">✓ Enregistré</div>
@@ -1027,30 +985,18 @@ function buildVisitCompact(v) {
 
 function renderVisits() {
   const today = new Date().toISOString().split('T')[0];
-  const pending = allVisits.filter(v => v.status==='pending').sort((a,b)=>(a.visit_date+a.visit_time).localeCompare(b.visit_date+b.visit_time));
   const upcoming = allVisits.filter(v => v.status==='confirmed' && v.visit_date>=today).sort((a,b)=>(a.visit_date+a.visit_time).localeCompare(b.visit_date+b.visit_time));
   const past = allVisits.filter(v => v.status==='cancelled'||v.status==='done'||(v.status==='confirmed'&&v.visit_date<today)).sort((a,b)=>b.visit_date.localeCompare(a.visit_date));
 
-  const pendingSection = document.getElementById('pendingSection');
   const upcomingSection = document.getElementById('upcomingSection');
   const pastSection = document.getElementById('pastSection');
   const emptyEl = document.getElementById('visitsEmpty');
-  const badge = document.getElementById('pendingCountBadge');
 
   if (!allVisits.length) {
-    pendingSection.style.display='none'; upcomingSection.style.display='none'; pastSection.style.display='none';
+    upcomingSection.style.display='none'; pastSection.style.display='none';
     emptyEl.style.display='block'; return;
   }
   emptyEl.style.display='none';
-
-  // Pending (urgent)
-  if (pending.length) {
-    pendingSection.style.display='block';
-    if (badge) badge.textContent=pending.length;
-    document.getElementById('pendingList').innerHTML = pending.map(buildVisitCompact).join('');
-  } else {
-    pendingSection.style.display='none';
-  }
 
   // Upcoming confirmed
   if (upcoming.length) {

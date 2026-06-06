@@ -639,7 +639,7 @@ router.post('/api/visits', requireAuth, express.json(), async (req, res) => {
   const { buyer_name, buyer_phone, buyer_email, visit_date, visit_time, notes } = req.body;
   if (!visit_date || !visit_time) return res.status(400).json({ error: 'Date et heure requises' });
   const result = db.prepare(
-    'INSERT INTO visits (property_id, seller_id, buyer_name, buyer_phone, buyer_email, visit_date, visit_time, status, notes) VALUES (?,?,?,?,?,?,?,\'pending\',?)'
+    'INSERT INTO visits (property_id, seller_id, buyer_name, buyer_phone, buyer_email, visit_date, visit_time, status, notes) VALUES (?,?,?,?,?,?,?,\'confirmed\',?)'
   ).run(property.id, req.seller.id, buyer_name || 'Acquéreur', buyer_phone || '', buyer_email || '', visit_date, visit_time, notes || '');
   db.prepare('INSERT INTO notifications (seller_id, type, title, body) VALUES (?,\'visit_request\',?,?)')
     .run(req.seller.id, 'Nouvelle visite programmée', `${buyer_name || 'Acquéreur'} — ${visit_date} à ${visit_time}`);

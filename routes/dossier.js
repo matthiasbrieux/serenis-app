@@ -78,21 +78,20 @@ router.post('/api/dossier/acheteur/:token/reserver', async (req, res) => {
     const conflict = db.prepare("SELECT id FROM visits WHERE property_id=? AND visit_date=? AND visit_time=? AND status != 'cancelled'").get(prop.id, visit_date, visit_time);
     if (conflict) return res.status(409).json({ error: 'Ce créneau est déjà pris. Choisissez un autre horaire.' });
 
-    db.prepare("INSERT INTO visits (property_id, seller_id, buyer_name, buyer_email, buyer_phone, visit_date, visit_time, status) VALUES (?,?,?,?,?,?,?,'pending')")
+    db.prepare("INSERT INTO visits (property_id, seller_id, buyer_name, buyer_email, buyer_phone, visit_date, visit_time, status) VALUES (?,?,?,?,?,?,?,'confirmed')")
       .run(prop.id, prop.seller_id, buyer_name, buyer_email, buyer_phone || '', visit_date, visit_time);
 
     db.prepare("INSERT INTO notifications (seller_id, type, title, body) VALUES (?,?,?,?)")
-      .run(prop.seller_id, 'visit_request', 'Nouvelle demande de visite', `${buyer_name} (${buyer_phone || buyer_email}) souhaite visiter le ${visit_date} à ${visit_time}`);
+      .run(prop.seller_id, 'visit_confirmed', 'Nouvelle visite confirmée', `${buyer_name} (${buyer_phone || buyer_email}) — ${visit_date} à ${visit_time}`);
 
     try {
-      const { sendVisitRequestReceived, sendNewVisitRequest } = require('../services/email');
-      await sendVisitRequestReceived(buyer_email, buyer_name, prop, visit_date, visit_time);
+      const { sendVisitConfirmation, sendNewVisitRequest } = require('../services/email');
+      await sendVisitConfirmation(buyer_email, buyer_name, prop, visit_date, visit_time, false);
       await sendNewVisitRequest({ sellerEmail: prop.seller_email, buyerName: buyer_name, visitDate: `${visit_date} à ${visit_time}`, notes: buyer_phone ? `📞 ${buyer_phone}` : buyer_email });
-      // SMS au vendeur avec le numéro de l'acheteur pour contact direct
       if (prop.seller_phone) {
         const { sendSmsNotification } = require('../services/twilio');
         await sendSmsNotification(prop.seller_phone,
-          `📅 Nouvelle visite programmée !\n${visit_date} à ${visit_time}\nAcheteur : ${buyer_name}\n📞 ${buyer_phone || 'non renseigné'}\n✉️ ${buyer_email}`
+          `📅 Visite confirmée !\n${visit_date} à ${visit_time}\nAcquéreur : ${buyer_name}\n📞 ${buyer_phone || 'non renseigné'}\n✉️ ${buyer_email}`
         ).catch(() => {});
       }
     } catch (e) {
