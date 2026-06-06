@@ -132,6 +132,23 @@
     .empty-tip { display:flex;align-items:flex-start;gap:12px;background:#fff;border-radius:10px;padding:12px 14px;font-size:0.82rem;color:#555;line-height:1.55; }
     .empty-tip-num { width:24px;height:24px;border-radius:50%;background:#3D5A47;color:#fff;font-size:0.7rem;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px; }
 
+    /* Modal SMS contre-proposition */
+    .sms-modal-overlay { position:fixed;inset:0;background:rgba(0,0,0,0.48);z-index:800;display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;pointer-events:none;transition:opacity 0.2s; }
+    .sms-modal-overlay.open { opacity:1;pointer-events:all; }
+    .sms-modal { background:#fff;border-radius:18px;padding:28px;width:100%;max-width:440px;transform:translateY(12px);transition:transform 0.2s;box-shadow:0 24px 60px rgba(0,0,0,0.22); }
+    .sms-modal-overlay.open .sms-modal { transform:translateY(0); }
+    .sms-modal-hdr { display:flex;align-items:center;gap:12px;margin-bottom:18px; }
+    .sms-modal-ico { width:42px;height:42px;border-radius:12px;background:#e8f5e9;display:flex;align-items:center;justify-content:center;flex-shrink:0; }
+    .sms-modal-title { font-size:1.05rem;font-weight:700;color:#1a1a1a;line-height:1.2; }
+    .sms-modal-sub { font-size:0.78rem;color:#888;margin-top:2px; }
+    .sms-modal-label { font-size:0.7rem;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;color:#aaa;margin-bottom:6px; }
+    .sms-modal-preview { background:#F5F0E8;border:1.5px solid #e0d8ce;border-radius:10px;padding:12px 14px;font-size:0.83rem;color:#444;line-height:1.6;margin-bottom:16px; }
+    .sms-modal-actions { display:flex;gap:10px; }
+    .sms-modal-btn-send { flex:1;padding:12px;background:#3D5A47;color:#fff;border:none;border-radius:10px;font-size:0.9rem;font-weight:700;cursor:pointer;font-family:inherit;text-decoration:none;display:flex;align-items:center;justify-content:center;gap:7px;transition:background 0.15s; }
+    .sms-modal-btn-send:hover { background:#2d4535; }
+    .sms-modal-btn-close { padding:12px 18px;background:#f5f0e8;color:#666;border:none;border-radius:10px;font-size:0.9rem;font-weight:600;cursor:pointer;font-family:inherit;transition:background 0.15s; }
+    .sms-modal-btn-close:hover { background:#e8e0d6; }
+
     /* Toast */
     .toast { position:fixed;bottom:24px;right:24px;background:#1a1a16;color:#fff;padding:12px 20px;border-radius:10px;font-size:0.88rem;z-index:9999;opacity:0;transform:translateY(8px);transition:all 0.3s;pointer-events:none; }
     .toast.show { opacity:1;transform:none; }
@@ -272,6 +289,30 @@
 
 <div class="toast" id="toast"></div>
 
+<!-- Modal SMS contre-proposition -->
+<div class="sms-modal-overlay" id="smsCounterModal">
+  <div class="sms-modal">
+    <div class="sms-modal-hdr">
+      <div class="sms-modal-ico">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#2e7d32" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+      </div>
+      <div>
+        <div class="sms-modal-title">Contre-proposition enregistrée</div>
+        <div class="sms-modal-sub" id="smsModalSub">Notifiez l'acquéreur par SMS</div>
+      </div>
+    </div>
+    <div class="sms-modal-label">Message prêt à envoyer</div>
+    <div class="sms-modal-preview" id="smsModalText"></div>
+    <div class="sms-modal-actions">
+      <a class="sms-modal-btn-send" id="smsModalBtn" href="#">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        Envoyer le SMS
+      </a>
+      <button class="sms-modal-btn-close" onclick="closeSmsModal()">Fermer</button>
+    </div>
+  </div>
+</div>
+
 <script src="/js/seller-nav.js"></script>
 <script>
 let allOffers = [];
@@ -400,7 +441,7 @@ function buildOfferCard(o, isActive) {
       <label>Votre contre-proposition</label>
       <div class="counter-input-row">
         <input type="number" class="counter-input" id="counter-val-${o.id}" placeholder="Ex: 285000" min="0" step="500">
-        <button class="btn-send-counter" onclick="sendCounter(${o.id})">Envoyer la contre-proposition</button>
+        <button class="btn-send-counter" onclick="sendCounter(${o.id})">Enregistrer ma contre-proposition</button>
       </div>
     </div>` : `
     <div class="offer-actions" style="gap:6px;">
@@ -464,15 +505,44 @@ async function sendCounter(id) {
       method:'POST', headers:{'Content-Type':'application/json'},
       body: JSON.stringify({ counter_amount: Number(val) })
     });
-    showToast('Contre-proposition envoyée');
-    // Update local state
     const o = allOffers.find(x => x.id === id);
     if (o) { o.status = 'countered'; o.counter_amount = Number(val); }
     renderOffers();
+    openSmsCounterModal(o, Number(val));
   } catch(e) {
-    showToast('Erreur lors de l\'envoi', 'error');
+    showToast('Erreur lors de l\'enregistrement', 'error');
   }
 }
+
+function openSmsCounterModal(offer, counterAmount) {
+  if (!offer) return;
+  const prenom = (offer.buyer_name || 'Madame, Monsieur').split(' ')[0];
+  const phone = offer.buyer_phone || '';
+  const originalFmt = formatPrice(offer.amount);
+  const counterFmt = formatPrice(counterAmount);
+  const smsText = `Bonjour ${prenom}, j'ai bien reçu votre offre de ${originalFmt}. Je vous fais une contre-proposition à ${counterFmt}. N'hésitez pas à me recontacter pour en discuter. Cordialement.`;
+  document.getElementById('smsModalText').textContent = smsText;
+  document.getElementById('smsModalSub').textContent = phone
+    ? `Notifiez ${offer.buyer_name || 'l\'acquéreur'} (${phone}) par SMS`
+    : `Notifiez ${offer.buyer_name || 'l\'acquéreur'} par SMS`;
+  const smsBtn = document.getElementById('smsModalBtn');
+  if (phone) {
+    smsBtn.href = `sms:${phone}?&body=${encodeURIComponent(smsText)}`;
+    smsBtn.style.opacity = '1';
+    smsBtn.style.pointerEvents = '';
+  } else {
+    smsBtn.href = `sms:?&body=${encodeURIComponent(smsText)}`;
+    smsBtn.style.opacity = '0.5';
+  }
+  document.getElementById('smsCounterModal').classList.add('open');
+}
+
+function closeSmsModal() {
+  document.getElementById('smsCounterModal').classList.remove('open');
+}
+document.getElementById('smsCounterModal').addEventListener('click', function(e) {
+  if (e.target === this) closeSmsModal();
+});
 
 async function setOfferStatus(id, status) {
   try {
