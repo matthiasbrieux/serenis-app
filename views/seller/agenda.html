@@ -1146,7 +1146,14 @@ function sendReminder(id) {
   const adresseText = _propertyAddress ? ` L'adresse de mon bien : ${_propertyAddress}.` : '';
   const sellerPrenom = (_data&&_data.seller&&_data.seller.first_name) || '';
   const signature = sellerPrenom ? ` ${sellerPrenom}` : '';
-  const smsText = `Bonjour ${prenom}, je vous rappelle notre visite prévue demain ${dateLabel} à ${time}.${adresseText} N'hésitez pas à me prévenir si vous avez un empêchement. À demain !${signature}`;
+  // Vérifier si la visite est vraiment demain
+  const _n2=new Date(); const _todayStr=`${_n2.getFullYear()}-${String(_n2.getMonth()+1).padStart(2,'0')}-${String(_n2.getDate()).padStart(2,'0')}`;
+  const _tomorrow=new Date(_n2); _tomorrow.setDate(_tomorrow.getDate()+1);
+  const _tomorrowStr=`${_tomorrow.getFullYear()}-${String(_tomorrow.getMonth()+1).padStart(2,'0')}-${String(_tomorrow.getDate()).padStart(2,'0')}`;
+  const isReallyTomorrow = v.visit_date === _tomorrowStr;
+  const smsText = isReallyTomorrow
+    ? `Bonjour ${prenom}, je vous rappelle notre visite prévue demain ${dateLabel} à ${time}.${adresseText} N'hésitez pas à me prévenir si vous avez un empêchement. À demain !${signature}`
+    : `Bonjour ${prenom}, je vous rappelle notre visite prévue le ${dateLabel} à ${time}.${adresseText} N'hésitez pas à me prévenir si vous avez un empêchement. À bientôt !${signature}`;
 
   document.getElementById('rappelSmsBuyerAvatar').textContent = initiales;
   document.getElementById('rappelSmsBuyerName').textContent = v.buyer_name || '—';
@@ -1220,7 +1227,7 @@ function renderCalendar() {
   const firstDay=new Date(year,month,1), lastDay=new Date(year,month+1,0);
   let startPad=firstDay.getDay(); startPad=startPad===0?6:startPad-1;
   const grid=document.getElementById('calGrid');
-  const today=new Date().toISOString().split('T')[0];
+  const _td=new Date(); const today=`${_td.getFullYear()}-${String(_td.getMonth()+1).padStart(2,'0')}-${String(_td.getDate()).padStart(2,'0')}`;
   let html='';
   for(let i=0;i<startPad;i++) html+=`<div class="cal-cell cal-empty"></div>`;
   // Dates J-1 (veille d'une visite confirmée)
@@ -1271,13 +1278,17 @@ function renderDayDetail(dateStr) {
   // Vérifier si c'est la veille d'une visite
   const nextDay = new Date(dateStr + 'T12:00:00');
   nextDay.setDate(nextDay.getDate() + 1);
-  const nextDateStr = nextDay.toISOString().split('T')[0];
+  const nextDateStr = `${nextDay.getFullYear()}-${String(nextDay.getMonth()+1).padStart(2,'0')}-${String(nextDay.getDate()).padStart(2,'0')}`;
   const nextVisits = allVisits.filter(v => v.visit_date === nextDateStr && v.status === 'confirmed');
 
   const JOURS = ['dimanche','lundi','mardi','mercredi','jeudi','vendredi','samedi'];
   const MOIS = ['janvier','février','mars','avril','mai','juin','juillet','août','septembre','octobre','novembre','décembre'];
   const d = new Date(dateStr + 'T12:00:00');
   const dateLabel = `${JOURS[d.getDay()]} ${d.getDate()} ${MOIS[d.getMonth()]}`;
+
+  // today (timezone-safe)
+  const _n=new Date(); const todayStr=`${_n.getFullYear()}-${String(_n.getMonth()+1).padStart(2,'0')}-${String(_n.getDate()).padStart(2,'0')}`;
+  const isClickedToday = dateStr === todayStr;
 
   if (!dayVisits.length && !nextVisits.length) { el.style.display='none'; return; }
   el.style.display = 'block';
@@ -1312,20 +1323,26 @@ function renderDayDetail(dateStr) {
     const nextD = new Date(nextDateStr + 'T12:00:00');
     const nextLabel = `${JOURS[nextD.getDay()]} ${nextD.getDate()} ${MOIS[nextD.getMonth()]}`;
     const time = v.visit_time ? v.visit_time.slice(0,5).replace(':','h') : '—';
+    const rappelHeader = isClickedToday ? '🔔 Rappel à envoyer aujourd\'hui' : `🔔 Rappel à envoyer le ${dateLabel}`;
+    const visiteLine = isClickedToday ? `Visite demain ${nextLabel} à ${time}` : `Visite le ${nextLabel} à ${time}`;
+    const rappelMsg = isClickedToday
+      ? `Envoyez un rappel SMS à <strong>${prenom}</strong> pour lui confirmer la visite de demain.`
+      : `Envoyez ce rappel SMS à <strong>${prenom}</strong> la veille de la visite (le ${dateLabel}).`;
+    const btnLabel = isClickedToday ? `Rappeler la visite de demain à ${prenom}` : `Préparer le rappel SMS pour ${prenom}`;
     html += `
     <div class="cal-detail-card type-eve">
-      <div class="cal-detail-date">🔔 Rappel à envoyer aujourd'hui</div>
+      <div class="cal-detail-date">${rappelHeader}</div>
       <div class="cal-detail-visit">
         <div class="cal-detail-avatar" style="background:linear-gradient(135deg,#b45309,#C4785A);">${ini}</div>
         <div>
           <div class="cal-detail-name">${v.buyer_name || 'Acquéreur'}</div>
-          <div class="cal-detail-time">Visite demain ${nextLabel} à ${time}</div>
+          <div class="cal-detail-time">${visiteLine}</div>
         </div>
       </div>
-      <div class="cal-detail-msg">Envoyez un rappel SMS à <strong>${prenom}</strong> pour lui confirmer la visite de demain.</div>
+      <div class="cal-detail-msg">${rappelMsg}</div>
       <button class="cal-detail-btn btn-orange" onclick="sendReminder(${v.id})">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.41a2 2 0 0 1 2-2.18h3a2 2 0 0 1 2 1.72 12.13 12.13 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.13 12.13 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
-        Rappeler la visite de demain à ${prenom}
+        ${btnLabel}
       </button>
     </div>`;
   });
