@@ -711,7 +711,7 @@ function buildCalendar() {
   let html = DAY_NAMES.map(n => `<div class="cal-day-name">${n}</div>`).join('');
   for (let i = 0; i < 28; i++) {
     const d = new Date(start); d.setDate(start.getDate() + i);
-    const dateStr = d.toISOString().split('T')[0];
+    const dateStr = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
     const isPast = d < today;
     const slots = isPast ? [] : getTimeSlotsForDay(dateStr);
     const hasSlots = slots.length > 0;
