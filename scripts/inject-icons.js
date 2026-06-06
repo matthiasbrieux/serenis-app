@@ -5,9 +5,9 @@ const path = require('path');
 const ROOT = path.join(__dirname, '..');
 
 // Canonical block to inject (after <meta charset> or first <meta>)
-const ICON_BLOCK = `  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png"/>
+const ICON_BLOCK = `  <link rel="icon" href="/favicon.ico" sizes="any"/>
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png"/>
   <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16.png"/>
-  <link rel="shortcut icon" href="/favicon.ico"/>
   <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"/>
   <link rel="manifest" href="/manifest.json"/>
   <meta name="theme-color" content="#3D5A47"/>
