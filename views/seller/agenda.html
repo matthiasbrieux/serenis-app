@@ -175,13 +175,19 @@
     .cal-cell.cal-today { border-color:#3D5A47; color:#3D5A47; font-weight:700; }
     .cal-cell.cal-selected { background:#3D5A47; color:#fff; border-color:#3D5A47; }
     .cal-cell.cal-empty { cursor:default; }
+    /* Jours avec visite confirmée */
+    .cal-has-confirmed { background:#2e7d32 !important; border-color:#2e7d32 !important; color:#fff !important; font-weight:800; border-radius:10px; }
+    .cal-has-confirmed:hover { background:#256628 !important; }
+    .cal-has-confirmed.cal-selected { background:#1a4d1e !important; border-color:#1a4d1e !important; }
+    .cal-visit-time { display:block; font-size:0.58rem; font-weight:700; opacity:0.92; margin-top:1px; letter-spacing:0.01em; }
+    /* Jours J-1 (veille d'une visite confirmée) */
+    .cal-has-eve { background:#fff3e0 !important; border-color:#fb8c00 !important; border-width:2px !important; color:#e65100 !important; font-weight:700; border-radius:10px; }
+    .cal-has-eve:hover { background:#ffe0b2 !important; }
+    .cal-eve-dot { display:block; font-size:0.6rem; margin-top:1px; opacity:0.85; }
+    /* Jours avec visite en attente */
+    .cal-has-pending { background:#fff8e1; border-color:#f57f17 !important; font-weight:700; }
     .cal-visit-bar { position:absolute; bottom:3px; left:20%; right:20%; height:3px; border-radius:2px; }
-    .cal-visit-bar.confirmed { background:#2e7d32; }
     .cal-visit-bar.pending { background:#f57f17; }
-    .cal-has-confirmed { background:#f0f8f2; border-color:#b8d8c2 !important; font-weight:700; }
-    .cal-has-confirmed.cal-selected { background:#2e7d32; border-color:#2e7d32 !important; color:#fff; }
-    .cal-has-pending { background:#fff8e1; }
-    .cal-has-confirmed .cal-visit-bar.confirmed { height:4px; background:linear-gradient(90deg,#2e7d32,#4CAF50); }
     .day-detail { background:#fff; border-radius:14px; border:1px solid #e8e0d6; padding:20px; }
     .day-detail-title { font-size:0.78rem; font-weight:700; text-transform:uppercase; letter-spacing:0.07em; color:#888; margin-bottom:14px; }
     .day-slot { display:flex; align-items:center; gap:12px; padding:10px 0; border-bottom:1px solid #f0ebe4; }
@@ -804,6 +810,7 @@ let allVisits = [];
 let calDate = new Date();
 let calSelected = null;
 let _mcAcheteurUrl = '';
+let _propertyAddress = '';
 
 // ── Tabs ──────────────────────────────────────────────
 // Tabs supprimés — tout est sur une seule page
@@ -897,8 +904,14 @@ function buildVisitConfirmedCard(v) {
   const dayNum = dy ? String(Number(dy)) : '—';
   const time = v.visit_time ? v.visit_time.slice(0,5) : '—';
   const svgPhone = `<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.41a2 2 0 0 1 2-2.18h3a2 2 0 0 1 2 1.72 12.13 12.13 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.13 12.13 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>`;
-  const smsClass = v.reminder_sent ? 'vcc-sms sent' : 'vcc-sms';
-  const smsLabel = v.reminder_sent ? '✓ Rappel envoyé' : `${svgPhone} Rappel SMS`;
+  // Construire le texte SMS de rappel
+  const JOURS_LONG=['dimanche','lundi','mardi','mercredi','jeudi','vendredi','samedi'];
+  const MOIS_LONG=['janvier','février','mars','avril','mai','juin','juillet','août','septembre','octobre','novembre','décembre'];
+  const dateLabel = d ? `${JOURS_LONG[d.getDay()]} ${Number(dy)} ${MOIS_LONG[d.getMonth()]}` : v.visit_date;
+  const prenom = (v.buyer_name||'').split(' ')[0] || 'Madame/Monsieur';
+  const adresseText = _propertyAddress ? ` Voici l'adresse de mon bien : ${_propertyAddress}.` : '';
+  const smsRappelText = `Bonjour ${prenom}, je vous rappelle notre visite prévue pour le ${dateLabel} à ${time}. N'hésitez pas à me prévenir si vous avez un empêchement.${adresseText}`;
+
   return `<div class="visit-confirmed-card" id="vcard-${v.id}">
     <div class="vcc-top">
       <div class="vcc-cal">
@@ -913,8 +926,14 @@ function buildVisitConfirmedCard(v) {
       </div>
     </div>
     <div class="vcc-actions">
-      ${v.buyer_phone?`<button class="${smsClass}" id="btn-reminder-${v.id}" onclick="sendReminder(${v.id})">${smsLabel}</button>`:''}
+      <button class="vcc-sms" onclick="copySmsRappel(this, ${v.id}, ${JSON.stringify(smsRappelText).replace(/'/g,"&apos;")})">
+        ${svgPhone} Rappel SMS
+      </button>
       <button class="vcc-cancel" onclick="if(confirm('Annuler cette visite ?')) changeVisitStatus(${v.id},'cancelled')">Annuler</button>
+    </div>
+    <div class="vcc-sms-panel" id="sms-panel-${v.id}" style="display:none;margin-top:10px;background:#f5f0e8;border-radius:8px;padding:10px 12px;">
+      <div style="font-size:0.76rem;color:#555;line-height:1.6;margin-bottom:8px;" id="sms-text-${v.id}">${smsRappelText}</div>
+      <button onclick="docopySmsRappel(${v.id})" style="width:100%;padding:8px;background:#3D5A47;color:#fff;border:none;border-radius:7px;font-size:0.8rem;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;" id="sms-copy-btn-${v.id}">Copier ce SMS</button>
     </div>
   </div>`;
 }
@@ -1000,6 +1019,26 @@ async function changeVisitStatus(id, status) {
   } catch(e) { showToast('Erreur réseau','error'); }
 }
 
+function copySmsRappel(btn, id, text) {
+  const panel = document.getElementById('sms-panel-'+id);
+  if (!panel) return;
+  const isOpen = panel.style.display !== 'none';
+  panel.style.display = isOpen ? 'none' : 'block';
+  btn.innerHTML = isOpen
+    ? `<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.41a2 2 0 0 1 2-2.18h3a2 2 0 0 1 2 1.72 12.13 12.13 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.13 12.13 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg> Rappel SMS`
+    : '✕ Fermer';
+}
+
+function docopySmsRappel(id) {
+  const text = document.getElementById('sms-text-'+id)?.textContent;
+  if (!text) return;
+  navigator.clipboard.writeText(text).then(() => {
+    const btn = document.getElementById('sms-copy-btn-'+id);
+    if (btn) { btn.textContent = '✓ Copié !'; btn.style.background='#2e7d32'; setTimeout(()=>{ btn.textContent='Copier ce SMS'; btn.style.background=''; },2500); }
+    showToast('SMS copié — collez-le dans votre messagerie');
+  });
+}
+
 async function sendReminder(id) {
   const btn = document.getElementById('btn-reminder-'+id);
   if (btn) { btn.disabled=true; btn.textContent='Envoi…'; }
@@ -1047,6 +1086,14 @@ function renderCalendar() {
   const today=new Date().toISOString().split('T')[0];
   let html='';
   for(let i=0;i<startPad;i++) html+=`<div class="cal-cell cal-empty"></div>`;
+  // Dates J-1 (veille d'une visite confirmée)
+  const eveDates = new Set(
+    allVisits.filter(v=>v.status==='confirmed').map(v=>{
+      const [vy,vm,vd]=v.visit_date.split('-');
+      const eve=new Date(Number(vy),Number(vm)-1,Number(vd)-1);
+      return `${eve.getFullYear()}-${String(eve.getMonth()+1).padStart(2,'0')}-${String(eve.getDate()).padStart(2,'0')}`;
+    })
+  );
   for(let d=1;d<=lastDay.getDate();d++) {
     const dateStr=`${year}-${String(month+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
     const dayVisits=allVisits.filter(v=>v.visit_date===dateStr);
@@ -1055,14 +1102,20 @@ function renderCalendar() {
     if (calSelected===dateStr) cls+=' cal-selected';
     const hasConfirmed = dayVisits.some(v=>v.status==='confirmed');
     const hasPending = dayVisits.some(v=>v.status==='pending');
+    const isEve = eveDates.has(dateStr) && !hasConfirmed;
     if (hasConfirmed) cls+=' cal-has-confirmed';
+    else if (isEve) cls+=' cal-has-eve';
     else if (hasPending) cls+=' cal-has-pending';
-    const dot = hasConfirmed
-      ? `<div class="cal-visit-bar confirmed"></div>`
-      : hasPending
-        ? `<div class="cal-visit-bar pending"></div>`
-        : '';
-    html+=`<div class="${cls}" onclick="selectCalDay('${dateStr}')">${d}${dot}</div>`;
+    let inner = String(d);
+    if (hasConfirmed) {
+      const time = dayVisits.find(v=>v.status==='confirmed')?.visit_time?.slice(0,5)||'';
+      inner += time ? `<span class="cal-visit-time">${time}</span>` : '';
+    } else if (isEve) {
+      inner += `<span class="cal-eve-dot">rappel</span>`;
+    } else if (hasPending) {
+      inner += `<div class="cal-visit-bar pending"></div>`;
+    }
+    html+=`<div class="${cls}" onclick="selectCalDay('${dateStr}')">${inner}</div>`;
   }
   grid.innerHTML=html;
   if (calSelected) renderDayDetail(calSelected);
@@ -1478,6 +1531,9 @@ async function loadData() {
     if (_data.property?.acheteur_token) {
       _mcAcheteurUrl=window.location.origin+'/dossier/acheteur/'+_data.property.acheteur_token;
     }
+    // Adresse du bien pour le SMS de rappel
+    const p = _data.property || {};
+    _propertyAddress = [p.address, p.city].filter(Boolean).join(', ') || p.city || '';
 
     // Sidebar pack
     const packEl=document.getElementById('sidebarPack');
