@@ -8,62 +8,102 @@
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/css/style.css">
   <style>
+    *, *::before, *::after { box-sizing: border-box; }
+
+    /* ── Grid ── */
     .platforms-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 20px;
+      gap: 18px;
       margin-top: 24px;
     }
-    @media (max-width: 700px) {
+    @media (max-width: 720px) {
       .platforms-grid { grid-template-columns: 1fr; }
     }
+
+    /* ── Platform Card ── */
     .platform-card {
-      background: var(--blanc);
+      background: #fff;
       border: 1.5px solid #e0d8cc;
-      border-radius: 14px;
-      padding: 20px 22px;
-      transition: box-shadow 0.2s;
+      border-radius: 16px;
+      overflow: hidden;
+      transition: box-shadow 0.2s, border-color 0.2s;
+      display: flex;
+      flex-direction: column;
     }
     .platform-card:hover {
-      box-shadow: 0 4px 18px rgba(61,90,71,0.08);
+      box-shadow: 0 4px 20px rgba(61,90,71,0.09);
     }
     .platform-card.is-active {
       border-color: #3D5A47;
+      box-shadow: 0 0 0 1px #3D5A47;
     }
+
+    /* Card top accent bar */
+    .platform-card-accent {
+      height: 3px;
+      width: 100%;
+    }
+
+    /* Card body */
+    .platform-card-body {
+      padding: 20px 22px 16px;
+      flex: 1;
+    }
+
+    /* Header row */
     .platform-header {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      margin-bottom: 16px;
+      margin-bottom: 14px;
+      gap: 8px;
     }
     .platform-identity {
       display: flex;
       align-items: center;
       gap: 10px;
+      min-width: 0;
     }
     .platform-logo {
-      font-size: 1.5rem;
-      line-height: 1;
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.75rem;
+      font-weight: 800;
+      color: #fff;
+      flex-shrink: 0;
     }
     .platform-name {
-      font-weight: 600;
-      font-size: 0.95rem;
+      font-weight: 700;
+      font-size: 0.97rem;
+      color: #1a1a1a;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
+
+    /* Status badge */
     .platform-badge {
       display: inline-flex;
       align-items: center;
       gap: 5px;
-      padding: 3px 10px;
+      padding: 4px 12px;
       border-radius: 20px;
       font-size: 0.75rem;
-      font-weight: 600;
+      font-weight: 700;
+      white-space: nowrap;
+      flex-shrink: 0;
     }
-    .platform-badge.active {
+    .platform-badge.published {
       background: #e8f5e9;
       color: #2e7d32;
     }
-    .platform-badge.inactive {
-      background: #f0f0f0;
+    .platform-badge.unpublished {
+      background: #f5f5f5;
       color: #888;
     }
     .badge-dot {
@@ -71,14 +111,62 @@
       height: 7px;
       border-radius: 50%;
       background: currentColor;
+      flex-shrink: 0;
     }
     .badge-dot.pulsing {
       animation: badgePulse 1.8s ease-in-out infinite;
     }
     @keyframes badgePulse {
       0%, 100% { opacity: 1; transform: scale(1); }
-      50% { opacity: 0.4; transform: scale(0.7); }
+      50%       { opacity: 0.35; transform: scale(0.65); }
     }
+
+    /* Stats row (views etc.) */
+    .platform-stats {
+      display: flex;
+      gap: 16px;
+      margin-bottom: 14px;
+    }
+    .platform-stat {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+    .platform-stat-n {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: #3D5A47;
+      line-height: 1;
+    }
+    .platform-stat-l {
+      font-size: 0.7rem;
+      color: #aaa;
+    }
+
+    /* View link prominent */
+    .platform-view-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 16px;
+      background: #F5F0E8;
+      border: 1.5px solid #e0d8cc;
+      border-radius: 8px;
+      color: #3D5A47;
+      font-size: 0.82rem;
+      font-weight: 600;
+      text-decoration: none;
+      transition: all 0.15s;
+      margin-bottom: 14px;
+    }
+    .platform-view-link:hover {
+      background: #3D5A47;
+      border-color: #3D5A47;
+      color: #fff;
+    }
+
+    /* Toggle row */
     .platform-toggle-row {
       display: flex;
       align-items: center;
@@ -86,27 +174,26 @@
       margin-bottom: 14px;
     }
     .platform-toggle-label {
-      font-size: 0.85rem;
+      font-size: 0.84rem;
       color: #555;
     }
     .toggle-switch-pub {
-      width: 40px;
-      height: 22px;
-      border-radius: 11px;
+      width: 42px;
+      height: 24px;
+      border-radius: 12px;
       background: #ddd;
       position: relative;
       cursor: pointer;
       transition: background 0.2s;
       flex-shrink: 0;
+      min-width: 42px;
     }
-    .toggle-switch-pub.on {
-      background: #3D5A47;
-    }
+    .toggle-switch-pub.on { background: #3D5A47; }
     .toggle-switch-pub::after {
       content: '';
       position: absolute;
-      top: 3px;
-      left: 3px;
+      top: 4px;
+      left: 4px;
       width: 16px;
       height: 16px;
       border-radius: 50%;
@@ -114,16 +201,16 @@
       transition: transform 0.2s;
       box-shadow: 0 1px 3px rgba(0,0,0,0.2);
     }
-    .toggle-switch-pub.on::after {
-      transform: translateX(18px);
-    }
+    .toggle-switch-pub.on::after { transform: translateX(18px); }
+
+    /* Fields */
     .platform-field {
       margin-bottom: 12px;
     }
     .platform-field label {
       display: block;
-      font-size: 0.78rem;
-      font-weight: 600;
+      font-size: 0.75rem;
+      font-weight: 700;
       color: #888;
       text-transform: uppercase;
       letter-spacing: 0.05em;
@@ -131,38 +218,32 @@
     }
     .platform-field input {
       width: 100%;
-      padding: 9px 12px;
+      padding: 10px 12px;
       border: 1.5px solid #e0d8cc;
       border-radius: 8px;
       font-family: 'DM Sans', sans-serif;
       font-size: 0.88rem;
-      background: var(--blanc);
+      background: #fff;
       color: #333;
-      box-sizing: border-box;
       transition: border-color 0.15s;
+      min-height: 44px;
     }
     .platform-field input:focus {
       outline: none;
       border-color: #3D5A47;
     }
-    .platform-link {
-      font-size: 0.8rem;
-      color: var(--terracotta);
-      text-decoration: none;
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
-      margin-top: 4px;
-    }
-    .platform-link:hover { text-decoration: underline; }
-    .platform-actions {
+
+    /* Card footer */
+    .platform-card-footer {
+      border-top: 1px solid #f0ece6;
+      background: #FAFAF8;
+      padding: 12px 22px;
       display: flex;
       align-items: center;
       gap: 10px;
-      margin-top: 16px;
     }
     .btn-save-platform {
-      padding: 8px 20px;
+      padding: 9px 20px;
       background: #3D5A47;
       color: #fff;
       border: none;
@@ -172,8 +253,9 @@
       font-weight: 600;
       cursor: pointer;
       transition: opacity 0.15s, transform 0.15s;
+      min-height: 44px;
     }
-    .btn-save-platform:hover { opacity: 0.9; transform: translateY(-1px); }
+    .btn-save-platform:hover { opacity: 0.88; transform: translateY(-1px); }
     .btn-save-platform:active { transform: none; }
     .save-feedback {
       font-size: 0.8rem;
@@ -181,54 +263,141 @@
       font-weight: 600;
       opacity: 0;
       transition: opacity 0.3s;
+      display: flex;
+      align-items: center;
+      gap: 5px;
     }
     .save-feedback.show { opacity: 1; }
-    .intro-card {
-      background: var(--vert-pale, #D4E4D8);
-      border-radius: 12px;
-      padding: 18px 22px;
-      margin-bottom: 8px;
-      display: flex;
-      gap: 14px;
-      align-items: flex-start;
+
+    /* Guide accordéon */
+    .platform-guide {
+      border-top: 1px solid #f0ece6;
+      overflow: hidden;
     }
-    .intro-card-icon { font-size: 1.4rem; flex-shrink: 0; margin-top: 2px; }
-    .intro-card-text { font-size: 0.88rem; color: #2a4030; line-height: 1.6; }
+    .platform-guide-toggle {
+      width: 100%;
+      background: none;
+      border: none;
+      padding: 11px 22px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      cursor: pointer;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: #C4785A;
+      transition: background 0.15s;
+    }
+    .platform-guide-toggle:hover { background: #FDF5F1; }
+    .platform-guide-toggle-icon {
+      transition: transform 0.2s;
+    }
+    .platform-guide-toggle.open .platform-guide-toggle-icon {
+      transform: rotate(180deg);
+    }
+    .platform-guide-body {
+      display: none;
+      padding: 4px 22px 16px;
+      background: #FDF5F1;
+    }
+    .platform-guide-body.open {
+      display: block;
+      animation: slideDown 0.2s ease;
+    }
+    @keyframes slideDown {
+      from { opacity:0; transform:translateY(-6px); }
+      to   { opacity:1; transform:none; }
+    }
+    .guide-step {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      padding: 8px 0;
+      font-size: 0.82rem;
+      color: #555;
+      line-height: 1.55;
+    }
+    .guide-step + .guide-step {
+      border-top: 1px solid rgba(196,120,90,0.12);
+    }
+    .guide-step-num {
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: #C4785A;
+      color: #fff;
+      font-size: 0.68rem;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+
+    /* Header */
+    .page-header-row {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 8px;
+      flex-wrap: wrap;
+    }
     .active-count-badge {
       display: inline-flex;
       align-items: center;
       gap: 6px;
       background: #3D5A47;
       color: #fff;
-      padding: 4px 14px;
+      padding: 5px 14px;
       border-radius: 20px;
       font-size: 0.82rem;
       font-weight: 600;
-      margin-left: 12px;
     }
+
+    /* Intro card */
+    .intro-card {
+      background: #D4E4D8;
+      border-radius: 12px;
+      padding: 16px 20px;
+      margin-bottom: 4px;
+      display: flex;
+      gap: 14px;
+      align-items: flex-start;
+    }
+    .intro-card-icon { font-size: 1.2rem; flex-shrink: 0; margin-top: 2px; }
+    .intro-card-text { font-size: 0.86rem; color: #2a4030; line-height: 1.6; }
+
+    /* Section CTA */
     .section-cta {
-      margin-top: 32px;
-      padding: 18px 22px;
-      background: var(--creme, #F5F0E8);
+      margin-top: 28px;
+      padding: 16px 20px;
+      background: #F5F0E8;
       border-radius: 12px;
       display: flex;
       align-items: center;
       justify-content: space-between;
       flex-wrap: wrap;
-      gap: 12px;
+      gap: 10px;
+      border: 1px solid #e8e3db;
     }
-    .section-cta p {
-      font-size: 0.88rem;
-      color: #555;
-      margin: 0;
-    }
-    .section-cta a {
-      color: var(--terracotta, #C4785A);
-      font-weight: 600;
-      text-decoration: none;
-      font-size: 0.9rem;
-    }
+    .section-cta p { font-size: 0.86rem; color: #555; margin: 0; }
+    .section-cta a { color: #C4785A; font-weight: 600; text-decoration: none; font-size: 0.88rem; }
     .section-cta a:hover { text-decoration: underline; }
+
+    /* Toast */
+    .toast { position:fixed;bottom:24px;right:24px;background:#1a1a16;color:#fff;padding:12px 20px;border-radius:10px;font-size:0.88rem;z-index:9999;opacity:0;transform:translateY(8px);transition:all 0.3s;pointer-events:none; }
+    .toast.show { opacity:1;transform:none; }
+    .toast.error { background:#dc2626; }
+
+    @media (max-width: 480px) {
+      .platform-card-body { padding: 16px 16px 12px; }
+      .platform-card-footer { padding: 10px 16px; }
+      .platform-guide-toggle { padding: 10px 16px; }
+      .platform-guide-body { padding: 4px 16px 14px; }
+    }
   </style>
 </head>
 <body>
@@ -256,7 +425,8 @@
       </a>
       <a href="/mon-guide-photos" class="sidebar-item">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg> Guide photos
-      </a>      <a href="/mon-agenda" class="sidebar-item">
+      </a>
+      <a href="/mon-agenda" class="sidebar-item">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg> Mon agenda
       </a>
       <a href="/ma-bibliotheque" class="sidebar-item">
@@ -266,7 +436,7 @@
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.55a11 11 0 0 1 14.08 0"/><path d="M1.42 9a16 16 0 0 1 21.16 0"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><circle cx="12" cy="20" r="1"/></svg> Mes publications
       </a>
       <a href="/coach-ia" class="sidebar-item">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/><circle cx="9" cy="10" r="1" fill="currentColor"/><circle cx="12" cy="10" r="1" fill="currentColor"/><circle cx="15" cy="10" r="1" fill="currentColor"/></svg>Coach IA
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/><circle cx="9" cy="10" r="1" fill="currentColor"/><circle cx="12" cy="10" r="1" fill="currentColor"/><circle cx="15" cy="10" r="1" fill="currentColor"/></svg> Coach IA
       </a>
     </nav>
     <div style="position:absolute;bottom:24px;left:0;right:0;padding:0 24px;">
@@ -275,87 +445,188 @@
   </aside>
 
   <main class="main-content">
-    <div class="page-header">
-      <h1>Mes publications <span id="activeCountBadge" class="active-count-badge" style="display:none">Actif sur 0 plateforme(s)</span></h1>
-      <p>Gérez vos annonces sur toutes les plateformes</p>
+    <div class="page-header-row">
+      <div>
+        <h1 class="page-title" style="margin-bottom:4px;">Mes publications <span id="activeCountBadge" class="active-count-badge" style="display:none;vertical-align:middle;margin-left:8px;">0 active</span></h1>
+        <p class="page-subtitle" style="margin:0;">Gérez vos annonces sur toutes les plateformes</p>
+      </div>
     </div>
 
-    <div class="intro-card">
-      <div class="intro-card-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><line x1="9" y1="18" x2="15" y2="18"/><line x1="10" y1="22" x2="14" y2="22"/><path d="M15.09 14c.18-.98.65-1.74 1.41-2.5A4.65 4.65 0 0 0 18 8 6 6 0 0 0 6 8c0 1 .23 2.23 1.5 3.5A4.61 4.61 0 0 1 8.91 14"/></svg></div>
+    <div class="intro-card" style="margin-top:16px;">
+      <div class="intro-card-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><line x1="9" y1="18" x2="15" y2="18"/><line x1="10" y1="22" x2="14" y2="22"/><path d="M15.09 14c.18-.98.65-1.74 1.41-2.5A4.65 4.65 0 0 0 18 8 6 6 0 0 0 6 8c0 1 .23 2.23 1.5 3.5A4.61 4.61 0 0 1 8.91 14"/></svg></div>
       <div class="intro-card-text">
-        <strong>Vous publiez vous-même vos annonces.</strong> Vendu Par Moi génère votre texte d'annonce optimisé — copiez-le depuis <a href="/mon-bien" style="color:#3D5A47;font-weight:600;">Mon bien</a> et collez-le sur chaque plateforme. Indiquez ici les URLs de vos annonces pour suivre leur statut.
+        <strong>Vous publiez vous-même vos annonces.</strong> Copiez votre texte depuis <a href="/mon-bien" style="color:#3D5A47;font-weight:600;">Mon bien</a>, collez-le sur chaque plateforme, puis renseignez ici l'URL et la date pour suivre votre diffusion. Les guides étape par étape sont disponibles pour chaque plateforme.
       </div>
     </div>
 
     <div class="platforms-grid" id="platformsGrid">
-      <!-- Cards injectées par JS -->
+      <!-- Cartes injectées par JS -->
     </div>
 
     <div class="section-cta">
-      <p>Vous n'avez pas encore rédigé votre texte d'annonce ?</p>
+      <p>Votre texte d'annonce n'est pas encore rédigé ?</p>
       <a href="/mon-bien">Générer mon texte avec l'IA dans "Mon bien" →</a>
     </div>
   </main>
 </div>
 
+<div class="toast" id="toast"></div>
+
 <script>
 const PLATFORMS = [
-  { key: 'leboncoin',  name: 'LeBonCoin',           color: '#F56B2A', logo: '<span style="display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:6px;background:#F56B2A;color:#fff;font-size:0.7rem;font-weight:800;">L</span>', hint: 'leboncoin.fr/annonces/offres/...' },
-  { key: 'pap',        name: 'PAP.fr',               color: '#003478', logo: '<span style="display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:6px;background:#003478;color:#fff;font-size:0.7rem;font-weight:800;">P</span>', hint: 'pap.fr/annonce/...' },
-  { key: 'seloger',    name: 'SeLoger',              color: '#e30613', logo: '<span style="display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:6px;background:#e30613;color:#fff;font-size:0.7rem;font-weight:800;">S</span>', hint: 'seloger.com/annonces/...' },
-  { key: 'bienici',    name: "Bien'ici",             color: '#00B4FF', logo: '<span style="display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:6px;background:#00B4FF;color:#fff;font-size:0.7rem;font-weight:800;">B</span>', hint: 'bienici.com/annonce/...' },
-  { key: 'facebook',   name: 'Facebook Marketplace', color: '#1877F2', logo: '<span style="display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:6px;background:#1877F2;color:#fff;font-size:0.7rem;font-weight:800;">F</span>', hint: 'facebook.com/marketplace/item/...' },
-  { key: 'other',      name: 'Autre plateforme',     color: '#888',    logo: '<span style="display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:6px;background:#888;color:#fff;font-size:0.7rem;font-weight:800;">+</span>', hint: "URL de votre annonce" },
+  {
+    key: 'leboncoin', name: 'LeBonCoin', color: '#F56B2A',
+    hint: 'leboncoin.fr/annonces/offres/...',
+    guide: [
+      { step: 'Allez sur leboncoin.fr, cliquez sur "Déposer une annonce" puis sélectionnez "Immobilier > Vente".' },
+      { step: 'Collez votre texte d\'annonce généré dans "Mon bien", ajoutez vos photos et renseignez le prix.' },
+      { step: 'Une fois publiée, copiez l\'URL de votre annonce et collez-la dans le champ ci-dessus.' },
+    ]
+  },
+  {
+    key: 'pap', name: 'PAP.fr', color: '#003478',
+    hint: 'pap.fr/annonce/...',
+    guide: [
+      { step: 'Rendez-vous sur pap.fr et créez un compte vendeur particulier (gratuit).' },
+      { step: 'Cliquez sur "Déposer une annonce", choisissez "Vente", et collez votre texte optimisé.' },
+      { step: 'Après publication, récupérez l\'URL et renseignez-la ici pour suivre votre annonce.' },
+    ]
+  },
+  {
+    key: 'seloger', name: 'SeLoger', color: '#e30613',
+    hint: 'seloger.com/annonces/...',
+    guide: [
+      { step: 'SeLoger est payant pour les particuliers. Comparez les formules sur seloger.com/deposer-annonce.' },
+      { step: 'Préparez vos 10 meilleures photos et votre description optimisée avant de commencer.' },
+      { step: 'Une fois l\'annonce en ligne, copiez l\'URL et suivez vos vues depuis votre espace.' },
+    ]
+  },
+  {
+    key: 'bienici', name: "Bien'ici", color: '#00B4FF',
+    hint: 'bienici.com/annonce/...',
+    guide: [
+      { step: 'Créez un compte sur bienici.com et déposez votre annonce depuis votre espace vendeur.' },
+      { step: 'Bien\'ici agrège aussi les annonces de certaines autres plateformes automatiquement.' },
+      { step: 'Renseignez l\'URL de votre annonce pour suivre les performances ici.' },
+    ]
+  },
+  {
+    key: 'facebook', name: 'Facebook Marketplace', color: '#1877F2',
+    hint: 'facebook.com/marketplace/item/...',
+    guide: [
+      { step: 'Depuis Facebook, cliquez sur "Marketplace" puis "Vendre" > "Maison/appartement à vendre".' },
+      { step: 'Ajoutez photos et description. Astuce : publiez aussi dans les groupes locaux "immo" de votre ville.' },
+      { step: 'Copiez le lien de votre annonce Marketplace et collez-le ici.' },
+    ]
+  },
+  {
+    key: 'other', name: 'Autre plateforme', color: '#888',
+    hint: 'URL de votre annonce',
+    guide: [
+      { step: 'Vous pouvez noter ici toute autre plateforme de diffusion : Figaro Immobilier, Logic-Immo, etc.' },
+      { step: 'Collez l\'URL de votre annonce et indiquez la date de mise en ligne.' },
+      { step: 'Activez le toggle pour marquer cette diffusion comme active dans vos stats.' },
+    ]
+  },
 ];
 
-// State: platform key → { id, url, active, published_at }
 const pubState = {};
-PLATFORMS.forEach(p => { pubState[p.key] = { id: null, url: '', active: false, published_at: '' }; });
+PLATFORMS.forEach(p => { pubState[p.key] = { id: null, url: '', active: false, published_at: '', views: null }; });
+
+function escHtml(str) {
+  return String(str || '').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
 
 function renderGrid() {
   const grid = document.getElementById('platformsGrid');
   grid.innerHTML = PLATFORMS.map(p => {
     const s = pubState[p.key];
+    const isPublished = s.active && s.url;
+
+    const statsHtml = (s.views != null && s.views > 0) ? `
+      <div class="platform-stats">
+        <div class="platform-stat">
+          <div class="platform-stat-n">${s.views.toLocaleString('fr-FR')}</div>
+          <div class="platform-stat-l">Vues enregistrées</div>
+        </div>
+      </div>` : '';
+
+    const viewLinkHtml = isPublished ? `
+      <a class="platform-view-link" href="${escHtml(s.url)}" target="_blank" rel="noopener noreferrer">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+        Voir l'annonce sur ${escHtml(p.name)} →
+      </a>` : '';
+
+    const guideHtml = !isPublished ? `
+      <div class="platform-guide">
+        <button class="platform-guide-toggle" id="guide-toggle-${p.key}" onclick="toggleGuide('${p.key}')">
+          <span>Comment publier sur ${escHtml(p.name)} en ${p.guide.length} étapes</span>
+          <svg class="platform-guide-toggle-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+        <div class="platform-guide-body" id="guide-body-${p.key}">
+          ${p.guide.map((g, i) => `
+            <div class="guide-step">
+              <span class="guide-step-num">${i + 1}</span>
+              <span>${escHtml(g.step)}</span>
+            </div>`).join('')}
+        </div>
+      </div>` : '';
+
     return `
     <div class="platform-card${s.active ? ' is-active' : ''}" id="card-${p.key}">
-      <div class="platform-header">
-        <div class="platform-identity">
-          <span class="platform-logo">${p.logo}</span>
-          <span class="platform-name" style="color:${p.color}">${p.name}</span>
+      <div class="platform-card-accent" style="background:${p.color};"></div>
+      <div class="platform-card-body">
+        <div class="platform-header">
+          <div class="platform-identity">
+            <div class="platform-logo" style="background:${p.color};">${p.name.charAt(0)}</div>
+            <span class="platform-name">${escHtml(p.name)}</span>
+          </div>
+          <span class="platform-badge ${isPublished ? 'published' : 'unpublished'}">
+            <span class="badge-dot${isPublished ? ' pulsing' : ''}"></span>
+            ${isPublished ? 'Publié' : 'Non publié'}
+          </span>
         </div>
-        <span class="platform-badge ${s.active ? 'active' : 'inactive'}">
-          <span class="badge-dot${s.active ? ' pulsing' : ''}"></span>
-          ${s.active ? 'Actif' : 'Inactif'}
+
+        ${statsHtml}
+        ${viewLinkHtml}
+
+        <div class="platform-toggle-row">
+          <div class="toggle-switch-pub${s.active ? ' on' : ''}" id="toggle-${p.key}" onclick="toggleActive('${p.key}')" role="switch" aria-checked="${s.active}" aria-label="Annonce active"></div>
+          <span class="platform-toggle-label">${s.active ? 'Annonce marquée active' : 'Marquer comme active'}</span>
+        </div>
+
+        <div class="platform-field">
+          <label>URL de l'annonce</label>
+          <input type="url" id="url-${p.key}" placeholder="${escHtml(p.hint)}" value="${escHtml(s.url)}">
+        </div>
+
+        <div class="platform-field">
+          <label>Date de publication</label>
+          <input type="date" id="date-${p.key}" value="${s.published_at ? s.published_at.split('T')[0] : ''}">
+        </div>
+      </div>
+
+      <div class="platform-card-footer">
+        <button class="btn-save-platform" onclick="savePlatform('${p.key}')">Sauvegarder</button>
+        <span class="save-feedback" id="feedback-${p.key}">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+          Sauvegardé !
         </span>
       </div>
 
-      <div class="platform-toggle-row">
-        <div class="toggle-switch-pub${s.active ? ' on' : ''}" id="toggle-${p.key}" onclick="toggleActive('${p.key}')"></div>
-        <span class="platform-toggle-label">${s.active ? 'Annonce active' : 'Annonce inactive'}</span>
-      </div>
-
-      <div class="platform-field">
-        <label>URL de l'annonce</label>
-        <input type="url" id="url-${p.key}" placeholder="${p.hint}" value="${escHtml(s.url)}">
-        ${s.url ? `<a class="platform-link" href="${escHtml(s.url)}" target="_blank" rel="noopener">Voir l'annonce →</a>` : ''}
-      </div>
-
-      <div class="platform-field">
-        <label>Date de publication</label>
-        <input type="date" id="date-${p.key}" value="${s.published_at ? s.published_at.split('T')[0] : ''}">
-      </div>
-
-      <div class="platform-actions">
-        <button class="btn-save-platform" onclick="savePlatform('${p.key}')">Sauvegarder</button>
-        <span class="save-feedback" id="feedback-${p.key}">Sauvegardé !</span>
-      </div>
+      ${guideHtml}
     </div>`;
   }).join('');
+
   updateActiveCount();
 }
 
-function escHtml(str) {
-  return String(str).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+function toggleGuide(key) {
+  const toggle = document.getElementById(`guide-toggle-${key}`);
+  const body = document.getElementById(`guide-body-${key}`);
+  if (!toggle || !body) return;
+  const isOpen = body.classList.toggle('open');
+  toggle.classList.toggle('open', isOpen);
 }
 
 function toggleActive(key) {
@@ -364,11 +635,11 @@ function toggleActive(key) {
 }
 
 function updateActiveCount() {
-  const count = PLATFORMS.filter(p => pubState[p.key].active).length;
+  const count = PLATFORMS.filter(p => pubState[p.key].active && pubState[p.key].url).length;
   const badge = document.getElementById('activeCountBadge');
   if (count > 0) {
     badge.style.display = 'inline-flex';
-    badge.textContent = `Actif sur ${count} plateforme${count > 1 ? 's' : ''}`;
+    badge.textContent = `${count} plateforme${count > 1 ? 's' : ''} active${count > 1 ? 's' : ''}`;
   } else {
     badge.style.display = 'none';
   }
@@ -386,6 +657,7 @@ async function loadPublications() {
             url: pub.url || '',
             active: !!pub.active,
             published_at: pub.published_at || '',
+            views: pub.views != null ? pub.views : null,
           };
         }
       });
@@ -421,14 +693,14 @@ async function savePlatform(key) {
   }
 }
 
-window.showToast = function(msg, type = 'success') {
-  let toast = document.querySelector('.toast');
-  if (!toast) { toast = document.createElement('div'); toast.className = 'toast'; document.body.appendChild(toast); }
+function showToast(msg, type) {
+  let toast = document.getElementById('toast');
+  if (!toast) { toast = document.createElement('div'); toast.id = 'toast'; toast.className = 'toast'; document.body.appendChild(toast); }
   toast.textContent = msg;
-  toast.className = `toast ${type === 'error' ? 'error' : ''}`;
-  toast.classList.add('show');
-  setTimeout(() => toast.classList.remove('show'), 3000);
-};
+  toast.className = `toast show${type === 'error' ? ' error' : ''}`;
+  clearTimeout(toast._t);
+  toast._t = setTimeout(() => { toast.className = 'toast'; }, 3000);
+}
 
 loadPublications();
 </script>
