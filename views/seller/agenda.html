@@ -950,14 +950,10 @@ function buildVisitConfirmedCard(v) {
       </div>
     </div>
     <div class="vcc-actions">
-      <button class="vcc-sms" onclick="copySmsRappel(this, ${v.id}, ${JSON.stringify(smsRappelText).replace(/'/g,"&apos;")})">
-        ${svgPhone} Rappel SMS
+      <button class="vcc-sms${v.reminder_sent?' sent':''}" id="btn-reminder-${v.id}" onclick="sendReminder(${v.id})">
+        ${svgPhone} ${v.reminder_sent ? 'Rappel copié' : 'Rappel SMS'}
       </button>
       <button class="vcc-cancel" onclick="if(confirm('Annuler cette visite ?')) changeVisitStatus(${v.id},'cancelled')">Annuler</button>
-    </div>
-    <div class="vcc-sms-panel" id="sms-panel-${v.id}" style="display:none;margin-top:10px;background:#f5f0e8;border-radius:8px;padding:10px 12px;">
-      <div style="font-size:0.76rem;color:#555;line-height:1.6;margin-bottom:8px;" id="sms-text-${v.id}">${smsRappelText}</div>
-      <button onclick="docopySmsRappel(${v.id})" style="width:100%;padding:8px;background:#3D5A47;color:#fff;border:none;border-radius:7px;font-size:0.8rem;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;" id="sms-copy-btn-${v.id}">Copier ce SMS</button>
     </div>
   </div>`;
 }
