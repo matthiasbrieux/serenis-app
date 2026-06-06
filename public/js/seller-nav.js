@@ -23,13 +23,31 @@
   const sidebar = document.querySelector('aside.sidebar, .sidebar');
   if (!sidebar || document.querySelector('.mobile-menu-btn')) return;
 
+  // ── Barre accent terracotta pleine largeur (mobile uniquement) ───
+  const topAccentStyle = document.createElement('style');
+  topAccentStyle.textContent = `
+    @media (max-width: 768px) {
+      body::before {
+        content: '';
+        display: block;
+        position: fixed;
+        top: 0; left: 0; right: 0;
+        height: 4px;
+        background: #C4785A;
+        z-index: 9999;
+        pointer-events: none;
+      }
+    }
+  `;
+  document.head.appendChild(topAccentStyle);
+
   // CSS mobile
   const style = document.createElement('style');
   style.textContent = `
     .mobile-menu-btn {
       display: none;
       position: fixed;
-      top: 12px;
+      top: 16px;
       left: 12px;
       z-index: 300;
       width: 44px;
@@ -143,6 +161,29 @@
   btn.addEventListener('click', openMenu);
   closeBtn.addEventListener('click', closeMenu);
   overlay.addEventListener('click', closeMenu);
+
+  // ── Masquer le hamburger en scrollant vers le bas ─────────────
+  let _lastScroll = 0;
+  let _btnVisible = true;
+
+  function setBtnVisible(visible) {
+    if (_btnVisible === visible) return;
+    _btnVisible = visible;
+    btn.style.opacity = visible ? '1' : '0';
+    btn.style.pointerEvents = visible ? '' : 'none';
+    btn.style.transform = visible ? '' : 'translateY(-8px) scale(0.85)';
+  }
+
+  window.addEventListener('scroll', function () {
+    if (sidebar.classList.contains('open')) return;
+    const y = window.scrollY;
+    if (y > _lastScroll && y > 80) {
+      setBtnVisible(false);
+    } else if (y < _lastScroll - 20 || y < 40) {
+      setBtnVisible(true);
+    }
+    _lastScroll = y;
+  }, { passive: true });
 
   // Fermer quand on clique sur un lien sidebar (navigation)
   sidebar.querySelectorAll('a').forEach(a => a.addEventListener('click', closeMenu));
