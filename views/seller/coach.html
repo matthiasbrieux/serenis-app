@@ -10,76 +10,356 @@
   <link rel="stylesheet" href="/css/style.css">
   <style>
     * { box-sizing: border-box; }
-    body { background: #1C1C1A; color: #FDFCF8; font-family: 'DM Sans', sans-serif; margin: 0; display: flex; flex-direction: column; height: 100dvh; }
-    .hdr { background: #111; padding: 14px 24px; display: flex; align-items: center; gap: 16px; border-bottom: 1px solid #2a2a28; flex-shrink: 0; }
-    .hdr a { color: rgba(253,252,248,.5); text-decoration: none; font-size: .85rem; }
+
+    body {
+      background: #1C1C1A;
+      color: #FDFCF8;
+      font-family: 'DM Sans', sans-serif;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      height: 100dvh;
+      overflow: hidden;
+    }
+
+    /* Header */
+    .hdr {
+      background: #111;
+      padding: 12px 20px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      border-bottom: 1px solid #2a2a28;
+      flex-shrink: 0;
+    }
+    .hdr a {
+      color: rgba(253,252,248,.45);
+      text-decoration: none;
+      font-size: .83rem;
+      transition: color 0.15s;
+    }
     .hdr a:hover { color: #C4603A; }
-    .hdr-title { font-family: 'Cormorant Garamond', serif; font-size: 1.3rem; color: #FDFCF8; }
-    .hdr-sub { font-size: .75rem; color: #9a9a8e; margin-left: 8px; }
-    .chat-wrap { flex: 1; overflow-y: auto; padding: 24px 16px; max-width: 760px; width: 100%; margin: 0 auto; }
-    .msg { display: flex; gap: 12px; margin-bottom: 20px; animation: fadeIn .2s ease; }
+    .hdr-identity { display: flex; align-items: center; gap: 10px; }
+    .hdr-avatar {
+      width: 34px; height: 34px; border-radius: 50%;
+      background: linear-gradient(135deg, #3D5A47, #2a4030);
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .hdr-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.2rem;
+      color: #FDFCF8;
+      line-height: 1.2;
+    }
+    .hdr-sub { font-size: .72rem; color: #7a7a6e; margin-top: 1px; }
+    .hdr-status {
+      display: flex; align-items: center; gap: 5px;
+      font-size: 0.7rem; color: #6a9870;
+      margin-left: auto;
+    }
+    .hdr-status::before {
+      content: '';
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: #6a9870;
+      animation: pulse 2s infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.4; }
+    }
+
+    /* Chat area */
+    .chat-wrap {
+      flex: 1;
+      overflow-y: auto;
+      padding: 20px 16px;
+      max-width: 760px;
+      width: 100%;
+      margin: 0 auto;
+      scroll-behavior: smooth;
+    }
+    .chat-wrap::-webkit-scrollbar { width: 4px; }
+    .chat-wrap::-webkit-scrollbar-track { background: transparent; }
+    .chat-wrap::-webkit-scrollbar-thumb { background: #333; border-radius: 2px; }
+
+    /* Messages */
+    .msg { display: flex; gap: 10px; margin-bottom: 16px; animation: fadeIn .25s ease; }
     .msg.user { flex-direction: row-reverse; }
-    @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
-    .msg-avatar { width: 36px; height: 36px; border-radius: 50%; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 1rem; }
-    .msg-avatar.ai { background: #C4603A; }
-    .msg-avatar.user { background: #3D5A47; }
-    .msg-bubble { max-width: 78%; padding: 14px 16px; border-radius: 16px; font-size: .9rem; line-height: 1.65; }
-    .msg.ai .msg-bubble { background: #232320; border-radius: 4px 16px 16px 16px; color: #FDFCF8; }
-    .msg.user .msg-bubble { background: #3D5A47; border-radius: 16px 4px 16px 16px; color: #FDFCF8; }
-    .msg-bubble strong { color: #C4603A; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+
+    .msg-avatar {
+      width: 34px; height: 34px; border-radius: 50%;
+      flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1rem; margin-top: 2px;
+    }
+    .msg-avatar.ai { background: linear-gradient(135deg, #3D5A47, #2a4030); }
+    .msg-avatar.user { background: #C4603A; }
+
+    .msg-bubble {
+      max-width: 76%;
+      padding: 13px 16px;
+      border-radius: 18px;
+      font-size: .9rem;
+      line-height: 1.68;
+    }
+    /* Bulle IA : fond vert très clair, border-left vert */
+    .msg.ai .msg-bubble {
+      background: #f0f7f2;
+      color: #1e2e22;
+      border-radius: 4px 18px 18px 18px;
+      border-left: 3px solid #3D5A47;
+    }
+    /* Bulle vendeur : fond blanc, alignée à droite */
+    .msg.user .msg-bubble {
+      background: #fff;
+      color: #1C1C1A;
+      border-radius: 18px 4px 18px 18px;
+      border-right: 3px solid #C4603A;
+    }
+
+    .msg-bubble strong { color: #2a4030; }
     .msg-bubble ul, .msg-bubble ol { padding-left: 18px; margin: 8px 0; }
     .msg-bubble li { margin-bottom: 4px; }
-    .msg-bubble code { background: rgba(255,255,255,.1); padding: 1px 5px; border-radius: 4px; font-size: .85rem; }
-    .typing { display: flex; gap: 5px; padding: 14px 16px; }
-    .typing span { width: 8px; height: 8px; border-radius: 50%; background: #C4603A; animation: bounce .9s infinite; }
+    .msg-bubble code {
+      background: rgba(61,90,71,0.1);
+      color: #2a4030;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: .84rem;
+    }
+
+    /* Typing indicator */
+    .typing { display: flex; gap: 5px; padding: 4px 2px; }
+    .typing span {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: #3D5A47;
+      animation: bounce .9s infinite;
+    }
     .typing span:nth-child(2) { animation-delay: .2s; }
     .typing span:nth-child(3) { animation-delay: .4s; }
-    @keyframes bounce { 0%,60%,100% { transform: translateY(0); } 30% { transform: translateY(-6px); } }
-    .input-bar { background: #111; border-top: 1px solid #2a2a28; padding: 14px 16px; flex-shrink: 0; }
-    .input-row { max-width: 760px; margin: 0 auto; display: flex; gap: 10px; }
-    .input-row textarea { flex: 1; background: #1e1e1c; border: 1px solid #333; border-radius: 12px; color: #FDFCF8; padding: 12px 16px; font-size: .9rem; font-family: 'DM Sans', sans-serif; resize: none; min-height: 48px; max-height: 140px; outline: none; line-height: 1.5; }
-    .input-row textarea:focus { border-color: #C4603A; }
-    .input-row button { background: #C4603A; border: none; border-radius: 12px; color: #fff; padding: 12px 20px; cursor: pointer; font-size: 1.1rem; transition: .15s; flex-shrink: 0; }
-    .input-row button:hover { background: #b5502f; }
-    .input-row button:disabled { background: #333; cursor: default; }
-    .suggestions { display: flex; flex-wrap: wrap; gap: 8px; max-width: 760px; margin: 0 auto 12px; }
-    .sug { background: #1e1e1c; border: 1px solid #333; border-radius: 20px; padding: 6px 14px; font-size: .8rem; color: #9a9a8e; cursor: pointer; transition: .15s; white-space: nowrap; }
-    .sug:hover { border-color: #C4603A; color: #FDFCF8; }
-    .welcome { text-align: center; padding: 40px 16px; }
-    .welcome h2 { font-family: 'Cormorant Garamond', serif; font-size: 1.8rem; margin-bottom: 8px; }
-    .welcome p { color: #9a9a8e; font-size: .9rem; }
+    @keyframes bounce {
+      0%,60%,100% { transform: translateY(0); }
+      30% { transform: translateY(-6px); }
+    }
+
+    /* Input bar — toujours fixée en bas, safe-area iOS */
+    .input-bar {
+      background: #111;
+      border-top: 1px solid #2a2a28;
+      padding: 10px 16px;
+      padding-bottom: calc(10px + env(safe-area-inset-bottom, 0px));
+      flex-shrink: 0;
+    }
+
+    /* Chips de suggestions */
+    .suggestions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+      max-width: 760px;
+      margin: 0 auto 10px;
+    }
+    .sug {
+      background: #1a1a18;
+      border: 1px solid #3a3a36;
+      border-radius: 20px;
+      padding: 7px 14px;
+      font-size: .8rem;
+      color: #b0b09a;
+      cursor: pointer;
+      transition: all .18s;
+      white-space: nowrap;
+    }
+    .sug:hover {
+      border-color: #3D5A47;
+      color: #FDFCF8;
+      background: rgba(61,90,71,0.15);
+    }
+    .sug:active { transform: scale(0.97); }
+
+    .input-row {
+      max-width: 760px;
+      margin: 0 auto;
+      display: flex;
+      gap: 10px;
+      align-items: flex-end;
+    }
+    .input-row textarea {
+      flex: 1;
+      background: #1e1e1c;
+      border: 1.5px solid #333;
+      border-radius: 14px;
+      color: #FDFCF8;
+      padding: 12px 16px;
+      font-size: .9rem;
+      font-family: 'DM Sans', sans-serif;
+      resize: none;
+      min-height: 48px;
+      max-height: 140px;
+      outline: none;
+      line-height: 1.5;
+      transition: border-color 0.15s;
+    }
+    .input-row textarea:focus { border-color: #3D5A47; }
+    .input-row textarea::placeholder { color: #5a5a52; }
+    .input-row button {
+      background: #3D5A47;
+      border: none;
+      border-radius: 14px;
+      color: #fff;
+      width: 48px; height: 48px;
+      cursor: pointer;
+      font-size: 1.1rem;
+      transition: all .15s;
+      flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .input-row button:hover { background: #2e4435; transform: translateY(-1px); }
+    .input-row button:disabled { background: #2a2a28; cursor: default; transform: none; }
+
+    /* État vide — écran d'accueil chat */
+    .welcome {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      padding: 32px 16px 24px;
+    }
+    .welcome-icon {
+      width: 64px; height: 64px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #3D5A47, #2a4030);
+      display: flex; align-items: center; justify-content: center;
+      margin-bottom: 16px;
+      box-shadow: 0 8px 24px rgba(61,90,71,0.35);
+    }
+    .welcome h2 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.75rem;
+      margin-bottom: 8px;
+      color: #FDFCF8;
+    }
+    .welcome-desc {
+      color: #9a9a8e;
+      font-size: .9rem;
+      line-height: 1.6;
+      max-width: 420px;
+      margin-bottom: 6px;
+    }
+    .welcome-hint {
+      font-size: 0.8rem;
+      color: #5a5a52;
+      margin-bottom: 28px;
+    }
+    /* Chips dans l'état vide (plus grandes, mieux visibles) */
+    .welcome-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      justify-content: center;
+      max-width: 560px;
+    }
+    .welcome-chip {
+      background: #1e1e1c;
+      border: 1px solid #3a3a36;
+      border-radius: 10px;
+      padding: 10px 16px;
+      font-size: .84rem;
+      color: #c8c8b8;
+      cursor: pointer;
+      transition: all .18s;
+      text-align: left;
+      line-height: 1.4;
+    }
+    .welcome-chip:hover {
+      border-color: #3D5A47;
+      background: rgba(61,90,71,0.18);
+      color: #FDFCF8;
+      transform: translateY(-1px);
+    }
+    .welcome-chip:active { transform: scale(0.98); }
+
+    /* Timestamp */
+    .msg-time {
+      font-size: 0.7rem;
+      color: #5a5a52;
+      margin-top: 4px;
+      padding: 0 4px;
+    }
+    .msg.user .msg-time { text-align: right; }
+
+    /* Scrollbar handle en bas */
+    .chat-spacer { height: 8px; }
+
+    @media (max-width: 480px) {
+      .hdr { padding: 10px 14px; }
+      .hdr-title { font-size: 1.1rem; }
+      .chat-wrap { padding: 14px 12px; }
+      .msg-bubble { max-width: 85%; font-size: .87rem; }
+      .welcome { padding: 20px 12px 16px; }
+      .welcome-chip { font-size: .8rem; padding: 9px 13px; }
+      .sug { font-size: .77rem; padding: 6px 12px; }
+    }
   </style>
 </head>
 <body>
 
 <div class="hdr">
-  <a href="/dashboard">← Dashboard</a>
-  <div>
-    <span class="hdr-title">Coach IA Vendu Par Moi</span>
-    <span class="hdr-sub">Expert en vente immobilière</span>
+  <a href="/dashboard">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:middle;margin-right:3px;"><polyline points="15 18 9 12 15 6"/></svg>
+    Dashboard
+  </a>
+  <div class="hdr-identity">
+    <div class="hdr-avatar">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+    </div>
+    <div>
+      <div class="hdr-title">Coach IA</div>
+      <div class="hdr-sub">Expert en vente immobilière</div>
+    </div>
   </div>
+  <div class="hdr-status">En ligne</div>
 </div>
 
 <div class="chat-wrap" id="chatWrap">
+  <!-- État vide : affiché tant qu'aucun message -->
   <div class="welcome" id="welcome">
-    <div style="display:flex;justify-content:center;margin-bottom:12px;"><div style="width:56px;height:56px;border-radius:50%;background:#3D5A47;display:flex;align-items:center;justify-content:center;"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></div></div>
-    <h2>Votre coach immobilier personnel</h2>
-    <p>Posez-moi toutes vos questions sur la vente de votre bien.</p>
-    <p style="margin-top:4px;">Prix, annonce, visites, négociation, juridique…</p>
+    <div class="welcome-icon">
+      <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.7"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+    </div>
+    <h2>Bonjour, je suis votre coach</h2>
+    <p class="welcome-desc">Posez-moi toutes vos questions sur la vente de votre bien — prix, annonce, visites, négociation, documents juridiques.</p>
+    <p class="welcome-hint">Réponse en quelques secondes · Disponible 24h/24</p>
+    <div class="welcome-chips">
+      <div class="welcome-chip" onclick="suggestWelcome(this)">Comment fixer le bon prix de vente ?</div>
+      <div class="welcome-chip" onclick="suggestWelcome(this)">Comment préparer ma première visite ?</div>
+      <div class="welcome-chip" onclick="suggestWelcome(this)">Quels documents dois-je avoir ?</div>
+      <div class="welcome-chip" onclick="suggestWelcome(this)">Comment qualifier un acheteur sérieux ?</div>
+      <div class="welcome-chip" onclick="suggestWelcome(this)">Comment rédiger une bonne annonce ?</div>
+      <div class="welcome-chip" onclick="suggestWelcome(this)">Comment répondre à une offre basse ?</div>
+    </div>
   </div>
+  <div class="chat-spacer"></div>
 </div>
 
 <div class="input-bar">
-  <div class="suggestions" id="suggestions">
-    <div class="sug" onclick="suggest(this)">Comment fixer mon prix de vente ?</div>
-    <div class="sug" onclick="suggest(this)">Comment rédiger une bonne description ?</div>
-    <div class="sug" onclick="suggest(this)">Comment me préparer pour une visite ?</div>
-    <div class="sug" onclick="suggest(this)">Comment répondre à une offre basse ?</div>
-    <div class="sug" onclick="suggest(this)">Quels diagnostics sont obligatoires ?</div>
+  <!-- Chips suggestions rapides (visibles après le premier échange) -->
+  <div class="suggestions" id="suggestions" style="display:none;">
+    <div class="sug" onclick="suggest(this)">Fixer mon prix</div>
+    <div class="sug" onclick="suggest(this)">Préparer la visite</div>
+    <div class="sug" onclick="suggest(this)">Documents obligatoires</div>
+    <div class="sug" onclick="suggest(this)">Répondre à une offre</div>
+    <div class="sug" onclick="suggest(this)">Qualifier l'acheteur</div>
   </div>
   <div class="input-row">
     <textarea id="input" placeholder="Posez votre question…" rows="1" onkeydown="handleKey(event)" oninput="autoResize(this)"></textarea>
-    <button id="sendBtn" onclick="send()" title="Envoyer">↑</button>
+    <button id="sendBtn" onclick="send()" title="Envoyer" aria-label="Envoyer">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg>
+    </button>
   </div>
 </div>
 
@@ -95,23 +375,47 @@ function handleKey(e) {
   if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(); }
 }
 
+function suggestWelcome(el) {
+  document.getElementById('input').value = el.textContent;
+  send();
+}
+
 function suggest(el) {
   document.getElementById('input').value = el.textContent;
-  document.getElementById('suggestions').style.display = 'none';
   send();
+}
+
+function formatTime() {
+  const now = new Date();
+  return now.getHours().toString().padStart(2,'0') + ':' + now.getMinutes().toString().padStart(2,'0');
 }
 
 function addMsg(role, content) {
   const wrap = document.getElementById('chatWrap');
-  document.getElementById('welcome')?.remove();
+  const welcomeEl = document.getElementById('welcome');
+  if (welcomeEl) welcomeEl.remove();
+
   const div = document.createElement('div');
   div.className = `msg ${role}`;
-  const avatar = role === 'ai' ? '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>' : '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>';
-  const cls = role;
-  div.innerHTML = `<div class="msg-avatar ${cls}">${avatar}</div><div class="msg-bubble" id="bubble-${Date.now()}">${content}</div>`;
-  wrap.appendChild(div);
+
+  const avatarIcon = role === 'ai'
+    ? '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>'
+    : '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>';
+
+  const bubbleId = 'bubble-' + Date.now() + '-' + Math.random().toString(36).slice(2);
+
+  div.innerHTML = `
+    <div class="msg-avatar ${role}">${avatarIcon}</div>
+    <div>
+      <div class="msg-bubble" id="${bubbleId}">${content}</div>
+      <div class="msg-time">${formatTime()}</div>
+    </div>`;
+
+  // Insérer avant le spacer
+  const spacer = wrap.querySelector('.chat-spacer');
+  wrap.insertBefore(div, spacer);
   wrap.scrollTop = wrap.scrollHeight;
-  return div.querySelector('.msg-bubble');
+  return document.getElementById(bubbleId);
 }
 
 function showTyping() {
@@ -119,8 +423,15 @@ function showTyping() {
   const div = document.createElement('div');
   div.className = 'msg ai';
   div.id = 'typing-indicator';
-  div.innerHTML = `<div class="msg-avatar ai"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></div><div class="msg-bubble"><div class="typing"><span></span><span></span><span></span></div></div>`;
-  wrap.appendChild(div);
+  div.innerHTML = `
+    <div class="msg-avatar ai">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+    </div>
+    <div class="msg-bubble">
+      <div class="typing"><span></span><span></span><span></span></div>
+    </div>`;
+  const spacer = wrap.querySelector('.chat-spacer');
+  wrap.insertBefore(div, spacer);
   wrap.scrollTop = wrap.scrollHeight;
 }
 
@@ -140,8 +451,10 @@ async function send() {
   const text = input.value.trim();
   if (!text) return;
 
-  document.getElementById('suggestions').style.display = 'none';
-  input.value = ''; input.style.height = 'auto';
+  // Masquer les chips welcome + afficher les chips suggestions rapides
+  document.getElementById('suggestions').style.display = 'flex';
+  input.value = '';
+  input.style.height = 'auto';
   document.getElementById('sendBtn').disabled = true;
 
   messages.push({ role: 'user', content: text });
@@ -175,15 +488,23 @@ async function send() {
         if (raw === '[DONE]') break;
         try {
           const d = JSON.parse(raw);
-          if (d.text) { fullText += d.text; bubble.innerHTML = formatText(fullText); document.getElementById('chatWrap').scrollTop = 999999; }
-          if (d.error) { bubble.innerHTML = `<em style="color:#dc2626">${d.error}</em>`; }
+          if (d.text) {
+            fullText += d.text;
+            bubble.innerHTML = formatText(fullText);
+            // Scroll fluide pendant le streaming
+            const wrap = document.getElementById('chatWrap');
+            wrap.scrollTop = wrap.scrollHeight;
+          }
+          if (d.error) {
+            bubble.innerHTML = `<em style="color:#e55;">${d.error}</em>`;
+          }
         } catch(e) {}
       }
     }
     messages.push({ role: 'assistant', content: fullText });
   } catch(e) {
     document.getElementById('typing-indicator')?.remove();
-    addMsg('ai', '<em style="color:#dc2626">Erreur de connexion. Réessayez.</em>');
+    addMsg('ai', '<em style="color:#e55;">Erreur de connexion. Réessayez.</em>');
   }
 
   document.getElementById('sendBtn').disabled = false;

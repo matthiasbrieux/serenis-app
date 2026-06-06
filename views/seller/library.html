@@ -155,10 +155,24 @@
     .iphone-ai-td:nth-child(2) { animation-delay: 0.2s; }
     .iphone-ai-td:nth-child(3) { animation-delay: 0.4s; }
 
-    /* ── Progress bar ── */
-    .lib-progress { display: flex; align-items: center; gap: 12px; margin-bottom: 28px; }
-    .lib-progress-bar { flex: 1; height: 6px; background: #E8E3DB; border-radius: 100px; overflow: hidden; }
-    .lib-progress-fill { height: 100%; background: #3D5A47; border-radius: 100px; transition: width 0.5s ease; }
+    /* ── Progress bar gamifiée ── */
+    .lib-progress-wrap { margin-bottom: 28px; }
+    .lib-progress-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+    .lib-progress-badge {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 6px 14px; border-radius: 100px;
+      background: linear-gradient(135deg, #3D5A47 0%, #4a6e55 100%);
+      color: #fff; font-size: 0.8rem; font-weight: 700;
+      box-shadow: 0 2px 10px rgba(61,90,71,0.28);
+    }
+    .lib-progress-badge-pct { font-family: 'Cormorant Garamond', serif; font-size: 1.15rem; font-weight: 600; line-height: 1; }
+    .lib-progress-label { font-size: 0.75rem; color: #888; }
+    .lib-progress { display: flex; align-items: center; gap: 12px; }
+    .lib-progress-bar { flex: 1; height: 8px; background: #E8E3DB; border-radius: 100px; overflow: hidden; }
+    .lib-progress-fill {
+      height: 100%; background: linear-gradient(90deg, #3D5A47, #6a9870); border-radius: 100px;
+      transition: width 1.2s cubic-bezier(0.16,1,0.3,1);
+    }
     .lib-progress-pct { font-size: 0.78rem; color: #3D5A47; font-weight: 600; white-space: nowrap; }
 
     /* ── Module tabs ── */
@@ -712,9 +726,10 @@
     .mod-tab, .tts-btn, .coach-ta, .coach-send, .coach-chip, .mail-copy, .step-body,
     .iphone-agent-listen, .iphone-agent-skip { font-family: 'Inter', system-ui, sans-serif; }
 
-    /* Progress bar — plus sobre et plus large */
-    .lib-progress { margin-bottom: 32px; gap: 14px; }
-    .lib-progress-bar { height: 4px; background: rgba(0,0,0,0.08); border-radius: 100px; }
+    /* Progress bar — override premium */
+    .lib-progress-wrap { margin-bottom: 28px; }
+    .lib-progress { margin-bottom: 0; gap: 14px; }
+    .lib-progress-bar { height: 8px; background: rgba(0,0,0,0.08); border-radius: 100px; }
     .lib-progress-fill { background: linear-gradient(90deg, #3D5A47, #5a8c6a); }
     .lib-progress-pct { font-weight: 600; font-size: 0.8rem; color: #3D5A47; }
 
@@ -964,6 +979,86 @@
     .celebrate-skip { display:inline-flex; align-items:center; justify-content:center; margin-top:12px; min-height:44px; padding:4px 16px; font-size:0.75rem; color:#b0a89f; cursor:pointer; background:none; border:none; font-family:inherit; touch-action:manipulation; }
     .celebrate-skip:hover { color:#7a7065; }
 
+    /* ── Section "Par où commencer ?" ── */
+    .welcome-banner {
+      background: linear-gradient(135deg, #EDF5F0 0%, #E4F0E8 100%);
+      border: 1.5px solid #C5DDD0; border-radius: 16px;
+      padding: 24px 28px; margin-bottom: 28px;
+      display: flex; align-items: center; gap: 24px; flex-wrap: wrap;
+    }
+    .welcome-banner-icon {
+      width: 56px; height: 56px; border-radius: 16px;
+      background: linear-gradient(135deg, #3D5A47, #4a6e55);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.5rem; flex-shrink: 0;
+      box-shadow: 0 4px 16px rgba(61,90,71,0.25);
+    }
+    .welcome-banner-body { flex: 1; min-width: 200px; }
+    .welcome-banner-title {
+      font-family: 'Cormorant Garamond', serif; font-size: 1.35rem;
+      font-weight: 600; color: #1C3028; margin-bottom: 4px; line-height: 1.2;
+    }
+    .welcome-banner-sub { font-size: 0.83rem; color: #3D5A47; line-height: 1.5; margin-bottom: 14px; }
+    .welcome-banner-cta {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 11px 22px; background: #3D5A47; color: #fff;
+      border-radius: 10px; font-size: 0.86rem; font-weight: 700;
+      border: none; cursor: pointer; font-family: 'DM Sans', sans-serif;
+      transition: background 0.15s; min-height: 44px; touch-action: manipulation;
+    }
+    .welcome-banner-cta:hover { background: #2d4535; }
+    @media (max-width: 640px) {
+      .welcome-banner { padding: 18px 18px; gap: 16px; }
+      .welcome-banner-icon { width: 44px; height: 44px; font-size: 1.2rem; }
+    }
+
+    /* ── Module tabs — états colorés ── */
+    .mod-tab.mod-status-done {
+      border-left: 3px solid #3D5A47 !important;
+      background: #F6FAF7 !important;
+    }
+    .mod-tab.mod-status-done .mod-tab-num {
+      background: #3D5A47 !important; color: #fff !important;
+    }
+    .mod-tab.mod-status-inprogress {
+      border-left: 3px solid #C4785A !important;
+    }
+    .mod-tab.active.mod-status-done,
+    .mod-tab.active.mod-status-inprogress {
+      background: #3D5A47 !important;
+      border-left-color: rgba(255,255,255,0.5) !important;
+    }
+    .mod-phase-apres .mod-tab.mod-status-done {
+      border-left-color: #9b6b0a !important;
+      background: #FDFAF2 !important;
+    }
+    .mod-phase-apres .mod-tab.mod-status-done .mod-tab-num {
+      background: #9b6b0a !important; color: #fff !important;
+    }
+    .mod-phase-apres .mod-tab.active.mod-status-done {
+      background: #9b6b0a !important;
+      border-left-color: rgba(255,255,255,0.5) !important;
+    }
+
+    /* ── Module hdr — barre de progression individuelle ── */
+    .mod-hdr-prog-wrap { margin-top: 10px; }
+    .mod-hdr-prog-label { font-size: 0.7rem; color: rgba(255,255,255,0.65); margin-bottom: 5px; }
+    .mod-hdr-prog-bar { height: 4px; background: rgba(255,255,255,0.18); border-radius: 100px; overflow: hidden; }
+    .mod-hdr-prog-fill { height: 100%; background: rgba(255,255,255,0.85); border-radius: 100px; transition: width 0.4s ease; }
+
+    /* ── Mobile — touches et grilles ── */
+    @media (max-width: 375px) {
+      .page-title { font-size: 1.35rem !important; }
+      .mod-tabs-row { grid-template-columns: 1fr !important; }
+      .lib-progress-badge-pct { font-size: 1rem; }
+      .f-hero-title { font-size: 1.45rem !important; }
+      .welcome-banner-title { font-size: 1.15rem; }
+    }
+    @media (max-width: 640px) {
+      .lib-progress-top { flex-direction: column; align-items: flex-start; gap: 6px; }
+      .nc-sig-grid { grid-template-columns: 1fr !important; }
+    }
+
     /* ── Coach IA immersif ── */
     .coach-avatar-sm { width:28px; height:28px; border-radius:50%; background:rgba(255,255,255,0.18); color:#fff; font-weight:700; font-size:0.78rem; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
     .coach-msg-row { display:flex; align-items:flex-end; gap:7px; max-width:92%; align-self:flex-start; }
@@ -1022,13 +1117,23 @@
   <main class="main-content">
     <div class="page-header">
       <h1 class="page-title">Ma formation</h1>
-      <p class="page-subtitle" id="progLabel">0 étape complétée sur 17 · 0%</p>
+      <p class="page-subtitle" id="progSubtitle">0 étape complétée sur 17 · 0%</p>
     </div>
 
-    <!-- Progress bar -->
-    <div class="lib-progress">
-      <div class="lib-progress-bar"><div class="lib-progress-fill" id="progFill" style="width:0%"></div></div>
-      <div class="lib-progress-pct" id="progPct">0%</div>
+    <!-- Progress bar gamifiée -->
+    <div class="lib-progress-wrap">
+      <div class="lib-progress-top">
+        <div class="lib-progress-badge" id="progBadge">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          <span class="lib-progress-badge-pct" id="progBadgePct">0%</span>
+          <span>complété</span>
+        </div>
+        <div class="lib-progress-label" id="progLabel">0 étape sur 17</div>
+      </div>
+      <div class="lib-progress">
+        <div class="lib-progress-bar"><div class="lib-progress-fill" id="progFill" style="width:0%"></div></div>
+        <div class="lib-progress-pct" id="progPct">0%</div>
+      </div>
     </div>
 
     <!-- 3-col hero : left / iPhone / right -->
@@ -1146,6 +1251,19 @@
     </div>
     </div><!-- /.f-hero-wrap -->
 
+    <!-- Section "Par où commencer ?" — visible si 0 étapes faites -->
+    <div class="welcome-banner" id="welcomeBanner" style="display:none;">
+      <div class="welcome-banner-icon">🚀</div>
+      <div class="welcome-banner-body">
+        <div class="welcome-banner-title">Par où commencer ?</div>
+        <div class="welcome-banner-sub">Commencez par <strong>Estimer son bien</strong> — c'est la base de tout. Vous saurez exactement comment fixer votre prix pour vendre vite, sans brader.</div>
+        <button class="welcome-banner-cta" id="welcomeStartBtn">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+          Commencer le module 1
+        </button>
+      </div>
+    </div>
+
     <!-- Module tabs -->
     <div class="mod-tabs-wrap" id="modTabs"></div>
 
@@ -1245,12 +1363,15 @@ let _cachedVoices = [];
   window.speechSynthesis.onvoiceschanged = _loadVoices;
 })();
 
+// Flag animation progress bar
+let _progAnimating = false;
+
 // ══════════════════════════════════════════
 //  DATA
 // ══════════════════════════════════════════
 const MODULES = [
   {
-    phase:'avant', mailCat:'visite', num:'01', title:'Estimer son bien', subtitle:'Trouver le prix juste pour vendre vite et bien',
+    phase:'avant', mailCat:'visite', num:'01', title:'Estimer son bien', subtitle:'Fixer le bon prix dès le départ — et déclencher des offres rapides',
     keyPoints:['Utilisez DVF.fr + 2 agences + MeilleursAgents pour trianguler','Prix juste dès le départ = plus de visites + offres rapides','Un bien >45j sans offre doit être réévalué','DPE F/G peut impacter le prix de -10% à -20%'],
     aiMsg:'Pour l\'estimation, commencez par DVF.fr — ce sont les prix réels des ventes notariées, pas les prix demandés. Comparez avec deux agences gratuites.',
     steps:[
@@ -1272,7 +1393,7 @@ const MODULES = [
     ]
   },
   {
-    phase:'avant', mailCat:'notaire', num:'02', title:'Préparer sa vente', subtitle:'Documents, dossier acheteur et fiche bien',
+    phase:'avant', mailCat:'notaire', num:'02', title:'Préparer sa vente', subtitle:'Avoir tous les documents prêts avant de trouver un acheteur — éviter les blocages de dernière minute',
     videoSrc:'/videos/formation-preparation.mp4', agentVideo:'/videos/agent-matthias.mov',
     keyPoints:['Rassemblez TOUS les documents AVANT de publier l\'annonce','Envoyez un dossier complet par email AVANT chaque visite','Ne donnez votre adresse exacte qu\'après qualification téléphonique','La fiche Vendu Par Moi répond à toutes les questions — remplissez-la une fois'],
     aiMsg:'Le module 2 est souvent négligé — c\'est une erreur. Un dossier incomplet peut bloquer votre vente au dernier moment. Commencez par rassembler le titre de propriété et les déclarations de travaux.',
@@ -1329,7 +1450,7 @@ const MODULES = [
     ]
   },
   {
-    phase:'avant', mailCat:'visite', num:'03', title:'Annonce & Photos', subtitle:'Rédiger, photographier et publier',
+    phase:'avant', mailCat:'visite', num:'03', title:'Annonce & Photos', subtitle:'Déclencher 2x plus de visites qualifiées grâce à une annonce qui donne envie et des photos qui vendent',
     videoSrc:'/videos/formation-annonce.mp4', agentVideo:'/videos/agent-annonce.mp4',
     keyPoints:['90% des acheteurs décident de visiter en 8 secondes sur les photos','Ne jamais écrire "prix négociable" — invite les offres basses','Titre idéal : type + surface + ville + prix + 1 atout (< 60 car.)','Dépersonnalisez votre bien — l\'acheteur doit se projeter, pas vous voir'],
     aiMsg:'Les photos sont votre seul argument de vente en ligne. Prenez-les après avoir dépersonnalisé — enlever toutes les photos personnelles fait une différence énorme sur le ressenti de l\'acheteur.',
@@ -1365,7 +1486,7 @@ const MODULES = [
     ]
   },
   {
-    phase:'apres', mailCat:'visite', num:'04', title:'Préparer sa visite', subtitle:'Qualifier l\'acheteur et préparer l\'accueil',
+    phase:'apres', mailCat:'visite', num:'04', title:'Préparer sa visite', subtitle:'Ne recevoir que des acheteurs vraiment finançables — et arrêter de perdre du temps',
     keyPoints:['Qualifiez l\'acheteur AVANT d\'ouvrir votre porte (financement !)','Ne donnez jamais votre adresse avant d\'avoir qualifié','20 minutes suffisent pour préparer une visite parfaite','Confirmez par SMS la veille avec l\'adresse exacte'],
     aiMsg:'La qualification avant visite est cruciale. Posez discrètement la question du financement — un acheteur non finançable peut vous faire perdre 3 à 6 mois.',
     steps:[
@@ -1385,7 +1506,7 @@ const MODULES = [
     ]
   },
   {
-    phase:'apres', mailCat:'visite', num:'05', title:'Les visites', subtitle:'Accueillir, guider et gérer les questions difficiles',
+    phase:'apres', mailCat:'visite', num:'05', title:'Les visites', subtitle:'Guider chaque acheteur pour qu\'il se projette — et savoir répondre aux questions pièges sans se déstabiliser',
     keyPoints:['Commencez par la meilleure pièce, terminez par la deuxième meilleure','Restez un pas en retrait — laissez l\'acheteur explorer librement','Les silences sont positifs — ne les remplissez pas','Préparez vos réponses aux questions pièges à l\'avance'],
     aiMsg:'Votre rôle en visite est de guider, pas de vendre. L\'acheteur doit se projeter — laissez-lui l\'espace pour le faire.',
     steps:[
@@ -1403,7 +1524,7 @@ const MODULES = [
     ]
   },
   {
-    phase:'apres', mailCat:'negociation', num:'06', title:'Négocier & Conclure', subtitle:'Offres, compromis, diagnostics et acte de vente',
+    phase:'apres', mailCat:'negociation', num:'06', title:'Négocier & Conclure', subtitle:'Défendre votre prix face aux offres basses et mener la vente jusqu\'à la signature sans agence',
     keyPoints:['Ne jamais refuser sèchement une offre — toujours contre-proposer','Répondez dans les 24h — au-delà, l\'acheteur cherche ailleurs','Le DDT complet doit être remis avant le compromis','Comptez ~3 mois entre compromis et acte de vente'],
     aiMsg:'Recevoir une offre est une excellente nouvelle, même en dessous de votre prix. C\'est le début d\'une négociation. Voici comment contre-proposer de façon ferme et professionnelle.',
     steps:[
@@ -1852,9 +1973,40 @@ function updateProgress() {
   const total = MODULES.reduce((s, m) => s + m.steps.length, 0);
   const done = Object.values(doneSteps).filter(Boolean).length;
   const pct = Math.round((done / total) * 100);
+
+  // Barre de progression (ne pas écraser pendant l'animation initiale)
   document.getElementById('progPct').textContent = pct + '%';
-  document.getElementById('progFill').style.width = pct + '%';
-  document.getElementById('progLabel').textContent = `${done} étape${done > 1 ? 's' : ''} complétée${done > 1 ? 's' : ''} sur ${total} · ${pct}%`;
+  if (!_progAnimating) document.getElementById('progFill').style.width = pct + '%';
+
+  // Badge prominent
+  const badgePct = document.getElementById('progBadgePct');
+  if (badgePct) badgePct.textContent = pct + '%';
+
+  // Label compact
+  const progLabel = document.getElementById('progLabel');
+  if (progLabel) progLabel.textContent = `${done} étape${done > 1 ? 's' : ''} sur ${total}`;
+
+  // Subtitle dans le header
+  const progSub = document.getElementById('progSubtitle');
+  if (progSub) progSub.textContent = `${done} étape${done > 1 ? 's' : ''} complétée${done > 1 ? 's' : ''} sur ${total} · ${pct}%`;
+
+  // Section "Par où commencer" — visible si 0 étapes faites
+  const wb = document.getElementById('welcomeBanner');
+  if (wb) wb.style.display = done === 0 ? '' : 'none';
+
+  // Couleur du badge selon avancement
+  const badge = document.getElementById('progBadge');
+  if (badge) {
+    if (pct === 100) {
+      badge.style.background = 'linear-gradient(135deg, #1C3028 0%, #3D5A47 100%)';
+    } else if (pct >= 50) {
+      badge.style.background = 'linear-gradient(135deg, #3D5A47 0%, #4a6e55 100%)';
+    } else if (pct > 0) {
+      badge.style.background = 'linear-gradient(135deg, #C4785A 0%, #a85a40 100%)';
+    } else {
+      badge.style.background = 'linear-gradient(135deg, #888 0%, #999 100%)';
+    }
+  }
 }
 
 // ── Alex agent vocal ──
@@ -1989,8 +2141,8 @@ function renderModules() {
   tabs.innerHTML = ''; container.innerHTML = '';
 
   const phases = [
-    { key:'avant', label:'Construire une vente solide', icon:'<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>', desc:'Aider le vendeur à construire des bases solides avant de recevoir ses premiers acquéreurs.' },
-    { key:'apres', label:'Finaliser sa vente sereinement', icon:'<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg>', desc:'Accompagner le vendeur depuis la préparation des visites jusqu\'à la signature finale.' },
+    { key:'avant', label:'Construire une vente solide', icon:'<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>', desc:'Estimez, préparez et publiez comme un pro. Tout ce qu\'il faut faire avant de recevoir vos premiers acheteurs.' },
+    { key:'apres', label:'Finaliser sa vente sereinement', icon:'<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg>', desc:'Gérez les visites, défendez votre prix et menez la signature chez le notaire — sans agence.' },
   ];
 
   phases.forEach(phase => {
@@ -2020,12 +2172,23 @@ function renderModules() {
 
     phaseMods.forEach(({ mod, mi }) => {
       const btn = document.createElement('button');
-      btn.className = 'mod-tab' + (mi === activeModule ? ' active' : '');
       const totalSteps = mod.steps?.length || 0;
       const doneCount = mod.steps ? mod.steps.filter((_, si) => doneSteps[`${mi}_${si}`]).length : 0;
       const progPct = totalSteps > 0 ? Math.round(doneCount / totalSteps * 100) : 0;
-      btn.innerHTML = `<span class="mod-tab-num">${mod.num}</span><span class="mod-tab-label">${mod.title}<div class="mod-tab-prog"><div class="mod-tab-prog-fill" id="mod-tab-prog-${mi}" style="width:${progPct}%"></div></div></span>`;
+      // État : done / inprogress / notstarted
+      let statusClass = '';
+      let statusIcon = '';
+      if (doneCount === totalSteps && totalSteps > 0) {
+        statusClass = ' mod-status-done';
+        statusIcon = `<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><polyline points="20 6 9 17 4 12"/></svg>`;
+      } else if (doneCount > 0) {
+        statusClass = ' mod-status-inprogress';
+        statusIcon = `<svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor" style="flex-shrink:0;opacity:0.7;"><circle cx="12" cy="12" r="5"/></svg>`;
+      }
+      btn.className = 'mod-tab' + (mi === activeModule ? ' active' : '') + statusClass;
+      btn.innerHTML = `<span class="mod-tab-num">${statusIcon || mod.num}</span><span class="mod-tab-label">${mod.title}<div class="mod-tab-prog"><div class="mod-tab-prog-fill" id="mod-tab-prog-${mi}" style="width:${progPct}%"></div></div></span>`;
       btn.type = 'button';
+      btn.setAttribute('title', `${doneCount}/${totalSteps} étapes · ${progPct}%`);
       btn.addEventListener('click', () => { stopAgent(); activeModule = mi; if (mod.mailCat) activeMailCat = mod.mailCat; renderModules(); updateKeyPoints(); updateModuleVideo(); showModuleSlides(mi); triggerAiModuleMsg(mi); renderMails(); renderChecklists(); setTimeout(() => { document.getElementById('modContainer').scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 60); });
       row.appendChild(btn);
     });
@@ -2039,7 +2202,11 @@ function renderModules() {
     const div = document.createElement('div');
     div.className = 'mod-content' + (mi === activeModule ? ' active' : '');
 
-    let html = `<div class="mod-hdr"><div class="mod-num">${mod.num}</div><div><div class="mod-hdr-title">${mod.title}</div><div class="mod-hdr-sub">${mod.subtitle}</div></div></div><div class="steps-list">`;
+    const modTotalSteps = mod.steps?.length || 0;
+    const modDoneCount = mod.steps ? mod.steps.filter((_, si) => doneSteps[`${mi}_${si}`]).length : 0;
+    const modProgPct = modTotalSteps > 0 ? Math.round(modDoneCount / modTotalSteps * 100) : 0;
+    const modCTALabel = modDoneCount === 0 ? 'Commencer' : modDoneCount === modTotalSteps ? 'Terminé ✓' : 'Continuer';
+    let html = `<div class="mod-hdr"><div class="mod-num">${mod.num}</div><div style="flex:1;min-width:0;"><div class="mod-hdr-title">${mod.title}</div><div class="mod-hdr-sub">${mod.subtitle}</div><div class="mod-hdr-prog-wrap"><div class="mod-hdr-prog-label">${modDoneCount}/${modTotalSteps} étape${modTotalSteps > 1 ? 's' : ''} · ${modProgPct}%</div><div class="mod-hdr-prog-bar"><div class="mod-hdr-prog-fill" style="width:${modProgPct}%"></div></div></div></div></div><div class="steps-list">`;
 
     mod.steps.forEach((step, si) => {
       const key = `${mi}_${si}`;
@@ -2804,6 +2971,40 @@ updateKeyPoints();
 updateModuleVideo();
 showWelcomeSlide();
 setTimeout(() => triggerAiModuleMsg(0), 2000);
+
+// Welcome banner CTA — aller au module 1
+const welcomeStartBtn = document.getElementById('welcomeStartBtn');
+if (welcomeStartBtn) {
+  welcomeStartBtn.addEventListener('click', () => {
+    activeModule = 0;
+    if (MODULES[0]?.mailCat) activeMailCat = MODULES[0].mailCat;
+    renderModules(); updateKeyPoints(); updateModuleVideo(); showModuleSlides(0); triggerAiModuleMsg(0); renderMails(); renderChecklists();
+    setTimeout(() => {
+      document.getElementById('modTabs')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 80);
+  });
+}
+
+// Animation d'entrée de la progress bar — la fill part de 0 et s'anime vers la valeur réelle
+(function animateProgressOnLoad() {
+  const fill = document.getElementById('progFill');
+  if (!fill) return;
+  const total = MODULES.reduce((s, m) => s + m.steps.length, 0);
+  const done = Object.values(doneSteps).filter(Boolean).length;
+  const pct = Math.round((done / total) * 100);
+  if (pct === 0) return; // Rien à animer
+  _progAnimating = true;
+  fill.style.width = '0%';
+  fill.style.transition = 'none';
+  fill.getBoundingClientRect(); // Reflow
+  requestAnimationFrame(() => {
+    fill.style.transition = 'width 1.2s cubic-bezier(0.16,1,0.3,1)';
+    setTimeout(() => {
+      fill.style.width = pct + '%';
+      setTimeout(() => { _progAnimating = false; }, 1300);
+    }, 80);
+  });
+})();
 // Fiche panel listeners (after modal HTML is in DOM)
 setTimeout(function() {
   const overlay = document.getElementById('ficheOverlay');
