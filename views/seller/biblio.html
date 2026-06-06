@@ -8,14 +8,77 @@
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,400&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/css/style.css">
   <style>
-    /* ── Bibliothèque ── */
-    .bib-hero { margin-bottom: 32px; }
+    /* ── Bibliothèque — Messages + Documents ── */
+
+    /* Hero */
+    .bib-hero { margin-bottom: 28px; }
     .bib-hero-badge { display: inline-flex; align-items: center; gap: 6px; padding: 3px 12px; border-radius: 100px; background: #F0F5F1; border: 1px solid #C5D9CB; color: #3D5A47; font-size: 0.68rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 10px; }
     .bib-hero-title { font-family: 'Cormorant Garamond', serif; font-size: 1.7rem; font-weight: 600; color: #1a1a1a; line-height: 1.2; margin: 0 0 8px; }
-    .bib-hero-desc { font-size: 0.85rem; color: #666; line-height: 1.65; max-width: 600px; }
+    .bib-hero-desc { font-size: 0.85rem; color: #666; line-height: 1.65; max-width: 620px; }
 
-    .bib-tip-banner { display: flex; align-items: flex-start; gap: 12px; padding: 14px 18px; background: #F8F6F2; border-radius: 12px; border-left: 3px solid #C4785A; margin-bottom: 28px; font-size: 0.82rem; color: #555; line-height: 1.65; }
+    .bib-tip-banner { display: flex; align-items: flex-start; gap: 12px; padding: 14px 18px; background: #F8F6F2; border-radius: 12px; border-left: 3px solid #C4785A; margin-bottom: 24px; font-size: 0.82rem; color: #555; line-height: 1.65; }
     .bib-tip-icon { font-size: 1.1rem; flex-shrink: 0; margin-top: 1px; }
+
+    /* Tab bar — Documents | Messages */
+    .bib-tab-bar { display: flex; gap: 4px; margin-bottom: 24px; border-bottom: 2px solid #E8E3DB; }
+    .bib-tab { padding: 10px 18px; font-size: 0.88rem; font-weight: 600; font-family: 'DM Sans', sans-serif; cursor: pointer; background: none; border: none; color: #888; border-bottom: 3px solid transparent; margin-bottom: -2px; transition: all 0.15s; display: flex; align-items: center; gap: 7px; }
+    .bib-tab:hover { color: #3D5A47; }
+    .bib-tab.active { color: #3D5A47; border-bottom-color: #3D5A47; }
+    .bib-tab-count { display: inline-flex; align-items: center; justify-content: center; background: #E8E3DB; color: #888; border-radius: 100px; font-size: 0.68rem; font-weight: 700; padding: 1px 7px; }
+    .bib-tab.active .bib-tab-count { background: #3D5A47; color: #fff; }
+
+    /* ═══════════════════════════════════════
+       SECTION DOCUMENTS
+       ═══════════════════════════════════════ */
+    #docSection { display: block; }
+    #msgSection { display: none; }
+
+    /* Category section with visual header */
+    .doc-category { margin-bottom: 32px; }
+    .doc-category-header { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; }
+    .doc-category-icon { width: 34px; height: 34px; border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .doc-category-title { font-size: 0.9rem; font-weight: 700; color: #1a1a1a; }
+    .doc-category-desc { font-size: 0.75rem; color: #aaa; margin-top: 1px; }
+    .doc-category-line { flex: 1; height: 1px; background: #E8E3DB; }
+
+    /* Document grid */
+    .doc-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(290px, 1fr)); gap: 10px; }
+
+    /* Document card */
+    .doc-card { background: #fff; border: 1.5px solid #E8E3DB; border-radius: 14px; padding: 16px 18px; display: flex; align-items: flex-start; gap: 14px; transition: all 0.18s; position: relative; }
+    .doc-card:hover { border-color: #C5D9CB; box-shadow: 0 4px 18px rgba(0,0,0,0.07); transform: translateY(-1px); }
+    .doc-card.essential { border-color: #C4785A; }
+    .doc-card.essential::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: #C4785A; border-radius: 14px 14px 0 0; }
+
+    /* File type icon */
+    .doc-file-icon { width: 40px; height: 48px; border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; position: relative; }
+    .doc-file-icon.pdf { background: #FEF2F2; color: #DC2626; }
+    .doc-file-icon.word { background: #EEF2FF; color: #4F46E5; }
+    .doc-file-icon.excel { background: #F0FFF4; color: #16A34A; }
+    .doc-file-icon.image { background: #F0F9FF; color: #0284C7; }
+    .doc-file-icon.zip { background: #FFFBEB; color: #B45309; }
+    .doc-file-ext { position: absolute; bottom: 4px; left: 50%; transform: translateX(-50%); font-size: 0.55rem; font-weight: 800; letter-spacing: 0.03em; white-space: nowrap; }
+
+    /* Card content */
+    .doc-content { flex: 1; min-width: 0; }
+    .doc-top-row { display: flex; align-items: flex-start; gap: 6px; margin-bottom: 4px; flex-wrap: wrap; }
+    .doc-title { font-size: 0.88rem; font-weight: 700; color: #1a1a1a; line-height: 1.3; }
+    .doc-badge-essential { display: inline-flex; align-items: center; gap: 3px; background: #FFF5F0; color: #C4785A; border: 1px solid #F0C8B4; border-radius: 100px; font-size: 0.62rem; font-weight: 700; padding: 1px 7px; white-space: nowrap; flex-shrink: 0; }
+    .doc-desc { font-size: 0.76rem; color: #888; line-height: 1.5; margin-bottom: 10px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+    /* Action buttons */
+    .doc-actions { display: flex; gap: 6px; flex-wrap: wrap; }
+    .doc-btn { display: inline-flex; align-items: center; gap: 5px; padding: 7px 13px; border-radius: 7px; font-size: 0.76rem; font-weight: 600; font-family: 'DM Sans', sans-serif; cursor: pointer; text-decoration: none; transition: all 0.15s; border: none; min-height: 36px; white-space: nowrap; }
+    .doc-btn-primary { background: #3D5A47; color: #fff; }
+    .doc-btn-primary:hover { background: #2e4435; }
+    .doc-btn-secondary { background: #fff; color: #555; border: 1.5px solid #E8E3DB; }
+    .doc-btn-secondary:hover { border-color: #3D5A47; color: #3D5A47; }
+    .doc-btn-terracotta { background: #fff; color: #C4785A; border: 1.5px solid #C4785A; }
+    .doc-btn-terracotta:hover { background: #FDF5F1; }
+
+    /* ═══════════════════════════════════════
+       SECTION MESSAGES (ancienne biblio)
+       ═══════════════════════════════════════ */
 
     /* Search + filters */
     .bib-search-row { display: flex; gap: 8px; margin-bottom: 16px; align-items: center; flex-wrap: wrap; }
@@ -39,10 +102,10 @@
 
     .bib-results-info { font-size: 0.73rem; color: #BBB; margin-bottom: 14px; }
 
-    /* Grid */
+    /* Template grid */
     .bib-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 12px; align-items: start; }
 
-    /* Cards */
+    /* Template cards */
     .tpl-card { background: #fff; border: 1.5px solid #E8E3DB; border-radius: 14px; overflow: hidden; transition: all 0.18s; display: flex; flex-direction: column; }
     .tpl-card:hover { border-color: #C5D9CB; box-shadow: 0 4px 24px rgba(0,0,0,0.07); transform: translateY(-1px); }
     .tpl-card-top { padding: 16px 16px 12px; flex: 1; }
@@ -60,14 +123,12 @@
     .tpl-preview { font-size: 0.78rem; color: #777; line-height: 1.6; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
     .tpl-var { display: inline-block; padding: 1px 5px; border-radius: 4px; background: #FFFBEB; color: #B45309; font-size: 0.72rem; font-weight: 700; border: 1px solid #FDE68A; margin: 0 1px; white-space: nowrap; }
 
-    /* Expanded body */
     .tpl-body-wrap { display: none; padding: 0 14px 10px; }
     .tpl-body-wrap.open { display: block; animation: fadeInBib 0.2s; }
     @keyframes fadeInBib { from{opacity:0;transform:translateY(4px)} to{opacity:1;transform:none} }
     .tpl-body-text { font-size: 0.8rem; color: #333; line-height: 1.8; white-space: pre-wrap; background: #FAFAF8; border-radius: 8px; padding: 12px 14px; border: 1px solid #F0ECE6; font-family: 'DM Sans', sans-serif; }
     .tpl-tip-bib { margin-top: 9px; font-size: 0.75rem; color: #2D4D38; padding: 7px 10px 7px 12px; background: #EDF5F0; border-left: 3px solid #3D5A47; border-radius: 0 6px 6px 0; line-height: 1.55; }
 
-    /* Actions */
     .tpl-actions { display: flex; gap: 6px; padding: 10px 12px; border-top: 1px solid #F0ECE6; background: #FAFAF8; align-items: center; }
     .tpl-copy-btn { flex: 1; min-width: 0; padding: 9px 12px; border-radius: 8px; background: #3D5A47; color: #fff; border: none; font-size: 0.8rem; font-weight: 600; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: all 0.18s; display: flex; align-items: center; justify-content: center; gap: 6px; }
     .tpl-copy-btn:hover { background: #2D4237; }
@@ -79,7 +140,6 @@
     .tpl-expand-btn:hover { border-color: #3D5A47; color: #3D5A47; }
 
     .bib-empty { text-align: center; padding: 56px 20px; color: #BBB; font-size: 0.85rem; grid-column: 1 / -1; }
-    .bib-empty-icon { font-size: 2.5rem; margin-bottom: 12px; }
     .bib-empty-msg { font-size: 0.88rem; color: #999; }
 
     /* Toast */
@@ -90,12 +150,15 @@
 
     @media (max-width: 768px) {
       .bib-grid { grid-template-columns: 1fr; }
+      .doc-grid { grid-template-columns: 1fr; }
       .bib-hero-title { font-size: 1.4rem; }
+      .bib-tab { padding: 9px 12px; font-size: 0.82rem; }
     }
     @media (max-width: 480px) {
       .bib-cat { padding: 6px 10px; font-size: 0.73rem; }
       .tpl-copy-btn { font-size: 0.76rem; }
       .bib-filter { padding: 7px 11px; }
+      .doc-card { padding: 14px 14px; gap: 10px; }
     }
   </style>
 </head>
@@ -120,7 +183,8 @@
       </a>
       <a href="/mon-guide-photos" class="sidebar-item">
         <span style="display:inline-flex;align-items:center;vertical-align:middle;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg></span> Guide photos
-      </a>      <a href="/mon-agenda" class="sidebar-item">
+      </a>
+      <a href="/mon-agenda" class="sidebar-item">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg> Mon agenda
       </a>
       <a href="/ma-bibliotheque" class="sidebar-item active">
@@ -130,7 +194,7 @@
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.55a11 11 0 0 1 14.08 0"/><path d="M1.42 9a16 16 0 0 1 21.16 0"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><circle cx="12" cy="20" r="1"/></svg> Mes publications
       </a>
       <a href="/coach-ia" class="sidebar-item">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/><circle cx="9" cy="10" r="1" fill="currentColor"/><circle cx="12" cy="10" r="1" fill="currentColor"/><circle cx="15" cy="10" r="1" fill="currentColor"/></svg>Coach IA
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/><circle cx="9" cy="10" r="1" fill="currentColor"/><circle cx="12" cy="10" r="1" fill="currentColor"/><circle cx="15" cy="10" r="1" fill="currentColor"/></svg> Coach IA
       </a>
     </nav>
     <div style="position:absolute;bottom:24px;left:0;right:0;padding:0 24px;">
@@ -139,45 +203,379 @@
   </aside>
 
   <main class="main-content">
-    <div class="page-header">
-      <h1 class="page-title">Ma bibliothèque</h1>
-      <p class="page-subtitle">Messages professionnels prêts à l'emploi</p>
-    </div>
 
     <!-- Hero -->
     <div class="bib-hero">
-      <div class="bib-hero-badge"><span style="display:inline-flex;align-items:center;vertical-align:middle;"><svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" stroke="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></span> Communication vendeur</div>
-      <h2 class="bib-hero-title">1 clic → copier → envoyer</h2>
-      <p class="bib-hero-desc">38 modèles de messages pour chaque situation de votre vente. Sélectionnez une catégorie, lisez la preview, copiez en 1 clic et personnalisez les <span class="tpl-var">[variables]</span> surlignées avant d'envoyer.</p>
+      <div class="bib-hero-badge"><svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" stroke="none" style="vertical-align:middle;"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg> Ressources vendeur</div>
+      <h2 class="bib-hero-title">Votre boîte à outils complète</h2>
+      <p class="bib-hero-desc">Documents téléchargeables et modèles de messages pour chaque étape de votre vente. Tout ce dont vous avez besoin, organisé par catégorie.</p>
     </div>
 
-    <!-- Tip banner -->
-    <div class="bib-tip-banner">
-      <div class="bib-tip-icon"><span style="display:inline-flex;align-items:center;vertical-align:middle;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><line x1="9" y1="18" x2="15" y2="18"/><line x1="10" y1="22" x2="14" y2="22"/><path d="M15.09 14c.18-.98.65-1.74 1.41-2.5A4.65 4.65 0 0 0 18 8 6 6 0 0 0 6 8c0 1 .23 2.23 1.5 3.5A4.61 4.61 0 0 1 8.91 14"/></svg></span></div>
-      <div>Personnalisez toujours les champs <span class="tpl-var">[NOM]</span> <span class="tpl-var">[DATE]</span> <span class="tpl-var">[HEURE]</span> avant d'envoyer. Un message personnalisé obtient 3× plus de réponses qu'un message générique.</div>
+    <!-- Tab bar -->
+    <div class="bib-tab-bar">
+      <button class="bib-tab active" id="tabDocuments" onclick="showTab('documents')">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+        Documents
+        <span class="bib-tab-count" id="docCount">18</span>
+      </button>
+      <button class="bib-tab" id="tabMessages" onclick="showTab('messages')">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        Modèles de messages
+        <span class="bib-tab-count" id="msgCount">38</span>
+      </button>
     </div>
 
-    <!-- Recherche + filtres -->
-    <div class="bib-search-row">
-      <div class="bib-search-wrap">
-        <svg class="bib-search-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-        <input class="bib-search" id="bibSearch" type="text" placeholder="Rechercher un modèle…" autocomplete="off">
+    <!-- ═══ DOCUMENTS ═══ -->
+    <div id="docSection">
+
+      <!-- Catégorie : Essentiels -->
+      <div class="doc-category">
+        <div class="doc-category-header">
+          <div class="doc-category-icon" style="background:#FFF5F0;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#C4785A" stroke-width="1.8"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          </div>
+          <div>
+            <div class="doc-category-title">Essentiels — À utiliser en priorité</div>
+            <div class="doc-category-desc">Les documents les plus utiles à chaque vendeur particulier</div>
+          </div>
+          <div class="doc-category-line"></div>
+        </div>
+        <div class="doc-grid">
+          <div class="doc-card essential">
+            <div class="doc-file-icon pdf">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+              <span class="doc-file-ext">PDF</span>
+            </div>
+            <div class="doc-content">
+              <div class="doc-top-row">
+                <span class="doc-title">Guide complet du vendeur particulier</span>
+                <span class="doc-badge-essential"><svg width="9" height="9" viewBox="0 0 24 24" fill="currentColor" stroke="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg> Essentiel</span>
+              </div>
+              <div class="doc-desc">De la mise en vente à la signature — 32 pages</div>
+              <div class="doc-actions">
+                <a href="/documents/guide-vendeur.pdf" class="doc-btn doc-btn-primary" download>
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                  Télécharger
+                </a>
+                <a href="/documents/guide-vendeur.pdf" class="doc-btn doc-btn-secondary" target="_blank">Voir</a>
+              </div>
+            </div>
+          </div>
+
+          <div class="doc-card essential">
+            <div class="doc-file-icon pdf">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+              <span class="doc-file-ext">PDF</span>
+            </div>
+            <div class="doc-content">
+              <div class="doc-top-row">
+                <span class="doc-title">Checklist visite acheteur</span>
+                <span class="doc-badge-essential"><svg width="9" height="9" viewBox="0 0 24 24" fill="currentColor" stroke="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg> Essentiel</span>
+              </div>
+              <div class="doc-desc">Points à vérifier avant chaque visite</div>
+              <div class="doc-actions">
+                <a href="/documents/checklist-visite.pdf" class="doc-btn doc-btn-primary" download>
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                  Télécharger
+                </a>
+                <a href="/documents/checklist-visite.pdf" class="doc-btn doc-btn-secondary" target="_blank">Voir</a>
+              </div>
+            </div>
+          </div>
+
+          <div class="doc-card essential">
+            <div class="doc-file-icon word">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+              <span class="doc-file-ext">DOC</span>
+            </div>
+            <div class="doc-content">
+              <div class="doc-top-row">
+                <span class="doc-title">Modèle de bon de visite</span>
+                <span class="doc-badge-essential"><svg width="9" height="9" viewBox="0 0 24 24" fill="currentColor" stroke="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg> Essentiel</span>
+              </div>
+              <div class="doc-desc">À faire signer à chaque visiteur</div>
+              <div class="doc-actions">
+                <a href="/documents/bon-de-visite.docx" class="doc-btn doc-btn-primary" download>
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                  Télécharger
+                </a>
+                <a href="/documents/bon-de-visite.pdf" class="doc-btn doc-btn-secondary" target="_blank">Voir</a>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
-      <div class="bib-filter-btns">
-        <button class="bib-filter" id="bibFltSms">SMS</button>
-        <button class="bib-filter" id="bibFltEmail">Email</button>
-        <button class="bib-filter" id="bibFltFavs"><span style="display:inline-flex;align-items:center;vertical-align:middle;"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></span> Favoris</button>
+
+      <!-- Catégorie : Juridique & Administratif -->
+      <div class="doc-category">
+        <div class="doc-category-header">
+          <div class="doc-category-icon" style="background:#EEF2FF;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#4F46E5" stroke-width="1.8"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1"/><line x1="9" y1="12" x2="15" y2="12"/><line x1="9" y1="16" x2="12" y2="16"/></svg>
+          </div>
+          <div>
+            <div class="doc-category-title">Juridique &amp; Administratif</div>
+            <div class="doc-category-desc">Documents légaux pour sécuriser votre vente</div>
+          </div>
+          <div class="doc-category-line"></div>
+        </div>
+        <div class="doc-grid">
+          <div class="doc-card">
+            <div class="doc-file-icon pdf">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+              <span class="doc-file-ext">PDF</span>
+            </div>
+            <div class="doc-content">
+              <div class="doc-top-row"><span class="doc-title">Liste des diagnostics obligatoires</span></div>
+              <div class="doc-desc">DPE, amiante, plomb, électricité… ce qui est requis</div>
+              <div class="doc-actions">
+                <a href="/documents/diagnostics-obligatoires.pdf" class="doc-btn doc-btn-primary" download>
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                  Télécharger
+                </a>
+                <a href="/documents/diagnostics-obligatoires.pdf" class="doc-btn doc-btn-secondary" target="_blank">Voir</a>
+              </div>
+            </div>
+          </div>
+
+          <div class="doc-card">
+            <div class="doc-file-icon word">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+              <span class="doc-file-ext">DOC</span>
+            </div>
+            <div class="doc-content">
+              <div class="doc-top-row"><span class="doc-title">Modèle offre d'achat</span></div>
+              <div class="doc-desc">Trame d'offre écrite à faire remplir par l'acheteur</div>
+              <div class="doc-actions">
+                <a href="/documents/offre-achat-modele.docx" class="doc-btn doc-btn-primary" download>
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                  Télécharger
+                </a>
+              </div>
+            </div>
+          </div>
+
+          <div class="doc-card">
+            <div class="doc-file-icon pdf">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+              <span class="doc-file-ext">PDF</span>
+            </div>
+            <div class="doc-content">
+              <div class="doc-top-row"><span class="doc-title">Guide loi Hoguet — vente entre particuliers</span></div>
+              <div class="doc-desc">Ce que vous avez le droit de faire sans agent</div>
+              <div class="doc-actions">
+                <a href="/documents/loi-hoguet-particuliers.pdf" class="doc-btn doc-btn-primary" download>
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                  Télécharger
+                </a>
+                <a href="/documents/loi-hoguet-particuliers.pdf" class="doc-btn doc-btn-secondary" target="_blank">Voir</a>
+              </div>
+            </div>
+          </div>
+
+          <div class="doc-card">
+            <div class="doc-file-icon pdf">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+              <span class="doc-file-ext">PDF</span>
+            </div>
+            <div class="doc-content">
+              <div class="doc-top-row"><span class="doc-title">Comprendre le compromis de vente</span></div>
+              <div class="doc-desc">Les clauses essentielles expliquées simplement</div>
+              <div class="doc-actions">
+                <a href="/documents/comprendre-compromis.pdf" class="doc-btn doc-btn-primary" download>
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                  Télécharger
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
+
+      <!-- Catégorie : Estimation & Prix -->
+      <div class="doc-category">
+        <div class="doc-category-header">
+          <div class="doc-category-icon" style="background:#ECFDF5;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="1.8"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+          </div>
+          <div>
+            <div class="doc-category-title">Estimation &amp; Prix</div>
+            <div class="doc-category-desc">Outils pour fixer et défendre votre prix de vente</div>
+          </div>
+          <div class="doc-category-line"></div>
+        </div>
+        <div class="doc-grid">
+          <div class="doc-card">
+            <div class="doc-file-icon excel">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M3 15h18M9 3v18"/></svg>
+              <span class="doc-file-ext">XLS</span>
+            </div>
+            <div class="doc-content">
+              <div class="doc-top-row"><span class="doc-title">Calculateur de prix net vendeur</span></div>
+              <div class="doc-desc">Calculez automatiquement votre net après frais</div>
+              <div class="doc-actions">
+                <a href="/documents/calculateur-prix.xlsx" class="doc-btn doc-btn-primary" download>
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                  Télécharger
+                </a>
+              </div>
+            </div>
+          </div>
+
+          <div class="doc-card">
+            <div class="doc-file-icon pdf">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+              <span class="doc-file-ext">PDF</span>
+            </div>
+            <div class="doc-content">
+              <div class="doc-top-row"><span class="doc-title">Guide de négociation du prix</span></div>
+              <div class="doc-desc">Comment répondre aux offres basses et tenir votre prix</div>
+              <div class="doc-actions">
+                <a href="/documents/guide-negociation.pdf" class="doc-btn doc-btn-primary" download>
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                  Télécharger
+                </a>
+                <a href="/documents/guide-negociation.pdf" class="doc-btn doc-btn-secondary" target="_blank">Voir</a>
+              </div>
+            </div>
+          </div>
+
+          <div class="doc-card">
+            <div class="doc-file-icon excel">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M3 15h18M9 3v18"/></svg>
+              <span class="doc-file-ext">XLS</span>
+            </div>
+            <div class="doc-content">
+              <div class="doc-top-row"><span class="doc-title">Tableau de suivi des offres</span></div>
+              <div class="doc-desc">Comparez plusieurs offres sur les mêmes critères</div>
+              <div class="doc-actions">
+                <a href="/documents/suivi-offres.xlsx" class="doc-btn doc-btn-primary" download>
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                  Télécharger
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Catégorie : Mise en valeur du bien -->
+      <div class="doc-category">
+        <div class="doc-category-header">
+          <div class="doc-category-icon" style="background:#F0F9FF;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0284C7" stroke-width="1.8"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+          </div>
+          <div>
+            <div class="doc-category-title">Mise en valeur du bien</div>
+            <div class="doc-category-desc">Photos, home staging et préparation des visites</div>
+          </div>
+          <div class="doc-category-line"></div>
+        </div>
+        <div class="doc-grid">
+          <div class="doc-card">
+            <div class="doc-file-icon pdf">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+              <span class="doc-file-ext">PDF</span>
+            </div>
+            <div class="doc-content">
+              <div class="doc-top-row"><span class="doc-title">Guide home staging — 10 astuces</span></div>
+              <div class="doc-desc">Maximisez l'impact visuel sans grands travaux</div>
+              <div class="doc-actions">
+                <a href="/documents/home-staging-guide.pdf" class="doc-btn doc-btn-primary" download>
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                  Télécharger
+                </a>
+                <a href="/documents/home-staging-guide.pdf" class="doc-btn doc-btn-secondary" target="_blank">Voir</a>
+              </div>
+            </div>
+          </div>
+
+          <div class="doc-card">
+            <div class="doc-file-icon pdf">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+              <span class="doc-file-ext">PDF</span>
+            </div>
+            <div class="doc-content">
+              <div class="doc-top-row"><span class="doc-title">Checklist préparation visite</span></div>
+              <div class="doc-desc">Ce qu'il faut préparer 24h avant chaque visite</div>
+              <div class="doc-actions">
+                <a href="/documents/preparation-visite.pdf" class="doc-btn doc-btn-primary" download>
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                  Télécharger
+                </a>
+              </div>
+            </div>
+          </div>
+
+          <div class="doc-card">
+            <div class="doc-file-icon word">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+              <span class="doc-file-ext">DOC</span>
+            </div>
+            <div class="doc-content">
+              <div class="doc-top-row"><span class="doc-title">Fiche descriptive de votre bien</span></div>
+              <div class="doc-desc">Template à remettre aux visiteurs lors de la visite</div>
+              <div class="doc-actions">
+                <a href="/documents/fiche-bien.docx" class="doc-btn doc-btn-primary" download>
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                  Télécharger
+                </a>
+              </div>
+            </div>
+          </div>
+
+          <div class="doc-card">
+            <div class="doc-file-icon pdf">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
+              <span class="doc-file-ext">PDF</span>
+            </div>
+            <div class="doc-content">
+              <div class="doc-top-row"><span class="doc-title">Guide photos immobilières</span></div>
+              <div class="doc-desc">Pièces, lumière, angles — les règles pour des photos pro</div>
+              <div class="doc-actions">
+                <a href="/mon-guide-photos" class="doc-btn doc-btn-terracotta">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                  Voir dans l'appli →
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
     </div>
+    <!-- /docSection -->
 
-    <!-- Catégories -->
-    <div class="bib-cats" id="bibCats"></div>
+    <!-- ═══ MESSAGES ═══ -->
+    <div id="msgSection">
+      <!-- Tip banner -->
+      <div class="bib-tip-banner" style="margin-bottom:20px;">
+        <div class="bib-tip-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="vertical-align:middle;"><line x1="9" y1="18" x2="15" y2="18"/><line x1="10" y1="22" x2="14" y2="22"/><path d="M15.09 14c.18-.98.65-1.74 1.41-2.5A4.65 4.65 0 0 0 18 8 6 6 0 0 0 6 8c0 1 .23 2.23 1.5 3.5A4.61 4.61 0 0 1 8.91 14"/></svg></div>
+        <div>Personnalisez toujours les champs <span class="tpl-var">[NOM]</span> <span class="tpl-var">[DATE]</span> <span class="tpl-var">[HEURE]</span> avant d'envoyer. Un message personnalisé obtient 3× plus de réponses qu'un message générique.</div>
+      </div>
 
-    <!-- Compteur -->
-    <div class="bib-results-info" id="bibInfo"></div>
+      <!-- Recherche + filtres -->
+      <div class="bib-search-row">
+        <div class="bib-search-wrap">
+          <svg class="bib-search-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input class="bib-search" id="bibSearch" type="text" placeholder="Rechercher un modèle…" autocomplete="off">
+        </div>
+        <div class="bib-filter-btns">
+          <button class="bib-filter" id="bibFltSms">SMS</button>
+          <button class="bib-filter" id="bibFltEmail">Email</button>
+          <button class="bib-filter" id="bibFltFavs"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" stroke="none" style="vertical-align:middle;"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg> Favoris</button>
+        </div>
+      </div>
 
-    <!-- Grille -->
-    <div class="bib-grid" id="bibGrid"></div>
+      <!-- Catégories -->
+      <div class="bib-cats" id="bibCats"></div>
+
+      <!-- Compteur -->
+      <div class="bib-results-info" id="bibInfo"></div>
+
+      <!-- Grille -->
+      <div class="bib-grid" id="bibGrid"></div>
+    </div>
+    <!-- /msgSection -->
 
     <div style="height:80px;"></div>
   </main>
@@ -188,8 +586,17 @@
 
 <script src="/js/transitions.js"></script>
 <script>
+// ── Tab switching ─────────────────────────────────────────────
+function showTab(tab) {
+  const isDoc = tab === 'documents';
+  document.getElementById('docSection').style.display = isDoc ? 'block' : 'none';
+  document.getElementById('msgSection').style.display = isDoc ? 'none'  : 'block';
+  document.getElementById('tabDocuments').classList.toggle('active', isDoc);
+  document.getElementById('tabMessages').classList.toggle('active', !isDoc);
+}
+
 // ══════════════════════════════════════════════════════════════
-// BIBLIOTHÈQUE DE COMMUNICATION VENDEUR
+// BIBLIOTHÈQUE DE COMMUNICATION VENDEUR — modèles de messages
 // ══════════════════════════════════════════════════════════════
 
 const BIB_CATS = [
@@ -235,7 +642,6 @@ const BIB_TEMPLATES = [
   { id:'vis-10', cat:'visites', title:'Demande de décision acquéreur', type:'email', tone:'ferme',
     tip:'Après 5 jours sans retour, relancez. Vous méritez une réponse claire.',
     body:`Bonjour,\n\nJe reviens vers vous concernant mon bien visité récemment afin de savoir si vous souhaitez donner suite à votre projet d'acquisition.\n\nJe reste disponible pour échanger.\n\nCordialement\n[NOM]` },
-
   // ── NÉGOCIATION ──────────────────────────────────────────────
   { id:'neg-1', cat:'negociation', title:"Refus d'offre — ferme", type:'email', tone:'ferme',
     tip:'Soyez courtois mais sans explication. Un refus poli laisse la porte ouverte.',
@@ -252,7 +658,6 @@ const BIB_TEMPLATES = [
   { id:'neg-5', cat:'negociation', title:'Négociation mobilier inclus', type:'email', tone:'amical',
     tip:'Le mobilier peut être un atout de négociation sans toucher au prix affiché.',
     body:`Bonjour,\n\nConcernant certains équipements présents dans mon bien, je suis ouvert à échanger avec vous sur les éléments pouvant éventuellement rester après la vente.\n\nNous pouvons en discuter ensemble.\n\nCordialement\n[NOM]` },
-
   // ── NOTAIRE ──────────────────────────────────────────────────
   { id:'not-1', cat:'notaire', title:'Demande documents acquéreur', type:'email', tone:'premium',
     tip:"Demandez ces documents dès l'acceptation de l'offre pour ne pas perdre de temps.",
@@ -263,7 +668,6 @@ const BIB_TEMPLATES = [
   { id:'not-3', cat:'notaire', title:'Documents manquants', type:'email', tone:'ferme',
     tip:'Soyez précis sur les documents manquants pour éviter des allers-retours inutiles.',
     body:`Bonjour,\n\nIl semble manquer certains documents nécessaires à la préparation du dossier de vente de mon bien.\n\nPouvez-vous me transmettre les éléments suivants :\n[DOCUMENTS]\n\nMerci par avance.\n\nCordialement\n[NOM]` },
-
   // ── FINANCEMENT ──────────────────────────────────────────────
   { id:'fin-1', cat:'financement', title:'Suivi financement bancaire', type:'email', tone:'rassurant',
     tip:"Relancez toutes les semaines jusqu'à l'obtention de l'accord. Votre vente en dépend.",
@@ -271,7 +675,6 @@ const BIB_TEMPLATES = [
   { id:'fin-2', cat:'financement', title:'Demande accord de principe', type:'email', tone:'ferme',
     tip:'Ne bloquez pas votre bien trop longtemps sans preuve de financement.',
     body:`Bonjour,\n\nAfin de sécuriser notre transaction, pouvez-vous me transmettre votre accord de principe bancaire ou tout document attestant de votre capacité de financement ?\n\nMerci de votre compréhension.\n\nCordialement\n[NOM]` },
-
   // ── SIGNATURE ────────────────────────────────────────────────
   { id:'sig-1', cat:'signature', title:'Rappel signature acte authentique', type:'email', tone:'premium',
     tip:'Envoyez ce rappel 48h avant la signature définitive.',
@@ -288,7 +691,6 @@ const BIB_TEMPLATES = [
   { id:'sig-5', cat:'signature', title:'Remerciement final', type:'email', tone:'amical',
     tip:'Un message sincère après la vente clôt magnifiquement cette expérience.',
     body:`Bonjour,\n\nJe vous remercie pour nos échanges tout au long de la vente de mon bien et vous souhaite une excellente continuation dans votre nouveau projet.\n\nCordialement\n[NOM]` },
-
   // ── RELANCES ─────────────────────────────────────────────────
   { id:'rel-1', cat:'relances', title:'Relance J+3 (SMS)', type:'sms', tone:'amical',
     tip:"Un SMS court est souvent plus efficace qu'un email à ce stade.",
@@ -297,32 +699,15 @@ const BIB_TEMPLATES = [
     tip:"Si pas de réponse au SMS, passez à l'email avec plus de contexte.",
     body:`Bonjour,\n\nJe me permets de revenir vers vous suite à votre visite afin de savoir si mon bien correspond toujours à votre projet.\n\nJe reste disponible pour échanger à votre convenance.\n\nCordialement\n[NOM]` },
   { id:'rel-3', cat:'relances', title:'Relance finale J+14', type:'email', tone:'ferme',
-    tip:'Après 2 semaines sans réponse, soyez direct. Vous avez besoin d\'une réponse claire.',
+    tip:"Après 2 semaines sans réponse, soyez direct. Vous avez besoin d'une réponse claire.",
     body:`Bonjour,\n\nJe reviens vers vous une dernière fois suite à votre visite de mon bien.\n\nSi votre projet a évolué ou si vous ne souhaitez pas donner suite, je comprends tout à fait — un simple mot me permettrait de passer à la suite.\n\nDans l'attente de votre retour.\n\nCordialement\n[NOM]` },
-
-  // ── ACHETEURS PAS SÉRIEUX ─────────────────────────────────────
-  { id:'pas-1', cat:'visites', title:'Refus visite sans qualification', type:'email', tone:'ferme',
-    tip:'Vous avez le droit de demander une pré-qualification avant toute visite.',
-    body:`Bonjour,\n\nJe vous remercie pour votre intérêt concernant mon bien.\n\nAvant d'organiser une visite, je souhaite m'assurer que votre projet correspond bien aux caractéristiques de mon bien et à votre capacité de financement.\n\nPouvez-vous me préciser votre situation ?\n\nCordialement\n[NOM]` },
+  // ── OFFRES ───────────────────────────────────────────────────
   { id:'pas-2', cat:'offres', title:'Offre trop basse — refus ferme', type:'email', tone:'ferme',
     tip:'Refusez clairement et sans justification excessive. Votre prix est votre prix.',
     body:`Bonjour,\n\nJe vous remercie pour votre offre.\n\nAprès réflexion, cette proposition est trop éloignée de mon prix de vente pour que je puisse y donner suite.\n\nMon bien reste disponible au prix affiché.\n\nCordialement\n[NOM]` },
-  { id:'pas-3', cat:'visites', title:'Clôture relation non productive', type:'email', tone:'premium',
-    tip:"Concluez proprement pour vous libérer et passer à d'autres acheteurs.",
-    body:`Bonjour,\n\nSuite à nos échanges, il semble que mon bien ne corresponde pas à votre projet actuel.\n\nJe vous souhaite bonne continuation dans vos recherches.\n\nCordialement\n[NOM]` },
-
-  // ── ACHETEURS SILENCIEUX ──────────────────────────────────────
-  { id:'sil-1', cat:'visites', title:'Relance acheteur silencieux (SMS)', type:'sms', tone:'amical',
-    tip:'Court, sans pression. Laissez une porte ouverte.',
-    body:`Bonjour [NOM], j'espère que vous allez bien. Avez-vous pu réfléchir à mon bien ? Je suis disponible si vous avez des questions.` },
-  { id:'sil-2', cat:'visites', title:'Relance après silence prolongé', type:'email', tone:'rassurant',
-    tip:"Après 10+ jours de silence, montrez que vous êtes disponible sans être intrusif.",
-    body:`Bonjour,\n\nJe prends contact avec vous car je n'ai pas eu de nouvelles depuis votre visite de mon bien.\n\nJe ne souhaite pas vous importuner — simplement m'assurer que vous disposez de toutes les informations nécessaires pour avancer dans votre réflexion.\n\nJe reste bien sûr disponible.\n\nCordialement\n[NOM]` },
   { id:'sil-3', cat:'offres', title:'Urgence — autre acquéreur', type:'email', tone:'ferme',
     tip:"Utilisez uniquement si c'est vrai. Une fausse urgence se retourne toujours contre vous.",
     body:`Bonjour,\n\nJe me permets de vous informer qu'un autre acquéreur a manifesté un intérêt sérieux pour mon bien.\n\nSouhaitez-vous que je vous réserve un créneau pour échanger avant de prendre une décision ?\n\nCordialement\n[NOM]` },
-
-  // ── OFFRES ───────────────────────────────────────────────────
   { id:'off-1', cat:'offres', title:"Accusé réception d'offre", type:'email', tone:'premium',
     tip:"Prenez toujours le temps de la réflexion. Aucune obligation de répondre immédiatement.",
     body:`Bonjour,\n\nJe vous confirme avoir bien reçu votre offre d'achat pour mon bien.\n\nJe reviendrai vers vous dans les prochains jours après l'avoir examinée avec attention.\n\nCordialement\n[NOM]` },
@@ -336,6 +721,9 @@ const BIB_TEMPLATES = [
     tip:"Une offre verbale ne vaut rien juridiquement. Demandez toujours une offre écrite.",
     body:`Bonjour,\n\nSuite à notre échange, afin de pouvoir examiner sérieusement votre proposition, je vous invite à me transmettre votre offre d'achat par écrit (email ou courrier).\n\nDans l'attente de votre retour.\n\nCordialement\n[NOM]` },
 ];
+
+// Update tab count
+document.getElementById('msgCount').textContent = BIB_TEMPLATES.length;
 
 // ── État ─────────────────────────────────────────────────────
 const BIB_LS_FAV    = 'comm_favs_v1';
@@ -351,7 +739,6 @@ const TONE_LABELS = { premium:'Premium', amical:'Amical', ferme:'Ferme', rassura
 const COPY_SVG = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>';
 const CHECK_SVG = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>';
 
-// ── Utilitaires ───────────────────────────────────────────────
 function bibVars(text) {
   var V = ['[NOM]','[DATE]','[HEURE]','[MONTANT]','[VILLE]','[ADRESSE]','[DOCUMENTS]','[DISPONIBILITÉS]'];
   V.forEach(function(v) { text = text.split(v).join('<span class="tpl-var">' + v + '</span>'); });
@@ -390,7 +777,6 @@ function bibFiltered() {
   });
 }
 
-// ── Rendu des cartes ──────────────────────────────────────────
 function bibRender() {
   var grid = document.getElementById('bibGrid');
   var info = document.getElementById('bibInfo');
@@ -402,7 +788,7 @@ function bibRender() {
   if (list.length === 0) {
     var empty = document.createElement('div');
     empty.className = 'bib-empty';
-    empty.innerHTML = '<div class="bib-empty-icon"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></div><div class="bib-empty-msg">Aucun modèle trouvé pour cette recherche.</div>';
+    empty.innerHTML = '<div style="font-size:2rem;margin-bottom:12px;"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></div><div class="bib-empty-msg">Aucun modèle trouvé pour cette recherche.</div>';
     grid.appendChild(empty);
     return;
   }
@@ -411,7 +797,6 @@ function bibRender() {
     var card = document.createElement('div');
     card.className = 'tpl-card';
 
-    // Top
     var top = document.createElement('div');
     top.className = 'tpl-card-top';
 
@@ -435,7 +820,6 @@ function bibRender() {
 
     top.appendChild(badges); top.appendChild(title); top.appendChild(preview);
 
-    // Body expandable
     var bodyWrap = document.createElement('div');
     bodyWrap.className = 'tpl-body-wrap';
     var bodyTxt = document.createElement('div');
@@ -445,11 +829,10 @@ function bibRender() {
     if (t.tip) {
       var tipEl = document.createElement('div');
       tipEl.className = 'tpl-tip-bib';
-      tipEl.innerHTML = '<span style="display:inline-flex;align-items:center;vertical-align:middle;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><line x1="9" y1="18" x2="15" y2="18"/><line x1="10" y1="22" x2="14" y2="22"/><path d="M15.09 14c.18-.98.65-1.74 1.41-2.5A4.65 4.65 0 0 0 18 8 6 6 0 0 0 6 8c0 1 .23 2.23 1.5 3.5A4.61 4.61 0 0 1 8.91 14"/></svg></span> ' + t.tip;
+      tipEl.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="vertical-align:middle;margin-right:4px;"><line x1="9" y1="18" x2="15" y2="18"/><line x1="10" y1="22" x2="14" y2="22"/><path d="M15.09 14c.18-.98.65-1.74 1.41-2.5A4.65 4.65 0 0 0 18 8 6 6 0 0 0 6 8c0 1 .23 2.23 1.5 3.5A4.61 4.61 0 0 1 8.91 14"/></svg>' + t.tip;
       bodyWrap.appendChild(tipEl);
     }
 
-    // Actions
     var actions = document.createElement('div');
     actions.className = 'tpl-actions';
 
@@ -479,14 +862,18 @@ function bibRender() {
 
     var favBtn = document.createElement('button');
     favBtn.className = 'tpl-fav-btn' + (bibFavs.has(t.id) ? ' active' : '');
-    favBtn.innerHTML = bibFavs.has(t.id) ? '<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>' : '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>';
+    favBtn.innerHTML = bibFavs.has(t.id)
+      ? '<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>'
+      : '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>';
     favBtn.title = 'Ajouter aux favoris';
     favBtn.addEventListener('click', (function(tpl, btn) {
       return function() {
         if (bibFavs.has(tpl.id)) { bibFavs.delete(tpl.id); } else { bibFavs.add(tpl.id); }
         localStorage.setItem(BIB_LS_FAV, JSON.stringify(Array.from(bibFavs)));
         btn.classList.toggle('active', bibFavs.has(tpl.id));
-        btn.innerHTML = bibFavs.has(tpl.id) ? '<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>' : '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>';
+        btn.innerHTML = bibFavs.has(tpl.id)
+          ? '<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>'
+          : '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>';
         if (bibFltFav) bibRender();
       };
     })(t, favBtn));
@@ -512,7 +899,6 @@ function bibRender() {
   });
 }
 
-// ── Rendu des catégories ──────────────────────────────────────
 function bibRenderCats() {
   var el = document.getElementById('bibCats');
   if (!el) return;
@@ -536,7 +922,6 @@ function bibRenderCats() {
   });
 }
 
-// ── Filtres ───────────────────────────────────────────────────
 (function() {
   var searchEl = document.getElementById('bibSearch');
   var fltSms   = document.getElementById('bibFltSms');
@@ -562,7 +947,6 @@ function bibRenderCats() {
   toggle(fltFavs,  function(v) { bibFltFav  = v; }, function() { return bibFltFav; });
 })();
 
-// ── Init ──────────────────────────────────────────────────────
 bibRenderCats();
 bibRender();
 </script>
