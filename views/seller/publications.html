@@ -676,12 +676,17 @@ async function loadPublications() {
 }
 
 async function savePlatform(key) {
-  const url = document.getElementById('url-' + key).value.trim();
-  const date = document.getElementById('date-' + key).value;
+  const urlInput = document.getElementById('url-' + key);
+  const dateInput = document.getElementById('date-' + key);
+  const btn = document.querySelector(`#card-${key} .btn-save-platform`);
+  const url = urlInput ? urlInput.value.trim() : '';
+  const date = dateInput ? dateInput.value : '';
   const active = pubState[key].active;
 
   pubState[key].url = url;
   pubState[key].published_at = date;
+
+  if (btn) { btn.textContent = 'Enregistrement…'; btn.disabled = true; }
 
   try {
     const res = await fetch('/api/publications', {
@@ -690,15 +695,21 @@ async function savePlatform(key) {
       body: JSON.stringify({ platform: key, url, active, published_at: date })
     });
     const data = await res.json();
-    if (data.success) {
+    if (data.error) {
+      showToast(data.error, 'error');
+      if (btn) { btn.textContent = 'Sauvegarder'; btn.disabled = false; }
+    } else if (data.success) {
       if (data.id) pubState[key].id = data.id;
+      renderGrid(); // recrée le DOM → le btn est remplacé, inutile de le restaurer
       const fb = document.getElementById('feedback-' + key);
-      fb.classList.add('show');
-      setTimeout(() => fb.classList.remove('show'), 2500);
-      renderGrid();
+      if (fb) {
+        fb.classList.add('show');
+        setTimeout(() => fb.classList.remove('show'), 2500);
+      }
     }
   } catch(e) {
     showToast('Erreur réseau', 'error');
+    if (btn) { btn.textContent = 'Sauvegarder'; btn.disabled = false; }
   }
 }
 
