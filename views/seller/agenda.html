@@ -18,8 +18,8 @@
   <link rel="stylesheet" href="/css/style.css">
   <style>
     /* ── Stats ────────────────────────────────────────── */
-    .agenda-stats { display:grid; grid-template-columns:repeat(6,1fr); gap:10px; margin-bottom:24px; }
-    @media(max-width:1100px){ .agenda-stats { grid-template-columns:repeat(3,1fr); } }
+    .agenda-stats { display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin-bottom:24px; }
+    @media(max-width:1100px){ .agenda-stats { grid-template-columns:repeat(2,1fr); } }
     @media(max-width:600px){ .agenda-stats { grid-template-columns:repeat(2,1fr); } }
     .stat-card-agenda { background:#fff; border-radius:12px; padding:16px 14px; border:1px solid #e8e0d6; display:flex; align-items:center; gap:10px; }
     .stat-card-agenda.urgent { border-color:#ffe082; background:#fffdf5; }
@@ -510,17 +510,13 @@
       <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:12px;">
         <div>
           <h1>Mon agenda</h1>
-          <div class="page-header-sub">Visites, acquéreurs et disponibilités — tout au même endroit</div>
+          <div class="page-header-sub">Visites et disponibilités — tout au même endroit</div>
         </div>
         <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
           <div class="serenis-number-pill" id="serenisNumberPill" style="display:none;">
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.27h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 9a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
             <span id="serenisNumberText">—</span>
           </div>
-          <button class="add-btn-sec" onclick="openModal('addContactOverlay')">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-            Acquéreur
-          </button>
           <button class="add-btn" onclick="openModal('addVisitOverlay')">
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
             Programmer une visite
@@ -543,12 +539,6 @@
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2e7d32" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
         </div>
         <div><div class="stat-val" id="statConfirmed">0</div><div class="stat-lbl">Confirmées</div></div>
-      </div>
-      <div class="stat-card-agenda">
-        <div class="stat-icon" style="background:#f0f5f1;">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#3D5A47" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-        </div>
-        <div><div class="stat-val" id="statContacts">0</div><div class="stat-lbl">Acquéreurs</div></div>
       </div>
       <div class="stat-card-agenda">
         <div class="stat-icon" style="background:#fce4ec;">
@@ -694,17 +684,6 @@
           <div class="sidebar-body" id="pastList"></div>
         </div>
 
-        <!-- Contacts acquéreurs (appels + SMS) -->
-        <div class="sidebar-section">
-          <div class="sidebar-section-title">
-            Contacts acquéreurs
-            <button class="add-btn-sec" onclick="openModal('addContactOverlay')" style="padding:5px 10px;font-size:0.74rem;border-radius:6px;">+ Ajouter</button>
-          </div>
-          <div id="recentContactsList">
-            <div style="text-align:center;padding:28px;color:#bbb;font-size:0.83rem;">Chargement…</div>
-          </div>
-        </div>
-
         <!-- Notifications récentes -->
         <div class="sidebar-section">
           <div class="sidebar-section-title">Activité récente</div>
@@ -716,22 +695,9 @@
       </aside>
     </div><!-- end dash-main-grid -->
 
-    <!-- ── Acquéreurs — numéro + table + mails ─────────── -->
-    <div class="dash-below-section" id="panel-acquereurs">
-
-
-      <div class="section-header-bar">
-        <div class="section-title-big">Acquéreurs</div>
-        <button class="add-btn-sec" onclick="openModal('addContactOverlay')" style="padding:7px 14px;font-size:0.81rem;">+ Ajouter un acquéreur</button>
-      </div>
-      <div id="contactsTableWrap">
-        <div class="empty-state" style="border:none;padding:32px 24px;">
-          <div class="empty-state-icon"><svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#ccc" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>
-          <p>Aucun acquéreur enregistré<br>Utilisez le bouton "Ajouter un acquéreur" pour enregistrer vos contacts</p>
-        </div>
-      </div>
-
-      <div class="mc-section" style="margin-top:28px;">
+    <!-- ── Modèles de mails ──────────────────────────────── -->
+    <div class="dash-below-section">
+      <div class="mc-section">
         <div class="mc-section-header">
           <div class="mc-section-title">Modèles de mails</div>
           <div class="mc-section-sub">À copier-coller directement depuis votre boîte mail. Remplacez les [crochets] par les vraies informations.</div>
@@ -802,42 +768,6 @@
   </div>
 </div>
 
-<!-- ── Modal: Ajouter un acquéreur ── -->
-<div class="modal-overlay" id="addContactOverlay">
-  <div class="modal">
-    <div class="modal-header">
-      <div class="modal-title">Ajouter un acquéreur</div>
-      <button class="modal-close" onclick="closeModal('addContactOverlay')">×</button>
-    </div>
-    <div class="modal-field">
-      <label>Nom</label>
-      <input type="text" id="cBuyerName" placeholder="Jean Martin">
-    </div>
-    <div class="modal-row">
-      <div class="modal-field">
-        <label>Téléphone</label>
-        <input type="tel" id="cBuyerPhone" placeholder="06 XX XX XX XX">
-      </div>
-      <div class="modal-field">
-        <label>Email (optionnel)</label>
-        <input type="email" id="cBuyerEmail" placeholder="email@exemple.fr">
-      </div>
-    </div>
-    <div class="modal-field">
-      <label>Budget estimé (€)</label>
-      <input type="number" id="cBuyerBudget" placeholder="350000">
-    </div>
-    <div class="modal-field">
-      <label>Notes</label>
-      <textarea id="cNotes" placeholder="Motivations, financement…"></textarea>
-    </div>
-    <div class="modal-actions">
-      <button class="btn-secondary-modal" onclick="closeModal('addContactOverlay')">Annuler</button>
-      <button class="btn-primary-modal" onclick="submitAddContact()">Ajouter l'acquéreur</button>
-    </div>
-  </div>
-</div>
-
 <div class="toast" id="toast"></div>
 
 <script>
@@ -857,11 +787,9 @@ function updateStats() {
   const pending = allVisits.filter(v => v.status === 'pending');
   const confirmed = allVisits.filter(v => v.status === 'confirmed');
   const todayV = allVisits.filter(v => v.visit_date === today && v.status !== 'cancelled');
-  const contacts = _data?.contacts || [];
   document.getElementById('statPending').textContent = pending.length;
   document.getElementById('statConfirmed').textContent = confirmed.length;
   document.getElementById('statToday').textContent = todayV.length;
-  document.getElementById('statContacts').textContent = contacts.length;
 }
 
 // ── Visit rendering ───────────────────────────────────
@@ -1200,91 +1128,6 @@ document.getElementById('saveAgenda').addEventListener('click',async()=>{
   btn.textContent='Enregistrer mes disponibilités'; btn.disabled=false;
 });
 
-// ── Contacts / Acquéreurs ─────────────────────────────
-function renderContacts() {
-  const wrap=document.getElementById('contactsTableWrap');
-  const contacts=_data?.contacts||[];
-  if (!contacts.length) {
-    wrap.innerHTML=`<div class="empty-state" style="border:none;border-radius:0;"><div class="empty-state-icon"><svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#ccc" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div><p>Aucun acquéreur enregistré</p></div>`;
-    return;
-  }
-  const STATUS_OPTS=[{val:'new',label:'Nouveau'},{val:'qualified',label:'Qualifié'},{val:'visit_planned',label:'Visite planifiée'},{val:'not_retained',label:'Non retenu'}];
-  const rows=contacts.map(c=>{
-    const date=c.created_at?new Date(c.created_at).toLocaleDateString('fr-FR',{day:'2-digit',month:'short'}):'—';
-    const statusOpts=STATUS_OPTS.map(o=>`<option value="${o.val}" ${c.status===o.val?'selected':''}>${o.label}</option>`).join('');
-    const budget=c.buyer_budget?parseInt(c.buyer_budget).toLocaleString('fr-FR')+' €':'—';
-    return `<tr>
-      <td><div class="contact-name">${c.buyer_name||'—'}</div><div class="contact-phone">${c.buyer_phone||''}</div></td>
-      <td style="color:#666;font-size:0.83rem;">${c.buyer_email||'—'}</td>
-      <td style="font-size:0.83rem;color:#555;">${budget}</td>
-      <td><span class="contact-source ${c.source==='serenis'?'source-serenis':'source-manuel'}">${c.source==='serenis'?'Vendu Par Moi':'Manuel'}</span></td>
-      <td><select class="contact-status-select status-${c.status}" onchange="updateContactStatus(${c.id},this)">${statusOpts}</select></td>
-      <td style="color:#aaa;font-size:0.8rem;">${date}</td>
-      <td><div class="contact-actions">
-        <button class="btn-icon" title="Programmer une visite" data-cid="${c.id}" data-cprefill="true"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></button>
-        <button class="btn-icon danger" title="Supprimer" data-cid="${c.id}" data-cdelete="true"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg></button>
-      </div></td>
-    </tr>`;
-  }).join('');
-  wrap.innerHTML=`<div style="overflow-x:auto;"><table class="contacts-table"><thead><tr><th>Acquéreur</th><th>Email</th><th>Budget</th><th>Source</th><th>Statut</th><th>Ajouté</th><th></th></tr></thead><tbody>${rows}</tbody></table></div>`;
-}
-
-document.getElementById('contactsTableWrap').addEventListener('click',function(e) {
-  const btn=e.target.closest('[data-cid]');
-  if (!btn) return;
-  const id=parseInt(btn.dataset.cid,10);
-  if (btn.dataset.cprefill) prefillVisit(id);
-  else if (btn.dataset.cdelete) deleteContact(id);
-});
-
-async function updateContactStatus(id,select) {
-  const status=select.value;
-  select.className='contact-status-select status-'+status;
-  try { await fetch(`/api/connect/contacts/${id}/status`,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({status})}); } catch(e) { showToast('Erreur','error'); }
-}
-
-async function deleteContact(id) {
-  if (!confirm('Supprimer cet acquéreur ?')) return;
-  await fetch(`/api/connect/contacts/${id}`,{method:'DELETE'});
-  showToast('Acquéreur supprimé');
-  await loadData();
-}
-
-function prefillVisit(contactId) {
-  const c=(_data?.contacts||[]).find(x=>x.id===contactId);
-  if (!c) return;
-  document.getElementById('vBuyerName').value=c.buyer_name||'';
-  document.getElementById('vBuyerPhone').value=c.buyer_phone||'';
-  document.getElementById('vBuyerEmail').value=c.buyer_email||'';
-  openModal('addVisitOverlay');
-}
-
-// ── Contacts récents (sidebar) ─────────────────────────
-function renderRecentContacts() {
-  const el = document.getElementById('recentContactsList');
-  if (!el) return;
-  const contacts = (_data?.contacts || []).slice(0, 8);
-  if (!contacts.length) {
-    el.innerHTML = `<div style="text-align:center;padding:24px;color:#bbb;font-size:0.82rem;">Aucun acquéreur enregistré pour l'instant.</div>`;
-    return;
-  }
-  const sourceLabel = { voice:'📞 Appel', sms:'💬 SMS', manuel:'✏️ Manuel' };
-  const sourceClass = { voice:'voice', sms:'sms', manuel:'manuel' };
-  el.innerHTML = contacts.map(c => {
-    const when = c.created_at ? new Date(c.created_at).toLocaleDateString('fr-FR',{day:'2-digit',month:'short'}) : '';
-    const phone = c.buyer_name || c.buyer_phone || '—';
-    const src = c.source || 'sms';
-    return `<div class="contact-item">
-      <div class="contact-avatar ${src==='voice'?'call':''}">${(c.buyer_name||c.buyer_phone||'?')[0].toUpperCase()}</div>
-      <div class="contact-info">
-        <div class="contact-phone">${phone}</div>
-        <div class="contact-meta">${c.buyer_email||''} ${when}</div>
-      </div>
-      <span class="contact-source ${sourceClass[src]||'sms'}">${sourceLabel[src]||'SMS'}</span>
-    </div>`;
-  }).join('');
-}
-
 // ── Notifications sidebar ──────────────────────────────
 function renderNotifSidebar() {
   const el = document.getElementById('notifSidebarContent');
@@ -1333,25 +1176,6 @@ async function submitAddVisit() {
     closeModal('addVisitOverlay');
     ['vBuyerName','vBuyerPhone','vBuyerEmail','vNotes'].forEach(id=>document.getElementById(id).value='');
     showToast('Visite programmée ✓');
-    await loadData();
-  } catch(e) { showToast('Erreur réseau','error'); }
-}
-
-async function submitAddContact() {
-  const body={
-    buyer_name:document.getElementById('cBuyerName').value.trim(),
-    buyer_phone:document.getElementById('cBuyerPhone').value.trim(),
-    buyer_email:document.getElementById('cBuyerEmail').value.trim(),
-    buyer_budget:document.getElementById('cBuyerBudget').value.trim(),
-    notes:document.getElementById('cNotes').value.trim(),
-  };
-  try {
-    const res=await fetch('/api/connect/contacts',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
-    const data=await res.json();
-    if (data.error) { showToast(data.error,'error'); return; }
-    closeModal('addContactOverlay');
-    ['cBuyerName','cBuyerPhone','cBuyerEmail','cBuyerBudget','cNotes'].forEach(id=>document.getElementById(id).value='');
-    showToast('Acquéreur ajouté ✓');
     await loadData();
   } catch(e) { showToast('Erreur réseau','error'); }
 }
@@ -1597,8 +1421,6 @@ async function loadData() {
 
     updateStats();
     renderVisits();
-    renderContacts();
-    renderRecentContacts();
     renderNotifSidebar();
     renderMcTabs();
     renderMcCards();
