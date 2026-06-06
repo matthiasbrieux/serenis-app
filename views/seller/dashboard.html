@@ -5,13 +5,13 @@
   <script>if("scrollRestoration"in history)history.scrollRestoration="manual";</script>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Tableau de bord — Vendu Par Moi</title>
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;1,400&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
   <link rel="manifest" href="/manifest.json">
   <link rel="stylesheet" href="/css/style.css">
   <style>
     /* ——— Base ——— */
     *, *::before, *::after { box-sizing: border-box; }
-    body { font-family: 'Inter', system-ui, -apple-system, sans-serif; background: #F5F0E8; margin: 0; -webkit-font-smoothing: antialiased; }
+    body { font-family: 'DM Sans', 'Inter', system-ui, -apple-system, sans-serif; background: #F5F0E8; margin: 0; -webkit-font-smoothing: antialiased; }
 
     /* ——— Layout ——— */
     .app-layout { display: flex; min-height: 100vh; }
@@ -310,26 +310,28 @@
     /* ——— Buttons ——— */
     .btn-primary {
       display: inline-flex; align-items: center; justify-content: center; gap: 8px;
-      padding: 10px 20px;
+      padding: 12px 22px; min-height: 44px;
       background: #3D5A47; color: #FDFCF8;
       border: none; border-radius: 8px;
-      font-family: 'Inter', sans-serif;
-      font-size: 0.88rem; font-weight: 500;
+      font-family: 'DM Sans', 'Inter', sans-serif;
+      font-size: 0.9rem; font-weight: 600;
       cursor: pointer; text-decoration: none;
-      transition: background 0.2s, box-shadow 0.2s;
+      transition: background 0.2s, box-shadow 0.2s, transform 0.15s;
     }
-    .btn-primary:hover { background: #2d4535; box-shadow: 0 4px 14px rgba(61,90,71,0.2); }
+    .btn-primary:hover { background: #2d4535; box-shadow: 0 4px 14px rgba(61,90,71,0.25); transform: translateY(-1px); }
+    .btn-primary:active { transform: translateY(0); }
     .btn-secondary {
       display: inline-flex; align-items: center; justify-content: center; gap: 8px;
-      padding: 10px 20px;
+      padding: 12px 22px; min-height: 44px;
       background: transparent; color: #3D5A47;
-      border: 1.5px solid #c8ddd0; border-radius: 8px;
-      font-family: 'Inter', sans-serif;
-      font-size: 0.88rem; font-weight: 500;
+      border: 1.5px solid #3D5A47; border-radius: 8px;
+      font-family: 'DM Sans', 'Inter', sans-serif;
+      font-size: 0.9rem; font-weight: 600;
       cursor: pointer; text-decoration: none;
-      transition: background 0.2s, border-color 0.2s;
+      transition: background 0.2s, border-color 0.2s, transform 0.15s;
     }
-    .btn-secondary:hover { background: #f0f7f2; border-color: #3D5A47; }
+    .btn-secondary:hover { background: #f0f7f2; transform: translateY(-1px); }
+    .btn-secondary:active { transform: translateY(0); }
 
     /* ——— Link box ——— */
     .link-input-group { display: flex; gap: 10px; align-items: center; }
@@ -383,6 +385,12 @@
       .two-col { grid-template-columns: 1fr; }
       .form-row { grid-template-columns: 1fr; }
       .page-header h1 { font-size: 1.4rem; }
+      .stats-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+    }
+    @media (max-width: 480px) {
+      .stats-grid { grid-template-columns: 1fr 1fr; gap: 8px; }
+      .stat-card { padding: 14px; }
+      .stat-value { font-size: 1.7rem; }
     }
     /* ── Séance photo booking ── */
     .ps-card { background:#f5f0e8; border:1px solid rgba(0,0,0,0.08); border-radius:10px; padding:20px 24px; margin-bottom:16px; }
@@ -427,7 +435,7 @@
     .db-grid2 { display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:14px; }
     .db-card { background:#fff; border-radius:14px; padding:20px 22px; box-shadow:0 1px 6px rgba(0,0,0,0.07); margin-bottom:14px; min-width:0; }
     .db-card-full { background:#fff; border-radius:14px; padding:20px 22px; box-shadow:0 1px 6px rgba(0,0,0,0.07); margin-bottom:14px; }
-    .db-card-band { margin:-20px -22px 18px; padding:15px 20px; border-radius:14px 14px 0 0; display:flex; align-items:center; gap:10px; font-size:0.97rem; font-weight:700; color:#fff; }
+    .db-card-band { margin:-20px -22px 18px; padding:15px 20px; border-radius:14px 14px 0 0; display:flex; align-items:center; gap:10px; font-size:0.97rem; font-weight:700; color:#fff; font-family:'Cormorant Garamond',serif; font-size:1.08rem; letter-spacing:0.01em; }
     .db-card-band-ico { width:28px; height:28px; border-radius:8px; display:inline-flex; align-items:center; justify-content:center; background:rgba(255,255,255,0.18); flex-shrink:0; }
     .db-band-link { margin-left:auto; font-size:0.72rem; color:rgba(255,255,255,0.9); text-decoration:none; font-weight:600; border:1px solid rgba(255,255,255,0.35); padding:5px 12px; border-radius:6px; white-space:nowrap; transition:background 0.15s; }
     .db-band-link:hover { background:rgba(255,255,255,0.18); }
@@ -473,8 +481,8 @@
     .db-mail-arr { color:#b0a89f; transition:transform 0.2s; flex-shrink:0; }
     .db-mail-item.open .db-mail-arr { transform:rotate(90deg); color:#3D5A47; }
     .db-mail-item.open .db-mail-hdr { background:#EDF5F0; border-bottom:1.5px solid #D4E8DA; }
-    .db-mail-body { display:none; padding:14px; background:#FAFDF9; }
-    .db-mail-item.open .db-mail-body { display:block; }
+    .db-mail-body { background:#FAFDF9; }
+    /* L'animation max-height est définie plus bas (accordion fluide) */
     .db-mail-pre { white-space:pre-wrap; word-break:break-word; overflow-wrap:break-word; font-family:'Inter',system-ui,sans-serif; font-size:0.8rem; color:#333; line-height:1.7; background:#fff; border:1px solid #E8E3DB; border-radius:8px; padding:13px; margin:0 0 10px; max-width:100%; overflow-x:auto; }
     .db-mail-copy { padding:9px 16px; background:#3D5A47; color:#fff; border:none; border-radius:6px; font-size:0.8rem; font-weight:600; cursor:pointer; font-family:inherit; transition:background 0.15s; width:100%; text-align:center; }
     .db-mail-copy:active { background:#2d4535; }
@@ -533,6 +541,283 @@
       .ps-btn { min-height: 44px; touch-action: manipulation; }
       .ps-btn-primary { min-height: 44px; }
       .db-pending-confirm, .db-pending-refuse { min-height: 44px; touch-action: manipulation; }
+    }
+
+    /* ══════════════════════════════════════════════
+       ANNEAU DE PROGRESSION SVG (formation)
+    ══════════════════════════════════════════════ */
+    .formation-progress-wrap {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+    .prog-ring-wrap {
+      position: relative;
+      width: 88px; height: 88px;
+      flex-shrink: 0;
+    }
+    .prog-ring-svg {
+      transform: rotate(-90deg);
+      width: 88px; height: 88px;
+    }
+    .prog-ring-bg {
+      fill: none;
+      stroke: #E8E3DB;
+      stroke-width: 7;
+    }
+    .prog-ring-fill {
+      fill: none;
+      stroke: url(#ringGrad);
+      stroke-width: 7;
+      stroke-linecap: round;
+      stroke-dasharray: 226;
+      stroke-dashoffset: 226;
+      transition: stroke-dashoffset 1.1s cubic-bezier(0.16,1,0.3,1);
+    }
+    .prog-ring-label {
+      position: absolute;
+      inset: 0;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      line-height: 1;
+    }
+    .prog-ring-pct {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.55rem; font-weight: 700;
+      color: #3D5A47;
+      line-height: 1;
+    }
+    .prog-ring-sub {
+      font-size: 0.55rem; color: #9a9087; margin-top: 2px;
+      font-weight: 500; text-transform: uppercase; letter-spacing: 0.05em;
+    }
+    .formation-progress-text {
+      flex: 1; min-width: 160px;
+    }
+    .formation-progress-text h3 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.15rem; font-weight: 600;
+      color: #3D5A47; margin: 0 0 4px;
+    }
+    .formation-progress-text p {
+      font-size: 0.82rem; color: #8C8880; margin: 0 0 12px;
+    }
+    .formation-progress-bar-wrap {
+      height: 8px; background: #E8E3DB;
+      border-radius: 99px; overflow: hidden;
+      margin-bottom: 8px;
+    }
+    .formation-progress-bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #5a8a6a, #3D5A47);
+      border-radius: 99px;
+      width: 0%;
+      transition: width 1.1s cubic-bezier(0.16,1,0.3,1);
+    }
+
+    /* ══════════════════════════════════════════════
+       MISSIONS DU JOUR
+    ══════════════════════════════════════════════ */
+    .missions-card {
+      background: #fff;
+      border-radius: 14px;
+      border: 1.5px solid #C4D8CA;
+      box-shadow: 0 2px 12px rgba(61,90,71,0.09);
+      margin-bottom: 14px;
+      overflow: hidden;
+    }
+    .missions-hdr {
+      background: linear-gradient(135deg, #4a6e55, #3D5A47);
+      padding: 14px 20px;
+      display: flex; align-items: center; gap: 12px;
+    }
+    .missions-hdr-ico {
+      width: 34px; height: 34px;
+      background: rgba(255,255,255,0.18);
+      border-radius: 9px;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .missions-hdr-title {
+      font-size: 0.94rem; font-weight: 700;
+      color: #fff; line-height: 1.2;
+    }
+    .missions-hdr-sub {
+      font-size: 0.72rem;
+      color: rgba(255,255,255,0.72);
+      margin-top: 2px;
+    }
+    .missions-body {
+      padding: 16px 20px;
+      display: flex; flex-direction: column; gap: 10px;
+    }
+    .mission-item {
+      display: flex; align-items: center; gap: 14px;
+      padding: 13px 16px;
+      border-radius: 10px;
+      border: 1.5px solid #E8E3DB;
+      background: #FAFDF9;
+      text-decoration: none;
+      transition: background 0.18s ease, border-color 0.18s ease, transform 0.18s ease, box-shadow 0.18s ease;
+      cursor: pointer;
+    }
+    .mission-item:hover {
+      background: #EDF5F0;
+      border-color: #A8CEBA;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 14px rgba(61,90,71,0.12);
+    }
+    .mission-ico {
+      width: 36px; height: 36px;
+      border-radius: 9px;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+      font-size: 1.1rem;
+    }
+    .mission-ico--green { background: #E8F5ED; color: #3D5A47; }
+    .mission-ico--orange { background: #FFF0E8; color: #C4603A; }
+    .mission-ico--blue { background: #E8F0FF; color: #3A5AC4; }
+    .mission-txt {
+      flex: 1; min-width: 0;
+    }
+    .mission-txt strong {
+      display: block;
+      font-size: 0.87rem; font-weight: 600; color: #1C1C1A;
+      line-height: 1.3;
+    }
+    .mission-txt span {
+      font-size: 0.76rem; color: #8C8880;
+      display: block; margin-top: 1px;
+    }
+    .mission-arrow {
+      color: #C4785A; font-size: 1rem; flex-shrink: 0;
+      transition: transform 0.18s ease;
+    }
+    .mission-item:hover .mission-arrow { transform: translateX(3px); }
+
+    /* ══════════════════════════════════════════════
+       ANIMATION D'ENTRÉE DES CARTES
+    ══════════════════════════════════════════════ */
+    @keyframes cardIn {
+      from { opacity: 0; transform: translateY(16px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .db-card-full, .db-card, .db-send-card, .db-pending-card, .missions-card {
+      animation: cardIn 0.42s cubic-bezier(0.16,1,0.3,1) both;
+    }
+    .db-card-full:nth-child(1)  { animation-delay: 0.04s; }
+    .db-card-full:nth-child(2)  { animation-delay: 0.08s; }
+    .missions-card              { animation-delay: 0.10s; }
+    .db-pending-card            { animation-delay: 0.13s; }
+    .db-card-full:nth-child(4)  { animation-delay: 0.16s; }
+    .db-card-full:nth-child(5)  { animation-delay: 0.19s; }
+    .db-send-card               { animation-delay: 0.22s; }
+
+    /* ══════════════════════════════════════════════
+       AMÉLIORATIONS HOVER CARTES
+    ══════════════════════════════════════════════ */
+    .db-card, .db-card-full {
+      transition: box-shadow 0.2s ease, transform 0.2s ease;
+    }
+    .db-send-card, .db-pending-card, .missions-card {
+      transition: box-shadow 0.2s ease, transform 0.2s ease;
+    }
+    .db-card:hover, .db-card-full:hover {
+      box-shadow: 0 6px 24px rgba(61,90,71,0.11);
+    }
+    .db-dispo-row {
+      transition: background 0.18s ease, border-color 0.18s ease;
+    }
+    .db-dispo-row:hover {
+      background: #F0F8F2;
+      border-color: #A8CEBA;
+    }
+    .db-visit-row {
+      transition: background 0.18s ease, transform 0.18s ease;
+    }
+    .db-visit-row:hover {
+      background: #EDF5F0;
+      transform: translateX(3px);
+    }
+
+    /* ══════════════════════════════════════════════
+       ACCORDION MAIL — animation fluide
+    ══════════════════════════════════════════════ */
+    .db-mail-body {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.35s cubic-bezier(0.16,1,0.3,1), padding 0.2s ease;
+      padding: 0 14px;
+    }
+    .db-mail-item.open .db-mail-body {
+      max-height: 800px;
+      padding: 14px;
+    }
+
+    /* ══════════════════════════════════════════════
+       AMÉLIORATIONS DB BUTTONS
+    ══════════════════════════════════════════════ */
+    .db-btn-primary {
+      transition: background 0.18s ease, transform 0.15s ease, box-shadow 0.15s ease !important;
+    }
+    .db-btn-primary:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 14px rgba(61,90,71,0.22) !important;
+    }
+    .db-btn-primary:active { transform: translateY(0) !important; }
+    .db-btn-outline {
+      transition: background 0.18s ease, transform 0.15s ease, box-shadow 0.15s ease !important;
+    }
+    .db-btn-outline:hover {
+      transform: translateY(-1px) !important;
+      box-shadow: 0 4px 10px rgba(61,90,71,0.14) !important;
+    }
+
+    /* ══════════════════════════════════════════════
+       MOBILE FIRST — 375px et moins
+    ══════════════════════════════════════════════ */
+    @media (max-width: 900px) {
+      .db-btn-primary, .db-btn-outline, .db-btn-sm {
+        min-height: 44px;
+        touch-action: manipulation;
+      }
+      .db-send-card, .db-pending-card, .missions-card {
+        border-radius: 12px;
+      }
+      .db-send-hdr { padding: 14px 16px; }
+      .db-send-body { padding: 12px 14px; }
+      .db-pending-body { padding: 12px 14px; }
+      .missions-hdr { padding: 12px 16px; }
+      .missions-body { padding: 12px 14px; gap: 8px; }
+      .mission-item { padding: 12px 13px; gap: 11px; }
+      .formation-progress-wrap { gap: 14px; }
+      .prog-ring-wrap { width: 76px; height: 76px; }
+      .prog-ring-svg { width: 76px; height: 76px; }
+      .prog-ring-pct { font-size: 1.3rem; }
+    }
+    @media (max-width: 640px) {
+      .db-mail-hdr { padding: 12px 14px; }
+      .db-mail-title { font-size: 0.82rem; }
+      .db-pending-item { padding: 12px 13px; }
+      .db-pending-name { font-size: 0.87rem; }
+      .db-pending-actions { gap: 6px; }
+      .db-pending-confirm, .db-pending-refuse { padding: 10px 10px; font-size: 0.8rem; }
+      .db-visit-row { padding: 11px 12px; }
+      .db-dispo-row { padding: 11px 12px; }
+      .formation-progress-wrap { flex-direction: row; align-items: center; }
+      .formation-progress-text h3 { font-size: 1.05rem; }
+    }
+    @media (max-width: 400px) {
+      .db-pending-top { flex-direction: column; gap: 6px; }
+      .db-pending-when { text-align: left; }
+      .db-visit-top { flex-direction: column; gap: 4px; }
+      .db-visit-date { text-align: left; }
+      .prog-ring-wrap { width: 70px; height: 70px; }
+      .prog-ring-svg { width: 70px; height: 70px; }
+      .prog-ring-pct { font-size: 1.15rem; }
+      .formation-progress-text h3 { font-size: 0.97rem; }
+      .mission-ico { width: 30px; height: 30px; font-size: 0.95rem; }
     }
   </style>
 </head>
@@ -622,18 +907,50 @@
         <div class="db-card-band-ico"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg></div>
         Ma formation
       </div>
-      <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap;">
-        <div style="display:flex;align-items:flex-end;gap:8px;">
-          <div class="db-form-pct" id="dbFormPct">0%</div>
-          <div style="font-size:0.78rem;color:#8C8880;padding-bottom:5px;" id="dbFormLabel">complété</div>
-        </div>
-        <div style="flex:1;min-width:120px;">
-          <div class="db-prog-bar" style="margin-bottom:0;">
-            <div class="db-prog-fill" id="dbFormFill" style="width:0%"></div>
+      <div class="formation-progress-wrap">
+        <!-- Anneau SVG -->
+        <div class="prog-ring-wrap">
+          <svg class="prog-ring-svg" viewBox="0 0 88 88">
+            <defs>
+              <linearGradient id="ringGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#5a8a6a"/>
+                <stop offset="100%" stop-color="#3D5A47"/>
+              </linearGradient>
+            </defs>
+            <circle class="prog-ring-bg" cx="44" cy="44" r="36"/>
+            <circle class="prog-ring-fill" id="dbRingFill" cx="44" cy="44" r="36"/>
+          </svg>
+          <div class="prog-ring-label">
+            <span class="prog-ring-pct" id="dbFormPct">0%</span>
+            <span class="prog-ring-sub">fait</span>
           </div>
         </div>
+        <!-- Texte + barre -->
+        <div class="formation-progress-text">
+          <h3>Progression de votre formation</h3>
+          <p id="dbFormLabel">0 étape sur 17 complétée</p>
+          <div class="formation-progress-bar-wrap">
+            <div class="formation-progress-bar-fill" id="dbFormFill" style="width:0%"></div>
+          </div>
+          <a href="/ma-formation" class="db-btn-primary" style="display:inline-flex;">Continuer ma formation →</a>
+        </div>
       </div>
-      <a href="/ma-formation" class="db-btn-primary" style="margin-top:14px;">Continuer ma formation →</a>
+    </div>
+
+    <!-- Missions du jour -->
+    <div class="missions-card" id="missionsCard">
+      <div class="missions-hdr">
+        <div class="missions-hdr-ico">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+        </div>
+        <div>
+          <div class="missions-hdr-title">À faire aujourd'hui</div>
+          <div class="missions-hdr-sub">Suggestions personnalisées selon votre avancement</div>
+        </div>
+      </div>
+      <div class="missions-body" id="missionsBody">
+        <!-- Rempli par JS -->
+      </div>
     </div>
 
     <!-- Visites à confirmer (urgent, masqué si vide) -->
@@ -667,6 +984,7 @@
       <div class="db-card-band db-band--visites">
         <div class="db-card-band-ico"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
         Mes visites réservées
+        <span id="dbVisitsCount" style="display:none;margin-left:auto;background:rgba(255,255,255,0.25);color:#fff;padding:3px 11px;border-radius:20px;font-size:0.75rem;font-weight:700;border:1px solid rgba(255,255,255,0.3);font-family:'DM Sans','Inter',sans-serif;"></span>
       </div>
       <div id="dbVisits"></div>
     </div>
@@ -805,15 +1123,161 @@ document.getElementById('profileForm').addEventListener('submit', async e => {
   }
 });
 
+/* ——— Count-up animation ——— */
+function countUp(el, target, duration = 900, suffix = '') {
+  if (!el) return;
+  const start = performance.now();
+  const startVal = 0;
+  function step(now) {
+    const elapsed = now - start;
+    const progress = Math.min(elapsed / duration, 1);
+    // ease-out cubic
+    const eased = 1 - Math.pow(1 - progress, 3);
+    const current = Math.round(startVal + (target - startVal) * eased);
+    el.textContent = current + suffix;
+    if (progress < 1) requestAnimationFrame(step);
+  }
+  requestAnimationFrame(step);
+}
+
 /* ——— Formation progress (localStorage) ——— */
 function renderFormationProgress() {
   const TOTAL = 17;
   const done = JSON.parse(localStorage.getItem('vpm_done_steps') || '{}');
   const count = Object.values(done).filter(Boolean).length;
   const pct = Math.min(100, Math.round(count / TOTAL * 100));
-  document.getElementById('dbFormPct').textContent = pct + '%';
+
+  // Texte label
   document.getElementById('dbFormLabel').textContent = count + ' étape' + (count > 1 ? 's' : '') + ' sur ' + TOTAL + ' complétée' + (count > 1 ? 's' : '');
+
+  // Barre de progression
   setTimeout(() => { document.getElementById('dbFormFill').style.width = pct + '%'; }, 80);
+
+  // Anneau SVG
+  const ringEl = document.getElementById('dbRingFill');
+  const pctEl = document.getElementById('dbFormPct');
+  if (ringEl) {
+    const radius = 36;
+    const circ = 2 * Math.PI * radius; // ~226.2
+    setTimeout(() => {
+      const offset = circ * (1 - pct / 100);
+      ringEl.style.strokeDasharray = circ;
+      ringEl.style.strokeDashoffset = offset;
+    }, 120);
+  }
+  // Count-up du pourcentage
+  if (pctEl) {
+    setTimeout(() => countUp(pctEl, pct, 1000, '%'), 150);
+  }
+}
+
+/* ——— Missions du jour ——— */
+function renderMissions(visits, agendaSlots, property) {
+  const el = document.getElementById('missionsBody');
+  if (!el) return;
+
+  const done = JSON.parse(localStorage.getItem('vpm_done_steps') || '{}');
+  const formDoneCount = Object.values(done).filter(Boolean).length;
+  const TOTAL = 17;
+  const formPct = Math.round(formDoneCount / TOTAL * 100);
+
+  const pendingVisits = (visits || []).filter(v => v.status === 'pending');
+  const confirmedVisits = (visits || []).filter(v => v.status === 'confirmed');
+  const hasSlots = (agendaSlots || []).filter(s => s.specific_date).length > 0;
+  const hasAddress = !!(property && property.address);
+  const hasBuyerUrl = !!(property && property.acheteur_url);
+
+  const missions = [];
+
+  // Priorité 1 : visites en attente
+  if (pendingVisits.length > 0) {
+    missions.push({
+      icon: '🕐',
+      iconClass: 'mission-ico--orange',
+      title: `Confirmer ${pendingVisits.length > 1 ? pendingVisits.length + ' visites en attente' : 'une visite en attente'}`,
+      sub: 'Des acheteurs attendent votre réponse',
+      href: '#dbPendingCard',
+    });
+  }
+
+  // Priorité 2 : formation incomplète
+  if (formPct < 100) {
+    missions.push({
+      icon: '📚',
+      iconClass: 'mission-ico--green',
+      title: formPct < 30 ? 'Démarrez votre formation vendeur' : `Continuez votre formation (${formPct}%)`,
+      sub: formPct < 30 ? 'Apprenez à vendre sereinement et au bon prix' : `Plus que ${TOTAL - formDoneCount} étape${TOTAL - formDoneCount > 1 ? 's' : ''} avant d'être prêt`,
+      href: '/ma-formation',
+    });
+  }
+
+  // Priorité 3 : pas de disponibilités
+  if (!hasSlots) {
+    missions.push({
+      icon: '📅',
+      iconClass: 'mission-ico--green',
+      title: 'Ajoutez vos créneaux de visite',
+      sub: 'Permettez aux acheteurs de réserver une visite',
+      href: '/mon-agenda',
+    });
+  }
+
+  // Priorité 4 : pas d'adresse
+  if (!hasAddress) {
+    missions.push({
+      icon: '🏠',
+      iconClass: 'mission-ico--orange',
+      title: 'Complétez les infos de votre bien',
+      sub: 'Adresse, surface, prix… pour être visible',
+      href: '/mon-bien',
+    });
+  }
+
+  // Priorité 5 : pas de lien acheteur
+  if (!hasBuyerUrl) {
+    missions.push({
+      icon: '🔗',
+      iconClass: 'mission-ico--blue',
+      title: 'Partagez votre dossier acheteur',
+      sub: 'Envoyez le lien à vos contacts intéressés',
+      href: '/mon-bien',
+    });
+  }
+
+  // Priorité 6 : visite confirmée mais pas de mail envoyé (suggestion)
+  if (confirmedVisits.length > 0 && hasBuyerUrl) {
+    missions.push({
+      icon: '✉️',
+      iconClass: 'mission-ico--green',
+      title: 'Envoyez le dossier complet avant la visite',
+      sub: 'Utilisez les messages prêts à l\'envoi ci-dessous',
+      href: '#dbMails',
+    });
+  }
+
+  // Fallback si tout est fait
+  if (!missions.length) {
+    missions.push({
+      icon: '🎉',
+      iconClass: 'mission-ico--green',
+      title: 'Votre dossier est complet — bravo !',
+      sub: 'Continuez à suivre vos visites et contacts acheteurs',
+      href: '/mes-acheteurs',
+    });
+  }
+
+  // Afficher max 3 missions
+  const toShow = missions.slice(0, 3);
+  el.innerHTML = toShow.map(m => `
+    <a class="mission-item" href="${m.href}">
+      <div class="mission-ico ${m.iconClass}">${m.icon}</div>
+      <div class="mission-txt">
+        <strong>${m.title}</strong>
+        <span>${m.sub}</span>
+      </div>
+      <span class="mission-arrow">→</span>
+    </a>
+  `).join('');
 }
 
 /* ——— Visites à confirmer (pending) ——— */
@@ -843,7 +1307,7 @@ function renderPending(visits) {
   const countEl = document.getElementById('dbPendingCount');
   if (!pending.length) { card.style.display = 'none'; return; }
   card.style.display = 'block';
-  if (countEl) countEl.textContent = pending.length;
+  if (countEl) countUp(countEl, pending.length, 600);
   el.innerHTML = pending.map(v => `
     <div class="db-pending-item">
       <div class="db-pending-top">
@@ -885,9 +1349,15 @@ function renderDispos(visits, agendaSlots) {
 function renderVisits(visits) {
   const confirmed = visits.filter(v => v.status === 'confirmed');
   const el = document.getElementById('dbVisits');
+  const countEl = document.getElementById('dbVisitsCount');
   if (!confirmed.length) {
     el.innerHTML = '<p class="db-empty">Aucune visite réservée pour le moment.</p>';
+    if (countEl) countEl.style.display = 'none';
     return;
+  }
+  if (countEl) {
+    countEl.style.display = 'inline-block';
+    countUp(countEl, confirmed.length, 600);
   }
   el.innerHTML = confirmed.map(v => `
     <div class="db-visit-row">
@@ -1125,6 +1595,9 @@ async function loadData() {
     renderDispos(visits, agendaSlots);
     renderVisits(visits);
 
+    /* Missions du jour */
+    renderMissions(visits, agendaSlots, property);
+
   } catch(err) {
     console.error('Dashboard error:', err);
     window.showToast('Erreur de chargement', 'error');
@@ -1133,6 +1606,7 @@ async function loadData() {
 
 renderFormationProgress();
 renderMails();
+renderMissions([], [], null);
 loadData();
 
 async function confirmDeleteAccount() {
