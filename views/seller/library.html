@@ -1917,7 +1917,7 @@ async function _getAcheteurLink() {
 }
 async function copySmsAcheteur(btn) {
   const link = await _getAcheteurLink() || '[lien non disponible — vérifiez votre espace Mon Bien]';
-  const sms = `Bonjour [Prénom],\n\nSuite à votre visite et afin de vous aider dans votre réflexion concernant mon logement, je vous transmets ci-dessous des informations complémentaires : entretien chaudière, ramonage, travaux réalisés...\n\n${link}\n\nN'hésitez pas à me contacter si vous avez des questions. 🙂\n\nCordialement,\n[Votre prénom]`;
+  const sms = _injectLibSeller(`Bonjour [Prénom],\n\nSuite à votre visite et afin de vous aider dans votre réflexion concernant mon logement, je vous transmets ci-dessous des informations complémentaires : entretien chaudière, ramonage, travaux réalisés...\n\n${link}\n\nN'hésitez pas à me contacter si vous avez des questions. 🙂\n\nCordialement,\n[Votre prénom]`);
   try { await navigator.clipboard.writeText(sms); } catch { prompt('Copiez ce texte :', sms); return; }
   const orig = btn.innerHTML; btn.innerHTML = '✓ Copié !'; btn.style.background = '#22c55e';
   setTimeout(() => { btn.innerHTML = orig; btn.style.background = '#3D5A47'; }, 2200);
@@ -2316,7 +2316,7 @@ function renderMails() {
       ic.textContent = open ? '+' : '−';
     });
     document.getElementById(`mc${i}`).addEventListener('click', () => {
-      navigator.clipboard.writeText(m.body);
+      navigator.clipboard.writeText(_injectLibSeller(m.body));
       const btn = document.getElementById(`mc${i}`);
       btn.textContent = '✓ Copié !';
       setTimeout(() => btn.textContent = 'Copier ce mail', 2000);
@@ -2464,7 +2464,7 @@ function handleInteractionEvent(e) {
   const fl = e.target.closest('.fiche-link');
   if (fl) { e.stopPropagation(); if (isTouchEnd && e.cancelable) e.preventDefault(); openFiche(fl.dataset.fiche); return; }
   const cm = e.target.closest('[data-copy-mail]');
-  if (cm) { navigator.clipboard.writeText(FICHE_MAILS[cm.dataset.copyMail] || ''); cm.textContent = '✓ Copié !'; setTimeout(() => cm.textContent = 'Copier ce modèle', 2000); return; }
+  if (cm) { navigator.clipboard.writeText(_injectLibSeller(FICHE_MAILS[cm.dataset.copyMail] || '')); cm.textContent = '✓ Copié !'; setTimeout(() => cm.textContent = 'Copier ce modèle', 2000); return; }
   const chk = e.target.closest('[data-chk]');
   if (chk) {
     e.stopPropagation();
@@ -3024,6 +3024,21 @@ setTimeout(function() {
   if (closeBtn) closeBtn.addEventListener('click', closeFiche);
   if (overlay) overlay.addEventListener('click', function(e) { if (e.target === this) closeFiche(); });
 }, 0);
+
+window._libSellerPrenom = '';
+window._libSellerFullName = '';
+fetch('/api/me').then(r=>r.json()).then(d=>{
+  if (d.seller) {
+    window._libSellerPrenom = d.seller.first_name || '';
+    window._libSellerFullName = [d.seller.first_name, d.seller.last_name].filter(Boolean).join(' ') || '';
+  }
+}).catch(()=>{});
+
+function _injectLibSeller(text) {
+  return text
+    .replace(/\[Votre prénom\]/g, window._libSellerPrenom || '[Votre prénom]')
+    .replace(/\[Nom et prénom\]/g, window._libSellerFullName || '[Nom et prénom]');
+}
 </script>
 <script src="/js/seller-nav.js"></script>
 
