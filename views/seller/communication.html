@@ -52,8 +52,8 @@
       letter-spacing:0.08em;text-transform:uppercase;margin-bottom:14px;
     }
     .number-display {
-      font-family:'Cormorant Garamond',serif;font-size:2.2rem;font-weight:600;
-      letter-spacing:0.04em;margin-bottom:6px;line-height:1.1;
+      font-family:'Cormorant Garamond',serif;font-size:3rem;font-weight:600;
+      letter-spacing:0.06em;margin-bottom:10px;line-height:1.1;
     }
     .number-display.no-number { font-size:1rem;font-style:italic;opacity:0.6;font-family:'DM Sans',sans-serif; }
     .number-actions { display:flex;gap:10px;align-items:center;margin-bottom:16px;flex-wrap:wrap; }
@@ -465,6 +465,35 @@
       </div>
     </div>
 
+    <!-- Comment ça marche -->
+    <div style="background:#fff;border-radius:16px;border:1px solid #e8e0d6;padding:24px 28px;margin-bottom:24px;">
+      <div style="font-size:0.72rem;text-transform:uppercase;letter-spacing:0.1em;color:#aaa;font-weight:700;margin-bottom:18px;">Comment ça marche</div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:20px;">
+        <div style="display:flex;flex-direction:column;gap:10px;">
+          <div style="width:40px;height:40px;border-radius:12px;background:#f0f7f2;display:flex;align-items:center;justify-content:center;">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#3D5A47" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.27h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 9a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+          </div>
+          <div style="font-size:0.75rem;font-weight:700;color:#3D5A47;">① Publiez votre numéro</div>
+          <div style="font-size:0.82rem;color:#666;line-height:1.6;">Copiez votre numéro Vendu Par Moi ci-dessus et publiez-le dans toutes vos annonces (LeBonCoin, SeLoger, PAP…).</div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:10px;">
+          <div style="width:40px;height:40px;border-radius:12px;background:#fff8f5;display:flex;align-items:center;justify-content:center;">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#C4785A" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+          </div>
+          <div style="font-size:0.75rem;font-weight:700;color:#C4603A;">② Les acheteurs vous contactent</div>
+          <div style="font-size:0.82rem;color:#666;line-height:1.6;">Les appels et SMS reçus sur ce numéro sont automatiquement centralisés ici — vous ne manquez aucun contact.</div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:10px;">
+          <div style="width:40px;height:40px;border-radius:12px;background:#f0f7f2;display:flex;align-items:center;justify-content:center;">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#3D5A47" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          </div>
+          <div style="font-size:0.75rem;font-weight:700;color:#3D5A47;">③ Gérez et planifiez</div>
+          <div style="font-size:0.82rem;color:#666;line-height:1.6;">Qualifiez chaque contact, programmez des visites et suivez leur avancement dans votre pipeline d'acheteurs.</div>
+        </div>
+      </div>
+      <style>@media(max-width:600px){.how-it-works-grid{grid-template-columns:1fr !important;}}</style>
+    </div>
+
     <!-- Stats -->
     <div class="stats-row">
       <div class="stat-card highlight">
@@ -835,20 +864,28 @@ function renderContacts() {
   ];
 
   let rows = contacts.map(c => {
-    const date = c.created_at ? new Date(c.created_at).toLocaleDateString('fr-FR', {day:'2-digit',month:'short'}) : '—';
+    const date = c.created_at ? new Date(c.created_at).toLocaleDateString('fr-FR', {day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'}) : '—';
     const statusOpts = STATUS_OPTS.map(o => `<option value="${o.val}" ${c.status === o.val ? 'selected' : ''}>${o.label}</option>`).join('');
     const budget = c.buyer_budget ? parseInt(c.buyer_budget).toLocaleString('fr-FR') + ' €' : '—';
+    const srcIcon = c.source === 'sms' ? '📱' : c.source === 'email' ? '✉️' : c.source === 'serenis' ? '📞' : '✏️';
+    const srcLabel = c.source === 'sms' ? 'SMS' : c.source === 'email' ? 'Email' : c.source === 'serenis' ? 'Appel' : 'Manuel';
+    const isNew = c.status === 'new';
 
-    return `<tr>
+    return `<tr style="${isNew ? 'background:#fffbf5;' : ''}">
       <td>
-        <div class="contact-name">${c.buyer_name || '—'}</div>
-        <div class="contact-phone">${c.buyer_phone || ''}</div>
+        <div style="display:flex;align-items:center;gap:8px;">
+          ${isNew ? '<span style="width:7px;height:7px;border-radius:50%;background:#C4785A;flex-shrink:0;display:inline-block;"></span>' : ''}
+          <div>
+            <div class="contact-name">${c.buyer_name || '—'}</div>
+            <div class="contact-phone">${c.buyer_phone || ''}</div>
+          </div>
+        </div>
       </td>
       <td style="color:#666;font-size:0.83rem;">${c.buyer_email || '—'}</td>
       <td style="font-size:0.83rem;color:#555;">${budget}</td>
       <td>
-        <span class="contact-source ${c.source === 'serenis' ? 'source-serenis' : 'source-manuel'}">
-          ${c.source === 'serenis' ? 'Vendu Par Moi' : 'Manuel'}
+        <span class="contact-source ${c.source === 'serenis' || c.source === 'sms' ? 'source-serenis' : 'source-manuel'}" style="display:inline-flex;align-items:center;gap:4px;">
+          ${srcIcon} ${srcLabel}
         </span>
       </td>
       <td>
