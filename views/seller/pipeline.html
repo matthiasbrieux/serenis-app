@@ -1,0 +1,869 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <script>if("scrollRestoration"in history)history.scrollRestoration="manual";</script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mes Acheteurs — Vendu Par Moi</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; }
+    body { font-family: 'DM Sans', sans-serif; background: #F5F0E8; margin: 0; }
+    .app-layout { display: flex; min-height: 100vh; }
+
+    .sidebar { width:240px;min-height:100vh;background:#3D5A47;display:flex;flex-direction:column;position:fixed;top:0;left:0;bottom:0;z-index:100; }
+    .sidebar-nav { flex:1;padding:16px 0;display:flex;flex-direction:column;gap:2px;overflow-y:auto; }
+    .sidebar-item { display:flex;align-items:center;gap:11px;padding:10px 24px;color:rgba(212,228,216,0.7);text-decoration:none;font-size:0.88rem;font-weight:400;transition:all 0.2s; }
+    .sidebar-item:hover { color:#FDFCF8;background:rgba(212,228,216,0.08); }
+    .sidebar-item.active { color:#FDFCF8;background:rgba(212,228,216,0.14);font-weight:500;border-left:3px solid #C4785A; }
+    .sidebar-footer { padding:20px 24px;border-top:1px solid rgba(212,228,216,0.12); }
+    .sidebar-footer a { color:rgba(212,228,216,0.4);font-size:0.78rem;text-decoration:none; }
+
+    .main { margin-left:240px; display:flex; flex-direction:column; min-height:100vh; }
+
+    /* Topbar */
+    .topbar { background:#fff; border-bottom:1px solid #e8e3db; padding:0 32px; height:64px; display:flex; align-items:center; gap:16px; position:sticky; top:0; z-index:50; overflow:hidden; }
+    .topbar-title { font-family:'Cormorant Garamond',serif; font-size:1.3rem; color:#1a1a1a; font-weight:600; }
+    .topbar-sub { font-size:0.78rem; color:#aaa; margin-top:1px; }
+    .topbar-spacer { flex:1; }
+    .btn-add-buyer { background:#3D5A47; color:#fff; border:none; border-radius:8px; padding:9px 18px; font-size:0.85rem; font-weight:600; cursor:pointer; font-family:'DM Sans',sans-serif; display:flex; align-items:center; gap:7px; transition:all 0.15s; white-space:nowrap; }
+    .btn-add-buyer:hover { background:#2e4435; }
+
+    /* Stats funnel */
+    .funnel-bar { background:#fff; border-bottom:1px solid #e8e3db; padding:16px 32px; display:flex; align-items:center; gap:0; overflow-x:auto; }
+    .funnel-step { display:flex; flex-direction:column; align-items:center; min-width:80px; flex:1; }
+    .funnel-n { font-size:1.6rem; font-weight:700; color:#1a1a1a; line-height:1; transition:all 0.5s; }
+    .funnel-l { font-size:0.7rem; color:#aaa; margin-top:3px; text-align:center; font-weight:500; }
+    .funnel-arrow { color:#e8e3db; font-size:1rem; flex-shrink:0; padding:0 4px; padding-bottom:12px; }
+
+    /* AI Insight */
+    .ai-bar { margin:20px 28px 0; background:linear-gradient(135deg,#3D5A47,#2e4435); border-radius:12px; padding:14px 18px; display:flex; align-items:flex-start; gap:12px; }
+    .ai-icon { font-size:1.2rem; flex-shrink:0; margin-top:1px; }
+    .ai-text { font-size:0.83rem; color:#D4E4D8; line-height:1.6; flex:1; }
+    .ai-text.loading { opacity:0.5; }
+    .ai-btn { background:rgba(255,255,255,0.12); border:none; border-radius:6px; padding:5px 12px; font-size:0.75rem; color:#D4E4D8; cursor:pointer; font-family:'DM Sans',sans-serif; flex-shrink:0; margin-top:2px; transition:background 0.15s; }
+    .ai-btn:hover { background:rgba(255,255,255,0.2); }
+
+    /* Pipeline board */
+    .pipeline-wrap { flex:1; padding:20px 28px 60px; overflow:hidden; }
+
+    /* Mobile stage tabs */
+    .stage-tabs { display:none; gap:0; overflow-x:auto; scrollbar-width:none; margin-bottom:16px; border-radius:12px; background:#fff; border:1px solid #e8e3db; }
+    .stage-tabs::-webkit-scrollbar { display:none; }
+    .stage-tab { flex-shrink:0; padding:10px 16px; font-size:0.78rem; font-weight:600; color:#999; cursor:pointer; white-space:nowrap; border-bottom:2px solid transparent; transition:all 0.2s; display:flex; align-items:center; gap:6px; touch-action:manipulation; }
+    .stage-tab.active { color:#3D5A47; border-bottom-color:#3D5A47; }
+    .stage-tab .tab-count { background:#e8e3db; color:#666; border-radius:20px; padding:1px 7px; font-size:0.7rem; font-weight:700; }
+    .stage-tab.active .tab-count { background:#3D5A47; color:#fff; }
+
+    .pipeline-board { display:grid; grid-template-columns:repeat(5,1fr); gap:14px; align-items:start; }
+
+    .pipeline-col { background:#fff; border-radius:14px; border:1px solid #e8e3db; overflow:hidden; min-height:200px; }
+    .col-head { padding:14px 16px 12px; border-bottom:1px solid #f0ebe3; display:flex; align-items:center; gap:8px; }
+    .col-icon { font-size:1.1rem; }
+    .col-title { font-size:0.82rem; font-weight:700; color:#1a1a1a; flex:1; }
+    .col-count { background:#f0ebe3; color:#888; border-radius:20px; padding:2px 8px; font-size:0.7rem; font-weight:700; }
+    .col-cards { padding:10px 10px; display:flex; flex-direction:column; gap:8px; min-height:100px; }
+    .col-cards.drag-over { background:#f0f7f2; border-radius:8px; }
+
+    /* Buyer card */
+    .buyer-card { background:#fff; border:1.5px solid #e8e3db; border-radius:10px; padding:12px 13px; cursor:pointer; transition:all 0.2s; position:relative; }
+    .buyer-card:hover { border-color:#c5d9cb; box-shadow:0 3px 14px rgba(0,0,0,0.07); transform:translateY(-1px); }
+    .buyer-card.dragging { opacity:0.5; transform:rotate(2deg); }
+    .buyer-card[data-stage="new"] { border-left:3px solid #C4785A; }
+    .buyer-card[data-stage="qualified"] { border-left:3px solid #4a8a5a; }
+    .buyer-card[data-stage="visit_planned"] { border-left:3px solid #3D5A47; }
+    .buyer-card[data-stage="visit_done"] { border-left:3px solid #2e4435; }
+    .buyer-card[data-stage="offer_received"] { border-left:3px solid #C4603A; }
+
+    .card-top { display:flex; align-items:flex-start; gap:9px; margin-bottom:7px; }
+    .card-avatar { width:32px; height:32px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:0.8rem; font-weight:700; color:#fff; flex-shrink:0; }
+    .card-info { flex:1; min-width:0; }
+    .card-name { font-size:0.85rem; font-weight:600; color:#1a1a1a; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .card-budget { font-size:0.75rem; color:#3D5A47; font-weight:600; margin-top:1px; }
+    .card-budget.empty { color:#bbb; font-weight:400; }
+    .card-meta { display:flex; align-items:center; gap:6px; flex-wrap:wrap; }
+    .card-badge { display:inline-flex; align-items:center; gap:3px; padding:2px 7px; border-radius:20px; font-size:0.65rem; font-weight:700; text-transform:uppercase; letter-spacing:0.03em; }
+    .badge-sms { background:#fff8f5; color:#C4603A; border:1px solid #f0d5c8; }
+    .badge-email { background:#f0f5ff; color:#3B5BDB; border:1px solid #c5d0f0; }
+    .badge-manuel { background:#f5f5f5; color:#888; border:1px solid #e8e8e8; }
+    .badge-dossier { background:#f0f7f2; color:#3D5A47; border:1px solid #c5d9cb; }
+    .card-date { font-size:0.68rem; color:#bbb; margin-left:auto; }
+
+    .card-actions { display:flex; gap:5px; margin-top:9px; padding-top:8px; border-top:1px solid #f0ebe3; }
+    .card-btn { flex:1; background:none; border:1px solid #e8e3db; border-radius:7px; padding:5px 4px; font-size:0.68rem; font-weight:600; color:#666; cursor:pointer; font-family:'DM Sans',sans-serif; transition:all 0.15s; text-align:center; touch-action:manipulation; }
+    .card-btn:hover { background:#f8f5f0; border-color:#c5d9cb; color:#3D5A47; }
+    .card-btn.primary { background:#3D5A47; color:#fff; border-color:#3D5A47; }
+    .card-btn.primary:hover { background:#2e4435; }
+    .card-btn.danger { color:#C4603A; border-color:#f0d5c8; }
+    .card-btn.danger:hover { background:#FDF7F4; }
+
+    /* Mobile move buttons */
+    .card-move { display:none; gap:4px; margin-top:8px; padding-top:8px; border-top:1px solid #f0ebe3; }
+    .move-btn { flex:1; background:#f8f5f0; border:1px solid #e8e3db; border-radius:7px; padding:7px 4px; font-size:0.72rem; font-weight:600; color:#666; cursor:pointer; font-family:'DM Sans',sans-serif; transition:all 0.15s; text-align:center; touch-action:manipulation; }
+    .move-btn.fwd { background:#3D5A47; color:#fff; border-color:#3D5A47; }
+    .move-btn:disabled { opacity:0.3; pointer-events:none; }
+
+    /* Empty state */
+    .col-empty { text-align:center; padding:24px 16px; color:#ccc; }
+    .col-empty-icon { font-size:1.8rem; margin-bottom:6px; opacity:0.5; }
+    .col-empty-text { font-size:0.75rem; color:#bbb; line-height:1.5; }
+
+    /* Not retained section */
+    .archived-section { margin:0 28px 32px; }
+    .archived-toggle { display:flex; align-items:center; gap:8px; cursor:pointer; padding:10px 0; user-select:none; }
+    .archived-toggle-label { font-size:0.78rem; color:#aaa; font-weight:600; }
+    .archived-count { background:#f0ebe3; color:#999; border-radius:20px; padding:1px 8px; font-size:0.7rem; font-weight:700; }
+    .archived-list { display:none; gap:8px; margin-top:8px; }
+    .archived-list.open { display:flex; flex-wrap:wrap; }
+
+    /* Detail panel */
+    .detail-overlay { position:fixed; inset:0; background:rgba(0,0,0,0.4); z-index:500; display:none; }
+    .detail-overlay.open { display:block; }
+    .detail-panel { position:fixed; right:0; top:0; bottom:0; width:400px; background:#fff; z-index:501; transform:translateX(100%); transition:transform 0.3s cubic-bezier(0.34,1.56,0.64,1); overflow-y:auto; display:flex; flex-direction:column; }
+    .detail-panel.open { transform:translateX(0); }
+    .detail-head { padding:24px 24px 20px; border-bottom:1px solid #f0ebe3; display:flex; align-items:flex-start; gap:14px; }
+    .detail-avatar { width:48px; height:48px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:1.1rem; font-weight:700; color:#fff; flex-shrink:0; }
+    .detail-name { font-size:1.1rem; font-weight:700; color:#1a1a1a; }
+    .detail-sub { font-size:0.82rem; color:#888; margin-top:3px; }
+    .detail-close { margin-left:auto; width:32px; height:32px; border-radius:50%; background:#f5f0e8; border:none; cursor:pointer; font-size:1rem; color:#888; display:flex; align-items:center; justify-content:center; flex-shrink:0; transition:all 0.15s; touch-action:manipulation; }
+    .detail-close:hover { background:#e8e3db; color:#333; }
+
+    .detail-section { padding:20px 24px; border-bottom:1px solid #f0ebe3; }
+    .detail-section-title { font-size:0.7rem; font-weight:700; color:#aaa; text-transform:uppercase; letter-spacing:0.08em; margin-bottom:12px; }
+    .detail-row { display:flex; align-items:center; gap:10px; margin-bottom:8px; font-size:0.85rem; }
+    .detail-row-label { color:#888; width:80px; flex-shrink:0; font-size:0.8rem; }
+    .detail-row-val { color:#1a1a1a; font-weight:500; }
+    .detail-row-val a { color:#3D5A47; text-decoration:none; }
+
+    /* Stage selector in detail panel */
+    .stage-selector { display:flex; flex-direction:column; gap:6px; }
+    .stage-option { display:flex; align-items:center; gap:10px; padding:9px 12px; border-radius:8px; border:1.5px solid #e8e3db; cursor:pointer; transition:all 0.15s; touch-action:manipulation; }
+    .stage-option:hover { background:#f8f5f0; }
+    .stage-option.active { border-color:#3D5A47; background:#f0f7f2; }
+    .stage-option-dot { width:10px; height:10px; border-radius:50%; flex-shrink:0; }
+    .stage-option-label { font-size:0.83rem; font-weight:600; color:#1a1a1a; }
+    .stage-option-desc { font-size:0.72rem; color:#aaa; margin-left:auto; }
+
+    /* Notes */
+    .notes-area { width:100%; border:1.5px solid #e8e3db; border-radius:8px; padding:10px 12px; font-family:'DM Sans',sans-serif; font-size:0.85rem; resize:vertical; min-height:80px; color:#1a1a1a; transition:border-color 0.15s; }
+    .notes-area:focus { outline:none; border-color:#3D5A47; }
+    .notes-save { background:#3D5A47; color:#fff; border:none; border-radius:7px; padding:7px 16px; font-size:0.8rem; font-weight:600; cursor:pointer; font-family:'DM Sans',sans-serif; margin-top:8px; transition:all 0.15s; touch-action:manipulation; }
+    .notes-save:hover { background:#2e4435; }
+
+    /* Pre-visit brief */
+    .brief-card { background:#f0f7f2; border-radius:10px; padding:14px 16px; border-left:3px solid #3D5A47; }
+    .brief-title { font-size:0.8rem; font-weight:700; color:#2e4435; margin-bottom:10px; }
+    .brief-q { font-size:0.8rem; color:#2a4030; margin-bottom:5px; display:flex; gap:7px; }
+    .brief-q::before { content:'→'; color:#4a8a5a; font-weight:700; flex-shrink:0; }
+
+    /* Dossier link */
+    .dossier-link-box { background:#FDF7F4; border:1px solid #f0d5c8; border-radius:8px; padding:10px 12px; display:flex; align-items:center; gap:8px; }
+    .dossier-link-url { font-size:0.75rem; color:#C4603A; flex:1; word-break:break-all; }
+    .dossier-copy-btn { background:#C4603A; color:#fff; border:none; border-radius:6px; padding:5px 10px; font-size:0.72rem; font-weight:600; cursor:pointer; font-family:'DM Sans',sans-serif; flex-shrink:0; touch-action:manipulation; transition:all 0.15s; }
+    .dossier-copy-btn:hover { background:#a8482e; }
+
+    /* Add buyer modal */
+    .modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,0.45); z-index:600; display:none; align-items:center; justify-content:center; padding:16px; }
+    .modal-overlay.open { display:flex; }
+    .modal { background:#fff; border-radius:16px; width:100%; max-width:440px; padding:28px; }
+    .modal-title { font-family:'Cormorant Garamond',serif; font-size:1.4rem; color:#1a1a1a; margin:0 0 20px; }
+    .form-row { margin-bottom:14px; }
+    .form-label { display:block; font-size:0.78rem; font-weight:600; color:#555; margin-bottom:5px; }
+    .form-input { width:100%; border:1.5px solid #e8e3db; border-radius:8px; padding:10px 12px; font-family:'DM Sans',sans-serif; font-size:0.9rem; color:#1a1a1a; transition:border-color 0.15s; }
+    .form-input:focus { outline:none; border-color:#3D5A47; }
+    .form-row-2 { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+    .modal-actions { display:flex; gap:10px; margin-top:20px; }
+    .btn-cancel { flex:1; background:none; border:1.5px solid #e8e3db; border-radius:8px; padding:10px; font-size:0.88rem; font-weight:600; color:#888; cursor:pointer; font-family:'DM Sans',sans-serif; touch-action:manipulation; }
+    .btn-save { flex:2; background:#3D5A47; color:#fff; border:none; border-radius:8px; padding:10px; font-size:0.88rem; font-weight:600; cursor:pointer; font-family:'DM Sans',sans-serif; touch-action:manipulation; transition:all 0.15s; }
+    .btn-save:hover { background:#2e4435; }
+
+    /* Toast */
+    .toast { position:fixed; bottom:24px; right:24px; background:#1a1a16; color:#fff; padding:12px 20px; border-radius:10px; font-size:0.88rem; z-index:9999; opacity:0; transform:translateY(8px); transition:all 0.3s; pointer-events:none; }
+    .toast.show { opacity:1; transform:none; }
+    .toast.success { background:#059669; }
+    .toast.error { background:#dc2626; }
+
+    /* Responsive */
+    @media(max-width:1200px) {
+      .pipeline-board { grid-template-columns:repeat(3,1fr); }
+    }
+    @media(max-width:900px) {
+      .pipeline-board { grid-template-columns:1fr; display:none; }
+      .pipeline-board.mobile-active { display:flex; flex-direction:column; }
+      .stage-tabs { display:flex; }
+      .pipeline-col { display:none; }
+      .pipeline-col.mobile-visible { display:block; }
+      .card-move { display:flex; }
+      .card-actions .card-btn:not(.primary):not(.danger) { display:none; }
+    }
+    @media(max-width:768px) {
+      .main { margin-left:0; }
+      .topbar { padding:0 16px; gap:10px; }
+      .topbar-sub { display:none; }
+      .funnel-bar { padding:12px 16px; gap:0; }
+      .funnel-n { font-size:1.3rem; }
+      .funnel-l { font-size:0.65rem; }
+      .ai-bar { margin:16px 16px 0; }
+      .pipeline-wrap { padding:16px 16px 60px; }
+      .archived-section { margin:0 16px 32px; }
+      .detail-panel { width:100%; }
+      .toast { bottom:max(16px, env(safe-area-inset-bottom, 16px)); left:16px; right:16px; width:auto; }
+    }
+    @media(max-width:480px) {
+      .form-row-2 { grid-template-columns:1fr; }
+    }
+    @media(pointer:coarse) {
+      .buyer-card { touch-action:manipulation; }
+      .stage-option { min-height:44px; }
+      .btn-add-buyer { min-height:44px; }
+    }
+  </style>
+</head>
+<body>
+<div class="app-layout">
+
+  <!-- Sidebar -->
+  <nav class="sidebar">
+    <div class="sidebar-logo">
+      <a href="/" class="sidebar-brand">
+        <div class="sidebar-brand-icon"><svg width="18" height="18" viewBox="0 0 32 32"><path d="M16 2L3 13v17h8v-8h10v8h8V13L16 2z" fill="#D4E4D8"/></svg></div>
+        <div class="sidebar-brand-text"><span class="sidebar-brand-name">Vendu Par Moi</span><span class="sidebar-brand-sub">Espace vendeur</span></div>
+      </a>
+    </div>
+    <div class="sidebar-nav">
+      <a href="/dashboard" class="sidebar-item"><span style="display:inline-flex;vertical-align:middle;margin-right:6px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></span>Dashboard</a>
+      <a href="/ma-formation" class="sidebar-item"><span style="display:inline-flex;vertical-align:middle;margin-right:6px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg></span>Ma formation</a>
+      <a href="/mon-bien" class="sidebar-item"><span style="display:inline-flex;vertical-align:middle;margin-right:6px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></span>Mon bien</a>
+      <a href="/mon-guide-photos" class="sidebar-item"><span style="display:inline-flex;vertical-align:middle;margin-right:6px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg></span>Guide photos</a>
+      <a href="/mon-agenda" class="sidebar-item"><span style="display:inline-flex;vertical-align:middle;margin-right:6px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span>Mon agenda</a>
+      <a href="/mes-acheteurs" class="sidebar-item active"><span style="display:inline-flex;vertical-align:middle;margin-right:6px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></span>Mes acheteurs</a>
+      <a href="/ma-bibliotheque" class="sidebar-item"><span style="display:inline-flex;vertical-align:middle;margin-right:6px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></span>Bibliothèque</a>
+      <a href="/mes-publications" class="sidebar-item"><span style="display:inline-flex;vertical-align:middle;margin-right:6px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="2"/><path d="M16.24 7.76a6 6 0 0 1 0 8.49m-8.48-.01a6 6 0 0 1 0-8.49m11.31-2.82a10 10 0 0 1 0 14.14m-14.14 0a10 10 0 0 1 0-14.14"/></svg></span>Publications</a>
+      <a href="/coach-ia" class="sidebar-item"><span style="display:inline-flex;vertical-align:middle;margin-right:6px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="11" width="18" height="10" rx="2"/><path d="M12 3v8"/><circle cx="12" cy="3" r="1"/><circle cx="8" cy="16" r="1" fill="currentColor"/><circle cx="16" cy="16" r="1" fill="currentColor"/></svg></span>Coach IA</a>
+    </div>
+    <div class="sidebar-footer">
+      <a href="/logout">Déconnexion →</a>
+    </div>
+  </nav>
+
+  <div class="main">
+    <!-- Topbar -->
+    <div class="topbar">
+      <div>
+        <div class="topbar-title">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="vertical-align:middle;margin-right:7px;"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>Mes Acheteurs
+        </div>
+        <div class="topbar-sub">Suivez chaque acheteur, de la prise de contact jusqu'à l'offre</div>
+      </div>
+      <div class="topbar-spacer"></div>
+      <button class="btn-add-buyer" onclick="openAddModal()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Ajouter
+      </button>
+    </div>
+
+    <!-- Stats funnel -->
+    <div class="funnel-bar" id="funnelBar">
+      <div class="funnel-step">
+        <div class="funnel-n" id="fn-total">—</div>
+        <div class="funnel-l">Contacts</div>
+      </div>
+      <div class="funnel-arrow">›</div>
+      <div class="funnel-step">
+        <div class="funnel-n" id="fn-qualified">—</div>
+        <div class="funnel-l">Qualifiés</div>
+      </div>
+      <div class="funnel-arrow">›</div>
+      <div class="funnel-step">
+        <div class="funnel-n" id="fn-visits">—</div>
+        <div class="funnel-l">Visites</div>
+      </div>
+      <div class="funnel-arrow">›</div>
+      <div class="funnel-step">
+        <div class="funnel-n" id="fn-done">—</div>
+        <div class="funnel-l">Faites</div>
+      </div>
+      <div class="funnel-arrow">›</div>
+      <div class="funnel-step">
+        <div class="funnel-n" id="fn-offers">—</div>
+        <div class="funnel-l">Offres</div>
+      </div>
+    </div>
+
+    <!-- AI Insight -->
+    <div class="ai-bar">
+      <div class="ai-icon">✨</div>
+      <div class="ai-text loading" id="aiInsightText">Analyse de votre pipeline en cours…</div>
+      <button class="ai-btn" onclick="refreshInsight()">Actualiser</button>
+    </div>
+
+    <!-- Pipeline -->
+    <div class="pipeline-wrap">
+      <!-- Mobile tabs -->
+      <div class="stage-tabs" id="stageTabs"></div>
+
+      <!-- Board -->
+      <div class="pipeline-board" id="pipelineBoard"></div>
+    </div>
+
+    <!-- Archived -->
+    <div class="archived-section" id="archivedSection" style="display:none;">
+      <div class="archived-toggle" onclick="toggleArchived()">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#aaa" stroke-width="2"><polyline id="archChevron" points="9 18 15 12 9 6"/></svg>
+        <span class="archived-toggle-label">Non retenus</span>
+        <span class="archived-count" id="archivedCount">0</span>
+      </div>
+      <div class="archived-list" id="archivedList"></div>
+    </div>
+  </div>
+</div>
+
+<!-- Detail panel -->
+<div class="detail-overlay" id="detailOverlay" onclick="closeDetail()"></div>
+<div class="detail-panel" id="detailPanel">
+  <div id="detailContent"></div>
+</div>
+
+<!-- Add buyer modal -->
+<div class="modal-overlay" id="addModal">
+  <div class="modal">
+    <div class="modal-title">Ajouter un acheteur</div>
+    <div class="form-row">
+      <label class="form-label">Prénom et nom</label>
+      <input type="text" class="form-input" id="f-name" placeholder="Ex: Marie Dupont">
+    </div>
+    <div class="form-row-2">
+      <div class="form-row" style="margin:0;">
+        <label class="form-label">Téléphone</label>
+        <input type="tel" class="form-input" id="f-phone" placeholder="06 00 00 00 00">
+      </div>
+      <div class="form-row" style="margin:0;">
+        <label class="form-label">Email</label>
+        <input type="email" class="form-input" id="f-email" placeholder="email@exemple.fr">
+      </div>
+    </div>
+    <div class="form-row">
+      <label class="form-label">Budget estimé (€)</label>
+      <input type="number" class="form-input" id="f-budget" placeholder="Ex: 280000">
+    </div>
+    <div class="form-row">
+      <label class="form-label">Notes (optionnel)</label>
+      <input type="text" class="form-input" id="f-notes" placeholder="Ex: Famille avec 2 enfants, cherche depuis 6 mois">
+    </div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeAddModal()">Annuler</button>
+      <button class="btn-save" onclick="saveNewBuyer()">Enregistrer</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="/js/seller-nav.js"></script>
+<script>
+// ── Config ───────────────────────────────────────────────────
+const STAGES = [
+  { id: 'new',           label: 'Nouveau contact',   icon: '🔔', color: '#C4785A', bg: '#FDF7F4', desc: 'Vient de vous contacter' },
+  { id: 'qualified',     label: 'Qualifié',           icon: '✅', color: '#4a8a5a', bg: '#F0FAF4', desc: 'Budget et projet confirmés' },
+  { id: 'visit_planned', label: 'Visite planifiée',   icon: '📅', color: '#3D5A47', bg: '#EFF6F2', desc: 'Rendez-vous confirmé' },
+  { id: 'visit_done',    label: 'Visite faite',       icon: '🏠', color: '#2e4435', bg: '#E8F2EC', desc: 'En réflexion post-visite' },
+  { id: 'offer_received',label: 'Offre reçue',        icon: '🤝', color: '#C4603A', bg: '#FDF3EE', desc: 'A fait une proposition' },
+];
+
+const AVATAR_COLORS = ['#C4603A','#3D5A47','#4a7a5a','#8a4a3a','#3a5a7a','#6a4a8a','#3a6a4a'];
+
+let allContacts = [];
+let dossierToken = null;
+let activeTab = 'new';
+let activeContact = null;
+
+// ── Utils ────────────────────────────────────────────────────
+function initials(name) {
+  if (!name) return '?';
+  const p = name.trim().split(' ').filter(Boolean);
+  return (p[0]?.[0] || '') + (p[1]?.[0] || '');
+}
+
+function avatarColor(name) {
+  if (!name) return AVATAR_COLORS[0];
+  let h = 0;
+  for (let i = 0; i < name.length; i++) h = (h * 31 + name.charCodeAt(i)) & 0xffff;
+  return AVATAR_COLORS[h % AVATAR_COLORS.length];
+}
+
+function formatDate(dt) {
+  const d = new Date(dt);
+  const now = new Date();
+  const diff = Math.floor((now - d) / 86400000);
+  if (diff === 0) return "Aujourd'hui";
+  if (diff === 1) return 'Hier';
+  if (diff < 7) return `Il y a ${diff}j`;
+  if (diff < 30) return `Il y a ${Math.floor(diff/7)}sem`;
+  return `Il y a ${Math.floor(diff/30)}mois`;
+}
+
+function formatBudget(n) {
+  if (!n) return null;
+  return new Intl.NumberFormat('fr-FR', { style:'currency', currency:'EUR', maximumFractionDigits:0 }).format(n);
+}
+
+function dossierUrl(token) {
+  return token ? `${location.origin}/dossier/acheteur/${token}` : null;
+}
+
+function toast(msg, type='') {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.className = 'toast show ' + type;
+  setTimeout(() => el.className = 'toast', 2800);
+}
+
+function animCount(el, to) {
+  const start = 0;
+  const dur = 600;
+  const t0 = performance.now();
+  function step(t) {
+    const p = Math.min(1, (t - t0) / dur);
+    el.textContent = Math.round(start + (to - start) * (1 - Math.pow(1 - p, 3)));
+    if (p < 1) requestAnimationFrame(step);
+  }
+  requestAnimationFrame(step);
+}
+
+// ── Load data ────────────────────────────────────────────────
+async function loadPipeline() {
+  try {
+    const r = await fetch('/api/pipeline');
+    const data = await r.json();
+    allContacts = data.contacts || [];
+    dossierToken = data.dossierToken || null;
+    renderAll();
+    loadInsight();
+  } catch(e) {
+    toast('Erreur de chargement', 'error');
+  }
+}
+
+// ── Render ───────────────────────────────────────────────────
+function renderAll() {
+  renderFunnel();
+  renderTabs();
+  renderBoard();
+  renderArchived();
+}
+
+function renderFunnel() {
+  const active = allContacts.filter(c => c.status !== 'not_retained');
+  animCount(document.getElementById('fn-total'),     active.length);
+  animCount(document.getElementById('fn-qualified'),  active.filter(c => ['qualified','visit_planned','visit_done','offer_received'].includes(c.status)).length);
+  animCount(document.getElementById('fn-visits'),     active.filter(c => ['visit_planned','visit_done','offer_received'].includes(c.status)).length);
+  animCount(document.getElementById('fn-done'),       active.filter(c => ['visit_done','offer_received'].includes(c.status)).length);
+  animCount(document.getElementById('fn-offers'),     active.filter(c => c.status === 'offer_received').length);
+}
+
+function renderTabs() {
+  const tabs = document.getElementById('stageTabs');
+  tabs.innerHTML = STAGES.map(s => {
+    const count = allContacts.filter(c => c.status === s.id).length;
+    return `<div class="stage-tab ${s.id === activeTab ? 'active' : ''}" onclick="setTab('${s.id}')">
+      ${s.icon} ${s.label}
+      <span class="tab-count">${count}</span>
+    </div>`;
+  }).join('');
+}
+
+function setTab(stageId) {
+  activeTab = stageId;
+  renderTabs();
+  // Show only the correct column on mobile
+  document.querySelectorAll('.pipeline-col').forEach(col => {
+    col.classList.toggle('mobile-visible', col.dataset.stage === stageId);
+  });
+}
+
+function renderBoard() {
+  const board = document.getElementById('pipelineBoard');
+  board.innerHTML = STAGES.map(s => {
+    const cards = allContacts.filter(c => c.status === s.id);
+    const isFirst = STAGES.indexOf(s) === 0;
+    const isLast = STAGES.indexOf(s) === STAGES.length - 1;
+    return `
+    <div class="pipeline-col ${s.id === activeTab ? 'mobile-visible' : ''}"
+         data-stage="${s.id}"
+         ondragover="onDragOver(event)" ondrop="onDrop(event, '${s.id}')">
+      <div class="col-head" style="border-top:3px solid ${s.color};">
+        <span class="col-icon">${s.icon}</span>
+        <span class="col-title">${s.label}</span>
+        <span class="col-count" id="count-${s.id}">${cards.length}</span>
+      </div>
+      <div class="col-cards" id="col-${s.id}">
+        ${cards.length === 0 ? `<div class="col-empty">
+          <div class="col-empty-icon">${s.icon}</div>
+          <div class="col-empty-text">${s.desc}</div>
+        </div>` : cards.map(c => renderCard(c, isFirst, isLast)).join('')}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function renderCard(c, isFirst, isLast) {
+  const stage = STAGES.find(s => s.id === c.status) || STAGES[0];
+  const stageIdx = STAGES.findIndex(s => s.id === c.status);
+  const prevStage = stageIdx > 0 ? STAGES[stageIdx - 1] : null;
+  const nextStage = stageIdx < STAGES.length - 1 ? STAGES[stageIdx + 1] : null;
+  const bgt = formatBudget(c.buyer_budget);
+  const src = c.source || 'manuel';
+  return `
+  <div class="buyer-card" data-id="${c.id}" data-stage="${c.status}"
+       draggable="true"
+       ondragstart="onDragStart(event, ${c.id})"
+       onclick="openDetail(${c.id})">
+    <div class="card-top">
+      <div class="card-avatar" style="background:${avatarColor(c.buyer_name)};">${initials(c.buyer_name) || '?'}</div>
+      <div class="card-info">
+        <div class="card-name">${c.buyer_name || 'Acheteur sans nom'}</div>
+        <div class="card-budget ${bgt ? '' : 'empty'}">${bgt || 'Budget non renseigné'}</div>
+      </div>
+    </div>
+    <div class="card-meta">
+      <span class="card-badge badge-${src}">${src === 'sms' ? '📱 SMS' : src === 'email' ? '✉️ Email' : '✏️ Manuel'}</span>
+      ${c.dossier_sent ? '<span class="card-badge badge-dossier">📋 Dossier envoyé</span>' : ''}
+      <span class="card-date">${formatDate(c.created_at)}</span>
+    </div>
+    <div class="card-actions">
+      <button class="card-btn primary" onclick="event.stopPropagation(); openDetail(${c.id})">Voir</button>
+      ${dossierToken ? `<button class="card-btn" onclick="event.stopPropagation(); copyDossier(${c.id})">📋 Dossier</button>` : ''}
+      <button class="card-btn danger" onclick="event.stopPropagation(); confirmDelete(${c.id})">Suppr.</button>
+    </div>
+    <div class="card-move">
+      <button class="move-btn" onclick="event.stopPropagation(); moveContact(${c.id}, '${prevStage?.id}')" ${!prevStage ? 'disabled' : ''}>← ${prevStage?.label || ''}</button>
+      <button class="move-btn fwd" onclick="event.stopPropagation(); moveContact(${c.id}, '${nextStage?.id}')" ${!nextStage ? 'disabled' : ''}>→ ${nextStage?.label || ''}</button>
+    </div>
+  </div>`;
+}
+
+function renderArchived() {
+  const archived = allContacts.filter(c => c.status === 'not_retained');
+  const section = document.getElementById('archivedSection');
+  if (archived.length === 0) { section.style.display = 'none'; return; }
+  section.style.display = 'block';
+  document.getElementById('archivedCount').textContent = archived.length;
+  const list = document.getElementById('archivedList');
+  list.innerHTML = archived.map(c => `
+    <div class="buyer-card" data-id="${c.id}" data-stage="not_retained" style="opacity:0.6;cursor:pointer;" onclick="openDetail(${c.id})">
+      <div class="card-top">
+        <div class="card-avatar" style="background:#bbb;">${initials(c.buyer_name) || '?'}</div>
+        <div class="card-info">
+          <div class="card-name">${c.buyer_name || 'Acheteur'}</div>
+          <div class="card-budget empty">Non retenu — ${formatDate(c.created_at)}</div>
+        </div>
+      </div>
+    </div>`).join('');
+}
+
+// ── Drag & drop ──────────────────────────────────────────────
+let dragId = null;
+
+function onDragStart(e, id) {
+  dragId = id;
+  e.dataTransfer.effectAllowed = 'move';
+  e.currentTarget.classList.add('dragging');
+  setTimeout(() => e.currentTarget.classList.remove('dragging'), 10);
+}
+
+function onDragOver(e) {
+  e.preventDefault();
+  e.dataTransfer.dropEffect = 'move';
+  e.currentTarget.querySelector('.col-cards')?.classList.add('drag-over');
+}
+
+function onDrop(e, stageId) {
+  e.preventDefault();
+  e.currentTarget.querySelector('.col-cards')?.classList.remove('drag-over');
+  if (dragId !== null) {
+    moveContact(dragId, stageId);
+    dragId = null;
+  }
+}
+
+document.addEventListener('dragleave', e => {
+  e.currentTarget?.querySelector?.('.col-cards.drag-over')?.classList.remove('drag-over');
+});
+
+// ── Move contact ─────────────────────────────────────────────
+async function moveContact(id, newStage) {
+  if (!newStage) return;
+  const c = allContacts.find(c => c.id === id);
+  if (!c || c.status === newStage) return;
+  const oldStage = c.status;
+  c.status = newStage; // optimistic
+  renderAll();
+  try {
+    const r = await fetch(`/api/connect/contacts/${id}/status`, {
+      method: 'PUT', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ status: newStage })
+    });
+    if (!r.ok) throw new Error();
+    const stageName = STAGES.find(s => s.id === newStage)?.label || newStage;
+    toast(`Déplacé vers "${stageName}"`, 'success');
+    // Refresh detail panel if open
+    if (activeContact?.id === id) {
+      activeContact = c;
+      renderDetailContent(c);
+    }
+  } catch {
+    c.status = oldStage;
+    renderAll();
+    toast('Erreur lors du déplacement', 'error');
+  }
+}
+
+// ── Detail panel ─────────────────────────────────────────────
+function openDetail(id) {
+  const c = allContacts.find(c => c.id === id);
+  if (!c) return;
+  activeContact = c;
+  renderDetailContent(c);
+  document.getElementById('detailOverlay').classList.add('open');
+  document.getElementById('detailPanel').classList.add('open');
+}
+
+function closeDetail() {
+  document.getElementById('detailOverlay').classList.remove('open');
+  document.getElementById('detailPanel').classList.remove('open');
+  activeContact = null;
+}
+
+function renderDetailContent(c) {
+  const stage = STAGES.find(s => s.id === c.status);
+  const bgt = formatBudget(c.buyer_budget);
+  const durl = dossierUrl(dossierToken);
+  const hasVisit = !!c.visit;
+  const stageIdx = STAGES.findIndex(s => s.id === c.status);
+
+  document.getElementById('detailContent').innerHTML = `
+    <div class="detail-head">
+      <div class="detail-avatar" style="background:${avatarColor(c.buyer_name)};">${initials(c.buyer_name) || '?'}</div>
+      <div>
+        <div class="detail-name">${c.buyer_name || 'Acheteur sans nom'}</div>
+        <div class="detail-sub">${stage?.icon || ''} ${stage?.label || ''} · ${formatDate(c.created_at)}</div>
+      </div>
+      <button class="detail-close" onclick="closeDetail()">✕</button>
+    </div>
+
+    <div class="detail-section">
+      <div class="detail-section-title">Coordonnées</div>
+      ${c.buyer_phone ? `<div class="detail-row"><span class="detail-row-label">Téléphone</span><span class="detail-row-val"><a href="tel:${c.buyer_phone}">${c.buyer_phone}</a></span></div>` : ''}
+      ${c.buyer_email ? `<div class="detail-row"><span class="detail-row-label">Email</span><span class="detail-row-val"><a href="mailto:${c.buyer_email}">${c.buyer_email}</a></span></div>` : ''}
+      ${bgt ? `<div class="detail-row"><span class="detail-row-label">Budget</span><span class="detail-row-val" style="color:#3D5A47;font-weight:700;">${bgt}</span></div>` : ''}
+      <div class="detail-row"><span class="detail-row-label">Source</span><span class="detail-row-val">${c.source === 'sms' ? '📱 SMS entrant' : c.source === 'email' ? '✉️ Email' : '✏️ Ajouté manuellement'}</span></div>
+    </div>
+
+    ${hasVisit ? `<div class="detail-section">
+      <div class="detail-section-title">Visite</div>
+      <div class="detail-row"><span class="detail-row-label">Date</span><span class="detail-row-val">${c.visit.visit_date} à ${c.visit.visit_time}</span></div>
+      <div class="detail-row"><span class="detail-row-label">Statut</span><span class="detail-row-val">${
+        c.visit.status === 'confirmed' ? '✅ Confirmée' :
+        c.visit.status === 'done' ? '🏁 Réalisée' :
+        c.visit.status === 'cancelled' ? '❌ Annulée' : '⏳ En attente'
+      }</span></div>
+    </div>` : ''}
+
+    ${c.status === 'visit_planned' ? `<div class="detail-section">
+      <div class="detail-section-title">Fiche pré-visite</div>
+      <div class="brief-card">
+        <div class="brief-title">💡 Posez ces 2 questions dès l'arrivée</div>
+        <div class="brief-q">Avez-vous visité d'autres biens dans ce secteur à ce budget ?</div>
+        <div class="brief-q">Êtes-vous déjà en contact avec une banque ou un courtier ?</div>
+      </div>
+      <div style="margin-top:10px; font-size:0.78rem; color:#888; line-height:1.6;">
+        Ces questions vous permettent de savoir en 2 minutes si l'acheteur est sérieux et financièrement prêt.
+      </div>
+    </div>` : ''}
+
+    ${durl ? `<div class="detail-section">
+      <div class="detail-section-title">Dossier acheteur</div>
+      <div class="dossier-link-box">
+        <div class="dossier-link-url">${durl}</div>
+        <button class="dossier-copy-btn" onclick="copyDossierUrl()">Copier</button>
+      </div>
+      <div style="margin-top:8px; font-size:0.75rem; color:#aaa;">Partagez ce lien avec l'acheteur pour lui donner accès à tous les documents du bien.</div>
+    </div>` : ''}
+
+    <div class="detail-section">
+      <div class="detail-section-title">Avancer dans le pipeline</div>
+      <div class="stage-selector">
+        ${STAGES.map((s, i) => `
+          <div class="stage-option ${c.status === s.id ? 'active' : ''}" onclick="moveContact(${c.id}, '${s.id}')">
+            <div class="stage-option-dot" style="background:${s.color};"></div>
+            <span class="stage-option-label">${s.icon} ${s.label}</span>
+            ${i <= stageIdx ? '' : '<span class="stage-option-desc">→ Déplacer ici</span>'}
+          </div>`).join('')}
+        <div class="stage-option ${c.status === 'not_retained' ? 'active' : ''}" onclick="moveContact(${c.id}, 'not_retained')" style="${c.status === 'not_retained' ? '' : 'opacity:0.5;'}">
+          <div class="stage-option-dot" style="background:#bbb;"></div>
+          <span class="stage-option-label">🚫 Non retenu</span>
+          ${c.status !== 'not_retained' ? '<span class="stage-option-desc">→ Archiver</span>' : ''}
+        </div>
+      </div>
+    </div>
+
+    <div class="detail-section">
+      <div class="detail-section-title">Notes personnelles</div>
+      <textarea class="notes-area" id="detailNotes" placeholder="Observations, impressions après visite, points d'attention…">${c.notes || ''}</textarea>
+      <button class="notes-save" onclick="saveNotes(${c.id})">Enregistrer les notes</button>
+    </div>
+
+    <div class="detail-section" style="border:none;">
+      <button onclick="confirmDelete(${c.id})" style="background:none;border:1.5px solid #f0d5c8;border-radius:8px;padding:8px 16px;font-size:0.8rem;color:#C4603A;cursor:pointer;font-family:'DM Sans',sans-serif;width:100%;">🗑 Supprimer cet acheteur</button>
+    </div>
+  `;
+}
+
+// ── Notes ────────────────────────────────────────────────────
+async function saveNotes(id) {
+  const notes = document.getElementById('detailNotes')?.value || '';
+  const c = allContacts.find(c => c.id === id);
+  if (c) c.notes = notes;
+  try {
+    await fetch(`/api/connect/contacts/${id}/notes`, {
+      method: 'PUT', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ notes })
+    });
+    toast('Notes enregistrées', 'success');
+  } catch { toast('Erreur', 'error'); }
+}
+
+// ── Dossier copy ─────────────────────────────────────────────
+function copyDossier(id) {
+  const url = dossierUrl(dossierToken);
+  if (!url) return;
+  copyToClipboard(url);
+  const c = allContacts.find(c => c.id === id);
+  if (c && !c.dossier_sent) {
+    fetch(`/api/connect/contacts/${id}/notes`, {
+      method: 'PUT', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ notes: (c.notes || '') + (c.notes ? '\n' : '') + 'Dossier envoyé le ' + new Date().toLocaleDateString('fr-FR') })
+    });
+  }
+}
+
+function copyDossierUrl() {
+  const url = dossierUrl(dossierToken);
+  if (url) copyToClipboard(url);
+}
+
+function copyToClipboard(text) {
+  navigator.clipboard?.writeText(text)
+    .then(() => toast('Lien copié !', 'success'))
+    .catch(() => {
+      const t = document.createElement('textarea');
+      t.value = text;
+      document.body.appendChild(t);
+      t.select();
+      document.execCommand('copy');
+      document.body.removeChild(t);
+      toast('Lien copié !', 'success');
+    });
+}
+
+// ── Delete ───────────────────────────────────────────────────
+function confirmDelete(id) {
+  const c = allContacts.find(c => c.id === id);
+  const name = c?.buyer_name || 'cet acheteur';
+  if (!confirm(`Supprimer ${name} ? Cette action est irréversible.`)) return;
+  deleteContact(id);
+}
+
+async function deleteContact(id) {
+  try {
+    await fetch(`/api/connect/contacts/${id}`, { method: 'DELETE' });
+    allContacts = allContacts.filter(c => c.id !== id);
+    closeDetail();
+    renderAll();
+    toast('Acheteur supprimé', 'success');
+  } catch { toast('Erreur lors de la suppression', 'error'); }
+}
+
+// ── Add buyer modal ──────────────────────────────────────────
+function openAddModal() {
+  document.getElementById('f-name').value = '';
+  document.getElementById('f-phone').value = '';
+  document.getElementById('f-email').value = '';
+  document.getElementById('f-budget').value = '';
+  document.getElementById('f-notes').value = '';
+  document.getElementById('addModal').classList.add('open');
+  setTimeout(() => document.getElementById('f-name').focus(), 50);
+}
+
+function closeAddModal() {
+  document.getElementById('addModal').classList.remove('open');
+}
+
+async function saveNewBuyer() {
+  const name = document.getElementById('f-name').value.trim();
+  const phone = document.getElementById('f-phone').value.trim();
+  const email = document.getElementById('f-email').value.trim();
+  const budget = parseInt(document.getElementById('f-budget').value) || null;
+  const notes = document.getElementById('f-notes').value.trim();
+  if (!name && !phone && !email) {
+    toast('Renseignez au moins un nom ou un contact', 'error');
+    return;
+  }
+  try {
+    const r = await fetch('/api/connect/contacts', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ buyer_name: name, buyer_phone: phone, buyer_email: email, buyer_budget: budget, notes })
+    });
+    const d = await r.json();
+    if (!r.ok) throw new Error(d.error);
+    closeAddModal();
+    await loadPipeline();
+    toast(`${name || 'Acheteur'} ajouté !`, 'success');
+  } catch(e) {
+    toast(e.message || 'Erreur lors de l\'ajout', 'error');
+  }
+}
+
+// ── Archived toggle ──────────────────────────────────────────
+function toggleArchived() {
+  const list = document.getElementById('archivedList');
+  const chevron = document.getElementById('archChevron');
+  const open = list.classList.toggle('open');
+  chevron.setAttribute('points', open ? '15 18 9 12 15 6' : '9 18 15 12 9 6');
+}
+
+// ── AI Insight ───────────────────────────────────────────────
+async function loadInsight() {
+  try {
+    const r = await fetch('/api/connect/ai-insight', { method: 'POST' });
+    const d = await r.json();
+    const el = document.getElementById('aiInsightText');
+    el.classList.remove('loading');
+    el.textContent = d.insight;
+  } catch {
+    document.getElementById('aiInsightText').textContent = 'Continuez à qualifier vos acheteurs et planifiez des visites pour avancer votre vente.';
+  }
+}
+
+async function refreshInsight() {
+  const el = document.getElementById('aiInsightText');
+  el.classList.add('loading');
+  el.textContent = 'Analyse en cours…';
+  await loadInsight();
+}
+
+// ── Close modal on overlay click ─────────────────────────────
+document.getElementById('addModal').addEventListener('click', function(e) {
+  if (e.target === this) closeAddModal();
+});
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') { closeDetail(); closeAddModal(); }
+});
+
+// ── Init ─────────────────────────────────────────────────────
+loadPipeline();
+</script>
+</body>
+</html>

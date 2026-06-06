@@ -738,7 +738,7 @@ router.post('/api/connect/contacts', requireAuth, express.json(), (req, res) => 
 
 router.put('/api/connect/contacts/:id/status', requireAuth, express.json(), (req, res) => {
   const { status } = req.body;
-  if (!['new','qualified','visit_planned','not_retained'].includes(status)) return res.status(400).json({ error: 'Statut invalide' });
+  if (!['new','qualified','visit_planned','visit_done','offer_received','not_retained'].includes(status)) return res.status(400).json({ error: 'Statut invalide' });
   db.prepare('UPDATE buyer_contacts SET status=? WHERE id=? AND seller_id=?').run(status, req.params.id, req.seller.id);
   res.json({ success: true });
 });
@@ -1053,6 +1053,23 @@ router.put('/api/offres/:id/repondre', requireAuth, express.json(), (req, res) =
   db.prepare('UPDATE offers SET status=?, seller_response=?, responded_at=CURRENT_TIMESTAMP WHERE id=?')
     .run(status, seller_response || null, offer.id);
   res.json({ success: true });
+});
+
+// ── Pipeline acheteurs ────────────────────────────────────────
+router.get('/mes-acheteurs', requireAuth, (req, res) => res.sendFile('pipeline.html', { root: './views/seller' }));
+
+router.get('/api/pipeline', requireAuth, (req, res) => {
+  const contacts = db.prepare('SELECT * FROM buyer_contacts WHERE seller_id=? ORDER BY created_at DESC').all(req.seller.id);
+  const visits = db.prepare('SELECT * FROM visits WHERE seller_id=? ORDER BY visit_date ASC, visit_time ASC').all(req.seller.id);
+  const property = db.prepare('SELECT acheteur_token FROM properties WHERE seller_id=?').get(req.seller.id);
+  const contactsWithVisits = contacts.map(c => {
+    const visit = visits.find(v =>
+      (c.buyer_phone && v.buyer_phone && v.buyer_phone === c.buyer_phone) ||
+      (c.buyer_email && v.buyer_email && v.buyer_email === c.buyer_email)
+    ) || null;
+    return { ...c, visit };
+  });
+  res.json({ contacts: contactsWithVisits, dossierToken: property?.acheteur_token || null });
 });
 
 // ── Guide photos immersives ───────────────────────────────────
