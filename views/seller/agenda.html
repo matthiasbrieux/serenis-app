@@ -57,6 +57,28 @@
     .vc-cancel { padding:10px; border-radius:8px; background:#f5f0e8; color:#888; border:none; font-family:'DM Sans',sans-serif; font-size:0.82rem; font-weight:500; cursor:pointer; min-height:44px; touch-action:manipulation; }
     .vc-cancel:hover { background:#e8e0d6; color:#c0392b; }
 
+    /* ── Visite confirmée (carte proéminente sidebar) ── */
+    .visit-confirmed-card { background:linear-gradient(135deg,#f0f8f2,#e8f5eb); border:1.5px solid #b8d8c2; border-left:4px solid #2e7d32; border-radius:14px; padding:14px 14px 12px; margin-bottom:2px; }
+    .vcc-top { display:flex; gap:11px; align-items:stretch; margin-bottom:12px; }
+    .vcc-cal { width:52px; flex-shrink:0; border-radius:9px; overflow:hidden; border:1.5px solid #a8c8b0; box-shadow:0 2px 8px rgba(46,125,50,0.18); }
+    .vcc-cal-month { background:#2e7d32; color:#fff; text-align:center; font-size:0.58rem; font-weight:700; text-transform:uppercase; letter-spacing:0.06em; padding:4px 0; }
+    .vcc-cal-day { background:#fff; text-align:center; font-family:'Cormorant Garamond',serif; font-size:1.9rem; font-weight:600; color:#1A1A16; line-height:1; padding:5px 0 4px; }
+    .vcc-info { flex:1; min-width:0; }
+    .vcc-badge { display:inline-flex; align-items:center; gap:4px; background:#2e7d32; color:#fff; font-size:0.62rem; font-weight:700; text-transform:uppercase; letter-spacing:0.05em; padding:2px 7px; border-radius:10px; margin-bottom:5px; }
+    .vcc-name { font-size:0.95rem; font-weight:700; color:#1A1A16; margin-bottom:2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .vcc-time { font-size:0.84rem; font-weight:700; color:#2e7d32; }
+    .vcc-phone { font-size:0.75rem; color:#666; margin-top:2px; }
+    .vcc-actions { display:flex; gap:6px; }
+    .vcc-sms { flex:1; padding:9px 10px; background:#3D5A47; color:#fff; border:none; border-radius:8px; font-size:0.8rem; font-weight:700; cursor:pointer; font-family:'DM Sans',sans-serif; min-height:40px; touch-action:manipulation; display:flex; align-items:center; justify-content:center; gap:5px; transition:background 0.15s; }
+    .vcc-sms:hover { background:#2a4030; }
+    .vcc-sms.sent { background:#e8f5e9; color:#2e7d32; border:1.5px solid #c8e6c9; }
+    .vcc-cancel { padding:9px 10px; background:#fff; color:#888; border:1px solid #d0c8be; border-radius:8px; font-size:0.78rem; cursor:pointer; font-family:'DM Sans',sans-serif; min-height:40px; touch-action:manipulation; transition:all 0.15s; }
+    .vcc-cancel:hover { border-color:#e74c3c; color:#e74c3c; background:#fdf2f2; }
+
+    /* ── Header section visites confirmées ── */
+    .confirmed-section-title { background:linear-gradient(135deg,#2e7d32,#3D5A47); color:#fff; border-bottom:none; border-radius:14px 14px 0 0; }
+    .confirmed-section-title svg { filter: brightness(10); }
+
     /* ── Contact item (sidebar) ──────────────────────── */
     .contact-item { display:flex; align-items:center; gap:10px; padding:10px 12px; border-bottom:1px solid #f5f0e8; }
     .contact-item:last-child { border-bottom:none; }
@@ -153,10 +175,13 @@
     .cal-cell.cal-today { border-color:#3D5A47; color:#3D5A47; font-weight:700; }
     .cal-cell.cal-selected { background:#3D5A47; color:#fff; border-color:#3D5A47; }
     .cal-cell.cal-empty { cursor:default; }
-    .cal-dots { display:flex; gap:2px; position:absolute; bottom:4px; left:50%; transform:translateX(-50%); }
-    .cal-dot { width:4px; height:4px; border-radius:50%; }
-    .cal-dot-confirmed { background:#2e7d32; }
-    .cal-dot-pending { background:#f57f17; }
+    .cal-visit-bar { position:absolute; bottom:3px; left:20%; right:20%; height:3px; border-radius:2px; }
+    .cal-visit-bar.confirmed { background:#2e7d32; }
+    .cal-visit-bar.pending { background:#f57f17; }
+    .cal-has-confirmed { background:#f0f8f2; border-color:#b8d8c2 !important; font-weight:700; }
+    .cal-has-confirmed.cal-selected { background:#2e7d32; border-color:#2e7d32 !important; color:#fff; }
+    .cal-has-pending { background:#fff8e1; }
+    .cal-has-confirmed .cal-visit-bar.confirmed { height:4px; background:linear-gradient(90deg,#2e7d32,#4CAF50); }
     .day-detail { background:#fff; border-radius:14px; border:1px solid #e8e0d6; padding:20px; }
     .day-detail-title { font-size:0.78rem; font-weight:700; text-transform:uppercase; letter-spacing:0.07em; color:#888; margin-bottom:14px; }
     .day-slot { display:flex; align-items:center; gap:12px; padding:10px 0; border-bottom:1px solid #f0ebe4; }
@@ -670,13 +695,14 @@
 
         <!-- Prochaines visites confirmées -->
         <div class="sidebar-section" id="upcomingSection" style="display:none;">
-          <div class="sidebar-section-title">
+          <div class="sidebar-section-title confirmed-section-title">
             <span style="display:flex;align-items:center;gap:6px;">
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#2e7d32" stroke-width="2.2"><polyline points="20 6 9 17 4 12"/></svg>
-              Prochaines visites
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+              Visites confirmées
             </span>
+            <span id="upcomingCountBadge" style="background:rgba(255,255,255,0.25);color:#fff;padding:2px 9px;border-radius:20px;font-size:0.72rem;font-weight:700;border:1px solid rgba(255,255,255,0.3);"></span>
           </div>
-          <div class="sidebar-body" id="upcomingList"></div>
+          <div class="sidebar-body no-max" id="upcomingList"></div>
         </div>
 
         <!-- Historique -->
@@ -863,6 +889,36 @@ function buildVisitCardHtml(v) {
   </div>`;
 }
 
+function buildVisitConfirmedCard(v) {
+  const [yr,mo,dy] = (v.visit_date||'').split('-');
+  const d = yr ? new Date(Number(yr),Number(mo)-1,Number(dy)) : null;
+  const MOIS_COURT = ['JAN','FÉV','MAR','AVR','MAI','JUIN','JUIL','AOÛT','SEP','OCT','NOV','DÉC'];
+  const monthStr = d ? MOIS_COURT[d.getMonth()] : '—';
+  const dayNum = dy ? String(Number(dy)) : '—';
+  const time = v.visit_time ? v.visit_time.slice(0,5) : '—';
+  const svgPhone = `<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.41a2 2 0 0 1 2-2.18h3a2 2 0 0 1 2 1.72 12.13 12.13 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.13 12.13 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>`;
+  const smsClass = v.reminder_sent ? 'vcc-sms sent' : 'vcc-sms';
+  const smsLabel = v.reminder_sent ? '✓ Rappel envoyé' : `${svgPhone} Rappel SMS`;
+  return `<div class="visit-confirmed-card" id="vcard-${v.id}">
+    <div class="vcc-top">
+      <div class="vcc-cal">
+        <div class="vcc-cal-month">${monthStr}</div>
+        <div class="vcc-cal-day">${dayNum}</div>
+      </div>
+      <div class="vcc-info">
+        <div class="vcc-badge">✓ Confirmée</div>
+        <div class="vcc-name">${v.buyer_name||'Acquéreur'}</div>
+        <div class="vcc-time">⏰ ${time}</div>
+        ${v.buyer_phone?`<div class="vcc-phone"><a href="tel:${v.buyer_phone}" style="color:#3D5A47;text-decoration:none;font-weight:600;">${v.buyer_phone}</a></div>`:''}
+      </div>
+    </div>
+    <div class="vcc-actions">
+      ${v.buyer_phone?`<button class="${smsClass}" id="btn-reminder-${v.id}" onclick="sendReminder(${v.id})">${smsLabel}</button>`:''}
+      <button class="vcc-cancel" onclick="if(confirm('Annuler cette visite ?')) changeVisitStatus(${v.id},'cancelled')">Annuler</button>
+    </div>
+  </div>`;
+}
+
 function buildVisitCompact(v) {
   const ini = initials(v.buyer_name);
   const dateStr = v.visit_date ? new Date(v.visit_date+'T12:00:00').toLocaleDateString('fr-FR',{weekday:'short',day:'numeric',month:'short'}) : '—';
@@ -873,11 +929,6 @@ function buildVisitCompact(v) {
     actions = `<div class="vc-actions">
       <button class="vc-confirm" onclick="changeVisitStatus(${v.id},'confirmed')">✓ Confirmer</button>
       <button class="vc-refuse" onclick="changeVisitStatus(${v.id},'cancelled')">Refuser</button>
-    </div>`;
-  } else if (v.status==='confirmed') {
-    actions = `<div class="vc-actions">
-      <button class="vc-cancel" onclick="if(confirm('Annuler cette visite ?')) changeVisitStatus(${v.id},'cancelled')">Annuler</button>
-      ${v.buyer_phone?`<button class="vc-cancel" style="color:#3D5A47;border-color:#c8ddd0;" id="btn-reminder-${v.id}" onclick="sendReminder(${v.id})">${v.reminder_sent?'✓ Rappel':'SMS rappel'}</button>`:''}
     </div>`;
   }
   return `<div class="visit-compact${isPending?' pending':''}" id="vcard-${v.id}">
@@ -916,10 +967,12 @@ function renderVisits() {
     pendingSection.style.display='none';
   }
 
-  // Upcoming
+  // Upcoming confirmed
   if (upcoming.length) {
     upcomingSection.style.display='block';
-    document.getElementById('upcomingList').innerHTML = upcoming.map(buildVisitCompact).join('');
+    const upBadge = document.getElementById('upcomingCountBadge');
+    if (upBadge) upBadge.textContent = upcoming.length;
+    document.getElementById('upcomingList').innerHTML = upcoming.map(buildVisitConfirmedCard).join('');
   } else {
     upcomingSection.style.display='none';
   }
@@ -1000,8 +1053,16 @@ function renderCalendar() {
     let cls='cal-cell';
     if (dateStr===today) cls+=' cal-today';
     if (calSelected===dateStr) cls+=' cal-selected';
-    const dots=dayVisits.slice(0,3).map(v=>`<span class="cal-dot ${v.status==='confirmed'?'cal-dot-confirmed':'cal-dot-pending'}"></span>`).join('');
-    html+=`<div class="${cls}" onclick="selectCalDay('${dateStr}')">${d}${dots?`<div class="cal-dots">${dots}</div>`:''}</div>`;
+    const hasConfirmed = dayVisits.some(v=>v.status==='confirmed');
+    const hasPending = dayVisits.some(v=>v.status==='pending');
+    if (hasConfirmed) cls+=' cal-has-confirmed';
+    else if (hasPending) cls+=' cal-has-pending';
+    const dot = hasConfirmed
+      ? `<div class="cal-visit-bar confirmed"></div>`
+      : hasPending
+        ? `<div class="cal-visit-bar pending"></div>`
+        : '';
+    html+=`<div class="${cls}" onclick="selectCalDay('${dateStr}')">${d}${dot}</div>`;
   }
   grid.innerHTML=html;
   if (calSelected) renderDayDetail(calSelected);
