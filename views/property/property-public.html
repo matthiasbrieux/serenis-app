@@ -12,36 +12,284 @@
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/css/style.css">
   <style>
+
+    /* ── Reset & base ── */
+    *, *::before, *::after { box-sizing: border-box; }
+
     /* ── Lightbox ── */
     .lb-overlay { display:none;position:fixed;inset:0;background:rgba(0,0,0,.94);z-index:1000;align-items:center;justify-content:center; }
     .lb-overlay.open { display:flex; }
     .lb-img { max-width:90vw;max-height:88vh;object-fit:contain;border-radius:4px; }
-    .lb-close { position:absolute;top:20px;right:28px;color:#fff;font-size:2rem;cursor:pointer;line-height:1;opacity:.8; }
+    .lb-close { position:absolute;top:20px;right:28px;color:#fff;font-size:2rem;cursor:pointer;line-height:1;opacity:.8;background:none;border:none; }
     .lb-close:hover { opacity:1; }
     .lb-prev, .lb-next { position:absolute;top:50%;transform:translateY(-50%);background:rgba(255,255,255,.12);border:none;color:#fff;font-size:1.8rem;padding:12px 18px;cursor:pointer;border-radius:8px;transition:.2s; }
     .lb-prev { left:20px; } .lb-next { right:20px; }
     .lb-prev:hover, .lb-next:hover { background:rgba(255,255,255,.25); }
     .lb-count { position:absolute;bottom:24px;left:50%;transform:translateX(-50%);color:rgba(255,255,255,.7);font-size:.85rem; }
 
-    /* ── Gallery grid ── */
-    .gallery-grid { display:grid;grid-template-columns:2fr 1fr 1fr;grid-template-rows:240px 240px;gap:4px;cursor:pointer;border-radius:12px;overflow:hidden; }
-    .gallery-grid .main-img { grid-row:1/3; }
-    .gallery-grid img { width:100%;height:100%;object-fit:cover;transition:.2s; }
-    .gallery-grid img:hover { opacity:.88; }
-    .gallery-more { position:relative; }
-    .gallery-more .overlay { position:absolute;inset:0;background:rgba(0,0,0,.55);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:1.1rem; }
-    @media(max-width:700px) {
-      .gallery-grid { grid-template-columns:1fr;grid-template-rows:auto; }
-      .gallery-grid .main-img { grid-row:auto; }
-      .gallery-grid > *:not(.main-img) { display:none; }
+    /* ── Hero photos ── */
+    .hero-photos-wrap {
+      margin-top: 56px;
+      position: relative;
+      background: #111;
+      line-height: 0; /* supprime l'espace sous les images inline */
     }
 
-    /* ── DPE badge ── */
-    .dpe-wrap { margin:28px 0; }
-    .dpe-scale { display:flex;flex-direction:column;gap:3px;max-width:280px; }
-    .dpe-bar { display:flex;align-items:center;gap:10px;font-size:.8rem; }
-    .dpe-color { height:28px;border-radius:3px;display:flex;align-items:center;padding:0 10px;color:#fff;font-weight:700;font-size:.85rem;min-width:40px;justify-content:center; }
-    .dpe-bar.active .dpe-color { outline:3px solid #1C1C1A;box-shadow:0 0 0 5px rgba(0,0,0,.1); }
+    /* Desktop: grille 2fr 1fr 1fr — hauteur basée sur aspect-ratio de la colonne principale */
+    .gallery-grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr;
+      gap: 3px;
+      cursor: pointer;
+      overflow: hidden;
+      aspect-ratio: 16/9;
+      max-height: 580px;
+    }
+    .gallery-grid .main-img { grid-row: 1 / 3; }
+    .gallery-grid img { width:100%;height:100%;object-fit:cover;display:block;transition:.2s; }
+    .gallery-grid img:hover { opacity:.88; }
+    .gallery-more { position:relative; }
+    .gallery-more .overlay {
+      position:absolute;inset:0;background:rgba(0,0,0,.55);
+      display:flex;align-items:center;justify-content:center;
+      color:#fff;font-weight:700;font-size:1.1rem;
+    }
+
+    /* Compteur photos overlay (desktop) */
+    .photo-counter-desktop {
+      position: absolute;
+      bottom: 16px;
+      right: 16px;
+      background: rgba(0,0,0,.6);
+      color: #fff;
+      font-size: .82rem;
+      font-weight: 600;
+      padding: 5px 12px;
+      border-radius: 20px;
+      backdrop-filter: blur(4px);
+      pointer-events: none;
+      z-index: 5;
+    }
+
+    /* ── Swipe slider mobile ── */
+    .hero-slider-mobile {
+      display: none;
+      position: relative;
+      width: 100%;
+      overflow: hidden;
+      aspect-ratio: 3/2;
+      background: #111;
+      cursor: grab;
+    }
+    .hero-slider-mobile.dragging { cursor: grabbing; }
+    .hero-slider-track {
+      display: flex;
+      height: 100%;
+      will-change: transform;
+      transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .hero-slider-track.no-transition { transition: none; }
+    .hero-slider-slide {
+      flex: 0 0 100%;
+      height: 100%;
+    }
+    .hero-slider-slide img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      user-select: none;
+      -webkit-user-drag: none;
+      pointer-events: none;
+    }
+    .photo-counter-mobile {
+      position: absolute;
+      bottom: 12px;
+      right: 14px;
+      background: rgba(0,0,0,.58);
+      color: #fff;
+      font-size: .78rem;
+      font-weight: 600;
+      padding: 4px 10px;
+      border-radius: 16px;
+      pointer-events: none;
+      z-index: 5;
+    }
+
+    /* Chargement fallback */
+    .gallery-fallback {
+      height: 380px;
+      background: #2a2a2a;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* ── Bandeau confiance ── */
+    .trust-banner {
+      background: linear-gradient(90deg, #3D5A47, #2e4436);
+      color: #fff;
+      text-align: center;
+      padding: 11px 24px;
+      font-size: .82rem;
+      font-weight: 500;
+      letter-spacing: .01em;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+    .trust-banner svg { flex-shrink: 0; }
+
+    /* ── Prix hero ── */
+    .price-hero-block {
+      background: #1C1C1A;
+      padding: 28px 40px 22px;
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    .price-hero-left {}
+    .price-hero-amount {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 3.4rem;
+      font-weight: 700;
+      color: #FDFCF8;
+      line-height: 1;
+      letter-spacing: -.01em;
+    }
+    .price-hero-sub {
+      font-size: .84rem;
+      color: #C4785A;
+      font-weight: 500;
+      margin-top: 6px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .price-hero-title {
+      font-size: .9rem;
+      color: rgba(253,252,248,.55);
+      margin-top: 8px;
+      font-weight: 400;
+    }
+    .price-hero-cta-desktop {
+      align-self: center;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: #3D5A47;
+      color: #fff;
+      font-family: 'DM Sans', sans-serif;
+      font-size: .95rem;
+      font-weight: 600;
+      padding: 14px 28px;
+      border-radius: 12px;
+      text-decoration: none;
+      min-height: 52px;
+      transition: background .2s;
+      white-space: nowrap;
+    }
+    .price-hero-cta-desktop:hover { background: #2e4436; }
+
+    /* ── Chips infos clés ── */
+    .key-chips-wrap {
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+      padding: 16px 32px;
+      background: #F5F0E8;
+      border-bottom: 1px solid #e8e0d2;
+    }
+    .key-chips-wrap::-webkit-scrollbar { display: none; }
+    .key-chips {
+      display: flex;
+      gap: 8px;
+      width: max-content;
+    }
+    .key-chip {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      background: #fff;
+      border: 1px solid #e0d8cc;
+      border-radius: 50px;
+      padding: 7px 14px;
+      white-space: nowrap;
+      font-size: .85rem;
+      font-weight: 500;
+      color: #1C1C1A;
+    }
+    .key-chip svg { flex-shrink: 0; color: #3D5A47; }
+    .key-chip .chip-val { font-weight: 700; color: #1C1C1A; }
+    .key-chip .chip-unit { color: #888; font-size: .78rem; font-weight: 400; }
+
+    /* ── DPE visuel ── */
+    .dpe-wrap { margin: 28px 0; }
+    .dpe-visual {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      max-width: 320px;
+    }
+    .dpe-bar-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .dpe-bar-color {
+      height: 30px;
+      border-radius: 3px 6px 6px 3px;
+      display: flex;
+      align-items: center;
+      padding: 0 12px;
+      color: #fff;
+      font-weight: 700;
+      font-size: .9rem;
+      min-width: 44px;
+      justify-content: center;
+      transition: transform .15s;
+    }
+    .dpe-bar-row.active .dpe-bar-color {
+      outline: 3px solid #1C1C1A;
+      box-shadow: 0 0 0 5px rgba(0,0,0,.1);
+      transform: scaleX(1.04);
+    }
+    .dpe-bar-label {
+      font-size: .8rem;
+      color: #aaa;
+    }
+    .dpe-bar-row.active .dpe-bar-label {
+      color: #1C1C1A;
+      font-weight: 600;
+    }
+    .dpe-costs {
+      display: flex;
+      gap: 12px;
+      margin-top: 20px;
+      flex-wrap: wrap;
+    }
+    .dpe-cost-pill {
+      background: #F5F0E8;
+      border-radius: 10px;
+      padding: 12px 18px;
+      text-align: center;
+      flex: 1;
+      min-width: 120px;
+    }
+    .dpe-cost-pill .val {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: #1C1C1A;
+    }
+    .dpe-cost-pill .lbl {
+      font-size: .75rem;
+      color: #888;
+      margin-top: 2px;
+    }
 
     /* ── Virtual tour ── */
     .vtour-wrap { margin:28px 0;border-radius:12px;overflow:hidden;aspect-ratio:16/9;background:#111; }
@@ -53,6 +301,33 @@
     .tab.active { color:#1C1C1A;border-bottom-color:#C4603A; }
     .tab-content { display:none; }
     .tab-content.active { display:block; }
+
+    /* ── Description avec "Lire la suite" ── */
+    .desc-text {
+      color: #444;
+      line-height: 1.7;
+      font-size: .95rem;
+      white-space: pre-line;
+      font-family: 'DM Sans', sans-serif;
+    }
+    .desc-text.collapsed {
+      display: -webkit-box;
+      -webkit-line-clamp: 6;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+    .desc-toggle-btn {
+      display: inline-block;
+      margin-top: 10px;
+      color: #3D5A47;
+      font-weight: 600;
+      font-size: .88rem;
+      cursor: pointer;
+      background: none;
+      border: none;
+      padding: 0;
+    }
+    .desc-toggle-btn:hover { text-decoration: underline; }
 
     /* ── Specs full table ── */
     .specs-table { width:100%;border-collapse:collapse; }
@@ -77,14 +352,25 @@
     .cta-number { background:linear-gradient(135deg,#D4E4D8,#c8dcd0);border-radius:12px;padding:24px;text-align:center;margin:28px 0; }
     .cta-number .num { font-family:'Cormorant Garamond',serif;font-size:2rem;font-weight:700;color:#2a4030;margin:8px 0; }
 
-
-    /* ── Price tag ── */
-    .property-price { font-family:'Cormorant Garamond',serif;font-size:2.6rem;font-weight:700;color:#FDFCF8;text-shadow:0 2px 8px rgba(0,0,0,.4); }
-    .property-title { font-size:1rem;color:rgba(253,252,248,.85);margin-top:4px; }
+    /* ── Layout body principal ── */
+    .property-body {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 40px 40px 60px;
+      display: grid;
+      grid-template-columns: 1fr 380px;
+      gap: 48px;
+      align-items: start;
+    }
 
     /* sticky sidebar on desktop */
     @media(min-width:900px) {
       .sidebar-sticky { position:sticky;top:80px; }
+    }
+
+    /* Masquer le CTA desktop intégré au prix sur mobile */
+    @media(max-width:700px) {
+      .price-hero-cta-desktop { display: none !important; }
     }
 
     /* ── Share bar ── */
@@ -101,6 +387,71 @@
     .loan-result { background:#F5F0E8;border-radius:10px;padding:14px;text-align:center; }
     .loan-mensualite { font-size:1.6rem;font-weight:700;color:#1C1C1A;font-family:'Cormorant Garamond',serif; }
     .loan-detail { font-size:.78rem;color:#888;margin-top:4px; }
+
+    /* ── CTA sticky mobile ── */
+    .cta-visit-sticky {
+      display: none;
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      z-index: 300;
+      padding: 12px 20px;
+      padding-bottom: calc(12px + env(safe-area-inset-bottom));
+      background: #fff;
+      box-shadow: 0 -2px 20px rgba(0,0,0,.12);
+    }
+    .cta-visit-btn {
+      display: block;
+      width: 100%;
+      min-height: 52px;
+      background: #3D5A47;
+      color: #fff;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 1rem;
+      font-weight: 600;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      text-align: center;
+      text-decoration: none;
+      line-height: 52px;
+      padding: 0 24px;
+      transition: background .2s;
+    }
+    .cta-visit-btn:hover { background: #2e4436; }
+
+    /* ── Responsive ── */
+    @media(max-width:900px) {
+      .property-body {
+        grid-template-columns: 1fr;
+        padding: 24px 20px 60px;
+        gap: 32px;
+      }
+    }
+
+    @media(max-width:700px) {
+      /* Masquer grille desktop, afficher slider */
+      .gallery-grid { display: none !important; }
+      .photo-counter-desktop { display: none !important; }
+      .hero-slider-mobile { display: block; }
+
+      /* Prix hero plus compact, une colonne */
+      .price-hero-amount { font-size: 2.4rem; }
+      .price-hero-block {
+        padding: 18px 20px 16px;
+        flex-direction: column;
+        gap: 8px;
+      }
+      .key-chips-wrap { padding: 14px 20px; }
+
+      /* CTA sticky */
+      .cta-visit-sticky { display: block; }
+
+      /* padding bas pour le CTA sticky */
+      .property-body { padding-bottom: calc(80px + env(safe-area-inset-bottom)); }
+    }
+
   </style>
 </head>
 <body>
@@ -120,24 +471,51 @@
   <div class="lb-count" id="lbCount"></div>
 </div>
 
-<!-- Hero gallery -->
-<div style="margin-top:56px;">
-  <div id="galleryGrid" class="gallery-grid" style="display:none;"></div>
-  <div id="galleryFallback" style="height:480px;background:#2a2a2a;display:flex;align-items:center;justify-content:center;">
+<!-- Hero photos -->
+<div class="hero-photos-wrap" id="heroPhotosWrap">
+
+  <!-- Fallback chargement -->
+  <div class="gallery-fallback" id="galleryFallback">
     <span style="color:#555;">Chargement...</span>
   </div>
-  <div class="property-hero" id="propertyHero" style="display:none;position:relative;">
-    <div class="property-hero-content" id="heroContent">
-      <div class="property-price" id="heroPrice"></div>
-      <div class="property-title" id="heroTitle"></div>
-    </div>
+
+  <!-- Grille desktop (masquée au départ) -->
+  <div id="galleryGrid" class="gallery-grid" style="display:none;"></div>
+  <div class="photo-counter-desktop" id="photoCounterDesktop" style="display:none;"></div>
+
+  <!-- Slider mobile (masqué au départ) -->
+  <div class="hero-slider-mobile" id="heroSliderMobile">
+    <div class="hero-slider-track" id="heroSliderTrack"></div>
+    <div class="photo-counter-mobile" id="photoCounterMobile">1 / 1</div>
   </div>
+
 </div>
 
-<!-- Price strip (mobile) -->
-<div id="priceStrip" style="display:none;background:#1C1C1A;padding:16px 24px;">
-  <div style="font-family:'Cormorant Garamond',serif;font-size:1.8rem;font-weight:700;color:#FDFCF8;" id="stripPrice"></div>
-  <div style="font-size:.85rem;color:#9a9a8e;" id="stripTitle"></div>
+<!-- Bandeau confiance -->
+<div class="trust-banner" id="trustBanner" style="display:none;">
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+  Vente directe entre particuliers — Dossier préparé avec des professionnels
+</div>
+
+<!-- Bloc prix hero -->
+<div class="price-hero-block" id="priceHeroBlock" style="display:none;">
+  <div class="price-hero-left">
+    <div class="price-hero-amount" id="heroPrice"></div>
+    <div class="price-hero-sub">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+      Prix net vendeur — sans commission d'agence
+    </div>
+    <div class="price-hero-title" id="heroTitle"></div>
+  </div>
+  <a href="#reservation" class="price-hero-cta-desktop" id="priceHeroCtaDesktop" onclick="event.preventDefault();scrollToForm();">
+    Demander une visite
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+  </a>
+</div>
+
+<!-- Chips infos clés -->
+<div class="key-chips-wrap" id="keyChipsWrap" style="display:none;">
+  <div class="key-chips" id="keyChips"></div>
 </div>
 
 <!-- Main content -->
@@ -163,15 +541,16 @@
 
     <!-- Tab: Caractéristiques -->
     <div class="tab-content active" id="tc-details">
-      <!-- Quick chips -->
-      <div class="property-details-grid" id="propDetailsGrid"></div>
+      <!-- Quick chips (legacy grid, masqué — on utilise les key-chips en haut) -->
+      <div class="property-details-grid" id="propDetailsGrid" style="display:none;"></div>
       <!-- Full specs -->
-      <div id="fullSpecs" style="margin-top:24px;"></div>
+      <div id="fullSpecs" style="margin-top:8px;"></div>
     </div>
 
     <!-- Tab: Description -->
     <div class="tab-content" id="tc-desc">
-      <p id="propDescription" style="color:#444;line-height:1.8;font-size:.95rem;white-space:pre-line;"></p>
+      <p id="propDescription" class="desc-text collapsed"></p>
+      <button class="desc-toggle-btn" id="descToggleBtn" onclick="toggleDesc()" style="display:none;">Lire la suite ↓</button>
     </div>
 
     <!-- Tab: DPE -->
@@ -194,7 +573,6 @@
       <div id="documentsList" style="display:flex;flex-direction:column;gap:8px;"></div>
     </div>
 
-
     <!-- Legal -->
     <div style="margin-top:48px;padding:16px;background:#f9f9f6;border-radius:8px;font-size:.76rem;color:#bbb;line-height:1.6;">
       Cette annonce est publiée par un particulier. Vendu Par Moi fournit des outils numériques, des automatisations et des contenus d'accompagnement destinés aux particuliers.
@@ -205,6 +583,9 @@
 
   <!-- Sidebar -->
   <div class="sidebar-sticky">
+    <!-- CTA desktop demander une visite -->
+    <a href="#reservation" class="cta-visit-btn" id="ctaVisitDesktop" style="display:block;margin-bottom:16px;text-decoration:none;">Demander une visite →</a>
+
     <!-- Booking card -->
     <div class="booking-card" id="reservation">
       <h3 style="font-family:'Cormorant Garamond',serif;font-size:1.4rem;color:#1C1C1A;margin:0 0 6px;">Réserver une visite</h3>
@@ -236,7 +617,6 @@
         <div id="bookingSuccess" class="form-success hidden" style="margin-top:12px;">✓ Demande envoyée ! Confirmation par email.</div>
         <div id="bookingError" class="form-error hidden" style="margin-top:12px;"></div>
       </form>
-
     </div>
 
     <!-- Simulateur de prêt -->
@@ -277,6 +657,11 @@
   </div>
 </div>
 
+<!-- CTA sticky mobile (bas d'écran) -->
+<div class="cta-visit-sticky" id="ctaVisitSticky">
+  <a href="#reservation" class="cta-visit-btn" onclick="scrollToForm()">Demander une visite →</a>
+</div>
+
 <!-- Footer -->
 <footer style="background:#1A1A16;color:rgba(253,252,248,.4);padding:28px 48px;font-size:.76rem;line-height:1.6;">
   <p>Vendu Par Moi fournit des outils numériques, des automatisations et des contenus d'accompagnement destinés aux particuliers. Le vendeur conserve l'entière maîtrise de sa vente.</p>
@@ -306,18 +691,30 @@ document.addEventListener('keydown', e => {
 
 // ── Tabs ──
 function switchTab(id) {
-  document.querySelectorAll('.tab').forEach((t, i) => t.classList.toggle('active', t.getAttribute('onclick') === `switchTab('${id}')`));
+  document.querySelectorAll('.tab').forEach((t) => t.classList.toggle('active', t.getAttribute('onclick') === `switchTab('${id}')`));
   document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
   document.getElementById('tc-' + id)?.classList.add('active');
 }
 
-// ── Gallery ──
-function buildGallery(photos) {
-  allPhotos = photos;
+// ── Description toggle ──
+let descExpanded = false;
+function toggleDesc() {
+  descExpanded = !descExpanded;
+  const p = document.getElementById('propDescription');
+  const btn = document.getElementById('descToggleBtn');
+  if (descExpanded) {
+    p.classList.remove('collapsed');
+    btn.textContent = 'Réduire ↑';
+  } else {
+    p.classList.add('collapsed');
+    btn.textContent = 'Lire la suite ↓';
+  }
+}
+
+// ── Gallery desktop ──
+function buildGalleryDesktop(photos) {
   const grid = document.getElementById('galleryGrid');
-  const fallback = document.getElementById('galleryFallback');
-  if (!photos.length) return;
-  fallback.style.display = 'none';
+  const counter = document.getElementById('photoCounterDesktop');
   const visible = photos.slice(0, 5);
   const more = photos.length - 5;
   grid.innerHTML = visible.map((ph, i) => {
@@ -326,33 +723,193 @@ function buildGallery(photos) {
     return `<div class="${cls}" onclick="lbOpen(${i})"><img src="${ph.thumbnail_url || ph.url}" alt="Photo ${i+1}" loading="${i===0?'eager':'lazy'}">${overlay}</div>`;
   }).join('');
   grid.style.display = 'grid';
-
-  // Hero overlay with price
-  const hero = document.getElementById('propertyHero');
-  hero.style.cssText = `display:block;position:relative;margin-top:-56px;pointer-events:none;`;
+  counter.textContent = `1 / ${photos.length} photos`;
+  counter.style.display = 'block';
 }
 
-// ── DPE ──
+// ── Slider mobile ──
+let sliderIdx = 0;
+let sliderTotal = 0;
+let touchStartX = 0;
+let touchStartY = 0;
+let touchDeltaX = 0;
+let isSwiping = false;
+
+function buildSliderMobile(photos) {
+  sliderTotal = photos.length;
+  const track = document.getElementById('heroSliderTrack');
+  track.innerHTML = photos.map((ph, i) =>
+    `<div class="hero-slider-slide"><img src="${ph.thumbnail_url || ph.url}" alt="Photo ${i+1}" loading="${i===0?'eager':'lazy'}"></div>`
+  ).join('');
+  updateSliderCounter();
+
+  const slider = document.getElementById('heroSliderMobile');
+
+  slider.addEventListener('touchstart', e => {
+    touchStartX = e.touches[0].clientX;
+    touchStartY = e.touches[0].clientY;
+    touchDeltaX = 0;
+    isSwiping = false;
+    track.classList.add('no-transition');
+  }, { passive: true });
+
+  slider.addEventListener('touchmove', e => {
+    const dx = e.touches[0].clientX - touchStartX;
+    const dy = e.touches[0].clientY - touchStartY;
+    if (!isSwiping && Math.abs(dy) > Math.abs(dx)) return; // scroll vertical
+    isSwiping = true;
+    touchDeltaX = dx;
+    const base = -sliderIdx * 100;
+    const drag = (dx / slider.offsetWidth) * 100;
+    track.style.transform = `translateX(calc(${base}% + ${dx}px))`;
+  }, { passive: true });
+
+  slider.addEventListener('touchend', e => {
+    track.classList.remove('no-transition');
+    if (!isSwiping) {
+      // Tap simple → ouvrir la lightbox
+      setSlide(sliderIdx);
+      lbOpen(sliderIdx);
+      return;
+    }
+    const threshold = slider.offsetWidth * 0.2;
+    if (touchDeltaX < -threshold && sliderIdx < sliderTotal - 1) {
+      setSlide(sliderIdx + 1);
+    } else if (touchDeltaX > threshold && sliderIdx > 0) {
+      setSlide(sliderIdx - 1);
+    } else {
+      setSlide(sliderIdx);
+    }
+  });
+}
+
+function setSlide(idx) {
+  sliderIdx = idx;
+  const track = document.getElementById('heroSliderTrack');
+  track.style.transform = `translateX(-${sliderIdx * 100}%)`;
+  updateSliderCounter();
+  // Sync lightbox index
+  lbIdx = sliderIdx;
+}
+
+function updateSliderCounter() {
+  document.getElementById('photoCounterMobile').textContent = `${sliderIdx + 1} / ${sliderTotal} photos`;
+}
+
+// ── Build gallery (global) ──
+function buildGallery(photos) {
+  allPhotos = photos;
+  const fallback = document.getElementById('galleryFallback');
+  if (!photos.length) return;
+  fallback.style.display = 'none';
+  buildGalleryDesktop(photos);
+  buildSliderMobile(photos);
+}
+
+// ── Chips infos clés ──
+function buildKeyChips(p) {
+  const chips = [
+    p.surface_habitable ? {
+      icon: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>',
+      label: 'Surface',
+      val: p.surface_habitable,
+      unit: 'm²'
+    } : null,
+    p.rooms ? {
+      icon: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>',
+      label: 'Pièces',
+      val: p.rooms,
+      unit: p.rooms > 1 ? 'pièces' : 'pièce'
+    } : null,
+    p.bedrooms ? {
+      icon: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 4v16M2 8h20v12H2M22 4v4M6 12h.01M10 12h.01"/></svg>',
+      label: 'Chambres',
+      val: p.bedrooms,
+      unit: p.bedrooms > 1 ? 'chambres' : 'chambre'
+    } : null,
+    p.dpe_class ? {
+      icon: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>',
+      label: 'DPE',
+      val: 'Classe ' + p.dpe_class.toUpperCase(),
+      unit: ''
+    } : null,
+    p.year_built ? {
+      icon: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>',
+      label: 'Construction',
+      val: p.year_built,
+      unit: ''
+    } : null,
+    p.surface_terrain ? {
+      icon: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></svg>',
+      label: 'Terrain',
+      val: p.surface_terrain,
+      unit: 'm²'
+    } : null,
+  ].filter(Boolean);
+
+  if (!chips.length) return;
+
+  const wrap = document.getElementById('keyChipsWrap');
+  const container = document.getElementById('keyChips');
+  container.innerHTML = chips.map(c => `
+    <div class="key-chip">
+      ${c.icon}
+      <span class="chip-val">${c.val}</span>
+      ${c.unit ? `<span class="chip-unit">${c.unit}</span>` : ''}
+    </div>
+  `).join('');
+  wrap.style.display = 'block';
+}
+
+// ── DPE visuel ──
 const DPE_COLORS = { A:'#319834', B:'#56ab2a', C:'#adc21f', D:'#f7d900', E:'#f5a623', F:'#e5511f', G:'#cf1715' };
 const DPE_CLASSES = ['A','B','C','D','E','F','G'];
+
 function buildDpe(p) {
   if (!p.dpe_class) return;
   document.getElementById('tabDpe').style.display = '';
   const cls = p.dpe_class.toUpperCase();
+
   let html = `<h3 style="font-family:'Cormorant Garamond',serif;font-size:1.4rem;margin:0 0 20px;">Diagnostic de Performance Énergétique</h3>`;
-  html += `<div class="dpe-scale">`;
+  html += `<div class="dpe-visual">`;
   DPE_CLASSES.forEach(c => {
     const active = c === cls ? 'active' : '';
-    const w = { A:60, B:80, C:100, D:120, E:140, F:160, G:180 }[c];
-    html += `<div class="dpe-bar ${active}">
-      <div class="dpe-color" style="background:${DPE_COLORS[c]};width:${w}px;">${c}</div>
-      <span style="font-size:.8rem;color:${active?'#1C1C1A':'#aaa'};">${active ? '← Votre bien' : ''}</span>
+    const widths = { A:60, B:80, C:100, D:120, E:140, F:160, G:180 };
+    html += `<div class="dpe-bar-row ${active}">
+      <div class="dpe-bar-color" style="background:${DPE_COLORS[c]};width:${widths[c]}px;">${c}</div>
+      <span class="dpe-bar-label">${active ? '← Votre bien' : ''}</span>
     </div>`;
   });
   html += `</div>`;
-  if (p.dpe_conso_energie) html += `<p style="margin-top:16px;font-size:.9rem;color:#555;">Consommation d'énergie : <strong>${p.dpe_conso_energie} kWh/m²/an</strong></p>`;
-  if (p.dpe_ges) html += `<p style="font-size:.9rem;color:#555;">Émissions GES : <strong>${p.dpe_ges} kgCO₂/m²/an</strong></p>`;
-  if (p.dpe_cout_min && p.dpe_cout_max) html += `<p style="font-size:.9rem;color:#555;">Coût estimé : <strong>${Number(p.dpe_cout_min).toLocaleString('fr-FR')} – ${Number(p.dpe_cout_max).toLocaleString('fr-FR')} €/an</strong></p>`;
+
+  // Coûts estimés
+  const hasCosts = p.dpe_cout_min && p.dpe_cout_max;
+  const hasConso = p.dpe_conso_energie;
+  const hasGes = p.dpe_ges;
+
+  if (hasCosts || hasConso || hasGes) {
+    html += `<div class="dpe-costs">`;
+    if (hasConso) {
+      html += `<div class="dpe-cost-pill">
+        <div class="val">${p.dpe_conso_energie} <span style="font-size:.85rem;font-weight:400;">kWh/m²/an</span></div>
+        <div class="lbl">Consommation énergie</div>
+      </div>`;
+    }
+    if (hasGes) {
+      html += `<div class="dpe-cost-pill">
+        <div class="val">${p.dpe_ges} <span style="font-size:.85rem;font-weight:400;">kgCO₂/m²/an</span></div>
+        <div class="lbl">Émissions GES</div>
+      </div>`;
+    }
+    if (hasCosts) {
+      html += `<div class="dpe-cost-pill">
+        <div class="val">${Number(p.dpe_cout_min).toLocaleString('fr-FR')} – ${Number(p.dpe_cout_max).toLocaleString('fr-FR')} €</div>
+        <div class="lbl">Coûts estimés / an</div>
+      </div>`;
+    }
+    html += `</div>`;
+  }
+
   document.getElementById('dpeSection').innerHTML = html;
 }
 
@@ -446,26 +1003,38 @@ async function loadProperty() {
   if (p.photos?.[0]) document.getElementById('ogImage').content = p.photos[0].url;
 
   // schema.org JSON-LD
-  const base = window.location.origin;
   const ld = { '@context':'https://schema.org', '@type':'RealEstateListing', name: titleText, description: descText, url: window.location.href, price: p.price, priceCurrency: 'EUR', address: { '@type':'PostalAddress', addressLocality: p.city, postalCode: p.postal_code, streetAddress: p.address } };
   const s = document.createElement('script'); s.type = 'application/ld+json'; s.text = JSON.stringify(ld); document.head.appendChild(s);
 
   // Gallery
   buildGallery(p.photos || []);
 
-  // Price strip
-  document.getElementById('stripPrice').textContent = p.price ? Number(p.price).toLocaleString('fr-FR') + ' €' : '';
-  document.getElementById('stripTitle').textContent = `${p.type || ''} — ${p.city || ''} (${p.postal_code || ''})`;
-  document.getElementById('priceStrip').style.display = 'block';
+  // Prix hero
   document.getElementById('heroPrice').textContent = p.price ? Number(p.price).toLocaleString('fr-FR') + ' €' : '';
   document.getElementById('heroTitle').textContent = `${p.type || ''} — ${p.city || ''} (${p.postal_code || ''})`;
+  document.getElementById('priceHeroBlock').style.display = 'block';
+
+  // Bandeau confiance
+  document.getElementById('trustBanner').style.display = 'flex';
+
+  // Chips infos clés
+  buildKeyChips(p);
 
   // Title / address
   document.getElementById('propTitle').textContent = `${p.type || ''} à vendre — ${p.city || ''}`;
   document.getElementById('propAddress').textContent = p.address ? `📍 ${p.address}, ${p.city} ${p.postal_code}` : `📍 ${p.city || ''} ${p.postal_code || ''}`;
-  document.getElementById('propDescription').textContent = p.description || '';
 
-  // Quick details chips
+  // Description avec "Lire la suite"
+  const desc = p.description || '';
+  document.getElementById('propDescription').textContent = desc;
+  // Afficher le bouton "Lire la suite" si description longue
+  if (desc.length > 400 || desc.split('\n').length > 6) {
+    document.getElementById('descToggleBtn').style.display = 'inline-block';
+  } else {
+    document.getElementById('propDescription').classList.remove('collapsed');
+  }
+
+  // Quick details chips (legacy grid, masqué — les chips s'affichent déjà en haut)
   const details = [
     p.surface_habitable ? { label:'Surface', value: p.surface_habitable + ' m²' } : null,
     p.rooms ? { label:'Pièces', value: p.rooms } : null,
@@ -580,7 +1149,13 @@ document.getElementById('bookingForm').addEventListener('submit', async e => {
   btn.textContent = 'Confirmer ma visite'; btn.disabled = false;
 });
 
-// Bouton dossier — branché dynamiquement sur le token acheteur après chargement
+// Scroll vers le formulaire
+function scrollToForm() {
+  const el = document.getElementById('reservation');
+  if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+// Bouton dossier
 function setDossierLink(token) {
   const btn = document.getElementById('dossierBtn');
   if (btn && token) btn.href = `/dossier/acheteur/${token}`;
@@ -622,7 +1197,6 @@ function calcLoan() {
     <div class="loan-detail">Total remboursé : ${totalRembourse.toLocaleString('fr-FR', { maximumFractionDigits:0 })} € sur ${duree} ans</div>`;
 }
 
-// Pré-remplir le simulateur avec le prix du bien
 function prefillLoan(price) {
   if (!price) return;
   const apport = Math.round(price * 0.10);
