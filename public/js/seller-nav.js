@@ -32,29 +32,47 @@
       top: 12px;
       left: 12px;
       z-index: 300;
-      width: 40px;
-      height: 40px;
+      width: 44px;
+      height: 44px;
       background: #3D5A47;
       border: none;
-      border-radius: 8px;
+      border-radius: 10px;
       cursor: pointer;
       align-items: center;
       justify-content: center;
       flex-direction: column;
       gap: 5px;
       padding: 0;
+      transition: opacity .2s, transform .2s;
     }
     .mobile-menu-btn span {
       display: block;
-      width: 18px;
+      width: 20px;
       height: 2px;
       background: #FDFCF8;
       border-radius: 2px;
-      transition: all .2s;
     }
-    .mobile-menu-btn.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
-    .mobile-menu-btn.open span:nth-child(2) { opacity: 0; }
-    .mobile-menu-btn.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+    /* Bouton fermer intégré dans le header sidebar */
+    .sidebar-close-btn {
+      display: none;
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      width: 36px;
+      height: 36px;
+      background: rgba(255,255,255,0.1);
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      align-items: center;
+      justify-content: center;
+      color: rgba(253,252,248,0.8);
+      font-size: 1.1rem;
+      line-height: 1;
+      transition: background .15s;
+      z-index: 10;
+    }
+    .sidebar-close-btn:hover { background: rgba(255,255,255,0.18); }
     .snav-overlay {
       display: none;
       position: fixed;
@@ -64,11 +82,14 @@
     }
     @media (max-width: 768px) {
       .mobile-menu-btn { display: flex !important; }
+      .sidebar-close-btn { display: flex !important; }
       aside.sidebar, .sidebar {
         transform: translateX(-100%);
         transition: transform .25s cubic-bezier(.4,0,.2,1);
         z-index: 200;
+        position: fixed !important;
       }
+      .sidebar-logo { position: relative; }
       aside.sidebar.open, .sidebar.open {
         transform: translateX(0);
         box-shadow: 4px 0 24px rgba(0,0,0,.25);
@@ -82,12 +103,21 @@
   `;
   document.head.appendChild(style);
 
-  // Bouton hamburger
+  // Bouton hamburger (visible uniquement quand sidebar fermée)
   const btn = document.createElement('button');
   btn.className = 'mobile-menu-btn';
-  btn.setAttribute('aria-label', 'Menu');
+  btn.setAttribute('aria-label', 'Ouvrir le menu');
   btn.innerHTML = '<span></span><span></span><span></span>';
   document.body.prepend(btn);
+
+  // Bouton fermer intégré dans le header de la sidebar
+  const closeBtn = document.createElement('button');
+  closeBtn.className = 'sidebar-close-btn';
+  closeBtn.setAttribute('aria-label', 'Fermer le menu');
+  closeBtn.innerHTML = '✕';
+  const sidebarLogo = sidebar.querySelector('.sidebar-logo');
+  if (sidebarLogo) sidebarLogo.appendChild(closeBtn);
+  else sidebar.insertBefore(closeBtn, sidebar.firstChild);
 
   // Overlay
   const overlay = document.createElement('div');
@@ -97,15 +127,21 @@
   function openMenu() {
     sidebar.classList.add('open');
     overlay.classList.add('open');
-    btn.classList.add('open');
+    // Cacher le hamburger externe pour ne pas couvrir le logo
+    btn.style.opacity = '0';
+    btn.style.pointerEvents = 'none';
+    btn.style.transform = 'scale(0.8)';
   }
   function closeMenu() {
     sidebar.classList.remove('open');
     overlay.classList.remove('open');
-    btn.classList.remove('open');
+    btn.style.opacity = '1';
+    btn.style.pointerEvents = '';
+    btn.style.transform = '';
   }
 
-  btn.addEventListener('click', () => sidebar.classList.contains('open') ? closeMenu() : openMenu());
+  btn.addEventListener('click', openMenu);
+  closeBtn.addEventListener('click', closeMenu);
   overlay.addEventListener('click', closeMenu);
 
   // Fermer quand on clique sur un lien sidebar (navigation)
