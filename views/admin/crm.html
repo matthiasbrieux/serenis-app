@@ -12,7 +12,7 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
   <meta name="apple-mobile-web-app-title" content="VPM"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CRM Vendeurs — Serenis Admin</title>
+  <title>CRM Vendeurs — Vendu Par Moi Admin</title>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
   <style>
     :root {
@@ -761,7 +761,7 @@ function exportCSV() {
   const csv = '﻿' + [header, ...rows].join('\r\n');
   const a = document.createElement('a');
   a.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8;' }));
-  a.download = `crm-serenis-${new Date().toISOString().split('T')[0]}.csv`;
+  a.download = `crm-venduparmo-${new Date().toISOString().split('T')[0]}.csv`;
   a.click();
   toast('Export CSV téléchargé ✓','ok');
 }
@@ -898,7 +898,7 @@ function emailSeller(email, name) {
   const c = sellers.find(s => s.email === email);
   emailTargetId = c ? c.id : null;
   document.getElementById('emTo').textContent = `À : ${name.trim()} <${email}>`;
-  document.getElementById('emSubject').value = 'Serenis — suivi de votre dossier';
+  document.getElementById('emSubject').value = 'Vendu Par Moi — suivi de votre dossier';
   document.getElementById('emBodyText').value = `Bonjour ${(name.trim().split(' ')[0])||''},\n\n`;
   document.getElementById('emSendBtn').disabled = false;
   document.getElementById('emSendBtn').textContent = '✉ Envoyer';

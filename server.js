@@ -126,7 +126,7 @@ app.post('/api/contact', async (req, res) => {
 
 // Téléchargement guide (protégé)
 app.get('/download/guide-vendeur', require('./middleware/auth').requireAuth, (req, res) => {
-  res.download(path.join(__dirname, 'content', 'guide_vendeur_final.docx'), 'Guide_Vendeur_Serenis.docx');
+  res.download(path.join(__dirname, 'content', 'guide_vendeur_final.docx'), 'Guide_Vendeur_Vendu_Par_Moi.docx');
 });
 
 // ── Healthcheck ──────────────────────────────────────────────
@@ -174,7 +174,7 @@ async function seedSellerAccount() {
 }
 
 app.listen(PORT, () => {
-  console.log(`✓ Serenis démarré — http://localhost:${PORT}`);
+  console.log(`✓ Vendu Par Moi démarré — http://localhost:${PORT}`);
   seedSellerAccount();
 
   // Rappels visites + nudges automatiques — tourne chaque jour à 18h

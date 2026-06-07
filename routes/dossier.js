@@ -208,8 +208,8 @@ router.post('/api/soumettre-offre/:token', express.json(), async (req, res) => {
     // Notification interne au vendeur
     try {
       db.prepare(`
-        INSERT INTO notifications (seller_id, type, title, body, link)
-        VALUES (?, 'offer', ?, ?, '/mes-offres')
+        INSERT INTO notifications (seller_id, type, title, body)
+        VALUES (?, 'offer', ?, ?)
       `).run(prop.seller_id,
              `Nouvelle offre de ${buyer_name}`,
              `${Number(amountInt).toLocaleString('fr-FR')} € pour ${prop.city || prop.address || 'votre bien'}`);

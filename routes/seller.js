@@ -735,7 +735,7 @@ router.post('/api/connect/ai-insight', requireAuth, async (req, res) => {
   const visits = db.prepare('SELECT * FROM visits WHERE seller_id=?').all(req.seller.id);
   const contacts = db.prepare('SELECT * FROM buyer_contacts WHERE seller_id=?').all(req.seller.id);
   if (visits.length === 0 && contacts.length === 0) {
-    return res.json({ insight: 'Publiez votre numéro Serenis dans vos annonces pour commencer à recevoir des contacts acquéreurs. Chaque demande sera automatiquement enregistrée ici.' });
+    return res.json({ insight: 'Publiez votre numéro dédié dans vos annonces pour commencer à recevoir des contacts acquéreurs. Chaque demande sera automatiquement enregistrée ici.' });
   }
   const summary = `${contacts.length} acquéreur(s) au total dont ${contacts.filter(c=>c.status==='qualified').length} qualifiés. ${visits.filter(v=>v.status==='confirmed').length} visite(s) confirmée(s), ${visits.filter(v=>v.status==='pending').length} en attente, ${visits.filter(v=>v.status==='done').length} réalisée(s).`;
   const Anthropic = require('@anthropic-ai/sdk');
@@ -954,7 +954,7 @@ router.post('/api/coach-ia', requireAuth, coachRateLimit, express.json(), async 
   const seller = db.prepare('SELECT first_name, pack FROM sellers WHERE id=?').get(req.seller.id);
   const property = db.prepare('SELECT type, city, price, surface_habitable, rooms, dpe_class, description FROM properties WHERE seller_id=?').get(req.seller.id);
 
-  const systemPrompt = `Tu es le Coach Immobilier Serenis, un expert en vente immobilière entre particuliers en France. Tu aides ${seller?.first_name || 'ce vendeur'} à vendre son bien de façon optimale.
+  const systemPrompt = `Tu es le Coach Immobilier Vendu Par Moi, un expert en vente immobilière entre particuliers en France. Tu aides ${seller?.first_name || 'ce vendeur'} à vendre son bien de façon optimale.
 
 ${property ? `Contexte du bien :
 - Type : ${property.type || 'non renseigné'}
@@ -1139,7 +1139,7 @@ router.get('/api/seller/rgpd/export', requireAuth, (req, res) => {
   const slots = db.prepare('SELECT day_of_week, specific_date, start_time, end_time, is_recurring FROM agenda_slots WHERE seller_id=?').all(req.seller.id);
   const export_data = { exported_at: new Date().toISOString(), seller, property, photos, documents, visits, contacts, agenda_slots: slots };
   res.setHeader('Content-Type', 'application/json');
-  res.setHeader('Content-Disposition', `attachment; filename="serenis-mes-donnees-${new Date().toISOString().slice(0,10)}.json"`);
+  res.setHeader('Content-Disposition', `attachment; filename="venduparmo-mes-donnees-${new Date().toISOString().slice(0,10)}.json"`);
   res.send(JSON.stringify(export_data, null, 2));
 });
 

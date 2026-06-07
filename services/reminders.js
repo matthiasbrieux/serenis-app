@@ -380,7 +380,7 @@ async function chargeInstallments() {
         payment_method: seller.stripe_payment_method_id,
         confirm: true,
         off_session: true,
-        description: `Pack Sérénité Serenis — versement ${installmentNum}/${seller.installments_total}`,
+        description: `Pack Sérénité Vendu Par Moi — versement ${installmentNum}/${seller.installments_total}`,
         metadata: { seller_id: String(seller.id), installment: String(installmentNum) },
       });
 

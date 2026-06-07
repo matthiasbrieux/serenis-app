@@ -1109,14 +1109,14 @@ router.post('/api/emails/send', requireAdmin, async (req, res) => {
       ok = await sendProspectNudge({ name: seller.first_name, email: seller.email });
     } else if (email_type === 'custom') {
       if (!custom_message) return res.status(400).json({ error: 'custom_message requis' });
-      ok = await sendAdminDirectEmail({ to: seller.email, subject: 'Message de Serenis', body: custom_message });
+      ok = await sendAdminDirectEmail({ to: seller.email, subject: 'Message de Vendu Par Moi', body: custom_message });
     } else if (email_type === 'info_needed') {
-      ok = await sendAdminDirectEmail({ to: seller.email, subject: 'Des renseignements sont nécessaires sur votre dossier', body: custom_message || `Bonjour ${seller.first_name || ''},\n\nDes informations complémentaires sont nécessaires pour compléter votre dossier Serenis.\n\nN\'hésitez pas à nous contacter pour plus de détails.\n\nL\'équipe Serenis` });
+      ok = await sendAdminDirectEmail({ to: seller.email, subject: 'Des renseignements sont nécessaires sur votre dossier', body: custom_message || `Bonjour ${seller.first_name || ''},\n\nDes informations complémentaires sont nécessaires pour compléter votre dossier.\n\nN\'hésitez pas à nous contacter pour plus de détails.\n\nL\'équipe Vendu Par Moi` });
     } else if (email_type === 'sold_congrats') {
-      ok = await sendAdminDirectEmail({ to: seller.email, subject: 'Félicitations — votre bien est vendu !', body: custom_message || `Bonjour ${seller.first_name || ''},\n\nToute l'équipe Serenis vous félicite pour la vente de votre bien !\n\nMerci pour votre confiance.\n\nL'équipe Serenis` });
+      ok = await sendAdminDirectEmail({ to: seller.email, subject: 'Félicitations — votre bien est vendu !', body: custom_message || `Bonjour ${seller.first_name || ''},\n\nToute l'équipe Vendu Par Moi vous félicite pour la vente de votre bien !\n\nMerci pour votre confiance.\n\nL'équipe Vendu Par Moi` });
     } else {
       // Fallback générique pour les types non encore implémentés
-      ok = await sendAdminDirectEmail({ to: seller.email, subject: `Email Serenis — ${email_type}`, body: custom_message || `Bonjour ${seller.first_name || ''},\n\nMessage de l'équipe Serenis.\n\nL'équipe Serenis` });
+      ok = await sendAdminDirectEmail({ to: seller.email, subject: `Vendu Par Moi — ${email_type}`, body: custom_message || `Bonjour ${seller.first_name || ''},\n\nMessage de l'équipe Vendu Par Moi.\n\nL'équipe Vendu Par Moi` });
     }
 
     if (ok) {

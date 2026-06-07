@@ -94,7 +94,7 @@ router.get('/api/bien/:slug/pdf', async (req, res) => {
     ${rows ? `<div class="sec">Caractéristiques</div><table>${rows}</table>` : ''}
     ${seller?.twilio_number ? `<div class="contact"><p style="font-weight:bold;color:#2a4030;margin-bottom:4px;">📞 Recevoir ce dossier par email</p><p style="font-size:17px;font-weight:bold;color:#2a4030;">${seller.twilio_number}</p><p style="font-size:11px;color:#555;">Envoyez votre adresse email par SMS — réponse automatique</p></div>` : ''}
   </div>
-  <div class="ft">Annonce publiée par un particulier. Vendu Par Moi fournit des outils numériques. Le vendeur reste seul responsable de sa vente.<br>Vendu Par Moi · Matthias Brieux · 06 95 44 36 54 · contact@vendupar moi.fr · Douai (59)</div>
+  <div class="ft">Annonce publiée par un particulier. Vendu Par Moi fournit des outils numériques. Le vendeur reste seul responsable de sa vente.<br>Vendu Par Moi · Matthias Brieux · 06 95 44 36 54 · contact@venduparmo.fr · Douai (59)</div>
   </body></html>`;
 
   try {
