@@ -782,7 +782,8 @@
 <!-- ── Modal: Programmer une visite ── -->
 <!-- ── Modal: Rappel SMS ── -->
 <div class="modal-overlay" id="rappelSmsOverlay">
-  <div class="modal confirm-sms-modal">
+  <div class="modal confirm-sms-modal" style="position:relative;">
+    <button onclick="closeModal('rappelSmsOverlay')" style="position:absolute;top:14px;right:16px;background:none;border:none;font-size:1.4rem;color:#aaa;cursor:pointer;line-height:1;padding:0 4px;z-index:2;" title="Fermer">×</button>
     <div class="confirm-sms-check" style="background:linear-gradient(135deg,#b45309,#C4785A);">
       <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
     </div>
@@ -808,7 +809,8 @@
 
 <!-- ── Modal: SMS confirmation de visite ── -->
 <div class="modal-overlay" id="confirmSmsOverlay">
-  <div class="modal confirm-sms-modal">
+  <div class="modal confirm-sms-modal" style="position:relative;">
+    <button onclick="closeModal('confirmSmsOverlay')" style="position:absolute;top:14px;right:16px;background:none;border:none;font-size:1.4rem;color:#aaa;cursor:pointer;line-height:1;padding:0 4px;z-index:2;" title="Fermer">×</button>
     <div class="confirm-sms-check">
       <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
     </div>
@@ -1516,6 +1518,7 @@ function renderNotifSidebar() {
 function openModal(id) { document.getElementById(id).classList.add('open'); document.body.style.overflow='hidden'; }
 function closeModal(id) { const el=document.getElementById(id); el.classList.remove('open'); el.classList.remove('active'); document.body.style.overflow=''; }
 document.querySelectorAll('.modal-overlay').forEach(o=>{ o.addEventListener('click',e=>{ if(e.target===o) closeModal(o.id); }); });
+document.addEventListener('keydown', e=>{ if(e.key==='Escape'){ const open=document.querySelector('.modal-overlay.open'); if(open) closeModal(open.id); } });
 
 function openAddVisit() {
   document.getElementById('vDate').value=new Date().toISOString().split('T')[0];
