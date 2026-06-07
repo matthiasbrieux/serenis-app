@@ -17,7 +17,7 @@ const required = [
 
 const optional = ['SENDGRID_FROM_EMAIL', 'BASE_URL', 'DATABASE_URL', 'PORT'];
 
-console.log('\n=== Vérification configuration Serenis ===\n');
+console.log('\n=== Vérification configuration Vendu Par Moi ===\n');
 
 let allOk = true;
 required.forEach(key => {

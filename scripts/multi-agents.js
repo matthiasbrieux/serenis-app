@@ -199,7 +199,7 @@ const client = new Anthropic.default({ apiKey: process.env.ANTHROPIC_API_KEY });
 
 // ── Contexte global ───────────────────────────────────────────
 const CTX = `
-Tu es un expert de haut niveau dans ton domaine, travaillant pour "VENDU PAR MOI" (anciennement Serenis).
+Tu es un expert de haut niveau dans ton domaine, travaillant pour "VENDU PAR MOI" .
 
 VENDU PAR MOI est une solution immobilière française qui permet aux particuliers de vendre leur bien eux-mêmes avec des outils professionnels :
 - Photos professionnelles

@@ -235,7 +235,8 @@ async function activateSeller(session) {
         const pms = await stripe.paymentMethods.list({ customer: customerId, type: 'card', limit: 1 });
         const pmId = pms.data[0]?.id;
         if (pmId) {
-          const nextDate = new Date(Date.now() + 30 * 24 * 3600 * 1000).toISOString().split('T')[0];
+          const _nd = new Date(Date.now() + 30 * 24 * 3600 * 1000);
+          const nextDate = `${_nd.getFullYear()}-${String(_nd.getMonth()+1).padStart(2,'0')}-${String(_nd.getDate()).padStart(2,'0')}`;
           db.prepare('UPDATE sellers SET stripe_payment_method_id=?, installments_paid=1, installments_total=4, next_installment_date=? WHERE id=?')
             .run(pmId, nextDate, seller.id);
           console.log(`✓ Carte sauvegardée pour paiement 4x — seller ${seller.id}`);
@@ -261,7 +262,7 @@ async function activateSeller(session) {
   // Facture automatique
   try {
     const amount = session.amount_total || (pack === 'serenite' ? 99900 : 49900);
-    const invoiceNumber = `SER-${new Date().getFullYear()}-${String(seller.id).padStart(5, '0')}`;
+    const invoiceNumber = `VPM-${new Date().getFullYear()}-${String(seller.id).padStart(5, '0')}`;
     await sendInvoiceEmail({ email: seller.email, firstName: seller.first_name, amount, pack: pack || 'serenite', invoiceNumber, date: new Date() });
   } catch(e) { console.error('Invoice email error:', e.message); }
 

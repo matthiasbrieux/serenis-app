@@ -259,7 +259,7 @@ async function sendPostVisitBuyerNudges() {
 
 async function sendWeeklyAdminReportEmail() {
   const { sendWeeklyAdminReport } = require('./email');
-  const adminEmail = process.env.ADMIN_EMAIL || process.env.SENDGRID_FROM_EMAIL || 'matthiasbrieux260598@gmail.com';
+  const adminEmail = process.env.ADMIN_EMAIL || process.env.SENDGRID_FROM_EMAIL || 'contact@venduparmo.fr';
 
   try {
     const newClients = db.prepare(`SELECT COUNT(*) as c FROM sellers WHERE paid_at >= date('now', '-7 days')`).get()?.c || 0;

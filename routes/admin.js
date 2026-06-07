@@ -789,7 +789,7 @@ router.get('/marketing/flyer', requireAdmin, (req, res) => {
       @media print{@page{size:A5;margin:0}body{padding:0}button{display:none}}
     </style></head><body>
     <div class="flyer">
-      <div class="flyer-logo">Sere<em>nis</em></div>
+      <div class="flyer-logo">Vendu Par Moi</div>
       <div style="font-size:0.65rem;letter-spacing:0.3em;text-transform:uppercase;color:rgba(196,96,58,0.8);margin-bottom:12px;">Vendez votre bien</div>
       <h1>Vendez comme<br>un pro.<br><em>Sans commission.</em></h1>
       <p class="sub">Photographe professionnel, visite virtuelle 360°, numéro intelligent, formation complète. Tout ce qu'une agence ferait — sans payer 10 000 à 20 000€ de commission.</p>
@@ -837,7 +837,7 @@ router.get('/marketing/parrainage', requireAdmin, (req, res) => {
       @media print{@page{size:A5 landscape;margin:20mm}button{display:none}}
     </style></head><body>
     <div class="cheque">
-      <div class="header"><div class="logo">Sere<em>nis</em></div><div class="badge">🎁 Chèque Parrainage</div></div>
+      <div class="header"><div class="logo">Vendu Par Moi</div><div class="badge">🎁 Chèque Parrainage</div></div>
       <div class="amount">100 €</div>
       <div class="title">Offerts pour chaque ami qui vend avec Vendu Par Moi</div>
       <div class="desc">Vous avez vendu votre bien avec Vendu Par Moi. Merci de nous faire confiance.<br>En signe de gratitude, voici votre chèque parrainage.</div>

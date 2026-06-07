@@ -183,7 +183,7 @@ function buildItems() {
     items.push({
       tab: 'offers', icon: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><path d="M14.5 9.5A2.5 2.5 0 0 0 12 7h-2v5h2a2.5 2.5 0 0 0 0-5H10v10h2.5"/></svg>', iconCls: 'ni-offer',
       title: `Offre de ${o.buyer_name} — ${Number(o.amount).toLocaleString('fr-FR')} €`,
-      sub: `Reçue le ${new Date(o.created_at).toLocaleDateString('fr-FR')} · ${o.status === 'pending' ? 'En attente de réponse' : o.status}`,
+      sub: `Reçue le ${new Date(o.created_at).toLocaleDateString('fr-FR')} · ${o.status === 'pending' ? 'En attente de réponse' : o.status === 'accepted' ? 'Acceptée' : o.status === 'refused' ? 'Refusée' : o.status === 'countered' ? 'Contre-offre envoyée' : o.status === 'expired' ? 'Expirée' : 'En attente'}`,
       date: o.created_at, unread: o.status === 'pending',
     });
   });
