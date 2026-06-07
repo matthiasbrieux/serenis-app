@@ -806,6 +806,32 @@
   </div>
 </div>
 
+<!-- ── Modal: SMS confirmation de visite ── -->
+<div class="modal-overlay" id="confirmSmsOverlay">
+  <div class="modal confirm-sms-modal">
+    <div class="confirm-sms-check">
+      <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+    </div>
+    <div class="confirm-sms-title">Visite confirmée — envoyez un SMS</div>
+    <div class="confirm-sms-buyer" id="confirmSmsBuyer">
+      <div class="confirm-sms-buyer-avatar" id="confirmSmsBuyerAvatar"></div>
+      <div class="confirm-sms-buyer-info">
+        <div class="confirm-sms-buyer-name" id="confirmSmsBuyerName"></div>
+        <div id="confirmSmsBuyerPhone"></div>
+      </div>
+    </div>
+    <div class="confirm-sms-preview" id="confirmSmsText"></div>
+    <a class="confirm-sms-btn-sms" id="confirmSmsSendBtn" href="#">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.41a2 2 0 0 1 2-2.18h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+      Ouvrir l'appli SMS
+    </a>
+    <button class="confirm-sms-copy" id="confirmSmsCopyBtn" onclick="copyConfirmSms(this)">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:middle;margin-right:5px;"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>Copier le SMS
+    </button>
+    <button class="confirm-sms-close" onclick="closeModal('confirmSmsOverlay')">Fermer</button>
+  </div>
+</div>
+
 <div class="modal-overlay" id="addVisitOverlay">
   <div class="modal">
     <div class="modal-header">
@@ -1058,11 +1084,12 @@ function openConfirmSmsModal(id) {
   const MOIS=['janvier','février','mars','avril','mai','juin','juillet','août','septembre','octobre','novembre','décembre'];
   const dateLabel = d ? `${JOURS[d.getDay()]} ${Number(dy)} ${MOIS[d.getMonth()]}` : v.visit_date;
   const [h,m] = (v.visit_time||'').split(':');
-  const time = m&&m!=='00' ? `${h}h${m}` : `${h}h`;
-  const adresseText = _propertyAddress ? `\n\nAdresse : ${_propertyAddress}` : '';
-  const sms = `Bonjour ${prenom}, c'est confirmé ! On se retrouve le ${dateLabel} à ${time}.${adresseText}\n\nÀ très bientôt !`;
+  const time = (h&&m!==undefined) ? (m&&m!=='00' ? `${h}h${m}` : `${h}h`) : '—';
+  const adresseText = _propertyAddress ? `\nAdresse : ${_propertyAddress}` : '';
+  const sellerNom = [_data?.seller?.first_name, _data?.seller?.last_name].filter(Boolean).join(' ');
+  const lienText = _mcAcheteurUrl ? `\n\nVotre dossier complet : ${_mcAcheteurUrl}` : '';
+  const sms = `Bonjour ${v.buyer_name||prenom}, c'est confirmé ! Rendez-vous le ${dateLabel} à ${time}.${adresseText}${lienText}\n\nÀ très bientôt,\n${sellerNom || 'Votre vendeur'}`;
 
-  // Buyer info
   document.getElementById('confirmSmsBuyerAvatar').textContent = initials(v.buyer_name);
   document.getElementById('confirmSmsBuyerName').textContent = v.buyer_name || 'Acquéreur';
   const phoneEl = document.getElementById('confirmSmsBuyerPhone');
@@ -1074,10 +1101,8 @@ function openConfirmSmsModal(id) {
     phoneEl.textContent = 'Aucun numéro renseigné';
   }
 
-  // SMS text
   document.getElementById('confirmSmsText').textContent = sms;
 
-  // "Envoyer le SMS" button — ouvre l'app SMS native avec numéro + message pré-remplis
   const sendBtn = document.getElementById('confirmSmsSendBtn');
   if (v.buyer_phone) {
     sendBtn.href = `sms:${v.buyer_phone}?&body=${encodeURIComponent(sms)}`;
@@ -1086,14 +1111,13 @@ function openConfirmSmsModal(id) {
     sendBtn.style.display = 'none';
   }
 
-  // Reset copy button
   const copyBtn = document.getElementById('confirmSmsCopyBtn');
   if (copyBtn) {
     copyBtn.innerHTML = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:middle;margin-right:5px;"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>Copier le SMS';
     copyBtn.classList.remove('copied');
   }
 
-  document.getElementById('confirmSmsOverlay').classList.add('open');
+  openModal('confirmSmsOverlay');
 }
 
 function copyConfirmSms(btn) {
@@ -1142,17 +1166,16 @@ function sendReminder(id) {
   const dateLabel = d ? `${JOURS[d.getDay()]} ${Number(dy)} ${MOIS[d.getMonth()]}` : v.visit_date;
   const [h,m] = (v.visit_time||'').split(':');
   const time = m&&m!=='00' ? `${h}h${m}` : `${h}h`;
-  const adresseText = _propertyAddress ? ` L'adresse de mon bien : ${_propertyAddress}.` : '';
-  const sellerPrenom = (_data&&_data.seller&&_data.seller.first_name) || '';
-  const signature = sellerPrenom ? ` ${sellerPrenom}` : '';
-  // Vérifier si la visite est vraiment demain
+  const adresseText = _propertyAddress ? `\nAdresse : ${_propertyAddress}` : '';
+  const sellerNom = [_data?.seller?.first_name, _data?.seller?.last_name].filter(Boolean).join(' ');
+  const lienText = _mcAcheteurUrl ? `\n\nVotre dossier complet : ${_mcAcheteurUrl}` : '';
   const _n2=new Date(); const _todayStr=`${_n2.getFullYear()}-${String(_n2.getMonth()+1).padStart(2,'0')}-${String(_n2.getDate()).padStart(2,'0')}`;
   const _tomorrow=new Date(_n2); _tomorrow.setDate(_tomorrow.getDate()+1);
   const _tomorrowStr=`${_tomorrow.getFullYear()}-${String(_tomorrow.getMonth()+1).padStart(2,'0')}-${String(_tomorrow.getDate()).padStart(2,'0')}`;
   const isReallyTomorrow = v.visit_date === _tomorrowStr;
   const smsText = isReallyTomorrow
-    ? `Bonjour ${prenom}, je vous rappelle notre visite prévue demain ${dateLabel} à ${time}.${adresseText} N'hésitez pas à me prévenir si vous avez un empêchement. À demain !${signature}`
-    : `Bonjour ${prenom}, je vous rappelle notre visite prévue le ${dateLabel} à ${time}.${adresseText} N'hésitez pas à me prévenir si vous avez un empêchement. À bientôt !${signature}`;
+    ? `Bonjour ${v.buyer_name||prenom}, je vous rappelle notre visite prévue demain ${dateLabel} à ${time}.${adresseText}${lienText}\n\nN'hésitez pas à me prévenir si vous avez un empêchement.\n${sellerNom || 'Votre vendeur'}`
+    : `Bonjour ${v.buyer_name||prenom}, je vous rappelle notre visite prévue le ${dateLabel} à ${time}.${adresseText}${lienText}\n\nN'hésitez pas à me prévenir si vous avez un empêchement.\n${sellerNom || 'Votre vendeur'}`;
 
   document.getElementById('rappelSmsBuyerAvatar').textContent = initiales;
   document.getElementById('rappelSmsBuyerName').textContent = v.buyer_name || '—';
