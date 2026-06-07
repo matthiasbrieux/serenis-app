@@ -169,6 +169,154 @@
       .bib-filter { padding: 7px 11px; }
       .doc-card { padding: 14px 14px; gap: 10px; }
     }
+
+    /* ═══════════════════════════════════════
+       DOCUMENT VIEWER OVERLAY
+       ═══════════════════════════════════════ */
+    #docViewerOverlay {
+      position: fixed; inset: 0; z-index: 10000;
+      display: none; flex-direction: column;
+      background: #F5F0E8;
+      animation: dvFadeIn 0.22s ease;
+    }
+    #docViewerOverlay.open { display: flex; }
+    @keyframes dvFadeIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
+
+    .dv-header {
+      background: #3D5A47; color: #fff;
+      padding: 0 28px; height: 62px;
+      display: flex; align-items: center; gap: 20px;
+      flex-shrink: 0; border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+    .dv-back-btn {
+      display: inline-flex; align-items: center; gap: 7px;
+      background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.2);
+      color: #fff; border-radius: 8px; padding: 7px 14px;
+      font-size: 0.82rem; font-weight: 600; font-family: 'DM Sans', sans-serif;
+      cursor: pointer; transition: all 0.15s; white-space: nowrap; flex-shrink: 0;
+    }
+    .dv-back-btn:hover { background: rgba(255,255,255,0.2); }
+    .dv-header-brand {
+      font-family: 'Cormorant Garamond', serif; font-size: 1.05rem;
+      color: rgba(255,255,255,0.6); white-space: nowrap; flex-shrink: 0;
+    }
+    .dv-header-sep { width: 1px; height: 22px; background: rgba(255,255,255,0.2); flex-shrink: 0; }
+    .dv-header-title {
+      font-size: 0.9rem; font-weight: 600; color: #fff;
+      font-family: 'DM Sans', sans-serif; flex: 1; white-space: nowrap;
+      overflow: hidden; text-overflow: ellipsis;
+    }
+    .dv-header-actions { display: flex; gap: 8px; flex-shrink: 0; }
+    .dv-print-btn {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2);
+      color: rgba(255,255,255,0.85); border-radius: 8px; padding: 7px 14px;
+      font-size: 0.8rem; font-weight: 600; font-family: 'DM Sans', sans-serif;
+      cursor: pointer; transition: all 0.15s;
+    }
+    .dv-print-btn:hover { background: rgba(255,255,255,0.18); }
+
+    .dv-body {
+      flex: 1; overflow-y: auto;
+      padding: 48px 24px 80px;
+    }
+    .dv-doc {
+      max-width: 720px; margin: 0 auto;
+      background: #fff; border-radius: 16px;
+      box-shadow: 0 4px 32px rgba(0,0,0,0.08);
+      overflow: hidden;
+    }
+    .dv-doc-header {
+      background: linear-gradient(135deg, #3D5A47 0%, #2e4435 100%);
+      padding: 36px 40px 30px; color: #fff;
+    }
+    .dv-doc-badge {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.25);
+      color: rgba(255,255,255,0.9); border-radius: 100px;
+      font-size: 0.68rem; font-weight: 700; letter-spacing: 0.07em;
+      text-transform: uppercase; padding: 3px 12px; margin-bottom: 14px;
+    }
+    .dv-doc-title {
+      font-family: 'Cormorant Garamond', serif; font-size: 1.9rem;
+      font-weight: 600; color: #fff; line-height: 1.25; margin: 0 0 8px;
+    }
+    .dv-doc-sub {
+      font-size: 0.82rem; color: rgba(255,255,255,0.65); line-height: 1.5;
+    }
+    .dv-doc-content { padding: 36px 40px; }
+    .dv-doc-content h2 {
+      font-family: 'Cormorant Garamond', serif; font-size: 1.35rem;
+      font-weight: 600; color: #3D5A47; margin: 32px 0 12px;
+      padding-bottom: 8px; border-bottom: 2px solid #F0ECE6;
+    }
+    .dv-doc-content h2:first-child { margin-top: 0; }
+    .dv-doc-content h3 {
+      font-size: 0.95rem; font-weight: 700; color: #1a1a1a; margin: 20px 0 8px;
+    }
+    .dv-doc-content p { font-size: 0.88rem; color: #333; line-height: 1.75; margin: 0 0 14px; }
+    .dv-doc-content ul, .dv-doc-content ol {
+      font-size: 0.88rem; color: #333; line-height: 1.75;
+      margin: 0 0 16px; padding-left: 22px;
+    }
+    .dv-doc-content li { margin-bottom: 6px; }
+    .dv-doc-content strong { color: #1a1a1a; font-weight: 700; }
+    .dv-tip {
+      background: #F0F5F1; border-left: 3px solid #3D5A47;
+      border-radius: 0 10px 10px 0; padding: 14px 18px;
+      margin: 18px 0; font-size: 0.84rem; color: #2D4D38; line-height: 1.65;
+    }
+    .dv-warning {
+      background: #FFF5F0; border-left: 3px solid #C4785A;
+      border-radius: 0 10px 10px 0; padding: 14px 18px;
+      margin: 18px 0; font-size: 0.84rem; color: #7a3a20; line-height: 1.65;
+    }
+    .dv-checklist { list-style: none; padding: 0; margin: 0 0 16px; }
+    .dv-checklist li {
+      display: flex; align-items: flex-start; gap: 10px;
+      padding: 9px 0; border-bottom: 1px solid #F0ECE6;
+      font-size: 0.88rem; color: #333; line-height: 1.55;
+    }
+    .dv-checklist li:last-child { border-bottom: none; }
+    .dv-check { width: 18px; height: 18px; border: 2px solid #C5D9CB; border-radius: 4px; flex-shrink: 0; margin-top: 2px; }
+    .dv-check.done { background: #3D5A47; border-color: #3D5A47; position: relative; }
+    .dv-check.done::after { content: '✓'; position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 0.7rem; font-weight: 700; }
+    .dv-table { width: 100%; border-collapse: collapse; margin: 0 0 20px; font-size: 0.85rem; }
+    .dv-table th { background: #3D5A47; color: #fff; padding: 10px 14px; text-align: left; font-weight: 600; font-size: 0.82rem; }
+    .dv-table td { padding: 10px 14px; border-bottom: 1px solid #F0ECE6; color: #333; vertical-align: top; }
+    .dv-table tr:nth-child(even) td { background: #FAFAF8; }
+    .dv-table .obl { color: #C4785A; font-weight: 700; }
+    .dv-table .cond { color: #888; font-size: 0.8rem; }
+    .dv-form-field { margin-bottom: 18px; }
+    .dv-form-label { font-size: 0.78rem; font-weight: 700; color: #555; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 5px; }
+    .dv-form-line { border: none; border-bottom: 1.5px solid #CCC; width: 100%; height: 28px; background: transparent; display: block; }
+    .dv-form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    .dv-form-sig { border: 1.5px dashed #CCC; border-radius: 8px; height: 70px; margin-top: 5px; display: flex; align-items: center; justify-content: center; color: #CCC; font-size: 0.75rem; }
+    .dv-section-divider { height: 1px; background: #F0ECE6; margin: 28px 0; }
+    .dv-tag { display: inline-block; padding: 2px 9px; border-radius: 100px; font-size: 0.72rem; font-weight: 700; margin: 2px; }
+    .dv-tag.green { background: #F0F5F1; color: #3D5A47; }
+    .dv-tag.orange { background: #FFF5F0; color: #C4785A; }
+    .dv-tag.red { background: #FEF2F2; color: #DC2626; }
+    .dv-footer-stamp {
+      background: #F5F0E8; border-top: 1px solid #E8E3DB;
+      padding: 18px 40px; display: flex; align-items: center;
+      justify-content: space-between; font-size: 0.73rem; color: #AAA;
+    }
+    @media print {
+      .dv-header { display: none; }
+      .dv-body { padding: 0; }
+      .dv-doc { box-shadow: none; border-radius: 0; }
+    }
+    @media (max-width: 600px) {
+      .dv-doc-header { padding: 24px 22px 20px; }
+      .dv-doc-content { padding: 24px 22px; }
+      .dv-doc-title { font-size: 1.5rem; }
+      .dv-header { padding: 0 14px; gap: 10px; }
+      .dv-header-brand { display: none; }
+      .dv-header-sep { display: none; }
+      .dv-form-row { grid-template-columns: 1fr; }
+      .dv-footer-stamp { padding: 14px 22px; flex-direction: column; gap: 4px; text-align: center; }
+    }
   </style>
 </head>
 <body>
@@ -269,7 +417,7 @@
                   <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
                   Télécharger
                 </a>
-                <a href="/documents/guide-vendeur.pdf" class="doc-btn doc-btn-secondary" target="_blank">Voir</a>
+                <button class="doc-btn doc-btn-secondary" onclick="openDoc('guide-vendeur')">Lire →</button>
               </div>
             </div>
           </div>
@@ -290,7 +438,7 @@
                   <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
                   Télécharger
                 </a>
-                <a href="/documents/checklist-visite.pdf" class="doc-btn doc-btn-secondary" target="_blank">Voir</a>
+                <button class="doc-btn doc-btn-secondary" onclick="openDoc('checklist-visite')">Lire →</button>
               </div>
             </div>
           </div>
@@ -311,7 +459,7 @@
                   <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
                   Télécharger
                 </a>
-                <a href="/documents/bon-de-visite.pdf" class="doc-btn doc-btn-secondary" target="_blank">Voir</a>
+                <button class="doc-btn doc-btn-secondary" onclick="openDoc('bon-de-visite')">Lire →</button>
               </div>
             </div>
           </div>
@@ -344,7 +492,7 @@
                   <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
                   Télécharger
                 </a>
-                <a href="/documents/diagnostics-obligatoires.pdf" class="doc-btn doc-btn-secondary" target="_blank">Voir</a>
+                <button class="doc-btn doc-btn-secondary" onclick="openDoc('diagnostics-obligatoires')">Lire →</button>
               </div>
             </div>
           </div>
@@ -379,7 +527,7 @@
                   <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
                   Télécharger
                 </a>
-                <a href="/documents/loi-hoguet-particuliers.pdf" class="doc-btn doc-btn-secondary" target="_blank">Voir</a>
+                <button class="doc-btn doc-btn-secondary" onclick="openDoc('loi-hoguet')">Lire →</button>
               </div>
             </div>
           </div>
@@ -446,7 +594,7 @@
                   <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
                   Télécharger
                 </a>
-                <a href="/documents/guide-negociation.pdf" class="doc-btn doc-btn-secondary" target="_blank">Voir</a>
+                <button class="doc-btn doc-btn-secondary" onclick="openDoc('guide-negociation')">Lire →</button>
               </div>
             </div>
           </div>
@@ -496,7 +644,7 @@
                   <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
                   Télécharger
                 </a>
-                <a href="/documents/home-staging-guide.pdf" class="doc-btn doc-btn-secondary" target="_blank">Voir</a>
+                <button class="doc-btn doc-btn-secondary" onclick="openDoc('home-staging')">Lire →</button>
               </div>
             </div>
           </div>
@@ -966,6 +1114,106 @@ bibRender();
 window._bibSellerPrenom = '';
 fetch('/api/me').then(r=>r.json()).then(d=>{ if(d.seller&&d.seller.first_name) window._bibSellerPrenom = d.seller.first_name; }).catch(()=>{});
 </script>
+
+<!-- ══════════════════════════════════════════════════════════════
+     DOCUMENT VIEWER OVERLAY
+     ══════════════════════════════════════════════════════════════ -->
+<div id="docViewerOverlay">
+  <div class="dv-header">
+    <button class="dv-back-btn" onclick="closeDoc()">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><polyline points="15 18 9 12 15 6"/></svg>
+      Retour
+    </button>
+    <span class="dv-header-brand">Vendu Par Moi</span>
+    <div class="dv-header-sep"></div>
+    <span class="dv-header-title" id="dvHeaderTitle"></span>
+    <div class="dv-header-actions">
+      <button class="dv-print-btn" onclick="window.print()">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+        Imprimer
+      </button>
+    </div>
+  </div>
+  <div class="dv-body"><div class="dv-doc" id="dvDocInner"></div></div>
+</div>
+
+<script>
+var DOC_DATA = {};
+DOC_DATA['guide-vendeur'] = {
+  title: 'Guide complet du vendeur particulier',
+  badge: 'Guide pratique',
+  sub: 'De la mise en vente à la signature chez le notaire',
+  html: '<h2>1. Préparer son dossier avant tout</h2><p>Avant même de fixer un prix, réunissez ces documents. Un acheteur sérieux les demandera dès la première visite.</p><ul><li><strong>Titre de propriété</strong> — si introuvable, demandez une copie chez le notaire qui a rédigé l\'acte</li><li><strong>Plans du bien</strong> si disponibles</li><li><strong>Derniers appels de charges</strong> (copropriété), règlement de copropriété, PV d\'AG des 3 dernières années</li><li><strong>Factures des travaux réalisés</strong> (chaudière, toiture, fenêtres…)</li><li><strong>Tous les diagnostics obligatoires</strong></li><li><strong>Avis de taxe foncière</strong></li></ul><div class="dv-tip">💡 Votre dossier acheteur Vendu Par Moi centralise déjà tout ça et peut être envoyé en un clic.</div><h2>2. Fixer le bon prix</h2><p>Le prix est la décision la plus importante. Un bien surestimé ne se vend pas et se dévalue dans l\'esprit des acheteurs.</p><ul><li>Consultez les <strong>prix réels des ventes récentes</strong> sur DVF (data.gouv.fr) — pas les prix des annonces concurrentes</li><li>Appliquez une décote ou prime selon l\'état, l\'exposition, l\'étage</li><li>Tenez compte du DPE : un F ou G peut décaler le prix de 10 à 15 %</li><li>Fixez un prix psychologiquement juste : 249 000 € plutôt que 250 000 €</li><li>Prévoyez une marge de négociation de 2 à 4 %</li></ul><div class="dv-warning">⚠️ Piège courant : fixer le prix selon vos projets futurs plutôt que selon le marché réel.</div><h2>3. Photos et annonce</h2><ul><li>Photographiez par temps clair, lumière naturelle maximale — ouvrez tous les volets</li><li>Désencombrez chaque pièce avant de photographier</li><li>Angle depuis les coins de pièce pour agrandir visuellement l\'espace</li><li>Minimum 10 photos, idéalement 20 pour une maison</li><li>Titre d\'annonce : 3 caractéristiques clés en premier</li><li>Description : du général au particulier, points forts en premier</li></ul><h2>4. Organiser les visites</h2><ul><li>Préparez le bien 24h avant : nettoyage, rangement, aération</li><li>Prévoyez 45 min à 1h par visite — ne pressez pas l\'acheteur</li><li>Faites <strong>signer un bon de visite</strong> à chaque visiteur — obligatoire pour votre protection</li><li>Notez les coordonnées complètes de chaque visiteur</li><li>Relancez dans les 48h pour avoir un retour</li></ul><h2>5. Gérer les offres</h2><ul><li>Toute offre doit être <strong>écrite</strong> pour être valable</li><li>Une offre au prix est en principe irrévocable pour vous si dans les formes</li><li>Vous pouvez accepter, refuser ou faire une contre-proposition</li><li>Vérifiez le plan de financement : apport, accord de principe bancaire</li></ul><div class="dv-tip">💡 Un acheteur avec 10 à 20 % d\'apport est plus fiable qu\'un financement intégral à 110 %.</div><h2>6. Le compromis de vente</h2><ul><li>Contrat qui engage les deux parties — rédigé par votre notaire</li><li>Fixe le prix définitif, les conditions suspensives et la date de l\'acte</li><li>L\'acheteur dispose de <strong>10 jours pour se rétracter</strong> sans motif (loi SRU)</li><li>Dépôt de garantie de 5 à 10 % versé par l\'acheteur à ce stade</li></ul><h2>7. L\'acte authentique</h2><ul><li>Signé chez le notaire, généralement 2 à 3 mois après le compromis</li><li>C\'est à ce moment que vous remettez les clés et recevez le solde</li><li>Pensez à transférer vos contrats (électricité, gaz, assurance) en amont</li></ul>'
+};
+DOC_DATA['checklist-visite'] = {
+  title: 'Checklist visite acheteur',
+  badge: 'À imprimer',
+  sub: 'Points essentiels à vérifier pendant une visite',
+  html: '<h2>Extérieur</h2><ul class="dv-checklist"><li><div class="dv-check"></div>État façade, toiture, gouttières</li><li><div class="dv-check"></div>Jardin ou terrasse : orientation, vis-à-vis</li><li><div class="dv-check"></div>Parking / garage : taille, accès</li><li><div class="dv-check"></div>Parties communes si copropriété : propreté, état</li></ul><h2>Pièces de vie</h2><ul class="dv-checklist"><li><div class="dv-check"></div>Luminosité et exposition de chaque pièce</li><li><div class="dv-check"></div>Sol : parquet, carrelage — état, craquements</li><li><div class="dv-check"></div>Murs et plafonds : fissures, traces d\'humidité, auréoles</li><li><div class="dv-check"></div>Fenêtres : simple ou double vitrage, joints, fermeture</li><li><div class="dv-check"></div>Isolation phonique (bruits de voisinage, rue)</li><li><div class="dv-check"></div>Vis-à-vis depuis les fenêtres</li></ul><h2>Cuisine</h2><ul class="dv-checklist"><li><div class="dv-check"></div>Surface et agencement suffisants</li><li><div class="dv-check"></div>Alimentation gaz ou électrique</li><li><div class="dv-check"></div>Hotte : évacuation extérieure ou recyclage simple</li><li><div class="dv-check"></div>État des raccordements eau</li></ul><h2>Salle de bain</h2><ul class="dv-checklist"><li><div class="dv-check"></div>Joints de carrelage et silicone : état</li><li><div class="dv-check"></div>Pression et température eau chaude</li><li><div class="dv-check"></div>Ventilation (VMC ou fenêtre)</li><li><div class="dv-check"></div>Traces d\'humidité plafond / cloisons</li></ul><h2>Chauffage &amp; installations</h2><ul class="dv-checklist"><li><div class="dv-check"></div>Type de chauffage, année d\'installation</li><li><div class="dv-check"></div>Dernier entretien chaudière (demandez facture)</li><li><div class="dv-check"></div>Tableau électrique : disjoncteurs différentiels</li><li><div class="dv-check"></div>DPE : classe et estimation charges annuelles</li></ul><h2>Questions à poser</h2><ul class="dv-checklist"><li><div class="dv-check"></div>Raison de la vente</li><li><div class="dv-check"></div>Charges mensuelles exactes</li><li><div class="dv-check"></div>Montant taxe foncière (demandez l\'avis)</li><li><div class="dv-check"></div>Travaux votés ou prévus en copropriété</li><li><div class="dv-check"></div>Nuisances sonores ou olfactives</li><li><div class="dv-check"></div>Délai souhaité pour libération du bien</li></ul><div class="dv-tip">💡 Prenez des photos pendant la visite et notez vos impressions immédiatement après avoir quitté le bien.</div>'
+};
+DOC_DATA['bon-de-visite'] = {
+  title: 'Bon de visite',
+  badge: 'Document légal',
+  sub: 'À faire signer à chaque visiteur — conservez ce document précieusement',
+  html: '<div class="dv-warning">⚠️ Ce bon de visite est obligatoire. Il prouve que vous avez présenté le bien directement à l\'acheteur et vous protège si un intermédiaire réclame une commission.</div><h2>Informations sur le bien</h2><div class="dv-form-row"><div class="dv-form-field"><div class="dv-form-label">Adresse du bien</div><div class="dv-form-line"></div></div><div class="dv-form-field"><div class="dv-form-label">Date de la visite</div><div class="dv-form-line"></div></div></div><div class="dv-form-row"><div class="dv-form-field"><div class="dv-form-label">Type de bien</div><div class="dv-form-line"></div></div><div class="dv-form-field"><div class="dv-form-label">Prix demandé (€)</div><div class="dv-form-line"></div></div></div><h2>Identité du vendeur</h2><div class="dv-form-row"><div class="dv-form-field"><div class="dv-form-label">Nom et prénom</div><div class="dv-form-line"></div></div><div class="dv-form-field"><div class="dv-form-label">Téléphone</div><div class="dv-form-line"></div></div></div><h2>Identité du visiteur</h2><div class="dv-form-row"><div class="dv-form-field"><div class="dv-form-label">Nom et prénom</div><div class="dv-form-line"></div></div><div class="dv-form-field"><div class="dv-form-label">Date de naissance</div><div class="dv-form-line"></div></div></div><div class="dv-form-row"><div class="dv-form-field"><div class="dv-form-label">Adresse actuelle</div><div class="dv-form-line"></div></div><div class="dv-form-field"><div class="dv-form-label">Téléphone</div><div class="dv-form-line"></div></div></div><div class="dv-form-field"><div class="dv-form-label">Email</div><div class="dv-form-line"></div></div><div class="dv-section-divider"></div><p>Je soussigné(e), reconnais avoir visité le bien susmentionné, présenté directement par le propriétaire vendeur. Je certifie ne pas avoir été présenté ce bien par un autre intermédiaire préalablement à cette visite. Je m\'engage à ne pas solliciter une agence immobilière pour visiter à nouveau ce bien ni pour faire une offre.</p><div class="dv-form-row" style="margin-top:28px;"><div class="dv-form-field"><div class="dv-form-label">Signature du visiteur</div><div class="dv-form-sig">Lu et approuvé</div></div><div class="dv-form-field"><div class="dv-form-label">Signature du vendeur</div><div class="dv-form-sig">Lu et approuvé</div></div></div><div class="dv-tip" style="margin-top:20px;">💡 Conservez ce document signé pendant au moins 5 ans après la vente.</div>'
+};
+DOC_DATA['diagnostics-obligatoires'] = {
+  title: 'Diagnostics obligatoires',
+  badge: 'Référence légale',
+  sub: 'Liste complète selon le type et l\'ancienneté du bien',
+  html: '<div class="dv-warning">⚠️ Les diagnostics doivent être réalisés par un diagnostiqueur certifié. Un diagnostic manquant peut bloquer votre vente.</div><h2>Toujours obligatoires</h2><table class="dv-table"><tr><th>Diagnostic</th><th>Contenu</th><th>Validité</th></tr><tr><td><strong>DPE</strong></td><td>Classe énergie A à G et estimation des charges</td><td>10 ans</td></tr><tr><td><strong>ERP</strong> — État des Risques et Pollutions</td><td>Risques naturels, miniers, technologiques, radon</td><td>6 mois</td></tr><tr><td><strong>Audit énergétique</strong></td><td>Obligatoire si DPE classé F ou G (depuis 2023)</td><td>5 ans</td></tr></table><h2>Selon l\'ancienneté du bien</h2><table class="dv-table"><tr><th>Diagnostic</th><th>Condition</th><th>Validité</th></tr><tr><td><strong>Amiante</strong></td><td>Permis de construire avant le 01/07/1997</td><td>Illimitée si négatif</td></tr><tr><td><strong>Plomb (CREP)</strong></td><td>Permis de construire avant le 01/01/1949</td><td>1 an si positif / illimitée si négatif</td></tr><tr><td><strong>Électricité</strong></td><td>Installation de plus de 15 ans</td><td>3 ans</td></tr><tr><td><strong>Gaz</strong></td><td>Installation de plus de 15 ans</td><td>3 ans</td></tr><tr><td><strong>Termites</strong></td><td>Zone à risque (arrêté préfectoral)</td><td>6 mois</td></tr></table><h2>Selon le type de bien</h2><table class="dv-table"><tr><th>Diagnostic</th><th>Condition</th><th>Validité</th></tr><tr><td><strong>Assainissement non collectif</strong></td><td>Maison non reliée au tout-à-l\'égout</td><td>3 ans</td></tr><tr><td><strong>Loi Carrez</strong> (superficie)</td><td>Appartement ou lot en copropriété</td><td>Illimitée sauf travaux</td></tr><tr><td><strong>Mérule</strong></td><td>Zone à risque (arrêté préfectoral)</td><td>Pas de durée légale</td></tr></table><h2>Budget et démarches</h2><ul><li>Faites appel à un <strong>diagnostiqueur certifié</strong> (vérifiez sur diagnostiqueurs.din.developpement-durable.gouv.fr)</li><li>Comparez <strong>au moins 3 devis</strong> — les tarifs varient du simple au triple</li><li>Prévoyez <strong>300 à 600 €</strong> pour un appartement, <strong>500 à 1 000 €</strong> pour une maison</li><li>Commandez dès que vous décidez de vendre — certains ont des délais de 1 à 2 semaines</li></ul><div class="dv-tip">💡 Un DPE classé F ou G peut réduire votre prix de 10 à 15 %. Si c\'est votre cas, un audit énergétique obligatoire vous permettra de chiffrer les travaux à présenter aux acheteurs.</div>'
+};
+DOC_DATA['loi-hoguet'] = {
+  title: 'Vendre sans agence — ce que dit la loi',
+  badge: 'Guide juridique',
+  sub: 'Ce que vous avez le droit de faire en tant que particulier vendeur',
+  html: '<h2>La loi Hoguet ne vous concerne pas</h2><p>La loi Hoguet n°70-9 du 2 janvier 1970 régit l\'activité des <strong>agents immobiliers et mandataires</strong>. Elle impose une carte professionnelle aux intermédiaires rémunérés.</p><p><strong>Elle ne s\'applique pas au propriétaire qui vend son propre bien.</strong></p><h2>Ce que vous avez le droit de faire</h2><ul><li>Publier votre annonce sur tous les portails (Leboncoin, SeLoger, PAP, Bien\'ici…)</li><li>Organiser et effectuer les visites vous-même</li><li>Négocier directement avec les acheteurs</li><li>Recevoir et accepter des offres d\'achat</li><li>Participer à la signature du compromis et de l\'acte authentique</li></ul><h2>Ce qu\'un particulier ne peut PAS faire</h2><ul><li>Recevoir de l\'argent pour le compte d\'autrui dans une transaction immobilière (réservé aux notaires et agents avec garantie financière)</li><li>Se présenter comme intermédiaire et percevoir une commission sur un bien qui ne lui appartient pas</li></ul><div class="dv-tip">💡 En tant que propriétaire vendeur, vous n\'avez aucune limitation légale dans la conduite de votre vente.</div><h2>Vos obligations légales</h2><ul><li><strong>Fournir tous les diagnostics obligatoires</strong> lors de la signature du compromis</li><li><strong>Déclarer tous les vices cachés connus</strong> — votre responsabilité court 2 ans après la vente</li><li><strong>Respecter le droit de rétractation de l\'acheteur</strong> (10 jours après signature du compromis — loi SRU)</li><li><strong>Respecter le droit de préemption</strong> de la commune si applicable</li><li><strong>Informer l\'acheteur des charges de copropriété</strong> et des litiges en cours</li></ul>'
+};
+DOC_DATA['guide-negociation'] = {
+  title: 'Guide de négociation du prix',
+  badge: 'Stratégie',
+  sub: 'Comment défendre votre prix et répondre aux offres basses',
+  html: '<h2>Comprendre la psychologie de la négociation</h2><p>Un acheteur qui fait une offre basse n\'est pas de mauvaise foi — c\'est souvent une stratégie d\'ancrage. Votre réaction détermine la suite.</p><div class="dv-tip">💡 Règle n°1 : ne jamais accepter la première offre, même si elle vous convient. Une acceptation immédiate fait regretter à l\'acheteur de ne pas avoir offert moins.</div><h2>Avant de négocier</h2><ul><li>Définissez <strong>votre prix plancher</strong> avant la mise en vente — ne le partagez jamais avec l\'acheteur</li><li>Calculez votre net vendeur réel (prix - remboursement prêt, taxe sur plus-value si applicable)</li></ul><h2>Répondre à une offre basse</h2><ul><li><strong>Ne refusez pas sèchement</strong> — maintenez le dialogue</li><li>Faites une <strong>contre-proposition écrite</strong> à 2 à 4 % sous votre prix initial</li><li>Justifiez votre prix avec des données : ventes comparables, travaux réalisés, DPE, équipements inclus</li><li>Donnez une deadline (48 à 72h) pour créer de l\'urgence</li></ul><div class="dv-warning">⚠️ Si vous avez plusieurs visites en cours, vous pouvez en informer l\'acheteur. Mais ne mentez jamais sur l\'existence d\'autres offres.</div><h2>Arguments pour défendre votre prix</h2><ul><li>"Le DPE est classé C" — un bien économe vaut 5 à 10 % de plus</li><li>"La chaudière a 2 ans" — mentionnez les équipements récents avec factures</li><li>"Le secteur est en tension" — montrez les ventes récentes dans le quartier</li><li>"Délai de vente rapide possible" — si vous êtes flexible sur la date de libération</li></ul><h2>Quand accepter de baisser</h2><ul><li>Votre bien est en vente depuis plus de <strong>3 mois</strong> sans offre</li><li>Vous avez reçu <strong>plusieurs refus</strong> au même niveau de prix</li><li>Un DPE défavorable est systématiquement cité comme frein</li></ul><p>Dans ce cas, une <strong>baisse franche</strong> (5 à 8 %) relancera davantage l\'intérêt qu\'une baisse symbolique de 1 à 2 %.</p>'
+};
+DOC_DATA['home-staging'] = {
+  title: 'Home staging — 10 astuces essentielles',
+  badge: 'Mise en valeur',
+  sub: 'Maximisez l\'impact visuel de votre bien sans budget important',
+  html: '<p>Le home staging ne consiste pas à décorer — il consiste à <strong>permettre à l\'acheteur de se projeter</strong>.</p><h2>1. Désencombrez radicalement</h2><p>Retirez 40 % du contenu de chaque pièce. Bibelots, photos personnelles, vêtements visibles — tout ce qui personnalise l\'espace doit disparaître.</p><div class="dv-tip">💡 Louez un garde-meuble. 50 €/mois pour accélérer la vente de plusieurs semaines, c\'est rentable.</div><h2>2. Nettoyez à fond</h2><p>Joints de carrelage, intérieur des placards, vitres, appareils électroménagers visibles, plinthes. Un bien propre inspire confiance.</p><h2>3. Réparez les petites imperfections</h2><p>Poignées branlantes, joints noirs, trous dans les murs, ampoules grillées, robinets qui fuient. Ces défauts déclenchent une négociation sur le prix.</p><h2>4. Rafraîchissez la peinture</h2><p>Une couche de blanc ou beige neutre sur les murs les plus abîmés : 80 € de peinture et une journée. Retour sur investissement immédiat.</p><h2>5. Maximisez la luminosité</h2><ul><li>LED lumière chaude (3000 K), forte puissance dans toutes les pièces</li><li>Ouvrez tous volets et rideaux pendant la visite</li><li>Miroirs face aux fenêtres pour réfléchir la lumière naturelle</li></ul><h2>6. Soignez l\'entrée</h2><p>L\'acheteur forme son opinion dans les 30 premières secondes. Couloir dégagé, lumière allumée, odeur agréable, tapis propre.</p><h2>7. Créez des espaces "vivre ensemble"</h2><p>Arrangez le salon pour montrer qu\'on peut s\'y asseoir à plusieurs. Disposez la table de salle à manger avec quelques couverts.</p><h2>8. Valorisez l\'extérieur</h2><ul><li>Tondez, désherbez, nettoyez la terrasse</li><li>Quelques pots de fleurs à l\'entrée</li><li>Rangez tout l\'outillage et les déchets verts</li></ul><h2>9. Neutralisez les odeurs</h2><p>Odeurs de tabac, d\'animal ou d\'humidité : aérez 2h avant chaque visite. Si ça persiste, investissez dans un purificateur d\'air.</p><h2>10. Rangez les éléments trop personnels</h2><p>Photos de famille, trophées, objets religieux — chacun réduit le cercle des acheteurs qui peuvent se projeter.</p><div class="dv-tip">💡 Budget total : 200 à 500 € pour un appartement, 500 à 1 500 € pour une maison. Retour sur investissement moyen : 5 à 15 fois la mise.</div>'
+};
+
+function openDoc(slug) {
+  var d = DOC_DATA[slug];
+  if (!d) return;
+  var overlay = document.getElementById('docViewerOverlay');
+  document.getElementById('dvHeaderTitle').textContent = d.title;
+  var stamp = new Date().toLocaleDateString('fr-FR', { year: 'numeric', month: 'long' });
+  document.getElementById('dvDocInner').innerHTML =
+    '<div class="dv-doc-header">' +
+      '<div class="dv-doc-badge">' + d.badge + '</div>' +
+      '<div class="dv-doc-title">' + d.title + '</div>' +
+      '<div class="dv-doc-sub">' + d.sub + '</div>' +
+    '</div>' +
+    '<div class="dv-doc-content">' + d.html + '</div>' +
+    '<div class="dv-footer-stamp">' +
+      '<span>Vendu Par Moi · venduparmo.fr</span>' +
+      '<span>Document généré le ' + stamp + '</span>' +
+    '</div>';
+  overlay.classList.add('open');
+  document.body.style.overflow = 'hidden';
+  overlay.querySelector('.dv-body').scrollTop = 0;
+}
+
+function closeDoc() {
+  document.getElementById('docViewerOverlay').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') closeDoc();
+});
+</script>
+
 <script src="/js/seller-nav.js"></script>
 </body>
 </html>
