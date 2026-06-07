@@ -458,7 +458,7 @@ try { db.exec("ALTER TABLE properties ADD COLUMN decouverte_photos_public INTEGE
 try { db.exec("ALTER TABLE properties ADD COLUMN details_photos_public INTEGER DEFAULT 0"); } catch(e) {}
 try { db.exec("ALTER TABLE properties ADD COLUMN diagnostics_in_dossier INTEGER DEFAULT 1"); } catch(e) {}
 try { db.exec("ALTER TABLE properties ADD COLUMN plan_docs_visible INTEGER DEFAULT 1"); } catch(e) {}
-try { db.exec("ALTER TABLE properties ADD COLUMN acheteur_docs_visible INTEGER DEFAULT 1"); } catch(e) {}
+try { db.exec("ALTER TABLE properties ADD COLUMN acheteur_docs_visible INTEGER DEFAULT 0"); } catch(e) {}
 
 // ── Contre-proposition offres ─────────────────────────────────
 try { db.exec("ALTER TABLE offers ADD COLUMN counter_amount INTEGER"); } catch(e) {}

@@ -15,12 +15,22 @@ router.get('/api/dossier/acheteur/:token', (req, res) => {
   if (!prop) return res.status(404).json({ error: 'Dossier introuvable' });
 
   const photos = db.prepare('SELECT url, thumbnail_url, order_index, category FROM property_photos WHERE property_id = ? ORDER BY order_index').all(prop.id);
-  const docs = db.prepare(`
+
+  const allDocs = db.prepare(`
     SELECT id, name, url, doc_type, folder, created_at
     FROM property_documents
-    WHERE property_id = ? AND (folder = 'diagnostics' OR folder = 'acheteur_serieux' OR folder IS NULL)
+    WHERE property_id = ?
     ORDER BY folder, created_at
   `).all(prop.id);
+
+  // Enforce seller permission flags — never expose notaire/entretien folders
+  const docs = allDocs.filter(doc => {
+    const f = doc.folder || '';
+    if (f === 'acheteur_serieux') return prop.acheteur_docs_visible === 1;
+    if (f === 'diagnostics') return prop.diagnostics_in_dossier !== 0;
+    if (f === '' || f === null) return prop.plan_docs_visible !== 0;
+    return false; // notaire, entretien → never shown to acheteur
+  });
 
   res.json({ property: prop, photos, documents: docs });
 });

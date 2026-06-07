@@ -114,7 +114,12 @@ router.get('/api/bien/:slug', (req, res) => {
   const property = db.prepare('SELECT * FROM properties WHERE slug = ? AND published = 1').get(req.params.slug);
   if (!property) return res.status(404).json({ error: 'Bien non trouvé' });
   const photos = db.prepare('SELECT url, thumbnail_url, order_index FROM property_photos WHERE property_id = ? ORDER BY order_index').all(property.id);
-  const documents = db.prepare("SELECT name, url, doc_type FROM property_documents WHERE property_id = ? AND (folder='diagnostics' OR folder IS NULL OR folder='')").all(property.id);
+  const allPublicDocs = db.prepare("SELECT name, url, doc_type, folder FROM property_documents WHERE property_id = ? AND (folder='diagnostics' OR folder IS NULL OR folder='')").all(property.id);
+  const documents = allPublicDocs.filter(doc => {
+    const f = doc.folder || '';
+    if (f === 'diagnostics') return property.diagnostics_in_dossier !== 0;
+    return property.plan_docs_visible !== 0;
+  });
   const seller = db.prepare('SELECT twilio_number FROM sellers WHERE id = ?').get(property.seller_id);
   res.json({ property: { ...property, photos, documents }, contact_number: seller?.twilio_number || null });
 });
