@@ -323,6 +323,7 @@ const newCols = [
   "ALTER TABLE buyer_contacts ADD COLUMN buyer_budget INTEGER",
   "ALTER TABLE buyer_contacts ADD COLUMN status TEXT DEFAULT 'new'",
   "ALTER TABLE visits ADD COLUMN notes TEXT",
+  "ALTER TABLE visits ADD COLUMN sms_copied_at TEXT",
   "ALTER TABLE properties ADD COLUMN rooms_detail TEXT",
   "ALTER TABLE properties ADD COLUMN acheteur_token TEXT",
   "ALTER TABLE properties ADD COLUMN notaire_token TEXT",

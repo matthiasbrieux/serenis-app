@@ -918,6 +918,12 @@ function formatDate(dateStr) {
   return d.toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long'});
 }
 
+function smsCopiedBadge(sms_copied_at) {
+  if (!sms_copied_at) return '';
+  const d = new Date(sms_copied_at).toLocaleDateString('fr-FR', { day:'2-digit', month:'short' });
+  return `<span style="display:inline-flex;align-items:center;gap:4px;background:#e8f4ec;color:#2e7d32;font-size:0.7rem;font-weight:700;padding:3px 8px;border-radius:20px;"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>SMS préparé le ${d}</span>`;
+}
+
 function buildVisitCardHtml(v) {
   const prenom = (v.buyer_name||'').split(' ')[0];
   const [yr,mo,dy] = (v.visit_date||'').split('-');
@@ -957,7 +963,8 @@ function buildVisitCardHtml(v) {
         ${svgPhone} ${v.reminder_sent?'Rappel copié':'Rappel SMS'}
       </button>
       <button class="btn-cancel-sm" onclick="if(confirm('Annuler cette visite ?')) changeVisitStatus(${v.id},'cancelled')">Annuler</button>
-    </div>`:''}
+    </div>
+    <div id="sms-badge-${v.id}" style="margin-top:6px;">${smsCopiedBadge(v.sms_copied_at)}</div>`:''}
     <div class="visit-notes-wrap">
       <textarea class="visit-notes-input" rows="2" placeholder="Notes post-visite…" id="notes-${v.id}" onblur="saveNotes(${v.id})">${v.notes||''}</textarea>
       <div class="visit-notes-saved" id="notes-saved-${v.id}">✓ Enregistré</div>
@@ -1000,6 +1007,7 @@ function buildVisitConfirmedCard(v) {
       </button>
       <button class="vcc-cancel" onclick="if(confirm('Annuler cette visite ?')) changeVisitStatus(${v.id},'cancelled')">Annuler</button>
     </div>
+    ${v.sms_copied_at ? `<div id="sms-badge-${v.id}" style="margin-top:8px;">${smsCopiedBadge(v.sms_copied_at)}</div>` : `<div id="sms-badge-${v.id}" style="margin-top:0;"></div>`}
   </div>`;
 }
 
@@ -1076,7 +1084,10 @@ async function changeVisitStatus(id, status) {
   } catch(e) { showToast('Erreur réseau','error'); }
 }
 
+let _currentConfirmSmsVisitId = null;
+
 function openConfirmSmsModal(id) {
+  _currentConfirmSmsVisitId = id;
   const v = allVisits.find(v=>v.id===id);
   if (!v) return;
   const prenom = (v.buyer_name||'').split(' ')[0] || 'Madame/Monsieur';
@@ -1133,6 +1144,16 @@ function copyConfirmSms(btn) {
       btn.innerHTML = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:middle;margin-right:5px;"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>Copier le SMS';
       btn.classList.remove('copied');
     }, 3000);
+    // Persister l'état en base
+    const visitId = _currentConfirmSmsVisitId;
+    if (!visitId) return;
+    fetch(`/api/visits/${visitId}/sms-copied`, { method:'PUT' }).then(() => {
+      const v = allVisits.find(v => v.id === visitId);
+      if (v) { v.sms_copied_at = new Date().toISOString(); }
+      // Mettre à jour le badge sur la carte sans re-render complet
+      const badge = document.getElementById(`sms-badge-${visitId}`);
+      if (badge) badge.innerHTML = smsCopiedBadge(v?.sms_copied_at);
+    }).catch(() => {});
   });
 }
 

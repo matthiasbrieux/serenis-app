@@ -277,6 +277,8 @@
       gap: 5px;
     }
     .save-feedback.show { opacity: 1; }
+    .save-badge { font-size:0.75rem;color:#3D5A47;font-weight:600;display:inline-flex;align-items:center;gap:4px;background:#e8f4ec;padding:4px 9px;border-radius:20px; }
+    .save-badge-unsaved { font-size:0.75rem;color:#C4785A;font-weight:600;display:inline-flex;align-items:center;gap:4px;background:#fff3ec;padding:4px 9px;border-radius:20px; }
 
     /* Guide accordéon */
     .platform-guide {
@@ -605,21 +607,18 @@ function renderGrid() {
 
         <div class="platform-field">
           <label>URL de l'annonce</label>
-          <input type="url" id="url-${p.key}" placeholder="${escHtml(p.hint)}" value="${escHtml(s.url)}">
+          <input type="url" id="url-${p.key}" placeholder="${escHtml(p.hint)}" value="${escHtml(s.url)}" oninput="markUnsaved('${p.key}')">
         </div>
 
         <div class="platform-field">
           <label>Date de publication</label>
-          <input type="date" id="date-${p.key}" value="${s.published_at ? s.published_at.split('T')[0] : ''}">
+          <input type="date" id="date-${p.key}" value="${s.published_at ? s.published_at.split('T')[0] : ''}" onchange="markUnsaved('${p.key}')">
         </div>
       </div>
 
       <div class="platform-card-footer">
-        <button class="btn-save-platform" onclick="savePlatform('${p.key}')">Sauvegarder</button>
-        <span class="save-feedback" id="feedback-${p.key}">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-          Sauvegardé !
-        </span>
+        <button class="btn-save-platform" id="savebtn-${p.key}" onclick="savePlatform('${p.key}')">Sauvegarder</button>
+        <span id="save-status-${p.key}">${buildSaveStatus(p.key, s)}</span>
       </div>
 
       ${guideHtml}
@@ -674,6 +673,26 @@ async function loadPublications() {
   renderGrid();
 }
 
+function buildSaveStatus(key, s) {
+  const saved = JSON.parse(localStorage.getItem('vpm_pub_saved') || '{}');
+  const entry = saved[key];
+  const currentUrl = s.url || '';
+  if (!currentUrl) return '';
+  if (entry && entry.url === currentUrl) {
+    const d = new Date(entry.at).toLocaleDateString('fr-FR', { day:'2-digit', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit' });
+    return `<span class="save-badge"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Enregistré le ${d}</span>`;
+  }
+  if (currentUrl) {
+    return `<span class="save-badge-unsaved">● Non enregistré</span>`;
+  }
+  return '';
+}
+
+function markUnsaved(key) {
+  const el = document.getElementById('save-status-' + key);
+  if (el) el.innerHTML = `<span class="save-badge-unsaved">● Modifications non enregistrées</span>`;
+}
+
 async function savePlatform(key) {
   const urlInput = document.getElementById('url-' + key);
   const dateInput = document.getElementById('date-' + key);
@@ -699,12 +718,11 @@ async function savePlatform(key) {
       if (btn) { btn.textContent = 'Sauvegarder'; btn.disabled = false; }
     } else if (data.success) {
       if (data.id) pubState[key].id = data.id;
-      renderGrid(); // recrée le DOM → le btn est remplacé, inutile de le restaurer
-      const fb = document.getElementById('feedback-' + key);
-      if (fb) {
-        fb.classList.add('show');
-        setTimeout(() => fb.classList.remove('show'), 2500);
-      }
+      // Persister l'état "sauvegardé" dans localStorage
+      const saved = JSON.parse(localStorage.getItem('vpm_pub_saved') || '{}');
+      saved[key] = { url, at: new Date().toISOString() };
+      localStorage.setItem('vpm_pub_saved', JSON.stringify(saved));
+      renderGrid(); // recrée le DOM avec le badge persistant
     }
   } catch(e) {
     showToast('Erreur réseau', 'error');

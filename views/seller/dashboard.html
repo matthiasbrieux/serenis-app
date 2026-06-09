@@ -536,9 +536,9 @@
     .db-resa-btn-copy:hover { background:#2d4535; }
     .db-resa-sms-row { display:flex; gap:8px; align-items:stretch; }
     .db-resa-sms-preview { flex:1; background:#f8f5f0; border:1.5px solid #e8e0d6; border-radius:8px; padding:10px 12px; font-size:0.78rem; color:#555; line-height:1.55; min-width:0; }
-    .db-resa-btn-sms { padding:10px 14px; background:#fff; border:1.5px solid #3D5A47; color:#3D5A47; border-radius:8px; font-size:0.81rem; font-weight:700; cursor:pointer; font-family:inherit; transition:all 0.15s; white-space:nowrap; flex-shrink:0; display:flex; align-items:center; gap:6px; text-decoration:none; }
-    .db-resa-btn-sms:hover { background:#3D5A47; color:#fff; }
-    @media(max-width:480px) { .db-resa-url-row, .db-resa-sms-row { flex-direction:column; } .db-resa-btn-copy, .db-resa-btn-sms { width:100%; justify-content:center; min-height:44px; } }
+    .db-resa-btn-copy-sms { padding:10px 14px; background:#fff; border:1.5px solid #3D5A47; color:#3D5A47; border-radius:8px; font-size:0.81rem; font-weight:700; cursor:pointer; font-family:inherit; transition:all 0.15s; white-space:nowrap; flex-shrink:0; }
+    .db-resa-btn-copy-sms:hover { background:#3D5A47; color:#fff; }
+    @media(max-width:480px) { .db-resa-url-row, .db-resa-sms-row { flex-direction:column; } .db-resa-btn-copy, .db-resa-btn-copy-sms { width:100%; justify-content:center; min-height:44px; } }
 
     /* ── Visites à confirmer ── */
     .db-pending-card { background:#fff; border-radius:14px; overflow:hidden; box-shadow:0 2px 10px rgba(196,96,58,0.18); margin-bottom:14px; border:1.5px solid #C4785A; }
@@ -1072,10 +1072,30 @@
         </div>
         <div class="db-resa-sms-row">
           <div class="db-resa-sms-preview" id="dbResaSmsText"></div>
-          <a class="db-resa-btn-sms" id="dbResaSmsBtn" href="#">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-            Envoyer par SMS
-          </a>
+          <button class="db-resa-btn-copy-sms" onclick="copyResaSms(this)">Copier le message</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Lien de soumission d'offre d'achat -->
+    <div class="db-resa-card" id="dbOffreCard" style="display:none;">
+      <div class="db-resa-hdr" style="background:linear-gradient(135deg,#C4785A,#B06548);">
+        <div class="db-resa-hdr-ico">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+        </div>
+        <div class="db-resa-hdr-text">
+          <div class="db-resa-hdr-title">Lien de soumission d'offre</div>
+          <div class="db-resa-hdr-sub">L'acheteur remplit le formulaire — l'offre apparaît dans "Mes offres"</div>
+        </div>
+      </div>
+      <div class="db-resa-body">
+        <div class="db-resa-url-row">
+          <input type="text" class="db-resa-input" id="dbOffreUrl" readonly>
+          <button class="db-resa-btn-copy" style="background:#C4785A;" onclick="copyOffreLinkDash(this)">Copier le lien</button>
+        </div>
+        <div class="db-resa-sms-row">
+          <div class="db-resa-sms-preview" id="dbOffreSmsText"></div>
+          <button class="db-resa-btn-copy-sms" onclick="copyOffreSms(this)">Copier le message</button>
         </div>
       </div>
     </div>
@@ -1275,18 +1295,7 @@ function renderMissions(visits, agendaSlots, property) {
     });
   }
 
-  // Priorité 2 : formation incomplète
-  if (formPct < 100) {
-    missions.push({
-      icon: '📚',
-      iconClass: 'mission-ico--green',
-      title: formPct < 30 ? 'Démarrez votre formation vendeur' : `Continuez votre formation (${formPct}%)`,
-      sub: formPct < 30 ? 'Apprenez à vendre sereinement et au bon prix' : `Plus que ${TOTAL - formDoneCount} étape${TOTAL - formDoneCount > 1 ? 's' : ''} avant d'être prêt`,
-      href: '/ma-formation',
-    });
-  }
-
-  // Priorité 3 : pas de disponibilités
+  // Priorité 2 : pas de disponibilités
   if (!hasSlots) {
     missions.push({
       icon: '📅',
@@ -1684,6 +1693,48 @@ function copyResaLink(btn) {
   });
 }
 
+function copyResaSms(btn) {
+  const text = document.getElementById('dbResaSmsText').textContent;
+  if (!text) return;
+  navigator.clipboard.writeText(text).then(() => {
+    btn.textContent = '✓ Copié !';
+    setTimeout(() => btn.textContent = 'Copier le message', 2000);
+  });
+}
+
+let _offreLinkDash = '';
+async function loadOffreLinkDash() {
+  try {
+    const res = await fetch('/api/offre-link');
+    const data = await res.json();
+    if (data.url) {
+      _offreLinkDash = data.url;
+      document.getElementById('dbOffreUrl').value = data.url;
+      const msg = `Bonjour, suite à notre échange, voici le lien pour soumettre votre offre d'achat en ligne : ${data.url} — Je la traiterai dans les meilleurs délais.`;
+      document.getElementById('dbOffreSmsText').textContent = msg;
+      document.getElementById('dbOffreCard').style.display = 'block';
+    }
+  } catch(e) {}
+}
+
+function copyOffreLinkDash(btn) {
+  if (!_offreLinkDash) return;
+  navigator.clipboard.writeText(_offreLinkDash).then(() => {
+    btn.textContent = '✓ Copié !';
+    setTimeout(() => btn.textContent = 'Copier le lien', 2000);
+  });
+}
+
+function copyOffreSms(btn) {
+  const text = document.getElementById('dbOffreSmsText').textContent;
+  if (!text) return;
+  navigator.clipboard.writeText(text).then(() => {
+    btn.textContent = '✓ Copié !';
+    setTimeout(() => btn.textContent = 'Copier le message', 2000);
+  });
+}
+}
+
 function formatDate(d) {
   if (!d) return '—';
   const parts = d.split('-');
@@ -1743,7 +1794,6 @@ async function loadData() {
       const smsText = `Bonjour, voici le lien pour réserver directement une date de visite selon mes disponibilités : ${resaUrl}`;
       document.getElementById('dbResaUrl').value = resaUrl;
       document.getElementById('dbResaSmsText').textContent = smsText;
-      document.getElementById('dbResaSmsBtn').href = `sms:?&body=${encodeURIComponent(smsText)}`;
       document.getElementById('dbResaCard').style.display = 'block';
     }
 
@@ -1769,6 +1819,7 @@ renderFormationProgress();
 renderMails();
 renderMissions([], [], null);
 loadData();
+loadOffreLinkDash();
 
 async function confirmDeleteAccount() {
   const ok = confirm('⚠️ Supprimer définitivement votre compte Vendu Par Moi ?\n\nTous vos biens, photos, contacts acheteurs et données seront effacés.\n\nCette action est irréversible.');

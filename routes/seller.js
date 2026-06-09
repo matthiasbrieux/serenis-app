@@ -689,6 +689,12 @@ router.put('/api/visits/:id/notes', requireAuth, express.json(), (req, res) => {
   res.json({ success: true });
 });
 
+router.put('/api/visits/:id/sms-copied', requireAuth, (req, res) => {
+  db.prepare('UPDATE visits SET sms_copied_at=? WHERE id=? AND seller_id=?')
+    .run(new Date().toISOString(), req.params.id, req.seller.id);
+  res.json({ success: true });
+});
+
 router.post('/api/visits/:id/reminder', requireAuth, (req, res) => {
   const visit = db.prepare('SELECT id FROM visits WHERE id=? AND seller_id=?').get(req.params.id, req.seller.id);
   if (!visit) return res.status(404).json({ error: 'Visite introuvable' });

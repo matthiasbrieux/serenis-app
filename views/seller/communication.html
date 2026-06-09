@@ -1443,11 +1443,15 @@ window._mcMailStore = {};
 function renderMcCards() {
   const mails = MC_MAILS.filter(m => m.cat === activeMcCat);
   const lien = _mcAcheteurUrl;
+  const sellerPrenom = _data?.seller?.first_name || 'Le propriétaire';
   window._mcMailStore = {};
 
   document.getElementById('mcCards').innerHTML = mails.map((m, i) => {
     const id = `mc-${m.cat}-${i}`;
-    const corpsWithLink = m.corps.replace(/{{LIEN}}/g, lien || '[lien dossier Vendu Par Moi]');
+    const corpsWithLink = m.corps
+      .replace(/{{LIEN}}/g, lien || '[lien dossier Vendu Par Moi]')
+      .replace(/L'équipe Vendu Par Moi\nPour le compte du propriétaire/g, sellerPrenom)
+      .replace(/L'équipe Vendu Par Moi\r\nPour le compte du propriétaire/g, sellerPrenom);
     window._mcMailStore[id] = { objet: m.objet, corps: corpsWithLink, lien };
 
     const linkRow = m.hasLink ? `
