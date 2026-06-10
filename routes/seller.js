@@ -38,7 +38,7 @@ router.post('/api/contrat/sign', requireAuth, contratSignLimit, express.json(), 
 
 // API — seller data
 router.get('/api/me', requireAuth, (req, res) => {
-  const seller = db.prepare('SELECT id, uuid, email, first_name, last_name, phone, pack, twilio_number, paid_at, created_at, client_availability, booking_step, photographer_scheduled, photographer_name, photographer_date, photographer_done, photo_report_url FROM sellers WHERE id = ?').get(req.seller.id);
+  const seller = db.prepare('SELECT id, uuid, email, first_name, last_name, phone, pack, twilio_number, paid_at, created_at, client_availability, booking_step, photographer_scheduled, photographer_name, photographer_date, photographer_done, photo_report_url, calendar_token FROM sellers WHERE id = ?').get(req.seller.id);
   const property = db.prepare('SELECT * FROM properties WHERE seller_id = ?').get(req.seller.id);
   const contacts = property ? db.prepare('SELECT COUNT(*) as count FROM buyer_contacts WHERE seller_id = ?').get(req.seller.id) : { count: 0 };
   const visits = property ? db.prepare('SELECT COUNT(*) as count FROM visits WHERE seller_id = ?').get(req.seller.id) : { count: 0 };
@@ -603,15 +603,41 @@ router.post('/api/performances/analyze', requireAuth, express.json(), async (req
 
 router.get('/serenis-connect', requireAuth, (req, res) => res.redirect('/mon-agenda'));
 
+// Calcule le score d'un contact acheteur basé sur son comportement
+function scoreBuyerContact(contact, visits, offers) {
+  const email = (contact.buyer_email || '').toLowerCase();
+  const phone = contact.buyer_phone || '';
+  const matchVisit = v =>
+    (email && v.buyer_email && v.buyer_email.toLowerCase() === email) ||
+    (phone && v.buyer_phone && v.buyer_phone === phone);
+  const matchOffer = o =>
+    (email && o.buyer_email && o.buyer_email.toLowerCase() === email);
+
+  const hasOffer = offers.some(matchOffer);
+  const contactVisits = visits.filter(matchVisit);
+  const hasDoneVisit = contactVisits.some(v => v.status === 'done' || (v.status === 'confirmed' && v.visit_date < new Date().toISOString().split('T')[0]));
+  const hasConfirmedVisit = contactVisits.some(v => v.status === 'confirmed');
+
+  if (hasOffer)           return { score: 4, score_label: 'Offre déposée',    score_color: '#2e7d32' };
+  if (hasDoneVisit)       return { score: 3, score_label: 'Visite réalisée',  score_color: '#C4603A' };
+  if (hasConfirmedVisit)  return { score: 2, score_label: 'Visite planifiée', score_color: '#e65100' };
+  if (contact.dossier_sent) return { score: 1, score_label: 'Dossier envoyé', score_color: '#1565c0' };
+  return                     { score: 0, score_label: 'Nouveau',             score_color: '#999' };
+}
+
 router.get('/api/connect/overview', requireAuth, (req, res) => {
   const seller = db.prepare('SELECT id, uuid, email, first_name, last_name, phone, pack, twilio_number FROM sellers WHERE id = ?').get(req.seller.id);
   const property = db.prepare('SELECT id, slug, published, type, address, city, postal_code, price, rooms, bedrooms, surface_habitable, acheteur_token, notaire_token FROM properties WHERE seller_id = ?').get(req.seller.id);
   const visits = property
     ? db.prepare('SELECT * FROM visits WHERE seller_id = ? ORDER BY visit_date ASC, visit_time ASC').all(req.seller.id)
     : [];
-  const contacts = property
+  const rawContacts = property
     ? db.prepare('SELECT * FROM buyer_contacts WHERE seller_id = ? ORDER BY created_at DESC').all(req.seller.id)
     : [];
+  const offers = property
+    ? db.prepare('SELECT buyer_email FROM offers WHERE seller_id = ?').all(req.seller.id)
+    : [];
+  const contacts = rawContacts.map(c => ({ ...c, ...scoreBuyerContact(c, visits, offers) }));
   const notifications = db.prepare('SELECT * FROM notifications WHERE seller_id = ? ORDER BY created_at DESC LIMIT 25').all(req.seller.id);
   const stats = {
     contacts: contacts.length,
@@ -736,6 +762,65 @@ router.post('/api/visits/:id/reminder', requireAuth, (req, res) => {
   if (!visit) return res.status(404).json({ error: 'Visite introuvable' });
   db.prepare('UPDATE visits SET reminder_sent=1 WHERE id=?').run(visit.id);
   res.json({ success: true });
+});
+
+// ── Feed calendrier (webcal) — public via token ───────────────
+router.get('/api/agenda/feed.ics', (req, res) => {
+  const { token } = req.query;
+  if (!token) return res.status(400).send('Token manquant');
+
+  const seller = db.prepare('SELECT id FROM sellers WHERE calendar_token = ?').get(token);
+  if (!seller) return res.status(404).send('Token invalide');
+
+  const visits = db.prepare(`
+    SELECT v.*, p.address, p.city, p.type
+    FROM visits v
+    JOIN properties p ON p.id = v.property_id
+    WHERE v.seller_id = ? AND v.status = 'confirmed'
+    ORDER BY v.visit_date, v.visit_time
+  `).all(seller.id);
+
+  const pad = n => String(n).padStart(2, '0');
+  const now = new Date().toISOString().replace(/[-:.]/g, '').slice(0, 15);
+
+  const events = visits.map(v => {
+    const [yr, mo, dy] = (v.visit_date || '').split('-');
+    const [hh, mm] = (v.visit_time || '00:00').split(':');
+    const dtStart = `${yr}${pad(mo)}${pad(dy)}T${pad(hh)}${pad(mm)}00`;
+    const endH = (parseInt(hh, 10) + 1) % 24;
+    const dtEnd = `${yr}${pad(mo)}${pad(dy)}T${pad(endH)}${pad(mm)}00`;
+    const typeLabel = v.type === 'appartement' ? 'Appartement' : v.type === 'maison' ? 'Maison' : (v.type || 'Bien');
+    const summary = `Visite — ${typeLabel} à ${v.city || ''}`;
+    const location = [v.address, v.city].filter(Boolean).join(', ');
+    const description = `Acquéreur : ${v.buyer_name || ''}\\nTél : ${v.buyer_phone || '—'}\\nEmail : ${v.buyer_email || '—'}`;
+    return [
+      'BEGIN:VEVENT',
+      `UID:visit-${v.id}@venduparmo.fr`,
+      `DTSTAMP:${now}Z`,
+      `DTSTART:${dtStart}`,
+      `DTEND:${dtEnd}`,
+      `SUMMARY:${summary}`,
+      `LOCATION:${location}`,
+      `DESCRIPTION:${description}`,
+      'END:VEVENT',
+    ].join('\r\n');
+  });
+
+  const ics = [
+    'BEGIN:VCALENDAR',
+    'VERSION:2.0',
+    'PRODID:-//Vendu Par Moi//FR',
+    'CALSCALE:GREGORIAN',
+    'METHOD:PUBLISH',
+    'X-WR-CALNAME:Visites — Vendu Par Moi',
+    'X-WR-TIMEZONE:Europe/Paris',
+    ...events,
+    'END:VCALENDAR',
+  ].join('\r\n');
+
+  res.setHeader('Content-Type', 'text/calendar; charset=utf-8');
+  res.setHeader('Cache-Control', 'no-cache');
+  res.send(ics);
 });
 
 router.post('/api/connect/contacts', requireAuth, express.json(), (req, res) => {
@@ -1109,15 +1194,16 @@ router.put('/api/offres/:id/repondre', requireAuth, express.json(), (req, res) =
 router.get('/mes-acheteurs', requireAuth, (req, res) => res.redirect('/mon-agenda'));
 
 router.get('/api/pipeline', requireAuth, (req, res) => {
-  const contacts = db.prepare('SELECT * FROM buyer_contacts WHERE seller_id=? ORDER BY created_at DESC').all(req.seller.id);
+  const rawContacts = db.prepare('SELECT * FROM buyer_contacts WHERE seller_id=? ORDER BY created_at DESC').all(req.seller.id);
   const visits = db.prepare('SELECT * FROM visits WHERE seller_id=? ORDER BY visit_date ASC, visit_time ASC').all(req.seller.id);
   const property = db.prepare('SELECT acheteur_token FROM properties WHERE seller_id=?').get(req.seller.id);
-  const contactsWithVisits = contacts.map(c => {
+  const offers = db.prepare('SELECT buyer_email FROM offers WHERE seller_id=?').all(req.seller.id);
+  const contactsWithVisits = rawContacts.map(c => {
     const visit = visits.find(v =>
       (c.buyer_phone && v.buyer_phone && v.buyer_phone === c.buyer_phone) ||
       (c.buyer_email && v.buyer_email && v.buyer_email === c.buyer_email)
     ) || null;
-    return { ...c, visit };
+    return { ...c, visit, ...scoreBuyerContact(c, visits, offers) };
   });
   res.json({ contacts: contactsWithVisits, dossierToken: property?.acheteur_token || null });
 });

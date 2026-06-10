@@ -441,6 +441,43 @@ async function sendPostVisitDossierNudges() {
   }
 }
 
+// ── Relance acheteurs post-visite J+3 ────────────────────────
+async function sendPostVisitJ3Nudges() {
+  const { sendPostVisitJ3Nudge } = require('./email');
+  const base = process.env.BASE_URL || 'https://venduparmo.fr';
+
+  const threeDaysAgo = new Date();
+  threeDaysAgo.setDate(threeDaysAgo.getDate() - 3);
+  const targetDate = threeDaysAgo.toISOString().split('T')[0];
+
+  const visits = db.prepare(`
+    SELECT v.buyer_email, v.buyer_name, v.id,
+           p.acheteur_token, p.city, p.type,
+           s.first_name as seller_first_name
+    FROM visits v
+    JOIN properties p ON p.id = v.property_id
+    JOIN sellers s ON s.id = v.seller_id
+    WHERE v.visit_date = ? AND v.status = 'confirmed'
+      AND NOT EXISTS (
+        SELECT 1 FROM offers o WHERE o.property_id = v.property_id AND o.buyer_email = v.buyer_email
+      )
+  `).all(targetDate);
+
+  for (const v of visits) {
+    try {
+      const triggerKey = `post_visit_j3:${v.id}`;
+      const already = db.prepare(`SELECT id FROM email_log WHERE trigger_type=? AND recipient_email=?`).get(triggerKey, v.buyer_email);
+      if (already) continue;
+      const dossierUrl = `${base}/dossier/acheteur/${v.acheteur_token}`;
+      const ok = await sendPostVisitJ3Nudge({ buyerEmail: v.buyer_email, buyerName: v.buyer_name, propertyCity: v.city, propertyType: v.type, dossierUrl, sellerFirstName: v.seller_first_name });
+      if (ok) {
+        db.prepare(`INSERT INTO email_log (trigger_type, recipient_email) VALUES (?,?)`).run(triggerKey, v.buyer_email);
+        console.log(`[NUDGE] post_visit_j3 → ${v.buyer_email}`);
+      }
+    } catch(e) { console.error('[NUDGE] post_visit_j3 error:', e.message); }
+  }
+}
+
 // ── Rapport hebdomadaire vendeurs (lundi 8h) ─────────────────
 async function sendWeeklySellerReportEmail() {
   const { sendWeeklySellerReport } = require('./email');
@@ -457,13 +494,18 @@ async function sendWeeklySellerReportEmail() {
 
   for (const s of sellers) {
     try {
-      const views = db.prepare(`SELECT COUNT(*) as c FROM property_page_views WHERE property_id=? AND viewed_at >= date('now','-7 days')`).get(s.prop_id)?.c || 0;
-      const contacts = db.prepare(`SELECT COUNT(*) as c FROM buyer_contacts WHERE seller_id=? AND created_at >= date('now','-7 days')`).get(s.id)?.c || 0;
-      const visits = db.prepare(`SELECT COUNT(*) as c FROM visits WHERE seller_id=? AND visit_date >= date('now','-7 days') AND status='confirmed'`).get(s.id)?.c || 0;
-      const offers = db.prepare(`SELECT COUNT(*) as c FROM offers WHERE seller_id=? AND created_at >= date('now','-7 days')`).get(s.id)?.c || 0;
-      const daysOnline = s.published_at ? Math.round((Date.now() - new Date(s.published_at)) / 86400000) : 0;
+      const views       = db.prepare(`SELECT COUNT(*) as c FROM property_page_views WHERE property_id=? AND viewed_at >= date('now','-7 days')`).get(s.prop_id)?.c || 0;
+      const viewsPrev   = db.prepare(`SELECT COUNT(*) as c FROM property_page_views WHERE property_id=? AND viewed_at >= date('now','-14 days') AND viewed_at < date('now','-7 days')`).get(s.prop_id)?.c || 0;
+      const contacts    = db.prepare(`SELECT COUNT(*) as c FROM buyer_contacts WHERE seller_id=? AND created_at >= date('now','-7 days')`).get(s.id)?.c || 0;
+      const contactsAll = db.prepare(`SELECT COUNT(*) as c FROM buyer_contacts WHERE seller_id=?`).get(s.id)?.c || 0;
+      const visits      = db.prepare(`SELECT COUNT(*) as c FROM visits WHERE seller_id=? AND visit_date >= date('now','-7 days') AND visit_date < date('now') AND status='confirmed'`).get(s.id)?.c || 0;
+      const visitsAll   = db.prepare(`SELECT COUNT(*) as c FROM visits WHERE seller_id=? AND status='confirmed'`).get(s.id)?.c || 0;
+      const upcoming    = db.prepare(`SELECT COUNT(*) as c FROM visits WHERE seller_id=? AND visit_date >= date('now') AND visit_date <= date('now','+7 days') AND status='confirmed'`).get(s.id)?.c || 0;
+      const offers      = db.prepare(`SELECT COUNT(*) as c FROM offers WHERE seller_id=? AND created_at >= date('now','-7 days')`).get(s.id)?.c || 0;
+      const offersAll   = db.prepare(`SELECT COUNT(*) as c FROM offers WHERE seller_id=?`).get(s.id)?.c || 0;
+      const daysOnline  = s.published_at ? Math.round((Date.now() - new Date(s.published_at)) / 86400000) : 0;
 
-      await sendWeeklySellerReport({ email: s.email, firstName: s.first_name, stats: { views, contacts, visits, offers, daysOnline } });
+      await sendWeeklySellerReport({ email: s.email, firstName: s.first_name, stats: { views, viewsPrev, contacts, contactsAll, visits, visitsAll, upcoming, offers, offersAll, daysOnline } });
       console.log(`[WEEKLY] Rapport vendeur → ${s.email}`);
     } catch(e) { console.error(`[WEEKLY] Seller report error ${s.email}:`, e.message); }
   }
@@ -502,4 +544,4 @@ async function sendPriceDropNudges() {
   }
 }
 
-module.exports = { sendVisitReminders, sendMissionReminders, sendAutomatedNudges, sendContractExpiryReminders, sendPostVisitBuyerNudges, sendPostVisitDossierNudges, sendWeeklyAdminReportEmail, sendWeeklySellerReportEmail, sendPhotographerAvailabilityNudges, sendPostFirstVisitFeedbackNudges, sendCheckInNoOfferNudges, chargeInstallments, sendPriceDropNudges };
+module.exports = { sendVisitReminders, sendMissionReminders, sendAutomatedNudges, sendContractExpiryReminders, sendPostVisitBuyerNudges, sendPostVisitDossierNudges, sendPostVisitJ3Nudges, sendWeeklyAdminReportEmail, sendWeeklySellerReportEmail, sendPhotographerAvailabilityNudges, sendPostFirstVisitFeedbackNudges, sendCheckInNoOfferNudges, chargeInstallments, sendPriceDropNudges };

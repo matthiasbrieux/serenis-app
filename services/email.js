@@ -593,28 +593,53 @@ async function sendWeeklyAdminReport({ to, stats }) {
 // ─────────────────────────────────────────────────────────────
 
 async function sendWeeklySellerReport({ email, firstName, stats }) {
-  const { views = 0, contacts = 0, visits = 0, offers = 0, daysOnline = 0 } = stats;
-  const hasActivity = views > 0 || contacts > 0 || visits > 0;
+  const { views = 0, viewsPrev = 0, contacts = 0, contactsAll = 0, visits = 0, visitsAll = 0, upcoming = 0, offers = 0, offersAll = 0, daysOnline = 0 } = stats;
+
+  // Tendance vues
+  const viewsTrend = viewsPrev === 0
+    ? null
+    : views > viewsPrev
+      ? `↑ +${views - viewsPrev} vs semaine dernière`
+      : views < viewsPrev
+        ? `↓ ${views - viewsPrev} vs semaine dernière`
+        : `= stable vs semaine dernière`;
+
+  // Conseil personnalisé selon le stade du funnel
+  let conseil = '';
+  if (offersAll > 0) {
+    conseil = `Vous avez reçu ${offersAll} offre${offersAll > 1 ? 's' : ''} au total. Répondez rapidement pour maintenir l'intérêt des acheteurs — une contre-proposition bien rédigée augmente vos chances de conclure.`;
+  } else if (visitsAll > 0 && offersAll === 0) {
+    conseil = `Vous avez reçu des visites mais pas encore d'offre. Pensez à relancer les visiteurs via votre agenda et à activer le dossier acheteur sérieux pour renforcer leur confiance.`;
+  } else if (contactsAll > 0 && visitsAll === 0) {
+    conseil = `Vous avez des contacts mais aucune visite planifiée. Assurez-vous que votre agenda est bien renseigné et que le lien de réservation est partagé dans vos messages.`;
+  } else if (views > 0 && contactsAll === 0) {
+    conseil = `Votre dossier est consulté mais ne génère pas encore de contacts. Vérifiez que votre prix est cohérent avec le marché et que vos photos sont suffisamment attractives.`;
+  } else {
+    conseil = `Votre bien est en ligne — continuez à diffuser votre dossier et à partager le lien de réservation. L'activité viendra progressivement.`;
+  }
+
   const html = layout(`
     ${badge('📊 Bilan de la semaine', '#3D5A47')}
     ${h1(`Bonjour ${firstName || ''}, voici votre bilan`)}
-    ${p('Voici un résumé de l\'activité de votre bien cette semaine.')}
+    ${p(`Votre bien est en ligne depuis <strong>${daysOnline} jour${daysOnline > 1 ? 's' : ''}</strong>.`)}
     ${infoTable(`
-      ${infoRow('Vues du dossier', views > 0 ? `<strong style="color:#3D5A47;">${views}</strong>` : `${views}`)}
+      ${infoRow('Vues cette semaine', views > 0
+        ? `<strong style="color:#3D5A47;">${views}</strong>${viewsTrend ? `<span style="font-size:0.75em;color:#888;margin-left:6px;">${viewsTrend}</span>` : ''}`
+        : `${views}`)}
       ${infoRow('Nouveaux contacts', contacts > 0 ? `<strong style="color:#C4785A;">${contacts}</strong>` : `${contacts}`)}
       ${infoRow('Visites réalisées', visits > 0 ? `<strong style="color:#3D5A47;">${visits}</strong>` : `${visits}`)}
+      ${upcoming > 0 ? infoRow('Visites à venir', `<strong style="color:#1565c0;">${upcoming} cette semaine</strong>`) : ''}
       ${infoRow('Offres reçues', offers > 0 ? `<strong style="color:#C4785A;">${offers}</strong>` : `${offers}`)}
-      ${infoRow('Jours en ligne', daysOnline)}
+      ${infoRow('Total contacts', contactsAll)}
+      ${infoRow('Total visites', visitsAll)}
     `)}
-    ${hasActivity
-      ? p('L\'activité est au rendez-vous. Continuez à relancer vos contacts et à préparer vos réponses aux acheteurs.')
-      : p('Peu d\'activité cette semaine. Pensez à vérifier que votre annonce est bien diffusée sur les portails et que vos photos sont attractives.')
-    }
+    ${h2('Conseil de la semaine')}
+    ${p(conseil)}
     ${btn('Voir mon espace vendeur', `${BASE_URL}/dashboard`)}
     ${divider()}
     ${muted('Rapport envoyé automatiquement chaque lundi. Consultez votre coach IA pour des conseils personnalisés.')}
-  `, { preheader: `Bilan semaine — ${views} vues, ${contacts} contacts, ${visits} visites` });
-  return send(email, '📊 Votre bilan de la semaine — Vendu Par Moi', html);
+  `, { preheader: `Bilan semaine — ${views} vues, ${contacts} contacts, ${visits} visites${upcoming > 0 ? `, ${upcoming} visite(s) à venir` : ''}` });
+  return send(email, `📊 Votre bilan — semaine du ${new Date().toLocaleDateString('fr-FR', { day: 'numeric', month: 'long' })}`, html);
 }
 
 // ─────────────────────────────────────────────────────────────
@@ -636,7 +661,26 @@ async function sendPostVisitDossierNudge({ buyerEmail, buyerName, propertyCity, 
 }
 
 // ─────────────────────────────────────────────────────────────
-// 15. NUDGE BAISSE DE PRIX (J+45 sans offre)
+// 15. RELANCE POST-VISITE J+3 VERS ACHETEUR
+// ─────────────────────────────────────────────────────────────
+
+async function sendPostVisitJ3Nudge({ buyerEmail, buyerName, propertyCity, propertyType, dossierUrl, sellerFirstName }) {
+  const typeLabel = propertyType === 'appartement' ? 'l\'appartement' : propertyType === 'maison' ? 'la maison' : 'le bien';
+  const firstName = buyerName ? buyerName.split(' ')[0] : '';
+  const html = layout(`
+    ${h1(`${firstName ? firstName + ', ' : ''}avez-vous eu le temps de réfléchir ?`)}
+    ${p(`Vous avez visité ${typeLabel} à <strong>${propertyCity || ''}</strong> il y a quelques jours.`)}
+    ${p(`${sellerFirstName || 'Le propriétaire'} reste disponible pour répondre à vos questions ou vous fournir des informations supplémentaires.`)}
+    ${p('Si ce bien vous intéresse, vous pouvez soumettre une offre directement en ligne ou relire le dossier complet :')}
+    ${btn('Revoir le dossier et faire une offre', dossierUrl, '#3D5A47')}
+    ${divider()}
+    ${muted('Vente entre particuliers accompagnée par <strong>Vendu Par Moi</strong>.')}
+  `, { preheader: `${firstName ? firstName + ', vous avez visité' : 'Vous avez visité'} ${typeLabel} à ${propertyCity} — des questions ?` });
+  return send(buyerEmail, `Avez-vous eu le temps de réfléchir ? — ${typeLabel} à ${propertyCity || ''}`, html);
+}
+
+// ─────────────────────────────────────────────────────────────
+// 16. NUDGE BAISSE DE PRIX (J+45 sans offre)
 // ─────────────────────────────────────────────────────────────
 
 async function sendPriceDropNudge({ email, firstName, daysPublished, currentPrice, propertyCity }) {
@@ -690,16 +734,57 @@ async function sendAdminDirectEmail({ to, subject, html: customHtml, text }) {
 // 14. PRÉVISUALISATION (admin marketing)
 // ─────────────────────────────────────────────────────────────
 
-function previewEmail(templateName, data = {}) {
-  const templates = {
-    welcome: () => layout(`${h1('Bienvenue !')}${p('Votre espace vendeur est prêt.')}`),
-    visit_confirmation: () => layout(`${h1('Visite confirmée')}${p('Votre visite a bien été enregistrée.')}`),
-    password_reset: () => layout(`${h1('Réinitialisation')}${p('Cliquez pour choisir un nouveau mot de passe.')}`),
-    check_in: () => layout(`${h1('Bilan de votre vente')}${p('Votre bien est en ligne depuis X jours.')}`),
-    post_visit_buyer: () => layout(`${h1('Suite à votre visite')}${p('Avez-vous des questions ?')}`),
+async function previewEmail(templateName) {
+  const fakeProp = { type: 'maison', address: '12 rue des Lilas', city: 'Lyon', slug: 'maison-lyon-preview', price: 320000 };
+  const fakeSellerEmail = 'sophie.martin@exemple.fr';
+  const fakeBuyerEmail = 'thomas.durand@exemple.fr';
+  const fakeDossierUrl = `${BASE_URL}/dossier/acheteur/preview-token`;
+
+  const fns = {
+    welcome:               () => sendWelcomeEmail({ email: fakeSellerEmail, firstName: 'Sophie' }),
+    welcome_v2:            () => sendWelcomeImproved({ email: fakeSellerEmail, firstName: 'Sophie' }),
+    password_reset:        () => sendPasswordResetEmail({ email: fakeSellerEmail, firstName: 'Sophie', resetUrl: `${BASE_URL}/reset-password?token=preview` }),
+    invoice:               () => sendInvoiceEmail({ email: fakeSellerEmail, firstName: 'Sophie', amount: 49900, pack: 'serenite', invoiceNumber: 'SER-2026-00042-V1', date: new Date() }),
+    published:             () => sendPublishedConfirmation({ email: fakeSellerEmail, firstName: 'Sophie', property: fakeProp }),
+    visit_confirmation:    () => sendVisitConfirmation(fakeBuyerEmail, 'Thomas Durand', fakeProp, '2026-06-20', '14:00', false),
+    new_visit_request:     () => sendNewVisitRequest({ sellerEmail: fakeSellerEmail, buyerName: 'Thomas Durand', visitDate: '20 juin 2026 à 14:00', notes: '📞 06 12 34 56 78' }),
+    visit_reminder_seller: () => sendVisitConfirmation(fakeBuyerEmail, 'Thomas Durand', fakeProp, '2026-06-21', '10:00', false),
+    dossier:               () => sendDossierEmail({ to: fakeBuyerEmail, buyerName: 'Thomas Durand', dossierUrl: fakeDossierUrl, propertyCity: 'Lyon', propertyType: 'maison' }),
+    prospect_nudge:        () => sendProspectNudge({ name: 'Thomas', email: fakeBuyerEmail }),
+    no_property:           () => sendNoPropertyNudge({ email: fakeSellerEmail }),
+    no_photos:             () => sendNoPhotosNudge({ email: fakeSellerEmail }),
+    not_published:         () => sendNotPublishedNudge({ email: fakeSellerEmail, score: 82 }),
+    missing_doc:           () => sendMissingDocNudge({ email: fakeSellerEmail, missingDocs: ['DPE', 'Taxe foncière'] }),
+    photographer_request:  () => sendPhotographerAvailabilityRequest({ email: fakeSellerEmail, firstName: 'Sophie' }),
+    post_first_visit:      () => sendPostFirstVisitFeedbackSeller({ email: fakeSellerEmail, firstName: 'Sophie' }),
+    check_in_no_offer:     () => sendCheckInNoOffer({ email: fakeSellerEmail, firstName: 'Sophie', daysPublished: 18 }),
+    contract_renewal:      () => sendContractRenewal({ email: fakeSellerEmail, firstName: 'Sophie', expiryDate: new Date(Date.now() + 14 * 86400000).toISOString(), daysLeft: 14 }),
+    post_visit_dossier:    () => sendPostVisitDossierNudge({ buyerEmail: fakeBuyerEmail, buyerName: 'Thomas Durand', propertyCity: 'Lyon', propertyType: 'maison', dossierUrl: fakeDossierUrl, sellerFirstName: 'Sophie' }),
+    post_visit_j3:         () => sendPostVisitJ3Nudge({ buyerEmail: fakeBuyerEmail, buyerName: 'Thomas Durand', propertyCity: 'Lyon', propertyType: 'maison', dossierUrl: fakeDossierUrl, sellerFirstName: 'Sophie' }),
+    post_visit_buyer:      () => sendPostVisitBuyerNudge({ buyerEmail: fakeBuyerEmail, buyerName: 'Thomas Durand', propertyCity: 'Lyon', propertyType: 'maison', propertySlug: 'maison-lyon-preview', price: 320000 }),
+    price_drop:            () => sendPriceDropNudge({ email: fakeSellerEmail, firstName: 'Sophie', daysPublished: 47, currentPrice: 320000, propertyCity: 'Lyon' }),
+    weekly_seller:         () => sendWeeklySellerReport({ email: fakeSellerEmail, firstName: 'Sophie', stats: { views: 24, viewsPrev: 18, contacts: 3, contactsAll: 11, visits: 2, visitsAll: 5, upcoming: 1, offers: 0, offersAll: 0, daysOnline: 32 } }),
+    weekly_admin:          () => sendWeeklyAdminReport({ to: fakeSellerEmail, stats: { newClients: 4, newOffers: 2, newVisits: 9, publishedProps: 3, totalRevenue: 249600, totalActive: 47 } }),
+    review_request:        () => sendReviewRequest({ email: fakeSellerEmail, firstName: 'Sophie' }),
+    sold_congrats:         () => sendSoldCongrats({ email: fakeSellerEmail, firstName: 'Sophie', property: fakeProp }),
   };
-  const fn = templates[templateName] || templates.welcome;
-  return fn(data);
+
+  // Ces fonctions envoient vraiment l'email — on intercepte via un wrapper sans envoi
+  // On appelle sgMail.send en mode "dry run" en lisant juste le HTML généré
+  const originalSend = sgMail.send.bind(sgMail);
+  let capturedHtml = null;
+  sgMail.send = async (msg) => { capturedHtml = msg.html; };
+
+  const fn = fns[templateName];
+  if (!fn) return `<p style="font-family:sans-serif;padding:20px;color:#c00;">Template inconnu : <strong>${templateName}</strong></p>`;
+
+  try {
+    await fn();
+  } finally {
+    sgMail.send = originalSend;
+  }
+
+  return capturedHtml || `<p style="font-family:sans-serif;padding:20px;color:#c00;">Rendu indisponible pour ce template.</p>`;
 }
 
 // ─────────────────────────────────────────────────────────────
@@ -744,6 +829,7 @@ module.exports = {
   // Nudges acheteurs
   sendPostVisitBuyerNudge,
   sendPostVisitDossierNudge,
+  sendPostVisitJ3Nudge,
   // Nudge prix
   sendPriceDropNudge,
   // Rapport vendeur

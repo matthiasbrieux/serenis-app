@@ -84,6 +84,9 @@ router.post('/api/dossier/acheteur/:token/reserver', async (req, res) => {
     if (!buyer_name || !buyer_email || !visit_date || !visit_time) {
       return res.status(400).json({ error: 'Informations manquantes' });
     }
+    if (!buyer_budget || !buyer_financing || !buyer_timeline) {
+      return res.status(400).json({ error: 'Merci de renseigner votre budget, financement et délai d\'achat.' });
+    }
 
     const conflict = db.prepare("SELECT id FROM visits WHERE property_id=? AND visit_date=? AND visit_time=? AND status != 'cancelled'").get(prop.id, visit_date, visit_time);
     if (conflict) return res.status(409).json({ error: 'Ce créneau est déjà pris. Choisissez un autre horaire.' });
@@ -92,7 +95,7 @@ router.post('/api/dossier/acheteur/:token/reserver', async (req, res) => {
     if (emailConflict) return res.status(409).json({ error: 'Une visite est déjà enregistrée pour cette adresse email.' });
 
     db.prepare("INSERT INTO visits (property_id, seller_id, buyer_name, buyer_email, buyer_phone, visit_date, visit_time, status, buyer_budget, buyer_financing, buyer_timeline) VALUES (?,?,?,?,?,?,?,'confirmed',?,?,?)")
-      .run(prop.id, prop.seller_id, buyer_name, buyer_email, buyer_phone || '', visit_date, visit_time, buyer_budget || null, buyer_financing || null, buyer_timeline || null);
+      .run(prop.id, prop.seller_id, buyer_name, buyer_email.trim().toLowerCase(), buyer_phone || '', visit_date, visit_time, buyer_budget || null, buyer_financing || null, buyer_timeline || null);
 
     db.prepare("INSERT INTO notifications (seller_id, type, title, body) VALUES (?,?,?,?)")
       .run(prop.seller_id, 'visit_confirmed', 'Nouvelle visite confirmée', `${buyer_name} (${buyer_phone || buyer_email}) — ${visit_date} à ${visit_time}`);

@@ -894,7 +894,10 @@
               <input type="text" class="db-step-input" id="dbUrl1" readonly placeholder="Disponible après publication">
               <button class="db-step-btn-link" onclick="copyStepLink(1,this)">Copier le lien</button>
             </div>
-            <button class="db-step-btn-msg" onclick="copyStepMsg(1,this)">Copier le message</button>
+            <div style="display:flex;gap:8px;flex-wrap:wrap;">
+              <button class="db-step-btn-msg" onclick="copyStepMsg(1,this)">Copier le message</button>
+              <button class="db-step-btn-msg" onclick="shareStepWhatsapp(1)" style="background:#25D366;color:#fff;border-color:#25D366;">📱 WhatsApp</button>
+            </div>
           </div>
         </div>
         <div class="db-step-divider"></div>
@@ -907,7 +910,10 @@
               <input type="text" class="db-step-input" id="dbUrl2" readonly placeholder="Disponible après publication">
               <button class="db-step-btn-link" onclick="copyStepLink(2,this)">Copier le lien</button>
             </div>
-            <button class="db-step-btn-msg" onclick="copyStepMsg(2,this)">Copier le message</button>
+            <div style="display:flex;gap:8px;flex-wrap:wrap;">
+              <button class="db-step-btn-msg" onclick="copyStepMsg(2,this)">Copier le message</button>
+              <button class="db-step-btn-msg" onclick="shareStepWhatsapp(2)" style="background:#25D366;color:#fff;border-color:#25D366;">📱 WhatsApp</button>
+            </div>
           </div>
         </div>
         <div class="db-step-divider"></div>
@@ -920,7 +926,10 @@
               <input type="text" class="db-step-input" id="dbUrl3" readonly placeholder="Disponible après publication">
               <button class="db-step-btn-link" onclick="copyStepLink(3,this)">Copier le lien</button>
             </div>
-            <button class="db-step-btn-msg" onclick="copyStepMsg(3,this)">Copier le message</button>
+            <div style="display:flex;gap:8px;flex-wrap:wrap;">
+              <button class="db-step-btn-msg" onclick="copyStepMsg(3,this)">Copier le message</button>
+              <button class="db-step-btn-msg" onclick="shareStepWhatsapp(3)" style="background:#25D366;color:#fff;border-color:#25D366;">📱 WhatsApp</button>
+            </div>
           </div>
         </div>
         <div class="db-step-divider"></div>
@@ -933,7 +942,10 @@
               <input type="text" class="db-step-input" id="dbUrl4" readonly placeholder="Disponible après publication">
               <button class="db-step-btn-link db-step-btn-link--accent" onclick="copyStepLink(4,this)">Copier le lien</button>
             </div>
-            <button class="db-step-btn-msg" onclick="copyStepMsg(4,this)">Copier le message</button>
+            <div style="display:flex;gap:8px;flex-wrap:wrap;">
+              <button class="db-step-btn-msg" onclick="copyStepMsg(4,this)">Copier le message</button>
+              <button class="db-step-btn-msg" onclick="shareStepWhatsapp(4)" style="background:#25D366;color:#fff;border-color:#25D366;">📱 WhatsApp</button>
+            </div>
           </div>
         </div>
         <div class="db-step-divider"></div>
@@ -946,7 +958,10 @@
               <input type="text" class="db-step-input" id="dbUrl5" readonly placeholder="Lien notaire non configuré">
               <button class="db-step-btn-link" onclick="copyStepLink(5,this)">Copier le lien</button>
             </div>
-            <button class="db-step-btn-msg" onclick="copyStepMsg(5,this)">Copier le message</button>
+            <div style="display:flex;gap:8px;flex-wrap:wrap;">
+              <button class="db-step-btn-msg" onclick="copyStepMsg(5,this)">Copier le message</button>
+              <button class="db-step-btn-msg" onclick="shareStepWhatsapp(5)" style="background:#25D366;color:#fff;border-color:#25D366;">📱 WhatsApp</button>
+            </div>
           </div>
         </div>
       </div>
@@ -1356,6 +1371,12 @@ function copyStepMsg(n, btn) {
     btn.textContent = '✓ Copié !';
     setTimeout(() => btn.textContent = 'Copier le message', 2000);
   });
+}
+
+function shareStepWhatsapp(n) {
+  if (!_stepUrls[n-1]) return;
+  const text = encodeURIComponent(_stepMsgs[n-1]());
+  window.open(`https://api.whatsapp.com/send?text=${text}`, '_blank');
 }
 
 async function loadOffreLink() {

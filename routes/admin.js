@@ -37,6 +37,58 @@ router.get('/parcours', requireAdmin, (req, res) => {
   res.sendFile('parcours.html', { root: './views/admin' });
 });
 
+router.get('/guide', requireAdmin, (req, res) => {
+  const mdPath = path.join(__dirname, '../PARCOURS.md');
+  let content = '';
+  try { content = fs.readFileSync(mdPath, 'utf8'); } catch(e) { content = '# Fichier introuvable\n\nPARCOURS.md non trouvé.'; }
+  const escaped = content.replace(/`/g, '\\`').replace(/\$/g, '\\$');
+  res.send(`<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Guide Parcours — Vendu Par Moi</title>
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'DM Sans', sans-serif; background: #f5f5f0; color: #1a1a1a; }
+    .topbar { background: #0C1910; color: #F5F0E8; padding: 14px 32px; display: flex; align-items: center; gap: 16px; }
+    .topbar a { color: #6BBF82; text-decoration: none; font-size: 13px; }
+    .topbar h1 { font-size: 16px; font-weight: 600; color: #F5F0E8; flex: 1; }
+    .content { max-width: 900px; margin: 40px auto; background: #fff; border-radius: 8px; padding: 48px 56px; box-shadow: 0 1px 4px rgba(0,0,0,.08); }
+    h1 { font-family: 'Cormorant Garamond', serif; font-size: 2rem; color: #0C1910; margin-bottom: 8px; border-bottom: 2px solid #3D5A47; padding-bottom: 12px; }
+    h2 { font-size: 1.3rem; color: #3D5A47; margin: 36px 0 12px; border-left: 3px solid #6BBF82; padding-left: 10px; }
+    h3 { font-size: 1rem; color: #C4603A; margin: 24px 0 8px; }
+    h4 { font-size: .95rem; color: #555; margin: 16px 0 6px; }
+    p { line-height: 1.7; margin-bottom: 10px; color: #333; }
+    ul, ol { margin: 8px 0 12px 24px; line-height: 1.8; }
+    li { margin-bottom: 2px; }
+    strong { color: #1a1a1a; }
+    em { color: #555; }
+    hr { border: none; border-top: 1px solid #e8e4dc; margin: 32px 0; }
+    table { width: 100%; border-collapse: collapse; margin: 16px 0 24px; font-size: 13px; }
+    th { background: #0C1910; color: #F5F0E8; padding: 8px 12px; text-align: left; }
+    td { padding: 7px 12px; border-bottom: 1px solid #eee; }
+    tr:nth-child(even) td { background: #f9f8f5; }
+    code { background: #f0ede6; padding: 2px 5px; border-radius: 3px; font-family: monospace; font-size: 12px; color: #C4603A; }
+    pre { background: #1a1a1a; color: #f0ede6; padding: 16px; border-radius: 6px; overflow-x: auto; margin: 12px 0; }
+    pre code { background: none; color: inherit; padding: 0; }
+    blockquote { border-left: 3px solid #C4603A; padding-left: 12px; color: #666; font-style: italic; margin: 12px 0; }
+  </style>
+</head>
+<body>
+  <div class="topbar">
+    <h1>Guide Parcours Complet</h1>
+    <a href="/admin">← Retour admin</a>
+  </div>
+  <div class="content" id="content"></div>
+  <script>
+    const md = \`${escaped}\`;
+    document.getElementById('content').innerHTML = marked.parse(md);
+  </script>
+</body>
+</html>`);
+});
+
 router.get('/api/parcours/tokens', requireAdmin, (req, res) => {
   // Préfère un bien publié avec photos, sinon prend le premier disponible
   const prop = db.prepare(`
@@ -1026,6 +1078,14 @@ const EMAIL_CATALOG = [
   { id: 'visit_feedback_buyer',  label: 'Retour visite (acheteur)',           trigger: 'J+1 après visite confirmée',       recipient: 'Acheteur', auto: false },
   { id: 'sold_congrats',         label: 'Félicitations — bien vendu !',       trigger: 'Offre acceptée',                   recipient: 'Vendeur',  auto: false },
   { id: 'welcome_v2',            label: 'Bienvenue (version améliorée)',      trigger: 'Création compte',                  recipient: 'Vendeur',  auto: true },
+  { id: 'post_visit_dossier',    label: 'Dossier sérieux J+1',               trigger: 'J+1 après visite (si docs actifs)', recipient: 'Acheteur', auto: true },
+  { id: 'post_visit_j3',         label: 'Relance J+3 post-visite',           trigger: 'J+3 si pas d\'offre',              recipient: 'Acheteur', auto: true },
+  { id: 'price_drop',            label: 'Conseil baisse de prix',            trigger: 'J+45 publié sans offre',           recipient: 'Vendeur',  auto: true },
+  { id: 'weekly_seller',         label: 'Rapport hebdo vendeur',             trigger: 'Chaque lundi 8h00',                recipient: 'Vendeur',  auto: true },
+  { id: 'weekly_admin',          label: 'Rapport hebdo admin',               trigger: 'Chaque lundi 8h00',                recipient: 'Admin',    auto: true },
+  { id: 'invoice',               label: 'Facture paiement',                  trigger: 'Après paiement / mensualité',      recipient: 'Vendeur',  auto: true },
+  { id: 'published',             label: 'Bien publié — confirmation',        trigger: 'Publication de l\'annonce',        recipient: 'Vendeur',  auto: true },
+  { id: 'review_request',        label: 'Demande d\'avis Google',            trigger: 'Après vente réalisée',             recipient: 'Vendeur',  auto: false },
 ];
 
 router.get('/api/emails/catalog', requireAdmin, (req, res) => {

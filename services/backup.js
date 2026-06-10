@@ -29,7 +29,7 @@ async function backupDatabase() {
     try {
       const cloudinary = require('cloudinary').v2;
       cloudinary.config({ secure: true });
-      const publicId = `serenis-backups/db-${ts}`;
+      const publicId = `venduparmo-backups/db-${ts}`;
       await cloudinary.uploader.upload(dest, {
         resource_type: 'raw',
         public_id: publicId,
@@ -42,7 +42,7 @@ async function backupDatabase() {
       const cutoff = new Date();
       cutoff.setDate(cutoff.getDate() - 7);
       const { resources } = await cloudinary.api.resources({
-        type: 'upload', resource_type: 'raw', prefix: 'serenis-backups/', max_results: 50,
+        type: 'upload', resource_type: 'raw', prefix: 'venduparmo-backups/', max_results: 50,
       });
       for (const r of resources) {
         if (new Date(r.created_at) < cutoff) {

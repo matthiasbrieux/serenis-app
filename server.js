@@ -182,7 +182,7 @@ app.listen(PORT, () => {
   backupDatabase(); // premier backup au démarrage
   setInterval(() => backupDatabase(), 24 * 60 * 60 * 1000); // backup quotidien
 
-  const { sendVisitReminders, sendMissionReminders, sendAutomatedNudges, sendContractExpiryReminders, sendPostVisitBuyerNudges, sendPostVisitDossierNudges, sendWeeklyAdminReportEmail, sendWeeklySellerReportEmail, sendPhotographerAvailabilityNudges, sendPostFirstVisitFeedbackNudges, sendCheckInNoOfferNudges, chargeInstallments, sendPriceDropNudges } = require('./services/reminders');
+  const { sendVisitReminders, sendMissionReminders, sendAutomatedNudges, sendContractExpiryReminders, sendPostVisitBuyerNudges, sendPostVisitDossierNudges, sendPostVisitJ3Nudges, sendWeeklyAdminReportEmail, sendWeeklySellerReportEmail, sendPhotographerAvailabilityNudges, sendPostFirstVisitFeedbackNudges, sendCheckInNoOfferNudges, chargeInstallments, sendPriceDropNudges } = require('./services/reminders');
 
   function runDailyJobs() {
     sendVisitReminders().catch(e => console.error('Reminder job error:', e.message));
@@ -191,6 +191,7 @@ app.listen(PORT, () => {
     sendContractExpiryReminders().catch(e => console.error('Contract expiry job error:', e.message));
     sendPostVisitBuyerNudges().catch(e => console.error('Post-visit nudge job error:', e.message));
     sendPostVisitDossierNudges().catch(e => console.error('Post-visit dossier nudge error:', e.message));
+    sendPostVisitJ3Nudges().catch(e => console.error('Post-visit J+3 nudge error:', e.message));
     sendPhotographerAvailabilityNudges().catch(e => console.error('Photographer nudge job error:', e.message));
     sendPostFirstVisitFeedbackNudges().catch(e => console.error('Post-visit feedback job error:', e.message));
     sendCheckInNoOfferNudges().catch(e => console.error('Check-in no offer job error:', e.message));

@@ -473,4 +473,19 @@ try {
   db.exec(`UPDATE sellers SET contrat_signe=1, contrat_signe_at=paid_at WHERE paid_at IS NOT NULL AND (contrat_signe IS NULL OR contrat_signe=0)`);
 } catch(e) {}
 
+// ── Index unique sur les créneaux de visite (anti double-booking) ──
+try {
+  db.exec(`CREATE UNIQUE INDEX IF NOT EXISTS idx_visits_slot ON visits(property_id, visit_date, visit_time) WHERE status != 'cancelled'`);
+} catch(e) {}
+
+// ── Token d'abonnement calendrier (webcal feed) ───────────────
+try { db.exec("ALTER TABLE sellers ADD COLUMN calendar_token TEXT"); } catch(e) {}
+try {
+  const { v4: uuidv4 } = require('uuid');
+  const sellersWithoutToken = db.prepare('SELECT id FROM sellers WHERE calendar_token IS NULL').all();
+  for (const s of sellersWithoutToken) {
+    db.prepare('UPDATE sellers SET calendar_token = ? WHERE id = ?').run(uuidv4(), s.id);
+  }
+} catch(e) { console.error('[DB] Calendar token generation error:', e.message); }
+
 module.exports = db;

@@ -710,6 +710,26 @@
           <p id="noLinkMsg" style="color:#bbb;font-size:0.83rem;margin:0;display:none;">Lien de réservation indisponible.</p>
         </div>
 
+        <!-- Synchronisation calendrier externe -->
+        <div id="calSyncBox" style="display:none;background:#fff;border:1px solid #e8e0d6;border-radius:14px;padding:20px;">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#3D5A47" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+            <strong style="font-size:0.9rem;color:#1A1A16;">Synchronisation calendrier</strong>
+          </div>
+          <p style="color:#666;font-size:0.82rem;margin-bottom:10px;">Abonnez-vous à votre agenda de visites depuis Google Calendar, Apple Calendar ou Outlook — vos visites s'y affichent automatiquement.</p>
+          <div style="display:flex;gap:8px;align-items:center;margin-bottom:8px;">
+            <input type="text" id="calFeedUrl" readonly style="flex:1;background:#F5F0E8;font-size:0.75rem;padding:9px 12px;border:1.5px solid #e8e0d6;border-radius:8px;">
+            <button onclick="copyCalFeed()" class="btn-primary" style="white-space:nowrap;padding:9px 14px;font-size:0.81rem;">Copier</button>
+          </div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;">
+            <a id="calWebcalLink" href="#" style="font-size:0.75rem;color:#3D5A47;text-decoration:none;display:inline-flex;align-items:center;gap:4px;background:#e8f4ec;padding:5px 10px;border-radius:6px;">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+              Ouvrir dans l'app calendrier
+            </a>
+          </div>
+          <p style="font-size:0.72rem;color:#bbb;margin-top:8px;margin-bottom:0;">Ce lien est privé — ne le partagez pas.</p>
+        </div>
+
       </div><!-- end dash-cal-col -->
 
       <!-- ── Sidebar actions (droite) ──────────────────── -->
@@ -760,6 +780,15 @@
             </span>
           </div>
           <div class="sidebar-body" id="pastList" style="display:none;max-height:none;"></div>
+        </div>
+
+        <!-- Pipeline acheteurs scorés -->
+        <div class="sidebar-section" id="contactsSection" style="display:none;">
+          <div class="sidebar-section-title">
+            <span>Acheteurs</span>
+            <span id="contactsCountBadge" style="background:#e8e3db;color:#666;padding:1px 8px;border-radius:12px;font-size:0.72rem;font-weight:700;"></span>
+          </div>
+          <div class="sidebar-body no-max" id="contactsList"></div>
         </div>
 
         <!-- Notifications récentes -->
@@ -1610,6 +1639,34 @@ function renderNotifSidebar() {
     </div>`).join('');
 }
 
+// ── Pipeline acheteurs scorés ──────────────────────────
+function renderContacts() {
+  const contacts = _data?.contacts || [];
+  const section = document.getElementById('contactsSection');
+  const list = document.getElementById('contactsList');
+  const badge = document.getElementById('contactsCountBadge');
+  if (!section || !list) return;
+  if (!contacts.length) { section.style.display = 'none'; return; }
+
+  section.style.display = 'block';
+  badge.textContent = contacts.length;
+
+  const sorted = [...contacts].sort((a, b) => b.score - a.score);
+  list.innerHTML = sorted.map(c => {
+    const name = c.buyer_name || c.buyer_phone || c.buyer_email || '—';
+    const initials = name.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);
+    const meta = c.buyer_email || c.buyer_phone || '';
+    return `<div class="contact-item">
+      <div class="contact-avatar" style="background:#f0f5f1;color:#3D5A47;">${initials}</div>
+      <div class="contact-info">
+        <div class="contact-phone">${name}</div>
+        <div class="contact-meta">${meta}</div>
+      </div>
+      <span style="font-size:0.65rem;font-weight:700;padding:2px 7px;border-radius:10px;white-space:nowrap;background:${c.score_color}18;color:${c.score_color};border:1px solid ${c.score_color}44;">${c.score_label}</span>
+    </div>`;
+  }).join('');
+}
+
 // ── Modals ─────────────────────────────────────────────
 function openModal(id) { document.getElementById(id).classList.add('open'); document.body.style.overflow='hidden'; }
 function closeModal(id) { const el=document.getElementById(id); el.classList.remove('open'); el.classList.remove('active'); document.body.style.overflow=''; }
@@ -1844,6 +1901,12 @@ function copyBookingLink() {
   showToast('Lien copié !');
 }
 
+function copyCalFeed() {
+  const input=document.getElementById('calFeedUrl');
+  navigator.clipboard.writeText(input.value).catch(()=>{ input.select(); document.execCommand('copy'); });
+  showToast('Lien calendrier copié !');
+}
+
 function copySerenisNumber() {
   const num=document.getElementById('scNumDisplay').textContent;
   if(!num||num==='—') return;
@@ -1879,12 +1942,22 @@ async function loadData() {
     if (_data.property?.acheteur_token) {
       _mcAcheteurUrl=window.location.origin+'/dossier/acheteur/'+_data.property.acheteur_token;
     }
+
+    // Lien d'abonnement calendrier (webcal)
+    if (_data.seller?.calendar_token) {
+      const feedUrl = `${window.location.origin}/api/agenda/feed.ics?token=${_data.seller.calendar_token}`;
+      const webcalUrl = feedUrl.replace(/^https?:/, 'webcal:');
+      document.getElementById('calSyncBox').style.display = 'block';
+      document.getElementById('calFeedUrl').value = feedUrl;
+      document.getElementById('calWebcalLink').href = webcalUrl;
+    }
     // Adresse du bien pour le SMS de rappel
     const p = _data.property || {};
     _propertyAddress = [p.address, p.city].filter(Boolean).join(', ') || p.city || '';
 
     updateStats();
     renderVisits();
+    renderContacts();
     renderNotifSidebar();
     renderMcTabs();
     renderMcCards();

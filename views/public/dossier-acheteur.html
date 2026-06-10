@@ -627,10 +627,10 @@ function render(p, ph, docs) {
             <div class="bform-field"><label>Téléphone *</label><input type="tel" id="bfPhone" placeholder="06 00 00 00 00"></div>
           </div>
           <div style="border-top:1.5px solid #f0ece4;margin:8px 0 4px;padding-top:14px;">
-            <div style="font-size:0.72rem;text-transform:uppercase;letter-spacing:0.06em;font-weight:700;color:#888;margin-bottom:12px;">Votre profil acheteur (aide le propriétaire à préparer la visite)</div>
+            <div style="font-size:0.72rem;text-transform:uppercase;letter-spacing:0.06em;font-weight:700;color:#888;margin-bottom:12px;">Votre profil acheteur <span style="color:#C4603A;font-size:0.65rem;">(obligatoire)</span></div>
             <div class="bform-row">
               <div class="bform-field">
-                <label>Budget maximum</label>
+                <label>Budget maximum *</label>
                 <select id="bfBudget" style="width:100%;border:1.5px solid #e0dbd0;border-radius:10px;padding:13px 14px;font-family:inherit;font-size:0.95rem;color:#1A1A16;background:#fafaf7;appearance:none;">
                   <option value="">— Sélectionner —</option>
                   <option>Moins de 100 000 €</option>
@@ -643,7 +643,7 @@ function render(p, ph, docs) {
                 </select>
               </div>
               <div class="bform-field">
-                <label>Financement</label>
+                <label>Financement *</label>
                 <select id="bfFinancing" style="width:100%;border:1.5px solid #e0dbd0;border-radius:10px;padding:13px 14px;font-family:inherit;font-size:0.95rem;color:#1A1A16;background:#fafaf7;appearance:none;">
                   <option value="">— Sélectionner —</option>
                   <option>Achat comptant</option>
@@ -655,7 +655,7 @@ function render(p, ph, docs) {
               </div>
             </div>
             <div class="bform-field" style="margin-top:8px;">
-              <label>Délai d'achat souhaité</label>
+              <label>Délai d'achat souhaité *</label>
               <select id="bfTimeline" style="width:100%;border:1.5px solid #e0dbd0;border-radius:10px;padding:13px 14px;font-family:inherit;font-size:0.95rem;color:#1A1A16;background:#fafaf7;appearance:none;">
                 <option value="">— Sélectionner —</option>
                 <option>Le plus tôt possible</option>
@@ -861,7 +861,21 @@ async function submitBooking() {
   const lastName = document.getElementById('bfLastName').value.trim();
   const email = document.getElementById('bfEmail').value.trim();
   const phone = document.getElementById('bfPhone').value.trim();
-  if (!firstName || !lastName || !email || !phone) { alert('Tous les champs sont obligatoires.'); return; }
+  const budget = document.getElementById('bfBudget').value;
+  const financing = document.getElementById('bfFinancing').value;
+  const timeline = document.getElementById('bfTimeline').value;
+
+  if (!firstName || !lastName || !email || !phone) { alert('Veuillez remplir tous vos coordonnées (prénom, nom, email, téléphone).'); return; }
+  if (!budget || !financing || !timeline) {
+    alert('Merci de compléter votre profil acheteur (budget, financement, délai) — ces informations aident le vendeur à préparer votre visite.');
+    ['bfBudget','bfFinancing','bfTimeline'].forEach(id => {
+      const el = document.getElementById(id);
+      if (!el.value) el.style.borderColor = '#C4603A';
+    });
+    return;
+  }
+  ['bfBudget','bfFinancing','bfTimeline'].forEach(id => document.getElementById(id).style.borderColor = '#e0dbd0');
+
   const name = firstName + ' ' + lastName;
 
   const btn = document.getElementById('bfSubmit');
