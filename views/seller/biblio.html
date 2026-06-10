@@ -966,12 +966,13 @@ function bibRender() {
     var expandBtn = document.createElement('button');
     expandBtn.className = 'tpl-expand-btn';
     expandBtn.textContent = 'Voir';
-    expandBtn.addEventListener('click', (function(wrap, btn) {
+    expandBtn.addEventListener('click', (function(wrap, btn, prev) {
       return function() {
         var open = wrap.classList.toggle('open');
         btn.textContent = open ? 'Réduire' : 'Voir';
+        prev.style.display = open ? 'none' : '';
       };
-    })(bodyWrap, expandBtn));
+    })(bodyWrap, expandBtn, preview));
 
     actions.appendChild(copyBtn);
     actions.appendChild(favBtn);
