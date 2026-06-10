@@ -409,16 +409,18 @@
     .db-step-body { flex:1; min-width:0; }
     .db-step-label { font-size:0.9rem; font-weight:700; color:#1C1C1A; margin-bottom:2px; line-height:1.3; }
     .db-step-sub { font-size:0.74rem; color:#9a9087; margin-bottom:10px; }
-    .db-step-url-row { display:flex; gap:8px; align-items:center; margin-bottom:7px; }
+    .db-step-url-row { display:flex; gap:8px; align-items:center; margin-bottom:10px; }
     .db-step-input { flex:1; min-width:0; padding:9px 12px; border:1.5px solid #e8e3db; border-radius:9px; font-size:0.74rem; color:#666; background:#faf8f5; font-family:'DM Sans',sans-serif; outline:none; cursor:text; }
-    .db-step-btn-link { padding:9px 15px; background:#3D5A47; color:#fff; border:none; border-radius:9px; font-size:0.78rem; font-weight:700; cursor:pointer; font-family:'DM Sans',sans-serif; white-space:nowrap; flex-shrink:0; transition:background 0.15s,transform 0.12s; min-height:38px; }
-    .db-step-btn-link:hover { background:#2e4435; transform:translateY(-1px); }
-    .db-step-btn-link--accent { background:#C4603A; }
-    .db-step-btn-link--accent:hover { background:#A85540; }
+    .db-step-btn-link { width:100%; padding:14px 20px; background:linear-gradient(135deg,#243d2c,#3D5A47); color:#fff; border:none; border-radius:12px; font-size:0.9rem; font-weight:700; cursor:pointer; font-family:'DM Sans',sans-serif; display:flex; align-items:center; justify-content:center; gap:9px; transition:all 0.2s; min-height:50px; box-shadow:0 4px 16px rgba(61,90,71,0.28); letter-spacing:0.01em; margin-bottom:8px; }
+    .db-step-btn-link:hover { background:linear-gradient(135deg,#1a2e20,#2e4435); transform:translateY(-2px); box-shadow:0 8px 24px rgba(61,90,71,0.38); }
+    .db-step-btn-link.copied { background:linear-gradient(135deg,#1B6B35,#2e7d32) !important; animation:dbCopyPulse 0.55s ease-out; }
+    .db-step-btn-link--accent { background:linear-gradient(135deg,#8b3a22,#C4603A); }
+    .db-step-btn-link--accent:hover { background:linear-gradient(135deg,#702e1a,#A85540); }
+    @keyframes dbCopyPulse { 0%{box-shadow:0 4px 16px rgba(61,90,71,0.28),0 0 0 0 rgba(46,125,50,0.5)} 65%{box-shadow:0 4px 16px rgba(61,90,71,0.28),0 0 0 14px rgba(46,125,50,0)} 100%{box-shadow:0 4px 16px rgba(61,90,71,0.28),0 0 0 0 rgba(46,125,50,0)} }
     .db-step-btn-msg { padding:6px 13px; background:none; border:1.5px solid #e8e3db; color:#777; border-radius:9px; font-size:0.73rem; font-weight:600; cursor:pointer; font-family:'DM Sans',sans-serif; transition:all 0.15s; }
     .db-step-btn-msg:hover { border-color:#3D5A47; color:#3D5A47; background:#F5F9F6; }
     .db-step-divider { height:1px; background:#f0ebe3; }
-    @media(max-width:480px) { .db-step-url-row { flex-direction:column; } .db-step-btn-link { width:100%; text-align:center; min-height:44px; } }
+    @media(max-width:480px) { .db-step-btn-link { font-size:0.85rem; min-height:52px; } }
     .db-info-item { margin-bottom:12px; }
     .db-info-item:last-of-type { margin-bottom:16px; }
     .db-info-lbl { font-size:0.68rem; color:#8C8880; margin-bottom:2px; }
@@ -892,11 +894,10 @@
             <div class="db-step-sub">Envoyez avant la visite — dossier complet du bien</div>
             <div class="db-step-url-row">
               <input type="text" class="db-step-input" id="dbUrl1" readonly placeholder="Disponible après publication">
-              <button class="db-step-btn-link" onclick="copyStepLink(1,this)">Copier le lien</button>
             </div>
+            <button class="db-step-btn-link" onclick="copyStepLink(1,this)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span class="db-step-btn-lbl">Copier le lien</span></button>
             <div style="display:flex;gap:8px;flex-wrap:wrap;">
               <button class="db-step-btn-msg" onclick="copyStepMsg(1,this)">Copier le message</button>
-              <button class="db-step-btn-msg" onclick="shareStepWhatsapp(1)" style="background:#25D366;color:#fff;border-color:#25D366;">📱 WhatsApp</button>
             </div>
           </div>
         </div>
@@ -908,11 +909,10 @@
             <div class="db-step-sub">L'acquéreur choisit un créneau dans votre agenda</div>
             <div class="db-step-url-row">
               <input type="text" class="db-step-input" id="dbUrl2" readonly placeholder="Disponible après publication">
-              <button class="db-step-btn-link" onclick="copyStepLink(2,this)">Copier le lien</button>
             </div>
+            <button class="db-step-btn-link" onclick="copyStepLink(2,this)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span class="db-step-btn-lbl">Copier le lien</span></button>
             <div style="display:flex;gap:8px;flex-wrap:wrap;">
               <button class="db-step-btn-msg" onclick="copyStepMsg(2,this)">Copier le message</button>
-              <button class="db-step-btn-msg" onclick="shareStepWhatsapp(2)" style="background:#25D366;color:#fff;border-color:#25D366;">📱 WhatsApp</button>
             </div>
           </div>
         </div>
@@ -924,11 +924,10 @@
             <div class="db-step-sub">Après la visite — partagez les documents complémentaires</div>
             <div class="db-step-url-row">
               <input type="text" class="db-step-input" id="dbUrl3" readonly placeholder="Disponible après publication">
-              <button class="db-step-btn-link" onclick="copyStepLink(3,this)">Copier le lien</button>
             </div>
+            <button class="db-step-btn-link" onclick="copyStepLink(3,this)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span class="db-step-btn-lbl">Copier le lien</span></button>
             <div style="display:flex;gap:8px;flex-wrap:wrap;">
               <button class="db-step-btn-msg" onclick="copyStepMsg(3,this)">Copier le message</button>
-              <button class="db-step-btn-msg" onclick="shareStepWhatsapp(3)" style="background:#25D366;color:#fff;border-color:#25D366;">📱 WhatsApp</button>
             </div>
           </div>
         </div>
@@ -940,11 +939,10 @@
             <div class="db-step-sub">L'acheteur soumet son offre — elle apparaît dans "Mes offres"</div>
             <div class="db-step-url-row">
               <input type="text" class="db-step-input" id="dbUrl4" readonly placeholder="Disponible après publication">
-              <button class="db-step-btn-link db-step-btn-link--accent" onclick="copyStepLink(4,this)">Copier le lien</button>
             </div>
+            <button class="db-step-btn-link db-step-btn-link--accent" onclick="copyStepLink(4,this)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span class="db-step-btn-lbl">Copier le lien</span></button>
             <div style="display:flex;gap:8px;flex-wrap:wrap;">
               <button class="db-step-btn-msg" onclick="copyStepMsg(4,this)">Copier le message</button>
-              <button class="db-step-btn-msg" onclick="shareStepWhatsapp(4)" style="background:#25D366;color:#fff;border-color:#25D366;">📱 WhatsApp</button>
             </div>
           </div>
         </div>
@@ -956,11 +954,10 @@
             <div class="db-step-sub">Transmettez les documents au notaire pour le compromis</div>
             <div class="db-step-url-row">
               <input type="text" class="db-step-input" id="dbUrl5" readonly placeholder="Lien notaire non configuré">
-              <button class="db-step-btn-link" onclick="copyStepLink(5,this)">Copier le lien</button>
             </div>
+            <button class="db-step-btn-link" onclick="copyStepLink(5,this)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span class="db-step-btn-lbl">Copier le lien</span></button>
             <div style="display:flex;gap:8px;flex-wrap:wrap;">
               <button class="db-step-btn-msg" onclick="copyStepMsg(5,this)">Copier le message</button>
-              <button class="db-step-btn-msg" onclick="shareStepWhatsapp(5)" style="background:#25D366;color:#fff;border-color:#25D366;">📱 WhatsApp</button>
             </div>
           </div>
         </div>
@@ -1357,11 +1354,12 @@ function initStepLinks() {
 
 function copyStepLink(n, btn) {
   const url = _stepUrls[n-1];
-  if (!url) { btn.textContent = '⚠ Indisponible'; setTimeout(() => btn.textContent = 'Copier le lien', 2000); return; }
+  const lbl = btn.querySelector('.db-step-btn-lbl') || btn;
+  if (!url) { lbl.textContent = '⚠ Indisponible'; setTimeout(() => lbl.textContent = 'Copier le lien', 2000); return; }
   navigator.clipboard.writeText(url).then(() => {
-    const orig = btn.textContent;
-    btn.textContent = '✓ Copié !';
-    setTimeout(() => btn.textContent = orig, 2000);
+    btn.classList.add('copied');
+    lbl.textContent = '✓ Lien copié !';
+    setTimeout(() => { btn.classList.remove('copied'); lbl.textContent = 'Copier le lien'; }, 2200);
   });
 }
 
