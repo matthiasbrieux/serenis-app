@@ -732,10 +732,19 @@
           <div class="sidebar-body no-max" id="upcomingList"></div>
         </div>
 
-        <!-- Historique -->
+        <!-- Historique / dossier visites passées -->
         <div class="sidebar-section" id="pastSection" style="display:none;">
-          <div class="sidebar-section-title">Historique</div>
-          <div class="sidebar-body" id="pastList"></div>
+          <div class="sidebar-section-title" onclick="togglePastSection()" style="cursor:pointer;user-select:none;">
+            <span style="display:flex;align-items:center;gap:7px;">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+              Visites passées
+            </span>
+            <span style="display:flex;align-items:center;gap:8px;">
+              <span id="pastCountBadge" style="background:#e8e3db;color:#666;padding:1px 8px;border-radius:12px;font-size:0.72rem;font-weight:700;"></span>
+              <svg id="pastChevron" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="transition:transform 0.2s;color:#aaa;"><polyline points="9 18 15 12 9 6"/></svg>
+            </span>
+          </div>
+          <div class="sidebar-body" id="pastList" style="display:none;max-height:none;"></div>
         </div>
 
         <!-- Notifications récentes -->
@@ -1075,13 +1084,45 @@ function renderVisits() {
     upcomingSection.style.display='none';
   }
 
-  // Past (max 5)
+  // Visites passées — dossier accordéon
   if (past.length) {
     pastSection.style.display='block';
-    document.getElementById('pastList').innerHTML = past.slice(0,5).map(buildVisitCompact).join('');
+    const badge = document.getElementById('pastCountBadge');
+    if (badge) badge.textContent = past.length;
+    document.getElementById('pastList').innerHTML = past.map(buildPastCard).join('');
   } else {
     pastSection.style.display='none';
   }
+}
+
+let _pastOpen = false;
+function togglePastSection() {
+  _pastOpen = !_pastOpen;
+  document.getElementById('pastList').style.display = _pastOpen ? 'flex' : 'none';
+  const ch = document.getElementById('pastChevron');
+  if (ch) ch.style.transform = _pastOpen ? 'rotate(90deg)' : '';
+}
+
+function buildPastCard(v) {
+  const ini = initials(v.buyer_name);
+  const dateStr = v.visit_date ? new Date(v.visit_date+'T12:00:00').toLocaleDateString('fr-FR',{day:'numeric',month:'short',year:'numeric'}) : '—';
+  const time = v.visit_time ? ' · '+v.visit_time.slice(0,5) : '';
+  const isCancelled = v.status === 'cancelled';
+  const statusBadge = isCancelled
+    ? `<span style="font-size:0.62rem;font-weight:700;color:#c0392b;background:#fdf2f2;padding:2px 7px;border-radius:10px;border:1px solid #ffd5d5;flex-shrink:0;">Annulée</span>`
+    : `<span style="font-size:0.62rem;font-weight:700;color:#2e7d32;background:#e8f5e9;padding:2px 7px;border-radius:10px;border:1px solid #b8d8c2;flex-shrink:0;">Effectuée</span>`;
+  const contact = [v.buyer_phone, v.buyer_email].filter(Boolean).join(' · ');
+  return `<div class="visit-compact" style="opacity:${isCancelled?'0.65':'1'};">
+    <div style="display:flex;align-items:center;gap:10px;">
+      <div class="vc-avatar" style="background:${isCancelled?'linear-gradient(135deg,#ccc,#aaa)':'linear-gradient(135deg,#3D5A47,#5C7A65)'};">${ini}</div>
+      <div style="flex:1;min-width:0;">
+        <div class="vc-name">${v.buyer_name||'Acquéreur'}</div>
+        <div class="vc-when">${dateStr}${time}</div>
+        ${contact?`<div style="font-size:0.7rem;color:#aaa;margin-top:1px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${contact}</div>`:''}
+      </div>
+      ${statusBadge}
+    </div>
+  </div>`;
 }
 
 async function changeVisitStatus(id, status) {
