@@ -492,14 +492,16 @@
     .db-dispo-date { font-weight:700; font-size:0.88rem; color:#1C1C1A; margin-bottom:4px; }
     .db-dispo-who { font-size:0.76rem; color:#8C8880; margin-bottom:8px; word-break:break-word; }
     .db-dispo-badge { display:inline-flex; align-items:center; padding:3px 10px; border-radius:20px; font-size:0.7rem; font-weight:600; background:#FFF8F0; color:#C4603A; border:1px solid #F5D8C4; }
-    .db-visit-row { padding:12px 14px; border-radius:10px; background:#F8F6F2; margin-bottom:8px; }
-    .db-visit-top { display:flex; justify-content:space-between; align-items:flex-start; gap:10px; }
-    .db-visit-name { font-weight:700; font-size:0.88rem; color:#1C1C1A; }
-    .db-visit-contact { font-size:0.75rem; color:#8C8880; margin-top:3px; word-break:break-word; }
-    .db-visit-date { font-size:0.82rem; font-weight:600; color:#3D5A47; white-space:nowrap; text-align:right; flex-shrink:0; }
-    .db-visit-sms-btn { display:flex; align-items:center; gap:6px; margin-top:10px; padding:8px 14px; background:#3D5A47; color:#fff; border:none; border-radius:8px; font-size:0.78rem; font-weight:600; cursor:pointer; font-family:inherit; transition:background 0.15s; width:100%; justify-content:center; }
-    .db-visit-sms-btn:active, .db-visit-sms-btn:hover { background:#2d4535; }
-    .db-visit-sms-btn.copied { background:#2d4535; }
+    .db-day-group { margin-bottom:10px; border:1.5px solid #E8E3DB; border-radius:10px; overflow:hidden; }
+    .db-day-group-hdr { display:flex; align-items:center; justify-content:space-between; padding:9px 14px; background:#F5F0E8; }
+    .db-day-label { font-weight:700; font-size:0.84rem; color:#1C1C1A; }
+    .db-day-badge { background:#3D5A47; color:#fff; border-radius:20px; padding:2px 9px; font-size:0.72rem; font-weight:700; }
+    .db-day-visit-line { display:flex; align-items:center; gap:10px; padding:8px 14px; border-top:1px solid #EDE8DF; font-size:0.83rem; color:#1C1C1A; }
+    .db-day-visit-line:last-child { }
+    .db-day-visit-time { font-weight:700; color:#3D5A47; white-space:nowrap; min-width:38px; }
+    .db-day-visit-name { flex:1; }
+    .db-agenda-link { display:block; text-align:right; margin-top:8px; font-size:0.78rem; color:#3D5A47; text-decoration:none; font-weight:600; }
+    .db-agenda-link:hover { text-decoration:underline; }
     .db-empty { color:#b0a89f; font-size:0.84rem; font-style:italic; padding:6px 0; }
 
     /* ── Offres d'achat reçues (priorité max) ── */
@@ -1456,10 +1458,16 @@ function renderDispos(visits, agendaSlots) {
   `).join('');
 }
 
-/* ——— Visites réservées (confirmed) ——— */
+/* ——— Visites réservées (confirmed, groupées par jour) ——— */
 function renderVisits(visits) {
   const todayV = new Date().toISOString().split('T')[0];
-  const confirmed = visits.filter(v => v.status === 'confirmed' && (!v.visit_date || v.visit_date >= todayV));
+  const confirmed = visits
+    .filter(v => v.status === 'confirmed' && (!v.visit_date || v.visit_date >= todayV))
+    .sort((a, b) => {
+      if (a.visit_date < b.visit_date) return -1;
+      if (a.visit_date > b.visit_date) return 1;
+      return (a.visit_time || '').localeCompare(b.visit_time || '');
+    });
   const el = document.getElementById('dbVisits');
   const countEl = document.getElementById('dbVisitsCount');
   if (!confirmed.length) {
@@ -1471,21 +1479,38 @@ function renderVisits(visits) {
     countEl.style.display = 'inline-block';
     countUp(countEl, confirmed.length, 600);
   }
-  el.innerHTML = confirmed.map(v => `
-    <div class="db-visit-row">
-      <div class="db-visit-top">
-        <div>
-          <div class="db-visit-name">${v.buyer_name || '—'}</div>
-          <div class="db-visit-contact">${v.buyer_email || ''}${v.buyer_phone ? '<br>' + v.buyer_phone : ''}</div>
-        </div>
-        <div class="db-visit-date">${formatDate(v.visit_date)}<br>${v.visit_time}</div>
-      </div>
-      <button class="db-visit-sms-btn" onclick="copyVisitConfirmSms(${v.id}, this)">
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-        Copier SMS de confirmation
-      </button>
-    </div>
-  `).join('');
+  const _days = ['dimanche','lundi','mardi','mercredi','jeudi','vendredi','samedi'];
+  const _months = ['janvier','février','mars','avril','mai','juin','juillet','août','septembre','octobre','novembre','décembre'];
+  function dayLabel(dateStr) {
+    if (!dateStr) return '—';
+    const parts = dateStr.split('-');
+    if (parts.length !== 3) return dateStr;
+    const d = new Date(dateStr + 'T12:00:00');
+    return _days[d.getDay()] + ' ' + parseInt(parts[2]) + ' ' + _months[parseInt(parts[1]) - 1];
+  }
+  const groups = [];
+  const byDate = {};
+  confirmed.forEach(v => {
+    const key = v.visit_date || 'nodate';
+    if (!byDate[key]) { byDate[key] = []; groups.push(key); }
+    byDate[key].push(v);
+  });
+  const html = groups.map(key => {
+    const dayVisits = byDate[key];
+    const lines = dayVisits.map(v => `
+      <div class="db-day-visit-line">
+        <span class="db-day-visit-time">${v.visit_time || '—'}</span>
+        <span class="db-day-visit-name">${v.buyer_name || '—'}</span>
+      </div>`).join('');
+    const count = dayVisits.length;
+    return `<div class="db-day-group">
+      <div class="db-day-group-hdr">
+        <span class="db-day-label">${dayLabel(key === 'nodate' ? null : key)}</span>
+        <span class="db-day-badge">${count} visite${count > 1 ? 's' : ''}</span>
+      </div>${lines}
+    </div>`;
+  }).join('');
+  el.innerHTML = html + '<a class="db-agenda-link" href="/seller/agenda">→ Détails dans Mon agenda</a>';
 }
 
 function copyVisitConfirmSms(visitId, btn) {
