@@ -1410,7 +1410,8 @@ async function confirmVisit(id, action) {
 }
 
 function renderPending(visits) {
-  const pending = visits.filter(v => v.status === 'pending');
+  const today = new Date().toISOString().split('T')[0];
+  const pending = visits.filter(v => v.status === 'pending' && (!v.visit_date || v.visit_date >= today));
   const card = document.getElementById('dbPendingCard');
   const el = document.getElementById('dbPending');
   const countEl = document.getElementById('dbPendingCount');
@@ -1436,7 +1437,8 @@ function renderPending(visits) {
 
 /* ——— Disponibilités (agenda_slots uniquement) ——— */
 function renderDispos(visits, agendaSlots) {
-  const specificSlots = (agendaSlots || []).filter(s => s.specific_date);
+  const todayD = new Date().toISOString().split('T')[0];
+  const specificSlots = (agendaSlots || []).filter(s => s.specific_date && s.specific_date >= todayD);
   const el = document.getElementById('dbDispos');
   if (!specificSlots.length) {
     el.innerHTML = '<p class="db-empty">Aucune disponibilité proposée pour le moment.</p>';
@@ -1456,7 +1458,8 @@ function renderDispos(visits, agendaSlots) {
 
 /* ——— Visites réservées (confirmed) ——— */
 function renderVisits(visits) {
-  const confirmed = visits.filter(v => v.status === 'confirmed');
+  const todayV = new Date().toISOString().split('T')[0];
+  const confirmed = visits.filter(v => v.status === 'confirmed' && (!v.visit_date || v.visit_date >= todayV));
   const el = document.getElementById('dbVisits');
   const countEl = document.getElementById('dbVisitsCount');
   if (!confirmed.length) {
