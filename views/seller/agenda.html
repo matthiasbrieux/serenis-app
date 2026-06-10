@@ -21,11 +21,33 @@
     .agenda-stats { display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin-bottom:24px; }
     @media(max-width:1100px){ .agenda-stats { grid-template-columns:repeat(2,1fr); } }
     @media(max-width:600px){ .agenda-stats { grid-template-columns:repeat(2,1fr); } }
-    .stat-card-agenda { background:#fff; border-radius:12px; padding:16px 14px; border:1px solid #e8e0d6; display:flex; align-items:center; gap:10px; }
+    .stat-card-agenda { background:#fff; border-radius:12px; padding:16px 14px; border:1px solid #e8e0d6; display:flex; align-items:center; gap:10px; cursor:pointer; transition:transform 0.22s ease, box-shadow 0.22s ease, border-color 0.22s ease, background 0.22s ease; position:relative; overflow:hidden; user-select:none; }
+    .stat-card-agenda::after { content:''; position:absolute; bottom:0; left:14px; right:14px; height:2.5px; border-radius:2px; background:transparent; transition:background 0.22s ease, opacity 0.22s ease; opacity:0; }
+    .stat-card-agenda:hover { transform:translateY(-3px); box-shadow:0 8px 28px rgba(0,0,0,0.1); border-color:#c8d8e0; }
+    .stat-card-agenda:hover::after { opacity:1; }
+    .stat-card-agenda[data-filter="avenir"]:hover::after    { background:#3d5a8a; }
+    .stat-card-agenda[data-filter="confirmees"]:hover::after { background:#2e7d32; }
+    .stat-card-agenda[data-filter="aujourd_hui"]:hover::after { background:#c2185b; }
+    .stat-card-agenda.active { transform:translateY(-3px); }
+    .stat-card-agenda.active::after { opacity:1; }
+    .stat-card-agenda[data-filter="avenir"].active    { border-color:#3d5a8a; background:linear-gradient(135deg,#f2f5ff,#fafbff); box-shadow:0 8px 28px rgba(61,90,138,0.15); }
+    .stat-card-agenda[data-filter="avenir"].active::after    { background:#3d5a8a; }
+    .stat-card-agenda[data-filter="avenir"].active .stat-val { color:#3d5a8a; }
+    .stat-card-agenda[data-filter="confirmees"].active { border-color:#2e7d32; background:linear-gradient(135deg,#f1faf3,#f8fdf9); box-shadow:0 8px 28px rgba(46,125,50,0.15); }
+    .stat-card-agenda[data-filter="confirmees"].active::after { background:#2e7d32; }
+    .stat-card-agenda[data-filter="confirmees"].active .stat-val { color:#2e7d32; }
+    .stat-card-agenda[data-filter="aujourd_hui"].active { border-color:#c2185b; background:linear-gradient(135deg,#fff4f7,#fffafe); box-shadow:0 8px 28px rgba(194,24,91,0.14); }
+    .stat-card-agenda[data-filter="aujourd_hui"].active::after { background:#c2185b; }
+    .stat-card-agenda[data-filter="aujourd_hui"].active .stat-val { color:#c2185b; }
     .stat-card-agenda.urgent { border-color:#ffe082; background:#fffdf5; }
-    .stat-card-agenda .stat-val { font-family:'Cormorant Garamond',serif; font-size:1.9rem; font-weight:600; color:#1A1A16; line-height:1; }
+    .stat-card-agenda .stat-val { font-family:'Cormorant Garamond',serif; font-size:1.9rem; font-weight:600; color:#1A1A16; line-height:1; transition:color 0.22s; }
     .stat-card-agenda .stat-lbl { font-size:0.71rem; color:#888; margin-top:3px; font-weight:500; line-height:1.3; }
     .stat-icon { width:38px; height:38px; border-radius:50%; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+    /* Filtre actif — section filtrée dans la sidebar */
+    .filtered-section-title { border-radius:10px 10px 0 0; }
+    .stat-filter-clear { margin-left:auto; width:22px; height:22px; border-radius:50%; border:none; background:rgba(255,255,255,0.2); color:#fff; cursor:pointer; font-size:0.65rem; display:flex; align-items:center; justify-content:center; transition:background 0.15s; flex-shrink:0; }
+    .stat-filter-clear:hover { background:rgba(255,255,255,0.38); }
+    .stat-filter-hint { display:flex; align-items:center; gap:5px; font-size:0.65rem; color:#bbb; margin-top:8px; font-style:italic; animation:fadeUp 0.2s ease; }
 
     /* ── Dashboard layout ─────────────────────────────── */
     .dash-main-grid { display:grid; grid-template-columns:1fr 360px; gap:20px; align-items:start; margin-bottom:28px; }
@@ -600,26 +622,37 @@
       </div>
     </div>
 
-    <!-- Stats -->
-    <!-- Stats -->
+    <!-- Stats filtrables -->
     <div class="agenda-stats">
-      <div class="stat-card-agenda">
+      <div class="stat-card-agenda" data-filter="avenir" onclick="setStatFilter('avenir')" title="Voir les visites à venir">
         <div class="stat-icon" style="background:#f0f5ff;">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#3d5a8a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
         </div>
-        <div><div class="stat-val" id="statPending">0</div><div class="stat-lbl">À venir</div></div>
+        <div>
+          <div class="stat-val" id="statPending">0</div>
+          <div class="stat-lbl">À venir</div>
+          <div class="stat-filter-hint" style="display:none;" id="hint-avenir">
+            <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>Cliquez pour filtrer
+          </div>
+        </div>
       </div>
-      <div class="stat-card-agenda">
+      <div class="stat-card-agenda" data-filter="confirmees" onclick="setStatFilter('confirmees')" title="Voir les visites confirmées">
         <div class="stat-icon" style="background:#e8f5e9;">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2e7d32" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
         </div>
-        <div><div class="stat-val" id="statConfirmed">0</div><div class="stat-lbl">Confirmées</div></div>
+        <div>
+          <div class="stat-val" id="statConfirmed">0</div>
+          <div class="stat-lbl">Confirmées</div>
+        </div>
       </div>
-      <div class="stat-card-agenda">
+      <div class="stat-card-agenda" data-filter="aujourd_hui" onclick="setStatFilter('aujourd_hui')" title="Voir les visites d'aujourd'hui">
         <div class="stat-icon" style="background:#fce4ec;">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#c2185b" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><line x1="12" y1="14" x2="12" y2="18"/><line x1="10" y1="16" x2="14" y2="16"/></svg>
         </div>
-        <div><div class="stat-val" id="statToday">0</div><div class="stat-lbl">Aujourd'hui</div></div>
+        <div>
+          <div class="stat-val" id="statToday">0</div>
+          <div class="stat-lbl">Aujourd'hui</div>
+        </div>
       </div>
     </div>
 
@@ -753,6 +786,15 @@
               </button>
             </div>
           </div>
+        </div>
+
+        <!-- Section filtrée par stat card -->
+        <div class="sidebar-section" id="filteredSection" style="display:none;">
+          <div class="sidebar-section-title confirmed-section-title filtered-section-title" id="filteredSectionTitle" style="background:linear-gradient(135deg,#3d5a8a,#5572a8);">
+            <span id="filteredLabel" style="display:flex;align-items:center;gap:6px;"></span>
+            <button class="stat-filter-clear" onclick="setStatFilter(null)" title="Effacer le filtre">✕</button>
+          </div>
+          <div class="sidebar-body no-max" id="filteredList"></div>
         </div>
 
         <!-- Prochaines visites confirmées -->
@@ -953,6 +995,75 @@ function updateStats() {
   document.getElementById('statToday').textContent = todayV.length;
 }
 
+// ── Stat cards filtres interactifs ────────────────────
+let activeStatFilter = null;
+
+function setStatFilter(filter) {
+  activeStatFilter = (activeStatFilter === filter && filter !== null) ? null : filter;
+  document.querySelectorAll('.stat-card-agenda[data-filter]').forEach(card => {
+    card.classList.toggle('active', card.dataset.filter === activeStatFilter);
+  });
+  renderVisitsFiltered();
+}
+
+function renderVisitsFiltered() {
+  const filteredSection  = document.getElementById('filteredSection');
+  const upcomingSection  = document.getElementById('upcomingSection');
+  const pastSection      = document.getElementById('pastSection');
+
+  if (!activeStatFilter) {
+    if (filteredSection) filteredSection.style.display = 'none';
+    if (upcomingSection) upcomingSection.style.display = '';
+    if (pastSection)     pastSection.style.display = '';
+    renderVisits();
+    return;
+  }
+
+  const today = new Date().toISOString().split('T')[0];
+  let filtered, filterLabel, gradientColors;
+
+  if (activeStatFilter === 'avenir') {
+    filtered = allVisits.filter(v => v.status === 'confirmed' && v.visit_date >= today)
+      .sort((a,b) => (a.visit_date+a.visit_time).localeCompare(b.visit_date+b.visit_time));
+    filterLabel = '📅 Visites à venir';
+    gradientColors = '#2c4f85, #3d6498';
+  } else if (activeStatFilter === 'confirmees') {
+    filtered = allVisits.filter(v => v.status === 'confirmed')
+      .sort((a,b) => a.visit_date.localeCompare(b.visit_date));
+    filterLabel = '✓ Visites confirmées';
+    gradientColors = '#2e7d32, #3D5A47';
+  } else {
+    filtered = allVisits.filter(v => v.visit_date === today && v.status !== 'cancelled')
+      .sort((a,b) => (a.visit_time||'').localeCompare(b.visit_time||''));
+    filterLabel = "📍 Aujourd'hui";
+    gradientColors = '#a31048, #c2185b';
+  }
+
+  if (upcomingSection) upcomingSection.style.display = 'none';
+  if (pastSection)     pastSection.style.display = 'none';
+  if (!filteredSection) return;
+
+  filteredSection.style.display = 'block';
+
+  const title = document.getElementById('filteredSectionTitle');
+  if (title) title.style.background = `linear-gradient(135deg,${gradientColors})`;
+
+  const labelEl = document.getElementById('filteredLabel');
+  const count = filtered.length;
+  if (labelEl) labelEl.innerHTML = `${filterLabel} <span style="background:rgba(255,255,255,0.25);padding:1px 8px;border-radius:12px;font-size:0.68rem;border:1px solid rgba(255,255,255,0.3);">${count}</span>`;
+
+  const list = document.getElementById('filteredList');
+  if (!list) return;
+
+  if (!count) {
+    list.innerHTML = `<div style="text-align:center;padding:28px 20px;color:#aaa;font-size:0.84rem;line-height:1.6;">Aucune visite dans cette catégorie</div>`;
+  } else {
+    list.innerHTML = filtered.map(v => v.status === 'confirmed' ? buildVisitConfirmedCard(v) : buildVisitCompact(v)).join('');
+  }
+
+  filteredSection.scrollIntoView({ behavior:'smooth', block:'nearest' });
+}
+
 // ── Visit rendering ───────────────────────────────────
 function initials(name) { return (name||'?').split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2); }
 function badgeHtml(status) {
@@ -1137,6 +1248,9 @@ function renderVisits() {
   } else {
     pastSection.style.display='none';
   }
+
+  // Ré-appliquer le filtre stat actif si besoin
+  if (activeStatFilter) renderVisitsFiltered();
 }
 
 let _pastOpen = false;
