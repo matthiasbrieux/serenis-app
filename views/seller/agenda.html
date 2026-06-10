@@ -201,6 +201,14 @@
     .cal-has-confirmed { background:#2e7d32 !important; border-color:#2e7d32 !important; color:#fff !important; font-weight:800; border-radius:10px; }
     .cal-has-confirmed:hover { background:#256628 !important; }
     .cal-has-confirmed.cal-selected { background:#1a4d1e !important; border-color:#1a4d1e !important; }
+    /* Couleurs filtre stat cards */
+    .cal-filter-avenir { background:#3d5a8a !important; border-color:#3d5a8a !important; color:#fff !important; font-weight:800; border-radius:10px; }
+    .cal-filter-avenir:hover { background:#2c4f85 !important; }
+    .cal-filter-avenir.cal-selected { background:#1e3a6a !important; border-color:#1e3a6a !important; }
+    .cal-filter-aujourd_hui { background:#c2185b !important; border-color:#c2185b !important; color:#fff !important; font-weight:800; border-radius:10px; }
+    .cal-filter-aujourd_hui:hover { background:#ad1457 !important; }
+    .cal-filter-aujourd_hui.cal-selected { background:#880e4f !important; border-color:#880e4f !important; }
+    .cal-filter-dimmed { opacity:0.28; pointer-events:none; }
     .cal-visit-time { display:block; font-size:0.58rem; font-weight:700; opacity:0.92; margin-top:1px; letter-spacing:0.01em; }
     /* Jours J-1 (veille d'une visite confirmée) */
     .cal-has-eve { background:#fff3e0 !important; border-color:#fb8c00 !important; border-width:2px !important; color:#e65100 !important; font-weight:700; border-radius:10px; }
@@ -1003,6 +1011,7 @@ function setStatFilter(filter) {
   document.querySelectorAll('.stat-card-agenda[data-filter]').forEach(card => {
     card.classList.toggle('active', card.dataset.filter === activeStatFilter);
   });
+  renderCalendar();
   renderVisitsFiltered();
 }
 
@@ -1250,7 +1259,7 @@ function renderVisits() {
   }
 
   // Ré-appliquer le filtre stat actif si besoin
-  if (activeStatFilter) renderVisitsFiltered();
+  if (activeStatFilter) { renderCalendar(); renderVisitsFiltered(); }
 }
 
 let _pastOpen = false;
@@ -1506,20 +1515,49 @@ function renderCalendar() {
     let cls='cal-cell';
     if (dateStr===today) cls+=' cal-today';
     if (calSelected===dateStr) cls+=' cal-selected';
-    const hasConfirmed = dayVisits.some(v=>v.status==='confirmed');
-    const hasPending = dayVisits.some(v=>v.status==='pending');
-    const isEve = eveDates.has(dateStr) && !hasConfirmed;
-    if (hasConfirmed) cls+=' cal-has-confirmed';
-    else if (isEve) cls+=' cal-has-eve';
-    else if (hasPending) cls+=' cal-has-pending';
     let inner = String(d);
-    if (hasConfirmed) {
-      const time = dayVisits.find(v=>v.status==='confirmed')?.visit_time?.slice(0,5)||'';
-      inner += time ? `<span class="cal-visit-time">${time}</span>` : '';
-    } else if (isEve) {
-      inner += `<span class="cal-eve-dot">rappel</span>`;
-    } else if (hasPending) {
-      inner += `<div class="cal-visit-bar pending"></div>`;
+
+    if (!activeStatFilter) {
+      // Mode normal
+      const hasConfirmed = dayVisits.some(v=>v.status==='confirmed');
+      const hasPending = dayVisits.some(v=>v.status==='pending');
+      const isEve = eveDates.has(dateStr) && !hasConfirmed;
+      if (hasConfirmed) cls+=' cal-has-confirmed';
+      else if (isEve) cls+=' cal-has-eve';
+      else if (hasPending) cls+=' cal-has-pending';
+      if (hasConfirmed) {
+        const time = dayVisits.find(v=>v.status==='confirmed')?.visit_time?.slice(0,5)||'';
+        inner += time ? `<span class="cal-visit-time">${time}</span>` : '';
+      } else if (isEve) {
+        inner += `<span class="cal-eve-dot">rappel</span>`;
+      } else if (hasPending) {
+        inner += `<div class="cal-visit-bar pending"></div>`;
+      }
+    } else if (activeStatFilter === 'avenir') {
+      const match = dayVisits.some(v=>v.status==='confirmed' && v.visit_date>=today);
+      if (match) {
+        cls+=' cal-filter-avenir';
+        const time = dayVisits.find(v=>v.status==='confirmed' && v.visit_date>=today)?.visit_time?.slice(0,5)||'';
+        inner += time ? `<span class="cal-visit-time">${time}</span>` : '';
+      } else {
+        cls+=' cal-filter-dimmed';
+      }
+    } else if (activeStatFilter === 'confirmees') {
+      const hasConfirmed = dayVisits.some(v=>v.status==='confirmed');
+      if (hasConfirmed) {
+        cls+=' cal-has-confirmed';
+        const time = dayVisits.find(v=>v.status==='confirmed')?.visit_time?.slice(0,5)||'';
+        inner += time ? `<span class="cal-visit-time">${time}</span>` : '';
+      } else {
+        cls+=' cal-filter-dimmed';
+      }
+    } else if (activeStatFilter === 'aujourd_hui') {
+      if (dateStr===today) {
+        cls = cls.replace(' cal-today','');
+        cls+=' cal-filter-aujourd_hui';
+      } else {
+        cls+=' cal-filter-dimmed';
+      }
     }
     html+=`<div class="${cls}" onclick="selectCalDay('${dateStr}')">${inner}</div>`;
   }
