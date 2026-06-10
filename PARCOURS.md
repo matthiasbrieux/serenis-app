@@ -1,5 +1,5 @@
 # Parcours complet — Vendu Par Moi
-*Mis à jour le 10/06/2026 — intègre toutes les modifications de l'audit P1→P9*
+*Mis à jour le 10/06/2026 — intègre l'audit P1→P9 + clarification du modèle de communication vendeur/acheteur*
 
 ---
 
@@ -14,8 +14,6 @@
 - Stripe crée la session de paiement
 - `activateSeller()` est appelée sur `checkout.session.completed` (webhook Stripe)
   - Marque `paid_at`
-  - Assigne un numéro Twilio depuis le pool (`assignTwilioNumber`)
-  - Si pas de numéro disponible → provisionne un nouveau numéro Twilio automatiquement
   - Si pack sérenité 4× : enregistre la date du premier prélèvement mensuel
 - Email envoyé : **`welcome`** → "Bienvenue sur Vendu Par Moi" + accès espace vendeur
 - Email envoyé : **`invoice`** → facture PDF en pièce jointe
@@ -255,58 +253,57 @@ Email envoyé : **`weekly_seller`** *(enrichi P9)*
 
 ## PARCOURS ACHETEUR
 
-### Canal 1 — Via SMS (numéro Twilio du vendeur)
-
-**Webhook :** `POST /sms` dans `routes/buyer.js`
-
-- L'acheteur envoie un SMS au numéro affiché sur l'annonce
-- Si le corps du SMS contient une adresse email :
-  - Crée le contact `buyer_contacts` (source: `sms`)
-  - Marque `dossier_sent=1`
-  - Email acheteur : **`dossier`** → lien dossier acheteur `/dossier/acheteur/:token`
-  - Notification interne au vendeur
-- Si pas d'email dans le SMS :
-  - Répond par SMS : "Merci pour votre intérêt ! Envoyez-nous votre email pour recevoir le dossier complet"
+> **Principe clé :** Vendu Par Moi n'intervient pas dans les échanges entre vendeurs et acheteurs. Le vendeur publie son annonce avec son propre numéro de téléphone. Quand un acheteur le contacte, c'est le vendeur qui lui envoie manuellement le lien dossier depuis son espace. Les seules automatisations de la plateforme sont les emails envoyés aux vendeurs pour les accompagner dans leur vente.
 
 ---
 
-### Canal 2 — Via Appel téléphonique (numéro Twilio du vendeur)
+### Étape 1 — Contact initial (hors plateforme)
 
-**Webhook :** `POST /voice` dans `routes/buyer.js`
+L'acheteur découvre l'annonce sur LeBonCoin, PAP, SeLoger ou autre portail. Il contacte le vendeur directement par **téléphone ou SMS** au numéro personnel du vendeur indiqué sur l'annonce.
 
-- Twilio reçoit l'appel → `voiceWebhook` joue un message TwiML
-- Enregistre le contact (`source: 'voice'`) dans `buyer_contacts`
-- Message vocal : demande à l'acheteur d'envoyer son email par SMS
+Vendu Par Moi n'intercepte pas ces échanges.
 
 ---
 
-### Canal 3 — Via page publique /bien/:slug
+### Étape 2 — Envoi du lien dossier (action vendeur)
 
-**Route :** `GET /bien/:slug` → SSR avec meta OG injectées (titre, description, image)  
-**API :** `GET /api/bien/:slug`, `GET /api/bien/:slug/creneaux`, `POST /api/bien/:slug`
+Depuis son espace vendeur (`/mon-bien` ou `/mon-agenda`), le vendeur copie son **lien dossier acheteur unique** et l'envoie manuellement à l'acheteur (par SMS, WhatsApp ou email).
 
-- Vue de la fiche complète du bien (photos, descriptif, prix, DPE…)
-- Réservation directe depuis la page (flow simplifié, sans qualification buyer obligatoire)
-- Tracking des pages vues → `property_page_views`
-- Export PDF dossier : `GET /api/bien/:slug/pdf`
+**Format du lien :** `https://venduparmo.fr/dossier/acheteur/:token`
+
+Ce token est unique par bien, généré à la création de la fiche. Le vendeur peut le régénérer à tout moment : `POST /api/property/regenerate-tokens`.
 
 ---
 
-### Canal 4 — Via lien dossier acheteur `/dossier/acheteur/:token`
+### Étape 3 — Consultation du dossier
 
 **Route :** `GET /dossier/acheteur/:token` → `dossier-acheteur.html`  
 **API :** `GET /api/dossier/acheteur/:token`, `GET /api/dossier/acheteur/:token/creneaux`
 
-- Accès public (pas de compte nécessaire)
-- Contenu affiché selon flags vendeur :
-  - `diagnostics_in_dossier` → diagnostics
-  - `acheteur_docs_visible` → dossier acheteur sérieux
-  - `plan_docs_visible` → plans
-- Onglets : présentation, photos, documents, agenda réservation
+Accès public, sans compte. L'acheteur consulte :
+- Fiche descriptive complète du bien
+- Galerie photos (pro, extérieur, immersive, technique)
+- Diagnostics et documents (selon flags vendeur)
+- Informations complémentaires
+- Agenda de réservation de visite avec les disponibilités du vendeur
+
+Contenu affiché selon flags vendeur :
+- `diagnostics_in_dossier` → diagnostics visibles
+- `acheteur_docs_visible` → dossier acheteur sérieux visible
+- `plan_docs_visible` → plans visibles
 
 ---
 
-### Réservation visite avec qualification obligatoire *(renforcé P2 + P3)*
+### Étape 4 — Page publique /bien/:slug (optionnel)
+
+**Route :** `GET /bien/:slug` → SSR avec meta OG (titre, description, image pour partage réseaux)  
+**API :** `GET /api/bien/:slug`, `GET /api/bien/:slug/creneaux`
+
+Page publique partageable (liens réseaux sociaux, QR code…). Moins complète que le dossier acheteur. Tracking des pages vues → `property_page_views`. Export PDF : `GET /api/bien/:slug/pdf`.
+
+---
+
+### Étape 5 — Réservation visite avec qualification obligatoire *(renforcé P2 + P3)*
 
 **API :** `POST /api/dossier/acheteur/:token/reserver`
 
@@ -326,12 +323,11 @@ Si OK :
 - Visite créée avec `status='confirmed'`
 - Email acheteur : **`visit_confirmation`** → récap date/heure/adresse
 - Email vendeur : **`new_visit_request`** → alerte nouvelle visite
-- SMS vendeur : notification Twilio si `seller_phone` renseigné
 - Notification interne vendeur
 
 ---
 
-### Rappel visite J-1
+### Étape 6 — Rappel visite J-1
 
 **Déclenché par cron quotidien 18h00**
 
@@ -340,13 +336,13 @@ Email vendeur : **`seller_visit_reminder`** → récap des visites du lendemain
 
 ---
 
-### Jour de visite
+### Étape 7 — Jour de visite
 
 La visite se déroule en présentiel. Le vendeur peut noter ses observations dans `PUT /api/visits/:id/notes`.
 
 ---
 
-### Post-visite automatisé
+### Étape 8 — Post-visite automatisé
 
 *(Voir Étape 12 du parcours vendeur — mêmes séquences, vues côté acheteur)*
 
@@ -358,7 +354,7 @@ La visite se déroule en présentiel. Le vendeur peut noter ses observations dan
 
 ---
 
-### Offre d'achat
+### Étape 9 — Offre d'achat
 
 **Route :** `GET /soumettre-offre/:token` → `soumettre-offre.html`  
 **API :** `GET /api/soumettre-offre/:token/info`, `POST /api/soumettre-offre/:token`
@@ -381,8 +377,7 @@ La visite se déroule en présentiel. Le vendeur peut noter ses observations dan
 | 3 | `published` | `POST /api/property/publish` | Vendeur |
 | 4 | `visit_confirmation` | Visite confirmée (via dossier ou agenda) | Acheteur |
 | 5 | `new_visit_request` | Nouvelle visite (dossier acheteur ou agenda vendeur) | Vendeur |
-| 6 | `dossier` | SMS acheteur avec email reçu | Acheteur |
-| 7 | `prospect_nudge` | Cron — acheteur contacté sans dossier | Acheteur |
+| 7 | `prospect_nudge` | Cron — acheteur sans réponse depuis 7j | Vendeur |
 | 8 | `no_property` | Cron — vendeur sans fiche bien | Vendeur |
 | 9 | `no_photos` | Cron — vendeur avec fiche mais sans photos | Vendeur |
 | 10 | `not_published` | Cron — fiche complète non publiée | Vendeur |
