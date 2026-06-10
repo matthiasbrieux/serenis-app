@@ -18,9 +18,9 @@
   <link rel="stylesheet" href="/css/style.css">
   <style>
     /* ── Stats ────────────────────────────────────────── */
-    .agenda-stats { display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin-bottom:24px; }
-    @media(max-width:1100px){ .agenda-stats { grid-template-columns:repeat(2,1fr); } }
-    @media(max-width:600px){ .agenda-stats { grid-template-columns:repeat(2,1fr); } }
+    .agenda-stats { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-bottom:24px; }
+    @media(max-width:1100px){ .agenda-stats { grid-template-columns:repeat(3,1fr); } }
+    @media(max-width:600px){ .agenda-stats { grid-template-columns:repeat(3,1fr); } }
     .stat-card-agenda { background:#fff; border-radius:12px; padding:16px 14px; border:1px solid #e8e0d6; display:flex; align-items:center; gap:10px; cursor:pointer; transition:transform 0.22s ease, box-shadow 0.22s ease, border-color 0.22s ease, background 0.22s ease; position:relative; overflow:hidden; user-select:none; }
     .stat-card-agenda::after { content:''; position:absolute; bottom:0; left:14px; right:14px; height:2.5px; border-radius:2px; background:transparent; transition:background 0.22s ease, opacity 0.22s ease; opacity:0; }
     .stat-card-agenda:hover { transform:translateY(-3px); box-shadow:0 8px 28px rgba(0,0,0,0.1); border-color:#c8d8e0; }
@@ -185,42 +185,57 @@
     /* ── Calendar ─────────────────────────────────────── */
     .calendar-layout { display:grid; grid-template-columns:1fr 300px; gap:20px; align-items:start; }
     @media(max-width:800px){ .calendar-layout { grid-template-columns:1fr; } }
-    .calendar-card { background:#fff; border-radius:14px; border:1px solid #e8e0d6; padding:24px; }
-    .cal-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:20px; }
-    .cal-month { font-family:'Cormorant Garamond',serif; font-size:1.5rem; font-weight:600; color:#1A1A16; }
-    .cal-nav { width:34px; height:34px; border-radius:8px; border:1.5px solid #e8e0d6; background:#fff; cursor:pointer; transition:0.15s; display:flex; align-items:center; justify-content:center; font-size:1rem; color:#555; }
-    .cal-nav:hover { border-color:#3D5A47; color:#3D5A47; background:#f0f5f1; }
-    .cal-grid { display:grid; grid-template-columns:repeat(7,1fr); gap:4px; }
-    .cal-day-label { text-align:center; font-size:0.7rem; font-weight:700; color:#aaa; text-transform:uppercase; letter-spacing:0.05em; padding-bottom:8px; }
-    .cal-cell { aspect-ratio:1; border-radius:8px; border:1.5px solid transparent; display:flex; flex-direction:column; align-items:center; justify-content:center; cursor:pointer; transition:0.15s; position:relative; font-size:0.85rem; font-weight:500; }
-    .cal-cell:hover:not(.cal-empty) { background:#f0f5f1; border-color:#c8ddd0; }
-    .cal-cell.cal-today { border-color:#3D5A47; color:#3D5A47; font-weight:700; }
-    .cal-cell.cal-selected { background:#3D5A47; color:#fff; border-color:#3D5A47; }
+    .calendar-card { background:#fff; border-radius:18px; border:1px solid #ebe6df; padding:24px 22px; box-shadow:0 2px 20px rgba(0,0,0,0.055); }
+    /* Header */
+    .cal-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:18px; }
+    .cal-header-left { display:flex; align-items:center; gap:10px; }
+    .cal-month { font-family:'Cormorant Garamond',serif; font-size:1.5rem; font-weight:600; color:#1A1A16; letter-spacing:-0.01em; }
+    .cal-today-btn { padding:4px 12px; border-radius:20px; border:1.5px solid #c8ddd0; background:#fff; color:#3D5A47; font-family:'DM Sans',sans-serif; font-size:0.71rem; font-weight:700; cursor:pointer; transition:all 0.15s; letter-spacing:0.03em; white-space:nowrap; }
+    .cal-today-btn:hover { background:#f0f5f1; border-color:#3D5A47; }
+    .cal-nav-group { display:flex; gap:4px; align-items:center; }
+    .cal-nav { width:34px; height:34px; border-radius:50%; border:1.5px solid #e8e0d6; background:#fff; cursor:pointer; transition:all 0.18s; display:flex; align-items:center; justify-content:center; color:#666; }
+    .cal-nav:hover { border-color:#3D5A47; color:#3D5A47; background:#f0f5f1; transform:scale(1.08); }
+    /* Grid */
+    .cal-grid { display:grid; grid-template-columns:repeat(7,1fr); gap:2px; }
+    .cal-day-label { text-align:center; font-size:0.66rem; font-weight:700; color:#bbb; text-transform:uppercase; letter-spacing:0.07em; padding-bottom:10px; }
+    /* Cells */
+    .cal-cell { aspect-ratio:1; border-radius:10px; border:none; display:flex; flex-direction:column; align-items:center; justify-content:center; cursor:pointer; transition:background 0.14s; position:relative; gap:3px; user-select:none; }
+    .cal-cell:hover:not(.cal-empty) { background:rgba(61,90,71,0.06); }
     .cal-cell.cal-empty { cursor:default; }
-    /* Jours avec visite confirmée */
-    .cal-has-confirmed { background:#2e7d32 !important; border-color:#2e7d32 !important; color:#fff !important; font-weight:800; border-radius:10px; }
-    .cal-has-confirmed:hover { background:#256628 !important; }
-    .cal-has-confirmed.cal-selected { background:#1a4d1e !important; border-color:#1a4d1e !important; }
-    /* Couleurs filtre stat cards */
-    .cal-filter-avenir { background:#3d5a8a !important; border-color:#3d5a8a !important; color:#fff !important; font-weight:800; border-radius:10px; }
-    .cal-filter-avenir:hover { background:#2c4f85 !important; }
-    .cal-filter-avenir.cal-selected { background:#1e3a6a !important; border-color:#1e3a6a !important; }
-    .cal-filter-passees { background:#7b1fa2 !important; border-color:#7b1fa2 !important; color:#fff !important; font-weight:800; border-radius:10px; }
-    .cal-filter-passees:hover { background:#6a1b9a !important; }
-    .cal-filter-passees.cal-selected { background:#4a148c !important; border-color:#4a148c !important; }
-    .cal-filter-aujourd_hui { background:#c2185b !important; border-color:#c2185b !important; color:#fff !important; font-weight:800; border-radius:10px; }
-    .cal-filter-aujourd_hui:hover { background:#ad1457 !important; }
-    .cal-filter-aujourd_hui.cal-selected { background:#880e4f !important; border-color:#880e4f !important; }
-    .cal-filter-dimmed { opacity:0.28; pointer-events:none; }
-    .cal-visit-time { display:block; font-size:0.58rem; font-weight:700; opacity:0.92; margin-top:1px; letter-spacing:0.01em; }
-    /* Jours J-1 (veille d'une visite confirmée) */
-    .cal-has-eve { background:#fff3e0 !important; border-color:#fb8c00 !important; border-width:2px !important; color:#e65100 !important; font-weight:700; border-radius:10px; }
-    .cal-has-eve:hover { background:#ffe0b2 !important; }
-    .cal-eve-dot { display:block; font-size:0.6rem; margin-top:1px; opacity:0.85; }
-    /* Jours avec visite en attente */
-    .cal-has-pending { background:#fff8e1; border-color:#f57f17 !important; font-weight:700; }
-    .cal-visit-bar { position:absolute; bottom:3px; left:20%; right:20%; height:3px; border-radius:2px; }
-    .cal-visit-bar.pending { background:#f57f17; }
+    /* Number circle — Google Calendar pattern */
+    .cal-num { width:32px; height:32px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:0.84rem; font-weight:500; color:#1A1A16; transition:background 0.14s,color 0.14s; line-height:1; }
+    .cal-cell:hover:not(.cal-empty):not(.cal-today):not(.cal-selected) .cal-num { background:rgba(61,90,71,0.1); }
+    /* Today — filled green circle */
+    .cal-today .cal-num { background:#3D5A47; color:#fff; font-weight:800; box-shadow:0 2px 8px rgba(61,90,71,0.32); }
+    .cal-today:hover .cal-num { background:#2a4030; }
+    /* Selected */
+    .cal-selected:not(.cal-today) .cal-num { background:#3D5A47; color:#fff; font-weight:700; box-shadow:0 2px 10px rgba(61,90,71,0.38); }
+    .cal-today.cal-selected .cal-num { background:#1f3329; box-shadow:0 2px 12px rgba(61,90,71,0.45); }
+    /* Past empty days */
+    .cal-past-day .cal-num { color:#ccc; font-weight:400; }
+    .cal-past-day:hover:not(.cal-selected) .cal-num { color:#aaa; }
+    /* Dots */
+    .cal-dots { display:flex; gap:3px; align-items:center; justify-content:center; min-height:6px; }
+    .cal-dot { width:5px; height:5px; border-radius:50%; flex-shrink:0; }
+    .cal-dot-confirmed   { background:#2e7d32; }
+    .cal-dot-pending     { background:#f57f17; }
+    .cal-dot-eve         { background:#fb8c00; }
+    .cal-dot-avenir      { background:#3d5a8a; }
+    .cal-dot-passees     { background:#7b1fa2; }
+    .cal-dot-aujourd_hui { background:#c2185b; }
+    /* Muted dots on past days */
+    .cal-past-day .cal-dot-confirmed { background:#a8cfa9; }
+    .cal-past-day .cal-dot-pending   { background:#f5c98a; }
+    .cal-past-day .cal-dot-eve       { background:#fac884; }
+    /* Filter dimmed */
+    .cal-filter-dimmed { opacity:0.15; pointer-events:none; }
+    /* Legend */
+    .cal-legend { display:flex; gap:16px; justify-content:center; margin-top:16px; padding-top:14px; border-top:1px solid #f0ebe4; flex-wrap:wrap; }
+    .cal-legend-item { display:flex; align-items:center; gap:5px; font-size:0.68rem; color:#aaa; font-weight:500; }
+    /* Month slide animation */
+    @keyframes calSlideIn { from { opacity:0.25; transform:translateY(5px); } to { opacity:1; transform:translateY(0); } }
+    .cal-anim { animation:calSlideIn 0.22s ease; }
+    /* Day detail panel */
     .day-detail { background:#fff; border-radius:14px; border:1px solid #e8e0d6; padding:20px; }
     .day-detail-title { font-size:0.78rem; font-weight:700; text-transform:uppercase; letter-spacing:0.07em; color:#888; margin-bottom:14px; }
     .day-slot { display:flex; align-items:center; gap:12px; padding:10px 0; border-bottom:1px solid #f0ebe4; }
@@ -228,11 +243,11 @@
     .day-slot-dot { width:10px; height:10px; border-radius:50%; flex-shrink:0; }
     .day-slot-time { font-weight:700; font-size:0.88rem; min-width:44px; }
     .day-slot-info { flex:1; }
-    /* ── Panneau détail jour ── */
-    .cal-detail-card { background:#fff; border-radius:14px; border:1.5px solid #e8e0d6; padding:16px 18px; margin-bottom:14px; animation:fadeUp 0.18s ease; }
-    .cal-detail-card.type-visit { border-color:#b8d8c2; background:linear-gradient(135deg,#f0f8f2,#e8f5eb); }
-    .cal-detail-card.type-eve { border-color:#f5c842; background:linear-gradient(135deg,#fffdf0,#fff8d6); }
-    .cal-detail-date { font-size:0.72rem; font-weight:700; text-transform:uppercase; letter-spacing:0.08em; color:#999; margin-bottom:10px; }
+    /* Day detail cards */
+    .cal-detail-card { background:#fff; border-radius:16px; border:1.5px solid #e8e0d6; padding:18px 18px 16px; margin-bottom:12px; animation:fadeUp 0.2s ease; }
+    .cal-detail-card.type-visit { border-color:#b8d8c2; background:linear-gradient(135deg,#f0f8f2,#eaf5ec); box-shadow:0 2px 12px rgba(46,125,50,0.08); }
+    .cal-detail-card.type-eve { border-color:#fbd38d; background:linear-gradient(135deg,#fffdf0,#fff8d6); box-shadow:0 2px 12px rgba(251,140,0,0.08); }
+    .cal-detail-date { font-size:0.7rem; font-weight:700; text-transform:uppercase; letter-spacing:0.09em; color:#999; margin-bottom:10px; }
     .cal-detail-visit { display:flex; align-items:center; gap:12px; margin-bottom:12px; }
     .cal-detail-avatar { width:42px; height:42px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:0.88rem; font-weight:700; color:#fff; flex-shrink:0; }
     .cal-detail-name { font-weight:700; font-size:0.95rem; color:#1a1a1a; }
@@ -358,8 +373,8 @@
     .mc-copy-btn.copied { background:#4cb84c; }
 
     /* ── Modals ───────────────────────────────────────── */
-    .modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,0.45); z-index:500; display:flex; align-items:center; justify-content:center; padding:20px; opacity:0; pointer-events:none; transition:opacity 0.2s; }
-    .modal-overlay.open { opacity:1; pointer-events:all; }
+    .modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,0.45); z-index:1100; display:flex; align-items:center; justify-content:center; padding:20px; opacity:0; pointer-events:none; visibility:hidden; transition:opacity 0.2s,visibility 0.2s; }
+    .modal-overlay.open { opacity:1; pointer-events:all; visibility:visible; }
     .modal { background:#fff; border-radius:20px; padding:28px 32px; width:100%; max-width:480px; transform:translateY(12px); transition:transform 0.2s; max-height:90vh; overflow-y:auto; }
     .modal-overlay.open .modal { transform:translateY(0); }
     .modal-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:24px; }
@@ -676,10 +691,17 @@
         <!-- Grand calendrier -->
         <div class="calendar-card">
           <div class="cal-header">
-            <span class="cal-month" id="calMonthLabel"></span>
-            <div style="display:flex;gap:6px;align-items:center;">
-              <button class="cal-nav" id="calPrev">&#8249;</button>
-              <button class="cal-nav" id="calNext">&#8250;</button>
+            <div class="cal-header-left">
+              <span class="cal-month" id="calMonthLabel"></span>
+              <button class="cal-today-btn" onclick="jumpToToday()">Aujourd'hui</button>
+            </div>
+            <div class="cal-nav-group">
+              <button class="cal-nav" id="calPrev" title="Mois précédent">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+              </button>
+              <button class="cal-nav" id="calNext" title="Mois suivant">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+              </button>
             </div>
           </div>
           <div class="cal-grid">
@@ -687,6 +709,11 @@
             <div class="cal-day-label">Jeu</div><div class="cal-day-label">Ven</div><div class="cal-day-label">Sam</div><div class="cal-day-label">Dim</div>
           </div>
           <div class="cal-grid" id="calGrid" style="margin-top:4px;"></div>
+          <div class="cal-legend">
+            <span class="cal-legend-item"><span class="cal-dot cal-dot-confirmed" style="display:inline-block;"></span>Confirmée</span>
+            <span class="cal-legend-item"><span class="cal-dot cal-dot-pending" style="display:inline-block;"></span>En attente</span>
+            <span class="cal-legend-item"><span class="cal-dot cal-dot-eve" style="display:inline-block;"></span>Rappel J-1</span>
+          </div>
         </div>
 
         <!-- Détail jour sélectionné -->
@@ -1518,53 +1545,37 @@ function renderCalendar() {
     let cls='cal-cell';
     if (dateStr===today) cls+=' cal-today';
     if (calSelected===dateStr) cls+=' cal-selected';
-    let inner = String(d);
+    let dotsHtml='';
 
     if (!activeStatFilter) {
-      // Mode normal
       const hasConfirmed = dayVisits.some(v=>v.status==='confirmed');
-      const hasPending = dayVisits.some(v=>v.status==='pending');
+      const hasPending   = dayVisits.some(v=>v.status==='pending');
       const isEve = eveDates.has(dateStr) && !hasConfirmed;
-      if (hasConfirmed) cls+=' cal-has-confirmed';
-      else if (isEve) cls+=' cal-has-eve';
-      else if (hasPending) cls+=' cal-has-pending';
-      if (hasConfirmed) {
-        const time = dayVisits.find(v=>v.status==='confirmed')?.visit_time?.slice(0,5)||'';
-        inner += time ? `<span class="cal-visit-time">${time}</span>` : '';
-      } else if (isEve) {
-        inner += `<span class="cal-eve-dot">rappel</span>`;
-      } else if (hasPending) {
-        inner += `<div class="cal-visit-bar pending"></div>`;
-      }
+      const isPast = dateStr < today;
+      if (hasConfirmed) dotsHtml += `<span class="cal-dot cal-dot-confirmed"></span>`;
+      if (isEve) dotsHtml += `<span class="cal-dot cal-dot-eve"></span>`;
+      if (hasPending && !hasConfirmed) dotsHtml += `<span class="cal-dot cal-dot-pending"></span>`;
+      if (isPast && !hasConfirmed && !hasPending && !isEve) cls += ' cal-past-day';
     } else if (activeStatFilter === 'avenir') {
       const match = dayVisits.some(v=>v.status!=='cancelled' && v.visit_date>=today);
-      if (match) {
-        cls+=' cal-filter-avenir';
-        const time = dayVisits.find(v=>v.status!=='cancelled' && v.visit_date>=today)?.visit_time?.slice(0,5)||'';
-        inner += time ? `<span class="cal-visit-time">${time}</span>` : '';
-      } else {
-        cls+=' cal-filter-dimmed';
-      }
+      if (match) dotsHtml += `<span class="cal-dot cal-dot-avenir"></span>`;
+      else cls+=' cal-filter-dimmed';
     } else if (activeStatFilter === 'passees') {
       const match = dayVisits.some(v=>v.status!=='cancelled' && v.visit_date<today);
-      if (match) {
-        cls+=' cal-filter-passees';
-        const time = dayVisits.find(v=>v.status!=='cancelled')?.visit_time?.slice(0,5)||'';
-        inner += time ? `<span class="cal-visit-time">${time}</span>` : '';
-      } else {
-        cls+=' cal-filter-dimmed';
-      }
+      if (match) dotsHtml += `<span class="cal-dot cal-dot-passees"></span>`;
+      else cls+=' cal-filter-dimmed';
     } else if (activeStatFilter === 'aujourd_hui') {
-      if (dateStr===today) {
-        cls = cls.replace(' cal-today','');
-        cls+=' cal-filter-aujourd_hui';
-      } else {
-        cls+=' cal-filter-dimmed';
-      }
+      if (dateStr===today) dotsHtml += `<span class="cal-dot cal-dot-aujourd_hui"></span>`;
+      else cls+=' cal-filter-dimmed';
     }
+    const inner=`<span class="cal-num">${d}</span><div class="cal-dots">${dotsHtml}</div>`;
     html+=`<div class="${cls}" onclick="selectCalDay('${dateStr}')">${inner}</div>`;
   }
   grid.innerHTML=html;
+  // Slide animation
+  grid.classList.remove('cal-anim');
+  void grid.offsetWidth;
+  grid.classList.add('cal-anim');
   if (calSelected) renderDayDetail(calSelected);
 }
 
@@ -1655,6 +1666,7 @@ function renderDayDetail(dateStr) {
 
 document.getElementById('calPrev').addEventListener('click',()=>{ calDate=new Date(calDate.getFullYear(),calDate.getMonth()-1); renderCalendar(); });
 document.getElementById('calNext').addEventListener('click',()=>{ calDate=new Date(calDate.getFullYear(),calDate.getMonth()+1); renderCalendar(); });
+function jumpToToday() { calDate=new Date(); calDate.setDate(1); calSelected=null; renderCalendar(); }
 
 // ── Disponibilités ────────────────────────────────────
 let availSlots=[];
