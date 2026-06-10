@@ -824,6 +824,9 @@ const COPY_SVG = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" st
 const CHECK_SVG = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>';
 
 function bibVars(text) {
+  if (window._bibSellerPrenom) {
+    text = text.split('[NOM]').join(window._bibSellerPrenom);
+  }
   var V = ['[NOM]','[DATE]','[HEURE]','[MONTANT]','[VILLE]','[ADRESSE]','[DOCUMENTS]','[DISPONIBILITÉS]'];
   V.forEach(function(v) { text = text.split(v).join('<span class="tpl-var">' + v + '</span>'); });
   return text;
@@ -1037,7 +1040,12 @@ bibRenderCats();
 bibRender();
 
 window._bibSellerPrenom = '';
-fetch('/api/me').then(r=>r.json()).then(d=>{ if(d.seller&&d.seller.first_name) window._bibSellerPrenom = d.seller.first_name; }).catch(()=>{});
+fetch('/api/me').then(r=>r.json()).then(d=>{
+  if(d.seller&&d.seller.first_name) {
+    window._bibSellerPrenom = d.seller.first_name;
+    bibRender();
+  }
+}).catch(()=>{});
 </script>
 
 <!-- ══════════════════════════════════════════════════════════════
