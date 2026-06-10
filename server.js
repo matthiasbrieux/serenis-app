@@ -182,7 +182,7 @@ app.listen(PORT, () => {
   backupDatabase(); // premier backup au démarrage
   setInterval(() => backupDatabase(), 24 * 60 * 60 * 1000); // backup quotidien
 
-  const { sendVisitReminders, sendMissionReminders, sendAutomatedNudges, sendContractExpiryReminders, sendPostVisitBuyerNudges, sendWeeklyAdminReportEmail, sendPhotographerAvailabilityNudges, sendPostFirstVisitFeedbackNudges, sendCheckInNoOfferNudges, chargeInstallments } = require('./services/reminders');
+  const { sendVisitReminders, sendMissionReminders, sendAutomatedNudges, sendContractExpiryReminders, sendPostVisitBuyerNudges, sendPostVisitDossierNudges, sendWeeklyAdminReportEmail, sendWeeklySellerReportEmail, sendPhotographerAvailabilityNudges, sendPostFirstVisitFeedbackNudges, sendCheckInNoOfferNudges, chargeInstallments, sendPriceDropNudges } = require('./services/reminders');
 
   function runDailyJobs() {
     sendVisitReminders().catch(e => console.error('Reminder job error:', e.message));
@@ -190,10 +190,12 @@ app.listen(PORT, () => {
     sendAutomatedNudges().catch(e => console.error('Automated nudges job error:', e.message));
     sendContractExpiryReminders().catch(e => console.error('Contract expiry job error:', e.message));
     sendPostVisitBuyerNudges().catch(e => console.error('Post-visit nudge job error:', e.message));
+    sendPostVisitDossierNudges().catch(e => console.error('Post-visit dossier nudge error:', e.message));
     sendPhotographerAvailabilityNudges().catch(e => console.error('Photographer nudge job error:', e.message));
     sendPostFirstVisitFeedbackNudges().catch(e => console.error('Post-visit feedback job error:', e.message));
     sendCheckInNoOfferNudges().catch(e => console.error('Check-in no offer job error:', e.message));
     chargeInstallments().catch(e => console.error('Installment charge job error:', e.message));
+    sendPriceDropNudges().catch(e => console.error('Price drop nudge job error:', e.message));
   }
 
   function scheduleReminders() {
@@ -220,8 +222,10 @@ app.listen(PORT, () => {
     const ms = next - now;
     setTimeout(() => {
       sendWeeklyAdminReportEmail().catch(e => console.error('Weekly report error:', e.message));
+      sendWeeklySellerReportEmail().catch(e => console.error('Weekly seller report error:', e.message));
       setInterval(() => {
         sendWeeklyAdminReportEmail().catch(e => console.error('Weekly report error:', e.message));
+        sendWeeklySellerReportEmail().catch(e => console.error('Weekly seller report error:', e.message));
       }, 7 * 24 * 60 * 60 * 1000);
     }, ms);
     console.log(`✓ Rapport hebdo planifié dans ${Math.round(ms / 3600000)}h`);

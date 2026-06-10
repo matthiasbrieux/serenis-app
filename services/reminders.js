@@ -406,4 +406,100 @@ async function chargeInstallments() {
   }
 }
 
-module.exports = { sendVisitReminders, sendMissionReminders, sendAutomatedNudges, sendContractExpiryReminders, sendPostVisitBuyerNudges, sendWeeklyAdminReportEmail, sendPhotographerAvailabilityNudges, sendPostFirstVisitFeedbackNudges, sendCheckInNoOfferNudges, chargeInstallments };
+// ── Envoi dossier acheteur sérieux J+1 après visite ──────────
+async function sendPostVisitDossierNudges() {
+  const { sendPostVisitDossierNudge } = require('./email');
+  const base = process.env.BASE_URL || 'https://venduparmo.fr';
+
+  const yesterday = new Date();
+  yesterday.setDate(yesterday.getDate() - 1);
+  const yesterdayStr = yesterday.toISOString().split('T')[0];
+
+  const visits = db.prepare(`
+    SELECT v.buyer_email, v.buyer_name, v.id,
+           p.acheteur_token, p.city, p.type,
+           s.first_name as seller_first_name
+    FROM visits v
+    JOIN properties p ON p.id = v.property_id
+    JOIN sellers s ON s.id = v.seller_id
+    WHERE v.visit_date = ? AND v.status = 'confirmed'
+      AND p.acheteur_docs_visible = 1
+  `).all(yesterdayStr);
+
+  for (const v of visits) {
+    try {
+      const triggerKey = `post_visit_dossier:${v.id}`;
+      const already = db.prepare(`SELECT id FROM email_log WHERE trigger_type=? AND recipient_email=?`).get(triggerKey, v.buyer_email);
+      if (already) continue;
+      const dossierUrl = `${base}/dossier/acheteur/${v.acheteur_token}`;
+      const ok = await sendPostVisitDossierNudge({ buyerEmail: v.buyer_email, buyerName: v.buyer_name, propertyCity: v.city, propertyType: v.type, dossierUrl, sellerFirstName: v.seller_first_name });
+      if (ok) {
+        db.prepare(`INSERT INTO email_log (trigger_type, recipient_email) VALUES (?,?)`).run(triggerKey, v.buyer_email);
+        console.log(`[NUDGE] post_visit_dossier → ${v.buyer_email}`);
+      }
+    } catch(e) { console.error('[NUDGE] post_visit_dossier error:', e.message); }
+  }
+}
+
+// ── Rapport hebdomadaire vendeurs (lundi 8h) ─────────────────
+async function sendWeeklySellerReportEmail() {
+  const { sendWeeklySellerReport } = require('./email');
+  const base = process.env.BASE_URL || 'https://venduparmo.fr';
+
+  const sellers = db.prepare(`
+    SELECT s.id, s.email, s.first_name, p.id as prop_id, p.published_at, p.acheteur_token
+    FROM sellers s
+    JOIN properties p ON p.seller_id = s.id
+    WHERE p.published = 1
+      AND p.published_at IS NOT NULL
+      AND (s.archived IS NULL OR s.archived = 0)
+  `).all();
+
+  for (const s of sellers) {
+    try {
+      const views = db.prepare(`SELECT COUNT(*) as c FROM property_page_views WHERE property_id=? AND viewed_at >= date('now','-7 days')`).get(s.prop_id)?.c || 0;
+      const contacts = db.prepare(`SELECT COUNT(*) as c FROM buyer_contacts WHERE seller_id=? AND created_at >= date('now','-7 days')`).get(s.id)?.c || 0;
+      const visits = db.prepare(`SELECT COUNT(*) as c FROM visits WHERE seller_id=? AND visit_date >= date('now','-7 days') AND status='confirmed'`).get(s.id)?.c || 0;
+      const offers = db.prepare(`SELECT COUNT(*) as c FROM offers WHERE seller_id=? AND created_at >= date('now','-7 days')`).get(s.id)?.c || 0;
+      const daysOnline = s.published_at ? Math.round((Date.now() - new Date(s.published_at)) / 86400000) : 0;
+
+      await sendWeeklySellerReport({ email: s.email, firstName: s.first_name, stats: { views, contacts, visits, offers, daysOnline } });
+      console.log(`[WEEKLY] Rapport vendeur → ${s.email}`);
+    } catch(e) { console.error(`[WEEKLY] Seller report error ${s.email}:`, e.message); }
+  }
+}
+
+// ── Nudge baisse de prix J+45 sans offre ─────────────────────
+async function sendPriceDropNudges() {
+  const { sendPriceDropNudge } = require('./email');
+
+  const sellers = db.prepare(`
+    SELECT s.email, s.first_name, s.id,
+           p.published_at, p.price, p.city,
+           CAST((julianday('now') - julianday(p.published_at)) AS INTEGER) as days_published
+    FROM sellers s
+    JOIN properties p ON p.seller_id = s.id
+    LEFT JOIN offers o ON o.seller_id = s.id
+    WHERE p.published_at IS NOT NULL
+      AND p.published = 1
+      AND (s.archived IS NULL OR s.archived = 0)
+      AND o.id IS NULL
+      AND p.published_at <= date('now', '-45 days')
+    LIMIT 20
+  `).all();
+
+  for (const s of sellers) {
+    const key = `price_drop_nudge:${s.id}`;
+    const already = db.prepare(`SELECT id FROM email_log WHERE trigger_type=? AND recipient_email=?`).get(key, s.email);
+    if (already) continue;
+    try {
+      const ok = await sendPriceDropNudge({ email: s.email, firstName: s.first_name, daysPublished: s.days_published, currentPrice: s.price, propertyCity: s.city });
+      if (ok) {
+        db.prepare(`INSERT INTO email_log (trigger_type, recipient_email) VALUES (?,?)`).run(key, s.email);
+        console.log(`[NUDGE] price_drop_nudge → ${s.email} (J+${s.days_published})`);
+      }
+    } catch(e) { console.error('[NUDGE] price_drop_nudge error:', e.message); }
+  }
+}
+
+module.exports = { sendVisitReminders, sendMissionReminders, sendAutomatedNudges, sendContractExpiryReminders, sendPostVisitBuyerNudges, sendPostVisitDossierNudges, sendWeeklyAdminReportEmail, sendWeeklySellerReportEmail, sendPhotographerAvailabilityNudges, sendPostFirstVisitFeedbackNudges, sendCheckInNoOfferNudges, chargeInstallments, sendPriceDropNudges };

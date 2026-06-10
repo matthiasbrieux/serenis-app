@@ -80,7 +80,7 @@ router.post('/api/dossier/acheteur/:token/reserver', async (req, res) => {
     `).get(req.params.token);
     if (!prop) return res.status(404).json({ error: 'Dossier introuvable' });
 
-    const { buyer_name, buyer_email, buyer_phone, visit_date, visit_time } = req.body;
+    const { buyer_name, buyer_email, buyer_phone, visit_date, visit_time, buyer_budget, buyer_financing, buyer_timeline } = req.body;
     if (!buyer_name || !buyer_email || !visit_date || !visit_time) {
       return res.status(400).json({ error: 'Informations manquantes' });
     }
@@ -88,8 +88,11 @@ router.post('/api/dossier/acheteur/:token/reserver', async (req, res) => {
     const conflict = db.prepare("SELECT id FROM visits WHERE property_id=? AND visit_date=? AND visit_time=? AND status != 'cancelled'").get(prop.id, visit_date, visit_time);
     if (conflict) return res.status(409).json({ error: 'Ce créneau est déjà pris. Choisissez un autre horaire.' });
 
-    db.prepare("INSERT INTO visits (property_id, seller_id, buyer_name, buyer_email, buyer_phone, visit_date, visit_time, status) VALUES (?,?,?,?,?,?,?,'confirmed')")
-      .run(prop.id, prop.seller_id, buyer_name, buyer_email, buyer_phone || '', visit_date, visit_time);
+    const emailConflict = db.prepare("SELECT id FROM visits WHERE property_id=? AND buyer_email=? AND status != 'cancelled'").get(prop.id, buyer_email.trim().toLowerCase());
+    if (emailConflict) return res.status(409).json({ error: 'Une visite est déjà enregistrée pour cette adresse email.' });
+
+    db.prepare("INSERT INTO visits (property_id, seller_id, buyer_name, buyer_email, buyer_phone, visit_date, visit_time, status, buyer_budget, buyer_financing, buyer_timeline) VALUES (?,?,?,?,?,?,?,'confirmed',?,?,?)")
+      .run(prop.id, prop.seller_id, buyer_name, buyer_email, buyer_phone || '', visit_date, visit_time, buyer_budget || null, buyer_financing || null, buyer_timeline || null);
 
     db.prepare("INSERT INTO notifications (seller_id, type, title, body) VALUES (?,?,?,?)")
       .run(prop.seller_id, 'visit_confirmed', 'Nouvelle visite confirmée', `${buyer_name} (${buyer_phone || buyer_email}) — ${visit_date} à ${visit_time}`);
@@ -188,8 +191,9 @@ router.get('/api/soumettre-offre/:token/info', (req, res) => {
 router.post('/api/soumettre-offre/:token', express.json(), async (req, res) => {
   try {
     const prop = db.prepare(`
-      SELECT p.id, p.seller_id, p.address, p.city, p.price
+      SELECT p.id, p.seller_id, p.address, p.city, p.price, s.phone as seller_phone
       FROM properties p
+      JOIN sellers s ON s.id = p.seller_id
       WHERE p.acheteur_token = ?
     `).get(req.params.token);
     if (!prop) return res.status(404).json({ error: 'Bien introuvable' });
@@ -224,6 +228,16 @@ router.post('/api/soumettre-offre/:token', express.json(), async (req, res) => {
              `Nouvelle offre de ${buyer_name}`,
              `${Number(amountInt).toLocaleString('fr-FR')} € pour ${prop.city || prop.address || 'votre bien'}`);
     } catch(e) {}
+
+    // SMS au vendeur
+    if (prop.seller_phone) {
+      try {
+        const { sendSmsNotification } = require('../services/twilio');
+        await sendSmsNotification(prop.seller_phone,
+          `💰 Nouvelle offre reçue !\n${buyer_name} propose ${Number(amountInt).toLocaleString('fr-FR')} €\n✉️ ${email.trim()}\n👉 Voir dans votre espace : /mes-offres`
+        ).catch(() => {});
+      } catch(e) {}
+    }
 
     res.json({ success: true, id: result.lastInsertRowid });
   } catch(e) {

@@ -405,7 +405,7 @@
     /* ── Misc ─────────────────────────────────────────── */
     .form-success { color:#3D5A47; font-size:0.82rem; }
     .form-success.hidden { display:none; }
-    .page-header h1 { font-size:1.5rem; font-weight:700; color:#1A1A16; margin:0 0 4px; }
+    .page-header h1 { font-family:'Cormorant Garamond',serif; font-size:clamp(1.5rem,4vw,1.85rem); font-weight:600; color:#1C1C1A; letter-spacing:-0.01em; line-height:1.1; margin:0 0 4px; }
     .page-header-sub { font-size:0.87rem; color:#888; }
 
     /* ── iOS mobile fixes (layout breakpoint) ── */
@@ -957,12 +957,22 @@ function buildVisitCardHtml(v) {
       <div class="visit-detail-row"><span class="visit-detail-icon">${svgClock}</span><strong>${v.visit_time||'—'}</strong></div>
       ${v.buyer_phone?`<div class="visit-detail-row"><span class="visit-detail-icon">${svgPhone}</span>${phoneLinkHtml}</div>`:''}
     </div>
+    ${(v.buyer_budget||v.buyer_financing||v.buyer_timeline)?`
+    <div style="background:#f8f5f0;border-radius:8px;padding:10px 12px;margin-bottom:10px;border-left:3px solid #C4785A;">
+      <div style="font-size:0.65rem;text-transform:uppercase;letter-spacing:0.06em;font-weight:700;color:#C4785A;margin-bottom:6px;">Profil acheteur</div>
+      ${v.buyer_budget?`<div style="font-size:0.8rem;color:#5a4a3a;margin-bottom:3px;">💰 Budget : <strong>${v.buyer_budget}</strong></div>`:''}
+      ${v.buyer_financing?`<div style="font-size:0.8rem;color:#5a4a3a;margin-bottom:3px;">🏦 Financement : <strong>${v.buyer_financing}</strong></div>`:''}
+      ${v.buyer_timeline?`<div style="font-size:0.8rem;color:#5a4a3a;">⏱ Délai : <strong>${v.buyer_timeline}</strong></div>`:''}
+    </div>`:''}
     ${v.status!=='cancelled'?`
     <div style="display:flex;align-items:center;justify-content:space-between;margin-top:8px;gap:8px;flex-wrap:wrap;">
       <button class="btn-sms-reminder${v.reminder_sent?' sent':''}" id="btn-reminder-${v.id}" onclick="sendReminder(${v.id})">
         ${svgPhone} ${v.reminder_sent?'Rappel copié':'Rappel SMS'}
       </button>
-      <button class="btn-cancel-sm" onclick="if(confirm('Annuler cette visite ?')) changeVisitStatus(${v.id},'cancelled')">Annuler</button>
+      <div style="display:flex;gap:6px;">
+        <a href="/api/visits/${v.id}/calendar.ics" download title="Ajouter à mon calendrier" style="display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:8px;background:#f0f7f2;color:#3D5A47;border:1px solid #c8dece;text-decoration:none;font-size:1rem;">📅</a>
+        <button class="btn-cancel-sm" onclick="if(confirm('Annuler cette visite ?')) changeVisitStatus(${v.id},'cancelled')">Annuler</button>
+      </div>
     </div>
     <div id="sms-badge-${v.id}" style="margin-top:6px;">${smsCopiedBadge(v.sms_copied_at)}</div>`:''}
     <div class="visit-notes-wrap">
@@ -1001,11 +1011,19 @@ function buildVisitConfirmedCard(v) {
         ${v.buyer_phone?`<div class="vcc-phone"><a href="tel:${v.buyer_phone}" style="color:#3D5A47;text-decoration:none;font-weight:600;">${v.buyer_phone}</a></div>`:''}
       </div>
     </div>
+    ${(v.buyer_budget||v.buyer_financing||v.buyer_timeline)?`
+    <div style="background:#fdf8f2;border-radius:8px;padding:8px 12px;margin-bottom:10px;border-left:3px solid #C4785A;font-size:0.78rem;color:#5a4a3a;">
+      <div style="font-size:0.62rem;text-transform:uppercase;letter-spacing:0.06em;font-weight:700;color:#C4785A;margin-bottom:5px;">Profil acheteur</div>
+      ${v.buyer_budget?`💰 ${v.buyer_budget}<br>`:''}${v.buyer_financing?`🏦 ${v.buyer_financing}<br>`:''}${v.buyer_timeline?`⏱ ${v.buyer_timeline}`:''}
+    </div>`:''}
     <div class="vcc-actions">
       <button class="vcc-sms${v.reminder_sent?' sent':''}" id="btn-reminder-${v.id}" onclick="sendReminder(${v.id})">
         ${svgPhone} ${v.reminder_sent ? 'Rappel copié' : 'Rappel SMS'}
       </button>
-      <button class="vcc-cancel" onclick="if(confirm('Annuler cette visite ?')) changeVisitStatus(${v.id},'cancelled')">Annuler</button>
+      <div style="display:flex;gap:6px;">
+        <a href="/api/visits/${v.id}/calendar.ics" download title="Ajouter à mon calendrier" style="display:inline-flex;align-items:center;justify-content:center;width:38px;height:38px;border-radius:8px;background:#f0f7f2;color:#3D5A47;border:1px solid #b8d8c2;text-decoration:none;font-size:1rem;">📅</a>
+        <button class="vcc-cancel" onclick="if(confirm('Annuler cette visite ?')) changeVisitStatus(${v.id},'cancelled')">Annuler</button>
+      </div>
     </div>
     ${v.sms_copied_at ? `<div id="sms-badge-${v.id}" style="margin-top:8px;">${smsCopiedBadge(v.sms_copied_at)}</div>` : `<div id="sms-badge-${v.id}" style="margin-top:0;"></div>`}
   </div>`;

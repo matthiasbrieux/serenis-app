@@ -214,6 +214,10 @@ router.delete('/api/property/photos/:cloudinary_id', requireAuth, async (req, re
   const property = db.prepare('SELECT id FROM properties WHERE seller_id = ?').get(req.seller.id);
   if (!property) return res.json({ error: 'Non autorisé' });
   db.prepare('DELETE FROM property_photos WHERE property_id = ? AND cloudinary_id = ?').run(property.id, req.params.cloudinary_id);
+  // Re-index order_index to keep sequence contiguous
+  const remaining = db.prepare('SELECT id FROM property_photos WHERE property_id = ? ORDER BY order_index ASC').all(property.id);
+  const stmt = db.prepare('UPDATE property_photos SET order_index = ? WHERE id = ?');
+  remaining.forEach((p, i) => stmt.run(i, p.id));
   const cloudinary = require('../services/upload').cloudinary;
   await cloudinary.uploader.destroy(req.params.cloudinary_id).catch(() => {});
   res.json({ success: true });
@@ -276,17 +280,6 @@ router.post('/api/property/publish', requireAuth, async (req, res) => {
     console.error('[EMAIL] sendPublishedConfirmation error:', e.message);
   }
 
-  // Assign Twilio number for all packs (both include a dedicated number)
-  const sellerRow = db.prepare('SELECT twilio_number, pack FROM sellers WHERE id=?').get(req.seller.id);
-  if (!sellerRow.twilio_number) {
-    try {
-      const num = await assignTwilioNumber(req.seller.id);
-      res.json({ success: true, twilio_number: num, slug: property.slug });
-      return;
-    } catch (e) {
-      console.error('Twilio assign error:', e);
-    }
-  }
   res.json({ success: true, slug: property.slug });
 });
 
@@ -695,6 +688,49 @@ router.put('/api/visits/:id/sms-copied', requireAuth, (req, res) => {
   res.json({ success: true });
 });
 
+router.get('/api/visits/:id/calendar.ics', requireAuth, (req, res) => {
+  const v = db.prepare(`
+    SELECT v.*, p.address, p.city, p.type FROM visits v
+    JOIN properties p ON p.id = v.property_id
+    WHERE v.id = ? AND v.seller_id = ?
+  `).get(req.params.id, req.seller.id);
+  if (!v) return res.status(404).send('Introuvable');
+
+  const [yr, mo, dy] = (v.visit_date || '').split('-');
+  const [hh, mm] = (v.visit_time || '00:00').split(':');
+  const pad = n => String(n).padStart(2, '0');
+  const dtStart = `${yr}${pad(mo)}${pad(dy)}T${pad(hh)}${pad(mm)}00`;
+  const endH = (parseInt(hh, 10) + 1) % 24;
+  const dtEnd = `${yr}${pad(mo)}${pad(dy)}T${pad(endH)}${pad(mm)}00`;
+  const now = new Date().toISOString().replace(/[-:.]/g, '').slice(0, 15);
+  const typeLabel = v.type === 'appartement' ? 'Appartement' : v.type === 'maison' ? 'Maison' : (v.type || 'Bien');
+  const summary = `Visite — ${typeLabel} à ${v.city || ''}`;
+  const location = [v.address, v.city].filter(Boolean).join(', ');
+  const description = `Acquéreur : ${v.buyer_name || ''}\\nTél : ${v.buyer_phone || '—'}\\nEmail : ${v.buyer_email || '—'}`;
+
+  const ics = [
+    'BEGIN:VCALENDAR',
+    'VERSION:2.0',
+    'PRODID:-//Vendu Par Moi//FR',
+    'CALSCALE:GREGORIAN',
+    'METHOD:PUBLISH',
+    'BEGIN:VEVENT',
+    `UID:visit-${v.id}@venduparmo.fr`,
+    `DTSTAMP:${now}Z`,
+    `DTSTART:${dtStart}`,
+    `DTEND:${dtEnd}`,
+    `SUMMARY:${summary}`,
+    `LOCATION:${location}`,
+    `DESCRIPTION:${description}`,
+    'END:VEVENT',
+    'END:VCALENDAR',
+  ].join('\r\n');
+
+  res.setHeader('Content-Type', 'text/calendar; charset=utf-8');
+  res.setHeader('Content-Disposition', `attachment; filename="visite-${v.visit_date}.ics"`);
+  res.send(ics);
+});
+
 router.post('/api/visits/:id/reminder', requireAuth, (req, res) => {
   const visit = db.prepare('SELECT id FROM visits WHERE id=? AND seller_id=?').get(req.params.id, req.seller.id);
   if (!visit) return res.status(404).json({ error: 'Visite introuvable' });
@@ -741,7 +777,7 @@ router.post('/api/connect/ai-insight', requireAuth, async (req, res) => {
   const visits = db.prepare('SELECT * FROM visits WHERE seller_id=?').all(req.seller.id);
   const contacts = db.prepare('SELECT * FROM buyer_contacts WHERE seller_id=?').all(req.seller.id);
   if (visits.length === 0 && contacts.length === 0) {
-    return res.json({ insight: 'Publiez votre numéro dédié dans vos annonces pour commencer à recevoir des contacts acquéreurs. Chaque demande sera automatiquement enregistrée ici.' });
+    return res.json({ insight: 'Partagez le lien de votre dossier acheteur à chaque personne intéressée par votre bien. L\'acheteur accède directement à la fiche, aux photos et à votre agenda pour réserver une visite.' });
   }
   const summary = `${contacts.length} acquéreur(s) au total dont ${contacts.filter(c=>c.status==='qualified').length} qualifiés. ${visits.filter(v=>v.status==='confirmed').length} visite(s) confirmée(s), ${visits.filter(v=>v.status==='pending').length} en attente, ${visits.filter(v=>v.status==='done').length} réalisée(s).`;
   const Anthropic = require('@anthropic-ai/sdk');

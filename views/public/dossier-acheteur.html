@@ -303,6 +303,7 @@ async function load() {
     document.getElementById('loading').style.display = 'none';
     document.getElementById('content').style.display = 'block';
     render(p, ph, docs);
+    checkSlotsAndToggleCta();
     if (location.hash === '#reservation') {
       setTimeout(() => openBooking(), 100);
     }
@@ -625,6 +626,46 @@ function render(p, ph, docs) {
             <div class="bform-field"><label>Email *</label><input type="email" id="bfEmail" placeholder="marie@exemple.fr"></div>
             <div class="bform-field"><label>Téléphone *</label><input type="tel" id="bfPhone" placeholder="06 00 00 00 00"></div>
           </div>
+          <div style="border-top:1.5px solid #f0ece4;margin:8px 0 4px;padding-top:14px;">
+            <div style="font-size:0.72rem;text-transform:uppercase;letter-spacing:0.06em;font-weight:700;color:#888;margin-bottom:12px;">Votre profil acheteur (aide le propriétaire à préparer la visite)</div>
+            <div class="bform-row">
+              <div class="bform-field">
+                <label>Budget maximum</label>
+                <select id="bfBudget" style="width:100%;border:1.5px solid #e0dbd0;border-radius:10px;padding:13px 14px;font-family:inherit;font-size:0.95rem;color:#1A1A16;background:#fafaf7;appearance:none;">
+                  <option value="">— Sélectionner —</option>
+                  <option>Moins de 100 000 €</option>
+                  <option>100 000 – 200 000 €</option>
+                  <option>200 000 – 300 000 €</option>
+                  <option>300 000 – 400 000 €</option>
+                  <option>400 000 – 500 000 €</option>
+                  <option>500 000 – 700 000 €</option>
+                  <option>Plus de 700 000 €</option>
+                </select>
+              </div>
+              <div class="bform-field">
+                <label>Financement</label>
+                <select id="bfFinancing" style="width:100%;border:1.5px solid #e0dbd0;border-radius:10px;padding:13px 14px;font-family:inherit;font-size:0.95rem;color:#1A1A16;background:#fafaf7;appearance:none;">
+                  <option value="">— Sélectionner —</option>
+                  <option>Achat comptant</option>
+                  <option>Prêt bancaire accordé</option>
+                  <option>Prêt en cours d'obtention</option>
+                  <option>Simulation en cours</option>
+                  <option>Vente à réaliser avant</option>
+                </select>
+              </div>
+            </div>
+            <div class="bform-field" style="margin-top:8px;">
+              <label>Délai d'achat souhaité</label>
+              <select id="bfTimeline" style="width:100%;border:1.5px solid #e0dbd0;border-radius:10px;padding:13px 14px;font-family:inherit;font-size:0.95rem;color:#1A1A16;background:#fafaf7;appearance:none;">
+                <option value="">— Sélectionner —</option>
+                <option>Le plus tôt possible</option>
+                <option>Dans 1 à 3 mois</option>
+                <option>Dans 3 à 6 mois</option>
+                <option>Dans 6 à 12 mois</option>
+                <option>Plus de 12 mois</option>
+              </select>
+            </div>
+          </div>
           <button class="bform-submit" id="bfSubmit" onclick="submitBooking()">Confirmer ma visite</button>
         </div>
       </div>
@@ -648,6 +689,19 @@ function render(p, ph, docs) {
       <em style="color:rgba(255,255,255,0.8);">${p.first_name} reste votre interlocuteur direct pour toute question sur ce bien.</em></p>
       ${p.seller_phone ? `<a href="tel:${p.seller_phone}" class="contact-btn">📞 Appeler ${p.first_name}</a>` : ''}
       ${p.slug ? `<a href="/bien/${p.slug}" class="contact-btn outline">Voir l'annonce complète</a>` : ''}
+    </div>
+    <div style="background:#fff;border-radius:14px;padding:20px 24px;margin-bottom:20px;box-shadow:0 1px 6px rgba(0,0,0,0.06);text-align:center;">
+      <div style="font-size:0.75rem;text-transform:uppercase;letter-spacing:0.06em;font-weight:700;color:#888;margin-bottom:14px;">Partager ce dossier</div>
+      <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">
+        <button onclick="shareDossierWhatsapp()" style="display:inline-flex;align-items:center;gap:8px;background:#25D366;color:#fff;border:none;padding:11px 20px;border-radius:10px;font-size:0.88rem;font-weight:600;cursor:pointer;font-family:inherit;">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+          WhatsApp
+        </button>
+        <button onclick="copyDossierLink()" id="shareCopyBtn" style="display:inline-flex;align-items:center;gap:8px;background:#f5f0e8;color:#3D5A47;border:1.5px solid #d5cfc6;padding:11px 20px;border-radius:10px;font-size:0.88rem;font-weight:600;cursor:pointer;font-family:inherit;">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+          <span id="shareCopyLabel">Copier le lien</span>
+        </button>
+      </div>
     </div>
   `;
 }
@@ -675,6 +729,17 @@ async function loadAgenda() {
       document.getElementById('calGrid').innerHTML = '<div class="no-slots-msg" style="grid-column:1/-1">Le vendeur n\'a pas encore renseigné ses disponibilités.<br>Contactez-le directement par téléphone.</div>';
     }
   } catch(e) { agendaSlots = []; agendaBooked = []; }
+}
+
+async function checkSlotsAndToggleCta() {
+  try {
+    const r = await fetch(`/api/dossier/acheteur/${token}/creneaux`);
+    const data = await r.json();
+    if (!data.slots || !data.slots.length) {
+      const cta = document.getElementById('visitCta');
+      if (cta) cta.style.display = 'none';
+    }
+  } catch(e) {}
 }
 
 function getTimeSlotsForDay(dateStr) {
@@ -806,7 +871,7 @@ async function submitBooking() {
     const r = await fetch(`/api/dossier/acheteur/${token}/reserver`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ buyer_name: name, buyer_email: email, buyer_phone: phone, visit_date: selectedDate, visit_time: selectedTime })
+      body: JSON.stringify({ buyer_name: name, buyer_email: email, buyer_phone: phone, visit_date: selectedDate, visit_time: selectedTime, buyer_budget: document.getElementById('bfBudget').value, buyer_financing: document.getElementById('bfFinancing').value, buyer_timeline: document.getElementById('bfTimeline').value })
     });
     const data = await r.json();
     if (data.error) { alert(data.error); btn.disabled = false; btn.textContent = 'Confirmer ma visite'; return; }
@@ -822,6 +887,19 @@ async function submitBooking() {
     alert('Erreur réseau, réessayez.');
     btn.disabled = false; btn.textContent = 'Confirmer ma visite';
   }
+}
+
+function shareDossierWhatsapp() {
+  const url = window.location.href;
+  window.open('https://wa.me/?text=' + encodeURIComponent('Dossier du bien : ' + url), '_blank');
+}
+function copyDossierLink() {
+  navigator.clipboard.writeText(window.location.href).then(() => {
+    const btn = document.getElementById('shareCopyBtn');
+    const lbl = document.getElementById('shareCopyLabel');
+    if (lbl) { lbl.textContent = 'Lien copié !'; btn.style.background = '#e8f4ec'; btn.style.borderColor = '#3D5A47'; }
+    setTimeout(() => { if (lbl) { lbl.textContent = 'Copier le lien'; btn.style.background = ''; btn.style.borderColor = ''; } }, 2000);
+  });
 }
 
 function setPhoto(idx) {
