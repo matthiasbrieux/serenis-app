@@ -20,143 +20,216 @@
     *, *::before, *::after { box-sizing: border-box; }
     body { font-family: 'DM Sans', sans-serif; background: #F5F0E8; margin: 0; }
     .app-layout { display: flex; min-height: 100vh; }
+    .main { margin-left: 240px; padding: 44px 52px 100px; max-width: 1240px; }
+    @media(max-width:900px) { .main { margin-left: 0; padding: 24px 16px 80px; } }
 
-.main { margin-left:240px; padding:32px 36px 60px; max-width:1100px; }
-    @media(max-width:900px) { .main { margin-left:0; padding:20px 16px 60px; } }
+    /* ── Page header ─────────────────────────────────────── */
+    .page-hdr { margin-bottom: 36px; display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+    .page-hdr-left { display: flex; align-items: center; gap: 16px; }
+    .page-hdr-icon { width: 52px; height: 52px; border-radius: 16px; background: linear-gradient(135deg, #3D5A47, #4d7a58); display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 16px rgba(61,90,71,0.28); flex-shrink: 0; }
+    .page-title { font-family: 'Cormorant Garamond', serif; font-size: 2rem; font-weight: 600; color: #1C1C1A; letter-spacing: -0.02em; line-height: 1.1; margin: 0 0 4px; }
+    .page-sub { font-size: 0.86rem; color: #999; }
+    .page-offers-badge { display: inline-flex; align-items: center; gap: 6px; background: #fff; border: 1.5px solid #e8e3db; border-radius: 24px; padding: 8px 16px; font-size: 0.82rem; font-weight: 600; color: #555; box-shadow: 0 1px 4px rgba(0,0,0,0.06); white-space: nowrap; }
+    .page-offers-badge .dot { width: 8px; height: 8px; border-radius: 50%; background: #C4785A; }
 
-    .page-hdr { margin-bottom:28px;display:flex;align-items:flex-start;justify-content:space-between;gap:16px;flex-wrap:wrap; }
-    .page-hdr h1 { font-family:'Cormorant Garamond',serif; font-size:clamp(1.5rem,4vw,1.85rem); font-weight:600; color:#1C1C1A; letter-spacing:-0.01em; line-height:1.1; margin:0 0 4px; }
-    .page-hdr-sub { font-size:0.85rem;color:#888; }
+    /* ── Stats row ───────────────────────────────────────── */
+    .stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 32px; }
+    @media(max-width:700px) { .stats-row { grid-template-columns: repeat(2,1fr); } }
+    .stat-card { background: #fff; border-radius: 18px; padding: 24px 22px; border: 1px solid #ebe6df; box-shadow: 0 2px 12px rgba(0,0,0,0.04); transition: box-shadow 0.18s; }
+    .stat-card:hover { box-shadow: 0 6px 24px rgba(0,0,0,0.08); }
+    .stat-num { font-family: 'Cormorant Garamond', serif; font-size: 2.6rem; font-weight: 600; line-height: 1; color: #1C1C1A; }
+    .stat-num.green { color: #2e7d32; }
+    .stat-num.terra { color: #C4603A; }
+    .stat-label { font-size: 0.78rem; color: #999; margin-top: 6px; font-weight: 500; }
+    .stat-sub { font-size: 0.72rem; color: #bbb; margin-top: 3px; }
 
-    /* Stats row */
-    .stats-row { display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:14px;margin-bottom:28px; }
-    .stat-card { background:#fff;border-radius:12px;padding:18px 20px;box-shadow:0 1px 4px rgba(0,0,0,0.06); }
-    .stat-n { font-family:'Cormorant Garamond',serif;font-size:2rem;font-weight:600;color:#3D5A47;line-height:1; }
-    .stat-l { font-size:0.75rem;color:#888;margin-top:4px; }
+    /* ── Invite card ─────────────────────────────────────── */
+    .invite-card { background: #fff; border-radius: 20px; border: 1px solid #ebe6df; overflow: hidden; margin-bottom: 32px; box-shadow: 0 4px 24px rgba(0,0,0,0.06); }
+    .invite-hdr { background: linear-gradient(135deg, #1D3A28 0%, #3D5A47 100%); padding: 20px 28px; display: flex; align-items: center; gap: 12px; }
+    .invite-hdr-icon { width: 36px; height: 36px; border-radius: 10px; background: rgba(255,255,255,0.12); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .invite-hdr-text { flex: 1; }
+    .invite-hdr-title { font-size: 0.9rem; font-weight: 700; color: #D4E4D8; letter-spacing: 0.02em; }
+    .invite-hdr-sub { font-size: 0.76rem; color: rgba(212,228,216,0.6); margin-top: 2px; }
+    .invite-body { padding: 28px; display: grid; grid-template-columns: 1fr 1fr; gap: 28px; }
+    @media(max-width:700px) { .invite-body { grid-template-columns: 1fr; } }
+    .invite-section-label { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: #bbb; margin-bottom: 10px; }
+    .invite-link-row { display: flex; gap: 10px; align-items: stretch; }
+    .invite-link-input { flex: 1; background: #F5F0E8; font-size: 0.82rem; padding: 12px 14px; border: 1.5px solid #e0d8cc; border-radius: 10px; font-family: 'DM Sans', sans-serif; color: #3D5A47; outline: none; font-weight: 500; min-width: 0; }
+    .invite-link-input:focus { border-color: #3D5A47; }
+    .btn-copy-link { padding: 12px 20px; background: #3D5A47; color: #fff; border: none; border-radius: 10px; font-size: 0.84rem; font-weight: 700; cursor: pointer; font-family: 'DM Sans', sans-serif; white-space: nowrap; transition: background 0.15s; display: flex; align-items: center; gap: 6px; }
+    .btn-copy-link:hover { background: #2a4030; }
+    .btn-copy-link.copied { background: #059669; }
+    .invite-link-hint { font-size: 0.75rem; color: #bbb; margin-top: 8px; line-height: 1.5; }
+    .invite-sms-preview { background: #F5F0E8; border: 1.5px solid #e0d8cc; border-radius: 10px; padding: 14px; font-size: 0.82rem; color: #444; line-height: 1.65; min-height: 72px; margin-bottom: 12px; }
+    .invite-sms-actions { display: flex; gap: 8px; }
+    .btn-copy-sms { padding: 10px 18px; background: #F5F0E8; color: #3D5A47; border: 1.5px solid #c8ddd0; border-radius: 10px; font-size: 0.82rem; font-weight: 600; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: all 0.15s; display: flex; align-items: center; gap: 6px; }
+    .btn-copy-sms:hover { background: #e0ede5; }
+    .btn-copy-sms.copied { background: #ecfdf5; color: #059669; border-color: #a7f3d0; }
+    .btn-send-sms-link { padding: 10px 16px; background: #fff; color: #555; border: 1.5px solid #e8e3db; border-radius: 10px; font-size: 0.82rem; font-weight: 600; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: all 0.15s; display: flex; align-items: center; gap: 6px; text-decoration: none; }
+    .btn-send-sms-link:hover { border-color: #3D5A47; color: #3D5A47; }
 
-    /* Section headers */
-    .section-header { display:flex;align-items:center;gap:10px;margin:28px 0 14px; }
-    .section-header-line { flex:1;height:1px;background:#e8e3db; }
-    .section-header-title { font-size:0.75rem;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:0.07em;white-space:nowrap; }
+    /* ── Section headers ─────────────────────────────────── */
+    .section-hdr { display: flex; align-items: center; gap: 12px; margin: 36px 0 16px; }
+    .section-hdr-title { font-size: 0.72rem; font-weight: 700; color: #999; text-transform: uppercase; letter-spacing: 0.08em; white-space: nowrap; }
+    .section-hdr-count { display: inline-flex; align-items: center; justify-content: center; background: #3D5A47; color: #fff; border-radius: 12px; padding: 2px 8px; font-size: 0.68rem; font-weight: 700; }
+    .section-hdr-line { flex: 1; height: 1px; background: #e8e3db; }
 
-    /* Offer cards */
-    .offers-list { display:flex;flex-direction:column;gap:14px; }
+    /* ── Offer list ──────────────────────────────────────── */
+    .offers-list { display: flex; flex-direction: column; gap: 16px; }
 
-    .offer-card { background:#fff;border:1.5px solid #e8e3db;border-radius:16px;overflow:hidden;transition:all 0.18s;position:relative; }
-    .offer-card:hover { border-color:#c5d9cb;box-shadow:0 6px 24px rgba(0,0,0,0.08); }
-    .offer-card.status-pending { border-left:4px solid #C4785A; }
-    .offer-card.status-accepted { border-left:4px solid #3D5A47; }
-    .offer-card.status-refused { border-left:4px solid #aaa;opacity:0.75; }
-    .offer-card.status-countered { border-left:4px solid #1a73e8; }
+    /* ── Offer card ──────────────────────────────────────── */
+    .offer-card { background: #fff; border-radius: 20px; border: 1px solid #ebe6df; overflow: hidden; box-shadow: 0 2px 12px rgba(0,0,0,0.04); transition: box-shadow 0.2s, transform 0.2s; position: relative; }
+    .offer-card:hover { box-shadow: 0 10px 40px rgba(0,0,0,0.1); transform: translateY(-2px); }
+    .offer-card.status-past { opacity: 0.8; }
+    .offer-card.status-past:hover { opacity: 1; }
 
-    /* Card main body */
-    .offer-body { padding:22px 24px 18px; }
+    /* Status top bar */
+    .offer-status-bar { display: flex; align-items: center; justify-content: space-between; padding: 12px 28px; border-bottom: 1px solid #f0ece6; }
+    .offer-status-bar.bar-pending  { background: #fdf6f2; }
+    .offer-status-bar.bar-countered{ background: #f0f4ff; }
+    .offer-status-bar.bar-accepted { background: #f0f8f2; }
+    .offer-status-bar.bar-refused  { background: #f8f8f8; }
 
-    /* Top row: avatar + identity + new badge */
-    .offer-top { display:flex;align-items:flex-start;gap:16px;margin-bottom:16px; }
-    .offer-avatar { width:46px;height:46px;border-radius:50%;background:#3D5A47;color:#fff;display:flex;align-items:center;justify-content:center;font-size:1.1rem;font-weight:700;flex-shrink:0;font-family:'DM Sans',sans-serif; }
-    .offer-identity { flex:1;min-width:0; }
-    .offer-name { font-size:1rem;font-weight:700;color:#1a1a1a;margin-bottom:3px; }
-    .offer-meta { font-size:0.78rem;color:#888;display:flex;gap:10px;flex-wrap:wrap; }
-    .offer-meta a { color:#C4785A;text-decoration:none; }
-    .offer-meta a:hover { text-decoration:underline; }
-    .offer-badges { display:flex;gap:6px;align-items:center;flex-shrink:0;flex-wrap:wrap; }
+    .offer-badge { display: inline-flex; align-items: center; gap: 6px; padding: 5px 13px; border-radius: 20px; font-size: 0.75rem; font-weight: 700; }
+    .badge-pending  { background: #C4603A; color: #fff; }
+    .badge-countered{ background: #1a73e8; color: #fff; }
+    .badge-accepted { background: #2e7d32; color: #fff; }
+    .badge-refused  { background: #e8e3db; color: #888; }
 
-    /* Badges */
-    .badge { display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:20px;font-size:0.72rem;font-weight:700; }
-    .badge-new-offer { background:#3D5A47;color:#fff;font-size:0.75rem;padding:5px 12px;box-shadow:0 2px 8px rgba(61,90,71,0.25); }
-    .badge-pending { background:#fff3e0;color:#e65100; }
-    .badge-accepted { background:#e8f4ec;color:#2e7d32; }
-    .badge-refused { background:#f5f5f5;color:#888; }
-    .badge-countered { background:#e8f0fe;color:#1a73e8; }
+    .offer-date { font-size: 0.75rem; color: #bbb; font-weight: 500; }
 
-    /* Amount — the star of the page */
-    .offer-amount-row { display:flex;align-items:center;gap:16px;margin-bottom:14px;flex-wrap:wrap; }
-    .offer-amount { font-family:'Cormorant Garamond',serif;font-size:2.2rem;font-weight:600;color:#3D5A47;line-height:1; }
-    .offer-amount-label { font-size:0.78rem;color:#888;margin-top:4px; }
-    .offer-vs-price { display:flex;flex-direction:column; }
-    .offer-vs-price .vs-label { font-size:0.72rem;color:#aaa;margin-bottom:2px; }
-    .offer-vs-price .vs-value { font-size:0.88rem;color:#555;font-weight:500; }
-    .offer-diff { display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:20px;font-size:0.78rem;font-weight:700; }
-    .offer-diff.positive { background:#e8f4ec;color:#2e7d32; }
-    .offer-diff.negative { background:#fef2f2;color:#dc2626; }
-    .offer-diff.neutral { background:#f0f0ed;color:#666; }
+    /* Card body */
+    .offer-body { padding: 26px 28px 20px; }
+    .offer-main-grid { display: grid; grid-template-columns: 1fr auto; gap: 28px; align-items: start; }
+    @media(max-width:600px) { .offer-main-grid { grid-template-columns: 1fr; gap: 20px; } }
 
-    /* Conditions */
-    .offer-conditions { display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px; }
-    .cond-tag { display:inline-flex;align-items:center;gap:5px;padding:5px 11px;border-radius:8px;background:#F5F0E8;font-size:0.76rem;color:#555;font-weight:500; }
+    /* Buyer info */
+    .offer-buyer { display: flex; align-items: center; gap: 16px; margin-bottom: 18px; }
+    .offer-avatar { width: 52px; height: 52px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.05rem; font-weight: 700; color: #fff; flex-shrink: 0; font-family: 'DM Sans', sans-serif; }
+    .avatar-pending  { background: linear-gradient(135deg, #C4603A, #C4785A); }
+    .avatar-countered{ background: linear-gradient(135deg, #1255c0, #1a73e8); }
+    .avatar-accepted { background: linear-gradient(135deg, #1b5e20, #2e7d32); }
+    .avatar-refused  { background: linear-gradient(135deg, #888, #aaa); }
+    .offer-buyer-info { flex: 1; min-width: 0; }
+    .offer-buyer-name { font-size: 1.05rem; font-weight: 700; color: #1a1a1a; margin-bottom: 5px; }
+    .offer-buyer-contacts { display: flex; flex-wrap: wrap; gap: 6px 14px; }
+    .offer-contact-item { display: inline-flex; align-items: center; gap: 5px; font-size: 0.8rem; color: #666; }
+    .offer-contact-item a { color: #3D5A47; text-decoration: none; font-weight: 600; }
+    .offer-contact-item a:hover { text-decoration: underline; }
 
-    /* Notes */
-    .offer-note { background:#FAFAF8;border-radius:8px;padding:10px 14px;font-size:0.82rem;color:#555;line-height:1.6;margin-bottom:14px;border-left:3px solid #e8e3db; }
+    /* Amount section */
+    .offer-amount-section { text-align: right; min-width: 220px; }
+    @media(max-width:600px) { .offer-amount-section { text-align: left; min-width: 0; } }
+    .offer-amount-value { font-family: 'Cormorant Garamond', serif; font-size: 3rem; font-weight: 600; color: #1C1C1A; line-height: 1; margin-bottom: 4px; }
+    .offer-amount-label { font-size: 0.75rem; color: #bbb; font-weight: 500; margin-bottom: 14px; }
+    .offer-vs-listing { background: #F5F0E8; border-radius: 10px; padding: 12px 14px; text-align: left; }
+    .offer-vs-row { display: flex; justify-content: space-between; align-items: center; font-size: 0.76rem; color: #999; margin-bottom: 8px; }
+    .offer-vs-row strong { color: #555; font-weight: 600; }
+    .offer-progress-track { height: 5px; background: #e8e3db; border-radius: 3px; overflow: hidden; margin-bottom: 8px; }
+    .offer-progress-fill { height: 100%; border-radius: 3px; background: linear-gradient(90deg, #3D5A47, #6BBF82); transition: width 0.4s ease; }
+    .offer-diff-badge { display: inline-flex; align-items: center; gap: 4px; padding: 3px 10px; border-radius: 12px; font-size: 0.74rem; font-weight: 700; }
+    .diff-positive { background: #e8f5e9; color: #2e7d32; }
+    .diff-negative { background: #fef2f2; color: #dc2626; }
+    .diff-neutral  { background: #f0f0ed; color: #666; }
 
-    /* Actions bar */
-    .offer-actions { border-top:1px solid #f0ece6;background:#FAFAF8;padding:14px 24px;display:flex;gap:8px;align-items:center;flex-wrap:wrap; }
-    .btn-accept { padding:10px 22px;background:#3D5A47;border:none;border-radius:8px;color:#fff;font-size:0.85rem;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all 0.15s;display:flex;align-items:center;gap:6px;min-height:44px; }
-    .btn-accept:hover { background:#2e4435;transform:translateY(-1px); }
-    .btn-refuse { padding:10px 18px;background:#fff;border:1.5px solid #C4785A;border-radius:8px;color:#C4785A;font-size:0.85rem;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all 0.15s;display:flex;align-items:center;gap:6px;min-height:44px; }
-    .btn-refuse:hover { background:#fdf5f1;transform:translateY(-1px); }
-    .btn-counter { padding:10px 18px;background:#fff;border:1.5px solid #e8e3db;border-radius:8px;color:#555;font-size:0.85rem;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all 0.15s;display:flex;align-items:center;gap:6px;min-height:44px; }
-    .btn-counter:hover { border-color:#3D5A47;color:#3D5A47;transform:translateY(-1px); }
-    .btn-icon-only { width:44px;height:44px;display:flex;align-items:center;justify-content:center;background:#fff;border:1.5px solid #e8e3db;border-radius:8px;cursor:pointer;color:#aaa;transition:all 0.15s;flex-shrink:0;margin-left:auto; }
-    .btn-icon-only:hover { border-color:#dc2626;color:#dc2626; }
+    /* Counter-offer display */
+    .counter-amount-section { margin-top: 12px; padding: 10px 14px; background: #eef4ff; border-radius: 10px; border: 1px solid #c2d3f5; }
+    .counter-amount-label { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: #1a73e8; margin-bottom: 4px; }
+    .counter-amount-value { font-family: 'Cormorant Garamond', serif; font-size: 1.5rem; font-weight: 600; color: #1a73e8; }
 
-    /* Past offers section — visually muted */
-    .offers-past .offer-card { opacity:0.7; }
-    .offers-past .offer-card:hover { opacity:1; }
+    /* Conditions tags */
+    .offer-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 14px; }
+    .offer-tag { display: inline-flex; align-items: center; gap: 5px; padding: 5px 12px; border-radius: 8px; background: #F5F0E8; font-size: 0.76rem; color: #555; font-weight: 500; }
+    .offer-tag.tag-green { background: #e8f5e9; color: #2e7d32; }
+    .offer-tag.tag-blue  { background: #e8f0fe; color: #1a73e8; }
 
-    /* Counter-offer input area */
-    .counter-panel { display:none;padding:14px 24px;border-top:1px solid #f0ece6;background:#fff; }
-    .counter-panel.open { display:block;animation:slideDown 0.2s ease; }
+    /* Message note */
+    .offer-message { margin-top: 14px; background: #FAFAF8; border-radius: 10px; padding: 12px 16px; font-size: 0.83rem; color: #555; line-height: 1.65; border-left: 3px solid #e0d8cc; font-style: italic; }
+
+    /* Counter panel */
+    .counter-panel { display: none; padding: 18px 28px; border-top: 1px solid #f0ece6; background: #fff; }
+    .counter-panel.open { display: block; animation: slideDown 0.2s ease; }
     @keyframes slideDown { from{opacity:0;transform:translateY(-6px)} to{opacity:1;transform:none} }
-    .counter-panel label { display:block;font-size:0.75rem;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:6px; }
-    .counter-input-row { display:flex;gap:8px;align-items:center;flex-wrap:wrap; }
-    .counter-input { flex:1;min-width:140px;padding:10px 14px;border:1.5px solid #e8e3db;border-radius:8px;font-size:0.9rem;font-family:'DM Sans',sans-serif;outline:none;color:#333; }
-    .counter-input:focus { border-color:#3D5A47; }
-    .btn-send-counter { padding:10px 18px;background:#C4785A;border:none;border-radius:8px;color:#fff;font-size:0.85rem;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;white-space:nowrap;min-height:44px; }
-    .btn-send-counter:hover { background:#b06548; }
+    .counter-panel-label { font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em; color: #bbb; margin-bottom: 10px; }
+    .counter-input-row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+    .counter-input { flex: 1; min-width: 160px; padding: 12px 16px; border: 1.5px solid #e8e3db; border-radius: 10px; font-size: 0.95rem; font-family: 'DM Sans', sans-serif; outline: none; color: #333; }
+    .counter-input:focus { border-color: #1a73e8; }
+    .btn-send-counter { padding: 12px 22px; background: #1a73e8; border: none; border-radius: 10px; color: #fff; font-size: 0.85rem; font-weight: 700; cursor: pointer; font-family: 'DM Sans', sans-serif; white-space: nowrap; min-height: 46px; transition: background 0.15s; }
+    .btn-send-counter:hover { background: #1256c4; }
+
+    /* Actions footer */
+    .offer-footer { padding: 16px 28px; background: #FAFAF8; border-top: 1px solid #f0ece6; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+    .btn-accept { display: flex; align-items: center; gap: 7px; padding: 11px 22px; background: #3D5A47; color: #fff; border: none; border-radius: 10px; font-size: 0.85rem; font-weight: 700; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: all 0.15s; min-height: 44px; }
+    .btn-accept:hover { background: #2a4030; transform: translateY(-1px); }
+    .btn-counter { display: flex; align-items: center; gap: 7px; padding: 11px 20px; background: #fff; color: #1a73e8; border: 1.5px solid #c2d3f5; border-radius: 10px; font-size: 0.85rem; font-weight: 700; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: all 0.15s; min-height: 44px; }
+    .btn-counter:hover { background: #eef4ff; transform: translateY(-1px); }
+    .btn-refuse { display: flex; align-items: center; gap: 7px; padding: 11px 20px; background: #fff; color: #C4603A; border: 1.5px solid #f0cec0; border-radius: 10px; font-size: 0.85rem; font-weight: 700; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: all 0.15s; min-height: 44px; }
+    .btn-refuse:hover { background: #fdf5f1; transform: translateY(-1px); }
+    .btn-delete { width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; background: #fff; border: 1.5px solid #e8e3db; border-radius: 10px; cursor: pointer; color: #ccc; transition: all 0.15s; margin-left: auto; flex-shrink: 0; }
+    .btn-delete:hover { border-color: #dc2626; color: #dc2626; background: #fff5f5; }
+    .past-status-label { font-size: 0.8rem; color: #999; font-style: italic; }
 
     /* Empty state */
-    .empty-state { text-align:center;padding:80px 20px; }
-    .empty-state-icon { width:72px;height:72px;border-radius:50%;background:#fff;border:2px solid #e8e3db;display:flex;align-items:center;justify-content:center;margin:0 auto 20px;color:#ccc; }
-    .empty-state-title { font-family:'Cormorant Garamond',serif;font-size:1.5rem;font-weight:600;color:#1a1a1a;margin-bottom:10px; }
-    .empty-state-sub { font-size:0.88rem;color:#888;line-height:1.7;max-width:400px;margin:0 auto 24px; }
-    .empty-state-tips { display:flex;flex-direction:column;gap:10px;max-width:380px;margin:0 auto;text-align:left; }
-    .empty-tip { display:flex;align-items:flex-start;gap:12px;background:#fff;border-radius:10px;padding:12px 14px;font-size:0.82rem;color:#555;line-height:1.55; }
-    .empty-tip-num { width:24px;height:24px;border-radius:50%;background:#3D5A47;color:#fff;font-size:0.7rem;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px; }
+    .empty-state { text-align: center; padding: 80px 20px; }
+    .empty-icon { width: 80px; height: 80px; border-radius: 50%; background: #fff; border: 2px solid #e8e3db; display: flex; align-items: center; justify-content: center; margin: 0 auto 24px; color: #ddd; box-shadow: 0 4px 16px rgba(0,0,0,0.04); }
+    .empty-title { font-family: 'Cormorant Garamond', serif; font-size: 1.6rem; font-weight: 600; color: #1a1a1a; margin-bottom: 12px; }
+    .empty-sub { font-size: 0.88rem; color: #999; line-height: 1.7; max-width: 420px; margin: 0 auto 32px; }
+    .empty-tips { display: flex; flex-direction: column; gap: 10px; max-width: 400px; margin: 0 auto; text-align: left; }
+    .empty-tip { display: flex; align-items: flex-start; gap: 12px; background: #fff; border-radius: 12px; padding: 14px 16px; font-size: 0.83rem; color: #555; line-height: 1.55; border: 1px solid #ebe6df; }
+    .empty-tip-num { width: 26px; height: 26px; border-radius: 50%; background: #3D5A47; color: #fff; font-size: 0.72rem; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 1px; }
 
-    /* Modal SMS contre-proposition */
-    .sms-modal-overlay { position:fixed;inset:0;background:rgba(0,0,0,0.48);z-index:800;display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;pointer-events:none;transition:opacity 0.2s; }
-    .sms-modal-overlay.open { opacity:1;pointer-events:all; }
-    .sms-modal { background:#fff;border-radius:18px;padding:28px;width:100%;max-width:440px;transform:translateY(12px);transition:transform 0.2s;box-shadow:0 24px 60px rgba(0,0,0,0.22); }
-    .sms-modal-overlay.open .sms-modal { transform:translateY(0); }
-    .sms-modal-hdr { display:flex;align-items:center;gap:12px;margin-bottom:18px; }
-    .sms-modal-ico { width:42px;height:42px;border-radius:12px;background:#e8f5e9;display:flex;align-items:center;justify-content:center;flex-shrink:0; }
-    .sms-modal-title { font-size:1.05rem;font-weight:700;color:#1a1a1a;line-height:1.2; }
-    .sms-modal-sub { font-size:0.78rem;color:#888;margin-top:2px; }
-    .sms-modal-label { font-size:0.7rem;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;color:#aaa;margin-bottom:6px; }
-    .sms-modal-preview { background:#F5F0E8;border:1.5px solid #e0d8ce;border-radius:10px;padding:12px 14px;font-size:0.83rem;color:#444;line-height:1.6;margin-bottom:16px; }
-    .sms-modal-actions { display:flex;gap:10px; }
-    .sms-modal-btn-send { flex:1;padding:12px;background:#3D5A47;color:#fff;border:none;border-radius:10px;font-size:0.9rem;font-weight:700;cursor:pointer;font-family:inherit;text-decoration:none;display:flex;align-items:center;justify-content:center;gap:7px;transition:background 0.15s; }
-    .sms-modal-btn-send:hover { background:#2d4535; }
-    .sms-modal-btn-close { padding:12px 18px;background:#f5f0e8;color:#666;border:none;border-radius:10px;font-size:0.9rem;font-weight:600;cursor:pointer;font-family:inherit;transition:background 0.15s; }
-    .sms-modal-btn-close:hover { background:#e8e0d6; }
+    /* Modals */
+    .sms-modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.48); z-index: 1100; display: flex; align-items: center; justify-content: center; padding: 20px; opacity: 0; pointer-events: none; visibility: hidden; transition: opacity 0.2s, visibility 0.2s; }
+    .sms-modal-overlay.open { opacity: 1; pointer-events: all; visibility: visible; }
+    .sms-modal { background: #fff; border-radius: 20px; padding: 32px; width: 100%; max-width: 480px; transform: translateY(12px); transition: transform 0.2s; box-shadow: 0 24px 60px rgba(0,0,0,0.22); }
+    .sms-modal-overlay.open .sms-modal { transform: translateY(0); }
+    .sms-modal-hdr { display: flex; align-items: center; gap: 14px; margin-bottom: 20px; }
+    .sms-modal-ico { width: 46px; height: 46px; border-radius: 14px; background: #e8f5e9; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .sms-modal-title { font-size: 1.1rem; font-weight: 700; color: #1a1a1a; }
+    .sms-modal-sub { font-size: 0.78rem; color: #888; margin-top: 3px; }
+    .sms-modal-label { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em; color: #bbb; margin-bottom: 8px; }
+    .sms-modal-preview { background: #F5F0E8; border: 1.5px solid #e0d8ce; border-radius: 12px; padding: 14px 16px; font-size: 0.85rem; color: #444; line-height: 1.65; margin-bottom: 18px; }
+    .sms-modal-actions { display: flex; gap: 10px; }
+    .sms-modal-btn-send { flex: 1; padding: 13px; background: #3D5A47; color: #fff; border: none; border-radius: 12px; font-size: 0.92rem; font-weight: 700; cursor: pointer; font-family: inherit; text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 7px; transition: background 0.15s; }
+    .sms-modal-btn-send:hover { background: #2d4535; }
+    .sms-modal-btn-close { padding: 13px 20px; background: #f5f0e8; color: #666; border: none; border-radius: 12px; font-size: 0.92rem; font-weight: 600; cursor: pointer; font-family: inherit; transition: background 0.15s; }
+    .sms-modal-btn-close:hover { background: #e8e0d6; }
+
+    /* Accept modal */
+    .accept-modal { max-width: 560px; position: relative; }
+    .accept-modal-close { position: absolute; top: 14px; right: 16px; background: none; border: none; font-size: 1.4rem; color: #bbb; cursor: pointer; line-height: 1; padding: 0 4px; }
+    .accept-modal-close:hover { color: #555; }
+    .accept-textarea { width: 100%; min-height: 200px; background: #F5F0E8; border: 1.5px solid #e0d8ce; border-radius: 12px; padding: 14px; font-size: 0.84rem; color: #333; line-height: 1.7; font-family: 'DM Sans', sans-serif; resize: vertical; outline: none; margin-bottom: 14px; }
+    .accept-textarea:focus { border-color: #3D5A47; }
+    .accept-actions { display: flex; gap: 10px; margin-bottom: 24px; }
+    .btn-copy-accept { flex: 1; padding: 13px; background: #3D5A47; color: #fff; border: none; border-radius: 12px; font-size: 0.92rem; font-weight: 700; cursor: pointer; font-family: inherit; display: flex; align-items: center; justify-content: center; gap: 7px; transition: background 0.15s; }
+    .btn-copy-accept:hover { background: #2d4535; }
+    .btn-copy-accept.copied { background: #059669; }
+    .btn-close-accept { padding: 13px 20px; background: #f5f0e8; color: #666; border: none; border-radius: 12px; font-size: 0.92rem; font-weight: 600; cursor: pointer; font-family: inherit; }
+    .next-steps { border-top: 1px solid #f0ece6; padding-top: 20px; }
+    .next-steps-label { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em; color: #bbb; margin-bottom: 14px; }
+    .step-item { display: flex; align-items: flex-start; gap: 12px; background: #f9f7f4; border-radius: 12px; padding: 14px 16px; margin-bottom: 10px; }
+    .step-num { width: 28px; height: 28px; border-radius: 50%; background: #3D5A47; color: #fff; font-size: 0.74rem; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .step-title { font-size: 0.88rem; font-weight: 700; color: #1a1a1a; margin-bottom: 3px; }
+    .step-sub { font-size: 0.78rem; color: #666; line-height: 1.5; }
 
     /* Toast */
-    .toast { position:fixed;bottom:24px;right:24px;background:#1a1a16;color:#fff;padding:12px 20px;border-radius:10px;font-size:0.88rem;z-index:9999;opacity:0;transform:translateY(8px);transition:all 0.3s;pointer-events:none; }
-    .toast.show { opacity:1;transform:none; }
-    .toast.success { background:#059669; }
-    .toast.error { background:#dc2626; }
+    .toast { position: fixed; bottom: 28px; right: 28px; background: #1a1a16; color: #fff; padding: 13px 22px; border-radius: 12px; font-size: 0.88rem; z-index: 9999; opacity: 0; transform: translateY(8px); transition: all 0.3s; pointer-events: none; font-weight: 500; }
+    .toast.show { opacity: 1; transform: none; }
+    .toast.success { background: #059669; }
+    .toast.error { background: #dc2626; }
 
     @keyframes spin { to { transform: rotate(360deg); } }
-    .loading-spinner { animation: spin 0.8s linear infinite; }
+    .spinner { animation: spin 0.8s linear infinite; }
 
     @media(max-width:600px) {
-      .offer-amount { font-size:1.8rem; }
-      .offer-body { padding:16px 16px 14px; }
-      .offer-actions { padding:12px 16px; }
-      .btn-accept, .btn-refuse, .btn-counter { padding:10px 14px; font-size:0.8rem; }
-      .counter-panel { padding:12px 16px; }
-      .sms-modal { max-height:90vh; overflow-y:auto; }
+      .offer-amount-value { font-size: 2.2rem; }
+      .offer-body { padding: 18px 16px 14px; }
+      .offer-footer { padding: 14px 16px; }
+      .offer-status-bar { padding: 10px 16px; }
+      .invite-body { padding: 20px 16px; }
+      .counter-panel { padding: 14px 16px; }
+      .sms-modal { max-height: 90vh; overflow-y: auto; }
     }
   </style>
 </head>
@@ -219,114 +292,150 @@
     </div>
   </aside>
 
-  <div class="main">
+  <main class="main">
+
+    <!-- Page header -->
     <div class="page-hdr">
-      <div>
-        <h1><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="vertical-align:middle;margin-right:6px;"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>Mes offres d'achat</h1>
-        <div class="page-hdr-sub">Les offres reçues sur votre bien — traitez-les rapidement pour avancer</div>
+      <div class="page-hdr-left">
+        <div class="page-hdr-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#D4E4D8" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+        </div>
+        <div>
+          <h1 class="page-title">Mes offres d'achat</h1>
+          <div class="page-sub">Suivez et gérez toutes les propositions reçues sur votre bien</div>
+        </div>
+      </div>
+      <div class="page-offers-badge" id="totalBadge" style="display:none;">
+        <span class="dot"></span>
+        <span id="totalBadgeLabel">0 offres</span>
       </div>
     </div>
 
-    <!-- ── SMS prêt à l'envoi ── -->
-    <div style="background:#fff;border:1.5px solid #e8e3db;border-radius:16px;overflow:hidden;margin-bottom:24px;" id="offreLinkCard">
-      <div style="background:#3D5A47;padding:14px 22px;display:flex;align-items:center;gap:10px;">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#D4E4D8" stroke-width="2" stroke-linecap="round"><polyline points="22 2 11 13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
-        <span style="font-size:0.82rem;font-weight:700;color:#D4E4D8;text-transform:uppercase;letter-spacing:0.07em;">SMS prêt à l'envoi — Inviter à soumettre une offre</span>
+    <!-- Stats row -->
+    <div class="stats-row" id="statsRow" style="display:none;">
+      <div class="stat-card">
+        <div class="stat-num" id="st-total">—</div>
+        <div class="stat-label">Offres reçues</div>
       </div>
-      <div style="padding:20px 22px;">
-        <div style="display:flex;align-items:flex-start;gap:16px;flex-wrap:wrap;">
+      <div class="stat-card">
+        <div class="stat-num terra" id="st-pending">—</div>
+        <div class="stat-label">En attente de décision</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num green" id="st-best">—</div>
+        <div class="stat-label">Meilleure offre</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num green" id="st-accepted">—</div>
+        <div class="stat-label">Offres acceptées</div>
+      </div>
+    </div>
 
-          <!-- Lien à copier -->
-          <div style="flex:1;min-width:260px;">
-            <div style="font-size:0.72rem;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:8px;">Votre lien d'offre</div>
-            <div style="display:flex;gap:8px;align-items:center;" id="offreLinkBox">
-              <input type="text" id="offreLinkInput" readonly style="flex:1;background:#F5F0E8;font-size:0.8rem;padding:9px 12px;border:1.5px solid #e8e0d6;border-radius:8px;font-family:'DM Sans',sans-serif;color:#3D5A47;outline:none;" placeholder="Chargement…">
-              <button onclick="copyOffreLink()" style="padding:9px 14px;background:#3D5A47;color:#fff;border:none;border-radius:8px;font-size:0.82rem;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;white-space:nowrap;min-height:38px;">Copier</button>
-            </div>
-            <div style="font-size:0.76rem;color:#aaa;margin-top:6px;">L'acheteur remplit le formulaire en ligne — l'offre apparaît ici automatiquement.</div>
+    <!-- Invite card -->
+    <div class="invite-card" id="offreLinkCard" style="display:none;">
+      <div class="invite-hdr">
+        <div class="invite-hdr-icon">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="rgba(212,228,216,0.8)" stroke-width="2" stroke-linecap="round"><polyline points="22 2 11 13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+        </div>
+        <div class="invite-hdr-text">
+          <div class="invite-hdr-title">Invitez vos acheteurs à soumettre une offre</div>
+          <div class="invite-hdr-sub">Partagez ce lien après chaque visite — l'offre apparaît ici automatiquement</div>
+        </div>
+      </div>
+      <div class="invite-body">
+        <!-- Lien -->
+        <div>
+          <div class="invite-section-label">Votre lien d'offre</div>
+          <div class="invite-link-row">
+            <input type="text" id="offreLinkInput" readonly class="invite-link-input" placeholder="Chargement…">
+            <button class="btn-copy-link" id="btnCopyLink" onclick="copyOffreLink()">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+              Copier
+            </button>
           </div>
-
-          <!-- SMS prêt à envoyer -->
-          <div style="flex:1;min-width:260px;">
-            <div style="font-size:0.72rem;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:8px;">Message prêt à l'envoi</div>
-            <div id="smsPreview" style="background:#F5F0E8;border:1.5px solid #e8e0d6;border-radius:10px;padding:12px 14px;font-size:0.82rem;color:#444;line-height:1.6;min-height:70px;">Chargement…</div>
-            <div style="display:flex;gap:8px;margin-top:10px;">
-              <button onclick="copySmsText()" style="padding:9px 14px;background:#3D5A47;color:#fff;border:none;border-radius:8px;font-size:0.82rem;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;min-height:38px;">Copier le message</button>
-            </div>
+          <div class="invite-link-hint">L'acheteur remplit le formulaire en ligne — aucune action de votre part requise.</div>
+        </div>
+        <!-- SMS -->
+        <div>
+          <div class="invite-section-label">Message SMS à envoyer</div>
+          <div class="invite-sms-preview" id="smsPreview">Chargement…</div>
+          <div class="invite-sms-actions">
+            <button class="btn-copy-sms" id="btnCopySms" onclick="copySmsText()">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+              Copier le SMS
+            </button>
+            <a class="btn-send-sms-link" id="smsSendBtn" href="#">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.41a2 2 0 0 1 2-2.18h3a2 2 0 0 1 2 1.72 12.13 12.13 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.13 12.13 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+              Ouvrir SMS
+            </a>
           </div>
-
         </div>
       </div>
     </div>
 
-    <div class="stats-row" id="statsRow">
-      <div class="stat-card"><div class="stat-n" id="st-total">—</div><div class="stat-l">Offres reçues</div></div>
-      <div class="stat-card"><div class="stat-n" id="st-pending" style="color:#C4785A;">—</div><div class="stat-l">En attente</div></div>
-      <div class="stat-card"><div class="stat-n" id="st-accepted" style="color:#3D5A47;">—</div><div class="stat-l">Acceptées</div></div>
-      <div class="stat-card"><div class="stat-n" id="st-best">—</div><div class="stat-l">Meilleure offre</div></div>
-    </div>
-
     <!-- Offres actives -->
-    <div id="activeSection" style="display:none">
-      <div class="section-header">
-        <span class="section-header-title">Offres en attente de décision</span>
-        <div class="section-header-line"></div>
+    <div id="activeSection" style="display:none;">
+      <div class="section-hdr">
+        <span class="section-hdr-title">Offres en attente de décision</span>
+        <span class="section-hdr-count" id="activeSectionCount">0</span>
+        <div class="section-hdr-line"></div>
       </div>
       <div class="offers-list" id="activeOffers"></div>
     </div>
 
-    <!-- État vide / Pas encore d'offres -->
-    <div id="emptyState" style="display:none">
+    <!-- Empty state -->
+    <div id="emptyState" style="display:none;">
       <div class="empty-state">
-        <div class="empty-state-icon">
-          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+        <div class="empty-icon">
+          <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
         </div>
-        <div class="empty-state-title">Votre première offre arrive bientôt</div>
-        <div class="empty-state-sub">Les offres arrivent après les visites. Continuez à qualifier vos acheteurs et à organiser des visites de qualité — les propositions sérieuses suivront.</div>
-        <div class="empty-state-tips">
-          <div class="empty-tip"><div class="empty-tip-num">1</div><div>Publiez votre annonce sur plusieurs plateformes pour maximiser la visibilité</div></div>
-          <div class="empty-tip"><div class="empty-tip-num">2</div><div>Qualifiez vos acheteurs avant la visite — un acheteur financé vaut 10 curieux</div></div>
-          <div class="empty-tip"><div class="empty-tip-num">3</div><div>Après chaque visite, relancez sous 48h avec un message de votre bibliothèque</div></div>
+        <div class="empty-title">Votre première offre arrive bientôt</div>
+        <div class="empty-sub">Les offres sérieuses suivent les visites qualifiées. Partagez votre lien d'offre après chaque visite pour déclencher les propositions.</div>
+        <div class="empty-tips">
+          <div class="empty-tip"><div class="empty-tip-num">1</div><div>Partagez le lien d'offre ci-dessus à vos visiteurs dans les 48h après la visite</div></div>
+          <div class="empty-tip"><div class="empty-tip-num">2</div><div>Qualifiez vos acheteurs avant la visite — financement, budget, délai</div></div>
+          <div class="empty-tip"><div class="empty-tip-num">3</div><div>Relancez avec un message de votre bibliothèque pour déclencher une décision</div></div>
         </div>
       </div>
     </div>
 
-    <!-- Offres passées (acceptées / refusées) -->
-    <div id="pastSection" style="display:none">
-      <div class="section-header">
-        <span class="section-header-title">Historique des offres</span>
-        <div class="section-header-line"></div>
+    <!-- Historique -->
+    <div id="pastSection" style="display:none;">
+      <div class="section-hdr">
+        <span class="section-hdr-title">Historique des offres</span>
+        <div class="section-hdr-line"></div>
       </div>
-      <div class="offers-list offers-past" id="pastOffers"></div>
+      <div class="offers-list" id="pastOffers"></div>
     </div>
 
     <!-- Chargement -->
-    <div id="loadingState" style="text-align:center;padding:60px 20px;">
-      <div class="loading-spinner" style="width:32px;height:32px;border:3px solid #e0e0d8;border-top-color:#3D5A47;border-radius:50%;margin:0 auto 16px;"></div>
-      <div style="color:#888;font-size:0.88rem;">Chargement…</div>
+    <div id="loadingState" style="text-align:center;padding:80px 20px;">
+      <div class="spinner" style="width:36px;height:36px;border:3px solid #e0e0d8;border-top-color:#3D5A47;border-radius:50%;margin:0 auto 16px;"></div>
+      <div style="color:#999;font-size:0.88rem;">Chargement des offres…</div>
     </div>
-  </div>
+
+  </main>
 </div>
 
 <div class="toast" id="toast"></div>
 
-<!-- Modal SMS contre-proposition -->
+<!-- Modal contre-proposition SMS -->
 <div class="sms-modal-overlay" id="smsCounterModal">
   <div class="sms-modal">
     <div class="sms-modal-hdr">
       <div class="sms-modal-ico">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#2e7d32" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#2e7d32" stroke-width="2.2" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
       </div>
       <div>
-        <div class="sms-modal-title">Contre-proposition enregistrée</div>
+        <div class="sms-modal-title">Contre-proposition envoyée</div>
         <div class="sms-modal-sub" id="smsModalSub">Notifiez l'acquéreur par SMS</div>
       </div>
     </div>
-    <div class="sms-modal-label">Message prêt à envoyer</div>
+    <div class="sms-modal-label">Message prêt à copier</div>
     <div class="sms-modal-preview" id="smsModalText"></div>
     <div class="sms-modal-actions">
-      <button class="sms-modal-btn-send" id="smsModalBtn" onclick="copySmsCounter(this)">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+      <button class="sms-modal-btn-send" onclick="copySmsCounter(this)">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
         Copier le SMS
       </button>
       <button class="sms-modal-btn-close" onclick="closeSmsModal()">Fermer</button>
@@ -336,49 +445,43 @@
 
 <!-- Modal acceptation offre -->
 <div class="sms-modal-overlay" id="acceptModal">
-  <div class="sms-modal" style="max-width:520px;position:relative;">
-    <button onclick="closeAcceptModal()" style="position:absolute;top:14px;right:16px;background:none;border:none;font-size:1.4rem;color:#aaa;cursor:pointer;line-height:1;padding:0 4px;">×</button>
+  <div class="sms-modal accept-modal">
+    <button class="accept-modal-close" onclick="closeAcceptModal()">×</button>
     <div class="sms-modal-hdr">
       <div class="sms-modal-ico" style="background:#e8f4ec;">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#2e7d32" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#2e7d32" stroke-width="2.2" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
       </div>
       <div>
         <div class="sms-modal-title">Offre acceptée !</div>
         <div class="sms-modal-sub">Informez l'acheteur et lancez la suite du processus</div>
       </div>
     </div>
-
-    <!-- Message d'acceptation -->
     <div class="sms-modal-label">Message pour l'acheteur — modifiable avant envoi</div>
-    <textarea id="acceptMsgText" style="width:100%;min-height:220px;background:#F5F0E8;border:1.5px solid #e0d8ce;border-radius:10px;padding:14px;font-size:0.83rem;color:#333;line-height:1.7;font-family:'DM Sans',sans-serif;resize:vertical;box-sizing:border-box;outline:none;margin-bottom:14px;"></textarea>
-    <div style="display:flex;gap:10px;margin-bottom:22px;">
-      <button onclick="copyAcceptMsg(this)" style="flex:1;padding:12px;background:#3D5A47;color:#fff;border:none;border-radius:10px;font-size:0.9rem;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:7px;">
+    <textarea id="acceptMsgText" class="accept-textarea"></textarea>
+    <div class="accept-actions">
+      <button class="btn-copy-accept" id="btnCopyAccept" onclick="copyAcceptMsg(this)">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
         Copier le message
       </button>
-      <button onclick="closeAcceptModal()" style="padding:12px 18px;background:#f5f0e8;color:#666;border:none;border-radius:10px;font-size:0.9rem;font-weight:600;cursor:pointer;font-family:inherit;">Fermer</button>
+      <button class="btn-close-accept" onclick="closeAcceptModal()">Fermer</button>
     </div>
-
-    <!-- Prochaines étapes -->
-    <div style="border-top:1px solid #f0ece6;padding-top:18px;">
-      <div style="font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;color:#aaa;margin-bottom:12px;">Étapes suivantes — Vers le compromis</div>
-      <div style="display:flex;flex-direction:column;gap:10px;">
-        <div style="display:flex;align-items:flex-start;gap:12px;background:#f9f7f4;border-radius:10px;padding:12px 14px;">
-          <div style="width:26px;height:26px;border-radius:50%;background:#3D5A47;color:#fff;font-size:0.72rem;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;">1</div>
-          <div><div style="font-size:0.85rem;font-weight:700;color:#1a1a1a;margin-bottom:2px;">Choisir votre notaire</div><div style="font-size:0.78rem;color:#666;line-height:1.5;">Contactez votre notaire ou demandez à l'acheteur le sien. Le compromis peut être rédigé par l'un ou l'autre (ou les deux).</div></div>
-        </div>
-        <div style="display:flex;align-items:flex-start;gap:12px;background:#f9f7f4;border-radius:10px;padding:12px 14px;">
-          <div style="width:26px;height:26px;border-radius:50%;background:#3D5A47;color:#fff;font-size:0.72rem;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;">2</div>
-          <div><div style="font-size:0.85rem;font-weight:700;color:#1a1a1a;margin-bottom:2px;">Documents à récupérer auprès de l'acheteur</div><div style="font-size:0.78rem;color:#666;line-height:1.5;">Pièce d'identité · Justificatif de domicile · Accord de principe bancaire ou attestation de fonds propres · Coordonnées de son notaire si souhaité.</div></div>
-        </div>
-        <div style="display:flex;align-items:flex-start;gap:12px;background:#f9f7f4;border-radius:10px;padding:12px 14px;">
-          <div style="width:26px;height:26px;border-radius:50%;background:#3D5A47;color:#fff;font-size:0.72rem;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;">3</div>
-          <div><div style="font-size:0.85rem;font-weight:700;color:#1a1a1a;margin-bottom:2px;">Documents à préparer de votre côté</div><div style="font-size:0.78rem;color:#666;line-height:1.5;">Titre de propriété · Diagnostics complets · Règlement de copropriété (si applicable) · Taxe foncière · Charges annuelles.</div></div>
-        </div>
-        <div style="display:flex;align-items:flex-start;gap:12px;background:#f9f7f4;border-radius:10px;padding:12px 14px;">
-          <div style="width:26px;height:26px;border-radius:50%;background:#3D5A47;color:#fff;font-size:0.72rem;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;">4</div>
-          <div><div style="font-size:0.85rem;font-weight:700;color:#1a1a1a;margin-bottom:2px;">Fixer la date du compromis</div><div style="font-size:0.78rem;color:#666;line-height:1.5;">Coordonnez-vous avec le notaire et l'acheteur pour choisir une date. Comptez 3 à 6 semaines après l'acceptation de l'offre.</div></div>
-        </div>
+    <div class="next-steps">
+      <div class="next-steps-label">Étapes suivantes — vers le compromis</div>
+      <div class="step-item">
+        <div class="step-num">1</div>
+        <div><div class="step-title">Choisir votre notaire</div><div class="step-sub">Contactez votre notaire ou demandez à l'acheteur le sien. Le compromis peut être rédigé par l'un ou l'autre.</div></div>
+      </div>
+      <div class="step-item">
+        <div class="step-num">2</div>
+        <div><div class="step-title">Documents à récupérer auprès de l'acheteur</div><div class="step-sub">Pièce d'identité · Justificatif de domicile · Accord bancaire ou attestation de fonds · Coordonnées de son notaire.</div></div>
+      </div>
+      <div class="step-item">
+        <div class="step-num">3</div>
+        <div><div class="step-title">Documents à préparer de votre côté</div><div class="step-sub">Titre de propriété · Diagnostics complets · Règlement de copropriété · Taxe foncière · Charges annuelles.</div></div>
+      </div>
+      <div class="step-item">
+        <div class="step-num">4</div>
+        <div><div class="step-title">Fixer la date du compromis</div><div class="step-sub">Coordonnez-vous avec le notaire et l'acheteur. Comptez 3 à 6 semaines après l'acceptation.</div></div>
       </div>
     </div>
   </div>
@@ -390,25 +493,30 @@ let allOffers = [];
 let listingPrice = 0;
 let _sellerFirstName = '';
 
-// Formater un montant en euros
+const SVG_COPY = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" style="vertical-align:middle;"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>';
+const SVG_CHECK = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" style="vertical-align:middle;"><polyline points="20 6 9 17 4 12"/></svg>';
+
 function formatPrice(n) {
-  if (!n) return '—';
-  return Number(n).toLocaleString('fr-FR', { style:'currency', currency:'EUR', maximumFractionDigits:0 });
+  if (!n && n !== 0) return '—';
+  return Number(n).toLocaleString('fr-FR', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 });
 }
 
-// Diff par rapport au prix affiché
-function priceDiff(offer, listing) {
+function priceDiffHtml(offer, listing) {
   if (!offer || !listing) return '';
   const diff = offer - listing;
   const pct = Math.round((diff / listing) * 100);
-  if (diff === 0) return '<span class="offer-diff neutral">= Prix affiché</span>';
-  if (diff > 0) return `<span class="offer-diff positive">+${formatPrice(diff)} (+${pct}%)</span>`;
-  return `<span class="offer-diff negative">${formatPrice(diff)} (${pct}%)</span>`;
+  if (diff === 0) return '<span class="offer-diff-badge diff-neutral">= Prix affiché</span>';
+  if (diff > 0) return `<span class="offer-diff-badge diff-positive">+${formatPrice(diff)} (+${pct}%)</span>`;
+  return `<span class="offer-diff-badge diff-negative">${formatPrice(diff)} (${pct}%)</span>`;
+}
+
+function progressPct(offer, listing) {
+  if (!offer || !listing) return 0;
+  return Math.min(Math.round((offer / listing) * 100), 100);
 }
 
 async function load() {
   try {
-    // Charger le prix du bien et le prénom vendeur
     try {
       const [propRes, meRes] = await Promise.all([fetch('/api/property'), fetch('/api/me')]);
       const propData = await propRes.json();
@@ -420,40 +528,47 @@ async function load() {
     const r = await fetch('/api/offers');
     const data = await r.json();
     allOffers = data.offers || [];
-
     document.getElementById('loadingState').style.display = 'none';
     renderOffers();
   } catch(e) {
-    document.getElementById('loadingState').innerHTML = `
-      <div style="text-align:center;padding:60px 20px;color:#888;">
-        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#ccc" stroke-width="1.4" style="margin-bottom:12px;display:block;margin-left:auto;margin-right:auto;"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
-        Impossible de charger les offres — vérifiez votre connexion
-      </div>`;
+    document.getElementById('loadingState').innerHTML =
+      '<div style="text-align:center;padding:60px 20px;color:#999;font-size:0.88rem;">Impossible de charger les offres — vérifiez votre connexion</div>';
   }
 }
 
 function renderOffers() {
-  const active = allOffers.filter(o => (o.status || 'pending') === 'pending' || (o.status || 'pending') === 'countered');
-  const past = allOffers.filter(o => o.status === 'accepted' || o.status === 'refused');
+  const active = allOffers.filter(o => !o.status || o.status === 'pending' || o.status === 'countered');
+  const past   = allOffers.filter(o => o.status === 'accepted' || o.status === 'refused');
 
   // Stats
-  document.getElementById('st-total').textContent = allOffers.length || '0';
-  document.getElementById('st-pending').textContent = active.length || '0';
+  const total = allOffers.length;
+  document.getElementById('st-total').textContent   = total || '0';
+  document.getElementById('st-pending').textContent  = active.length || '0';
   document.getElementById('st-accepted').textContent = past.filter(o => o.status === 'accepted').length || '0';
   const amounts = allOffers.map(o => Number(o.amount)).filter(Boolean);
-  document.getElementById('st-best').textContent = amounts.length ? formatPrice(Math.max(...amounts)) : '—';
+  document.getElementById('st-best').textContent     = amounts.length ? formatPrice(Math.max(...amounts)) : '—';
 
-  if (!allOffers.length) {
+  // Page badge
+  const badge = document.getElementById('totalBadge');
+  if (total > 0) {
+    badge.style.display = 'inline-flex';
+    document.getElementById('totalBadgeLabel').textContent = total + ' offre' + (total > 1 ? 's' : '') + ' reçue' + (total > 1 ? 's' : '');
+  }
+
+  // Stats visibility
+  document.getElementById('statsRow').style.display = total > 0 ? 'grid' : 'none';
+
+  if (!total) {
     document.getElementById('emptyState').style.display = 'block';
     document.getElementById('activeSection').style.display = 'none';
     document.getElementById('pastSection').style.display = 'none';
     return;
   }
-
   document.getElementById('emptyState').style.display = 'none';
 
   if (active.length) {
     document.getElementById('activeSection').style.display = 'block';
+    document.getElementById('activeSectionCount').textContent = active.length;
     document.getElementById('activeOffers').innerHTML = active
       .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
       .map(o => buildOfferCard(o, true)).join('');
@@ -473,110 +588,134 @@ function renderOffers() {
 
 function buildOfferCard(o, isActive) {
   const status = o.status || 'pending';
-  const initials = (o.buyer_name || '?').split(' ').map(w => w[0]).slice(0,2).join('').toUpperCase();
-  const date = new Date(o.created_at).toLocaleDateString('fr-FR', { day:'2-digit', month:'short', year:'numeric' });
+  const initials = (o.buyer_name || '?').split(' ').map(w => w[0]).slice(0, 2).join('').toUpperCase();
 
-  const BADGE_HTML = {
-    pending: '<span class="badge badge-new-offer"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="vertical-align:middle;margin-right:3px;"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>Nouvelle offre</span>',
-    countered: '<span class="badge badge-countered">Contre-proposition</span>',
-    accepted: '<span class="badge badge-accepted"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="vertical-align:middle;margin-right:3px;"><polyline points="20 6 9 17 4 12"/></svg>Acceptée</span>',
-    refused: '<span class="badge badge-refused">Refusée</span>',
+  const dateObj = new Date(o.created_at);
+  const dateStr = dateObj.toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: 'numeric' });
+  const timeStr = dateObj.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+  const dateFull = `${dateStr} à ${timeStr}`;
+
+  const BADGE = {
+    pending:   '<span class="offer-badge badge-pending"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="vertical-align:middle;margin-right:4px;"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>Offre reçue</span>',
+    countered: '<span class="offer-badge badge-countered"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="vertical-align:middle;margin-right:4px;"><path d="M17 1l4 4-4 4"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><path d="M7 23l-4-4 4-4"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>Contre-proposition</span>',
+    accepted:  '<span class="offer-badge badge-accepted"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="vertical-align:middle;margin-right:4px;"><polyline points="20 6 9 17 4 12"/></svg>Acceptée</span>',
+    refused:   '<span class="offer-badge badge-refused"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:middle;margin-right:4px;"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>Refusée</span>',
   };
 
-  const conditionTags = [];
-  if (o.financing === 'cash') conditionTags.push('<span class="cond-tag"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg> Comptant</span>');
-  if (o.financing === 'loan') conditionTags.push('<span class="cond-tag"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg> Financement bancaire</span>');
-  if (o.loan_approved) conditionTags.push('<span class="cond-tag" style="color:#2e7d32;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="20 6 9 17 4 12"/></svg> Accord bancaire obtenu</span>');
-  if (o.suspensive_condition) conditionTags.push('<span class="cond-tag">Condition suspensive</span>');
+  // Tags financement/conditions
+  const tags = [];
+  if (o.financing === 'cash')
+    tags.push('<span class="offer-tag"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="vertical-align:middle;"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg> Comptant</span>');
+  if (o.financing === 'loan')
+    tags.push('<span class="offer-tag"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="vertical-align:middle;"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg> Financement bancaire</span>');
+  if (o.loan_approved)
+    tags.push('<span class="offer-tag tag-green"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" style="vertical-align:middle;"><polyline points="20 6 9 17 4 12"/></svg> Accord bancaire obtenu</span>');
+  if (o.suspensive_condition)
+    tags.push('<span class="offer-tag">Condition suspensive</span>');
   if (o.deadline) {
-    const dl = new Date(o.deadline).toLocaleDateString('fr-FR', { day:'2-digit', month:'short' });
-    conditionTags.push(`<span class="cond-tag"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/></svg> Réponse attendue avant le ${dl}</span>`);
+    const dl = new Date(o.deadline).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short' });
+    tags.push(`<span class="offer-tag"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="vertical-align:middle;"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/></svg> Réponse avant le ${dl}</span>`);
   }
 
+  // Progress bar vs listing price
+  const vsListingHtml = listingPrice ? `
+    <div class="offer-vs-listing">
+      <div class="offer-vs-row">
+        <span>Prix affiché</span>
+        <strong>${formatPrice(listingPrice)}</strong>
+      </div>
+      <div class="offer-progress-track">
+        <div class="offer-progress-fill" style="width:${progressPct(o.amount, listingPrice)}%;"></div>
+      </div>
+      ${priceDiffHtml(o.amount, listingPrice)}
+    </div>` : '';
+
+  // Counter amount display (if countered)
+  const counterHtml = o.counter_amount ? `
+    <div class="counter-amount-section">
+      <div class="counter-amount-label">Votre contre-proposition</div>
+      <div class="counter-amount-value">${formatPrice(o.counter_amount)}</div>
+    </div>` : '';
+
+  // Actions
   const actionsHtml = isActive ? `
-    <div class="offer-actions">
+    <div class="offer-footer">
       <button class="btn-accept" onclick="setOfferStatus(${o.id},'accepted')">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
         Accepter l'offre
       </button>
       <button class="btn-counter" onclick="toggleCounter(${o.id})">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M17 1l4 4-4 4"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><path d="M7 23l-4-4 4-4"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M17 1l4 4-4 4"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><path d="M7 23l-4-4 4-4"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>
         Contre-proposer
       </button>
       <button class="btn-refuse" onclick="setOfferStatus(${o.id},'refused')">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
         Refuser
       </button>
-      <button class="btn-icon-only" title="Supprimer" onclick="deleteOffer(${o.id})">
+      <button class="btn-delete" title="Supprimer cette offre" onclick="deleteOffer(${o.id})">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
       </button>
     </div>
     <div class="counter-panel" id="counter-${o.id}">
-      <label>Votre contre-proposition</label>
+      <div class="counter-panel-label">Votre contre-proposition</div>
       <div class="counter-input-row">
-        <input type="number" class="counter-input" id="counter-val-${o.id}" placeholder="Ex: 285000" min="0" step="500">
-        <button class="btn-send-counter" onclick="sendCounter(${o.id})">Enregistrer ma contre-proposition</button>
+        <input type="number" class="counter-input" id="counter-val-${o.id}" placeholder="Ex : 285 000" min="0" step="500">
+        <button class="btn-send-counter" onclick="sendCounter(${o.id})">Enregistrer la contre-proposition</button>
       </div>
     </div>` : `
-    <div class="offer-actions" style="gap:6px;">
-      <span style="font-size:0.78rem;color:#888;">${status === 'accepted' ? 'Offre acceptée — en cours de compromis' : 'Offre refusée'}</span>
-      <button class="btn-icon-only" title="Supprimer" onclick="deleteOffer(${o.id})" style="margin-left:auto;">
+    <div class="offer-footer">
+      <span class="past-status-label">${status === 'accepted' ? '✓ Offre acceptée — compromis en cours' : '✕ Offre refusée'}</span>
+      <button class="btn-delete" title="Supprimer" onclick="deleteOffer(${o.id})">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
       </button>
     </div>`;
 
   return `
-  <div class="offer-card status-${status}" id="offer-${o.id}">
-    <div class="offer-body">
-      <div class="offer-top">
-        <div class="offer-avatar">${initials}</div>
-        <div class="offer-identity">
-          <div class="offer-name">${o.buyer_name || 'Acheteur anonyme'}</div>
-          <div class="offer-meta">
-            ${o.buyer_phone ? `<span><a href="tel:${o.buyer_phone}">${o.buyer_phone}</a></span>` : ''}
-            ${o.buyer_email ? `<span><a href="mailto:${o.buyer_email}">${o.buyer_email}</a></span>` : ''}
-            <span>${date}</span>
-          </div>
-        </div>
-        <div class="offer-badges">
-          ${BADGE_HTML[status] || BADGE_HTML.pending}
-        </div>
-      </div>
-
-      <div class="offer-amount-row">
-        <div>
-          <div class="offer-amount">${formatPrice(o.amount)}</div>
-          <div class="offer-amount-label">Montant proposé</div>
-        </div>
-        ${listingPrice ? `<div class="offer-vs-price">
-          <span class="vs-label">Prix affiché</span>
-          <span class="vs-value">${formatPrice(listingPrice)}</span>
-        </div>
-        ${priceDiff(o.amount, listingPrice)}` : ''}
-      </div>
-
-      ${conditionTags.length ? `<div class="offer-conditions">${conditionTags.join('')}</div>` : ''}
-      ${o.message ? `<div class="offer-note">${o.message}</div>` : ''}
+  <div class="offer-card${!isActive ? ' status-past' : ''}" id="offer-${o.id}">
+    <div class="offer-status-bar bar-${status}">
+      ${BADGE[status] || BADGE.pending}
+      <span class="offer-date">${dateFull}</span>
     </div>
-
+    <div class="offer-body">
+      <div class="offer-main-grid">
+        <div>
+          <div class="offer-buyer">
+            <div class="offer-avatar avatar-${status}">${initials}</div>
+            <div class="offer-buyer-info">
+              <div class="offer-buyer-name">${o.buyer_name || 'Acheteur anonyme'}</div>
+              <div class="offer-buyer-contacts">
+                ${o.buyer_phone ? `<span class="offer-contact-item"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.41a2 2 0 0 1 2-2.18h3a2 2 0 0 1 2 1.72 12.13 12.13 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.13 12.13 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg><a href="tel:${o.buyer_phone}">${o.buyer_phone}</a></span>` : ''}
+                ${o.buyer_email ? `<span class="offer-contact-item"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg><a href="mailto:${o.buyer_email}">${o.buyer_email}</a></span>` : ''}
+              </div>
+            </div>
+          </div>
+          ${tags.length ? `<div class="offer-tags">${tags.join('')}</div>` : ''}
+          ${o.message ? `<div class="offer-message">"${o.message}"</div>` : ''}
+        </div>
+        <div class="offer-amount-section">
+          <div class="offer-amount-value">${formatPrice(o.amount)}</div>
+          <div class="offer-amount-label">Montant proposé</div>
+          ${vsListingHtml}
+          ${counterHtml}
+        </div>
+      </div>
+    </div>
     ${actionsHtml}
   </div>`;
 }
 
 function toggleCounter(id) {
-  const panel = document.getElementById(`counter-${id}`);
+  const panel = document.getElementById('counter-' + id);
   panel.classList.toggle('open');
-  if (panel.classList.contains('open')) {
-    document.getElementById(`counter-val-${id}`)?.focus();
-  }
+  if (panel.classList.contains('open')) document.getElementById('counter-val-' + id)?.focus();
 }
 
 async function sendCounter(id) {
-  const val = document.getElementById(`counter-val-${id}`)?.value;
+  const val = document.getElementById('counter-val-' + id)?.value;
   if (!val || Number(val) <= 0) { showToast('Entrez un montant valide', 'error'); return; }
   try {
-    await fetch(`/api/offers/${id}/counter`, {
-      method:'POST', headers:{'Content-Type':'application/json'},
+    await fetch('/api/offers/' + id + '/counter', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ counter_amount: Number(val) })
     });
     const o = allOffers.find(x => x.id === id);
@@ -592,9 +731,7 @@ function openSmsCounterModal(offer, counterAmount) {
   if (!offer) return;
   const prenom = (offer.buyer_name || 'Madame, Monsieur').split(' ')[0];
   const phone = offer.buyer_phone || '';
-  const originalFmt = formatPrice(offer.amount);
-  const counterFmt = formatPrice(counterAmount);
-  const smsText = `Bonjour ${prenom}, j'ai bien reçu votre offre de ${originalFmt}. Je vous fais une contre-proposition à ${counterFmt}. N'hésitez pas à me recontacter pour en discuter. Cordialement.`;
+  const smsText = `Bonjour ${prenom}, j'ai bien reçu votre offre de ${formatPrice(offer.amount)}. Je vous fais une contre-proposition à ${formatPrice(counterAmount)}. N'hésitez pas à me recontacter pour en discuter. Cordialement.`;
   document.getElementById('smsModalText').textContent = smsText;
   document.getElementById('smsModalSub').textContent = phone
     ? `Notifiez ${offer.buyer_name || 'l\'acquéreur'} (${phone}) par SMS`
@@ -604,32 +741,28 @@ function openSmsCounterModal(offer, counterAmount) {
 
 function copySmsCounter(btn) {
   const text = document.getElementById('smsModalText').textContent;
+  const orig = btn.innerHTML;
   navigator.clipboard.writeText(text).then(() => {
-    const orig = btn.innerHTML;
-    btn.innerHTML = '✓ Copié !';
+    btn.innerHTML = SVG_CHECK + ' Copié !';
     btn.style.background = '#059669';
     setTimeout(() => { btn.innerHTML = orig; btn.style.background = ''; }, 2500);
   });
 }
 
-function closeSmsModal() {
-  document.getElementById('smsCounterModal').classList.remove('open');
-}
-document.getElementById('smsCounterModal').addEventListener('click', function(e) {
-  if (e.target === this) closeSmsModal();
-});
+function closeSmsModal() { document.getElementById('smsCounterModal').classList.remove('open'); }
+document.getElementById('smsCounterModal').addEventListener('click', function(e) { if (e.target === this) closeSmsModal(); });
 
 async function setOfferStatus(id, status) {
   try {
-    await fetch(`/api/offers/${id}/status`, {
-      method:'PUT', headers:{'Content-Type':'application/json'},
+    await fetch('/api/offers/' + id + '/status', {
+      method: 'PUT', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ status })
     });
     const o = allOffers.find(x => x.id === id);
-    if (o) { o.status = status; }
+    if (o) o.status = status;
     renderOffers();
-    const labels = { accepted:'Offre acceptée !', refused:'Offre refusée', countered:'Contre-proposition envoyée' };
-    showToast(labels[status] || 'Mis à jour');
+    const labels = { accepted: 'Offre acceptée !', refused: 'Offre refusée', countered: 'Contre-proposition envoyée' };
+    showToast(labels[status] || 'Mis à jour', 'success');
     if (status === 'accepted') openAcceptModal(o);
   } catch(e) {
     showToast('Erreur réseau', 'error');
@@ -639,8 +772,8 @@ async function setOfferStatus(id, status) {
 function openAcceptModal(offer) {
   const prenom = (offer?.buyer_name || 'Madame, Monsieur').split(' ')[0];
   const vendeur = _sellerFirstName || 'Le propriétaire';
-  const msg = `Bonjour ${prenom},\n\nJe vous confirme avoir accepté votre offre d'achat concernant mon bien.\n\nAfin de permettre la préparation du compromis de vente, pourriez-vous me transmettre les informations et documents nécessaires à la constitution du dossier ?\n\nSouhaitez-vous être représenté(e) par votre propre notaire pour la suite de la procédure ?\nSi oui, merci de me communiquer ses coordonnées complètes (nom, étude notariale, téléphone et adresse e-mail).\n\nJe reste à votre disposition pour toute information complémentaire.\n\nCordialement,\n${vendeur}`;
-  document.getElementById('acceptMsgText').value = msg;
+  document.getElementById('acceptMsgText').value =
+    `Bonjour ${prenom},\n\nJe vous confirme avoir accepté votre offre d'achat concernant mon bien.\n\nAfin de permettre la préparation du compromis de vente, pourriez-vous me transmettre les informations et documents nécessaires à la constitution du dossier ?\n\nSouhaitez-vous être représenté(e) par votre propre notaire pour la suite de la procédure ?\nSi oui, merci de me communiquer ses coordonnées complètes (nom, étude notariale, téléphone et adresse e-mail).\n\nJe reste à votre disposition pour toute information complémentaire.\n\nCordialement,\n${vendeur}`;
   document.getElementById('acceptModal').classList.add('open');
   document.body.style.overflow = 'hidden';
 }
@@ -652,28 +785,26 @@ function closeAcceptModal() {
 
 function copyAcceptMsg(btn) {
   const text = document.getElementById('acceptMsgText').value;
+  const orig = btn.innerHTML;
   navigator.clipboard.writeText(text).then(() => {
-    const orig = btn.innerHTML;
-    btn.textContent = '✓ Copié !';
-    btn.style.background = '#059669';
-    setTimeout(() => { btn.innerHTML = orig; btn.style.background = ''; }, 2500);
+    btn.innerHTML = SVG_CHECK + ' Copié !';
+    btn.classList.add('copied');
+    setTimeout(() => { btn.innerHTML = orig; btn.classList.remove('copied'); }, 2500);
   });
 }
 
-document.getElementById('acceptModal').addEventListener('click', function(e) {
-  if (e.target === this) closeAcceptModal();
-});
+document.getElementById('acceptModal').addEventListener('click', function(e) { if (e.target === this) closeAcceptModal(); });
 document.addEventListener('keydown', e => {
-  if (e.key === 'Escape' && document.getElementById('acceptModal').classList.contains('open')) closeAcceptModal();
+  if (e.key === 'Escape') { closeAcceptModal(); closeSmsModal(); }
 });
 
 async function deleteOffer(id) {
-  if (!confirm('Supprimer cette offre ?')) return;
+  if (!confirm('Supprimer cette offre définitivement ?')) return;
   try {
-    await fetch(`/api/offers/${id}`, { method:'DELETE' });
+    await fetch('/api/offers/' + id, { method: 'DELETE' });
     allOffers = allOffers.filter(o => o.id !== id);
     renderOffers();
-    showToast('Offre supprimée');
+    showToast('Offre supprimée', 'success');
   } catch(e) {
     showToast('Erreur réseau', 'error');
   }
@@ -682,9 +813,9 @@ async function deleteOffer(id) {
 function showToast(msg, type) {
   const t = document.getElementById('toast');
   t.textContent = msg;
-  t.className = 'toast show' + (type === 'error' ? ' error' : ' success');
+  t.className = 'toast show' + (type === 'error' ? ' error' : type === 'success' ? ' success' : '');
   clearTimeout(t._t);
-  t._t = setTimeout(() => { t.className = 'toast'; }, 2500);
+  t._t = setTimeout(() => { t.className = 'toast'; }, 2600);
 }
 
 let offreLinkUrl = '';
@@ -696,28 +827,41 @@ async function loadOffreLink() {
     if (data.url) {
       offreLinkUrl = data.url;
       document.getElementById('offreLinkInput').value = data.url;
+      document.getElementById('offreLinkCard').style.display = 'block';
       const smsText = `Bonjour, suite à votre visite de mon bien, voici le lien pour soumettre votre offre d'achat en ligne : ${data.url} — Je la traiterai dans les meilleurs délais.`;
       document.getElementById('smsPreview').textContent = smsText;
-      document.getElementById('smsSendBtn').href = `sms:?&body=${encodeURIComponent(smsText)}`;
-    } else {
-      const card = document.getElementById('offreLinkCard');
-      if (card) card.style.display = 'none';
+      const sendBtn = document.getElementById('smsSendBtn');
+      if (sendBtn) sendBtn.href = `sms:?&body=${encodeURIComponent(smsText)}`;
     }
-  } catch(e) {
-    const card = document.getElementById('offreLinkCard');
-    if (card) card.style.display = 'none';
-  }
+  } catch(e) {}
 }
 
 function copyOffreLink() {
   if (!offreLinkUrl) return;
-  navigator.clipboard.writeText(offreLinkUrl).then(() => showToast('Lien copié !', 'success'));
+  navigator.clipboard.writeText(offreLinkUrl).then(() => {
+    const btn = document.getElementById('btnCopyLink');
+    if (!btn) return;
+    const orig = btn.innerHTML;
+    btn.innerHTML = SVG_CHECK + ' Copié !';
+    btn.classList.add('copied');
+    setTimeout(() => { btn.innerHTML = orig; btn.classList.remove('copied'); }, 2200);
+    showToast('Lien copié !', 'success');
+  });
 }
 
 function copySmsText() {
   const text = document.getElementById('smsPreview')?.textContent;
-  if (!text) return;
-  navigator.clipboard.writeText(text).then(() => showToast('Texte copié !', 'success'));
+  if (!text || text === 'Chargement…') return;
+  const btn = document.getElementById('btnCopySms');
+  navigator.clipboard.writeText(text).then(() => {
+    if (btn) {
+      const orig = btn.innerHTML;
+      btn.innerHTML = SVG_CHECK + ' Copié !';
+      btn.classList.add('copied');
+      setTimeout(() => { btn.innerHTML = orig; btn.classList.remove('copied'); }, 2200);
+    }
+    showToast('Message copié !', 'success');
+  });
 }
 
 load();
