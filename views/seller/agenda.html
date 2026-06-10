@@ -1468,7 +1468,8 @@ const MONTHS_SHORT_FR=['jan','fév','mar','avr','mai','juin','juil','août','sep
 function renderAvailMonth() {
   document.getElementById('availMonthLabel').textContent=MONTHS_FR[availMonth.getMonth()]+' '+availMonth.getFullYear();
   const key=availMonthKey(availMonth);
-  const monthSlots=availSlots.filter(s=>s.date.startsWith(key)).sort((a,b)=>a.date.localeCompare(b.date)||a.start.localeCompare(b.start));
+  const todayKey=new Date().toISOString().split('T')[0];
+  const monthSlots=availSlots.filter(s=>s.date.startsWith(key)&&s.date>=todayKey).sort((a,b)=>a.date.localeCompare(b.date)||a.start.localeCompare(b.start));
   const list=document.getElementById('availSlotList');
 
   // Update count badge
@@ -1888,6 +1889,11 @@ async function loadData() {
       const saved=JSON.parse(localStorage.getItem('avail_slots_v2')||'[]');
       if (saved.length) availSlots=saved;
     }
+    // Nettoyer automatiquement les créneaux passés
+    const _today = new Date().toISOString().split('T')[0];
+    const _before = availSlots.length;
+    availSlots = availSlots.filter(s => s.date >= _today);
+    if (availSlots.length < _before) persistAvail();
     renderAvailMonth();
 
   } catch(e) { showToast('Erreur de chargement','error'); }
