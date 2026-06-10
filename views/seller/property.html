@@ -2450,11 +2450,20 @@
 
         /* Section sub-labels */
         .docs-sub-label { font-size:0.7rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:#bbb;margin-bottom:10px; }
+
+        /* ── Collapsible dpanels (comme les photo-folders) ── */
+        .dpanel.collapsed .dpanel-body { display:none; }
+        .dpanel.collapsed .dpanel-progress { display:none; }
+        .dpanel-head { cursor:pointer; transition:background 0.15s; }
+        .dpanel-head:hover { background:#faf8f5; }
+        .dpanel-chevron { flex-shrink:0; transition:transform 0.2s; margin-left:4px; }
+        .dpanel:not(.collapsed) .dpanel-chevron svg { transform:rotate(180deg); }
+        .dpanel-count { padding:3px 10px;border-radius:20px;font-size:0.65rem;font-weight:700;background:#e8f5e9;color:#2e7d32;white-space:nowrap;flex-shrink:0;margin-right:4px; }
       </style>
 
 
       <!-- ─── SECTION 0 : Diagnostics réglementaires ─── -->
-      <div class="dpanel">
+      <div class="dpanel" id="dpanel-diag">
         <div class="dpanel-head">
           <div class="dpanel-icon" style="background:#edf4ef;display:flex;align-items:center;justify-content:center;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2e7d32" stroke-width="1.8"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="12" x2="8" y2="12"/><line x1="12" y1="16" x2="8" y2="16"/></svg></div>
           <div style="flex:1;">
@@ -2535,7 +2544,7 @@
       </div>
 
       <!-- ─── SECTION 1 : Plan du bien ─── -->
-      <div class="dpanel">
+      <div class="dpanel" id="dpanel-plan">
         <div class="dpanel-head">
           <div class="dpanel-icon" style="background:#f0f0ff;display:flex;align-items:center;justify-content:center;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#3949ab" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="1"/><line x1="2" y1="9" x2="14" y2="9"/><line x1="14" y1="2" x2="14" y2="9"/><line x1="9" y1="9" x2="9" y2="22"/><line x1="14" y1="14" x2="22" y2="14"/></svg></div>
           <div style="flex:1;">
@@ -4612,6 +4621,73 @@ function renderDocuments(docs) {
       bannerEl.innerHTML = '<strong>Organisez votre dossier documentaire</strong><br>Commencez par déposer le dossier de diagnostics remis par votre diagnostiqueur.';
     }
   }
+
+  initDocPanels();
+  updateDocPanelCounts();
+}
+
+function initDocPanels() {
+  document.querySelectorAll('#tab-documents .dpanel').forEach(function(panel) {
+    if (panel._dpanelInited) return;
+    panel._dpanelInited = true;
+    panel.classList.add('collapsed');
+    var head = panel.querySelector('.dpanel-head');
+    if (!head) return;
+    if (!head.querySelector('.dpanel-chevron')) {
+      var chev = document.createElement('span');
+      chev.className = 'dpanel-chevron';
+      chev.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#bbb" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>';
+      head.appendChild(chev);
+    }
+    head.addEventListener('click', function(e) {
+      if (e.target.closest('button,label,input,a,select')) return;
+      panel.classList.toggle('collapsed');
+    });
+  });
+}
+
+function updateDocPanelCounts() {
+  // rawLists = children sans classe vide (diagBlocList etc.)
+  // cardLists = contiennent .docs-card quand remplis (acheteurDocsList etc.)
+  var cfg = [
+    { id:'dpanel-diag',      rawLists:['diagBlocList','assainissementBlocList'], cardLists:[], slots:[] },
+    { id:'dpanel-plan',      rawLists:[], cardLists:[], slots:['planSlots'] },
+    { id:'section-acheteur', rawLists:[], cardLists:['acheteurDocsList'], slots:['acheteurSlots'] },
+    { id:'section-notaire',  rawLists:[], cardLists:['notaireDocsList'], slots:['notaireSlots'] },
+  ];
+  cfg.forEach(function(c) {
+    var panel = document.getElementById(c.id);
+    if (!panel) return;
+    var head = panel.querySelector('.dpanel-head');
+    if (!head) return;
+    var count = 0;
+    c.rawLists.forEach(function(lid) {
+      var el = document.getElementById(lid);
+      if (el) count += el.children.length;
+    });
+    c.cardLists.forEach(function(lid) {
+      var el = document.getElementById(lid);
+      if (el) count += el.querySelectorAll('.docs-card').length;
+    });
+    c.slots.forEach(function(sid) {
+      var el = document.getElementById(sid);
+      if (el) count += el.querySelectorAll('.conf-slot.filled').length;
+    });
+    var badge = head.querySelector('.dpanel-count');
+    if (!badge) {
+      badge = document.createElement('span');
+      badge.className = 'dpanel-count';
+      var chev = head.querySelector('.dpanel-chevron');
+      if (chev) head.insertBefore(badge, chev);
+      else head.appendChild(badge);
+    }
+    if (count > 0) {
+      badge.textContent = count + (count === 1 ? ' fichier' : ' fichiers');
+      badge.style.display = '';
+    } else {
+      badge.style.display = 'none';
+    }
+  });
 }
 
 // ── AI Description generator ───────────────────────────
