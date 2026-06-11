@@ -397,11 +397,8 @@ async function chargeInstallments() {
       }
     } catch(e) {
       console.error(`4x charge error seller ${seller.id}:`, e.message);
-      // Alerte admin si carte refusée
-      try {
-        db.prepare(`INSERT INTO notifications (seller_id, type, title, body) VALUES (0,'admin_alert','Échec mensualité 4x',?)`)
-          .run(`${seller.email} (id=${seller.id}) — versement ${installmentNum}/${seller.installments_total} refusé : ${e.message}`);
-      } catch(ne) {}
+      // Alerte admin si carte refusée (log serveur — seller_id=0 invalide en base)
+      console.error(`⚠️  Échec mensualité 4x — ${seller.email} (id=${seller.id}) versement ${installmentNum}/${seller.installments_total} : ${e.message}`);
     }
   }
 }

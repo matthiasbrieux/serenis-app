@@ -15,8 +15,9 @@
       span.className = 'sidebar-badge';
       el.appendChild(span);
     }
-    badge('offresBadge', '/mes-offres', pendingOffers);
-    badge('agendaBadge', '/mon-agenda', (upcomingVisits || 0) + (unreadNotifs || 0) || undefined);
+    badge('offresBadge', '/mes-offres',      pendingOffers);
+    badge('agendaBadge', '/mon-agenda',      upcomingVisits || undefined);
+    badge('coachBadge',  '/coach-ia',        unreadNotifs   || undefined);
   } catch(e) {}
 })();
 

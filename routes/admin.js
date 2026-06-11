@@ -215,19 +215,22 @@ router.post('/api/seed-demo', requireAdmin, (req, res) => {
 
   const demoHash = bcrypt.hashSync('demo1234', 10);
 
-  // Supprime les démos existantes
+  // Supprime les démos existantes (transaction atomique — P3-5)
   const existing = db.prepare("SELECT id FROM sellers WHERE email LIKE '%@demo.serenis'").all();
-  existing.forEach(s => {
-    const props = db.prepare('SELECT id FROM properties WHERE seller_id=?').all(s.id);
-    props.forEach(p => {
-      db.prepare('DELETE FROM property_photos WHERE property_id=?').run(p.id);
-      db.prepare('DELETE FROM property_documents WHERE property_id=?').run(p.id);
+  const deleteDemo = db.transaction((sellers) => {
+    sellers.forEach(s => {
+      const props = db.prepare('SELECT id FROM properties WHERE seller_id=?').all(s.id);
+      props.forEach(p => {
+        db.prepare('DELETE FROM property_photos WHERE property_id=?').run(p.id);
+        db.prepare('DELETE FROM property_documents WHERE property_id=?').run(p.id);
+      });
+      db.prepare('DELETE FROM buyer_contacts WHERE seller_id=?').run(s.id);
+      db.prepare('DELETE FROM visits WHERE seller_id=?').run(s.id);
+      db.prepare('DELETE FROM properties WHERE seller_id=?').run(s.id);
+      db.prepare('DELETE FROM sellers WHERE id=?').run(s.id);
     });
-    db.prepare('DELETE FROM buyer_contacts WHERE seller_id=?').run(s.id);
-    db.prepare('DELETE FROM visits WHERE seller_id=?').run(s.id);
-    db.prepare('DELETE FROM properties WHERE seller_id=?').run(s.id);
-    db.prepare('DELETE FROM sellers WHERE id=?').run(s.id);
   });
+  deleteDemo(existing);
 
   const PHOTOS = [
     'https://images.unsplash.com/photo-1568605114967-8130f3a36994?w=800&q=80',
