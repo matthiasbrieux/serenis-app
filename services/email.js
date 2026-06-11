@@ -429,6 +429,25 @@ async function sendMissionReminderJ1(clientEmail, clientName, mission, photograp
 // 10. NUDGES VENDEURS (automatisations)
 // ─────────────────────────────────────────────────────────────
 
+async function sendNewOfferEmail({ sellerEmail, sellerFirstName, buyerName, amount, city, offersUrl }) {
+  const amountFmt = Number(amount).toLocaleString('fr-FR') + ' €';
+  const html = layout(`
+    ${badge('💰 Nouvelle offre', '#C4603A')}
+    ${h1(`${buyerName} vous a fait une offre`)}
+    ${p(`Bonjour ${sellerFirstName || ''},`)}
+    ${p(`Vous venez de recevoir une offre d'achat pour votre bien${city ? ` à <strong>${city}</strong>` : ''} :`)}
+    ${infoTable([
+      ['Acheteur', buyerName],
+      ['Montant proposé', `<strong style="color:#C4603A;font-size:1.1em;">${amountFmt}</strong>`],
+    ])}
+    ${p('Connectez-vous à votre espace vendeur pour consulter l\'offre, répondre ou faire une contre-offre.')}
+    ${btn('Voir l\'offre', offersUrl || `${BASE_URL}/mes-offres`, '#C4603A')}
+    ${divider()}
+    ${muted('Cette notification vous a été envoyée car vous avez reçu une offre sur votre bien via Vendu Par Moi.')}
+  `, { preheader: `${buyerName} propose ${amountFmt} pour votre bien.` });
+  return send(sellerEmail, `💰 Nouvelle offre de ${buyerName} — ${amountFmt}`, html);
+}
+
 async function sendProspectNudge({ name, email }) {
   const html = layout(`
     ${h1(`Vendre entre particuliers, c'est possible.`)}
@@ -808,7 +827,7 @@ module.exports = {
   sendVisitConfirmation,
   sendNewVisitRequest,
   sendVisitRequestReceived,
-  // Offres — notifications intégrées dans les routes, pas d'email dédié séparé
+  sendNewOfferEmail,
   // Contrat
   sendContractRenewal,
   // Avis

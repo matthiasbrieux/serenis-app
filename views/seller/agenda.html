@@ -2350,6 +2350,12 @@ async function saveCompromis() {
   } catch(e) { showToast('Erreur de sauvegarde', 'error'); }
 }
 
+// Auto-marquer les notifs visite comme lues dès l'ouverture de l'agenda
+fetch('/api/notifications/read-by-type', {
+  method: 'POST', headers: {'Content-Type':'application/json'},
+  body: JSON.stringify({ types: ['visit_request','visit_confirmed','visit_reminder'] })
+}).catch(() => {});
+
 loadData().then(() => {
   renderCalendar();
   renderAvailMonth();

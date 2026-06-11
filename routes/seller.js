@@ -1092,6 +1092,16 @@ router.post('/api/notifications/read-all', requireAuth, (req, res) => {
   res.json({ success: true });
 });
 
+// Marquer comme lues uniquement certains types (ex: visites quand on ouvre l'agenda)
+router.post('/api/notifications/read-by-type', requireAuth, express.json(), (req, res) => {
+  const { types } = req.body;
+  if (!Array.isArray(types) || types.length === 0) return res.json({ success: true });
+  const ph = types.map(() => '?').join(',');
+  db.prepare(`UPDATE notifications SET read_at=CURRENT_TIMESTAMP WHERE seller_id=? AND read_at IS NULL AND type IN (${ph})`)
+    .run(req.seller.id, ...types);
+  res.json({ success: true });
+});
+
 // ── Coach IA immobilier ───────────────────────────────────────
 const coachRateLimit = require('express-rate-limit')({
   windowMs: 60 * 60 * 1000,

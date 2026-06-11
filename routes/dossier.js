@@ -194,7 +194,7 @@ router.get('/api/soumettre-offre/:token/info', (req, res) => {
 router.post('/api/soumettre-offre/:token', express.json(), async (req, res) => {
   try {
     const prop = db.prepare(`
-      SELECT p.id, p.seller_id, p.address, p.city, p.price, s.phone as seller_phone
+      SELECT p.id, p.seller_id, p.address, p.city, p.price, s.phone as seller_phone, s.email as seller_email, s.first_name as seller_first_name
       FROM properties p
       JOIN sellers s ON s.id = p.seller_id
       WHERE p.acheteur_token = ?
@@ -239,6 +239,21 @@ router.post('/api/soumettre-offre/:token', express.json(), async (req, res) => {
         await sendSmsNotification(prop.seller_phone,
           `💰 Nouvelle offre reçue !\n${buyer_name} propose ${Number(amountInt).toLocaleString('fr-FR')} €\n✉️ ${email.trim()}\n👉 Voir dans votre espace : /mes-offres`
         ).catch(() => {});
+      } catch(e) {}
+    }
+
+    // Email au vendeur
+    if (prop.seller_email) {
+      try {
+        const { sendNewOfferEmail } = require('../services/email');
+        await sendNewOfferEmail({
+          sellerEmail: prop.seller_email,
+          sellerFirstName: prop.seller_first_name,
+          buyerName: buyer_name,
+          amount: amountInt,
+          city: prop.city || prop.address,
+          offersUrl: `${process.env.BASE_URL || ''}/mes-offres`
+        }).catch(() => {});
       } catch(e) {}
     }
 

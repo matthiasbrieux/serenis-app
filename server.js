@@ -202,6 +202,11 @@ app.listen(PORT, () => {
     sendCheckInNoOfferNudges().catch(e => console.error('Check-in no offer job error:', e.message));
     chargeInstallments().catch(e => console.error('Installment charge job error:', e.message));
     sendPriceDropNudges().catch(e => console.error('Price drop nudge job error:', e.message));
+    // Nettoyage notifications lues de plus de 60 jours
+    try {
+      const db = require('./database');
+      db.prepare("DELETE FROM notifications WHERE read_at IS NOT NULL AND created_at < datetime('now', '-60 days')").run();
+    } catch(e) { console.error('Notification cleanup error:', e.message); }
   }
 
   function scheduleReminders() {

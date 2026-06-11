@@ -873,6 +873,12 @@ function copySmsText() {
   });
 }
 
+// Auto-marquer les notifs offre comme lues dès l'ouverture de la page
+fetch('/api/notifications/read-by-type', {
+  method: 'POST', headers: {'Content-Type':'application/json'},
+  body: JSON.stringify({ types: ['offer'] })
+}).catch(() => {});
+
 load();
 loadOffreLink();
 </script>
