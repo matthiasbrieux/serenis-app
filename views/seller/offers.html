@@ -440,13 +440,13 @@
         <div class="sms-modal-sub" id="smsModalSub">Notifiez l'acquéreur par SMS</div>
       </div>
     </div>
-    <div class="sms-modal-label">Message prêt à copier</div>
+    <div class="sms-modal-label">Message prêt à envoyer</div>
     <div class="sms-modal-preview" id="smsModalText"></div>
     <div class="sms-modal-actions">
-      <button class="sms-modal-btn-send" onclick="copySmsCounter(this)">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
-        Copier le SMS
-      </button>
+      <a class="sms-modal-btn-send" id="smsCounterSendBtn" href="#">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.41a2 2 0 0 1 2-2.18h3a2 2 0 0 1 2 1.72 12.13 12.13 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.13 12.13 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+        Envoyer le SMS
+      </a>
       <button class="sms-modal-btn-close" onclick="closeSmsModal()">Fermer</button>
     </div>
   </div>
@@ -468,9 +468,9 @@
     <div class="sms-modal-label">Message pour l'acheteur — modifiable avant envoi</div>
     <textarea id="acceptMsgText" class="accept-textarea"></textarea>
     <div class="accept-actions">
-      <button class="btn-copy-accept" id="btnCopyAccept" onclick="copyAcceptMsg(this)">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
-        Copier le message
+      <button class="btn-copy-accept" id="btnCopyAccept" onclick="openAcceptSms()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.41a2 2 0 0 1 2-2.18h3a2 2 0 0 1 2 1.72 12.13 12.13 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.13 12.13 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+        Envoyer le SMS
       </button>
       <button class="btn-close-accept" onclick="closeAcceptModal()">Fermer</button>
     </div>
@@ -740,11 +740,14 @@ function openSmsCounterModal(offer, counterAmount) {
   if (!offer) return;
   const prenom = (offer.buyer_name || 'Madame, Monsieur').split(' ')[0];
   const phone = offer.buyer_phone || '';
-  const smsText = `Bonjour ${prenom}, j'ai bien reçu votre offre de ${formatPrice(offer.amount)}. Je vous fais une contre-proposition à ${formatPrice(counterAmount)}. N'hésitez pas à me recontacter pour en discuter. Cordialement.`;
+  const signature = _sellerFirstName ? `\n\nCordialement, ${_sellerFirstName}` : '\n\nCordialement.';
+  const smsText = `Bonjour ${prenom}, j'ai bien reçu votre offre de ${formatPrice(offer.amount)}. Je vous fais une contre-proposition à ${formatPrice(counterAmount)}. N'hésitez pas à me recontacter pour en discuter.${signature}`;
   document.getElementById('smsModalText').textContent = smsText;
   document.getElementById('smsModalSub').textContent = phone
     ? `Notifiez ${offer.buyer_name || 'l\'acquéreur'} (${phone}) par SMS`
     : `Notifiez ${offer.buyer_name || 'l\'acquéreur'} par SMS`;
+  const sendBtn = document.getElementById('smsCounterSendBtn');
+  if (sendBtn) sendBtn.href = phone ? `sms:${phone}?body=${encodeURIComponent(smsText)}` : `sms:?body=${encodeURIComponent(smsText)}`;
   document.getElementById('smsCounterModal').classList.add('open');
 }
 
@@ -778,13 +781,20 @@ async function setOfferStatus(id, status) {
   }
 }
 
+let _acceptPhone = '';
 function openAcceptModal(offer) {
   const prenom = (offer?.buyer_name || 'Madame, Monsieur').split(' ')[0];
   const vendeur = _sellerFirstName || 'Le propriétaire';
+  _acceptPhone = offer?.buyer_phone || '';
   document.getElementById('acceptMsgText').value =
     `Bonjour ${prenom},\n\nJe vous confirme avoir accepté votre offre d'achat concernant mon bien.\n\nAfin de permettre la préparation du compromis de vente, pourriez-vous me transmettre les informations et documents nécessaires à la constitution du dossier ?\n\nSouhaitez-vous être représenté(e) par votre propre notaire pour la suite de la procédure ?\nSi oui, merci de me communiquer ses coordonnées complètes (nom, étude notariale, téléphone et adresse e-mail).\n\nJe reste à votre disposition pour toute information complémentaire.\n\nCordialement,\n${vendeur}`;
   document.getElementById('acceptModal').classList.add('open');
   document.body.style.overflow = 'hidden';
+}
+function openAcceptSms() {
+  const text = document.getElementById('acceptMsgText').value;
+  const href = _acceptPhone ? `sms:${_acceptPhone}?body=${encodeURIComponent(text)}` : `sms:?body=${encodeURIComponent(text)}`;
+  window.location.href = href;
 }
 
 function closeAcceptModal() {
@@ -837,10 +847,11 @@ async function loadOffreLink() {
       offreLinkUrl = data.url;
       document.getElementById('offreLinkInput').value = data.url;
       document.getElementById('offreLinkCard').style.display = 'block';
-      const smsText = `Bonjour, suite à votre visite de mon bien, voici le lien pour soumettre votre offre d'achat en ligne : ${data.url} — Je la traiterai dans les meilleurs délais.`;
+      const signature = _sellerFirstName ? `\n\nCordialement, ${_sellerFirstName}` : '';
+      const smsText = `Bonjour, suite à votre visite de mon bien, voici le lien pour soumettre votre offre d'achat en ligne : ${data.url} — Je la traiterai dans les meilleurs délais.${signature}`;
       document.getElementById('smsPreview').textContent = smsText;
       const sendBtn = document.getElementById('smsSendBtn');
-      if (sendBtn) sendBtn.href = `sms:?&body=${encodeURIComponent(smsText)}`;
+      if (sendBtn) sendBtn.href = `sms:?body=${encodeURIComponent(smsText)}`;
     }
   } catch(e) {}
 }
