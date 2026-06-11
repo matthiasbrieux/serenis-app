@@ -6,11 +6,7 @@ const cookieParser = require('cookie-parser');
 const path = require('path');
 
 // Vérification des variables d'environnement au démarrage
-if (!process.env.JWT_SECRET) {
-  console.error('⛔ JWT_SECRET manquant — démarrage impossible (toutes les authentifications échoueraient).');
-  process.exit(1);
-}
-['STRIPE_SECRET_KEY', 'SENDGRID_API_KEY', 'ANTHROPIC_API_KEY'].forEach(k => {
+['JWT_SECRET', 'STRIPE_SECRET_KEY', 'SENDGRID_API_KEY', 'ANTHROPIC_API_KEY'].forEach(k => {
   if (!process.env[k]) console.warn(`⚠️  ${k} non défini — fonctionnalité associée désactivée.`);
 });
 
