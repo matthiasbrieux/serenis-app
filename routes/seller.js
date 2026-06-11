@@ -8,6 +8,12 @@ const { uploadPhoto, uploadDocument } = require('../services/upload');
 const { assignTwilioNumber } = require('../services/twilio');
 const { sendSoldCongrats, sendPropertySoldToBuyer, sendVisitConfirmation } = require('../services/email');
 
+// Désactiver le cache navigateur pour toutes les pages vendeur
+router.use((req, res, next) => {
+  res.set('Cache-Control', 'no-store, no-cache, must-revalidate');
+  next();
+});
+
 // Pages vendeur (toutes protégées)
 router.get('/dashboard', requireAuth, (req, res) => res.sendFile('dashboard.html', { root: './views/seller' }));
 router.get('/mon-bien', requireAuth, (req, res) => {
