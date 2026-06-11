@@ -1852,13 +1852,9 @@ function renderAvailMonth() {
     const monthShort=MONTHS_SHORT_FR[d.getMonth()];
     const fullDate=d.toLocaleDateString('fr-FR',{day:'numeric',month:'long',year:'numeric'});
     const globalIdx=availSlots.indexOf(s);
-    // Distinguer récurrent (lundi/mardi/etc.) vs ponctuel
-    const isWeekend = d.getDay()===0||d.getDay()===6;
     const isRecurrent = s.recurrent || false;
     const slotClass = isRecurrent ? 'avail-slot-item recurrent' : 'avail-slot-item';
-    const slotTypeBadge = isRecurrent
-      ? `<span class="recurrent-badge">↻ Récurrent</span>`
-      : `<span class="ponctuel-badge">${isWeekend?'📅 Week-end':'📌 Ponctuel'}</span>`;
+    const slotTypeBadge = isRecurrent ? `<span class="recurrent-badge">↻ Récurrent</span>` : '';
     return `<div class="${slotClass}" data-slot-idx="${globalIdx}">
       <div class="avail-slot-cal">
         <div class="avail-slot-cal-month">${monthShort}</div>
