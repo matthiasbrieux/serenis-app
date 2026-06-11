@@ -247,10 +247,30 @@
     .cal-has-confirmed.cal-past-day { background: #d6ece0; }
     .cal-has-confirmed.cal-past-day .cal-num { color: #2e7d32; }
     .cal-has-confirmed.cal-past-day:hover { background: #c4e4d0; }
-    /* Jalons compromis */
+    /* Jalons compromis — cellules entières colorées */
     .cal-dot-sru        { background: #D32F2F; }
     .cal-dot-conditions { background: #1565C0; }
     .cal-dot-acte       { background: #C4603A; }
+    .cal-has-sru, .cal-has-conditions, .cal-has-acte {
+      border-radius: 10px;
+      justify-content: center;
+    }
+    .cal-has-sru        { background: #D32F2F; }
+    .cal-has-conditions { background: #1565C0; }
+    .cal-has-acte       { background: #C4603A; }
+    .cal-has-sru .cal-num, .cal-has-conditions .cal-num, .cal-has-acte .cal-num {
+      color: #fff; font-weight: 700; background: transparent; box-shadow: none;
+    }
+    .cal-has-sru:hover        { background: #b71c1c; }
+    .cal-has-conditions:hover { background: #0d47a1; }
+    .cal-has-acte:hover       { background: #a84e2e; }
+    .cal-today.cal-has-sru .cal-num,
+    .cal-today.cal-has-conditions .cal-num,
+    .cal-today.cal-has-acte .cal-num { background: rgba(255,255,255,0.2); box-shadow: none; }
+    .cal-milestone-lbl {
+      font-size: 0.42rem; font-weight: 800; text-transform: uppercase;
+      letter-spacing: 0.06em; color: rgba(255,255,255,0.88); line-height: 1; text-align: center;
+    }
     /* Compromis card */
     .compromis-card { background:#fff; border:1px solid #e8e0d6; border-radius:14px; overflow:hidden; }
     .compromis-card-hdr { background:linear-gradient(135deg,#2a4030,#3D5A47); color:#fff; padding:14px 20px; display:flex; align-items:center; gap:10px; }
@@ -758,7 +778,9 @@
           <div class="cal-legend">
             <span class="cal-legend-item"><span style="display:inline-block;width:12px;height:12px;border-radius:3px;background:#1D3A28;flex-shrink:0;"></span>Mes visites</span>
             <span class="cal-legend-item"><span class="cal-dot cal-dot-eve" style="display:inline-block;"></span>Rappel J-1</span>
-            <span class="cal-legend-item" id="legendCompromis" style="display:none;"><span class="cal-dot cal-dot-sru" style="display:inline-block;"></span><span class="cal-dot cal-dot-conditions" style="display:inline-block;"></span><span class="cal-dot cal-dot-acte" style="display:inline-block;"></span>Jalons compromis</span>
+            <span class="cal-legend-item" id="legendSru" style="display:none;"><span style="display:inline-block;width:12px;height:12px;border-radius:3px;background:#D32F2F;flex-shrink:0;"></span>Rétractation</span>
+            <span class="cal-legend-item" id="legendConditions" style="display:none;"><span style="display:inline-block;width:12px;height:12px;border-radius:3px;background:#1565C0;flex-shrink:0;"></span>Cond. suspensive</span>
+            <span class="cal-legend-item" id="legendActe" style="display:none;"><span style="display:inline-block;width:12px;height:12px;border-radius:3px;background:#C4603A;flex-shrink:0;"></span>Acte authentique</span>
           </div>
         </div>
 
@@ -1665,11 +1687,22 @@ function renderCalendar() {
       if (dateStr===today) dotsHtml += `<span class="cal-dot cal-dot-aujourd_hui"></span>`;
       else cls+=' cal-filter-dimmed';
     }
-    // Jalons compromis — toujours visibles quel que soit le filtre
-    if (milestones.sru === dateStr) dotsHtml += `<span class="cal-dot cal-dot-sru"></span>`;
-    if (milestones.conditions === dateStr) dotsHtml += `<span class="cal-dot cal-dot-conditions"></span>`;
-    if (milestones.acte === dateStr) dotsHtml += `<span class="cal-dot cal-dot-acte"></span>`;
-    const inner=`<span class="cal-num">${d}</span><div class="cal-dots">${dotsHtml}</div>`;
+    // Jalons compromis — case entière colorée (dots si jour déjà une visite)
+    let milestoneLabel = '';
+    const hasVisit = cls.includes('cal-has-confirmed');
+    if (milestones.sru === dateStr) {
+      if (hasVisit) dotsHtml += `<span class="cal-dot cal-dot-sru"></span>`;
+      else { cls += ' cal-has-sru'; milestoneLabel = '<div class="cal-milestone-lbl">rétractation</div>'; }
+    }
+    if (milestones.conditions === dateStr) {
+      if (hasVisit) dotsHtml += `<span class="cal-dot cal-dot-conditions"></span>`;
+      else { cls += ' cal-has-conditions'; milestoneLabel = '<div class="cal-milestone-lbl">prêt</div>'; }
+    }
+    if (milestones.acte === dateStr) {
+      if (hasVisit) dotsHtml += `<span class="cal-dot cal-dot-acte"></span>`;
+      else { cls += ' cal-has-acte'; milestoneLabel = '<div class="cal-milestone-lbl">acte</div>'; }
+    }
+    const inner=`<span class="cal-num">${d}</span><div class="cal-dots">${dotsHtml}</div>${milestoneLabel}`;
     html+=`<div class="${cls}" onclick="selectCalDay('${dateStr}')">${inner}</div>`;
   }
   grid.innerHTML=html;
@@ -2267,14 +2300,19 @@ function updateCompromisMilestones() {
   const m = getMilestoneDates();
   const delay = Number(compromisData.compromis_conditions_delay) || 45;
   const block = document.getElementById('compromisMilestones');
-  const legend = document.getElementById('legendCompromis');
+  const show = v => v && (v.style.display = 'inline-flex');
+  const hide = v => v && (v.style.display = 'none');
   if (!m.sru) {
     block.style.display = 'none';
-    if (legend) legend.style.display = 'none';
+    hide(document.getElementById('legendSru'));
+    hide(document.getElementById('legendConditions'));
+    hide(document.getElementById('legendActe'));
     return;
   }
   block.style.display = 'block';
-  if (legend) legend.style.display = 'inline-flex';
+  show(document.getElementById('legendSru'));
+  show(document.getElementById('legendConditions'));
+  show(document.getElementById('legendActe'));
   document.getElementById('milestoneSru').textContent = formatDateFR(m.sru);
   document.getElementById('milestoneConditions').textContent = formatDateFR(m.conditions);
   document.getElementById('milestoneConditionsLabel').textContent = `(J+${delay})`;
