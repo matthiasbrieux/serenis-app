@@ -278,12 +278,16 @@
     }
     .dv-checklist { list-style: none; padding: 0; margin: 0 0 16px; }
     .dv-checklist li {
-      display: flex; align-items: flex-start; gap: 10px;
-      padding: 9px 0; border-bottom: 1px solid #F0ECE6;
+      display: flex; align-items: center; gap: 12px;
+      padding: 11px 8px; border-bottom: 1px solid #F0ECE6;
       font-size: 0.88rem; color: #333; line-height: 1.55;
+      cursor: pointer; border-radius: 8px; transition: background 0.14s;
+      min-height: 44px; user-select: none; -webkit-tap-highlight-color: transparent;
     }
     .dv-checklist li:last-child { border-bottom: none; }
-    .dv-check { width: 18px; height: 18px; border: 2px solid #C5D9CB; border-radius: 4px; flex-shrink: 0; margin-top: 2px; }
+    .dv-checklist li:hover { background: #f4f9f5; }
+    .dv-checklist li.done-row { background: #f0f8f2; }
+    .dv-check { width: 20px; height: 20px; border: 2px solid #C5D9CB; border-radius: 5px; flex-shrink: 0; transition: all 0.14s; }
     .dv-check.done { background: #3D5A47; border-color: #3D5A47; position: relative; }
     .dv-check.done::after { content: '✓'; position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 0.7rem; font-weight: 700; }
     .dv-table { width: 100%; border-collapse: collapse; margin: 0 0 20px; font-size: 0.85rem; }
@@ -1190,8 +1194,14 @@ function closeDoc() {
 }
 
 document.getElementById('dvDocInner').addEventListener('click', function(e) {
-  var ck = e.target.closest('.dv-check');
-  if (ck) ck.classList.toggle('done');
+  var li = e.target.closest('.dv-checklist li');
+  if (li) {
+    var ck = li.querySelector('.dv-check');
+    if (ck) {
+      ck.classList.toggle('done');
+      li.classList.toggle('done-row', ck.classList.contains('done'));
+    }
+  }
 });
 
 document.addEventListener('keydown', function(e) {
