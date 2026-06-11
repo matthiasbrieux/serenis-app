@@ -94,6 +94,8 @@
     .vcc-sms { flex:1; padding:9px 10px; background:#3D5A47; color:#fff; border:none; border-radius:8px; font-size:0.8rem; font-weight:700; cursor:pointer; font-family:'DM Sans',sans-serif; min-height:40px; touch-action:manipulation; display:flex; align-items:center; justify-content:center; gap:5px; transition:background 0.15s; }
     .vcc-sms:hover { background:#2a4030; }
     .vcc-sms.sent { background:#e8f5e9; color:#2e7d32; border:1.5px solid #c8e6c9; }
+    .visit-confirmed-card.reminder-done { opacity:0.68; border-left-color:#6BBF82; background:linear-gradient(135deg,#f5fcf6,#eef9f1); }
+    .vcc-reminder-tag { display:inline-flex;align-items:center;gap:3px;font-size:0.64rem;font-weight:700;color:#2e7d32;margin-top:3px; }
     .vcc-cancel { padding:9px 10px; background:#fff; color:#888; border:1px solid #d0c8be; border-radius:8px; font-size:0.78rem; cursor:pointer; font-family:'DM Sans',sans-serif; min-height:40px; touch-action:manipulation; transition:all 0.15s; }
     .vcc-cancel:hover { border-color:#e74c3c; color:#e74c3c; background:#fdf2f2; }
 
@@ -1314,7 +1316,8 @@ function buildVisitConfirmedCard(v) {
   const adresseText = _propertyAddress ? ` Voici l'adresse de mon bien : ${_propertyAddress}.` : '';
   const smsRappelText = `Bonjour ${prenom}, je vous rappelle notre visite prévue pour le ${dateLabel} à ${time}. N'hésitez pas à me prévenir si vous avez un empêchement.${adresseText}`;
 
-  return `<div class="visit-confirmed-card" id="vcard-${v.id}">
+  const svgCheck10 = `<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>`;
+  return `<div class="visit-confirmed-card${v.reminder_sent?' reminder-done':''}" id="vcard-${v.id}">
     <div class="vcc-top">
       <div class="vcc-cal">
         <div class="vcc-cal-month">${monthStr}</div>
@@ -1325,6 +1328,7 @@ function buildVisitConfirmedCard(v) {
         <div class="vcc-name">${v.buyer_name||'Acquéreur'}</div>
         <div class="vcc-time">⏰ ${time}</div>
         ${v.buyer_phone?`<div class="vcc-phone"><a href="tel:${v.buyer_phone}" style="color:#3D5A47;text-decoration:none;font-weight:600;">${v.buyer_phone}</a></div>`:''}
+        <div class="vcc-reminder-tag" id="reminder-tag-${v.id}">${v.reminder_sent ? svgCheck10+' Rappel envoyé' : ''}</div>
       </div>
     </div>
     ${(v.buyer_budget||v.buyer_financing||v.buyer_timeline)?`
@@ -1605,7 +1609,16 @@ function copyRappelSms(btn) {
       const v = allVisits.find(v=>v.id===id);
       if (v) v.reminder_sent = 1;
       const reminderBtn = document.getElementById('btn-reminder-'+id);
-      if (reminderBtn) { reminderBtn.className='btn-sms-reminder sent'; reminderBtn.innerHTML='✓ Rappel copié'; }
+      if (reminderBtn) {
+        const isVcc = reminderBtn.classList.contains('vcc-sms');
+        reminderBtn.className = (isVcc ? 'vcc-sms' : 'btn-sms-reminder') + ' sent';
+        reminderBtn.innerHTML = '✓ Rappel copié';
+      }
+      const card = document.getElementById('vcard-'+id);
+      if (card) card.classList.add('reminder-done');
+      const tag = document.getElementById('reminder-tag-'+id);
+      const svgCheck10 = `<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>`;
+      if (tag) tag.innerHTML = svgCheck10 + ' Rappel envoyé';
       fetch(`/api/visits/${id}/reminder`,{method:'POST'}).catch(()=>{});
     }
   }
