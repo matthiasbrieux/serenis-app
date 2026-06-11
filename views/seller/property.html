@@ -202,6 +202,12 @@
       content:'';flex:1;height:1px;background:#e8e0d6;
     }
 
+    /* ── Titre de section commun (Photos / Documents / Envoi) ──── */
+    .tab-section-lbl { display:flex;align-items:center;gap:12px;margin:24px 0 16px; }
+    .tab-section-lbl:first-child, .tab-section-lbl[data-first] { margin-top:0; }
+    .tab-section-lbl > span { font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:#3D5A47;background:#edf4ef;border:1.5px solid #c8ddd0;border-radius:20px;padding:5px 14px;white-space:nowrap;flex-shrink:0; }
+    .tab-section-lbl::after { content:'';flex:1;height:1.5px;background:#e8e0d6; }
+
     /* ── Progress dots ──────────────────────────── */
     .form-completion {
       display:flex;align-items:center;gap:10px;margin-bottom:28px;
@@ -2134,7 +2140,8 @@
       <div class="form-section">
 
         <!-- Intro -->
-        <p style="font-size:0.82rem;color:#aaa;margin:0 0 20px;line-height:1.6;">Organisez vos photos en 4 dossiers distincts — chaque dossier correspond à une section du dossier envoyé aux acheteurs.</p>
+        <div class="tab-section-lbl" data-first="1"><span>Vos 4 dossiers photos</span></div>
+        <p style="font-size:0.82rem;color:#888;margin:-6px 0 20px;line-height:1.6;">Chaque dossier correspond à une section du dossier envoyé aux acheteurs.</p>
 
         <div style="display:flex;flex-direction:column;gap:16px;">
 
@@ -2303,10 +2310,11 @@
         @keyframes docCardIn { from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:none} }
 
         /* Panel containers */
-        .dpanel { background:#fff;border:1px solid #e8e0d6;border-radius:16px;overflow:hidden;margin-bottom:20px;box-shadow:0 1px 6px rgba(0,0,0,0.04); }
-        .dpanel-head { display:flex;align-items:center;gap:14px;padding:20px 24px;border-bottom:1px solid #f0ebe4; }
-        .dpanel-icon { width:46px;height:46px;border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:1.3rem; }
-        .dpanel-title { font-weight:700;font-size:0.95rem;color:#1a1a1a; }
+        .dpanel { background:#fff;border:1.5px solid #e8e0d6;border-radius:16px;overflow:hidden;margin-bottom:12px;box-shadow:0 2px 8px rgba(0,0,0,0.05); }
+        .dpanel-head { display:flex;align-items:center;gap:14px;padding:20px 24px;border-bottom:1px solid #ede8e1;background:#faf8f5; }
+        .dpanel-head:hover { background:#f5f2ee; }
+        .dpanel-icon { width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:1.1rem; }
+        .dpanel-title { font-weight:700;font-size:0.95rem;color:#1a1a16; }
         .dpanel-sub { font-size:0.76rem;color:#aaa;margin-top:3px;line-height:1.45; }
         .dpanel-badge { padding:4px 12px;border-radius:20px;font-size:0.7rem;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;flex-shrink:0; }
 
@@ -2462,6 +2470,8 @@
       </style>
 
 
+      <div class="tab-section-lbl" data-first="1"><span>Transmis aux acheteurs</span></div>
+
       <!-- ─── SECTION 0 : Diagnostics réglementaires ─── -->
       <div class="dpanel" id="dpanel-diag">
         <div class="dpanel-head">
@@ -2563,6 +2573,8 @@
         </div>
       </div>
 
+      <div class="tab-section-lbl"><span>Sur demande — acheteur sérieux</span></div>
+
       <!-- ─── SECTION 2 : Dossier acheteur sérieux ──── -->
       <div class="dpanel" id="section-acheteur">
         <div class="dpanel-head">
@@ -2616,6 +2628,8 @@
           </div>
         </div>
       </div>
+
+      <div class="tab-section-lbl"><span>Confidentiel — notaire</span></div>
 
       <!-- ─── SECTION 3 : Dossier notaire complet ───── -->
       <div class="dpanel" id="section-notaire">
@@ -2676,20 +2690,22 @@
     ════════════════════════════════════════════════════ -->
     <div class="tab-content hidden" id="tab-envoi">
       <style>
-        .ev-sect-lbl { font-size:0.68rem; font-weight:700; text-transform:uppercase; letter-spacing:0.1em; color:#ccc; margin:0 0 10px; display:flex; align-items:center; gap:10px; }
-        .ev-sect-lbl::after { content:''; flex:1; height:1px; background:#f0ebe4; }
-        .ev-card { border:1px solid #e8e0d6; border-radius:14px; overflow:hidden; margin-bottom:10px; background:#fff; box-shadow:0 1px 4px rgba(0,0,0,0.04); }
-        .ev-card-btn { width:100%; text-align:left; border:none; background:none; padding:14px 18px; cursor:pointer; display:flex; align-items:center; gap:12px; font-family:inherit; transition:background 0.15s; }
-        .ev-card-btn:hover { background:#faf8f5; }
-        .ev-card-ico { width:36px; height:36px; border-radius:9px; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+        .ev-sect-lbl { display:flex;align-items:center;gap:12px;margin:28px 0 16px; }
+        .ev-sect-lbl > span { font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:#3D5A47;background:#edf4ef;border:1.5px solid #c8ddd0;border-radius:20px;padding:5px 14px;white-space:nowrap;flex-shrink:0; }
+        .ev-sect-lbl::after { content:'';flex:1;height:1.5px;background:#e8e0d6; }
+        .ev-card { border:1.5px solid #e8e0d6; border-radius:16px; overflow:hidden; margin-bottom:12px; background:#fff; box-shadow:0 2px 8px rgba(0,0,0,0.05); }
+        .ev-card-btn { width:100%; text-align:left; border:none; background:#faf8f5; padding:18px 20px; cursor:pointer; display:flex; align-items:center; gap:14px; font-family:inherit; transition:background 0.15s; border-bottom:1px solid transparent; }
+        .ev-card-btn:hover { background:#f5f2ee; }
+        .ev-card.open .ev-card-btn { border-bottom-color:#ede8e1; }
+        .ev-card-ico { width:40px; height:40px; border-radius:10px; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
         .ev-card-info { flex:1; min-width:0; text-align:left; }
-        .ev-card-ttl { font-weight:700; font-size:0.88rem; color:#1a1a1a; }
-        .ev-card-sub { font-size:0.72rem; color:#bbb; margin-top:2px; }
+        .ev-card-ttl { font-weight:700; font-size:0.92rem; color:#1a1a16; }
+        .ev-card-sub { font-size:0.76rem; color:#aaa; margin-top:3px; }
         .ev-card-count { padding:3px 10px; border-radius:20px; font-size:0.7rem; font-weight:700; color:#fff; flex-shrink:0; }
-        .ev-card-badge { padding:3px 9px; border-radius:20px; font-size:0.65rem; font-weight:700; text-transform:uppercase; letter-spacing:0.05em; flex-shrink:0; }
+        .ev-card-badge { padding:4px 10px; border-radius:20px; font-size:0.65rem; font-weight:700; text-transform:uppercase; letter-spacing:0.05em; flex-shrink:0; }
         .ev-chev { flex-shrink:0; transition:transform 0.2s; }
         .ev-card.open .ev-chev { transform:rotate(180deg); }
-        .ev-card-body { padding:0 18px 16px; display:none; }
+        .ev-card-body { padding:0 20px 18px; display:none; }
         .ev-card.open .ev-card-body { display:block; }
         .ev-link-row { display:flex; gap:7px; align-items:center; margin-bottom:10px; }
         .ev-link-input { flex:1; min-width:0; padding:8px 11px; border:1.5px solid #e8e0d6; border-radius:7px; font-size:0.79rem; color:#555; background:#fafaf8; cursor:pointer; font-family:inherit; outline:none; }
@@ -2704,7 +2720,7 @@
       <div class="form-section">
 
         <!-- ── Avant mes visites ── -->
-        <div class="ev-sect-lbl">Avant mes visites</div>
+        <div class="ev-sect-lbl" style="margin-top:0;"><span>Avant mes visites</span></div>
 
         <!-- ── Fiche descriptive ── -->
         <div class="ev-card" id="ev-card-fiche" style="border-color:#d0e4d8;background:linear-gradient(135deg,#f7faf8 0%,#fff 100%);">
@@ -2855,7 +2871,7 @@
         </div>
 
         <!-- ── Après mes visites ── -->
-        <div class="ev-sect-lbl" style="margin-top:20px;">Après mes visites</div>
+        <div class="ev-sect-lbl"><span>Après mes visites</span></div>
 
         <!-- Dossier acheteur sérieux -->
         <div class="ev-card" id="ev-card-acheteur">
