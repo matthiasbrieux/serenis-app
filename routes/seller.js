@@ -346,6 +346,21 @@ router.get('/api/checklist/:type', requireAuth, (req, res) => {
 });
 
 // Status update
+// Compromis de vente — jalons calendrier
+router.get('/api/compromis', requireAuth, (req, res) => {
+  const prop = db.prepare('SELECT compromis_date, compromis_conditions_delay FROM properties WHERE seller_id=?').get(req.seller.id);
+  res.json(prop || { compromis_date: null, compromis_conditions_delay: 45 });
+});
+
+router.post('/api/compromis', requireAuth, express.json(), (req, res) => {
+  const { compromis_date, compromis_conditions_delay } = req.body;
+  const prop = db.prepare('SELECT id FROM properties WHERE seller_id=?').get(req.seller.id);
+  if (!prop) return res.status(404).json({ error: 'Aucun bien enregistré' });
+  db.prepare('UPDATE properties SET compromis_date=?, compromis_conditions_delay=? WHERE seller_id=?')
+    .run(compromis_date || null, Number(compromis_conditions_delay) || 45, req.seller.id);
+  res.json({ success: true });
+});
+
 router.post('/api/property/status', requireAuth, express.json(), async (req, res) => {
   const { status } = req.body;
   const valid = ['preparation','en-ligne','visites','offre','compromis','vendu'];

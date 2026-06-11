@@ -247,6 +247,20 @@
     .cal-has-confirmed.cal-past-day { background: #d6ece0; }
     .cal-has-confirmed.cal-past-day .cal-num { color: #2e7d32; }
     .cal-has-confirmed.cal-past-day:hover { background: #c4e4d0; }
+    /* Jalons compromis */
+    .cal-dot-sru        { background: #D32F2F; }
+    .cal-dot-conditions { background: #1565C0; }
+    .cal-dot-acte       { background: #C4603A; }
+    /* Compromis card */
+    .compromis-card { background:#fff; border:1px solid #e8e0d6; border-radius:14px; overflow:hidden; }
+    .compromis-card-hdr { background:linear-gradient(135deg,#2a4030,#3D5A47); color:#fff; padding:14px 20px; display:flex; align-items:center; gap:10px; }
+    .compromis-card-hdr h3 { font-family:'DM Sans',sans-serif; font-size:0.9rem; font-weight:700; margin:0; letter-spacing:0.01em; }
+    .compromis-card-body { padding:18px 20px; }
+    .compromis-milestone { display:flex; align-items:center; gap:10px; padding:11px 0; border-bottom:1px solid #f0ebe4; }
+    .compromis-milestone:last-child { border-bottom:none; }
+    .compromis-milestone-dot { width:10px; height:10px; border-radius:50%; flex-shrink:0; }
+    .compromis-milestone-label { font-size:0.81rem; color:#666; flex:1; line-height:1.35; }
+    .compromis-milestone-date { font-size:0.86rem; font-weight:700; color:#1A1A16; white-space:nowrap; }
     /* Filter dimmed */
     .cal-filter-dimmed { opacity:0.15; pointer-events:none; }
     /* Legend */
@@ -744,6 +758,7 @@
           <div class="cal-legend">
             <span class="cal-legend-item"><span style="display:inline-block;width:12px;height:12px;border-radius:3px;background:#1D3A28;flex-shrink:0;"></span>Mes visites</span>
             <span class="cal-legend-item"><span class="cal-dot cal-dot-eve" style="display:inline-block;"></span>Rappel J-1</span>
+            <span class="cal-legend-item" id="legendCompromis" style="display:none;"><span class="cal-dot cal-dot-sru" style="display:inline-block;"></span><span class="cal-dot cal-dot-conditions" style="display:inline-block;"></span><span class="cal-dot cal-dot-acte" style="display:inline-block;"></span>Jalons compromis</span>
           </div>
         </div>
 
@@ -810,6 +825,48 @@
             <p style="font-size:0.75rem;color:#999;margin:0;">Ce lien ouvre directement le calendrier de réservation — sans fiche descriptive.</p>
           </div>
           <p id="noLinkMsg" style="color:#bbb;font-size:0.83rem;margin:0;display:none;">Lien de réservation indisponible.</p>
+        </div>
+
+        <!-- Mon compromis de vente -->
+        <div class="compromis-card">
+          <div class="compromis-card-hdr">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+            <h3>Mon compromis de vente</h3>
+          </div>
+          <div class="compromis-card-body">
+            <p style="font-size:0.81rem;color:#888;margin:0 0 16px;line-height:1.5;">Renseignez la date de signature pour que les 3 jalons clés apparaissent automatiquement dans votre calendrier.</p>
+            <div style="display:flex;flex-wrap:wrap;gap:10px;align-items:flex-end;">
+              <div style="display:flex;flex-direction:column;gap:4px;flex:1;min-width:140px;">
+                <label style="font-size:0.75rem;font-weight:700;color:#555;text-transform:uppercase;letter-spacing:0.06em;">Date du compromis</label>
+                <input type="date" id="compromisDateInput" style="padding:9px 12px;border:1.5px solid #e0d8ce;border-radius:9px;font-family:'DM Sans',sans-serif;font-size:0.88rem;color:#1A1A16;background:#fafaf8;outline:none;width:100%;box-sizing:border-box;">
+              </div>
+              <div style="display:flex;flex-direction:column;gap:4px;">
+                <label style="font-size:0.75rem;font-weight:700;color:#555;text-transform:uppercase;letter-spacing:0.06em;">Délai prêt</label>
+                <select id="compromisDelayInput" style="padding:9px 12px;border:1.5px solid #e0d8ce;border-radius:9px;font-family:'DM Sans',sans-serif;font-size:0.88rem;color:#1A1A16;background:#fafaf8;outline:none;">
+                  <option value="45">45 jours</option>
+                  <option value="60">60 jours</option>
+                </select>
+              </div>
+              <button onclick="saveCompromis()" class="btn-primary" style="padding:10px 18px;font-size:0.85rem;border-radius:9px;white-space:nowrap;height:40px;">Enregistrer</button>
+            </div>
+            <div id="compromisMilestones" style="display:none;margin-top:18px;border-top:1px solid #f0ebe4;padding-top:14px;">
+              <div class="compromis-milestone">
+                <span class="compromis-milestone-dot" style="background:#D32F2F;"></span>
+                <span class="compromis-milestone-label">Fin délai de rétractation <span style="color:#aaa;">(J+10)</span></span>
+                <span class="compromis-milestone-date" id="milestoneSru">—</span>
+              </div>
+              <div class="compromis-milestone">
+                <span class="compromis-milestone-dot" style="background:#1565C0;"></span>
+                <span class="compromis-milestone-label">Limite condition suspensive prêt <span id="milestoneConditionsLabel" style="color:#aaa;">(J+45)</span></span>
+                <span class="compromis-milestone-date" id="milestoneConditions">—</span>
+              </div>
+              <div class="compromis-milestone">
+                <span class="compromis-milestone-dot" style="background:#C4603A;"></span>
+                <span class="compromis-milestone-label">Signature acte authentique <span style="color:#aaa;">(J+90)</span></span>
+                <span class="compromis-milestone-date" id="milestoneActe">—</span>
+              </div>
+            </div>
+          </div>
         </div>
 
         <!-- Synchronisation calendrier externe -->
@@ -1047,6 +1104,7 @@ let _data = null;
 let allVisits = [];
 let calDate = new Date();
 let calSelected = null;
+let compromisData = { compromis_date: null, compromis_conditions_delay: 45 };
 let _mcAcheteurUrl = '';
 let _propertyAddress = '';
 
@@ -1555,9 +1613,17 @@ async function saveNotes(id) {
 // ── Calendar ──────────────────────────────────────────
 const MONTHS_FR=['Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août','Septembre','Octobre','Novembre','Décembre'];
 
+function getMilestoneDates() {
+  if (!compromisData || !compromisData.compromis_date) return {};
+  const delay = Number(compromisData.compromis_conditions_delay) || 45;
+  const add = (n) => { const d=new Date(compromisData.compromis_date+'T12:00:00'); d.setDate(d.getDate()+n); return d.toISOString().split('T')[0]; };
+  return { sru: add(10), conditions: add(delay), acte: add(90) };
+}
+
 function renderCalendar() {
   const year=calDate.getFullYear(), month=calDate.getMonth();
   document.getElementById('calMonthLabel').textContent=`${MONTHS_FR[month]} ${year}`;
+  const milestones = getMilestoneDates();
   const firstDay=new Date(year,month,1), lastDay=new Date(year,month+1,0);
   let startPad=firstDay.getDay(); startPad=startPad===0?6:startPad-1;
   const grid=document.getElementById('calGrid');
@@ -1599,6 +1665,10 @@ function renderCalendar() {
       if (dateStr===today) dotsHtml += `<span class="cal-dot cal-dot-aujourd_hui"></span>`;
       else cls+=' cal-filter-dimmed';
     }
+    // Jalons compromis — toujours visibles quel que soit le filtre
+    if (milestones.sru === dateStr) dotsHtml += `<span class="cal-dot cal-dot-sru"></span>`;
+    if (milestones.conditions === dateStr) dotsHtml += `<span class="cal-dot cal-dot-conditions"></span>`;
+    if (milestones.acte === dateStr) dotsHtml += `<span class="cal-dot cal-dot-acte"></span>`;
     const inner=`<span class="cal-num">${d}</span><div class="cal-dots">${dotsHtml}</div>`;
     html+=`<div class="${cls}" onclick="selectCalDay('${dateStr}')">${inner}</div>`;
   }
@@ -2186,10 +2256,67 @@ async function loadData() {
 }
 
 // ── Init ──────────────────────────────────────────────
+// ── Compromis — fonctions ──────────────────────────────────────
+function formatDateFR(dateStr) {
+  if (!dateStr) return '—';
+  const d = new Date(dateStr + 'T12:00:00');
+  return d.toLocaleDateString('fr-FR', { day:'numeric', month:'long', year:'numeric' });
+}
+
+function updateCompromisMilestones() {
+  const m = getMilestoneDates();
+  const delay = Number(compromisData.compromis_conditions_delay) || 45;
+  const block = document.getElementById('compromisMilestones');
+  const legend = document.getElementById('legendCompromis');
+  if (!m.sru) {
+    block.style.display = 'none';
+    if (legend) legend.style.display = 'none';
+    return;
+  }
+  block.style.display = 'block';
+  if (legend) legend.style.display = 'inline-flex';
+  document.getElementById('milestoneSru').textContent = formatDateFR(m.sru);
+  document.getElementById('milestoneConditions').textContent = formatDateFR(m.conditions);
+  document.getElementById('milestoneConditionsLabel').textContent = `(J+${delay})`;
+  document.getElementById('milestoneActe').textContent = formatDateFR(m.acte);
+  renderCalendar();
+}
+
+async function loadCompromis() {
+  try {
+    const r = await fetch('/api/compromis');
+    if (!r.ok) return;
+    compromisData = await r.json();
+    if (compromisData.compromis_date) {
+      document.getElementById('compromisDateInput').value = compromisData.compromis_date;
+      document.getElementById('compromisDelayInput').value = compromisData.compromis_conditions_delay || 45;
+    }
+    updateCompromisMilestones();
+  } catch(e) {}
+}
+
+async function saveCompromis() {
+  const date = document.getElementById('compromisDateInput').value;
+  const delay = document.getElementById('compromisDelayInput').value;
+  try {
+    const r = await fetch('/api/compromis', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ compromis_date: date || null, compromis_conditions_delay: Number(delay) || 45 })
+    });
+    if (r.ok) {
+      compromisData = { compromis_date: date || null, compromis_conditions_delay: Number(delay) || 45 };
+      updateCompromisMilestones();
+      showToast('Compromis enregistré ✓');
+    }
+  } catch(e) { showToast('Erreur de sauvegarde', 'error'); }
+}
+
 loadData().then(() => {
   renderCalendar();
   renderAvailMonth();
   loadNotifications();
+  loadCompromis();
 });
 </script>
 <script src="/js/transitions.js"></script>

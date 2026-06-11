@@ -491,4 +491,8 @@ try {
   }
 } catch(e) { console.error('[DB] Calendar token generation error:', e.message); }
 
+// ── Compromis de vente — jalons calendrier ─────────────────────
+try { db.exec("ALTER TABLE properties ADD COLUMN compromis_date DATE"); } catch(e) {}
+try { db.exec("ALTER TABLE properties ADD COLUMN compromis_conditions_delay INTEGER DEFAULT 45"); } catch(e) {}
+
 module.exports = db;
