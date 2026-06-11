@@ -133,11 +133,7 @@ async function stripeWebhook(req, res) {
     if (session.payment_status === 'paid') {
       try { await activateSeller(session); }
       catch (e) {
-        console.error('Webhook activate error:', e.message);
-        try {
-          db.prepare(`INSERT INTO notifications (seller_id, type, title, body) VALUES (0,'admin_alert','⚠️ Paiement non activé',?)`)
-            .run(`Session Stripe ${session.id} (${session.customer_email || session.metadata?.email || '?'}) — erreur : ${e.message}`);
-        } catch (_) {}
+        console.error('Webhook activate error:', e.message, '| session:', session.id, '| email:', session.customer_email || session.metadata?.email || '?');
       }
     }
   }
@@ -205,9 +201,10 @@ async function activateSeller(session) {
   if (seller && seller.paid_at) return null; // déjà activé
 
   if (seller) {
-    // Activer le compte existant
-    db.prepare('UPDATE sellers SET paid_at=CURRENT_TIMESTAMP, stripe_session_id=?, stripe_customer_id=?, pack=? WHERE id=?')
+    // Activer le compte existant — AND paid_at IS NULL pour idempotence (P2-6)
+    const result = db.prepare('UPDATE sellers SET paid_at=CURRENT_TIMESTAMP, stripe_session_id=?, stripe_customer_id=?, pack=? WHERE id=? AND paid_at IS NULL')
       .run(session.id, session.customer || null, pack || seller.pack, seller.id);
+    if (result.changes === 0) return null; // déjà activé (double webhook / double appel)
   } else {
     // Créer le compte (cas webhook sans pré-création)
     const uuid = uuidv4();
@@ -223,12 +220,7 @@ async function activateSeller(session) {
   if (!seller.twilio_number) {
     const assigned = await assignPhoneNumber(seller);
     if (!assigned) {
-      // Notifier l'admin qu'un numéro doit être attribué manuellement
-      try {
-        db.prepare(`INSERT INTO notifications (seller_id, type, title, body) VALUES (0,'admin_alert','Numéro à attribuer',?)`)
-          .run(`Aucun numéro disponible pour ${seller.email} (id=${seller.id}). Ajoutez un numéro dans l'admin.`);
-      } catch(e) {}
-      console.warn(`⚠️  Aucun numéro Twilio disponible pour ${seller.email}`);
+      console.warn(`⚠️  Aucun numéro Twilio disponible pour ${seller.email} (id=${seller.id}). Ajoutez un numéro dans l'admin.`);
     }
   }
 

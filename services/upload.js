@@ -13,6 +13,7 @@ function docFilename(req, file, cb) {
 let cloudinary = { uploader: { destroy: async () => {} } };
 
 if (process.env.CLOUDINARY_URL) {
+  try {
   const _cloudinary = require('cloudinary').v2;
   const { CloudinaryStorage } = require('multer-storage-cloudinary');
   _cloudinary.config({
@@ -46,6 +47,9 @@ if (process.env.CLOUDINARY_URL) {
     uploadDocument: multer({ storage: docStorage, limits: { fileSize: 50 * 1024 * 1024 } }),
     cloudinary,
   };
+  } catch (err) {
+    console.error('⚠️  CLOUDINARY_URL malformée — uploads désactivés, stockage local utilisé:', err.message);
+  }
 } else {
   // Dev mode — local disk storage
   const photoDisk = multer.diskStorage({

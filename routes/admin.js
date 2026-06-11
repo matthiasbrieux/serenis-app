@@ -366,7 +366,7 @@ router.delete('/api/seed-demo', requireAdmin, (req, res) => {
   res.json({ success: true, deleted: existing.length });
 });
 
-router.get('/create-test-account', async (req, res) => {
+router.get('/create-test-account', requireAdmin, async (req, res) => {
   const email = 'associe@test.fr';
   const password = 'Test2025';
   const hashed = await bcrypt.hash(password, 12);

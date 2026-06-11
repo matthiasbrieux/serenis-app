@@ -5,6 +5,15 @@ const rateLimit = require('express-rate-limit');
 const cookieParser = require('cookie-parser');
 const path = require('path');
 
+// Vérification des variables d'environnement au démarrage
+if (!process.env.JWT_SECRET) {
+  console.error('⛔ JWT_SECRET manquant — démarrage impossible (toutes les authentifications échoueraient).');
+  process.exit(1);
+}
+['STRIPE_SECRET_KEY', 'SENDGRID_API_KEY', 'ANTHROPIC_API_KEY'].forEach(k => {
+  if (!process.env[k]) console.warn(`⚠️  ${k} non défini — fonctionnalité associée désactivée.`);
+});
+
 const app = express();
 const PORT = process.env.PORT || 3000;
 app.set('trust proxy', 1); // Render / reverse proxy → req.protocol retourne https

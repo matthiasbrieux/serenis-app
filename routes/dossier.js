@@ -3,6 +3,15 @@ const router = express.Router();
 const db = require('../database');
 const { v4: uuidv4 } = require('uuid');
 const { requireAuth } = require('../middleware/auth');
+const rateLimit = require('express-rate-limit');
+
+// Rate limit sur les actions publiques (booking + offre) — anti-spam
+const publicActionLimit = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 10,
+  keyGenerator: (req) => req.ip,
+  handler: (req, res) => res.status(429).json({ error: 'Trop de tentatives. Réessayez dans 15 minutes.' }),
+});
 
 // ── Données dossier acheteur (token public) ───────────────────
 router.get('/api/dossier/acheteur/:token', (req, res) => {
@@ -32,7 +41,9 @@ router.get('/api/dossier/acheteur/:token', (req, res) => {
     return false; // notaire, entretien → never shown to acheteur
   });
 
-  res.json({ property: prop, photos, documents: docs });
+  // Ne jamais exposer le token notaire ni la session Stripe au dossier public
+  const { notaire_token, stripe_session_id, stripe_customer_id, password, ...safeProperty } = prop;
+  res.json({ property: safeProperty, photos, documents: docs });
 });
 
 // ── Données dossier notaire (token privé) ─────────────────────
@@ -71,7 +82,7 @@ router.get('/api/dossier/acheteur/:token/creneaux', (req, res) => {
 });
 
 // ── Réservation visite (par token acheteur) ───────────────────
-router.post('/api/dossier/acheteur/:token/reserver', async (req, res) => {
+router.post('/api/dossier/acheteur/:token/reserver', publicActionLimit, async (req, res) => {
   try {
     const prop = db.prepare(`
       SELECT p.*, s.email as seller_email, s.first_name as seller_first_name, s.phone as seller_phone
@@ -88,17 +99,20 @@ router.post('/api/dossier/acheteur/:token/reserver', async (req, res) => {
       return res.status(400).json({ error: 'Merci de renseigner votre budget, financement et délai d\'achat.' });
     }
 
-    const conflict = db.prepare("SELECT id FROM visits WHERE property_id=? AND visit_date=? AND visit_time=? AND status != 'cancelled'").get(prop.id, visit_date, visit_time);
-    if (conflict) return res.status(409).json({ error: 'Ce créneau est déjà pris. Choisissez un autre horaire.' });
-
-    const emailConflict = db.prepare("SELECT id FROM visits WHERE property_id=? AND buyer_email=? AND status != 'cancelled'").get(prop.id, buyer_email.trim().toLowerCase());
-    if (emailConflict) return res.status(409).json({ error: 'Une visite est déjà enregistrée pour cette adresse email.' });
-
-    db.prepare("INSERT INTO visits (property_id, seller_id, buyer_name, buyer_email, buyer_phone, visit_date, visit_time, status, buyer_budget, buyer_financing, buyer_timeline) VALUES (?,?,?,?,?,?,?,'confirmed',?,?,?)")
-      .run(prop.id, prop.seller_id, buyer_name, buyer_email.trim().toLowerCase(), buyer_phone || '', visit_date, visit_time, buyer_budget || null, buyer_financing || null, buyer_timeline || null);
-
-    db.prepare("INSERT INTO notifications (seller_id, type, title, body) VALUES (?,?,?,?)")
-      .run(prop.seller_id, 'visit_confirmed', 'Nouvelle visite confirmée', `${buyer_name} (${buyer_phone || buyer_email}) — ${visit_date} à ${visit_time}`);
+    // Transaction atomique pour éviter le double booking (P2-1)
+    const bookVisit = db.transaction(() => {
+      const conflict = db.prepare("SELECT id FROM visits WHERE property_id=? AND visit_date=? AND visit_time=? AND status != 'cancelled'").get(prop.id, visit_date, visit_time);
+      if (conflict) return { error: 'Ce créneau est déjà pris. Choisissez un autre horaire.', status: 409 };
+      const emailConflict = db.prepare("SELECT id FROM visits WHERE property_id=? AND buyer_email=? AND status != 'cancelled'").get(prop.id, buyer_email.trim().toLowerCase());
+      if (emailConflict) return { error: 'Une visite est déjà enregistrée pour cette adresse email.', status: 409 };
+      db.prepare("INSERT INTO visits (property_id, seller_id, buyer_name, buyer_email, buyer_phone, visit_date, visit_time, status, buyer_budget, buyer_financing, buyer_timeline) VALUES (?,?,?,?,?,?,?,'confirmed',?,?,?)")
+        .run(prop.id, prop.seller_id, buyer_name, buyer_email.trim().toLowerCase(), buyer_phone || '', visit_date, visit_time, buyer_budget || null, buyer_financing || null, buyer_timeline || null);
+      db.prepare("INSERT INTO notifications (seller_id, type, title, body) VALUES (?,?,?,?)")
+        .run(prop.seller_id, 'visit_confirmed', 'Nouvelle visite confirmée', `${buyer_name} (${buyer_phone || buyer_email}) — ${visit_date} à ${visit_time}`);
+      return { success: true };
+    });
+    const bookResult = bookVisit();
+    if (bookResult.error) return res.status(bookResult.status).json({ error: bookResult.error });
 
     try {
       const { sendVisitConfirmation, sendNewVisitRequest } = require('../services/email');
@@ -191,7 +205,7 @@ router.get('/api/soumettre-offre/:token/info', (req, res) => {
 });
 
 // Soumission de l'offre par l'acheteur (sans authentification)
-router.post('/api/soumettre-offre/:token', express.json(), async (req, res) => {
+router.post('/api/soumettre-offre/:token', publicActionLimit, express.json(), async (req, res) => {
   try {
     const prop = db.prepare(`
       SELECT p.id, p.seller_id, p.address, p.city, p.price, s.phone as seller_phone, s.email as seller_email, s.first_name as seller_first_name

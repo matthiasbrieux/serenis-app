@@ -14,6 +14,15 @@ router.use((req, res, next) => {
   next();
 });
 
+// Rate limit partagé pour tous les endpoints IA (formation/chat, performances/analyze, ai-insight)
+const aiRateLimit = require('express-rate-limit')({
+  windowMs: 60 * 60 * 1000,
+  max: 40,
+  keyGenerator: (req) => String(req.seller?.id || req.ip),
+  handler: (req, res) => res.status(429).json({ error: 'Limite atteinte — 40 requêtes IA/heure maximum.' }),
+  skip: (req) => !req.seller,
+});
+
 // Pages vendeur (toutes protégées)
 router.get('/dashboard', requireAuth, (req, res) => res.sendFile('dashboard.html', { root: './views/seller' }));
 router.get('/mon-bien', requireAuth, (req, res) => {
@@ -307,16 +316,22 @@ router.get('/api/agenda', requireAuth, (req, res) => {
 router.post('/api/agenda', requireAuth, express.json(), (req, res) => {
   try {
     const { slots } = req.body;
-    db.prepare('UPDATE agenda_slots SET active=0 WHERE seller_id=?').run(req.seller.id);
-    const insert = db.prepare('INSERT INTO agenda_slots (seller_id, day_of_week, specific_date, start_time, end_time, is_recurring) VALUES (?,?,?,?,?,?)');
-    (slots || []).forEach(s => {
-      if (s.date) {
-        const d = new Date(s.date + 'T00:00:00');
-        insert.run(req.seller.id, d.getDay(), s.date, s.start || '', s.end || '', 0);
-      } else if (s.day != null) {
-        insert.run(req.seller.id, s.day, null, s.start || '', s.end || '', 1);
-      }
+    const TIME_RE = /^\d{2}:\d{2}$/;
+    const saveAgenda = db.transaction(() => {
+      db.prepare('UPDATE agenda_slots SET active=0 WHERE seller_id=?').run(req.seller.id);
+      const insert = db.prepare('INSERT INTO agenda_slots (seller_id, day_of_week, specific_date, start_time, end_time, is_recurring) VALUES (?,?,?,?,?,?)');
+      (slots || []).forEach(s => {
+        const start = TIME_RE.test(s.start) ? s.start : '';
+        const end   = TIME_RE.test(s.end)   ? s.end   : '';
+        if (s.date) {
+          const d = new Date(s.date + 'T00:00:00');
+          insert.run(req.seller.id, d.getDay(), s.date, start, end, 0);
+        } else if (s.day != null) {
+          insert.run(req.seller.id, s.day, null, start, end, 1);
+        }
+      });
     });
+    saveAgenda();
     res.json({ success: true });
   } catch(e) {
     console.error('Agenda save error:', e.message);
@@ -427,7 +442,8 @@ router.post('/api/property/generate-description', requireAuth, express.json(), a
 });
 
 // ── Coach IA formation ─────────────��──────────────────────────
-router.post('/api/formation/chat', requireAuth, express.json(), async (req, res) => {
+router.post('/api/formation/chat', requireAuth, aiRateLimit, express.json(), async (req, res) => {
+  if (!process.env.ANTHROPIC_API_KEY) return res.status(503).json({ error: 'Coach formation non configuré — ajoutez ANTHROPIC_API_KEY.' });
   const { message, module: moduleName, history = [] } = req.body;
   if (!message) return res.json({ error: 'Message manquant' });
 
@@ -596,7 +612,8 @@ router.get('/api/score', requireAuth, (req, res) => {
   res.json({ score, breakdown, recommendations, stats: { totalViews, totalMessages, totalVisitsDone, totalOffers } });
 });
 
-router.post('/api/performances/analyze', requireAuth, express.json(), async (req, res) => {
+router.post('/api/performances/analyze', requireAuth, aiRateLimit, express.json(), async (req, res) => {
+  if (!process.env.ANTHROPIC_API_KEY) return res.status(503).json({ error: 'Analyse IA non configurée — ajoutez ANTHROPIC_API_KEY.' });
   const { performances } = req.body;
   if (!performances?.length) return res.json({ analysis: 'Renseignez vos statistiques pour obtenir une analyse.' });
 
@@ -888,7 +905,8 @@ router.post('/api/connect/notifications/read-all', requireAuth, (req, res) => {
   res.json({ success: true });
 });
 
-router.post('/api/connect/ai-insight', requireAuth, async (req, res) => {
+router.post('/api/connect/ai-insight', requireAuth, aiRateLimit, async (req, res) => {
+  if (!process.env.ANTHROPIC_API_KEY) return res.status(503).json({ insight: null });
   const visits = db.prepare('SELECT * FROM visits WHERE seller_id=?').all(req.seller.id);
   const contacts = db.prepare('SELECT * FROM buyer_contacts WHERE seller_id=?').all(req.seller.id);
   if (visits.length === 0 && contacts.length === 0) {
@@ -1314,23 +1332,30 @@ router.get('/api/seller/rgpd/export', requireAuth, (req, res) => {
 router.delete('/api/seller/rgpd/account', requireAuth, async (req, res) => {
   const sid = req.seller.id;
   const property = db.prepare('SELECT id FROM properties WHERE seller_id=?').get(sid);
-  if (property) {
+
+  // Suppression Cloudinary hors transaction (appels réseau)
+  if (property && process.env.CLOUDINARY_URL) {
     const photos = db.prepare('SELECT cloudinary_id FROM property_photos WHERE property_id=?').all(property.id);
     const docs = db.prepare('SELECT cloudinary_id FROM property_documents WHERE property_id=? AND cloudinary_id IS NOT NULL').all(property.id);
-    if (process.env.CLOUDINARY_URL) {
-      const { cloudinary } = require('../services/upload');
-      for (const ph of photos) await cloudinary.uploader.destroy(ph.cloudinary_id).catch(() => {});
-      for (const d of docs) await cloudinary.uploader.destroy(d.cloudinary_id).catch(() => {});
-    }
-    db.prepare('DELETE FROM property_photos WHERE property_id=?').run(property.id);
-    db.prepare('DELETE FROM property_documents WHERE property_id=?').run(property.id);
-    db.prepare('DELETE FROM buyer_contacts WHERE property_id=?').run(property.id);
-    db.prepare('DELETE FROM visits WHERE property_id=?').run(property.id);
-    db.prepare('DELETE FROM properties WHERE id=?').run(property.id);
+    const { cloudinary } = require('../services/upload');
+    for (const ph of photos) await cloudinary.uploader.destroy(ph.cloudinary_id).catch(() => {});
+    for (const d of docs) await cloudinary.uploader.destroy(d.cloudinary_id).catch(() => {});
   }
-  db.prepare('DELETE FROM agenda_slots WHERE seller_id=?').run(sid);
-  db.prepare('DELETE FROM notifications WHERE seller_id=?').run(sid);
-  db.prepare('DELETE FROM sellers WHERE id=?').run(sid);
+
+  // Suppression SQLite dans une seule transaction atomique
+  const deleteAccount = db.transaction(() => {
+    if (property) {
+      db.prepare('DELETE FROM property_photos WHERE property_id=?').run(property.id);
+      db.prepare('DELETE FROM property_documents WHERE property_id=?').run(property.id);
+      db.prepare('DELETE FROM buyer_contacts WHERE property_id=?').run(property.id);
+      db.prepare('DELETE FROM visits WHERE property_id=?').run(property.id);
+      db.prepare('DELETE FROM properties WHERE id=?').run(property.id);
+    }
+    db.prepare('DELETE FROM agenda_slots WHERE seller_id=?').run(sid);
+    db.prepare('DELETE FROM notifications WHERE seller_id=?').run(sid);
+    db.prepare('DELETE FROM sellers WHERE id=?').run(sid);
+  });
+  deleteAccount();
   res.clearCookie('token');
   res.json({ success: true });
 });
