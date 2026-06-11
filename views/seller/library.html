@@ -663,6 +663,7 @@
     .ai-checkbox svg { display:none; }
     .ai-item.ai-checked .ai-checkbox { background:#3D5A47; border-color:#3D5A47; }
     .ai-item.ai-checked .ai-checkbox svg { display:block; }
+    .ai-hint { margin-left:auto; font-size:0.67rem; font-weight:600; color:#3D5A47; background:#edf4ef; border:1px solid #c8ddd0; border-radius:100px; padding:2px 8px; white-space:nowrap; flex-shrink:0; max-width:90px; overflow:hidden; text-overflow:ellipsis; }
 
     /* ── iPhone Slides ── */
     .iphone-slides { position:absolute; inset:0; z-index:15; display:none; overflow:hidden; border-radius:38px; }
@@ -2804,11 +2805,53 @@ function updateAnnonceInfoCounters() {
   const el = document.getElementById('aiTotalCounter');
   if (el) el.textContent = `${done} / ${total}`;
 }
+let _propHintsCache = null;
+async function _loadPropHints() {
+  if (_propHintsCache !== null) return _propHintsCache;
+  try {
+    const r = await fetch('/api/property');
+    if (!r.ok) { _propHintsCache = {}; return _propHintsCache; }
+    const { property: p } = await r.json();
+    if (!p) { _propHintsCache = {}; return _propHintsCache; }
+    const garden = p.garden ? 'Jardin' : '';
+    const terrace = p.terrace ? 'Terrasse' : '';
+    const balcon = [garden, terrace].filter(Boolean).join(' · ');
+    _propHintsCache = {
+      aic_type_bien: p.type || null,
+      aic_surface:   p.surface_habitable ? `${p.surface_habitable} m²` : null,
+      aic_pieces:    p.rooms    ? `${p.rooms} pièce${p.rooms > 1 ? 's' : ''}` : null,
+      aic_chambres:  p.bedrooms ? `${p.bedrooms} chambre${p.bedrooms > 1 ? 's' : ''}` : null,
+      aic_etage:     p.floor != null && p.floor !== '' ? `Étage ${p.floor}` : null,
+      aic_annee:     p.year_built ? `${p.year_built}` : null,
+      aic_quartier:  p.city || null,
+      aic_transports: p.train_station || null,
+      aic_commerces:  p.commerces || null,
+      aic_balcon:    balcon || null,
+      aic_cave:      p.stationnement_type || null,
+      aic_expo:      p.exposition || null,
+      aic_chauffage: p.heating_type || null,
+      aic_dpe:       p.dpe_class ? `Classe ${p.dpe_class}` : null,
+      aic_prix:      p.price ? Number(p.price).toLocaleString('fr-FR') + ' €' : null,
+      aic_taxe:      p.taxe_fonciere ? `${p.taxe_fonciere} €/an` : null,
+      aic_travaux:   p.travaux_recents || null,
+    };
+  } catch { _propHintsCache = {}; }
+  return _propHintsCache;
+}
 function initAnnonceInfo() {
   document.querySelectorAll('.ai-item[data-key]').forEach(el => {
     if (localStorage.getItem(el.dataset.key) === '1') el.classList.add('ai-checked');
   });
   updateAnnonceInfoCounters();
+  _loadPropHints().then(hints => {
+    document.querySelectorAll('.ai-item[data-key]').forEach(el => {
+      const val = hints[el.dataset.key];
+      if (!val) return;
+      let hint = el.querySelector('.ai-hint');
+      if (!hint) { hint = document.createElement('span'); hint.className = 'ai-hint'; el.appendChild(hint); }
+      hint.textContent = val;
+    });
+  });
 }
 
 // ── iPhone Slides ──
