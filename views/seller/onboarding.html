@@ -251,6 +251,15 @@
     }
     .ob-coach-banner-sub { color: #a8c8b4; font-size: 0.82rem; }
 
+    /* iOS anti-zoom */
+    @media (pointer: coarse) {
+      .ob-form-group input, .ob-form-group select { font-size: 1rem !important; }
+      .btn-primary { min-height: 54px; touch-action: manipulation; }
+      .ob-choice { min-height: 44px; }
+      .ob-doc-item { min-height: 44px; }
+      .ob-nav-back { min-height: 44px; }
+    }
+
     /* Mobile */
     @media (max-width: 460px) {
       .ob-wrap { padding: 20px 16px 72px; }
@@ -568,7 +577,7 @@
     </div>
 
     <div class="ob-nav" style="justify-content:center;">
-      <a href="/dashboard" class="btn-primary btn-large btn-full" onclick="finishOnboarding()">Accéder à mon espace →</a>
+      <a href="/dashboard" class="btn-primary btn-large btn-full" onclick="finishOnboarding(event)">Accéder à mon espace →</a>
     </div>
   </div>
 
@@ -628,11 +637,19 @@ function prevStep(current) {
 }
 
 function goToStep(n) {
-  document.getElementById('step-' + currentStep).classList.remove('active');
-  document.getElementById('dot-' + currentStep).classList.remove('active');
-  document.getElementById('dot-' + currentStep).classList.add('done');
-  if (currentStep < totalSteps && document.getElementById('line-' + currentStep)) {
-    document.getElementById('line-' + currentStep).classList.add('done');
+  const prev = currentStep;
+  document.getElementById('step-' + prev).classList.remove('active');
+  document.getElementById('dot-' + prev).classList.remove('active');
+  if (n > prev) {
+    document.getElementById('dot-' + prev).classList.add('done');
+    if (document.getElementById('line-' + prev)) {
+      document.getElementById('line-' + prev).classList.add('done');
+    }
+  } else {
+    document.getElementById('dot-' + prev).classList.remove('done');
+    if (document.getElementById('line-' + prev)) {
+      document.getElementById('line-' + prev).classList.remove('done');
+    }
   }
 
   currentStep = n;
@@ -657,8 +674,12 @@ async function saveProfile() {
   } catch(e) {}
 }
 
-function finishOnboarding() {
-  localStorage.setItem('vpm_onboarded', '1');
+async function finishOnboarding(e) {
+  e.preventDefault();
+  try {
+    await fetch('/api/onboarding/complete', { method: 'POST', headers: { 'Content-Type': 'application/json' } });
+  } catch(err) {}
+  window.location.href = '/dashboard';
 }
 </script>
 </body>

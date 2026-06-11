@@ -2,7 +2,7 @@ const jwt = require('jsonwebtoken');
 const db = require('../database');
 
 // Routes exemptées du check contrat (contrat lui-même + son API)
-const CONTRAT_EXEMPT = ['/contrat', '/api/contrat/sign', '/api/me'];
+const CONTRAT_EXEMPT = ['/contrat', '/api/contrat/sign', '/api/me', '/onboarding', '/api/onboarding/complete'];
 
 function requireAuth(req, res, next) {
   const token = req.cookies?.token || req.headers.authorization?.replace('Bearer ', '');

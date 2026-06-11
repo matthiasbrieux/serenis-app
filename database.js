@@ -455,6 +455,9 @@ installmentCols.forEach(sql => { try { db.exec(sql); } catch(e) {} });
 // ── Travaux récents ───────────────────────────────────────────
 try { db.exec("ALTER TABLE properties ADD COLUMN travaux_recents TEXT"); } catch(e) {}
 
+// ── Suivi onboarding ─────────────────────────────────────────
+try { db.exec("ALTER TABLE sellers ADD COLUMN onboarding_done BOOLEAN DEFAULT 0"); } catch(e) {}
+
 // ── Visibilité photos dans le dossier acheteur ───────────────
 try { db.exec("ALTER TABLE properties ADD COLUMN exterieur_photos_public INTEGER DEFAULT 0"); } catch(e) {}
 try { db.exec("ALTER TABLE properties ADD COLUMN pro_photos_public INTEGER DEFAULT 0"); } catch(e) {}

@@ -23,7 +23,11 @@ router.get('/ma-formation', requireAuth, (req, res) => res.sendFile('library.htm
 router.get('/coaching-vpm', requireAuth, (req, res) => res.sendFile('coaching-vpm.html', { root: './views/seller' }));
 router.get('/mon-agenda', requireAuth, (req, res) => res.sendFile('agenda.html', { root: './views/seller' }));
 router.get('/ma-bibliotheque', requireAuth, (req, res) => res.sendFile('biblio.html', { root: './views/seller' }));
-router.get('/onboarding', requireAuth, (req, res) => res.sendFile('onboarding.html', { root: './views/seller' }));
+router.get('/onboarding', requireAuth, (req, res) => {
+  const row = db.prepare('SELECT onboarding_done FROM sellers WHERE id=?').get(req.seller.id);
+  if (row && row.onboarding_done) return res.redirect('/dashboard');
+  res.sendFile('onboarding.html', { root: './views/seller' });
+});
 
 // Contrat — accessible sans vérification contrat (exemption dans requireAuth)
 router.get('/contrat', requireAuth, (req, res) => res.sendFile('contrat.html', { root: './views/seller' }));
@@ -33,6 +37,11 @@ const contratSignLimit = require('express-rate-limit')({ windowMs: 15 * 60 * 100
 router.post('/api/contrat/sign', requireAuth, contratSignLimit, express.json(), (req, res) => {
   const ip = req.headers['x-forwarded-for']?.split(',')[0]?.trim() || req.socket.remoteAddress || '';
   db.prepare('UPDATE sellers SET contrat_signe=1, contrat_signe_at=CURRENT_TIMESTAMP, contrat_ip=? WHERE id=?').run(ip, req.seller.id);
+  res.json({ success: true });
+});
+
+router.post('/api/onboarding/complete', requireAuth, express.json(), (req, res) => {
+  db.prepare('UPDATE sellers SET onboarding_done=1 WHERE id=?').run(req.seller.id);
   res.json({ success: true });
 });
 
