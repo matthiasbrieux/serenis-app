@@ -38,6 +38,11 @@ app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
+// Pages publiques statiques (avant les autres routes pour éviter interception)
+app.get('/cgv', (req, res) => res.sendFile('cgv.html', { root: './public' }));
+app.get('/tarifs', (req, res) => res.sendFile('tarifs.html', { root: './public' }));
+app.get('/faq', (req, res) => res.sendFile('faq.html', { root: './public' }));
+
 app.use(express.static(path.join(__dirname, 'public'), {
   maxAge: '7d',
   setHeaders: (res, filePath) => {
@@ -105,11 +110,6 @@ app.get('/sitemap.xml', (req, res) => {
   res.type('application/xml');
   res.send(`<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${[...staticUrls,...propUrls].join('\n')}\n</urlset>`);
 });
-
-// Pages publiques statiques
-app.get('/cgv', (req, res) => res.sendFile('cgv.html', { root: './public' }));
-app.get('/tarifs', (req, res) => res.sendFile('tarifs.html', { root: './public' }));
-app.get('/faq', (req, res) => res.sendFile('faq.html', { root: './public' }));
 
 // Redirect mentions légales → section dans CGV
 app.get('/mentions-legales', (req, res) => res.redirect(301, '/cgv#mentions-legales'));
