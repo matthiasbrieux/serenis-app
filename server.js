@@ -39,9 +39,9 @@ app.get('/', (req, res) => {
 });
 
 // Pages publiques statiques
-app.get('/cgv', (req, res) => res.sendFile(path.join(__dirname, 'public', 'cgv.html')));
-app.get('/tarifs', (req, res) => res.sendFile(path.join(__dirname, 'public', 'tarifs.html')));
-app.get('/faq', (req, res) => res.sendFile(path.join(__dirname, 'public', 'faq.html')));
+app.get('/cgv', (req, res) => { res.set('Cache-Control', 'no-store, no-cache, must-revalidate'); res.sendFile(path.join(__dirname, 'public', 'cgv.html')); });
+app.get('/tarifs', (req, res) => { res.set('Cache-Control', 'no-store, no-cache, must-revalidate'); res.sendFile(path.join(__dirname, 'public', 'tarifs.html')); });
+app.get('/faq', (req, res) => { res.set('Cache-Control', 'no-store, no-cache, must-revalidate'); res.sendFile(path.join(__dirname, 'public', 'faq.html')); });
 
 app.use(express.static(path.join(__dirname, 'public'), {
   maxAge: '7d',
