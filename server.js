@@ -38,10 +38,10 @@ app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
-// Pages publiques statiques (avant les autres routes pour éviter interception)
-app.get('/cgv', (req, res) => res.sendFile('cgv.html', { root: './public' }));
-app.get('/tarifs', (req, res) => res.sendFile('tarifs.html', { root: './public' }));
-app.get('/faq', (req, res) => res.sendFile('faq.html', { root: './public' }));
+// Pages publiques statiques
+app.get('/cgv', (req, res) => res.sendFile(path.join(__dirname, 'public', 'cgv.html')));
+app.get('/tarifs', (req, res) => res.sendFile(path.join(__dirname, 'public', 'tarifs.html')));
+app.get('/faq', (req, res) => res.sendFile(path.join(__dirname, 'public', 'faq.html')));
 
 app.use(express.static(path.join(__dirname, 'public'), {
   maxAge: '7d',
