@@ -2527,7 +2527,7 @@
               <input type="file" id="diagBlocInput" multiple accept=".pdf,.zip,.jpg,.jpeg,.png,.webp" style="position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;">
             </label>
           </div>
-          <div id="diagBlocList" style="display:flex;flex-direction:column;gap:5px;margin-bottom:6px;"></div>
+          <div id="diagBlocList" style="display:flex;flex-direction:column;gap:8px;margin-bottom:10px;"></div>
           <button onclick="openDiagHelp()" style="display:inline-flex;align-items:center;gap:5px;padding:0;background:none;border:none;cursor:pointer;font-size:0.73rem;color:#3D5A47;font-family:'DM Sans',sans-serif;text-decoration:underline;text-underline-offset:3px;">
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
             Quels diagnostics sont obligatoires ?
@@ -2545,7 +2545,7 @@
               <input type="file" id="assainissementBlocInput" multiple accept=".pdf,.jpg,.jpeg,.png,.webp" style="position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;">
             </label>
           </div>
-          <div id="assainissementBlocList" style="display:flex;flex-direction:column;gap:5px;"></div>
+          <div id="assainissementBlocList" style="display:flex;flex-direction:column;gap:8px;"></div>
 
           <!-- ─── Mode envoi diagnostics ─── -->
           <div style="margin-top:14px;border-top:1.5px solid #c8ddd0;padding-top:12px;">
@@ -4582,13 +4582,13 @@ function renderDocuments(docs) {
   var diagBlocList = document.getElementById('diagBlocList');
   if (diagBlocList) {
     while (diagBlocList.firstChild) diagBlocList.removeChild(diagBlocList.firstChild);
-    diagDocs.forEach(function(doc) { diagBlocList.appendChild(_renderDocRow(doc, '#3D5A47')); });
+    diagDocs.forEach(function(doc) { diagBlocList.appendChild(_docsCard(doc)); });
   }
 
   var assainissementBlocList = document.getElementById('assainissementBlocList');
   if (assainissementBlocList) {
     while (assainissementBlocList.firstChild) assainissementBlocList.removeChild(assainissementBlocList.firstChild);
-    assainissementDocs.forEach(function(doc) { assainissementBlocList.appendChild(_renderDocRow(doc, '#1565c0')); });
+    assainissementDocs.forEach(function(doc) { assainissementBlocList.appendChild(_docsCard(doc)); });
   }
 
   // ── Diag complet (legacy single PDF) ────────────────
@@ -4663,6 +4663,13 @@ function renderDocuments(docs) {
 
   initDocPanels();
   updateDocPanelCounts();
+
+  // Auto-ouvrir les panneaux qui ont des fichiers
+  var diagHasFiles = (diagDocs.length + assainissementDocs.length) > 0;
+  if (diagHasFiles) {
+    var diagPanel = document.getElementById('dpanel-diag');
+    if (diagPanel) diagPanel.classList.remove('collapsed');
+  }
 }
 
 function initDocPanels() {
