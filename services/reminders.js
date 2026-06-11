@@ -24,16 +24,16 @@ async function sendVisitReminders() {
         visit.visit_date, visit.visit_time, false
       );
 
-      if (visit.seller_phone) {
-        await sendSmsNotification(
-          visit.seller_phone,
-          `Rappel visite demain ${visit.visit_date} à ${visit.visit_time}\nAcquéreur : ${visit.buyer_name} — ${visit.buyer_email}`
-        );
-      }
-
       db.prepare('UPDATE visits SET reminder_sent = 1 WHERE id = ?').run(visit.id);
       db.prepare("INSERT INTO notifications (seller_id, type, title, body) VALUES (?,?,?,?)")
         .run(visit.seller_id, 'visit_reminder', '📅 Rappel visite demain', `${visit.buyer_name} — ${visit.visit_date} à ${visit.visit_time}`);
+
+      if (visit.seller_phone) {
+        sendSmsNotification(
+          visit.seller_phone,
+          `Rappel visite demain ${visit.visit_date} à ${visit.visit_time}\nAcquéreur : ${visit.buyer_name} — ${visit.buyer_email}`
+        ).catch(() => {});
+      }
       console.log(`Reminder sent for visit ${visit.id}`);
     } catch (e) {
       console.error(`Reminder error for visit ${visit.id}:`, e.message);

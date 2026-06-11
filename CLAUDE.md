@@ -134,6 +134,7 @@ STRIPE_PRICE_AUTONOME   # price_xxx
 STRIPE_PRICE_SERENITE   # price_xxx
 TWILIO_ACCOUNT_SID
 TWILIO_AUTH_TOKEN
+TWILIO_FROM_NUMBER      # Numéro Twilio plateforme pour notifs SMS sortants vendeurs (ex: +33xxxxxxxxx). Si absent → SMS silencieusement ignorés
 BASE_URL                # https://venduparmo.fr
 NODE_ENV
 PORT                    # 3000

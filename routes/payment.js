@@ -132,7 +132,13 @@ async function stripeWebhook(req, res) {
     const session = event.data.object;
     if (session.payment_status === 'paid') {
       try { await activateSeller(session); }
-      catch (e) { console.error('Webhook activate error:', e.message); }
+      catch (e) {
+        console.error('Webhook activate error:', e.message);
+        try {
+          db.prepare(`INSERT INTO notifications (seller_id, type, title, body) VALUES (0,'admin_alert','⚠️ Paiement non activé',?)`)
+            .run(`Session Stripe ${session.id} (${session.customer_email || session.metadata?.email || '?'}) — erreur : ${e.message}`);
+        } catch (_) {}
+      }
     }
   }
   res.json({ received: true });
