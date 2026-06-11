@@ -4,17 +4,19 @@
     const r = await fetch('/api/notifications/counts');
     if (!r.ok) return;
     const { pendingOffers, upcomingVisits, unreadNotifs } = await r.json();
-    function badge(selector, count) {
+    function badge(badgeId, fallbackHref, count) {
       if (!count) return;
-      const el = document.querySelector(selector);
+      const existing = document.getElementById(badgeId);
+      if (existing) { existing.textContent = count; existing.style.display = 'inline-flex'; return; }
+      const el = document.querySelector('a[href="' + fallbackHref + '"]');
       if (!el) return;
       const span = document.createElement('span');
       span.textContent = count;
-      span.style.cssText = 'display:inline-flex;align-items:center;justify-content:center;background:#C4603A;color:#fff;font-size:10px;font-weight:700;border-radius:50%;width:16px;height:16px;margin-left:6px;flex-shrink:0;';
+      span.className = 'sidebar-badge';
       el.appendChild(span);
     }
-    badge('a[href="/mes-offres"]', pendingOffers);
-    badge('a[href="/mon-agenda"]', (upcomingVisits || 0) + (unreadNotifs || 0) || undefined);
+    badge('offresBadge', '/mes-offres', pendingOffers);
+    badge('agendaBadge', '/mon-agenda', (upcomingVisits || 0) + (unreadNotifs || 0) || undefined);
   } catch(e) {}
 })();
 
