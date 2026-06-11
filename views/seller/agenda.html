@@ -230,6 +230,39 @@
     .cal-past-day .cal-dot-confirmed { background:#a8cfa9; }
     .cal-past-day .cal-dot-pending   { background:#f5c98a; }
     .cal-past-day .cal-dot-eve       { background:#fac884; }
+    /* ── Visite confirmée : cellule entière colorée ── */
+    .cal-has-confirmed {
+      background: #1D3A28;
+      border-radius: 10px;
+    }
+    .cal-has-confirmed .cal-num {
+      color: #fff;
+      font-weight: 700;
+      background: transparent;
+      box-shadow: none;
+    }
+    .cal-has-confirmed:hover { background: #162d1f; }
+    .cal-today.cal-has-confirmed .cal-num { background: rgba(255,255,255,0.18); box-shadow: none; }
+    .cal-has-confirmed.cal-selected .cal-num { background: rgba(255,255,255,0.25); box-shadow: none; }
+    .cal-has-confirmed.cal-past-day { background: #d6ece0; }
+    .cal-has-confirmed.cal-past-day .cal-num { color: #2e7d32; }
+    .cal-has-confirmed.cal-past-day:hover { background: #c4e4d0; }
+    /* ── Visite en attente : cellule entière colorée ── */
+    .cal-has-pending {
+      background: #E07B2A;
+      border-radius: 10px;
+    }
+    .cal-has-pending .cal-num {
+      color: #fff;
+      font-weight: 700;
+      background: transparent;
+      box-shadow: none;
+    }
+    .cal-has-pending:hover { background: #c96820; }
+    .cal-today.cal-has-pending .cal-num { background: rgba(255,255,255,0.18); box-shadow: none; }
+    .cal-has-pending.cal-selected .cal-num { background: rgba(255,255,255,0.25); box-shadow: none; }
+    .cal-has-pending.cal-past-day { background: #fdebd4; }
+    .cal-has-pending.cal-past-day .cal-num { color: #b45309; }
     /* Filter dimmed */
     .cal-filter-dimmed { opacity:0.15; pointer-events:none; }
     /* Legend */
@@ -725,8 +758,8 @@
           </div>
           <div class="cal-grid" id="calGrid" style="margin-top:4px;"></div>
           <div class="cal-legend">
-            <span class="cal-legend-item"><span class="cal-dot cal-dot-confirmed" style="display:inline-block;"></span>Confirmée</span>
-            <span class="cal-legend-item"><span class="cal-dot cal-dot-pending" style="display:inline-block;"></span>En attente</span>
+            <span class="cal-legend-item"><span style="display:inline-block;width:12px;height:12px;border-radius:3px;background:#1D3A28;flex-shrink:0;"></span>Visite confirmée</span>
+            <span class="cal-legend-item"><span style="display:inline-block;width:12px;height:12px;border-radius:3px;background:#E07B2A;flex-shrink:0;"></span>En attente</span>
             <span class="cal-legend-item"><span class="cal-dot cal-dot-eve" style="display:inline-block;"></span>Rappel J-1</span>
           </div>
         </div>
@@ -1569,9 +1602,9 @@ function renderCalendar() {
       const hasPending   = dayVisits.some(v=>v.status==='pending');
       const isEve = eveDates.has(dateStr) && !hasConfirmed;
       const isPast = dateStr < today;
-      if (hasConfirmed) dotsHtml += `<span class="cal-dot cal-dot-confirmed"></span>`;
+      if (hasConfirmed) cls += ' cal-has-confirmed';
+      else if (hasPending) cls += ' cal-has-pending';
       if (isEve) dotsHtml += `<span class="cal-dot cal-dot-eve"></span>`;
-      if (hasPending && !hasConfirmed) dotsHtml += `<span class="cal-dot cal-dot-pending"></span>`;
       if (isPast && !hasConfirmed && !hasPending && !isEve) cls += ' cal-past-day';
     } else if (activeStatFilter === 'avenir') {
       const match = dayVisits.some(v=>v.status!=='cancelled' && v.visit_date>=today);
