@@ -988,7 +988,7 @@
           <div class="sidebar-section-title confirmed-section-title">
             <span style="display:flex;align-items:center;gap:6px;">
               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-              Visites confirmées
+              Mes visites
             </span>
             <span id="upcomingCountBadge" style="background:rgba(255,255,255,0.25);color:#fff;padding:2px 9px;border-radius:20px;font-size:0.72rem;font-weight:700;border:1px solid rgba(255,255,255,0.3);"></span>
           </div>
@@ -1360,11 +1360,10 @@ function buildVisitConfirmedCard(v) {
         <div class="vcc-cal-day">${dayNum}</div>
       </div>
       <div class="vcc-info">
-        <div class="vcc-badge">✓ Confirmée</div>
+        <div class="vcc-badge" id="badge-${v.id}" style="${v.reminder_sent?'':'display:none;'}">✓ Rappel envoyé</div>
         <div class="vcc-name">${v.buyer_name||'Acquéreur'}</div>
         <div class="vcc-time">⏰ ${time}</div>
         ${v.buyer_phone?`<div class="vcc-phone"><a href="tel:${v.buyer_phone}" style="color:#3D5A47;text-decoration:none;font-weight:600;">${v.buyer_phone}</a></div>`:''}
-        <div class="vcc-reminder-tag" id="reminder-tag-${v.id}">${v.reminder_sent ? svgCheck10+' Rappel envoyé' : ''}</div>
       </div>
     </div>
     ${(v.buyer_budget||v.buyer_financing||v.buyer_timeline)?`
@@ -1652,9 +1651,8 @@ function copyRappelSms(btn) {
       }
       const card = document.getElementById('vcard-'+id);
       if (card) card.classList.add('reminder-done');
-      const tag = document.getElementById('reminder-tag-'+id);
-      const svgCheck10 = `<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>`;
-      if (tag) tag.innerHTML = svgCheck10 + ' Rappel envoyé';
+      const badge = document.getElementById('badge-'+id);
+      if (badge) badge.style.display = '';
       fetch(`/api/visits/${id}/reminder`,{method:'POST'}).catch(()=>{});
     }
   }
