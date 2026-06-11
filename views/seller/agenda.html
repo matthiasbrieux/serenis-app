@@ -513,6 +513,25 @@
     /* ── Misc ─────────────────────────────────────────── */
     .form-success { color:#3D5A47; font-size:0.82rem; }
     .form-success.hidden { display:none; }
+    /* ── Hero agenda ── */
+    .agenda-hero { margin-bottom: 24px; padding: 28px 28px 22px; background: linear-gradient(135deg, #F5F0E8 0%, #EDF2EE 100%); border-radius: 20px; border: 1px solid #E2DDD6; position: relative; overflow: hidden; }
+    .agenda-hero::before { content: ''; position: absolute; top: -50px; right: -50px; width: 200px; height: 200px; background: radial-gradient(circle, rgba(61,90,71,0.07) 0%, transparent 70%); pointer-events: none; }
+    .agenda-hero-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; flex-wrap: wrap; }
+    .agenda-hero-badge { display: inline-flex; align-items: center; gap: 6px; padding: 4px 13px; border-radius: 100px; background: #fff; border: 1px solid #C5D9CB; color: #3D5A47; font-size: 0.67rem; font-weight: 700; letter-spacing: 0.09em; text-transform: uppercase; margin-bottom: 12px; box-shadow: 0 1px 4px rgba(61,90,71,0.1); }
+    .agenda-hero-title { font-family: 'Cormorant Garamond', serif; font-size: 2rem; font-weight: 600; color: #1A1A16; line-height: 1.15; margin: 0 0 10px; }
+    .agenda-hero-title em { font-style: italic; color: #3D5A47; }
+    .agenda-hero-desc { font-size: 0.83rem; color: #666; line-height: 1.7; max-width: 520px; margin: 0; }
+    .agenda-hero-actions { display: flex; flex-direction: column; align-items: flex-end; gap: 8px; flex-shrink: 0; padding-top: 4px; }
+    .agenda-hero-features { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 18px; }
+    .agenda-hero-feat { display: inline-flex; align-items: center; gap: 7px; padding: 7px 13px; background: #fff; border: 1px solid #D8D2CB; border-radius: 10px; font-size: 0.77rem; font-weight: 600; color: #444; box-shadow: 0 1px 3px rgba(0,0,0,0.04); white-space: nowrap; }
+    .agenda-hero-feat svg { color: #3D5A47; flex-shrink: 0; opacity: 0.75; }
+    @media (max-width: 600px) {
+      .agenda-hero { padding: 20px 18px 18px; }
+      .agenda-hero-title { font-size: 1.65rem; }
+      .agenda-hero-actions { align-items: stretch; width: 100%; }
+      .agenda-hero-features { gap: 6px; }
+      .agenda-hero-feat { font-size: 0.73rem; padding: 6px 11px; }
+    }
     /* page-header : hérité de style.css */
 
     /* ── iOS mobile fixes (layout breakpoint) ── */
@@ -542,11 +561,6 @@
 
     /* ── AMÉLIORATIONS MOBILE 375px ─────────────────────── */
     @media (max-width:480px) {
-      /* Header */
-      .page-header > div { flex-direction: column; align-items: stretch !important; }
-      .page-header > div > div:last-child { display: flex; flex-direction: column; gap: 8px; }
-      .page-header > div > div:last-child button { width: 100%; justify-content: center; }
-
       /* Stats en 2 colonnes serrées */
       .agenda-stats { grid-template-columns: repeat(2,1fr); gap: 8px; }
       .stat-card-agenda { padding: 12px 10px; gap: 8px; }
@@ -696,22 +710,44 @@
 
   <main class="main-content">
 
-    <!-- Header -->
-    <div class="page-header">
-      <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:12px;">
+    <!-- Hero -->
+    <div class="agenda-hero">
+      <div class="agenda-hero-top">
         <div>
-          <h1 class="page-title">Mon agenda</h1>
-          <p class="page-subtitle">Visites et disponibilités — tout au même endroit</p>
-        </div>
-        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
-          <div class="serenis-number-pill" id="serenisNumberPill" style="display:none;">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.27h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 9a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
-            <span id="serenisNumberText">—</span>
+          <div class="agenda-hero-badge">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+            Agenda intelligent
           </div>
+          <h1 class="agenda-hero-title">Vos visites,<br><em>pilotées</em></h1>
+          <p class="agenda-hero-desc">Créneaux en ligne, réservation acheteur autonome, rappels SMS et jalons compromis — votre calendrier géré sans effort.</p>
+        </div>
+        <div class="agenda-hero-actions">
           <button class="add-btn" onclick="openModal('addVisitOverlay')">
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
             Programmer une visite
           </button>
+          <div class="serenis-number-pill" id="serenisNumberPill" style="display:none;">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.27h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 9a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+            <span id="serenisNumberText">—</span>
+          </div>
+        </div>
+      </div>
+      <div class="agenda-hero-features">
+        <div class="agenda-hero-feat">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          Calendrier visuel
+        </div>
+        <div class="agenda-hero-feat">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.41a2 2 0 0 1 2-2.18h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+          Rappels SMS automatiques
+        </div>
+        <div class="agenda-hero-feat">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          Réservation acheteur autonome
+        </div>
+        <div class="agenda-hero-feat">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          Jalons compromis
         </div>
       </div>
     </div>
