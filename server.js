@@ -4,10 +4,18 @@ const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
 const cookieParser = require('cookie-parser');
 const path = require('path');
+const fs = require('fs');
 
 // Vérification des variables d'environnement au démarrage
 ['JWT_SECRET', 'STRIPE_SECRET_KEY', 'SENDGRID_API_KEY', 'ANTHROPIC_API_KEY'].forEach(k => {
   if (!process.env[k]) console.warn(`⚠️  ${k} non défini — fonctionnalité associée désactivée.`);
+});
+if (!process.env.CLOUDINARY_URL) console.warn('⚠️  CLOUDINARY_URL non défini — les photos seront stockées localement (non persistant sur Render).');
+
+// Créer les dossiers d'upload s'ils n'existent pas
+['public/uploads/photos', 'public/uploads/documents'].forEach(dir => {
+  const fullPath = path.join(__dirname, dir);
+  if (!fs.existsSync(fullPath)) fs.mkdirSync(fullPath, { recursive: true });
 });
 
 const app = express();
