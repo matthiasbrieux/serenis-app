@@ -2828,6 +2828,18 @@ function updateAnnonceInfoCounters() {
   const el = document.getElementById('aiTotalCounter');
   if (el) el.textContent = `${done} / ${total}`;
 }
+function _extractPlainText(val) {
+  if (!val) return null;
+  try {
+    const nodes = JSON.parse(val);
+    const arr = Array.isArray(nodes) ? nodes : (nodes.content || []);
+    let text = '';
+    function walk(n) { if (n.type === 'text') text += n.text || ''; else if (n.content) n.content.forEach(walk); }
+    arr.forEach(walk);
+    text = text.trim();
+    return text ? (text.length > 30 ? text.slice(0, 28) + '…' : text) : 'Renseigné';
+  } catch { return typeof val === 'string' && val.length > 30 ? val.slice(0, 28) + '…' : (val || null); }
+}
 let _propHintsCache = null;
 async function _loadPropHints() {
   if (_propHintsCache !== null) return _propHintsCache;
@@ -2856,7 +2868,7 @@ async function _loadPropHints() {
       aic_dpe:       p.dpe_class ? `Classe ${p.dpe_class}` : null,
       aic_prix:      p.price ? Number(p.price).toLocaleString('fr-FR') + ' €' : null,
       aic_taxe:      p.taxe_fonciere ? `${p.taxe_fonciere} €/an` : null,
-      aic_travaux:   p.travaux_recents || null,
+      aic_travaux:   _extractPlainText(p.travaux_recents),
     };
   } catch { _propHintsCache = {}; }
   return _propHintsCache;
