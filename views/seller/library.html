@@ -26,14 +26,51 @@
       box-shadow: 0 8px 40px rgba(0,0,0,0.18);
     }
 
-    /* ── 3-col hero ── */
+    /* ── 2-col hero ── */
     .f-hero {
       display: grid;
-      grid-template-columns: 1fr 224px 1fr;
+      grid-template-columns: 1fr 1fr;
       gap: 36px;
-      align-items: center;
+      align-items: stretch;
     }
+    .iphone-wrap { display: none !important; }
     .f-hero-left, .f-hero-right { display: flex; flex-direction: column; gap: 14px; }
+
+    /* Module carousel */
+    .mod-car-wrap {
+      background: rgba(255,255,255,0.05); border: 1.5px solid rgba(255,255,255,0.1);
+      border-radius: 16px; padding: 22px 22px 20px;
+      display: flex; flex-direction: column; gap: 0; flex: 1;
+      cursor: pointer; transition: border-color 0.2s, background 0.2s;
+    }
+    .mod-car-wrap:hover { border-color: rgba(212,228,216,0.25); background: rgba(255,255,255,0.08); }
+    .mod-car-hdr { display: flex; align-items: flex-start; gap: 14px; margin-bottom: 14px; }
+    .mod-car-num-badge {
+      width: 34px; height: 34px; border-radius: 9px; flex-shrink: 0;
+      background: rgba(168,212,181,0.15); color: #A8D4B5;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 800; font-size: 0.86rem; font-family: 'DM Sans', sans-serif;
+    }
+    .mod-car-title { font-size: 1rem; font-weight: 700; color: #FDFCF8; line-height: 1.25; }
+    .mod-car-sub { font-size: 0.72rem; color: rgba(212,228,216,0.5); line-height: 1.4; margin-top: 4px; }
+    .mod-car-sep { height: 1px; background: rgba(255,255,255,0.08); margin-bottom: 14px; }
+    .mod-car-points { display: flex; flex-direction: column; gap: 9px; flex: 1; margin-bottom: 18px; }
+    .mod-car-point { display: flex; align-items: flex-start; gap: 9px; font-size: 0.78rem; color: rgba(255,255,255,0.78); line-height: 1.55; }
+    .mod-car-point-dot { width: 5px; height: 5px; border-radius: 50%; background: #C4785A; flex-shrink: 0; margin-top: 7px; }
+    .mod-car-footer { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+    .mod-car-dots { display: flex; gap: 5px; align-items: center; }
+    .mod-car-dot-nav {
+      width: 6px; height: 6px; border-radius: 50%; border: none; padding: 0; cursor: pointer;
+      background: rgba(255,255,255,0.2); transition: all 0.25s; flex-shrink: 0;
+    }
+    .mod-car-dot-nav.active { width: 18px; border-radius: 3px; background: #A8D4B5; }
+    .mod-car-cta {
+      font-size: 0.74rem; font-weight: 700; color: rgba(168,212,181,0.9);
+      background: none; border: 1.5px solid rgba(168,212,181,0.25);
+      border-radius: 20px; padding: 5px 14px; cursor: pointer;
+      font-family: 'DM Sans', sans-serif; transition: all 0.18s; white-space: nowrap;
+    }
+    .mod-car-cta:hover { background: rgba(168,212,181,0.12); border-color: rgba(168,212,181,0.45); }
 
     /* left — sur fond sombre */
     .f-badge { display: inline-flex; align-items: center; gap: 6px; padding: 4px 12px; border-radius: 100px; background: rgba(212,228,216,0.12); border: 1px solid rgba(212,228,216,0.2); color: #D4E4D8; font-size: 0.66rem; font-weight: 700; letter-spacing: 0.09em; text-transform: uppercase; width: fit-content; }
@@ -394,8 +431,7 @@
     @media (max-width: 900px) {
       .f-hero-wrap { padding: 24px 18px 28px; border-radius: 14px; }
       .f-hero { grid-template-columns: 1fr; gap: 28px; }
-      .f-hero-right { order: 3; }
-      .iphone-wrap { order: 2; }
+      .f-hero-right { order: 2; }
       .f-hero-left { order: 1; }
     }
     @media (max-width: 640px) { .coach-panel { right: 12px; left: 12px; width: auto; } }
@@ -1331,15 +1367,24 @@
         </div>
       </div>
 
-      <!-- RIGHT : points clés + rappels -->
+      <!-- RIGHT : carousel modules -->
       <div class="f-hero-right">
-        <div class="kp-right-title">Points clés du module actif</div>
-        <div id="keyPoints"></div>
-        <div class="kp-divider"></div>
-        <div class="kp-legal">
-          <div class="kp-legal-title"><span style="display:inline-flex;align-items:center;vertical-align:middle;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></span> Rappels juridiques</div>
-          <div class="kp-legal-i">Ne signez aucun document sans notaire.</div>
+        <div class="mod-car-wrap" id="modCarWrap">
+          <div class="mod-car-hdr">
+            <div class="mod-car-num-badge" id="carNum">1</div>
+            <div>
+              <div class="mod-car-title" id="carTitle"></div>
+              <div class="mod-car-sub" id="carSub"></div>
+            </div>
+          </div>
+          <div class="mod-car-sep"></div>
+          <div class="mod-car-points" id="carPoints"></div>
+          <div class="mod-car-footer">
+            <div class="mod-car-dots" id="carDots"></div>
+            <button class="mod-car-cta" id="carCta">Ouvrir ce module →</button>
+          </div>
         </div>
+        <div id="keyPoints" style="display:none"></div>
       </div>
 
     </div>
@@ -2298,6 +2343,38 @@ function updateKeyPoints() {
   if (!mod) return;
   document.getElementById('keyPoints').innerHTML = mod.keyPoints.map(p =>
     `<div class="kp-item"><div class="kp-dot"></div><span>${p}</span></div>`).join('');
+  renderCarousel(activeModule);
+  resetCarouselTimer();
+}
+
+// ── Module carousel ──
+let carouselIdx = 0;
+let carouselTimer = null;
+
+function renderCarousel(idx) {
+  carouselIdx = ((idx % MODULES.length) + MODULES.length) % MODULES.length;
+  const mod = MODULES[carouselIdx];
+  document.getElementById('carNum').textContent = parseInt(mod.num, 10);
+  document.getElementById('carTitle').textContent = mod.title;
+  document.getElementById('carSub').textContent = mod.subtitle;
+  document.getElementById('carPoints').innerHTML = mod.keyPoints.map(p =>
+    `<div class="mod-car-point"><div class="mod-car-point-dot"></div><span>${p}</span></div>`
+  ).join('');
+  document.querySelectorAll('.mod-car-dot-nav').forEach((d, i) => d.classList.toggle('active', i === carouselIdx));
+}
+
+function resetCarouselTimer() {
+  if (carouselTimer) clearInterval(carouselTimer);
+  carouselTimer = setInterval(() => renderCarousel(carouselIdx + 1), 4200);
+}
+
+function goToCarouselModule(idx) {
+  stopAgent();
+  activeModule = idx;
+  if (MODULES[idx].mailCat) activeMailCat = MODULES[idx].mailCat;
+  renderModules(); updateKeyPoints(); updateModuleVideo(); showModuleSlides(idx);
+  triggerAiModuleMsg(idx); renderMails(); renderChecklists();
+  setTimeout(() => document.getElementById('modContainer').scrollIntoView({ behavior: 'smooth', block: 'start' }), 60);
 }
 
 // ── Module video ──
@@ -3206,6 +3283,33 @@ updateKeyPoints();
 updateModuleVideo();
 showWelcomeSlide();
 setTimeout(() => triggerAiModuleMsg(0), 2000);
+
+// ── Init carousel ──
+(function initCarousel() {
+  const dotsEl = document.getElementById('carDots');
+  if (!dotsEl) return;
+  dotsEl.innerHTML = MODULES.map((m, i) =>
+    `<button class="mod-car-dot-nav" data-idx="${i}" title="${m.title}"></button>`
+  ).join('');
+  dotsEl.querySelectorAll('.mod-car-dot-nav').forEach(btn => {
+    btn.addEventListener('click', e => {
+      e.stopPropagation();
+      renderCarousel(parseInt(btn.dataset.idx));
+      resetCarouselTimer();
+    });
+  });
+  renderCarousel(activeModule);
+  resetCarouselTimer();
+  const wrap = document.getElementById('modCarWrap');
+  if (!wrap) return;
+  wrap.addEventListener('mouseenter', () => { if (carouselTimer) clearInterval(carouselTimer); });
+  wrap.addEventListener('mouseleave', () => resetCarouselTimer());
+  wrap.addEventListener('click', () => goToCarouselModule(carouselIdx));
+  document.getElementById('carCta').addEventListener('click', e => {
+    e.stopPropagation();
+    goToCarouselModule(carouselIdx);
+  });
+})();
 
 // Welcome banner CTA — aller au module 1
 const welcomeStartBtn = document.getElementById('welcomeStartBtn');
