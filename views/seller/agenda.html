@@ -723,6 +723,23 @@
     .avail-slot2-del svg { width:13px; height:13px; stroke:currentColor; pointer-events:none; }
     @keyframes slotOut2 { from{opacity:1;transform:translateX(0);max-height:90px;} to{opacity:0;transform:translateX(16px);max-height:0;padding:0;margin:0;border:none;} }
     .avail-slot2.removing { animation:slotOut2 0.22s ease forwards; }
+
+    /* ── Qualification acheteur (dans modal rappel) ─────── */
+    .qualif-sep { display:flex; align-items:center; gap:8px; margin:10px 0; }
+    .qualif-sep-line { flex:1; height:1px; background:#f0ebe4; }
+    .qualif-sep-lbl { font-size:0.63rem; font-weight:700; color:#ccc; text-transform:uppercase; letter-spacing:0.06em; white-space:nowrap; }
+    .qualif-toggle { width:100%; display:flex; align-items:center; gap:8px; padding:10px 14px; border-radius:11px; border:1.5px solid #d0e4d8; background:#f8fdf9; color:#3D5A47; font-family:'DM Sans',sans-serif; font-size:0.84rem; font-weight:700; cursor:pointer; transition:all 0.18s; margin-bottom:0; text-align:left; }
+    .qualif-toggle:hover { background:#edf7f1; border-color:#3D5A47; }
+    .qualif-toggle.open { background:#3D5A47; color:#fff; border-color:#3D5A47; }
+    .qualif-arrow { margin-left:auto; font-size:1.1rem; line-height:1; transition:transform 0.22s cubic-bezier(0.16,1,0.3,1); display:inline-block; }
+    .qualif-panel { max-height:0; overflow:hidden; transition:max-height 0.32s cubic-bezier(0.16,1,0.3,1); }
+    .qualif-panel.open { max-height:500px; }
+    .qualif-panel-inner { padding:12px 0 4px; }
+    .qualif-lbl { font-size:0.62rem; font-weight:800; text-transform:uppercase; letter-spacing:0.07em; color:#3D5A47; margin-bottom:6px; display:flex; align-items:center; gap:5px; }
+    .qualif-preview { background:#f0f5f1; border:1.5px solid #c8ddd0; border-radius:11px; padding:13px 15px; font-size:0.84rem; color:#2d2d2d; line-height:1.65; margin-bottom:10px; white-space:pre-wrap; word-break:break-word; }
+    .qualif-copy-btn { width:100%; padding:11px; background:#3D5A47; color:#fff; border:none; border-radius:10px; font-family:'DM Sans',sans-serif; font-size:0.87rem; font-weight:700; cursor:pointer; transition:0.15s; display:flex; align-items:center; justify-content:center; gap:7px; margin-bottom:4px; }
+    .qualif-copy-btn:hover { background:#2a4030; }
+    .qualif-copy-btn.copied { background:#059669; }
   </style>
 </head>
 <body>
@@ -1129,6 +1146,32 @@
     <button class="confirm-sms-copy" id="rappelSmsCopyBtn" onclick="copyRappelSms(this)">
       <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:middle;margin-right:5px;"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>Copier le SMS
     </button>
+
+    <!-- Qualification acheteur -->
+    <div class="qualif-sep">
+      <div class="qualif-sep-line"></div>
+      <span class="qualif-sep-lbl">Aller plus loin</span>
+      <div class="qualif-sep-line"></div>
+    </div>
+    <button class="qualif-toggle" id="qualifToggle" onclick="toggleQualifPanel()">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      Qualifier l'acheteur avant la visite
+      <span class="qualif-arrow" id="qualifArrow">+</span>
+    </button>
+    <div class="qualif-panel" id="qualifPanel">
+      <div class="qualif-panel-inner">
+        <div class="qualif-lbl">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+          Message de qualification
+        </div>
+        <div class="qualif-preview" id="qualifSmsText"></div>
+        <button class="qualif-copy-btn" id="qualifCopyBtn" onclick="copyQualifSms(this)">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+          Copier ce message
+        </button>
+      </div>
+    </div>
+
     <button class="confirm-sms-close" onclick="closeModal('rappelSmsOverlay')">Fermer</button>
   </div>
 </div>
@@ -1771,6 +1814,19 @@ function sendReminder(id) {
   } else {
     sendBtn.style.display = 'none';
   }
+  // Qualification SMS
+  const sellerPrenom = _data?.seller?.first_name || 'Votre prénom';
+  const qualifText = `Bonjour ${prenom},\nJe vous confirme notre rendez-vous du ${dateLabel} à ${time}.\n\nPour préparer au mieux votre visite, pourriez-vous simplement me dire où vous en êtes dans votre projet d'achat et si vous avez déjà échangé avec votre banque ou un courtier concernant votre financement ?\n\nÀ bientôt,\n${sellerPrenom}`;
+  document.getElementById('qualifSmsText').textContent = qualifText;
+  const qualifPanel = document.getElementById('qualifPanel');
+  const qualifToggle = document.getElementById('qualifToggle');
+  const qualifArrow = document.getElementById('qualifArrow');
+  if (qualifPanel) { qualifPanel.classList.remove('open'); }
+  if (qualifToggle) { qualifToggle.classList.remove('open'); }
+  if (qualifArrow) { qualifArrow.style.transform = ''; }
+  const qualifCopyBtn = document.getElementById('qualifCopyBtn');
+  if (qualifCopyBtn) { qualifCopyBtn.textContent = 'Copier ce message'; qualifCopyBtn.classList.remove('copied'); }
+
   document.getElementById('rappelSmsOverlay')._visitId = id;
   openModal('rappelSmsOverlay');
 }
@@ -1800,6 +1856,35 @@ function copyRappelSms(btn) {
       if (badge) badge.style.display = '';
       fetch(`/api/visits/${id}/reminder`,{method:'POST'}).catch(()=>{});
     }
+  }
+  if (navigator.clipboard && window.isSecureContext) {
+    navigator.clipboard.writeText(text).then(onCopied).catch(() => {
+      const ta=document.createElement('textarea'); ta.value=text; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta); onCopied();
+    });
+  } else {
+    const ta=document.createElement('textarea'); ta.value=text; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta); onCopied();
+  }
+}
+
+function toggleQualifPanel() {
+  const panel = document.getElementById('qualifPanel');
+  const toggle = document.getElementById('qualifToggle');
+  const arrow = document.getElementById('qualifArrow');
+  const isOpen = panel.classList.contains('open');
+  panel.classList.toggle('open');
+  toggle.classList.toggle('open');
+  if (arrow) arrow.style.transform = isOpen ? '' : 'rotate(45deg)';
+}
+
+function copyQualifSms(btn) {
+  const text = document.getElementById('qualifSmsText').textContent;
+  function onCopied() {
+    btn.innerHTML = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> Copié !';
+    btn.classList.add('copied');
+    setTimeout(() => {
+      btn.innerHTML = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Copier ce message';
+      btn.classList.remove('copied');
+    }, 2500);
   }
   if (navigator.clipboard && window.isSecureContext) {
     navigator.clipboard.writeText(text).then(onCopied).catch(() => {
