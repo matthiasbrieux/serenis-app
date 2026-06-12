@@ -1119,7 +1119,8 @@
     <button class="confirm-sms-copy" id="cancelSmsCopyBtn" onclick="copyCancelSms(this)">
       <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:middle;margin-right:5px;"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>Copier le SMS
     </button>
-    <button class="confirm-sms-close" onclick="closeModal('cancelSmsOverlay')">Fermer</button>
+    <button id="cancelSmsNoSmsBtn" style="width:100%;padding:10px;background:none;border:1px solid #e0d5d5;border-radius:11px;font-family:'DM Sans',sans-serif;font-size:0.82rem;font-weight:600;color:#c0392b;cursor:pointer;margin-bottom:8px;">Annuler la visite sans envoyer de SMS</button>
+    <button class="confirm-sms-close" onclick="closeModal('cancelSmsOverlay')">Ne pas annuler</button>
   </div>
 </div>
 
@@ -1332,7 +1333,7 @@ function buildVisitCardHtml(v) {
         <button class="btn-sms-reminder${v.reminder_sent?' sent':''}" id="btn-reminder-${v.id}" onclick="sendReminder(${v.id})">${svgPhone} ${v.reminder_sent?'Rappel copié':'Rappel SMS'}</button>
         <div style="display:flex;gap:6px;">
           <a href="/api/visits/${v.id}/calendar.ics" download title="Ajouter à mon calendrier" style="display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:8px;background:#f0f7f2;color:#3D5A47;border:1px solid #c8dece;text-decoration:none;font-size:1rem;">📅</a>
-          <button class="btn-cancel-sm" onclick="if(confirm('Annuler cette visite ?')) changeVisitStatus(${v.id},'cancelled')">Annuler</button>
+          <button class="btn-cancel-sm" onclick="openCancelSmsModal(${v.id})">Annuler</button>
         </div>
       </div>
       <div id="sms-badge-${v.id}">${smsCopiedBadge(v.sms_copied_at)}</div>`:''}
@@ -1385,7 +1386,7 @@ function buildVisitConfirmedCard(v) {
       </button>
       <div style="display:flex;gap:6px;">
         <a href="/api/visits/${v.id}/calendar.ics" download title="Ajouter à mon calendrier" style="display:inline-flex;align-items:center;justify-content:center;width:38px;height:38px;border-radius:8px;background:#f0f7f2;color:#3D5A47;border:1px solid #b8d8c2;text-decoration:none;font-size:1rem;">📅</a>
-        <button class="vcc-cancel" onclick="if(confirm('Annuler cette visite ?')) changeVisitStatus(${v.id},'cancelled')">Annuler</button>
+        <button class="vcc-cancel" onclick="openCancelSmsModal(${v.id})">Annuler</button>
       </div>
     </div>
     ${v.sms_copied_at ? `<div id="sms-badge-${v.id}" style="margin-top:8px;">${smsCopiedBadge(v.sms_copied_at)}</div>` : `<div id="sms-badge-${v.id}" style="margin-top:0;"></div>`}
@@ -1505,8 +1506,6 @@ async function changeVisitStatus(id, status) {
       renderVisits(); updateStats(); renderCalendar();
       if (status==='confirmed') {
         openConfirmSmsModal(id);
-      } else if (status==='cancelled') {
-        openCancelSmsModal(id);
       }
     } else { showToast(data.error||'Erreur','error'); }
   } catch(e) { showToast('Erreur réseau','error'); }
@@ -1589,14 +1588,14 @@ let _currentCancelSmsVisitId = null;
 
 function openCancelSmsModal(id) {
   _currentCancelSmsVisitId = id;
-  const v = allVisits.find(v=>v.id===id);
-  if (!v) { showToast('Visite annulée'); return; }
+  const v = allVisits.find(v => String(v.id) === String(id));
+  if (!v) return;
   const prenom = (v.buyer_name||'').split(' ')[0] || 'Madame/Monsieur';
   const [yr,mo,dy] = (v.visit_date||'').split('-');
   const d = yr ? new Date(Number(yr),Number(mo)-1,Number(dy)) : null;
   const JOURS=['dimanche','lundi','mardi','mercredi','jeudi','vendredi','samedi'];
   const MOIS=['janvier','février','mars','avril','mai','juin','juillet','août','septembre','octobre','novembre','décembre'];
-  const dateLabel = d ? `${JOURS[d.getDay()]} ${Number(dy)} ${MOIS[d.getMonth()]}` : v.visit_date;
+  const dateLabel = d ? `${JOURS[d.getDay()]} ${Number(dy)} ${MOIS[d.getMonth()]}` : (v.visit_date||'');
   const [h,m] = (v.visit_time||'').split(':');
   const time = (h&&m!==undefined) ? (m&&m!=='00' ? `${h}h${m}` : `${h}h`) : '';
   const timeStr = time ? ` à ${time}` : '';
@@ -1610,13 +1609,15 @@ function openCancelSmsModal(id) {
     phoneEl.innerHTML = `<a href="tel:${v.buyer_phone}" style="color:#c0392b;font-size:0.8rem;text-decoration:none;">${v.buyer_phone}</a>`;
   } else {
     phoneEl.textContent = 'Pas de téléphone enregistré';
-    phoneEl.style.color = '#bbb';
-    phoneEl.style.fontSize = '0.78rem';
+    phoneEl.style.cssText += ';color:#bbb;font-size:0.78rem;';
   }
   document.getElementById('cancelSmsText').textContent = sms;
   const phone = (v.buyer_phone||'').replace(/\s/g,'');
   const encoded = encodeURIComponent(sms);
-  document.getElementById('cancelSmsSendBtn').href = phone ? `sms:${phone}?body=${encoded}` : `sms:?body=${encoded}`;
+  const sendBtn = document.getElementById('cancelSmsSendBtn');
+  sendBtn.href = phone ? `sms:${phone}?body=${encoded}` : `sms:?body=${encoded}`;
+  sendBtn.onclick = () => { changeVisitStatus(id, 'cancelled'); };
+  document.getElementById('cancelSmsNoSmsBtn').onclick = () => { changeVisitStatus(id, 'cancelled'); closeModal('cancelSmsOverlay'); };
   openModal('cancelSmsOverlay');
 }
 
@@ -1631,6 +1632,7 @@ function copyCancelSms(btn) {
       btn.innerHTML = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:middle;margin-right:5px;"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>Copier le SMS';
       btn.classList.remove('copied');
     }, 3000);
+    changeVisitStatus(_currentCancelSmsVisitId, 'cancelled');
   });
 }
 
