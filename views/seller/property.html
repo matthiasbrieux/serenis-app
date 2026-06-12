@@ -591,6 +591,11 @@
     .photo-sel-btn-del:not(:disabled):hover { background:#a93226; }
     .photo-sel-btn-cancel { font-size:0.73rem; font-weight:600; color:#666; background:none; border:1px solid #e0e0e0; border-radius:6px; padding:3px 10px; cursor:pointer; font-family:inherit; transition:all 0.15s; }
     .photo-sel-btn-cancel:hover { color:#444; border-color:#bbb; }
+    .photo-sel-btn-move { font-size:0.73rem; font-weight:600; color:#3D5A47; background:#edf4ef; border:1px solid #c8ddd0; border-radius:6px; padding:3px 10px; cursor:pointer; font-family:inherit; transition:all 0.15s; }
+    .photo-sel-btn-move:hover { background:#d8eede; }
+    .photo-sel-btn-move:disabled { opacity:0.4; cursor:default; }
+    .photo-move-opt { display:block; width:100%; text-align:left; padding:7px 10px; border:none; background:none; border-radius:7px; font-family:'DM Sans',sans-serif; font-size:0.8rem; color:#333; cursor:pointer; transition:background 0.1s; }
+    .photo-move-opt:hover { background:#edf4ef; color:#3D5A47; }
     /* Fade-out right edge */
     .photo-scroll-outer::after {
       content: '';
@@ -3463,6 +3468,7 @@ document.getElementById('propertyForm').addEventListener('submit', async (e) => 
 
 // ── Photo upload — 3 dossiers distincts ──────────────
 const PHOTO_CATS = ['pro', 'exterieur', 'decouverte', 'details'];
+const CAT_LABELS_SHORT = { pro: '01 Photos pro', exterieur: '02 Extérieur', decouverte: '03 Immersives', details: '04 Détails' };
 let allPhotos = { pro: [], exterieur: [], decouverte: [], details: [] };
 const photoVisibility = { pro: 0, exterieur: 0, decouverte: 0, details: 0 };
 const _uploadLock = {};
@@ -3731,11 +3737,16 @@ function renderGrid(category) {
 
   const inSel = !!_selectMode[category];
   const selCount = (_selectedCids[category] || new Set()).size;
+  const _moveDdOpts = PHOTO_CATS.filter(c => c !== category).map(c =>
+    `<button class="photo-move-opt" onclick="moveSelectedPhotos('${category}','${c}');toggleMoveDd('${category}')">${CAT_LABELS_SHORT[c]}</button>`
+  ).join('');
+  const _moveDdInner = `<div id="move-dd-${category}" style="display:none;position:absolute;left:0;bottom:calc(100% + 4px);background:#fff;border:1px solid #e8e0d6;border-radius:10px;padding:6px;min-width:140px;box-shadow:0 4px 16px rgba(0,0,0,0.12);z-index:50;">${_moveDdOpts}</div>`;
   const selBarHtml = `<div id="sel-bar-${category}" class="photo-sel-bar">${
     !inSel
       ? `<button class="photo-sel-btn-enter" onclick="enterSelectMode('${category}')">Sélectionner</button>`
       : `<span id="sel-count-${category}" style="font-size:0.76rem;color:#888;">${selCount} photo${selCount>1?'s':''} sélectionnée${selCount>1?'s':''}</span>
-         <button id="sel-del-${category}" class="photo-sel-btn-del" onclick="deleteSelectedPhotos('${category}')"${selCount===0?' disabled':''}>Supprimer${selCount>0?' ('+selCount+')':' (0)'}</button>
+         <div style="position:relative;display:inline-flex;">${_moveDdInner}<button id="sel-mv-${category}" class="photo-sel-btn-move" onclick="toggleMoveDd('${category}')"${selCount===0?' disabled':''}>Déplacer ▾</button></div>
+         <button id="sel-del-${category}" class="photo-sel-btn-del" onclick="deleteSelectedPhotos('${category}')"${selCount===0?' disabled':''}>Supprimer${selCount>0?' ('+selCount+')':''}</button>
          <button class="photo-sel-btn-cancel" onclick="exitSelectMode('${category}')">Annuler</button>`
   }</div>`;
 
@@ -3987,8 +3998,12 @@ function enterSelectMode(cat) {
   _selectedCids[cat] = new Set();
   const track = document.getElementById('scroll-track-' + cat);
   if (track) track.classList.add('select-mode-active');
+  const moveDdOpts = PHOTO_CATS.filter(c => c !== cat).map(c =>
+    `<button class="photo-move-opt" onclick="moveSelectedPhotos('${cat}','${c}');toggleMoveDd('${cat}')">${CAT_LABELS_SHORT[c]}</button>`
+  ).join('');
   const bar = document.getElementById('sel-bar-' + cat);
   if (bar) bar.innerHTML = `<span id="sel-count-${cat}" style="font-size:0.76rem;color:#888;">0 photo sélectionnée</span>
+    <div style="position:relative;display:inline-flex;"><div id="move-dd-${cat}" style="display:none;position:absolute;left:0;bottom:calc(100% + 4px);background:#fff;border:1px solid #e8e0d6;border-radius:10px;padding:6px;min-width:140px;box-shadow:0 4px 16px rgba(0,0,0,0.12);z-index:50;">${moveDdOpts}</div><button id="sel-mv-${cat}" class="photo-sel-btn-move" onclick="toggleMoveDd('${cat}')" disabled>Déplacer ▾</button></div>
     <button id="sel-del-${cat}" class="photo-sel-btn-del" onclick="deleteSelectedPhotos('${cat}')" disabled>Supprimer (0)</button>
     <button class="photo-sel-btn-cancel" onclick="exitSelectMode('${cat}')">Annuler</button>`;
 }
@@ -4013,6 +4028,8 @@ function toggleSelectPhoto(cid, cat) {
   if (countEl) countEl.textContent = `${count} photo${count > 1 ? 's' : ''} sélectionnée${count > 1 ? 's' : ''}`;
   const delBtn = document.getElementById('sel-del-' + cat);
   if (delBtn) { delBtn.textContent = `Supprimer (${count})`; delBtn.disabled = count === 0; }
+  const mvBtn = document.getElementById('sel-mv-' + cat);
+  if (mvBtn) mvBtn.disabled = count === 0;
 }
 
 async function deleteSelectedPhotos(cat) {
@@ -4027,6 +4044,38 @@ async function deleteSelectedPhotos(cat) {
   _selectMode[cat] = false;
   renderGrid(cat);
   showToast(`${cids.length} photo${cids.length > 1 ? 's supprimées' : ' supprimée'}`);
+}
+
+function toggleMoveDd(cat) {
+  const dd = document.getElementById('move-dd-' + cat);
+  if (!dd) return;
+  dd.style.display = dd.style.display === 'none' ? 'block' : 'none';
+}
+
+async function moveSelectedPhotos(fromCat, toCat) {
+  const cids = Array.from(_selectedCids[fromCat] || new Set());
+  if (!cids.length) return;
+  try {
+    const r = await fetch('/api/property/photos/move-category', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ cloudinary_ids: cids, category: toCat })
+    });
+    const d = await r.json();
+    if (d.success) {
+      const moved = allPhotos[fromCat].filter(p => cids.includes(p.cloudinary_id));
+      allPhotos[fromCat] = allPhotos[fromCat].filter(p => !cids.includes(p.cloudinary_id));
+      moved.forEach(p => { p.category = toCat; allPhotos[toCat].push(p); });
+      exitSelectMode(fromCat);
+      renderGrid(fromCat);
+      renderGrid(toCat);
+      showToast(`${cids.length} photo${cids.length > 1 ? 's déplacées' : ' déplacée'} vers ${CAT_LABELS_SHORT[toCat]} ✓`);
+    } else {
+      showToast(d.error || 'Erreur', 'error');
+    }
+  } catch(e) {
+    showToast('Erreur réseau', 'error');
+  }
 }
 
 // ── Document upload ───────────────────────────────────

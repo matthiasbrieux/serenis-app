@@ -211,7 +211,8 @@ router.post('/api/property/photos', requireAuth, uploadPhoto.array('photos', 50)
   const existing = db.prepare('SELECT COUNT(*) as count FROM property_photos WHERE property_id = ?').get(property.id);
   if (existing.count + req.files.length > MAX_PHOTOS_PER_PROPERTY) return res.json({ error: `Maximum ${MAX_PHOTOS_PER_PROPERTY} photos au total` });
 
-  const category = req.body.category || 'pro';
+  const VALID_PHOTO_CATS = ['pro', 'exterieur', 'decouverte', 'details'];
+  const category = VALID_PHOTO_CATS.includes(req.body.category) ? req.body.category : 'pro';
   const room = req.body.room || null;
   const angle_label = req.body.angle_label || null;
   const isLocal = !process.env.CLOUDINARY_URL;
@@ -244,6 +245,20 @@ router.delete('/api/property/photos/:cloudinary_id', requireAuth, async (req, re
   remaining.forEach((p, i) => stmt.run(i, p.id));
   const cloudinary = require('../services/upload').cloudinary;
   await cloudinary.uploader.destroy(req.params.cloudinary_id).catch(() => {});
+  res.json({ success: true });
+});
+
+// Move photos between categories
+router.put('/api/property/photos/move-category', requireAuth, express.json(), (req, res) => {
+  const property = db.prepare('SELECT id FROM properties WHERE seller_id = ?').get(req.seller.id);
+  if (!property) return res.json({ error: 'Non autorisé' });
+  const VALID_CATS = ['pro', 'exterieur', 'decouverte', 'details'];
+  const { cloudinary_ids, category } = req.body;
+  if (!VALID_CATS.includes(category) || !Array.isArray(cloudinary_ids) || !cloudinary_ids.length) {
+    return res.json({ error: 'Paramètres invalides' });
+  }
+  const stmt = db.prepare('UPDATE property_photos SET category = ? WHERE property_id = ? AND cloudinary_id = ?');
+  cloudinary_ids.forEach(cid => stmt.run(category, property.id, cid));
   res.json({ success: true });
 });
 
