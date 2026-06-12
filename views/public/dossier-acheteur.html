@@ -306,6 +306,8 @@ async function load() {
     checkSlotsAndToggleCta();
     if (location.hash === '#reservation') {
       setTimeout(() => openBooking(), 100);
+    } else if (location.hash === '#documents') {
+      setTimeout(() => { document.getElementById('section-documents')?.scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 100);
     }
   } catch(e) {
     document.getElementById('loading').style.display = 'none';
@@ -568,7 +570,7 @@ function render(p, ph, docs) {
 
     ${roomsSectionHtml}
 
-    <div class="section">
+    <div class="section" id="section-documents">
       <div class="section-title"><span>📂</span> Documents</div>
       ${allDocsHtml}
     </div>

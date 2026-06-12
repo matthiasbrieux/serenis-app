@@ -1295,7 +1295,7 @@ const _stepUrls = ['', '', '', '', ''];
 const _stepMsgs = [
   () => `Bonjour,\n\nSuite à votre intérêt, je vous transmets le dossier complet : fiche descriptive, photos, DPE et diagnostics obligatoires 🏡\n\n${_stepCtx.buyerUrl}\n\nJe vends en direct, sans agence — le dossier a été préparé avec des professionnels. Le prix affiché est le prix final, sans commission.\n\nCordialement,\n${_stepCtx.firstName}`,
   () => `Bonjour, voici le lien pour réserver directement une date de visite selon mes disponibilités : ${_stepCtx.resaUrl}\n\nCordialement,\n${_stepCtx.firstName}`,
-  () => `Bonjour,\n\nSuite à votre visite et afin de vous accompagner dans votre réflexion, je vous transmets mes documents complémentaires (entretien chaudière, ramonage, travaux réalisés...) :\n\n${_stepCtx.buyerUrl}\n\nN'hésitez pas à me contacter si vous avez des questions 🙂\n\nCordialement,\n${_stepCtx.firstName}`,
+  () => `Bonjour,\n\nSuite à votre visite et afin de vous accompagner dans votre réflexion, je vous transmets mes documents complémentaires (entretien chaudière, ramonage, travaux réalisés...) :\n\n${_stepCtx.documentsUrl || _stepCtx.buyerUrl}\n\nN'hésitez pas à me contacter si vous avez des questions 🙂\n\nCordialement,\n${_stepCtx.firstName}`,
   () => `Bonjour, suite à notre échange, voici le lien pour soumettre votre offre d'achat en ligne : ${_stepCtx.offreUrl} — Je la traiterai dans les meilleurs délais.\n\nCordialement,\n${_stepCtx.firstName}`,
   () => `Bonjour Maître,\n\nSuite à notre accord sur la vente du bien situé au ${_stepCtx.address}, je vous transmets le dossier complet incluant le titre de propriété, les diagnostics, et l'ensemble des documents nécessaires à la rédaction du compromis.\n\nLien sécurisé : ${_stepCtx.notaireUrl}\n\nRestant à votre disposition,\n${_stepCtx.firstName}`
 ];
@@ -1303,7 +1303,7 @@ const _stepMsgs = [
 function initStepLinks() {
   _stepUrls[0] = _stepCtx.buyerUrl;
   _stepUrls[1] = _stepCtx.resaUrl;
-  _stepUrls[2] = _stepCtx.buyerUrl;
+  _stepUrls[2] = _stepCtx.documentsUrl || _stepCtx.buyerUrl;
   _stepUrls[3] = _stepCtx.offreUrl;
   _stepUrls[4] = _stepCtx.notaireUrl;
   for (let i = 1; i <= 5; i++) {
@@ -1514,6 +1514,7 @@ async function loadData() {
     _stepCtx.notaireUrl = property.notaire_url || '';
     const resaToken = property.acheteur_token;
     if (resaToken) _stepCtx.resaUrl = `${window.location.origin}/dossier/acheteur/${resaToken}#reservation`;
+    if (_stepCtx.buyerUrl) _stepCtx.documentsUrl = _stepCtx.buyerUrl + '#documents';
     initStepLinks();
 
     /* Mes offres d'achat reçues */
