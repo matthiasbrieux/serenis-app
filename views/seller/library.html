@@ -240,6 +240,9 @@
     .step-tag { font-size: 0.7rem; color: #3D5A47; font-weight: 600; margin-top: 4px; opacity: 0.85; }
     .step-card.open .step-tag { color: rgba(200,235,210,0.9); }
     .step-tw { flex: 1; min-width: 0; }
+    .vpm-badge { display:inline-flex;align-items:center;gap:5px;background:linear-gradient(135deg,#1C2E22 0%,#2d4535 100%);color:#A8D4B5;font-size:0.58rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;padding:3px 8px 3px 7px;border-radius:20px;white-space:nowrap;flex-shrink:0;line-height:1.3;border:1px solid rgba(168,212,181,0.18); }
+    .vpm-badge svg { flex-shrink:0; }
+    .step-card.open .vpm-badge { background:rgba(255,255,255,0.14);border-color:rgba(255,255,255,0.22);color:rgba(255,255,255,0.92); }
     .step-arr { color: #C8D8CC; flex-shrink: 0; transition: transform 0.2s, color 0.2s; display: flex; align-items: center; }
     .step-card.open .step-arr { color: rgba(255,255,255,0.6); transform: rotate(90deg); }
     .tts-btn { padding:5px 12px; border-radius:20px; border:1.5px solid #3D5A47; background:#fff; color:#3D5A47; font-size:0.75rem; font-weight:700; cursor:pointer; flex-shrink:0; font-family:'DM Sans',sans-serif; transition:all 0.15s; white-space:nowrap; min-height:36px; display:inline-flex; align-items:center; touch-action:manipulation; }
@@ -1448,7 +1451,7 @@ const MODULES = [
         tips:['Appliquez les ajustements avec modération — ne cumulez pas tous les bonus','Votre bien ne peut pas raisonnablement valoir 30% de plus que la médiane locale'],
         warnings:['L\'erreur classique : surestimer de 10-15% "pour négocier". Résultat : zéro visite pendant 2 mois.']
       },
-      { title:'◆ Votre avantage Vendu par moi', meta:'5 min · Stratégie',
+      { title:'◆ Votre avantage Vendu par moi', meta:'5 min · Stratégie', tag:'Stratégie exclusive Vendu par moi — transformez les frais d\'agence en levier de prix',
         speakText:`À ce stade, vous n'avez pas encore fixé votre prix définitif. C'est normal. Mais grâce à la méthode Vendu par moi, vous avez déjà un avantage. L'équivalent des frais de commercialisation devient un levier dans votre stratégie : vous pouvez vendre plus vite, gagner plus, ou vous garder une marge de négociation. Dans tous les cas, cet avantage travaille pour vous.`,
         explication:`À ce stade de la formation, vous n'avez pas encore déterminé votre prix de vente définitif. C'est normal.<br><br>Mais une chose est déjà certaine : grâce à la méthode Vendu par moi, vous disposez d'un avantage supplémentaire que vous pourrez utiliser de la manière qui vous semble la plus adaptée à votre situation.<br><br>Autrement dit, vous n'avez encore rien vendu, mais vous avez déjà gagné quelque chose : du temps, de la flexibilité ou de l'argent.<br><br>En effet, l'équivalent des frais de commercialisation habituellement constatés sur le marché devient un véritable <strong>levier dans votre stratégie de prix</strong>.`,
         sections:[
@@ -1591,7 +1594,7 @@ const MODULES = [
     keyPoints:['Qualifiez l\'acheteur AVANT d\'ouvrir votre porte (financement !)','20 minutes suffisent pour préparer une visite parfaite','Confirmez par SMS la veille avec l\'adresse exacte'],
     aiMsg:'La qualification avant visite est cruciale. Posez discrètement la question du financement — un acheteur non finançable peut vous faire perdre 3 à 6 mois.',
     steps:[
-      { title:'◆ Avant les visites', meta:'5 min · Introduction',
+      { title:'◆ Avant les visites', meta:'5 min · Introduction', tag:'Vendu par moi intègre votre agenda de visites directement dans vos fiches acheteur',
         speakText:`Vous avez réalisé une grande partie du travail. Vous avez déterminé le prix, préparé vos photos, réuni vos documents et construit une présentation complète. Vous disposez maintenant de fiches professionnelles et de liens prêts à être envoyés en quelques secondes. Mais nous avons voulu aller encore plus loin — c'est pourquoi nous avons intégré un agenda de visites directement dans vos fiches. Notre conseil : privilégiez une ou deux plages fixes par semaine, le mercredi après-midi, le samedi ou en début de soirée. Regrouper les visites crée une dynamique et vous fait gagner un temps précieux.`,
         explication:`À ce stade de la formation, vous avez déjà réalisé une grande partie du travail.<br><br>Ensemble, nous avons déterminé le prix de votre bien, préparé vos photos, réuni vos documents et construit une présentation complète de votre maison.<br><br>Vous disposez désormais de <strong>fiches de renseignements professionnelles</strong> et de <strong>liens prêts à être envoyés en quelques secondes</strong> à chacun de vos prospects.<br><br>Ainsi, vous n'avez plus besoin de passer des heures au téléphone à répondre aux mêmes questions ou à rechercher des documents dans l'urgence. Chaque acheteur potentiel peut accéder facilement aux informations essentielles de votre bien — ce qui vous permet de gagner un temps précieux tout en offrant une expérience plus professionnelle.<br><br><strong>Mais nous avons souhaité aller encore plus loin.</strong>`,
         sections:[
@@ -2350,7 +2353,7 @@ function renderModules() {
       html += `<div class="step-card${done ? ' done' : ''}" id="step-${mi}-${si}">
         <div class="step-hdr" data-mi="${mi}" data-si="${si}">
           <div class="step-chk" data-chk="1" data-mi="${mi}" data-si="${si}">✓</div>
-          <div class="step-tw"><div class="step-t">${step.title.replace(/^◆\s*/, '')}</div><div class="step-m">${step.meta}</div>${step.tag ? `<div class="step-tag">→ ${step.tag}</div>` : ''}</div>
+          <div class="step-tw"><div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;"><div class="step-t">${step.title.replace(/^◆\s*/, '')}</div>${step.tag ? `<span class="vpm-badge"><svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg> Vendu par moi</span>` : ''}</div><div class="step-m">${step.meta}</div>${step.tag ? `<div class="step-tag">→ ${step.tag}</div>` : ''}</div>
           ${step.speakText ? `<button class="tts-btn" onclick="event.stopPropagation();playStepAudio(${mi},${si},this)"><svg width="9" height="9" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg> Écouter</button>` : ''}
           <div class="step-arr"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></div>
         </div>
