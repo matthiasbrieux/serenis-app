@@ -1165,6 +1165,10 @@
           Message de qualification
         </div>
         <div class="qualif-preview" id="qualifSmsText"></div>
+        <a class="confirm-sms-btn-sms" id="qualifSmsSendBtn" href="#" style="margin-bottom:8px;">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.41a2 2 0 0 1 2-2.18h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+          Envoyer le SMS
+        </a>
         <button class="qualif-copy-btn" id="qualifCopyBtn" onclick="copyQualifSms(this)">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
           Copier ce message
@@ -1818,6 +1822,15 @@ function sendReminder(id) {
   const sellerPrenom = _data?.seller?.first_name || 'Votre prénom';
   const qualifText = `Bonjour ${prenom},\nJe vous confirme notre rendez-vous du ${dateLabel} à ${time}.\n\nPour préparer au mieux votre visite, pourriez-vous simplement me dire où vous en êtes dans votre projet d'achat et si vous avez déjà échangé avec votre banque ou un courtier concernant votre financement ?\n\nÀ bientôt,\n${sellerPrenom}`;
   document.getElementById('qualifSmsText').textContent = qualifText;
+  const qualifSendBtn = document.getElementById('qualifSmsSendBtn');
+  if (qualifSendBtn) {
+    if (v.buyer_phone) {
+      qualifSendBtn.href = `sms:${v.buyer_phone}?&body=${encodeURIComponent(qualifText)}`;
+      qualifSendBtn.style.display = '';
+    } else {
+      qualifSendBtn.style.display = 'none';
+    }
+  }
   const qualifPanel = document.getElementById('qualifPanel');
   const qualifToggle = document.getElementById('qualifToggle');
   const qualifArrow = document.getElementById('qualifArrow');
