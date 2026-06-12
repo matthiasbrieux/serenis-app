@@ -24,39 +24,14 @@
 /* ── Main layout ── */
     .main { margin-left:240px; display:flex; flex-direction:column; min-height:100vh; }
 
-    /* ── Top bar ── */
-    .topbar {
-      background:#fff;
-      border-bottom: 1px solid rgba(0,0,0,0.06);
-      padding: 12px 36px;
-      min-height: 72px;
-      display: flex;
-      align-items: center;
-      gap: 20px;
-      position: sticky;
-      top: 0;
-      z-index: 50;
-      box-shadow: 0 2px 16px rgba(0,0,0,0.05);
-    }
-    .topbar-icon-wrap {
-      width: 40px; height: 40px;
-      background: linear-gradient(135deg, #3D5A47, #5a8a6a);
-      border-radius: 12px;
-      display: flex; align-items: center; justify-content: center;
-      flex-shrink: 0;
-    }
-    .topbar-info { flex: 1; }
-    .topbar-title {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 1.55rem;
-      color: #1C1C1A;
-      font-weight: 600;
-      letter-spacing: -0.01em;
-      line-height: 1.1;
-    }
-    .topbar-sub { font-size: 0.75rem; color: #999; margin-top: 2px; }
-    .topbar-sub a { color: #3D5A47; font-weight: 600; text-decoration: underline; }
-    .topbar-sub strong { color: #3D5A47; }
+    /* ── Hero ── */
+    .photo-hero { background: #FDFCF8; border-bottom: 1px solid rgba(0,0,0,0.06); padding: 28px 36px 24px; display: flex; align-items: flex-start; justify-content: space-between; gap: 20px; flex-wrap: wrap; }
+    .photo-hero-left { flex: 1; min-width: 0; }
+    .photo-hero-badge { display: inline-flex; align-items: center; gap: 6px; background: #1D3A28; color: rgba(212,228,216,0.9); font-size: 0.65rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; padding: 5px 12px; border-radius: 20px; margin-bottom: 12px; }
+    .photo-hero-title { font-family: 'Cormorant Garamond', serif; font-size: 2rem; font-weight: 600; color: #1A1A16; line-height: 1.15; margin: 0 0 10px; }
+    .photo-hero-title em { font-style: italic; color: #3D5A47; }
+    .photo-hero-sub { font-size: 0.84rem; color: #6B6860; margin: 0; }
+    .photo-hero-sub a { color: #3D5A47; font-weight: 600; text-decoration: underline; }
 
     .progress-container { display: flex; align-items: center; gap: 14px; flex-shrink: 0; }
     .progress-wrap { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; }
@@ -95,8 +70,8 @@
       padding: 24px 0 20px;
       overflow-y: auto;
       position: sticky;
-      top: 72px;
-      height: calc(100vh - 72px);
+      top: 16px;
+      height: calc(100vh - 32px);
       align-self: flex-start;
     }
     .room-list-header {
@@ -542,10 +517,10 @@
       .room-content { padding:16px 14px 80px; }
     }
     @media(max-width:768px) {
-      .topbar { padding:0 14px; height:60px; }
-      .topbar-sub { display:none; }
+      .photo-hero { padding:18px 16px 16px; flex-direction:column; gap:12px; }
+      .photo-hero-title { font-size:1.6rem; }
+      .photo-hero-sub { display:none; }
       .progress-track { width:100px; }
-      .topbar-icon-wrap { width:34px; height:34px; border-radius:10px; }
       .toast { bottom:max(20px,env(safe-area-inset-bottom,20px)); left:max(16px,env(safe-area-inset-left,16px)); right:max(16px,env(safe-area-inset-right,16px)); width:auto; }
     }
     @media(max-width:480px) {
@@ -572,7 +547,7 @@
 <script>
   if (new URLSearchParams(location.search).get('embed') === '1') {
     document.getElementById('embed-style').textContent = `
-      .topbar { display:none !important; }
+      .photo-hero { display:none !important; }
       .main { margin-left:0 !important; }
       .room-list { top:0 !important; height:100vh !important; }
       body { background:#fff !important; }
@@ -650,20 +625,15 @@
   </aside>
 
   <div class="main">
-    <!-- Top bar -->
-    <div class="topbar">
-      <div class="topbar-icon-wrap">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
-      </div>
-      <div class="topbar-info">
-        <div class="topbar-title">Mon guide photos immersives</div>
-        <div class="topbar-sub">Photos <strong>synchronisées automatiquement</strong> dans <a href="/mon-bien?tab=photos&section=section-photos-decouverte">Mes photos → Photos immersives</a></div>
-        <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:7px;">
-          <span style="display:inline-flex;align-items:center;gap:5px;padding:3px 9px;background:rgba(61,90,71,0.1);border-radius:5px;font-size:0.7rem;font-weight:600;color:#3D5A47;"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>Angles certifiés pro</span>
-          <span style="display:inline-flex;align-items:center;gap:5px;padding:3px 9px;background:rgba(61,90,71,0.1);border-radius:5px;font-size:0.7rem;font-weight:600;color:#3D5A47;"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>Synchronisation auto</span>
-          <span style="display:inline-flex;align-items:center;gap:5px;padding:3px 9px;background:rgba(61,90,71,0.1);border-radius:5px;font-size:0.7rem;font-weight:600;color:#3D5A47;"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>Pièce par pièce</span>
-          <span style="display:inline-flex;align-items:center;gap:5px;padding:3px 9px;background:rgba(61,90,71,0.1);border-radius:5px;font-size:0.7rem;font-weight:600;color:#3D5A47;"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 6s4-6 11-6 11 6 11 6-4 6-11 6-11-6-11-6z"/><circle cx="12" cy="6" r="2"/></svg>Résultat immersif</span>
+    <!-- Hero -->
+    <div class="photo-hero">
+      <div class="photo-hero-left">
+        <div class="photo-hero-badge">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+          Guide photos
         </div>
+        <h1 class="photo-hero-title">Vos photos,<br><em>niveau professionnel</em></h1>
+        <p class="photo-hero-sub">Photos synchronisées dans <a href="/mon-bien?tab=photos&section=section-photos-decouverte">Mes photos → Photos immersives</a></p>
       </div>
       <div class="progress-container">
         <div class="progress-wrap">
