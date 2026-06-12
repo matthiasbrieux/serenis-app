@@ -2373,15 +2373,6 @@ function renderModules() {
         step.script.forEach(line => { html += `<div class="script-msg ${line.speaker}"><div class="script-who">${line.speaker === 'vendeur' ? 'Vous' : 'Acheteur'}</div><div class="script-bubble">${line.line}</div></div>`; });
         html += `</div></div>`;
       }
-      if (step.tips?.length) {
-        html += `<div class="sst"><div class="sst-title">Conseils</div>`;
-        step.tips.forEach(t => { html += `<div class="tip-i"><div class="tip-icon"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div><div class="tip-text">${t}</div></div>`; });
-        html += `</div>`;
-      }
-      if (step.warnings?.length) {
-        step.warnings.forEach(w => { html += `<div class="warn-i"><div class="warn-icon"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div><div class="warn-text">${w}</div></div>`; });
-      }
-      if (step.cta) { html += step.cta; }
       if (step.sections?.length) {
         step.sections.forEach(sec => {
           if (sec.collapsible) {
@@ -2391,6 +2382,15 @@ function renderModules() {
           }
         });
       }
+      if (step.tips?.length) {
+        html += `<div class="sst"><div class="sst-title">Conseils</div>`;
+        step.tips.forEach(t => { html += `<div class="tip-i"><div class="tip-icon"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div><div class="tip-text">${t}</div></div>`; });
+        html += `</div>`;
+      }
+      if (step.warnings?.length) {
+        step.warnings.forEach(w => { html += `<div class="warn-i"><div class="warn-icon"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div><div class="warn-text">${w}</div></div>`; });
+      }
+      if (step.cta) { html += step.cta; }
       html += `<button class="ask-coach-btn" data-step="${step.title.replace(/'/g,"\\'")}">Demander à Alex sur cette étape →</button></div></div>`;
     });
     html += `</div>`;
