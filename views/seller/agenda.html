@@ -1003,6 +1003,21 @@
           <div class="sidebar-body" id="pastList" style="display:none;max-height:none;"></div>
         </div>
 
+        <!-- Visites annulées -->
+        <div class="agenda-panel" id="cancelledSection" style="display:none;">
+          <div class="agenda-panel-title" onclick="toggleCancelledSection()" style="cursor:pointer;user-select:none;background:linear-gradient(135deg,#5c1a1a,#8b2a2a);">
+            <span style="display:flex;align-items:center;gap:7px;">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+              Visites annulées
+            </span>
+            <span style="display:flex;align-items:center;gap:8px;">
+              <span id="cancelledCountBadge" style="background:rgba(255,255,255,0.2);color:#fff;padding:1px 8px;border-radius:12px;font-size:0.72rem;font-weight:700;"></span>
+              <svg id="cancelledChevron" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="transition:transform 0.2s;color:rgba(255,255,255,0.7);"><polyline points="9 18 15 12 9 6"/></svg>
+            </span>
+          </div>
+          <div class="sidebar-body" id="cancelledList" style="display:none;max-height:none;"></div>
+        </div>
+
         <!-- Pipeline acheteurs scorés -->
         <div class="agenda-panel" id="contactsSection" style="display:none;">
           <div class="agenda-panel-title">
@@ -1078,6 +1093,33 @@
       <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:middle;margin-right:5px;"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>Copier le SMS
     </button>
     <button class="confirm-sms-close" onclick="closeModal('confirmSmsOverlay')">Fermer</button>
+  </div>
+</div>
+
+<!-- ── Modal: SMS annulation visite ── -->
+<div class="modal-overlay" id="cancelSmsOverlay">
+  <div class="modal confirm-sms-modal" style="position:relative;">
+    <button onclick="closeModal('cancelSmsOverlay')" style="position:absolute;top:14px;right:16px;background:none;border:none;font-size:1.4rem;color:#aaa;cursor:pointer;line-height:1;padding:0 4px;z-index:2;" title="Fermer">×</button>
+    <div class="confirm-sms-check" style="background:linear-gradient(135deg,#8b2a2a,#c0392b);">
+      <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </div>
+    <div class="confirm-sms-title">Visite annulée — prévenez l'acheteur</div>
+    <div class="confirm-sms-buyer" id="cancelSmsBuyer">
+      <div class="confirm-sms-buyer-avatar" id="cancelSmsBuyerAvatar" style="background:linear-gradient(135deg,#8b2a2a,#c0392b);"></div>
+      <div class="confirm-sms-buyer-info">
+        <div class="confirm-sms-buyer-name" id="cancelSmsBuyerName"></div>
+        <div id="cancelSmsBuyerPhone"></div>
+      </div>
+    </div>
+    <div class="confirm-sms-preview" id="cancelSmsText"></div>
+    <a class="confirm-sms-btn-sms" id="cancelSmsSendBtn" href="#" style="background:linear-gradient(135deg,#8b2a2a,#c0392b);box-shadow:0 4px 14px rgba(192,57,43,0.3);">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.41a2 2 0 0 1 2-2.18h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+      Ouvrir l'appli SMS
+    </a>
+    <button class="confirm-sms-copy" id="cancelSmsCopyBtn" onclick="copyCancelSms(this)">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:middle;margin-right:5px;"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>Copier le SMS
+    </button>
+    <button class="confirm-sms-close" onclick="closeModal('cancelSmsOverlay')">Fermer</button>
   </div>
 </div>
 
@@ -1374,14 +1416,16 @@ function buildVisitCompact(v) {
 function renderVisits() {
   const today = new Date().toISOString().split('T')[0];
   const upcoming = allVisits.filter(v => v.status==='confirmed' && v.visit_date>=today).sort((a,b)=>(a.visit_date+a.visit_time).localeCompare(b.visit_date+b.visit_time));
-  const past = allVisits.filter(v => v.status==='cancelled'||v.status==='done'||(v.status==='confirmed'&&v.visit_date<today)).sort((a,b)=>b.visit_date.localeCompare(a.visit_date));
+  const past = allVisits.filter(v => v.status==='done'||(v.status==='confirmed'&&v.visit_date<today)||(v.status==='pending'&&v.visit_date<today)).sort((a,b)=>b.visit_date.localeCompare(a.visit_date));
+  const cancelled = allVisits.filter(v => v.status==='cancelled').sort((a,b)=>b.visit_date.localeCompare(a.visit_date));
 
   const upcomingSection = document.getElementById('upcomingSection');
   const pastSection = document.getElementById('pastSection');
+  const cancelledSection = document.getElementById('cancelledSection');
   const emptyEl = document.getElementById('visitsEmpty');
 
   if (!allVisits.length) {
-    upcomingSection.style.display='none'; pastSection.style.display='none';
+    upcomingSection.style.display='none'; pastSection.style.display='none'; cancelledSection.style.display='none';
     emptyEl.style.display='block'; return;
   }
   emptyEl.style.display='none';
@@ -1396,7 +1440,7 @@ function renderVisits() {
     upcomingSection.style.display='none';
   }
 
-  // Visites passées — dossier accordéon
+  // Visites passées
   if (past.length) {
     pastSection.style.display='block';
     const badge = document.getElementById('pastCountBadge');
@@ -1404,6 +1448,16 @@ function renderVisits() {
     document.getElementById('pastList').innerHTML = past.map(buildPastCard).join('');
   } else {
     pastSection.style.display='none';
+  }
+
+  // Visites annulées
+  if (cancelled.length) {
+    cancelledSection.style.display='block';
+    const badge = document.getElementById('cancelledCountBadge');
+    if (badge) badge.textContent = cancelled.length;
+    document.getElementById('cancelledList').innerHTML = cancelled.map(buildPastCard).join('');
+  } else {
+    cancelledSection.style.display='none';
   }
 
   // Ré-appliquer le filtre stat actif si besoin
@@ -1451,8 +1505,8 @@ async function changeVisitStatus(id, status) {
       renderVisits(); updateStats(); renderCalendar();
       if (status==='confirmed') {
         openConfirmSmsModal(id);
-      } else {
-        showToast('Visite annulée');
+      } else if (status==='cancelled') {
+        openCancelSmsModal(id);
       }
     } else { showToast(data.error||'Erreur','error'); }
   } catch(e) { showToast('Erreur réseau','error'); }
@@ -1529,6 +1583,63 @@ function copyConfirmSms(btn) {
       if (badge) badge.innerHTML = smsCopiedBadge(v?.sms_copied_at);
     }).catch(() => {});
   });
+}
+
+let _currentCancelSmsVisitId = null;
+
+function openCancelSmsModal(id) {
+  _currentCancelSmsVisitId = id;
+  const v = allVisits.find(v=>v.id===id);
+  if (!v) { showToast('Visite annulée'); return; }
+  const prenom = (v.buyer_name||'').split(' ')[0] || 'Madame/Monsieur';
+  const [yr,mo,dy] = (v.visit_date||'').split('-');
+  const d = yr ? new Date(Number(yr),Number(mo)-1,Number(dy)) : null;
+  const JOURS=['dimanche','lundi','mardi','mercredi','jeudi','vendredi','samedi'];
+  const MOIS=['janvier','février','mars','avril','mai','juin','juillet','août','septembre','octobre','novembre','décembre'];
+  const dateLabel = d ? `${JOURS[d.getDay()]} ${Number(dy)} ${MOIS[d.getMonth()]}` : v.visit_date;
+  const [h,m] = (v.visit_time||'').split(':');
+  const time = (h&&m!==undefined) ? (m&&m!=='00' ? `${h}h${m}` : `${h}h`) : '';
+  const timeStr = time ? ` à ${time}` : '';
+  const sellerNom = [_data?.seller?.first_name, _data?.seller?.last_name].filter(Boolean).join(' ');
+  const sms = `Bonjour ${prenom}, je suis malheureusement contraint d'annuler notre visite prévue le ${dateLabel}${timeStr}.\n\nPourrions-nous la reprogrammer à une date qui vous convient ? N'hésitez pas à me recontacter.\n\nCordialement,\n${sellerNom || 'Votre vendeur'}`;
+
+  document.getElementById('cancelSmsBuyerAvatar').textContent = initials(v.buyer_name);
+  document.getElementById('cancelSmsBuyerName').textContent = v.buyer_name || 'Acquéreur';
+  const phoneEl = document.getElementById('cancelSmsBuyerPhone');
+  if (v.buyer_phone) {
+    phoneEl.innerHTML = `<a href="tel:${v.buyer_phone}" style="color:#c0392b;font-size:0.8rem;text-decoration:none;">${v.buyer_phone}</a>`;
+  } else {
+    phoneEl.textContent = 'Pas de téléphone enregistré';
+    phoneEl.style.color = '#bbb';
+    phoneEl.style.fontSize = '0.78rem';
+  }
+  document.getElementById('cancelSmsText').textContent = sms;
+  const phone = (v.buyer_phone||'').replace(/\s/g,'');
+  const encoded = encodeURIComponent(sms);
+  document.getElementById('cancelSmsSendBtn').href = phone ? `sms:${phone}?body=${encoded}` : `sms:?body=${encoded}`;
+  openModal('cancelSmsOverlay');
+}
+
+function copyCancelSms(btn) {
+  const text = document.getElementById('cancelSmsText')?.textContent;
+  if (!text) return;
+  navigator.clipboard.writeText(text).then(() => {
+    btn.innerHTML = '✓ SMS copié !';
+    btn.classList.add('copied');
+    showToast('SMS copié — collez-le dans votre messagerie');
+    setTimeout(() => {
+      btn.innerHTML = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:middle;margin-right:5px;"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>Copier le SMS';
+      btn.classList.remove('copied');
+    }, 3000);
+  });
+}
+
+let _cancelledOpen = false;
+function toggleCancelledSection() {
+  _cancelledOpen = !_cancelledOpen;
+  document.getElementById('cancelledList').style.display = _cancelledOpen ? 'flex' : 'none';
+  const ch = document.getElementById('cancelledChevron');
+  if (ch) ch.style.transform = _cancelledOpen ? 'rotate(90deg)' : '';
 }
 
 function copySmsRappel(btn, id, text) {
