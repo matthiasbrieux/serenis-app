@@ -50,11 +50,23 @@
     .stat-filter-hint { display:flex; align-items:center; gap:5px; font-size:0.65rem; color:#bbb; margin-top:8px; font-style:italic; animation:fadeUp 0.2s ease; }
 
     /* ── Dashboard layout ─────────────────────────────── */
-    .dash-main-grid { display:grid; grid-template-columns:1fr 360px; gap:20px; align-items:start; margin-bottom:28px; }
-    @media(max-width:960px){ .dash-main-grid { grid-template-columns:1fr; } }
-    .dash-cal-col { display:flex; flex-direction:column; gap:16px; min-width:0; }
-    .dash-sidebar { display:flex; flex-direction:column; gap:14px; position:sticky; top:16px; }
-    @media(max-width:960px){ .dash-sidebar { position:static; } }
+    .dash-main-grid {
+      display: grid;
+      grid-template-columns: 1fr 360px;
+      grid-template-areas: "cal-top sidebar" "cal-bottom sidebar";
+      gap: 20px;
+      align-items: start;
+      margin-bottom: 28px;
+    }
+    .dash-cal-primary  { grid-area: cal-top;    display:flex; flex-direction:column; gap:16px; min-width:0; }
+    .dash-cal-secondary{ grid-area: cal-bottom; display:flex; flex-direction:column; gap:16px; min-width:0; }
+    .dash-sidebar      { grid-area: sidebar;    display:flex; flex-direction:column; gap:14px; position:sticky; top:16px; }
+    @media(max-width:960px){
+      .dash-main-grid { grid-template-columns:1fr; grid-template-areas:none; }
+      .dash-cal-primary   { order:1; }
+      .dash-sidebar       { order:2; position:static; }
+      .dash-cal-secondary { order:3; }
+    }
 
     /* ── Agenda panels ─────────────────────────────────── */
     .agenda-panel { background:#fff; border:1.5px solid #ddd5c8; border-radius:16px; overflow:hidden; box-shadow:0 2px 10px rgba(0,0,0,0.04); }
@@ -774,8 +786,8 @@
     <!-- Dashboard principale : calendrier + sidebar actions -->
     <div class="dash-main-grid">
 
-      <!-- ── Colonne calendrier (gauche) ───────────────── -->
-      <div class="dash-cal-col">
+      <!-- ── Calendrier (haut gauche) ────────────────── -->
+      <div class="dash-cal-primary">
 
         <!-- Grand calendrier -->
         <div class="calendar-card">
@@ -810,6 +822,10 @@
         <!-- Détail jour sélectionné -->
         <div id="calDayDetail" style="display:none;"></div>
 
+      </div><!-- end dash-cal-primary -->
+
+      <!-- ── Disponibilités + outils (bas gauche) ─────── -->
+      <div class="dash-cal-secondary">
         <!-- Disponibilités -->
         <div class="dispo-card">
           <div class="dispo-card-hdr">
@@ -934,7 +950,7 @@
           <p style="font-size:0.72rem;color:#bbb;margin-top:8px;margin-bottom:0;">Ce lien est privé — ne le partagez pas.</p>
         </div>
 
-      </div><!-- end dash-cal-col -->
+      </div><!-- end dash-cal-secondary -->
 
       <!-- ── Sidebar actions (droite) ──────────────────── -->
       <aside class="dash-sidebar">
