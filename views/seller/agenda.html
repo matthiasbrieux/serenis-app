@@ -258,9 +258,10 @@
     .cal-has-confirmed:hover { background: #162d1f; }
     .cal-today.cal-has-confirmed .cal-num { background: rgba(255,255,255,0.18); box-shadow: none; }
     .cal-has-confirmed.cal-selected .cal-num { background: rgba(255,255,255,0.25); box-shadow: none; }
-    .cal-has-confirmed.cal-past-day { background: #d6ece0; }
-    .cal-has-confirmed.cal-past-day .cal-num { color: #2e7d32; }
-    .cal-has-confirmed.cal-past-day:hover { background: #c4e4d0; }
+    .cal-has-confirmed.cal-past-day { background: transparent; }
+    .cal-has-confirmed.cal-past-day .cal-num { background: transparent; color: #ccc; font-weight: 400; box-shadow: none; }
+    .cal-has-confirmed.cal-past-day:hover { background: rgba(61,90,71,0.06); }
+    .cal-has-confirmed.cal-past-day:hover .cal-num { color: #aaa; }
     /* Jalons compromis — cellules entières colorées */
     .cal-dot-sru        { background: #D32F2F; }
     .cal-dot-conditions { background: #1565C0; }
@@ -1963,7 +1964,7 @@ function renderCalendar() {
       const isPast = dateStr < today;
       if (hasConfirmed) cls += ' cal-has-confirmed';
       if (isEve) dotsHtml += `<span class="cal-dot cal-dot-eve"></span>`;
-      if (isPast && !hasConfirmed && !isEve) cls += ' cal-past-day';
+      if (isPast) cls += ' cal-past-day';
     } else if (activeStatFilter === 'avenir') {
       const match = dayVisits.some(v=>v.status!=='cancelled' && v.visit_date>=today);
       if (match) dotsHtml += `<span class="cal-dot cal-dot-avenir"></span>`;
