@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <link rel="icon" href="/favicon.ico" sizes="any"/>
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png"/>
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16.png"/>
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Commencer — Vendu Par Moi</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;1,400&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: #f7f5f0;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px 16px;
+    }
+    .card {
+      background: #fff;
+      border-radius: 20px;
+      box-shadow: 0 4px 40px rgba(0,0,0,0.10);
+      width: 100%;
+      max-width: 480px;
+      padding: 40px 36px 36px;
+    }
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 28px;
+      text-decoration: none;
+    }
+    .logo-text {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.7rem;
+      color: #1D3A28;
+    }
+    .logo-text em { color: #C4785A; font-style: italic; }
+    h1 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.9rem;
+      font-weight: 600;
+      color: #1a2a1a;
+      margin-bottom: 6px;
+    }
+    .sub {
+      font-size: 0.875rem;
+      color: #6b7280;
+      margin-bottom: 28px;
+      line-height: 1.5;
+    }
+    .row { display: flex; gap: 12px; }
+    .form-group { margin-bottom: 16px; flex: 1; }
+    label { display: block; font-size: 0.8rem; font-weight: 600; color: #374151; margin-bottom: 6px; }
+    input {
+      width: 100%;
+      padding: 11px 14px;
+      border: 1.5px solid #d1d5db;
+      border-radius: 10px;
+      font-size: 0.9rem;
+      font-family: inherit;
+      color: #111;
+      transition: border-color 0.15s;
+      background: #fff;
+    }
+    input:focus { outline: none; border-color: #3D5A47; }
+    input.error { border-color: #ef4444; }
+
+    .separator {
+      text-align: center;
+      font-size: 0.78rem;
+      color: #9ca3af;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+      margin: 24px 0 16px;
+      position: relative;
+    }
+    .separator::before, .separator::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      width: calc(50% - 60px);
+      height: 1px;
+      background: #e5e7eb;
+    }
+    .separator::before { left: 0; }
+    .separator::after { right: 0; }
+
+    .plan-grid { display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; }
+    .plan-btn {
+      width: 100%;
+      padding: 16px 18px;
+      border-radius: 12px;
+      border: 2px solid transparent;
+      cursor: pointer;
+      font-family: inherit;
+      text-align: left;
+      transition: all 0.15s;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+    .plan-btn.primary {
+      background: #1D3A28;
+      color: #fff;
+    }
+    .plan-btn.primary:hover { background: #152d1f; }
+    .plan-btn.secondary {
+      background: #f9fafb;
+      border-color: #d1d5db;
+      color: #1a2a1a;
+    }
+    .plan-btn.secondary:hover { border-color: #3D5A47; background: #f0f5f2; }
+    .plan-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+
+    .plan-label { font-size: 0.95rem; font-weight: 600; }
+    .plan-detail { font-size: 0.78rem; opacity: 0.75; margin-top: 2px; }
+    .plan-price { font-size: 1.1rem; font-weight: 700; white-space: nowrap; flex-shrink: 0; }
+    .plan-price small { font-size: 0.72rem; font-weight: 500; opacity: 0.7; display: block; text-align: right; }
+
+    .error-msg {
+      background: #fef2f2;
+      border: 1px solid #fecaca;
+      color: #dc2626;
+      border-radius: 8px;
+      padding: 10px 14px;
+      font-size: 0.82rem;
+      margin-bottom: 16px;
+      display: none;
+    }
+
+    .footer-links {
+      margin-top: 20px;
+      font-size: 0.78rem;
+      color: #9ca3af;
+      text-align: center;
+      line-height: 1.7;
+    }
+    .footer-links a { color: #3D5A47; text-decoration: none; }
+    .footer-links a:hover { text-decoration: underline; }
+
+    .spinner {
+      display: inline-block;
+      width: 14px; height: 14px;
+      border: 2px solid rgba(255,255,255,0.4);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin 0.6s linear infinite;
+      vertical-align: middle;
+      margin-right: 6px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    @media (max-width: 500px) {
+      .card { padding: 28px 20px 24px; }
+      .row { flex-direction: column; gap: 0; }
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <a href="/" class="logo">
+      <svg width="32" height="32" viewBox="0 0 32 32"><path d="M16 2L3 13v17h8v-8h10v8h8V13L16 2z" fill="#3D5A47"/></svg>
+      <span class="logo-text">Vendu <em>Par Moi</em></span>
+    </a>
+
+    <h1>Créez votre compte</h1>
+    <p class="sub">Vos coordonnées, puis vous choisissez votre mode de paiement.</p>
+
+    <div id="errorMsg" class="error-msg"></div>
+
+    <form id="registerForm" autocomplete="on">
+      <div class="row">
+        <div class="form-group">
+          <label for="firstName">Prénom</label>
+          <input type="text" id="firstName" name="fname" required placeholder="Marie" autocomplete="given-name">
+        </div>
+        <div class="form-group">
+          <label for="lastName">Nom</label>
+          <input type="text" id="lastName" name="lname" required placeholder="Dupont" autocomplete="family-name">
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="email">Email</label>
+        <input type="email" id="email" name="email" required placeholder="marie@email.fr" autocomplete="email">
+      </div>
+      <div class="form-group">
+        <label for="phone">Téléphone <span style="color:#9ca3af;font-weight:400;">(facultatif)</span></label>
+        <input type="tel" id="phone" name="phone" placeholder="06 12 34 56 78" autocomplete="tel">
+      </div>
+    </form>
+
+    <div class="separator">CHOISISSEZ VOTRE FORMULE</div>
+
+    <div class="plan-grid">
+      <button class="plan-btn primary" id="btn4x" onclick="submit4x()">
+        <div>
+          <div class="plan-label">Paiement en 4 fois</div>
+          <div class="plan-detail">Sans frais — prélevé automatiquement</div>
+        </div>
+        <div class="plan-price">
+          390&nbsp;€
+          <small>× 4 versements</small>
+        </div>
+      </button>
+      <button class="plan-btn secondary" id="btnUnique" onclick="submitUnique()">
+        <div>
+          <div class="plan-label">Paiement en une fois</div>
+          <div class="plan-detail">1&nbsp;548&nbsp;€ TTC tout compris</div>
+        </div>
+        <div class="plan-price">1&nbsp;548&nbsp;€</div>
+      </button>
+    </div>
+
+    <div class="footer-links">
+      En continuant, vous acceptez nos <a href="/cgv" target="_blank">CGV</a>.<br>
+      Déjà un compte ? <a href="/login">Se connecter</a><br>
+      Une question ? <strong style="color:#1a2a1a;">06 95 44 36 54</strong>
+    </div>
+  </div>
+
+  <script>
+    function getFormData() {
+      const firstName = document.getElementById('firstName').value.trim();
+      const lastName  = document.getElementById('lastName').value.trim();
+      const email     = document.getElementById('email').value.trim();
+      const phone     = document.getElementById('phone').value.trim();
+
+      // Validation
+      let err = '';
+      if (!firstName) err = 'Veuillez entrer votre prénom.';
+      else if (!lastName) err = 'Veuillez entrer votre nom.';
+      else if (!email || !email.includes('@')) err = 'Adresse email invalide.';
+
+      if (err) {
+        showError(err);
+        return null;
+      }
+      hideError();
+      return { firstName, lastName, email, phone };
+    }
+
+    function showError(msg) {
+      const el = document.getElementById('errorMsg');
+      el.textContent = msg;
+      el.style.display = 'block';
+    }
+    function hideError() {
+      document.getElementById('errorMsg').style.display = 'none';
+    }
+
+    function setLoading(btnId, loading) {
+      const btn = document.getElementById(btnId);
+      if (loading) {
+        btn.disabled = true;
+        document.getElementById('btn4x').disabled = true;
+        document.getElementById('btnUnique').disabled = true;
+        const orig = btn.innerHTML;
+        btn.dataset.orig = orig;
+        btn.innerHTML = '<span class="spinner"></span>Redirection vers le paiement…';
+      } else {
+        document.getElementById('btn4x').disabled = false;
+        document.getElementById('btnUnique').disabled = false;
+        btn.innerHTML = btn.dataset.orig || btn.innerHTML;
+      }
+    }
+
+    async function checkout(plan) {
+      const data = getFormData();
+      if (!data) return;
+
+      const btnId = plan === '4x' ? 'btn4x' : 'btnUnique';
+      setLoading(btnId, true);
+
+      try {
+        const res = await fetch('/create-checkout', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            pack: 'serenite',
+            plan,
+            email: data.email,
+            first_name: data.firstName,
+            last_name: data.lastName,
+            phone: data.phone
+          })
+        });
+        const json = await res.json();
+        if (json.url) {
+          window.location.href = json.url;
+        } else {
+          showError(json.error || 'Une erreur est survenue. Réessayez ou appelez le 06 95 44 36 54.');
+          setLoading(btnId, false);
+        }
+      } catch {
+        showError('Erreur réseau. Vérifiez votre connexion et réessayez.');
+        setLoading(btnId, false);
+      }
+    }
+
+    function submit4x()     { checkout('4x'); }
+    function submitUnique() { checkout('unique'); }
+  </script>
+</body>
+</html>

@@ -20,7 +20,7 @@ const checkoutLimit = rateLimit({
 
 // Checkout session creation
 router.post('/create-checkout', express.json(), checkoutLimit, async (req, res) => {
-  const { pack, email, plan } = req.body;
+  const { pack, email, plan, first_name, last_name, phone } = req.body;
   let { password } = req.body;
   if (!['serenite', 'autonome'].includes(pack)) return res.json({ error: 'Pack invalide' });
   if (!email) return res.json({ error: 'Email requis' });
@@ -44,15 +44,15 @@ router.post('/create-checkout', express.json(), checkoutLimit, async (req, res) 
 
   let amount, productName, productDesc;
   if (isSerenite) {
-    amount = is4x ? 24900 : 99900; // 249€ × 4 ou 999€
-    productName = is4x ? 'Pack Sérénité — Vendu Par Moi (1er paiement sur 4)' : 'Pack Sérénité — Vendu Par Moi';
+    amount = is4x ? 39000 : 154800; // 390€ × 4 ou 1548€
+    productName = is4x ? 'Vendu Par Moi — 1er versement sur 4' : 'Vendu Par Moi — Paiement intégral';
     productDesc = is4x
-      ? '1er versement sur 4 · 249€ × 4 = 996€ · sans frais ni intérêts'
-      : 'Photographe pro · Numéro dédié · Dossiers automatisés · Coach IA';
+      ? '1er versement sur 4 · 390€ × 4 = 1 560€ TTC · sans frais ni intérêts'
+      : 'Fiche descriptive · Agenda intelligent · SMS automatiques · Formation complète · Coach IA';
   } else {
-    amount = 49900; // 499€
-    productName = 'Pack Autonome — Vendu Par Moi';
-    productDesc = 'Numéro dédié · Dossiers automatisés · Agenda visites · Coach IA · Formation vidéo';
+    amount = 154800; // 1548€
+    productName = 'Vendu Par Moi';
+    productDesc = 'Fiche descriptive · Agenda intelligent · SMS automatiques · Formation complète · Coach IA';
   }
 
   try {
@@ -60,9 +60,9 @@ router.post('/create-checkout', express.json(), checkoutLimit, async (req, res) 
     const uuid = uuidv4();
     const existing = db.prepare('SELECT id FROM sellers WHERE email = ?').get(email.toLowerCase());
     if (existing) {
-      db.prepare('UPDATE sellers SET password=?, pack=? WHERE id=?').run(hashed, pack, existing.id);
+      db.prepare('UPDATE sellers SET password=?, pack=?, first_name=COALESCE(NULLIF(?,\'\'), first_name), last_name=COALESCE(NULLIF(?,\'\'), last_name), phone=COALESCE(NULLIF(?,\'\'), phone) WHERE id=?').run(hashed, pack, first_name||'', last_name||'', phone||'', existing.id);
     } else {
-      db.prepare('INSERT INTO sellers (uuid, email, password, pack) VALUES (?,?,?,?)').run(uuid, email.toLowerCase(), hashed, pack);
+      db.prepare('INSERT INTO sellers (uuid, email, password, pack, first_name, last_name, phone) VALUES (?,?,?,?,?,?,?)').run(uuid, email.toLowerCase(), hashed, pack, first_name||'', last_name||'', phone||'');
     }
     const seller = db.prepare('SELECT id FROM sellers WHERE email=?').get(email.toLowerCase());
 
