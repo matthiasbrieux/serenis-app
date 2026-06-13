@@ -551,8 +551,8 @@ async function load() {
       const propData = await propRes.json();
       listingPrice = propData.price || propData.asking_price || 0;
       const meData = await meRes.json();
-      _sellerFirstName = meData.first_name || '';
-      _sellerFullName = [meData.first_name, meData.last_name].filter(Boolean).join(' ');
+      _sellerFirstName = meData.seller?.first_name || '';
+      _sellerFullName = [meData.seller?.first_name, meData.seller?.last_name].filter(Boolean).join(' ');
     } catch(e) {}
 
     const r = await fetch('/api/offers');
