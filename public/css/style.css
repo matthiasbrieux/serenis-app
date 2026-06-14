@@ -1746,3 +1746,18 @@ section { padding: 100px 0; }
     opacity: 0.8;
   }
 }
+
+/* ── 9. iOS Performance — désactive GPU effects coûteux sur touch ── */
+@media (pointer: coarse) {
+  /* Supprime backdrop-filter sur la nav publique (recalcul GPU à chaque scroll) */
+  .nav::before { backdrop-filter: none !important; -webkit-backdrop-filter: none !important; }
+  .nav.scrolled::before { backdrop-filter: none !important; -webkit-backdrop-filter: none !important; background: rgba(253,252,248,0.97) !important; }
+  /* Supprime backdrop-filter sur les éléments hero */
+  .hero-badge { backdrop-filter: none !important; -webkit-backdrop-filter: none !important; background: rgba(255,255,255,0.14) !important; }
+  .hero-card { backdrop-filter: none !important; -webkit-backdrop-filter: none !important; background: rgba(255,255,255,0.12) !important; }
+  /* Supprime backdrop-filter sur les modales */
+  .modal-overlay { backdrop-filter: none !important; -webkit-backdrop-filter: none !important; }
+  /* Désactive les transitions hover qui causent des repaints en scroll */
+  .offre-serenite:hover, .stat-card:hover { transform: none !important; box-shadow: none !important; }
+  * { -webkit-tap-highlight-color: transparent; }
+}
