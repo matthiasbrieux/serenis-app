@@ -439,6 +439,26 @@
     .vst-sms-btn { display:inline-flex; align-items:center; gap:5px; background:#3D5A47; color:#fff; border:none; border-radius:8px; padding:6px 12px; font-size:0.75rem; font-weight:700; cursor:pointer; font-family:inherit; white-space:nowrap; transition:background 0.15s; }
     .vst-sms-btn:hover { background:#2d4535; }
     .vst-sms-btn.copied { background:#6BBF82; }
+    /* Modal rappel SMS */
+    .db-modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,0.45); display:flex; align-items:center; justify-content:center; z-index:9999; padding:16px; opacity:0; visibility:hidden; transition:opacity 0.2s, visibility 0.2s; }
+    .db-modal-overlay.active { opacity:1; visibility:visible; }
+    .db-modal { background:#fff; border-radius:20px; padding:28px 24px 22px; max-width:420px; width:100%; position:relative; transform:translateY(16px); transition:transform 0.2s; text-align:center; }
+    .db-modal-overlay.active .db-modal { transform:translateY(0); }
+    .db-modal-close { position:absolute; top:14px; right:16px; background:none; border:none; font-size:1.4rem; color:#aaa; cursor:pointer; line-height:1; padding:0 4px; }
+    .db-modal-icon { width:52px; height:52px; border-radius:50%; background:linear-gradient(135deg,#b45309,#C4785A); display:flex; align-items:center; justify-content:center; margin:0 auto 14px; box-shadow:0 4px 14px rgba(196,120,90,0.3); }
+    .db-modal-title { font-family:'Cormorant Garamond',serif; font-size:1.35rem; font-weight:700; color:#1a1a1a; margin-bottom:14px; }
+    .db-modal-buyer { display:flex; align-items:center; gap:12px; background:#f0f5f1; border:1.5px solid #c8ddd0; border-radius:12px; padding:12px 15px; margin-bottom:14px; text-align:left; }
+    .db-modal-avatar { width:38px; height:38px; border-radius:50%; background:linear-gradient(135deg,#b45309,#C4785A); color:#fff; display:flex; align-items:center; justify-content:center; font-size:0.82rem; font-weight:700; flex-shrink:0; }
+    .db-modal-buyer-name { font-size:0.9rem; font-weight:700; color:#1a1a1a; }
+    .db-modal-buyer-phone { font-size:0.8rem; color:#3D5A47; font-weight:600; margin-top:2px; }
+    .db-modal-buyer-nophone { font-size:0.78rem; color:#aaa; margin-top:2px; font-style:italic; }
+    .db-modal-preview { background:#f5f0e8; border:1.5px solid #e0d8cc; border-radius:12px; padding:14px 16px; font-size:0.86rem; color:#2d2d2d; line-height:1.65; text-align:left; margin-bottom:14px; white-space:pre-wrap; word-break:break-word; }
+    .db-modal-btn-sms { display:flex; align-items:center; justify-content:center; gap:8px; width:100%; padding:13px; background:linear-gradient(135deg,#b45309,#C4785A); color:#fff; border:none; border-radius:11px; font-family:'DM Sans',sans-serif; font-size:0.9rem; font-weight:700; cursor:pointer; transition:0.15s; box-shadow:0 4px 14px rgba(196,120,90,0.25); margin-bottom:10px; text-decoration:none; }
+    .db-modal-btn-sms:hover { background:linear-gradient(135deg,#9a3a05,#b45309); transform:translateY(-1px); }
+    .db-modal-btn-copy { width:100%; padding:11px; background:#f0f5f1; color:#3D5A47; border:1.5px solid #c8ddd0; border-radius:11px; font-family:'DM Sans',sans-serif; font-size:0.86rem; font-weight:600; cursor:pointer; transition:0.15s; margin-bottom:12px; }
+    .db-modal-btn-copy:hover { background:#e0ede5; }
+    .db-modal-btn-copy.copied { background:#ecfdf5; color:#059669; border-color:#a7f3d0; }
+    .db-modal-fermer { font-size:0.82rem; color:#bbb; background:none; border:none; cursor:pointer; font-family:'DM Sans',sans-serif; text-decoration:underline; }
     .vst-link { display:flex; align-items:center; justify-content:center; gap:7px; margin-top:4px; padding:11px; background:#F5F0E8; border-radius:12px; font-size:0.82rem; color:#3D5A47; font-weight:600; text-decoration:none; transition:background 0.15s; border:none; cursor:pointer; width:100%; font-family:inherit; }
     .vst-link:hover { background:#E8F4EE; }
     /* ── Mes disponibilités — design premium ── */
@@ -1254,28 +1274,60 @@ function renderVisits(visits) {
   el.innerHTML = html + '<a class="vst-link" href="/mon-agenda">→ Voir tous les détails dans Mon agenda</a>';
 }
 
-function copyVisitConfirmSms(visitId, btn) {
-  const confirmed = (window._allVisits || []).filter(v => v.status === 'confirmed');
-  const v = confirmed.find(v => v.id === visitId);
+function copyVisitConfirmSms(visitId) {
+  const v = (window._allVisits || []).find(v => v.id === visitId);
   if (!v) return;
-  const days = ['dimanche','lundi','mardi','mercredi','jeudi','vendredi','samedi'];
-  const months = ['janvier','février','mars','avril','mai','juin','juillet','août','septembre','octobre','novembre','décembre'];
-  let dateStr = v.visit_date;
-  const parts = v.visit_date ? v.visit_date.split('-') : [];
+  const JOURS = ['dimanche','lundi','mardi','mercredi','jeudi','vendredi','samedi'];
+  const MOIS = ['janvier','février','mars','avril','mai','juin','juillet','août','septembre','octobre','novembre','décembre'];
+  const parts = (v.visit_date || '').split('-');
+  let dateLabel = v.visit_date || '';
   if (parts.length === 3) {
-    const d = new Date(v.visit_date);
-    dateStr = `${days[d.getDay()]} ${parseInt(parts[2])} ${months[parseInt(parts[1])-1]} ${parts[0]}`;
+    const d = new Date(Number(parts[0]), Number(parts[1])-1, Number(parts[2]));
+    dateLabel = `${JOURS[d.getDay()]} ${Number(parts[2])} ${MOIS[d.getMonth()]}`;
   }
-  const address = _mailCtx.address || '';
-  const sellerName = _mailCtx.firstName || '';
-  const buyerFirstName = (v.buyer_name || '').split(' ')[0];
-  const time = v.visit_time ? v.visit_time.replace(':', 'h') : '';
-  const sms = `Bonjour ${buyerFirstName}, je vous confirme notre visite prévue le ${dateStr} à ${time}${address ? ' au ' + address : ''}. À bientôt ! ${sellerName}`;
-  navigator.clipboard.writeText(sms).then(() => {
+  const [h, m] = (v.visit_time || '').split(':');
+  const time = h ? (m && m !== '00' ? `${h}h${m}` : `${h}h`) : '';
+  const address = _stepCtx.address || '';
+  const sellerNom = _stepCtx.firstName || '';
+  const adresseText = address ? `\nAdresse : ${address}` : '';
+  const tomorrow = new Date(); tomorrow.setDate(tomorrow.getDate() + 1);
+  const tomorrowStr = `${tomorrow.getFullYear()}-${String(tomorrow.getMonth()+1).padStart(2,'0')}-${String(tomorrow.getDate()).padStart(2,'0')}`;
+  const sms = v.visit_date === tomorrowStr
+    ? `Bonjour ${v.buyer_name || 'Madame/Monsieur'}, je vous rappelle notre visite prévue demain ${dateLabel} à ${time}.${adresseText}\n\nN'hésitez pas à me prévenir si vous avez un empêchement.\n${sellerNom || 'Votre vendeur'}`
+    : `Bonjour ${v.buyer_name || 'Madame/Monsieur'}, je vous rappelle notre visite prévue le ${dateLabel} à ${time}.${adresseText}\n\nN'hésitez pas à me prévenir si vous avez un empêchement.\n${sellerNom || 'Votre vendeur'}`;
+  const initiales = (v.buyer_name || '?').split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
+  document.getElementById('dbRappelAvatar').textContent = initiales;
+  document.getElementById('dbRappelName').textContent = v.buyer_name || '—';
+  const phoneEl = document.getElementById('dbRappelPhone');
+  if (v.buyer_phone) {
+    phoneEl.className = 'db-modal-buyer-phone';
+    phoneEl.textContent = v.buyer_phone;
+  } else {
+    phoneEl.className = 'db-modal-buyer-nophone';
+    phoneEl.textContent = 'Téléphone non renseigné';
+  }
+  document.getElementById('dbRappelText').textContent = sms;
+  const sendBtn = document.getElementById('dbRappelSendBtn');
+  if (v.buyer_phone) {
+    sendBtn.href = `sms:${v.buyer_phone}?&body=${encodeURIComponent(sms)}`;
+    sendBtn.style.display = '';
+  } else {
+    sendBtn.style.display = 'none';
+  }
+  document.getElementById('dbRappelCopyBtn').innerHTML = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:middle;margin-right:5px;"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>Copier le SMS';
+  document.getElementById('dbRappelCopyBtn').classList.remove('copied');
+  document.getElementById('dbRappelOverlay').classList.add('active');
+}
+function closeDashModal() {
+  document.getElementById('dbRappelOverlay').classList.remove('active');
+}
+function copyDashRappelSms(btn) {
+  const text = document.getElementById('dbRappelText').textContent;
+  navigator.clipboard.writeText(text).then(() => {
     btn.textContent = '✓ SMS copié !';
     btn.classList.add('copied');
     setTimeout(() => {
-      btn.innerHTML = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg> SMS rappel';
+      btn.innerHTML = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:middle;margin-right:5px;"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>Copier le SMS';
       btn.classList.remove('copied');
     }, 2500);
   });
@@ -1614,5 +1666,32 @@ document.getElementById('stepMsgModal').addEventListener('click', function(e) {
 <script src="/js/transitions.js"></script>
 <script src="/js/seller-nav.js"></script>
 <script>if('serviceWorker' in navigator) navigator.serviceWorker.register('/sw.js');</script>
+
+<!-- Modal rappel SMS visite -->
+<div class="db-modal-overlay" id="dbRappelOverlay" onclick="if(event.target===this)closeDashModal()">
+  <div class="db-modal">
+    <button class="db-modal-close" onclick="closeDashModal()">×</button>
+    <div class="db-modal-icon">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+    </div>
+    <div class="db-modal-title">Rappel de visite</div>
+    <div class="db-modal-buyer">
+      <div class="db-modal-avatar" id="dbRappelAvatar"></div>
+      <div>
+        <div class="db-modal-buyer-name" id="dbRappelName"></div>
+        <div id="dbRappelPhone"></div>
+      </div>
+    </div>
+    <div class="db-modal-preview" id="dbRappelText"></div>
+    <a class="db-modal-btn-sms" id="dbRappelSendBtn" href="#">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.41a2 2 0 0 1 2-2.18h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+      Envoyer le SMS
+    </a>
+    <button class="db-modal-btn-copy" id="dbRappelCopyBtn" onclick="copyDashRappelSms(this)">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:middle;margin-right:5px;"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>Copier le SMS
+    </button>
+    <button class="db-modal-fermer" onclick="closeDashModal()">Fermer</button>
+  </div>
+</div>
 </body>
 </html>
