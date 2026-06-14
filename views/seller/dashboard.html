@@ -435,7 +435,9 @@
     .vst-row:last-child { border-bottom:none; }
     .vst-row:hover { background:#F7FCF9; }
     .vst-avatar { width:38px; height:38px; border-radius:50%; background:linear-gradient(135deg,#4d7a58,#3D5A47); color:#fff; font-size:0.83rem; font-weight:700; display:flex; align-items:center; justify-content:center; flex-shrink:0; letter-spacing:0.03em; }
-    .vst-name { flex:1; font-size:0.9rem; font-weight:600; color:#1C1C1A; }
+    .vst-buyer-link { display:flex; align-items:center; gap:12px; flex:1; text-decoration:none; min-width:0; }
+    .vst-buyer-link:hover .vst-name { color:#3D5A47; }
+    .vst-name { font-size:0.9rem; font-weight:600; color:#1C1C1A; }
     .vst-sms-btn { display:inline-flex; align-items:center; gap:5px; background:#3D5A47; color:#fff; border:none; border-radius:8px; padding:6px 12px; font-size:0.75rem; font-weight:700; cursor:pointer; font-family:inherit; white-space:nowrap; transition:background 0.15s; }
     .vst-sms-btn:hover { background:#2d4535; }
     .vst-sms-btn.copied { background:#6BBF82; }
@@ -1269,8 +1271,10 @@ function renderVisits(visits) {
         <span class="vst-day-time">${timeStr}</span>
       </div>
       <div class="vst-row">
-        <div class="vst-avatar">${initials(v.buyer_name)}</div>
-        <span class="vst-name">${v.buyer_name || '—'}</span>
+        <a href="/mon-agenda" class="vst-buyer-link">
+          <div class="vst-avatar">${initials(v.buyer_name)}</div>
+          <span class="vst-name">${v.buyer_name || '—'}</span>
+        </a>
         <button class="vst-sms-btn" onclick="copyVisitConfirmSms(${v.id}, this)"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg> SMS rappel</button>
       </div>
     </div>`;
