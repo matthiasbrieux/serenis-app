@@ -979,7 +979,42 @@
       .fiche-close-btn { width: 44px; height: 44px; }
       .fiche-copy-btn { min-height: 44px; }
       .mail-copy { min-height: 44px; }
+
+      /* ── iOS scroll fluidity fixes ── */
+
+      /* Supprime backdrop-filter (recalcul à chaque frame = jank garanti) */
+      .agent-stop-btn, .agent-speed-btn { backdrop-filter: none; -webkit-backdrop-filter: none; background: rgba(30,50,35,0.92); }
+      .iphone-ai-overlay { backdrop-filter: none; -webkit-backdrop-filter: none; background: rgba(28,46,34,0.95); }
+
+      /* Neutralise tous les effets hover (déclenchés au tap sur iOS, causent des layout shifts) */
+      .f-pillar:hover { border-color: rgba(255,255,255,0.1) !important; background: rgba(255,255,255,0.06) !important; box-shadow: none !important; }
+      .f-pillar:hover .f-pillar-perks { max-height: 0 !important; }
+      .mod-car-wrap:hover { border-color: rgba(212,228,216,0.12) !important; background: rgba(255,255,255,0.04) !important; }
+      .ck-row:hover { background: transparent !important; }
+      .step-card:hover { border-color: #E8E3DB !important; }
+
+      /* Supprime les transitions coûteuses en scroll */
+      .step-card, .step-hdr, .mod-car-wrap, .f-pillar, .ck-box, .tts-btn, .ask-coach-btn, .mail-cat-tab { transition: none !important; }
+
+      /* Animation modFadeIn simplifiée — sans translateY pour éviter les repaints */
+      .mod-content.active { animation: modFadeInMobile 0.18s ease; }
+
+      /* Désactive les animations infinies hors focus */
+      .iphone:not(.speaking) { animation: none; }
+      .wave-bar { animation-play-state: paused; }
+      .iphone.speaking .wave-bar { animation-play-state: running; }
+
+      /* Force la composition GPU sur les éléments animés */
+      .step-arr, .ck-prog-fill, .mod-tab-prog-fill { will-change: transform; }
+
+      /* Tap highlight supprimé pour fluidité visuelle */
+      * { -webkit-tap-highlight-color: transparent; }
+
+      /* Prévient le scroll horizontal parasite */
+      .main-content, .mod-content, .step-body { overflow-x: hidden; }
     }
+
+    @keyframes modFadeInMobile { from { opacity: 0; } to { opacity: 1; } }
 
     /* ── Mobile hamburger & sidebar overlay ── */
     .mobile-menu-btn {
