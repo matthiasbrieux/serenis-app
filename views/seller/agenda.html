@@ -296,6 +296,13 @@
     .compromis-milestone-dot { width:10px; height:10px; border-radius:50%; flex-shrink:0; }
     .compromis-milestone-label { font-size:0.81rem; color:#666; flex:1; line-height:1.35; }
     .compromis-milestone-date { font-size:0.86rem; font-weight:700; color:#1A1A16; white-space:nowrap; }
+    .compromis-form { display:flex; flex-wrap:wrap; gap:10px; align-items:flex-end; }
+    @media (max-width:600px) {
+      .compromis-form { flex-direction:column; align-items:stretch; }
+      .compromis-form .compromis-form-delay { width:100%; }
+      .compromis-form .compromis-form-delay select { width:100%; box-sizing:border-box; }
+      .compromis-form-btn { width:100%; justify-content:center; }
+    }
     /* Filter dimmed */
     .cal-filter-dimmed { opacity:0.15; pointer-events:none; }
     /* Legend */
@@ -972,19 +979,19 @@
           </div>
           <div class="compromis-card-body">
             <p style="font-size:0.81rem;color:#888;margin:0 0 16px;line-height:1.5;">Renseignez la date de signature pour générer automatiquement les 3 dates clés jusqu'à la vente de votre bien dans votre agenda.</p>
-            <div style="display:flex;flex-wrap:wrap;gap:10px;align-items:flex-end;">
+            <div class="compromis-form">
               <div style="display:flex;flex-direction:column;gap:4px;flex:1;min-width:140px;">
                 <label style="font-size:0.75rem;font-weight:700;color:#555;text-transform:uppercase;letter-spacing:0.06em;">Date du compromis</label>
                 <input type="date" id="compromisDateInput" style="padding:9px 12px;border:1.5px solid #e0d8ce;border-radius:9px;font-family:'DM Sans',sans-serif;font-size:0.88rem;color:#1A1A16;background:#fafaf8;outline:none;width:100%;box-sizing:border-box;">
               </div>
-              <div style="display:flex;flex-direction:column;gap:4px;">
+              <div class="compromis-form-delay" style="display:flex;flex-direction:column;gap:4px;">
                 <label style="font-size:0.75rem;font-weight:700;color:#555;text-transform:uppercase;letter-spacing:0.06em;">Délai prêt</label>
                 <select id="compromisDelayInput" style="padding:9px 12px;border:1.5px solid #e0d8ce;border-radius:9px;font-family:'DM Sans',sans-serif;font-size:0.88rem;color:#1A1A16;background:#fafaf8;outline:none;">
                   <option value="45">45 jours</option>
                   <option value="60">60 jours</option>
                 </select>
               </div>
-              <button onclick="saveCompromis()" class="btn-primary" style="padding:10px 18px;font-size:0.85rem;border-radius:9px;white-space:nowrap;height:40px;">Enregistrer</button>
+              <button onclick="saveCompromis()" class="btn-primary compromis-form-btn" style="padding:10px 18px;font-size:0.85rem;border-radius:9px;white-space:nowrap;height:40px;">Enregistrer</button>
             </div>
             <div id="compromisMilestones" style="display:none;margin-top:18px;border-top:1px solid #f0ebe4;padding-top:14px;">
               <div class="compromis-milestone">
