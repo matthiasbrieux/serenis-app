@@ -989,6 +989,9 @@
       /* Neutralise tous les effets hover (déclenchés au tap sur iOS, causent des layout shifts) */
       .f-pillar:hover { border-color: rgba(255,255,255,0.1) !important; background: rgba(255,255,255,0.06) !important; box-shadow: none !important; }
       .f-pillar:hover .f-pillar-perks { max-height: 0 !important; }
+      /* Remplace le hover par un tap toggle sur iOS */
+      .f-pillar.open { border-color: rgba(212,228,216,0.3) !important; background: rgba(255,255,255,0.1) !important; }
+      .f-pillar.open .f-pillar-perks { max-height: 180px !important; }
       .mod-car-wrap:hover { border-color: rgba(212,228,216,0.12) !important; background: rgba(255,255,255,0.04) !important; }
       .ck-row:hover { background: transparent !important; }
       .step-card:hover { border-color: #E8E3DB !important; }
@@ -2774,6 +2777,12 @@ function handleInteractionEvent(e) {
     card?.classList.toggle('open');
     if (!wasOpen) triggerStepAgent(+hdr.dataset.mi, +hdr.dataset.si);
     else stopAgent();
+    return;
+  }
+  const pillar = e.target.closest('.f-pillar');
+  if (pillar) {
+    if (isTouchEnd && e.cancelable) e.preventDefault();
+    pillar.classList.toggle('open');
     return;
   }
   const ab = e.target.closest('.ask-coach-btn');
