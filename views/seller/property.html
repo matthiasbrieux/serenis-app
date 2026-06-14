@@ -309,13 +309,14 @@
       font-size:0.75rem;color:#2e7d32;font-weight:600;
     }
     .fd-label {
-      font-size:0.8rem;color:#888;padding:4px 10px 4px 0;vertical-align:top;
-      white-space:nowrap;width:42%;
+      font-size:0.78rem;color:#3D5A47;padding:6px 12px 6px 0;vertical-align:top;
+      white-space:nowrap;width:44%;font-weight:500;opacity:0.8;
     }
     .fd-value {
-      font-size:0.82rem;color:#222;padding:4px 0;font-weight:500;vertical-align:top;
+      font-size:0.82rem;color:#1C2E22;padding:6px 0;font-weight:600;vertical-align:top;
     }
-    tr:nth-child(even) .fd-label, tr:nth-child(even) .fd-value { background:#fafaf9; }
+    tr:nth-child(even) .fd-label, tr:nth-child(even) .fd-value { background:rgba(250,250,248,0.6); }
+    tr .fd-label, tr .fd-value { border-bottom:1px solid rgba(61,90,71,0.06); }
 
     /* ── AI description button ──────────────────── */
     .btn-ai {
@@ -5009,10 +5010,10 @@ function buildFicheHtml() {
       const fr = roomsList.filter(r => r.floor === fl);
       if (!fr.length) return;
       fr.forEach((r,i) => {
-        roomsRows += `<tr style="${i%2===0?'background:#fafaf9;':''}">
-          <td class="fd-label" style="font-size:0.75rem;color:#aaa;padding-left:10px;">${i===0?fl:''}</td>
-          <td class="fd-value" style="padding:5px 8px;">${r.icon} ${r.label}</td>
-          <td class="fd-value" style="text-align:right;padding:5px 10px 5px 0;color:#888;">${r.surface>0?r.surface+' m²':'—'}</td>
+        roomsRows += `<tr style="${i%2===0?'background:rgba(250,250,248,0.5);':''}">
+          <td class="fd-label" style="font-size:0.72rem;color:#3D5A47;padding-left:8px;opacity:0.6;">${i===0?fl:''}</td>
+          <td class="fd-value" style="padding:6px 8px;">${r.icon} ${r.label}</td>
+          <td class="fd-value" style="text-align:right;padding:6px 10px 6px 0;color:#C4785A;font-weight:700;">${r.surface>0?r.surface+' m²':'—'}</td>
         </tr>`;
       });
     });
@@ -5045,167 +5046,233 @@ function buildFicheHtml() {
   })();
 
   var _html = `
-  <div class="fiche-container" id="ficheCard" style="font-family:'DM Sans',sans-serif;background:#f2f0eb;color:#1A1A16;">
+  <div class="fiche-container" id="ficheCard" style="font-family:'DM Sans',sans-serif;background:#FAFAF8;color:#1C2E22;">
 
-    <!-- ── HEADER ── -->
-    <div style="background:linear-gradient(135deg,#2a3e32,#3D5A47);padding:16px 32px;display:flex;justify-content:space-between;align-items:center;">
-      <div>
-        <div style="font-family:'Cormorant Garamond',serif;font-size:2rem;color:#fff;font-weight:600;line-height:1;">Vendu Par Moi</div>
-        <div style="font-size:0.62rem;color:rgba(255,255,255,0.45);letter-spacing:0.12em;text-transform:uppercase;margin-top:3px;">Vente immobilière entre particuliers</div>
+    <!-- ── HEADER PREMIUM ── -->
+    <div style="background:#1C2E22;padding:18px 24px;display:flex;justify-content:space-between;align-items:center;">
+      <div style="display:flex;align-items:center;gap:10px;">
+        <div style="width:34px;height:34px;border-radius:8px;background:rgba(196,120,90,0.18);border:1.5px solid rgba(196,120,90,0.35);display:flex;align-items:center;justify-content:center;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#C4785A" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        </div>
+        <div>
+          <div style="font-family:'Cormorant Garamond',serif;font-size:1.5rem;color:#fff;font-weight:600;line-height:1.1;">Vendu Par Moi</div>
+          <div style="font-size:0.6rem;color:rgba(255,255,255,0.35);letter-spacing:0.14em;text-transform:uppercase;margin-top:2px;">Vente entre particuliers</div>
+        </div>
       </div>
       <div style="text-align:right;">
-        <div style="font-size:0.6rem;color:rgba(255,255,255,0.4);text-transform:uppercase;letter-spacing:0.08em;">Référence</div>
-        <div style="font-size:0.8rem;font-weight:700;color:#fff;margin-top:1px;">${refNum}</div>
-        <div style="font-size:0.6rem;color:rgba(255,255,255,0.4);margin-top:3px;">${today}</div>
+        <div style="font-size:0.58rem;color:rgba(255,255,255,0.35);text-transform:uppercase;letter-spacing:0.1em;">Réf. ${refNum}</div>
+        <div style="font-size:0.68rem;color:rgba(196,120,90,0.8);margin-top:3px;font-weight:500;">${today}</div>
       </div>
     </div>
 
-    <!-- ── HERO PHOTO + PRIX ── -->
+    <!-- ── HERO ── -->
     ${mainPhoto ? `
-    <div style="position:relative;height:310px;overflow:hidden;">
+    <div style="position:relative;height:320px;overflow:hidden;">
       <img src="${mainPhoto.url || mainPhoto.file_path}" style="width:100%;height:100%;object-fit:cover;" alt="">
-      <div style="position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,0.78) 0%,rgba(0,0,0,0.05) 55%,transparent 100%);"></div>
-      <div style="position:absolute;bottom:0;left:0;right:0;padding:28px 32px 22px;display:flex;align-items:flex-end;justify-content:space-between;">
-        <div>
-          <div style="font-size:0.62rem;color:rgba(255,255,255,0.55);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:3px;">Prix de vente</div>
-          <div style="font-family:'Cormorant Garamond',serif;font-size:2.4rem;font-weight:700;color:#fff;line-height:1;">${priceFormatted}</div>
-          <div style="font-size:0.84rem;color:rgba(255,255,255,0.75);margin-top:5px;">${icon} ${p.type || 'Bien'}${_shareAddress && p.address ? ' · ' + p.address : ''}${p.city ? ' · ' + (p.postal_code ? p.postal_code + ' ' : '') + p.city : ''}</div>
+      <div style="position:absolute;inset:0;background:linear-gradient(to top,rgba(28,46,34,0.88) 0%,rgba(28,46,34,0.1) 50%,transparent 100%);"></div>
+      <div style="position:absolute;bottom:0;left:0;right:0;padding:28px 24px 22px;">
+        <div style="font-size:0.6rem;color:rgba(255,255,255,0.5);text-transform:uppercase;letter-spacing:0.14em;margin-bottom:6px;">Prix de vente</div>
+        <div style="font-family:'Cormorant Garamond',serif;font-size:2.6rem;font-weight:700;color:#fff;line-height:1;">${priceFormatted}</div>
+        <div style="display:flex;align-items:center;gap:8px;margin-top:8px;flex-wrap:wrap;">
+          <span style="font-size:0.8rem;color:rgba(255,255,255,0.75);">${icon} ${p.type || 'Bien'}${_shareAddress && p.address ? ' · ' + p.address : ''}${p.city ? ' · ' + (p.postal_code ? p.postal_code + ' ' : '') + p.city : ''}</span>
+          ${dpeClass ? `<span style="display:inline-flex;align-items:center;gap:4px;padding:3px 10px;background:${dpeColor};color:${dpeTextColor};border-radius:20px;font-size:0.7rem;font-weight:800;letter-spacing:0.05em;">DPE ${dpeClass}</span>` : ''}
         </div>
-        ${dpeClass ? `<div style="background:${dpeColor};color:${dpeTextColor};width:52px;height:52px;border-radius:10px;display:flex;flex-direction:column;align-items:center;justify-content:center;font-weight:800;font-size:1.3rem;border:3px solid rgba(255,255,255,0.5);flex-shrink:0;">${dpeClass}<div style="font-size:0.5rem;letter-spacing:0.05em;font-weight:600;margin-top:-1px;">DPE</div></div>` : ''}
       </div>
     </div>` : `
-    <div style="background:linear-gradient(135deg,#2a3e32,#3D5A47);padding:24px 20px;display:flex;align-items:center;justify-content:space-between;gap:12px;">
-      <div>
-        <div style="font-size:0.6rem;color:rgba(255,255,255,0.5);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:4px;">Prix de vente</div>
-        <div style="font-family:'Cormorant Garamond',serif;font-size:2.2rem;font-weight:700;color:#fff;line-height:1;">${priceFormatted}</div>
-        <div style="font-size:0.82rem;color:rgba(255,255,255,0.65);margin-top:6px;">${icon} ${p.type || 'Bien'}${p.city ? ' · ' + (p.postal_code ? p.postal_code + ' ' : '') + p.city : ''}</div>
+    <div style="background:linear-gradient(135deg,#1C2E22,#3D5A47);padding:28px 24px 24px;">
+      <div style="font-size:0.6rem;color:rgba(255,255,255,0.45);text-transform:uppercase;letter-spacing:0.14em;margin-bottom:8px;">Prix de vente</div>
+      <div style="font-family:'Cormorant Garamond',serif;font-size:2.4rem;font-weight:700;color:#fff;line-height:1;">${priceFormatted}</div>
+      <div style="display:flex;align-items:center;gap:8px;margin-top:10px;flex-wrap:wrap;">
+        <span style="font-size:0.82rem;color:rgba(255,255,255,0.7);">${icon} ${p.type || 'Bien'}${p.city ? ' · ' + (p.postal_code ? p.postal_code + ' ' : '') + p.city : ''}</span>
+        ${dpeClass ? `<span style="display:inline-flex;align-items:center;gap:4px;padding:3px 10px;background:${dpeColor};color:${dpeTextColor};border-radius:20px;font-size:0.7rem;font-weight:800;letter-spacing:0.05em;">DPE ${dpeClass}</span>` : ''}
       </div>
-      ${dpeClass ? `<div style="background:${dpeColor};color:${dpeTextColor};width:52px;height:52px;border-radius:10px;display:flex;flex-direction:column;align-items:center;justify-content:center;font-weight:800;font-size:1.3rem;border:3px solid rgba(255,255,255,0.4);flex-shrink:0;">${dpeClass}<div style="font-size:0.5rem;letter-spacing:0.05em;font-weight:600;margin-top:-1px;">DPE</div></div>` : ''}
     </div>`}
 
-    <!-- ── STATS RAPIDES ── -->
-    <div style="background:#fff;border-bottom:2px solid #e8e0d6;padding:16px 20px;">
-      <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:0;">
-      ${[
-        p.surface_habitable ? { v: p.surface_habitable + ' m²', l: 'Habitable' } : null,
-        p.surface_terrain ? { v: p.surface_terrain + ' m²', l: 'Terrain' } : null,
-        p.rooms ? { v: p.rooms + ' pièces', l: 'dont ' + (p.bedrooms || '—') + ' chambres' } : null,
-        p.year_built ? { v: p.year_built, l: 'Année de construction' } : null,
-        p.taxe_fonciere ? { v: Number(p.taxe_fonciere).toLocaleString('fr-FR') + ' €/an', l: 'Taxe foncière' } : null,
-        p.hauteur_plafond ? { v: p.hauteur_plafond + ' m', l: 'Hauteur plafond' } : null,
-      ].filter(Boolean).map((s,i) => `
-        <div style="padding:10px 14px;border-bottom:1px solid #f0ece6;${i%2===0?'border-right:1px solid #f0ece6;':''}">
-          <div style="font-family:'Cormorant Garamond',serif;font-size:1.3rem;font-weight:700;color:#1A1A16;line-height:1.1;">${s.v}</div>
-          <div style="font-size:0.6rem;text-transform:uppercase;letter-spacing:0.07em;color:#999;margin-top:3px;">${s.l}</div>
-        </div>`).join('')}
-      </div>
-    </div>
-
-    <!-- ── POINTS FORTS ── -->
+    <!-- ── INCONTOURNABLES ── -->
     ${_atouts.length ? `
-    <div style="background:#3D5A47;padding:16px 32px;">
-      <div style="display:flex;align-items:center;gap:6px;font-size:0.6rem;font-weight:700;text-transform:uppercase;letter-spacing:0.12em;color:rgba(255,255,255,0.6);margin-bottom:10px;"><span style="color:rgba(255,255,255,0.5);">${fi.star}</span> Points forts du bien</div>
-      <div style="display:flex;flex-wrap:wrap;gap:8px;">
-        ${_atouts.map(a => `<div style="display:inline-flex;align-items:center;gap:6px;padding:5px 14px;background:rgba(255,255,255,0.13);border:1px solid rgba(255,255,255,0.22);border-radius:20px;font-size:0.8rem;font-weight:500;color:#fff;"><span style="display:inline-flex;align-items:center;opacity:0.85;">${a.icon}</span>${a.text}</div>`).join('')}
+    <div style="background:#fff;border-bottom:1px solid rgba(196,120,90,0.12);padding:14px 20px;">
+      <div style="display:flex;align-items:center;gap:6px;margin-bottom:10px;">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="#C4785A" stroke="none"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+        <span style="font-size:0.58rem;font-weight:700;text-transform:uppercase;letter-spacing:0.14em;color:#3D5A47;">Points forts du bien</span>
+      </div>
+      <div style="display:flex;flex-wrap:wrap;gap:7px;">
+        ${_atouts.map(a => `<div style="display:inline-flex;align-items:center;gap:6px;padding:5px 12px;background:#FAFAF8;border:1px solid rgba(61,90,71,0.18);border-radius:20px;font-size:0.78rem;font-weight:500;color:#1C2E22;"><span style="display:inline-flex;align-items:center;color:#3D5A47;opacity:0.9;">${a.icon}</span>${a.text}</div>`).join('')}
+      </div>
+    </div>` : ''}
+
+    <!-- ── STATS CLÉS ── -->
+    ${[
+      p.surface_habitable ? { v: p.surface_habitable + ' m²', l: 'Surface habitable' } : null,
+      p.surface_terrain ? { v: p.surface_terrain + ' m²', l: 'Terrain' } : null,
+      p.rooms ? { v: p.rooms + ' pièces', l: 'dont ' + (p.bedrooms || '—') + ' ch.' } : null,
+      p.year_built ? { v: p.year_built, l: 'Construction' } : null,
+      p.taxe_fonciere ? { v: Number(p.taxe_fonciere).toLocaleString('fr-FR') + ' €', l: 'Taxe foncière / an' } : null,
+      p.hauteur_plafond ? { v: p.hauteur_plafond + ' m', l: 'Hauteur plafond' } : null,
+    ].filter(Boolean).length ? `
+    <div style="background:#FAFAF8;padding:0 0 2px;">
+      <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:0;border-top:1px solid rgba(61,90,71,0.08);">
+      ${[
+        p.surface_habitable ? { v: p.surface_habitable + ' m²', l: 'Surface habitable' } : null,
+        p.surface_terrain ? { v: p.surface_terrain + ' m²', l: 'Terrain' } : null,
+        p.rooms ? { v: p.rooms + ' pièces', l: 'dont ' + (p.bedrooms || '—') + ' ch.' } : null,
+        p.year_built ? { v: p.year_built, l: 'Construction' } : null,
+        p.taxe_fonciere ? { v: Number(p.taxe_fonciere).toLocaleString('fr-FR') + ' €', l: 'Taxe foncière / an' } : null,
+        p.hauteur_plafond ? { v: p.hauteur_plafond + ' m', l: 'Hauteur plafond' } : null,
+      ].filter(Boolean).map((s,i,arr) => `
+        <div style="padding:14px 18px;border-bottom:1px solid rgba(61,90,71,0.07);${i%2===0?'border-right:1px solid rgba(61,90,71,0.07);':''}background:#fff;">
+          <div style="font-family:'Cormorant Garamond',serif;font-size:1.45rem;font-weight:700;color:#C4785A;line-height:1.1;">${s.v}</div>
+          <div style="font-size:0.6rem;text-transform:uppercase;letter-spacing:0.09em;color:#3D5A47;font-weight:600;margin-top:4px;opacity:0.75;">${s.l}</div>
+        </div>`).join('')}
       </div>
     </div>` : ''}
 
     <!-- ── DESCRIPTION ── -->
     ${p.description ? `
-    <div style="background:#fff;border-bottom:1px solid #e8e0d6;padding:22px 20px;">
-      <div style="font-size:0.6rem;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:#3D5A47;margin-bottom:10px;">Description</div>
-      <div style="font-size:0.9rem;color:#333;line-height:1.8;">${p.description.replace(/^#{1,3}\s*/gm,'').replace(/\n\n+/g,'</p><p style="margin:0 0 12px;">').replace(/\n/g,'<br>')}</div>
+    <div style="background:#fff;border-top:1px solid rgba(196,120,90,0.1);border-bottom:1px solid rgba(196,120,90,0.1);padding:22px 22px;">
+      <div style="display:flex;align-items:center;gap:7px;margin-bottom:14px;">
+        <div style="width:3px;height:18px;background:#C4785A;border-radius:2px;flex-shrink:0;"></div>
+        <span style="font-size:0.6rem;font-weight:700;text-transform:uppercase;letter-spacing:0.14em;color:#1C2E22;">Le bien en quelques mots</span>
+      </div>
+      <div style="font-size:0.88rem;color:#2a3a2e;line-height:1.85;">${p.description.replace(/^#{1,3}\s*/gm,'').replace(/\*\*/g,'').replace(/\n\n+/g,'</p><p style="margin:0 0 14px;">').replace(/\n/g,'<br>')}</div>
     </div>` : ''}
 
-    <!-- ── DONNÉES EN CARDS ── -->
-    <div class="fiche-data-grid" style="padding:20px 16px;background:#f2f0eb;">
+    <!-- ── CARACTÉRISTIQUES ── -->
+    <div style="padding:18px 16px 6px;background:#FAFAF8;">
 
-      ${surfacesRows ? `<div style="background:#fff;border-radius:10px;padding:16px 18px;box-shadow:0 1px 4px rgba(0,0,0,0.05);">
-        <div style="font-size:0.6rem;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:#3D5A47;border-bottom:2px solid #3D5A47;padding-bottom:6px;margin-bottom:10px;">Surfaces</div>
-        <table style="width:100%;border-collapse:collapse;font-size:0.8rem;">${surfacesRows}</table>
+      ${surfacesRows ? `
+      <div style="background:#fff;border-radius:14px;padding:18px 20px;box-shadow:0 2px 12px rgba(28,46,34,0.06);border:1px solid rgba(61,90,71,0.08);margin-bottom:12px;">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px;">
+          <div style="width:28px;height:28px;border-radius:8px;background:rgba(61,90,71,0.08);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#3D5A47" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
+          </div>
+          <span style="font-size:0.62rem;font-weight:700;text-transform:uppercase;letter-spacing:0.12em;color:#1C2E22;">Surfaces</span>
+        </div>
+        <table style="width:100%;border-collapse:collapse;font-size:0.82rem;">${surfacesRows}</table>
       </div>` : ''}
 
-      ${interiorRows ? `<div style="background:#fff;border-radius:10px;padding:16px 18px;box-shadow:0 1px 4px rgba(0,0,0,0.05);">
-        <div style="font-size:0.6rem;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:#3D5A47;border-bottom:2px solid #3D5A47;padding-bottom:6px;margin-bottom:10px;">Intérieur</div>
-        <table style="width:100%;border-collapse:collapse;font-size:0.8rem;">${interiorRows}</table>
+      ${interiorRows ? `
+      <div style="background:#fff;border-radius:14px;padding:18px 20px;box-shadow:0 2px 12px rgba(28,46,34,0.06);border:1px solid rgba(61,90,71,0.08);margin-bottom:12px;">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px;">
+          <div style="width:28px;height:28px;border-radius:8px;background:rgba(61,90,71,0.08);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#3D5A47" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+          </div>
+          <span style="font-size:0.62rem;font-weight:700;text-transform:uppercase;letter-spacing:0.12em;color:#1C2E22;">Intérieur</span>
+        </div>
+        <table style="width:100%;border-collapse:collapse;font-size:0.82rem;">${interiorRows}</table>
       </div>` : ''}
 
-      ${exteriorRows ? `<div style="background:#fff;border-radius:10px;padding:16px 18px;box-shadow:0 1px 4px rgba(0,0,0,0.05);">
-        <div style="font-size:0.6rem;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:#3D5A47;border-bottom:2px solid #3D5A47;padding-bottom:6px;margin-bottom:10px;">Extérieur</div>
-        <table style="width:100%;border-collapse:collapse;font-size:0.8rem;">${exteriorRows}</table>
+      ${exteriorRows ? `
+      <div style="background:#fff;border-radius:14px;padding:18px 20px;box-shadow:0 2px 12px rgba(28,46,34,0.06);border:1px solid rgba(61,90,71,0.08);margin-bottom:12px;">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px;">
+          <div style="width:28px;height:28px;border-radius:8px;background:rgba(61,90,71,0.08);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#3D5A47" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+          </div>
+          <span style="font-size:0.62rem;font-weight:700;text-transform:uppercase;letter-spacing:0.12em;color:#1C2E22;">Extérieur</span>
+        </div>
+        <table style="width:100%;border-collapse:collapse;font-size:0.82rem;">${exteriorRows}</table>
       </div>` : ''}
 
-      ${locRows ? `<div style="background:#fff;border-radius:10px;padding:16px 18px;box-shadow:0 1px 4px rgba(0,0,0,0.05);">
-        <div style="font-size:0.6rem;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:#3D5A47;border-bottom:2px solid #3D5A47;padding-bottom:6px;margin-bottom:10px;">Localisation</div>
-        <table style="width:100%;border-collapse:collapse;font-size:0.8rem;">${locRows}</table>
+      ${locRows ? `
+      <div style="background:#fff;border-radius:14px;padding:18px 20px;box-shadow:0 2px 12px rgba(28,46,34,0.06);border:1px solid rgba(61,90,71,0.08);margin-bottom:12px;">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px;">
+          <div style="width:28px;height:28px;border-radius:8px;background:rgba(61,90,71,0.08);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#3D5A47" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+          </div>
+          <span style="font-size:0.62rem;font-weight:700;text-transform:uppercase;letter-spacing:0.12em;color:#1C2E22;">Localisation</span>
+        </div>
+        <table style="width:100%;border-collapse:collapse;font-size:0.82rem;">${locRows}</table>
       </div>` : ''}
 
-      ${coproRows ? `<div style="background:#fff;border-radius:10px;padding:16px 18px;box-shadow:0 1px 4px rgba(0,0,0,0.05);">
-        <div style="font-size:0.6rem;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:#3D5A47;border-bottom:2px solid #3D5A47;padding-bottom:6px;margin-bottom:10px;">Copropriété</div>
-        <table style="width:100%;border-collapse:collapse;font-size:0.8rem;">${coproRows}</table>
+      ${coproRows ? `
+      <div style="background:#fff;border-radius:14px;padding:18px 20px;box-shadow:0 2px 12px rgba(28,46,34,0.06);border:1px solid rgba(61,90,71,0.08);margin-bottom:12px;">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px;">
+          <div style="width:28px;height:28px;border-radius:8px;background:rgba(61,90,71,0.08);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#3D5A47" stroke-width="2"><path d="M3 21h18M3 10h18M5 6l7-3 7 3M4 10v11M20 10v11M8 14v3M12 14v3M16 14v3"/></svg>
+          </div>
+          <span style="font-size:0.62rem;font-weight:700;text-transform:uppercase;letter-spacing:0.12em;color:#1C2E22;">Copropriété</span>
+        </div>
+        <table style="width:100%;border-collapse:collapse;font-size:0.82rem;">${coproRows}</table>
       </div>` : ''}
 
-      ${finRows ? `<div style="background:#fff;border-radius:10px;padding:16px 18px;box-shadow:0 1px 4px rgba(0,0,0,0.05);">
-        <div style="font-size:0.6rem;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:#3D5A47;border-bottom:2px solid #3D5A47;padding-bottom:6px;margin-bottom:10px;">Aspects financiers</div>
-        <table style="width:100%;border-collapse:collapse;font-size:0.8rem;">${finRows}</table>
+      ${finRows ? `
+      <div style="background:#fff;border-radius:14px;padding:18px 20px;box-shadow:0 2px 12px rgba(28,46,34,0.06);border:1px solid rgba(61,90,71,0.08);margin-bottom:12px;">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px;">
+          <div style="width:28px;height:28px;border-radius:8px;background:rgba(196,120,90,0.08);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#C4785A" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+          </div>
+          <span style="font-size:0.62rem;font-weight:700;text-transform:uppercase;letter-spacing:0.12em;color:#1C2E22;">Aspects financiers</span>
+        </div>
+        <table style="width:100%;border-collapse:collapse;font-size:0.82rem;">${finRows}</table>
       </div>` : ''}
 
     </div>
 
     <!-- ── DPE ── -->
     ${dpeClass ? `
-    <div style="background:#fff;border-top:1px solid #e8e0d6;padding:20px 32px;">
-      <div style="font-size:0.6rem;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:#3D5A47;margin-bottom:14px;">Diagnostics énergétiques (DPE)</div>
-      <div style="display:flex;gap:36px;align-items:flex-start;flex-wrap:wrap;">
+    <div style="background:#fff;border-top:1px solid rgba(61,90,71,0.08);padding:20px 22px;">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:16px;">
+        <div style="width:3px;height:18px;background:#3D5A47;border-radius:2px;flex-shrink:0;"></div>
+        <span style="font-size:0.6rem;font-weight:700;text-transform:uppercase;letter-spacing:0.14em;color:#1C2E22;">Diagnostics énergétiques (DPE)</span>
+      </div>
+      <div style="display:flex;gap:24px;align-items:flex-start;flex-wrap:wrap;">
         <div style="min-width:0;flex:1;">${dpeBars}</div>
-        <div style="display:flex;flex-direction:column;gap:6px;">
-          ${p.dpe_conso_energie ? `<div style="display:flex;align-items:center;gap:6px;font-size:0.84rem;color:#444;"><span style="color:#f5a623;">${fi.bolt}</span> Consommation : <strong>${p.dpe_conso_energie} kWh/m²/an</strong></div>` : ''}
-          ${p.dpe_ges ? `<div style="display:flex;align-items:center;gap:6px;font-size:0.84rem;color:#444;"><span style="color:#5b9bd5;">${fi.wind}</span> Émissions GES : <strong>${p.dpe_ges} kg CO₂/m²/an</strong></div>` : ''}
-          ${p.dpe_cout_min && p.dpe_cout_max ? `<div style="display:flex;align-items:center;gap:6px;font-size:0.84rem;color:#444;"><span style="color:#3D5A47;">${fi.euro}</span> Coût estimé : <strong>${parseInt(p.dpe_cout_min).toLocaleString('fr-FR')} – ${parseInt(p.dpe_cout_max).toLocaleString('fr-FR')} €/an</strong></div>` : ''}
+        <div style="display:flex;flex-direction:column;gap:8px;flex-shrink:0;">
+          ${p.dpe_conso_energie ? `<div style="display:flex;align-items:center;gap:8px;font-size:0.82rem;color:#2a3a2e;"><span style="color:#f5a623;">${fi.bolt}</span> <span>Consommation : <strong>${p.dpe_conso_energie} kWh/m²/an</strong></span></div>` : ''}
+          ${p.dpe_ges ? `<div style="display:flex;align-items:center;gap:8px;font-size:0.82rem;color:#2a3a2e;"><span style="color:#5b9bd5;">${fi.wind}</span> <span>Émissions GES : <strong>${p.dpe_ges} kg CO₂/m²/an</strong></span></div>` : ''}
+          ${p.dpe_cout_min && p.dpe_cout_max ? `<div style="display:flex;align-items:center;gap:8px;font-size:0.82rem;color:#2a3a2e;"><span style="color:#C4785A;">${fi.euro}</span> <span>Coût estimé : <strong>${parseInt(p.dpe_cout_min).toLocaleString('fr-FR')} – ${parseInt(p.dpe_cout_max).toLocaleString('fr-FR')} €/an</strong></span></div>` : ''}
         </div>
       </div>
     </div>` : ''}
 
     <!-- ── ÉQUIPEMENTS ── -->
     ${p.equipment ? `
-    <div style="background:#fff;border-top:1px solid #e8e0d6;padding:18px 32px;">
-      <div style="font-size:0.6rem;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:#3D5A47;margin-bottom:10px;">Équipements inclus</div>
-      <div style="display:flex;flex-wrap:wrap;gap:6px;">
-        ${p.equipment.split(',').map(e => `<span style="padding:4px 13px;background:#f0f5f1;border:1px solid #c8ddd0;border-radius:16px;font-size:0.8rem;color:#1a3a2a;font-weight:500;">${e.trim()}</span>`).join('')}
+    <div style="background:#fff;border-top:1px solid rgba(61,90,71,0.08);padding:18px 22px;">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;">
+        <div style="width:3px;height:18px;background:#C4785A;border-radius:2px;flex-shrink:0;"></div>
+        <span style="font-size:0.6rem;font-weight:700;text-transform:uppercase;letter-spacing:0.14em;color:#1C2E22;">Équipements inclus</span>
+      </div>
+      <div style="display:flex;flex-wrap:wrap;gap:7px;">
+        ${p.equipment.split(',').map(e => `<span style="padding:5px 13px;background:#FAFAF8;border:1px solid rgba(61,90,71,0.18);border-radius:20px;font-size:0.78rem;color:#1C2E22;font-weight:500;">${e.trim()}</span>`).join('')}
       </div>
     </div>` : ''}
 
     <!-- ── TRAVAUX RÉCENTS ── -->
     ${_travauxFiche.length ? `
-    <div style="background:#fff;border-top:1px solid #e8e0d6;padding:18px 32px;">
-      <div style="display:flex;align-items:center;gap:6px;font-size:0.6rem;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:#3D5A47;margin-bottom:12px;"><span style="color:#3D5A47;">${fi.wrench}</span>Travaux récents</div>
+    <div style="background:#fff;border-top:1px solid rgba(61,90,71,0.08);padding:18px 22px;">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;">
+        <div style="width:3px;height:18px;background:#3D5A47;border-radius:2px;flex-shrink:0;"></div>
+        <span style="font-size:0.6rem;font-weight:700;text-transform:uppercase;letter-spacing:0.14em;color:#1C2E22;">Travaux récents</span>
+      </div>
       <div style="display:flex;flex-wrap:wrap;gap:8px;">
-        ${_travauxFiche.map(t => `<div style="display:inline-flex;align-items:center;gap:7px;padding:7px 16px;background:#f0f5f1;border:1.5px solid #c8ddd0;border-radius:8px;font-size:0.84rem;font-weight:600;color:#1a3a2a;"><span style="color:#3D5A47;font-size:1rem;">✓</span>${t}</div>`).join('')}
+        ${_travauxFiche.map(t => `<div style="display:inline-flex;align-items:center;gap:8px;padding:7px 15px;background:#FAFAF8;border:1.5px solid rgba(61,90,71,0.18);border-radius:10px;font-size:0.82rem;font-weight:600;color:#1C2E22;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#3D5A47" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>${t}</div>`).join('')}
       </div>
     </div>` : ''}
 
     <!-- ── VISITE VIRTUELLE ── -->
     ${p.virtual_tour_url ? `
-    <div style="background:#fff;border-top:1px solid #e8e0d6;padding:16px 32px;">
-      <a href="${p.virtual_tour_url}" target="_blank" style="display:flex;align-items:center;gap:12px;padding:12px 18px;background:#f0f5f1;border-radius:10px;color:#3D5A47;text-decoration:none;border:1.5px solid #c8ddd0;">
-        <span style="display:inline-flex;align-items:center;justify-content:center;width:40px;height:40px;background:#e8f0f5;border-radius:10px;color:#3D5A47;flex-shrink:0;">${fi.vr}</span>
+    <div style="background:#fff;border-top:1px solid rgba(61,90,71,0.08);padding:16px 22px;">
+      <a href="${p.virtual_tour_url}" target="_blank" style="display:flex;align-items:center;gap:14px;padding:14px 18px;background:linear-gradient(135deg,rgba(61,90,71,0.05),rgba(61,90,71,0.09));border-radius:14px;color:#1C2E22;text-decoration:none;border:1.5px solid rgba(61,90,71,0.15);">
+        <span style="display:inline-flex;align-items:center;justify-content:center;width:42px;height:42px;background:#3D5A47;border-radius:11px;flex-shrink:0;">${fi.vr}</span>
         <div>
-          <div style="font-size:0.9rem;font-weight:700;color:#3D5A47;">Visite 3D interactive disponible</div>
-          <div style="font-size:0.72rem;color:#888;margin-top:2px;">${p.virtual_tour_url}</div>
+          <div style="font-size:0.88rem;font-weight:700;color:#1C2E22;">Visite 3D interactive disponible</div>
+          <div style="font-size:0.7rem;color:#3D5A47;margin-top:2px;opacity:0.75;">${p.virtual_tour_url}</div>
         </div>
-        <span style="margin-left:auto;font-size:0.8rem;color:#3D5A47;white-space:nowrap;font-weight:600;">Ouvrir →</span>
+        <span style="margin-left:auto;font-size:0.78rem;color:#C4785A;white-space:nowrap;font-weight:700;">Ouvrir →</span>
       </a>
     </div>` : ''}
 
     <!-- ── COMPOSITION DES PIÈCES ── -->
     ${roomsRows ? `
-    <div style="background:#fff;border-top:1px solid #e8e0d6;padding:20px 32px;">
-      <div style="font-size:0.6rem;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:#3D5A47;margin-bottom:12px;">Composition des pièces</div>
-      <table style="width:100%;border-collapse:collapse;border-radius:8px;overflow:hidden;">
-        <thead><tr style="background:#f8f5f0;">
-          <th style="text-align:left;padding:8px 12px;font-size:0.62rem;text-transform:uppercase;letter-spacing:0.06em;color:#999;font-weight:700;border-bottom:1px solid #eee;">Niveau</th>
-          <th style="text-align:left;padding:8px 10px;font-size:0.62rem;text-transform:uppercase;letter-spacing:0.06em;color:#999;font-weight:700;border-bottom:1px solid #eee;">Pièce</th>
-          <th style="text-align:right;padding:8px 14px 8px 0;font-size:0.62rem;text-transform:uppercase;letter-spacing:0.06em;color:#999;font-weight:700;border-bottom:1px solid #eee;">Surface</th>
+    <div style="background:#fff;border-top:1px solid rgba(61,90,71,0.08);padding:20px 22px;">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px;">
+        <div style="width:3px;height:18px;background:#3D5A47;border-radius:2px;flex-shrink:0;"></div>
+        <span style="font-size:0.6rem;font-weight:700;text-transform:uppercase;letter-spacing:0.14em;color:#1C2E22;">Composition des pièces</span>
+      </div>
+      <table style="width:100%;border-collapse:collapse;border-radius:10px;overflow:hidden;">
+        <thead><tr style="background:#FAFAF8;">
+          <th style="text-align:left;padding:9px 12px;font-size:0.6rem;text-transform:uppercase;letter-spacing:0.08em;color:#3D5A47;font-weight:700;border-bottom:1px solid rgba(61,90,71,0.1);opacity:0.75;">Niveau</th>
+          <th style="text-align:left;padding:9px 10px;font-size:0.6rem;text-transform:uppercase;letter-spacing:0.08em;color:#3D5A47;font-weight:700;border-bottom:1px solid rgba(61,90,71,0.1);opacity:0.75;">Pièce</th>
+          <th style="text-align:right;padding:9px 14px 9px 0;font-size:0.6rem;text-transform:uppercase;letter-spacing:0.08em;color:#3D5A47;font-weight:700;border-bottom:1px solid rgba(61,90,71,0.1);opacity:0.75;">Surface</th>
         </tr></thead>
         <tbody>${roomsRows}</tbody>
       </table>
@@ -5213,96 +5280,100 @@ function buildFicheHtml() {
 
     <!-- ── PHOTOS PRO ── -->
     ${proPhotos.length > 0 ? `
-    <div style="background:#f2f0eb;border-top:3px solid #3D5A47;padding:24px 32px 20px;">
-      <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #ddd8d0;">
-        <span style="display:inline-flex;align-items:center;justify-content:center;width:40px;height:40px;background:#f0f5f1;border-radius:10px;color:#3D5A47;flex-shrink:0;">${fi.camera}</span>
+    <div style="background:#FAFAF8;border-top:2px solid #1C2E22;padding:22px 20px 18px;">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
+        <div style="width:36px;height:36px;background:#1C2E22;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">${fi.camera}</div>
         <div>
-          <div style="font-size:1.1rem;font-weight:700;color:#1A1A16;">Photos professionnelles</div>
-          <div style="font-size:0.72rem;color:#888;margin-top:1px;">${proPhotos.length} photo${proPhotos.length>1?'s':''} · Cliquer pour agrandir</div>
+          <div style="font-size:1rem;font-weight:700;color:#1C2E22;">Photos professionnelles</div>
+          <div style="font-size:0.68rem;color:#3D5A47;margin-top:1px;opacity:0.7;">${proPhotos.length} photo${proPhotos.length>1?'s':''} · Toucher pour agrandir</div>
         </div>
       </div>
-      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;">
-        ${proPhotos.map((ph,i) => `<div style="aspect-ratio:4/3;overflow:hidden;border-radius:8px;background:#e8e0d6;cursor:zoom-in;" onclick="openLightbox('pro',${i})">
-          <img src="${ph.url||ph.file_path}" style="width:100%;height:100%;object-fit:cover;transition:transform 0.22s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform=''" alt="">
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;">
+        ${proPhotos.map((ph,i) => `<div style="aspect-ratio:4/3;overflow:hidden;border-radius:10px;background:#ddd8d0;cursor:zoom-in;" onclick="openLightbox('pro',${i})">
+          <img src="${ph.url||ph.file_path}" style="width:100%;height:100%;object-fit:cover;transition:transform 0.25s;" onmouseover="this.style.transform='scale(1.04)'" onmouseout="this.style.transform=''" alt="">
         </div>`).join('')}
       </div>
     </div>` : ''}
 
     <!-- ── PHOTOS EXTÉRIEUR ── -->
     ${exterieurPhotos.length > 0 ? `
-    <div style="background:#f2f0eb;border-top:2px solid #e0d8cc;padding:24px 32px 20px;">
-      <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #ddd8d0;">
-        <span style="display:inline-flex;align-items:center;justify-content:center;width:40px;height:40px;background:#eaf1fb;border-radius:10px;color:#4A72A8;flex-shrink:0;">${fi.home}</span>
+    <div style="background:#FAFAF8;border-top:1px solid rgba(61,90,71,0.1);padding:22px 20px 18px;">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
+        <div style="width:36px;height:36px;background:rgba(61,90,71,0.1);border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;color:#3D5A47;">${fi.home}</div>
         <div>
-          <div style="font-size:1.1rem;font-weight:700;color:#1A1A16;">Extérieur &amp; façade</div>
-          <div style="font-size:0.72rem;color:#888;margin-top:1px;">${exterieurPhotos.length} photo${exterieurPhotos.length>1?'s':''} · Façade, jardin, terrasse, vue de rue</div>
+          <div style="font-size:1rem;font-weight:700;color:#1C2E22;">Extérieur &amp; façade</div>
+          <div style="font-size:0.68rem;color:#3D5A47;margin-top:1px;opacity:0.7;">${exterieurPhotos.length} photo${exterieurPhotos.length>1?'s':''} · Façade, jardin, terrasse</div>
         </div>
       </div>
-      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;">
-        ${exterieurPhotos.map((ph,i) => `<div style="aspect-ratio:4/3;overflow:hidden;border-radius:8px;background:#e8e0d6;cursor:zoom-in;" onclick="openLightbox('exterieur',${i})">
-          <img src="${ph.url||ph.file_path}" style="width:100%;height:100%;object-fit:cover;transition:transform 0.22s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform=''" alt="">
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;">
+        ${exterieurPhotos.map((ph,i) => `<div style="aspect-ratio:4/3;overflow:hidden;border-radius:10px;background:#ddd8d0;cursor:zoom-in;" onclick="openLightbox('exterieur',${i})">
+          <img src="${ph.url||ph.file_path}" style="width:100%;height:100%;object-fit:cover;transition:transform 0.25s;" onmouseover="this.style.transform='scale(1.04)'" onmouseout="this.style.transform=''" alt="">
         </div>`).join('')}
       </div>
     </div>` : ''}
 
     <!-- ── PHOTOS DÉCOUVERTE ── -->
     ${decouvertePhotos.length > 0 ? `
-    <div style="background:#f2f0eb;border-top:2px solid #e0d8cc;padding:24px 32px 20px;">
-      <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #ddd8d0;">
-        <span style="display:inline-flex;align-items:center;justify-content:center;width:40px;height:40px;background:#f0f5f1;border-radius:10px;color:#3D5A47;flex-shrink:0;">${fi.sofa}</span>
+    <div style="background:#FAFAF8;border-top:1px solid rgba(61,90,71,0.1);padding:22px 20px 18px;">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
+        <div style="width:36px;height:36px;background:rgba(196,120,90,0.1);border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;color:#C4785A;">${fi.sofa}</div>
         <div>
-          <div style="font-size:1.1rem;font-weight:700;color:#1A1A16;">Photos immersives</div>
-          <div style="font-size:0.72rem;color:#888;margin-top:1px;">${decouvertePhotos.length} photo${decouvertePhotos.length>1?'s':''} · Pièces de vie, intérieur</div>
+          <div style="font-size:1rem;font-weight:700;color:#1C2E22;">Photos immersives</div>
+          <div style="font-size:0.68rem;color:#3D5A47;margin-top:1px;opacity:0.7;">${decouvertePhotos.length} photo${decouvertePhotos.length>1?'s':''} · Pièces de vie, intérieur</div>
         </div>
       </div>
-      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;">
-        ${decouvertePhotos.map((ph,i) => `<div style="aspect-ratio:4/3;overflow:hidden;border-radius:8px;background:#e8e0d6;cursor:zoom-in;" onclick="openLightbox('decouverte',${i})">
-          <img src="${ph.url||ph.file_path}" style="width:100%;height:100%;object-fit:cover;transition:transform 0.22s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform=''" alt="">
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;">
+        ${decouvertePhotos.map((ph,i) => `<div style="aspect-ratio:4/3;overflow:hidden;border-radius:10px;background:#ddd8d0;cursor:zoom-in;" onclick="openLightbox('decouverte',${i})">
+          <img src="${ph.url||ph.file_path}" style="width:100%;height:100%;object-fit:cover;transition:transform 0.25s;" onmouseover="this.style.transform='scale(1.04)'" onmouseout="this.style.transform=''" alt="">
         </div>`).join('')}
       </div>
     </div>` : ''}
 
     <!-- ── PHOTOS DÉTAILS ── -->
     ${detailsPhotos.length > 0 ? `
-    <div style="background:#f2f0eb;border-top:2px solid #e0d8cc;padding:24px 32px 20px;">
-      <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #ddd8d0;">
-        <span style="display:inline-flex;align-items:center;justify-content:center;width:40px;height:40px;background:#f8f5f0;border-radius:10px;color:#888;flex-shrink:0;">${fi.zoom}</span>
+    <div style="background:#FAFAF8;border-top:1px solid rgba(61,90,71,0.1);padding:22px 20px 18px;">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
+        <div style="width:36px;height:36px;background:rgba(61,90,71,0.07);border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;color:#555;">${fi.zoom}</div>
         <div>
-          <div style="font-size:1.1rem;font-weight:700;color:#1A1A16;">Photos des détails techniques</div>
-          <div style="font-size:0.72rem;color:#888;margin-top:1px;">${detailsPhotos.length} photo${detailsPhotos.length>1?'s':''} · Éléments à connaître avant une visite</div>
+          <div style="font-size:1rem;font-weight:700;color:#1C2E22;">Détails techniques</div>
+          <div style="font-size:0.68rem;color:#3D5A47;margin-top:1px;opacity:0.7;">${detailsPhotos.length} photo${detailsPhotos.length>1?'s':''} · Éléments à connaître</div>
         </div>
       </div>
-      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;">
-        ${detailsPhotos.map((ph,i) => `<div style="aspect-ratio:4/3;overflow:hidden;border-radius:8px;background:#e8e0d6;border:1px solid #ccc8c0;cursor:zoom-in;" onclick="openLightbox('details',${i})">
-          <img src="${ph.url||ph.file_path}" style="width:100%;height:100%;object-fit:cover;transition:transform 0.22s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform=''" alt="">
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;">
+        ${detailsPhotos.map((ph,i) => `<div style="aspect-ratio:4/3;overflow:hidden;border-radius:10px;background:#ddd8d0;cursor:zoom-in;" onclick="openLightbox('details',${i})">
+          <img src="${ph.url||ph.file_path}" style="width:100%;height:100%;object-fit:cover;transition:transform 0.25s;" onmouseover="this.style.transform='scale(1.04)'" onmouseout="this.style.transform=''" alt="">
         </div>`).join('')}
       </div>
     </div>` : ''}
 
     <!-- ── DOCUMENTS ── -->
     ${publicDocs.length > 0 ? `
-    <div style="background:#fff;border-top:1px solid #e8e0d6;padding:20px 32px;">
-      <div style="display:flex;align-items:center;gap:6px;font-size:0.6rem;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:#3D5A47;margin-bottom:12px;"><span style="color:#3D5A47;">${fi.clip}</span>Documents fournis</div>
-      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:8px;">
+    <div style="background:#fff;border-top:1px solid rgba(61,90,71,0.08);padding:20px 22px;">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px;">
+        <div style="width:3px;height:18px;background:#3D5A47;border-radius:2px;flex-shrink:0;"></div>
+        <span style="font-size:0.6rem;font-weight:700;text-transform:uppercase;letter-spacing:0.14em;color:#1C2E22;">Documents fournis</span>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:8px;">
         ${publicDocs.map(function(doc) {
           var m = DOC_META[doc.doc_type] || DOC_META.autre;
-          return '<a href="' + doc.url + '" target="_blank" rel="noopener" style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:#f8f9fa;border:1.5px solid #e8e0d6;border-radius:8px;text-decoration:none;color:inherit;">'
-            + '<div style="width:34px;height:34px;border-radius:8px;background:' + m.color + ';display:flex;align-items:center;justify-content:center;flex-shrink:0;color:' + m.text + ';">' + fi.clip + '</div>'
-            + '<div style="min-width:0;"><div style="font-size:0.8rem;font-weight:700;color:#1a1a1a;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" title="' + doc.name + '">' + doc.name + '</div>'
-            + '<div style="font-size:0.62rem;color:' + m.text + ';background:' + m.color + ';padding:1px 7px;border-radius:10px;display:inline-block;margin-top:3px;font-weight:700;text-transform:uppercase;letter-spacing:0.04em;">' + m.label + '</div></div></a>';
+          return '<a href="' + doc.url + '" target="_blank" rel="noopener" style="display:flex;align-items:center;gap:10px;padding:11px 13px;background:#FAFAF8;border:1.5px solid rgba(61,90,71,0.12);border-radius:12px;text-decoration:none;color:inherit;">'
+            + '<div style="width:34px;height:34px;border-radius:9px;background:' + m.color + ';display:flex;align-items:center;justify-content:center;flex-shrink:0;color:' + m.text + ';">' + fi.clip + '</div>'
+            + '<div style="min-width:0;"><div style="font-size:0.78rem;font-weight:700;color:#1C2E22;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" title="' + doc.name + '">' + doc.name + '</div>'
+            + '<div style="font-size:0.6rem;color:' + m.text + ';background:' + m.color + ';padding:2px 8px;border-radius:10px;display:inline-block;margin-top:3px;font-weight:700;text-transform:uppercase;letter-spacing:0.04em;">' + m.label + '</div></div></a>';
         }).join('')}
       </div>
     </div>` : ''}
 
     <!-- ── FOOTER ── -->
-    <div style="background:linear-gradient(135deg,#2a3e32,#3D5A47);padding:16px 32px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
+    <div style="background:#1C2E22;padding:20px 24px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;">
       <div>
-        <div style="font-size:0.9rem;font-weight:700;color:#fff;" class="fiche-seller-name">Chargement...</div>
-        <div style="font-size:0.76rem;color:rgba(255,255,255,0.6);" class="fiche-seller-phone"></div>
+        <div style="font-size:0.6rem;color:rgba(196,120,90,0.7);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:4px;">Contact vendeur</div>
+        <div style="font-size:0.92rem;font-weight:700;color:#fff;" class="fiche-seller-name">Chargement...</div>
+        <div style="font-size:0.76rem;color:rgba(255,255,255,0.5);margin-top:2px;" class="fiche-seller-phone"></div>
       </div>
       <div style="text-align:right;">
-        <div style="display:flex;align-items:center;gap:4px;font-size:0.6rem;color:rgba(255,255,255,0.4);"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>Dossier sans documents confidentiels</div>
-        <div style="font-size:0.58rem;color:rgba(255,255,255,0.3);margin-top:2px;">Documents notariaux exclus · Généré par Vendu Par Moi</div>
+        <div style="font-family:'Cormorant Garamond',serif;font-size:1.1rem;color:rgba(255,255,255,0.35);font-weight:600;letter-spacing:0.02em;">Vendu Par Moi</div>
+        <div style="font-size:0.58rem;color:rgba(255,255,255,0.2);margin-top:3px;">Documents notariaux exclus · Généré le ${today}</div>
       </div>
     </div>
   </div>`;
