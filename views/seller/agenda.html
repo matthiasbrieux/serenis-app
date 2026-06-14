@@ -2625,11 +2625,22 @@ fetch('/api/notifications/read-by-type', {
 }).catch(() => {});
 
 loadData().then(() => {
+  const _urlDate = new URLSearchParams(window.location.search).get('date');
+  if (_urlDate && /^\d{4}-\d{2}-\d{2}$/.test(_urlDate)) {
+    const [yr, mo, dy] = _urlDate.split('-').map(Number);
+    calDate = new Date(yr, mo - 1, 1);
+    calSelected = _urlDate;
+  }
   renderCalendar();
   renderAvailMonth();
   loadNotifications();
   loadCompromis();
-  if (window.location.hash) {
+  if (_urlDate) {
+    setTimeout(() => {
+      const cal = document.querySelector('.dash-cal-primary');
+      if (cal) cal.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 300);
+  } else if (window.location.hash) {
     const target = document.querySelector(window.location.hash);
     if (target) setTimeout(() => target.scrollIntoView({ behavior: 'smooth', block: 'start' }), 200);
   }
