@@ -1320,13 +1320,16 @@ function copyVisitConfirmSms(visitId) {
   }
   document.getElementById('dbRappelCopyBtn').innerHTML = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:middle;margin-right:5px;"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>Copier le SMS';
   document.getElementById('dbRappelCopyBtn').classList.remove('copied');
-  document.getElementById('dbRappelOverlay').classList.add('active');
+  const overlay = document.getElementById('dbRappelOverlay');
+  overlay._visitId = visitId;
+  overlay.classList.add('active');
 }
 function closeDashModal() {
   document.getElementById('dbRappelOverlay').classList.remove('active');
 }
 function copyDashRappelSms(btn) {
   const text = document.getElementById('dbRappelText').textContent;
+  const id = document.getElementById('dbRappelOverlay')._visitId;
   navigator.clipboard.writeText(text).then(() => {
     btn.textContent = '✓ SMS copié !';
     btn.classList.add('copied');
@@ -1334,6 +1337,7 @@ function copyDashRappelSms(btn) {
       btn.innerHTML = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:middle;margin-right:5px;"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>Copier le SMS';
       btn.classList.remove('copied');
     }, 2500);
+    if (id) fetch(`/api/visits/${id}/reminder`, { method: 'POST' }).catch(() => {});
   });
 }
 
