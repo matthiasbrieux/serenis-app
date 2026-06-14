@@ -1131,7 +1131,7 @@
     <div class="confirm-sms-check" style="background:linear-gradient(135deg,#b45309,#C4785A);">
       <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
     </div>
-    <div class="confirm-sms-title">Rappel de visite</div>
+    <div class="confirm-sms-title" id="rappelSmsTitle">Rappel de visite</div>
     <div class="confirm-sms-buyer" id="rappelSmsBuyer">
       <div class="confirm-sms-buyer-avatar" id="rappelSmsBuyerAvatar" style="background:linear-gradient(135deg,#b45309,#C4785A);"></div>
       <div class="confirm-sms-buyer-info">
@@ -1795,10 +1795,15 @@ function sendReminder(id) {
   const _n2=new Date(); const _todayStr=`${_n2.getFullYear()}-${String(_n2.getMonth()+1).padStart(2,'0')}-${String(_n2.getDate()).padStart(2,'0')}`;
   const _tomorrow=new Date(_n2); _tomorrow.setDate(_tomorrow.getDate()+1);
   const _tomorrowStr=`${_tomorrow.getFullYear()}-${String(_tomorrow.getMonth()+1).padStart(2,'0')}-${String(_tomorrow.getDate()).padStart(2,'0')}`;
+  const isPast = v.visit_date < _todayStr;
   const isReallyTomorrow = v.visit_date === _tomorrowStr;
-  const smsText = isReallyTomorrow
-    ? `Bonjour ${v.buyer_name||prenom}, je vous rappelle notre visite prévue demain ${dateLabel} à ${time}.${adresseText}${lienText}\n\nN'hésitez pas à me prévenir si vous avez un empêchement.\n${sellerNom || 'Votre vendeur'}`
-    : `Bonjour ${v.buyer_name||prenom}, je vous rappelle notre visite prévue le ${dateLabel} à ${time}.${adresseText}${lienText}\n\nN'hésitez pas à me prévenir si vous avez un empêchement.\n${sellerNom || 'Votre vendeur'}`;
+  const smsText = isPast
+    ? `Bonjour ${v.buyer_name||prenom}, suite à notre visite du ${dateLabel}, je me permets de vous demander où vous en êtes dans votre réflexion.\n\nN'hésitez pas à me contacter si vous avez des questions ou souhaitez organiser une deuxième visite.${lienText}\n\n${sellerNom || 'Votre vendeur'}`
+    : isReallyTomorrow
+      ? `Bonjour ${v.buyer_name||prenom}, je vous rappelle notre visite prévue demain ${dateLabel} à ${time}.${adresseText}${lienText}\n\nN'hésitez pas à me prévenir si vous avez un empêchement.\n${sellerNom || 'Votre vendeur'}`
+      : `Bonjour ${v.buyer_name||prenom}, je vous rappelle notre visite prévue le ${dateLabel} à ${time}.${adresseText}${lienText}\n\nN'hésitez pas à me prévenir si vous avez un empêchement.\n${sellerNom || 'Votre vendeur'}`;
+  const titleEl = document.getElementById('rappelSmsTitle');
+  if (titleEl) titleEl.textContent = isPast ? 'Relance après visite' : 'Rappel de visite';
 
   document.getElementById('rappelSmsBuyerAvatar').textContent = initiales;
   document.getElementById('rappelSmsBuyerName').textContent = v.buyer_name || '—';
