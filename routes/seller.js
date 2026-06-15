@@ -202,9 +202,9 @@ router.post('/api/property', requireAuth, express.json(), (req, res) => {
 });
 
 // Photo upload
-const MAX_PHOTOS_PER_PROPERTY = 100;
+const MAX_PHOTOS_PER_PROPERTY = 150;
 
-router.post('/api/property/photos', requireAuth, uploadPhoto.array('photos', 50), async (req, res) => {
+router.post('/api/property/photos', requireAuth, uploadPhoto.array('photos', 150), async (req, res) => {
   const property = db.prepare('SELECT id FROM properties WHERE seller_id = ?').get(req.seller.id);
   if (!property) return res.json({ error: 'Créez d\'abord la fiche du bien' });
 
