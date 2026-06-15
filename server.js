@@ -53,6 +53,8 @@ app.get('/', (req, res) => {
 
 // Pages publiques statiques
 app.get('/cgv', (req, res) => { res.set('Cache-Control', 'no-store, no-cache, must-revalidate'); res.sendFile(path.join(__dirname, 'public', 'cgv.html')); });
+app.get('/mentions-legales', (req, res) => { res.set('Cache-Control', 'no-store, no-cache, must-revalidate'); res.sendFile(path.join(__dirname, 'public', 'mentions-legales.html')); });
+app.get('/confidentialite', (req, res) => { res.set('Cache-Control', 'no-store, no-cache, must-revalidate'); res.sendFile(path.join(__dirname, 'public', 'confidentialite.html')); });
 app.get('/tarifs', (req, res) => { res.set('Cache-Control', 'no-store, no-cache, must-revalidate'); res.sendFile(path.join(__dirname, 'public', 'tarifs.html')); });
 app.get('/faq', (req, res) => { res.set('Cache-Control', 'no-store, no-cache, must-revalidate'); res.sendFile(path.join(__dirname, 'public', 'faq.html')); });
 app.get('/register', (req, res) => { res.set('Cache-Control', 'no-store, no-cache, must-revalidate'); res.sendFile(path.join(__dirname, 'public', 'register.html')); });
@@ -125,8 +127,6 @@ app.get('/sitemap.xml', (req, res) => {
   res.send(`<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${[...staticUrls,...propUrls].join('\n')}\n</urlset>`);
 });
 
-// Redirect mentions légales → section dans CGV
-app.get('/mentions-legales', (req, res) => res.redirect(301, '/cgv#mentions-legales'));
 
 // Contact form
 app.post('/api/contact', async (req, res) => {
