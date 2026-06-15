@@ -442,14 +442,32 @@ router.post('/api/property/generate-description', requireAuth, express.json(), a
   try {
     const response = await client.messages.create({
       model: 'claude-haiku-4-5-20251001',
-      max_tokens: 700,
-      system: `Tu es un expert en rédaction d'annonces immobilières premium pour particuliers en France.\nTu dois rédiger une annonce accrocheuse, authentique et complète en 3-4 paragraphes (300-400 mots).\nStructure : 1) Phrase d'accroche émotionnelle 2) Description des espaces de vie 3) Atouts du bien et environnement 4) Appel à l'action.\nTon : chaleureux, précis, sans superlatifs creux. Évite "magnifique", "coup de cœur", "exceptionnel".\nInclus les chiffres clés naturellement dans le texte.\nCommence immédiatement par le texte de l'annonce, sans préambule.`,
+      max_tokens: 500,
+      system: `Tu es un rédacteur d'annonces immobilières expert pour particuliers vendeurs en France.
+Tu rédiges des annonces COURTES, PERCUTANTES, 100% factuelles. Total : 10 à 12 lignes maximum.
+MOTS INTERDITS : havre de paix, écrin de verdure, nid douillet, coup de cœur, exceptionnel, magnifique, paradis, idéal pour, rêve, charme intemporel, sérénité, cosy.
+Retourne UNIQUEMENT un objet JSON valide, sans texte avant ni après, avec exactement ces 5 clés :
+{
+  "accroche": "< 60 caractères. Format : Type + Surface + Lieu + 1 atout clé. Factuel, percutant.",
+  "presentation": "2 lignes max. Description rapide et impactante du bien et de son contexte global.",
+  "espaces": "3 à 4 lignes max. Pièces, surfaces, configuration, atouts intérieurs. Chiffres précis.",
+  "localisation": "2 lignes max. Quartier précis, distances réelles, commerces et commodités.",
+  "conclusion": "1 à 2 lignes max. Invitation claire à contacter + rappel du prix de vente."
+}`,
       messages: [{
         role: 'user',
-        content: `Rédige une annonce immobilière pour ce bien. Respecte la structure en 4 parties et vise 300-400 mots. Sois précis, honnête, et mets en valeur les vrais atouts du bien.\n\nCaractéristiques :\n${details}`
+        content: `Génère l'annonce structurée en JSON pour ce bien. Sois factuel, moderne et ultra-vendeur. Aucun blabla poétique.\n\nCaractéristiques :\n${details}`
       }]
     });
-    res.json({ description: response.content[0].text });
+    const raw = response.content[0].text.trim();
+    let blocks;
+    try {
+      const jsonMatch = raw.match(/\{[\s\S]*\}/);
+      blocks = JSON.parse(jsonMatch ? jsonMatch[0] : raw);
+    } catch(parseErr) {
+      return res.json({ description: raw });
+    }
+    res.json({ blocks });
   } catch (err) {
     console.error('generate-description error:', err.message);
     res.json({ error: 'Génération indisponible, réessayez.' });

@@ -330,6 +330,19 @@
     .btn-ai:disabled { opacity:0.6;cursor:not-allowed;transform:none; }
     .ai-generating { font-size:0.82rem;color:#888;font-style:italic;margin-left:8px; }
 
+    /* ── AI 5-blocs structured preview ── */
+    .ai-preview-wrap { background:#FAFAF8; border:1px solid #E8E3DB; border-radius:14px; padding:16px 18px; margin-top:14px; }
+    .ai-preview-title { font-size:0.68rem; font-weight:700; text-transform:uppercase; letter-spacing:0.1em; color:#3D5A47; margin-bottom:12px; display:flex; align-items:center; gap:7px; }
+    .ai-bloc-row { display:flex; align-items:flex-start; gap:12px; padding:12px 14px; background:#fff; border-radius:10px; margin-bottom:7px; box-shadow:0 1px 4px rgba(0,0,0,0.04); }
+    .ai-bloc-row:last-child { margin-bottom:0; background:linear-gradient(135deg,#1C2E22 0%,#2d4535 100%); }
+    .ai-bloc-num { width:30px; height:30px; border-radius:7px; background:#3D5A47; color:#fff; font-size:0.84rem; font-weight:700; display:flex; align-items:center; justify-content:center; flex-shrink:0; font-family:'DM Sans',sans-serif; }
+    .ai-bloc-row:last-child .ai-bloc-num { background:rgba(255,255,255,0.18); }
+    .ai-bloc-body { flex:1; min-width:0; }
+    .ai-bloc-label { font-size:0.64rem; font-weight:700; text-transform:uppercase; letter-spacing:0.09em; color:#3D5A47; margin-bottom:3px; }
+    .ai-bloc-row:last-child .ai-bloc-label { color:#A8D4B5; }
+    .ai-bloc-text { font-size:0.87rem; color:#1C2E22; line-height:1.6; white-space:pre-wrap; }
+    .ai-bloc-row:last-child .ai-bloc-text { color:#fff; }
+
     /* ── Photo grid enhanced ─────────────────────── */
     .photo-badge-main {
       position:absolute;top:8px;left:8px;
@@ -2086,8 +2099,49 @@
             </span>
           </div>
           <div id="aiDescPreview" style="display:none;margin-top:12px;">
-            <textarea id="aiDescText" rows="8" style="width:100%;padding:12px;border:1.5px solid #3D5A47;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:0.9rem;line-height:1.6;resize:vertical;box-sizing:border-box;background:#f0f7f2;color:#222;" oninput="(function(el){var c=el.value.trim()?el.value.trim().split(/\s+/).length:0;var s=document.getElementById('aiDescWordCount');if(s)s.textContent=c;})(this)"></textarea>
-            <div style="text-align:right;font-size:0.78rem;color:#888;margin-top:3px;"><span id="aiDescWordCount">0</span> mot(s)</div>
+            <div class="ai-preview-wrap">
+              <div class="ai-preview-title">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                Annonce générée — 5 blocs structurés
+              </div>
+              <div class="ai-bloc-row">
+                <div class="ai-bloc-num">1</div>
+                <div class="ai-bloc-body">
+                  <div class="ai-bloc-label">Phrase d'accroche</div>
+                  <div class="ai-bloc-text" id="aiBloc1Text"></div>
+                </div>
+              </div>
+              <div class="ai-bloc-row">
+                <div class="ai-bloc-num">2</div>
+                <div class="ai-bloc-body">
+                  <div class="ai-bloc-label">Présentation générale</div>
+                  <div class="ai-bloc-text" id="aiBloc2Text"></div>
+                </div>
+              </div>
+              <div class="ai-bloc-row">
+                <div class="ai-bloc-num">3</div>
+                <div class="ai-bloc-body">
+                  <div class="ai-bloc-label">Description des espaces</div>
+                  <div class="ai-bloc-text" id="aiBloc3Text"></div>
+                </div>
+              </div>
+              <div class="ai-bloc-row">
+                <div class="ai-bloc-num">4</div>
+                <div class="ai-bloc-body">
+                  <div class="ai-bloc-label">Localisation &amp; environnement</div>
+                  <div class="ai-bloc-text" id="aiBloc4Text"></div>
+                </div>
+              </div>
+              <div class="ai-bloc-row">
+                <div class="ai-bloc-num">5</div>
+                <div class="ai-bloc-body">
+                  <div class="ai-bloc-label">Conclusion</div>
+                  <div class="ai-bloc-text" id="aiBloc5Text"></div>
+                </div>
+              </div>
+            </div>
+            <textarea id="aiDescText" style="display:none;"></textarea>
+            <div style="text-align:right;font-size:0.78rem;color:#888;margin-top:6px;"><span id="aiDescWordCount">0</span> mot(s)</div>
           </div>
           <div class="coach-tip" style="margin-top:8px;">
             <span class="coach-tip-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></span>
@@ -4826,10 +4880,21 @@ async function generateAIDescription() {
       body: JSON.stringify({ property })
     });
     const data = await res.json();
-    if (data.description) {
-      aiDescText.value = data.description;
-      const wc = data.description.trim().split(/\s+/).length;
-      if (aiWordCount) aiWordCount.textContent = wc;
+    if (data.blocks || data.description) {
+      if (data.blocks) {
+        const b = data.blocks;
+        document.getElementById('aiBloc1Text').textContent = b.accroche || '';
+        document.getElementById('aiBloc2Text').textContent = b.presentation || '';
+        document.getElementById('aiBloc3Text').textContent = b.espaces || '';
+        document.getElementById('aiBloc4Text').textContent = b.localisation || '';
+        document.getElementById('aiBloc5Text').textContent = b.conclusion || '';
+        const full = [b.accroche, b.presentation, b.espaces, b.localisation, b.conclusion].filter(Boolean).join('\n\n');
+        aiDescText.value = full;
+        if (aiWordCount) aiWordCount.textContent = full.trim().split(/\s+/).length;
+      } else {
+        aiDescText.value = data.description;
+        if (aiWordCount) aiWordCount.textContent = data.description.trim().split(/\s+/).length;
+      }
       preview.style.display = 'block';
       useBtn.style.display = 'inline-block';
       regenBtn.style.display = 'inline-flex';
