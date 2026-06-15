@@ -498,4 +498,14 @@ try { db.exec("ALTER TABLE notifications ADD COLUMN link TEXT"); } catch(e) {}
 try { db.exec("ALTER TABLE properties ADD COLUMN compromis_date DATE"); } catch(e) {}
 try { db.exec("ALTER TABLE properties ADD COLUMN compromis_conditions_delay INTEGER DEFAULT 45"); } catch(e) {}
 
+// ── Nettoyage photos locales (avant Cloudinary) ─────────────────
+// Supprime les photos et documents dont l'URL commence par /uploads/
+// (stockage local éphémère Render — fichiers définitivement perdus)
+try {
+  const deletedPhotos = db.prepare("DELETE FROM property_photos WHERE url LIKE '/uploads/%'").run();
+  const deletedDocs = db.prepare("DELETE FROM property_documents WHERE url LIKE '/uploads/%'").run();
+  if (deletedPhotos.changes > 0) console.log(`🧹 Nettoyage : ${deletedPhotos.changes} photo(s) locale(s) supprimée(s) de la base`);
+  if (deletedDocs.changes > 0) console.log(`🧹 Nettoyage : ${deletedDocs.changes} document(s) local/aux supprimé(s) de la base`);
+} catch(e) {}
+
 module.exports = db;
