@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Plaquette de formation — Vendu Par Moi</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;1,400&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --green-dark: #1C2E22;
+      --green: #3D5A47;
+      --green-light: #EDF5F0;
+      --green-border: #C8DDD0;
+      --terra: #C4785A;
+      --cream: #F8F5F0;
+      --text: #1a1a1a;
+      --text-muted: #555;
+    }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--cream);
+      color: var(--text);
+      font-size: 14px;
+      line-height: 1.65;
+    }
+
+    /* ── PRINT BUTTON ── */
+    .print-bar {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 999;
+      background: var(--green-dark); color: #fff;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 12px 28px; gap: 16px;
+    }
+    .print-bar-left { font-size: 0.82rem; color: rgba(212,228,216,0.7); }
+    .print-bar-title { font-family: 'Cormorant Garamond', serif; font-size: 1.05rem; color: #F5F0E8; }
+    .btn-print {
+      background: var(--terra); color: #fff; border: none;
+      border-radius: 8px; padding: 9px 22px; font-size: 0.85rem;
+      font-weight: 700; cursor: pointer; font-family: 'DM Sans', sans-serif;
+      letter-spacing: 0.02em; display: flex; align-items: center; gap: 7px;
+    }
+    .btn-print:hover { background: #b56747; }
+
+    /* ── LAYOUT ── */
+    .plaquette { max-width: 840px; margin: 0 auto; padding: 80px 32px 60px; }
+
+    /* ── COVER ── */
+    .cover {
+      background: linear-gradient(160deg, var(--green-dark) 0%, #2d4535 100%);
+      border-radius: 20px; padding: 56px 52px 52px;
+      margin-bottom: 48px; position: relative; overflow: hidden;
+    }
+    .cover::before {
+      content: ''; position: absolute; top: -60px; right: -60px;
+      width: 280px; height: 280px; border-radius: 50%;
+      background: rgba(255,255,255,0.03);
+    }
+    .cover-badge {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: rgba(168,212,181,0.12); border: 1px solid rgba(168,212,181,0.25);
+      border-radius: 100px; padding: 4px 14px;
+      font-size: 0.62rem; font-weight: 700; letter-spacing: 0.1em;
+      text-transform: uppercase; color: #A8D4B5; margin-bottom: 28px;
+    }
+    .cover-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 2.8rem; font-weight: 600; color: #F5F0E8;
+      line-height: 1.15; margin-bottom: 16px;
+    }
+    .cover-sub {
+      font-size: 0.95rem; color: rgba(212,228,216,0.75);
+      line-height: 1.65; max-width: 480px; margin-bottom: 40px;
+    }
+    .cover-stats {
+      display: flex; gap: 32px; flex-wrap: wrap;
+    }
+    .cover-stat-n { font-size: 1.6rem; font-weight: 700; color: #6BBF82; line-height: 1; }
+    .cover-stat-l { font-size: 0.72rem; color: rgba(212,228,216,0.55); margin-top: 3px; }
+
+    /* ── MODULE HEADER ── */
+    .module-wrap { margin-bottom: 48px; page-break-inside: avoid; }
+    .module-header {
+      background: linear-gradient(135deg, var(--green-dark) 0%, #2a4035 100%);
+      border-radius: 14px 14px 0 0; padding: 24px 28px;
+      display: flex; align-items: flex-start; gap: 18px;
+    }
+    .module-num {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 2.6rem; color: rgba(168,212,181,0.35); font-weight: 600;
+      line-height: 1; flex-shrink: 0; margin-top: 2px;
+    }
+    .module-titles { flex: 1; }
+    .module-phase {
+      font-size: 0.58rem; font-weight: 700; letter-spacing: 0.1em;
+      text-transform: uppercase; color: var(--terra); margin-bottom: 5px;
+    }
+    .module-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.55rem; color: #F5F0E8; font-weight: 600; line-height: 1.2;
+      margin-bottom: 6px;
+    }
+    .module-subtitle { font-size: 0.82rem; color: rgba(212,228,216,0.65); line-height: 1.5; }
+
+    .module-body {
+      background: #fff; border: 1.5px solid #E8E3DB;
+      border-top: none; border-radius: 0 0 14px 14px; padding: 24px 28px;
+    }
+
+    /* ── KEY POINTS ── */
+    .kp-label {
+      font-size: 0.58rem; font-weight: 700; letter-spacing: 0.1em;
+      text-transform: uppercase; color: var(--green); margin-bottom: 12px;
+    }
+    .kp-list { display: flex; flex-direction: column; gap: 7px; margin-bottom: 24px; }
+    .kp-item {
+      display: flex; align-items: flex-start; gap: 10px;
+      font-size: 0.83rem; color: var(--text); line-height: 1.55;
+    }
+    .kp-dot {
+      width: 6px; height: 6px; border-radius: 50%;
+      background: var(--green); flex-shrink: 0; margin-top: 6px;
+    }
+
+    /* ── STEP ── */
+    .step-wrap {
+      border-left: 3px solid var(--green-border);
+      padding-left: 20px; margin-bottom: 28px;
+      page-break-inside: avoid;
+    }
+    .step-title {
+      font-size: 0.68rem; font-weight: 700; letter-spacing: 0.08em;
+      text-transform: uppercase; color: var(--green); margin-bottom: 8px;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .step-meta { font-size: 0.62rem; color: #aaa; font-weight: 400; }
+    .step-speak {
+      font-size: 0.88rem; color: var(--text-muted); line-height: 1.7;
+      margin-bottom: 10px;
+    }
+
+    /* ── TIPS / WARNINGS ── */
+    .tip-list, .warn-list { display: flex; flex-direction: column; gap: 5px; margin-top: 8px; }
+    .tip-item {
+      background: var(--green-light); border-left: 2px solid var(--green);
+      border-radius: 0 6px 6px 0; padding: 6px 10px;
+      font-size: 0.78rem; color: #2d5035; line-height: 1.5;
+    }
+    .warn-item {
+      background: #FFF5F0; border-left: 2px solid var(--terra);
+      border-radius: 0 6px 6px 0; padding: 6px 10px;
+      font-size: 0.78rem; color: #7a3a20; line-height: 1.5;
+    }
+    .tip-label, .warn-label {
+      font-size: 0.58rem; font-weight: 700; letter-spacing: 0.08em;
+      text-transform: uppercase; margin-bottom: 4px;
+    }
+    .tip-label { color: var(--green); }
+    .warn-label { color: var(--terra); }
+
+    /* ── TABLE ── */
+    .p-table { width: 100%; border-collapse: collapse; margin: 10px 0; font-size: 0.8rem; }
+    .p-table th {
+      background: var(--green); color: #fff;
+      padding: 6px 10px; text-align: left; font-weight: 600; font-size: 0.72rem;
+    }
+    .p-table td {
+      padding: 6px 10px; border-bottom: 1px solid #EEE;
+      vertical-align: top; line-height: 1.5;
+    }
+    .p-table tr:nth-child(even) td { background: #FAFAF8; }
+
+    /* ── SCRIPT / DIALOGUE ── */
+    .script-wrap { background: #F4F6F4; border-radius: 10px; padding: 14px 16px; margin: 8px 0; }
+    .script-label {
+      font-size: 0.58rem; font-weight: 700; letter-spacing: 0.08em;
+      text-transform: uppercase; color: #888; margin-bottom: 10px;
+    }
+    .script-line { display: flex; gap: 8px; margin-bottom: 7px; font-size: 0.82rem; line-height: 1.5; }
+    .script-who {
+      font-size: 0.62rem; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.05em; white-space: nowrap; margin-top: 1px; min-width: 60px;
+    }
+    .script-who.v { color: var(--green); }
+    .script-who.a { color: var(--terra); }
+
+    /* ── DIVIDER ── */
+    .section-div {
+      border: none; border-top: 1.5px dashed #DDD6CC;
+      margin: 32px 0;
+    }
+
+    /* ── MAIL SECTION ── */
+    .mail-section { margin-bottom: 48px; }
+    .section-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.8rem; color: var(--green-dark); margin-bottom: 6px;
+    }
+    .section-desc { font-size: 0.82rem; color: var(--text-muted); margin-bottom: 24px; }
+    .mail-cat { margin-bottom: 28px; }
+    .mail-cat-title {
+      font-size: 0.62rem; font-weight: 700; letter-spacing: 0.1em;
+      text-transform: uppercase; color: var(--green);
+      border-bottom: 1.5px solid var(--green-border);
+      padding-bottom: 7px; margin-bottom: 14px;
+    }
+    .mail-card {
+      background: #fff; border: 1.5px solid #E8E3DB; border-radius: 10px;
+      padding: 14px 16px; margin-bottom: 10px; page-break-inside: avoid;
+    }
+    .mail-title { font-weight: 700; font-size: 0.82rem; color: var(--green-dark); margin-bottom: 8px; }
+    .mail-body {
+      font-size: 0.78rem; color: var(--text-muted); line-height: 1.8;
+      white-space: pre-wrap; font-family: 'DM Sans', sans-serif;
+    }
+
+    /* ── CHECKLIST SECTION ── */
+    .ck-section { margin-bottom: 36px; }
+    .ck-title { font-weight: 700; font-size: 0.88rem; color: var(--green-dark); margin-bottom: 10px; }
+    .ck-items { display: flex; flex-direction: column; gap: 4px; }
+    .ck-item {
+      display: flex; align-items: center; gap: 10px;
+      font-size: 0.82rem; color: var(--text-muted); line-height: 1.45;
+    }
+    .ck-box {
+      width: 16px; height: 16px; border-radius: 4px;
+      border: 1.5px solid var(--green-border); flex-shrink: 0;
+    }
+
+    /* ── PRINT STYLES ── */
+    @media print {
+      .print-bar { display: none; }
+      body { background: #fff; font-size: 11pt; }
+      .plaquette { padding: 0; max-width: 100%; }
+      .cover { border-radius: 0; page-break-after: always; print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+      .module-wrap { page-break-before: always; }
+      .module-header { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+      .tip-item { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+      .warn-item { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+      .p-table th { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+      .section-div { page-break-before: always; margin: 0; border: none; }
+      .mail-section, .ck-section { page-break-inside: avoid; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="print-bar">
+  <div>
+    <div class="print-bar-title">Vendu Par Moi</div>
+    <div class="print-bar-left">Plaquette de formation — usage interne</div>
+  </div>
+  <button class="btn-print" onclick="window.print()">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+    Imprimer / PDF
+  </button>
+</div>
+
+<div class="plaquette" id="plaquetteRoot"></div>
+
+<script>
+const MODULES = [
+  {
+    phase: 'Avant la mise en vente', num: '01', title: 'Estimer son bien',
+    subtitle: 'Fixer le bon prix dès le départ — et déclencher des offres rapides',
+    keyPoints: ['Utilisez DVF.fr + MeilleursAgents pour trianguler le prix réel du marché','Prix juste dès le départ = plus de visites + offres rapides','Un bien >45 jours sans offre doit être réévalué','DPE F/G peut impacter le prix de -10% à -20%'],
+    steps: [
+      {
+        title: 'Mes outils pour estimer', meta: '5 min · Fondamentaux',
+        speak: `Vous avez déjà une première idée de la valeur de votre bien. L'objectif est maintenant de la confirmer avec des données concrètes. Deux outils gratuits et fiables : DVF.gouv.fr pour les prix des ventes réellement signées chez le notaire, et MeilleursAgents pour les tendances du marché local. Ensemble, ils vous permettent de fixer un prix cohérent et crédible aux yeux des acheteurs.`,
+        tips: ['Sur DVF.fr, filtrez par type de bien et surface similaire (±15%) pour des comparaisons pertinentes','MeilleursAgents est idéal pour obtenir rapidement une fourchette de prix sans recevoir d\'agents'],
+        warnings: ['Ne fixez jamais votre prix uniquement sur des annonces en ligne — elles reflètent les prix demandés, pas les prix obtenus']
+      },
+      {
+        title: 'Calculer mon prix au m²', meta: '8 min · Méthode',
+        speak: `Le prix au mètre carré, c'est votre boussole. Calculez-le depuis les ventes récentes proches, puis ajustez selon vos atouts — exposition, garage, jardin, état général. L'erreur classique : surestimer de dix pourcents pour négocier. Résultat : zéro visite pendant deux mois.`,
+        table: { headers: ['Caractéristique','Impact sur le prix'], rows: [['Dernier étage avec vue','+5% à +12%'],['Rez-de-chaussée','-5% à -10%'],['Travaux importants à prévoir','-10% à -25%'],['Double exposition','+3% à +8%'],['Parking ou garage inclus','+5 000€ à +20 000€'],['DPE F ou G','-5% à -20%'],['Jardin privatif','+5% à +15%']] },
+        tips: ['Appliquez les ajustements avec modération — ne cumulez pas tous les bonus','Votre bien ne peut pas raisonnablement valoir 30% de plus que la médiane locale'],
+        warnings: ['L\'erreur classique : surestimer de 10-15% "pour négocier". Résultat : zéro visite pendant 2 mois.']
+      },
+      {
+        title: 'Votre avantage Vendu Par Moi', meta: '5 min · Stratégie',
+        speak: `À ce stade, vous n'avez pas encore fixé votre prix définitif. C'est normal. Mais grâce à la méthode Vendu Par Moi, vous avez déjà un avantage. L'équivalent des frais de commercialisation devient un levier dans votre stratégie : vous pouvez vendre plus vite, gagner plus, ou vous garder une marge de négociation. Dans tous les cas, cet avantage travaille pour vous.`,
+        tips: ['Vous pouvez combiner les stratégies selon le contexte — par exemple afficher un prix attractif puis tenir lors de la négociation','Cet avantage est le même quel que soit le prix de votre bien']
+      }
+    ]
+  },
+  {
+    phase: 'Avant la mise en vente', num: '02', title: 'Préparer sa vente',
+    subtitle: 'Avoir tous les documents prêts avant de trouver un acheteur — éviter les blocages de dernière minute',
+    keyPoints: ['Rassemblez TOUS les documents AVANT de publier l\'annonce','Envoyez un dossier complet par email AVANT chaque visite','La fiche Vendu Par Moi répond à toutes les questions — remplissez-la une fois'],
+    steps: [
+      {
+        title: 'Mes documents à réunir', meta: '10 min · Organisation',
+        speak: `Avant même de publier votre annonce, rassemblez tous vos documents. Titre de propriété, déclarations de travaux, factures — un dossier complet dès le départ inspire confiance et évite les blocages de dernière minute.`,
+        table: { headers: ['Document','Pourquoi c\'est important'], rows: [['Titre de propriété','Pièce obligatoire pour le notaire — souvent oubliée'],['Déclarations de travaux en mairie','Tout travail extérieur doit avoir une déclaration. Sans ça, l\'acheteur peut se retourner contre vous.'],['Factures de travaux','L\'acheteur peut les réclamer. Elles rassurent et justifient le prix.'],['Factures énergétiques','Gaz, électricité — utiles pour informer l\'acheteur sur les charges'],['Dernier avis de taxe foncière','L\'acheteur le demandera systématiquement']] },
+        tips: ['Rassemblez ces documents AVANT de publier votre annonce','Un dossier complet dès le départ inspire confiance et accélère la vente'],
+        warnings: ['Un travail non déclaré en mairie peut bloquer la vente ou engager votre responsabilité légale']
+      },
+      {
+        title: 'Mes diagnostics', meta: '7 min · Administratif',
+        speak: `Les diagnostics sont obligatoires, mais ici on va plus loin — on en fait un outil de sélection. Envoyez-les avant chaque visite : un acheteur qui confirme après les avoir lus, c'est un acheteur vraiment motivé.`,
+        table: { headers: ['Diagnostic','Condition','Validité'], rows: [['DPE — Diagnostic de Performance Énergétique','Toujours obligatoire','10 ans'],['État des risques et pollutions (ERP)','Toujours obligatoire','6 mois'],['Diagnostic amiante','Construction avant 1997','Illimitée si négatif'],['Diagnostic plomb (CREP)','Construction avant 1949','1 an si positif'],['Diagnostic électricité','Installation > 15 ans','3 ans'],['Diagnostic gaz','Installation > 15 ans','3 ans'],['Mesurage Loi Carrez','Appartement en copropriété uniquement','Permanent'],['Contrôle Assainissement','Assainissement individuel (fosse, micro-station…)','3 ans (variable)']] },
+        tips: ['Commandez vos diagnostics dès la décision de vendre — comptez 1 à 2 semaines de délai','Envoyez les diagnostics en amont : un acheteur qui confirme après les avoir lus est un acheteur qualifié'],
+        warnings: ['Un DPE F ou G doit être intégré dans votre prix — il impacte fortement la négociation']
+      },
+      {
+        title: 'Mon dossier vendeur', meta: '10 min · Organisation',
+        speak: `Votre fiche Vendu Par Moi, c'est votre meilleur commercial. Remplissez-la une fois en détail — exposition, travaux, chauffage, quartier — et elle filtre naturellement les acheteurs incompatibles avant même qu'ils franchissent votre porte.`,
+        table: { headers: ['Rubrique','Ce qu\'il faut renseigner — et pourquoi'], rows: [['Exposition','Nord, sud, est, ouest — précisez pour chaque pièce principale. Critère éliminatoire pour beaucoup d\'acheteurs.'],['Travaux réalisés','Indiquez chaque travaux avec l\'année précise : toiture 2019, PAC 2022, isolation 2018. Plus c\'est précis, plus ça rassure.'],['Points forts','Lumière naturelle, calme, jardin orienté, garage double, cave, terrain plat… Listez tout.'],['Vie du quartier','Boulangerie, école (nom + distance à pied), supérette, gare ou bus (durée réelle). Soyez précis.'],['Fenêtres','Simple ou double vitrage, PVC/bois/aluminium, année de pose.'],['Chauffage','Type, marque si connue, année d\'installation, dernier entretien.'],['Toiture','Type de couverture, année de dernière réfection ou révision.'],['Raison de la vente','Préparez une réponse courte, positive et rassurante.']] },
+        tips: ['Remplissez-la une fois soigneusement, utilisez-la pour toutes vos visites','Plus vous la remplissez en détail, moins vous ferez de visites inutiles']
+      },
+      {
+        title: 'Préparer ma vente efficacement', meta: '8 min · Organisation',
+        speak: `Deux dossiers, deux objectifs. Le dossier acheteur sérieux rassure après la visite. Le dossier notaire prépare le compromis. Constituez-les maintenant — quand vous aurez un acheteur, tout sera déjà prêt.`,
+        tips: ['Constituez vos deux dossiers (acheteur sérieux + notaire) AVANT d\'avoir un acquéreur','Plus vous apportez d\'informations, plus vous inspirez confiance']
+      }
+    ]
+  },
+  {
+    phase: 'Avant la mise en vente', num: '03', title: 'Annonce & Photos',
+    subtitle: 'Déclencher 2x plus de visites qualifiées grâce à une annonce qui donne envie et des photos qui vendent',
+    keyPoints: ['90% des acheteurs décident de visiter en 8 secondes sur les photos','Ne jamais écrire "prix négociable" — invite les offres basses','Titre idéal : type + surface + ville + prix + 1 atout (< 60 car.)','Dépersonnalisez votre bien — l\'acheteur doit se projeter, pas vous voir'],
+    steps: [
+      {
+        title: 'Rédiger mon annonce de pro', meta: '12 min · Copywriting',
+        speak: `Votre annonce, c'est la première impression — elle se joue en quelques secondes. Commencez par un titre accrocheur, décrivez les pièces, les atouts, le quartier. Et surtout : ne jamais écrire prix négociable — c'est une invitation directe aux offres basses.`,
+        table: { headers: ['Structure de l\'annonce','Contenu'], rows: [['1. Titre accrocheur','Type + surface + ville + 1 atout clé (< 60 caractères)'],['2. Présentation générale','Description rapide du bien et de son environnement'],['3. Description des espaces','Pièces, surfaces, configuration, atouts intérieurs'],['4. Localisation & environnement','Quartier, distances, commodités'],['5. Conclusion','Invitation à contacter + informations pratiques (DPE, taxe foncière)']] },
+        tips: ['Mentionnez toujours le DPE — les acheteurs le cherchent systématiquement','Ajoutez plan du bien, charges annuelles, travaux récents avec années'],
+        warnings: ['Ne jamais écrire "prix négociable" — invite les offres basses','Ne mentez jamais sur la surface ou l\'état — illégal et destructeur de confiance']
+      },
+      {
+        title: 'Réussir mes photos', meta: '6 min · Home staging',
+        speak: `Quatre-vingt-dix pourcents des acheteurs décident de visiter en huit secondes sur les photos. Rangez, dépersonnalisez, ouvrez tous les volets et allumez toutes les lumières. L'acheteur doit se projeter dans une maison neutre — pas dans votre vie.`,
+        table: { headers: ['Action','Impact'], rows: [['Ranger et désencombrer chaque pièce','Très élevé'],['Enlever tous les objets personnels (photos, bibelots)','Très élevé'],['Ouvrir rideaux et volets','Très élevé'],['Cuisine et salle de bain totalement dégagées','Élevé'],['Nettoyer vitres, joints et surfaces','Élevé'],['Sortir la voiture pour la photo de façade','Élevé'],['Tondre la pelouse et tailler les bordures','Élevé']] },
+        warnings: ['N\'investissez pas dans une rénovation complète avant de vendre — c\'est presque jamais rentable']
+      },
+      {
+        title: 'Créer ma visite virtuelle', meta: '8 min · Méthode',
+        speak: `Vendu Par Moi repose sur trois catégories de photos. Les photos professionnelles pour attirer sur les annonces. Les photos immersives pour faire visiter à distance, pièce par pièce. Et les photos techniques pour rassurer sur l'état du bien. Ensemble, elles qualifient les acheteurs avant même qu'ils se déplacent.`,
+        table: { headers: ['Catégorie','Objectif','Exemples'], rows: [['📸 Photos professionnelles','Attirer sur les annonces','Séjour, cuisine, chambres, façade, jardin'],['🚶 Photos immersives','Visiter à distance — pièce par pièce','Entrée → séjour → cuisine → couloir → chambres → SDB'],['🔧 Photos techniques','Rassurer sur l\'état du bien','Tableau électrique, chaudière, ballon ECS, électroménager']] },
+        tips: ['Pour les photos immersives : une vue depuis l\'entrée + une vue en profondeur par pièce, dans le sens naturel de circulation']
+      }
+    ]
+  },
+  {
+    phase: 'Pendant la vente', num: '04', title: 'Préparer sa visite',
+    subtitle: 'Ne recevoir que des acheteurs vraiment finançables — et arrêter de perdre du temps',
+    keyPoints: ['Qualifiez l\'acheteur AVANT d\'ouvrir votre porte (financement !)','20 minutes suffisent pour préparer une visite parfaite','Confirmez par SMS la veille avec l\'adresse exacte'],
+    steps: [
+      {
+        title: 'Programmer mes visites', meta: '5 min · Organisation',
+        speak: `Vous avez réalisé une grande partie du travail. Vous disposez maintenant de fiches professionnelles et de liens prêts à être envoyés en quelques secondes. Notre conseil : privilégiez une ou deux plages fixes par semaine — le mercredi après-midi, le samedi ou en début de soirée. Regrouper les visites crée une dynamique et vous fait gagner un temps précieux.`,
+        tips: ['Proposez un nombre limité de créneaux — être disponible en permanence n\'est pas toujours la meilleure stratégie','Regrouper plusieurs visites sur une même plage crée une dynamique qui peut accélérer les décisions']
+      },
+      {
+        title: 'Qualifier l\'acheteur avant la visite', meta: '4 min · Organisation',
+        speak: `Un acheteur non finançable peut vous faire perdre trois à six mois. Avant d'ouvrir votre porte, posez deux questions simples : quel est votre budget, et avez-vous rencontré votre banque ? L'adresse exacte, vous la donnez uniquement après avoir qualifié.`,
+        table: { headers: ['Profil acheteur','Ce qu\'il doit vous fournir'], rows: [['Achat comptant','Attestation de fonds ou relevé bancaire'],['Achat avec crédit','Étude de faisabilité banque/courtier + montant apport + accord de principe'],['Propriétaire vendeur','Vérifiez que son bien est en vente ou déjà vendu']] },
+        script: [
+          { who: 'v', line: 'Avant de fixer un rendez-vous, puis-je vous poser quelques questions rapides ?' },
+          { who: 'a', line: 'Bien sûr.' },
+          { who: 'v', line: 'Quel est votre budget global ? Avez-vous déjà rencontré votre banque ou un courtier ?' },
+          { who: 'v', line: 'Dans quel délai souhaitez-vous idéalement emménager ?' }
+        ],
+        tips: ['Créneaux de 45 min minimum','Horaires idéaux : semaine après 18h, ou samedi matin'],
+        warnings: ['Ne donnez jamais votre adresse avant d\'avoir qualifié l\'acheteur']
+      },
+      {
+        title: 'Check-list avant chaque visite', meta: '3 min · Pratique',
+        speak: `Une visite se prépare en vingt minutes. Volets ouverts, lumières d'ambiance allumées, cuisine dégagée, température à vingt degrés. Ces détails paraissent simples — mais un bien bien présenté se vend plus vite et mieux.`,
+        table: { headers: ['Action','Détail'], rows: [['Tous les volets ouverts','Lumière maximale dans toutes les pièces'],['Lumières d\'ambiance allumées','Évitez les plafonniers'],['Télévision éteinte','L\'acheteur doit entendre le calme'],['Plan de travail cuisine dégagé','Max 2 objets dessus'],['Abattant WC fermé','Détail qui compte'],['Température 19-20°C','Aérez 20 min avant, puis réchauffez'],['Poubelle sortie ou cachée','Cuisine et salle de bain']] }
+      }
+    ]
+  },
+  {
+    phase: 'Pendant la vente', num: '05', title: 'Les visites',
+    subtitle: 'Guider chaque acheteur pour qu\'il se projette — et savoir répondre aux questions pièges sans se déstabiliser',
+    keyPoints: ['Commencez par la meilleure pièce, terminez par la deuxième meilleure','Restez un pas en retrait — laissez l\'acheteur explorer librement','Les silences sont positifs — ne les remplissez pas','Préparez vos réponses aux questions pièges à l\'avance'],
+    steps: [
+      {
+        title: 'Comment se comporter pendant la visite', meta: '8 min · Technique',
+        speak: `Votre rôle, c'est de guider — pas de faire la visite comme un agent. Commencez par la meilleure pièce, laissez l'acheteur entrer en premier dans chaque espace, restez un pas en retrait. Les silences sont positifs : c'est lui qui s'imagine déjà vivre là.`,
+        table: { headers: ['Comportement','Pourquoi'], rows: [['Guidez sans marcher devant','L\'acheteur doit découvrir l\'espace, pas votre dos'],['Laissez-le entrer en premier dans chaque pièce','Il doit ressentir l\'espace sans obstruction'],['Restez un pas en retrait','Disponible, pas intrusif'],['Laissez des silences','L\'acheteur s\'imagine vivre là — le silence est positif']] },
+        warnings: ['Ne dites jamais : "On est obligés de vendre rapidement", "Le prix est négociable", "Les voisins sont un peu bruyants"']
+      },
+      {
+        title: 'Répondre aux questions difficiles', meta: '6 min · Négociation',
+        speak: `Certaines questions en visite sont des pièges. Pourquoi vous vendez, est-ce qu'il y a des travaux, vous êtes pressés... Préparez vos réponses à l'avance. Restez court, positif, factuel. Ce que vous ne dites pas ne peut pas être retourné contre vous.`,
+        table: { headers: ['Question piège','Réponse recommandée'], rows: [['"Pourquoi vous vendez ?"','Réponse courte et positive : "Nouveau projet de vie / mutation / agrandissement"'],['"Il y a des travaux à prévoir ?"','Soyez honnête mais contextualisez : "C\'est intégré dans le prix"'],['"Vous êtes pressés de vendre ?"','Jamais : "Non, je prends le temps de trouver le bon acheteur"'],['"Vous avez eu des offres ?"','"J\'ai eu des contacts sérieux mais rien qui correspondait à mes critères"'],['"Quel est le principal défaut ?"','Transformez : "La cuisine est à rafraîchir — c\'est intégré dans notre prix"']] }
+      }
+    ]
+  },
+  {
+    phase: 'Conclure la vente', num: '06', title: 'Négocier & Conclure',
+    subtitle: 'Défendre votre prix face aux offres basses et mener la vente jusqu\'à la signature sans agence',
+    keyPoints: ['Ne jamais refuser sèchement une offre — toujours contre-proposer','Répondez dans les 24h — au-delà, l\'acheteur cherche ailleurs','Le DDT complet doit être remis avant le compromis','Comptez ~3 mois entre compromis et acte de vente'],
+    steps: [
+      {
+        title: 'Comprendre et accepter mon offre', meta: '8 min · Négociation',
+        speak: `Recevoir une offre, même en dessous de votre prix, c'est une excellente nouvelle — c'est le début d'une négociation. Avant tout, qualifiez le financement de l'acheteur. Un beau dossier mal financé peut faire échouer une vente à l'avant-dernière étape.`,
+        table: { headers: ['Offre reçue','Votre réaction'], rows: [['Au prix demandé','Acceptez immédiatement, par écrit'],['- 2% à - 5%','Contre-proposez à -1% ou tenez votre prix avec justificatif'],['- 5% à - 10%','Contre-proposez avec explication (travaux réalisés, marché local)'],['Plus de - 10%','Déclinez poliment en expliquant votre valorisation']] },
+        script: [
+          { who: 'a', line: '« On vous propose 260 000€ pour votre bien à 275 000€. »' },
+          { who: 'v', line: '« Merci pour votre offre. Elle est en dessous de ma valorisation. Je peux aller à 270 000€ — c\'est mon prix ferme. »' },
+          { who: 'a', line: '« 265 000€ ? »' },
+          { who: 'v', line: '« 268 000€ et je laisse [équipement inclus] — c\'est ma dernière position. »' }
+        ],
+        tips: ['Si plusieurs acheteurs sont intéressés : fixez une date limite identique pour toutes les offres','Comparez les offres sur le prix ET les conditions : financement solide, délai rapide, peu de conditions'],
+        warnings: ['Répondez dans les 24h — au-delà, l\'acheteur cherche ailleurs','Ne signez aucun document sans votre notaire']
+      },
+      {
+        title: 'La signature de mon compromis', meta: '8 min · Juridique',
+        speak: `Une fois l'offre acceptée, le notaire prend le relais. Transmettez-lui rapidement vos documents — titre de propriété, diagnostics, taxe foncière. Plus vous êtes réactif, plus les délais sont courts et la vente sécurisée.`,
+        table: { headers: ['Document à fournir au notaire','Détail'], rows: [['Titre de propriété','Obligatoire'],['Diagnostics techniques (DDT)','Complet'],['Dernier avis de taxe foncière','Année en cours'],['Factures travaux + garanties décennales','Si travaux < 10 ans'],['Déclarations de travaux en mairie','Si extension ou modification extérieure'],['Pièce d\'identité + justificatif de domicile','Des deux vendeurs si couple']] },
+        warnings: ['Ne coupez jamais les compteurs avant la signature de l\'acte de vente']
+      },
+      {
+        title: 'Les 3 dates jusqu\'à la vente de mon bien', meta: '5 min · Juridique',
+        speak: `Trois dates structurent la fin de votre vente. Le compromis, puis dix jours de rétractation, puis environ deux mois pour le financement bancaire, et enfin l'acte de vente chez le notaire. Notez-les — elles vous éviteront de vous impatienter inutilement.`,
+        table: { headers: ['Étape','Délai'], rows: [['Signature du compromis','Jour 0'],['Fin du délai de rétractation','J+10'],['Instruction du financement par la banque','Semaines 3 à 8'],['Émission de l\'offre de prêt','Semaines 8 à 10'],['Préparation de l\'acte authentique','Semaines 10 à 12'],['Signature définitive — remise des clés','~Semaine 12']] },
+        tips: ['Le notaire est le chef d\'orchestre : fournissez rapidement les documents demandés et restez réactif','Votre rôle : fournir les documents, répondre aux sollicitations, préparer votre départ']
+      }
+    ]
+  }
+];
+
+const MAILS = {
+  'Visite': [
+    { title: 'Premier contact acheteur', body: `Bonjour [Prénom],\n\nMerci pour votre intérêt pour mon bien au [Adresse].\n\nRésumé :\n- Surface : [X] m²\n- Pièces : [N]\n- DPE : [Lettre]\n- Taxe foncière : [X]€/an\n- Charges : [X]€/mois\n\nJe suis disponible [jours et horaires]. Merci de m'indiquer votre budget et situation de financement.\n\n[Votre prénom] — [Téléphone]` },
+    { title: 'Réponse à une demande de visite', body: `Bonjour [Prénom],\n\nMerci pour votre message concernant mon bien au [Adresse].\n\nAvant de fixer un rendez-vous, je vous transmets quelques informations importantes :\n→ [Lien dossier / diagnostics]\n\nMerci de prendre le temps de les consulter, puis de me confirmer que vous souhaitez maintenir la visite.\n\nDisponibilités : [vos créneaux].\n\nCordialement,\n[Votre prénom] — [Téléphone]` },
+    { title: 'Envoi dossier avant visite', body: `Bonjour [Prénom],\n\nAvant notre rendez-vous du [Date], je vous transmets le lien vers les diagnostics techniques complets du bien :\n→ [Lien diagnostics]\n\nPrenez le temps de les consulter et confirmez-moi que vous souhaitez maintenir la visite. 🙂\n\nÀ bientôt,\n[Votre prénom]` },
+    { title: 'Confirmation de rendez-vous', body: `Bonjour [Prénom],\n\nJe confirme notre rendez-vous pour la visite du bien situé au [Adresse], le [Date] à [Heure].\n\nDurée estimée : 30 à 45 minutes. Sonnez au nom : [Votre nom].\n\nCordialement,\n[Votre prénom]` },
+    { title: 'Envoi dossier acheteur après visite', body: `Bonjour [Prénom],\n\nSuite à votre visite, je vous transmets les informations complémentaires sur mon bien :\n→ [Lien dossier acheteur]\n\nVous y trouverez : entretiens, travaux réalisés, diagnostics, documents administratifs.\n\nN'hésitez pas si vous avez des questions. 🙂\n\n[Votre prénom] — [Téléphone]` }
+  ],
+  'Relances': [
+    { title: 'Relance après visite sans retour', body: `Bonjour [Prénom],\n\nJe me permets de vous recontacter suite à votre visite du [Date].\n\nAvez-vous eu le temps de réfléchir ? Je serais ravi(e) de répondre à vos questions ou d'organiser une seconde visite.\n\nMon bien est toujours disponible.\n\nCordialement,\n[Votre prénom]` },
+    { title: 'Alerte offre concurrente', body: `Bonjour [Prénom],\n\nJe vous contacte car j'ai reçu une offre sérieuse sur le bien que vous avez visité le [Date].\n\nSi votre projet est toujours d'actualité, je vous invite à me faire part de votre position dans les 48 heures.\n\nCordialement,\n[Votre prénom]` },
+    { title: 'Relance acheteur silencieux', body: `Bonjour [Prénom],\n\nJe me permets de revenir vers vous — je n'ai pas eu de nouvelles depuis notre visite du [Date].\n\nSi votre projet a évolué ou si vous avez des questions, je suis disponible pour en discuter.\n\n[Votre prénom] — [Téléphone]` }
+  ],
+  'Négociation': [
+    { title: 'Réponse à une offre trop basse', body: `Bonjour [Prénom],\n\nMerci pour votre offre de [Montant]€.\n\nAprès réflexion, je ne peux pas accepter ce prix. Je serais prêt(e) à descendre à [Contre-offre]€.\n\nJe reste disponible si vous souhaitez en discuter.\n\n[Votre prénom]` },
+    { title: 'Contre-proposition ferme', body: `Bonjour [Prénom],\n\nSuite à nos échanges, je vous transmets ma contre-proposition à [Montant]€, prix ferme et définitif.\n\nJe vous laisse jusqu'au [Date] pour me confirmer votre position.\n\n[Votre prénom]` },
+    { title: 'Maintien du prix — argumentation', body: `Bonjour [Prénom],\n\nJe me dois de maintenir mon prix de [Montant]€.\n\nÉléments qui justifient ce positionnement :\n- [Argument 1 : surface, emplacement, état]\n- [Argument 2 : travaux récents]\n- [Argument 3 : prix du marché local]\n\nJe reste ouvert(e) à la discussion si votre situation évolue.\n\n[Votre prénom]` }
+  ],
+  'Notaire': [
+    { title: 'Demande de copie de l\'acte notarial', body: `Objet : Demande de copie de mon acte de vente\n\nMadame, Monsieur,\n\nJe suis propriétaire du bien situé :\n[Adresse complète]\n\nAcquis le : [Date d'acquisition]\nPar acte signé au sein de votre étude.\n\nJe souhaiterais obtenir une copie intégrale de l'acte authentique de vente.\n\n[Nom et prénom] — [Téléphone] — [E-mail]` },
+    { title: 'Transmission du dossier au notaire', body: `Bonjour Maître,\n\nSuite à l'acceptation de l'offre d'achat pour le bien au [Adresse], je vous transmets les éléments nécessaires à la rédaction du compromis :\n\n✓ Titre de propriété\n✓ Diagnostics techniques complets\n✓ Taxe foncière\n✓ [Documents complémentaires]\n\nL'acheteur est [Nom Prénom], joignable au [Téléphone].\n\n[Votre prénom] — [Téléphone]` }
+  ],
+  'Signature': [
+    { title: 'Confirmation de date de signature', body: `Bonjour [Prénom],\n\nJe vous confirme notre rendez-vous chez le notaire pour la signature [du compromis / de l'acte définitif] :\n\n📅 Date : [Date]\n🕐 Heure : [Heure]\n📍 Adresse : [Étude notariale]\n\nPensez à apporter une pièce d'identité valide.\n\nÀ bientôt,\n[Votre prénom]` },
+    { title: 'Message post-signature — remise des clés', body: `Bonjour [Prénom],\n\nToutes nos félicitations pour l'acquisition ! 🏡\n\nJe vous remets ce jour :\n✓ [X] jeux de clés\n✓ Codes [digicode / portail / boîte aux lettres]\n✓ Notice chaudière\n✓ [Autres documents utiles]\n\nBonne installation !\n\n[Votre prénom]` }
+  ]
+};
+
+const CHECKLISTS = [
+  { title: 'Avant de demander une estimation', items: ['Surface habitable exacte connue','DPE disponible ou commandé','Dernier avis de taxe foncière retrouvé','Liste des travaux réalisés ces 10 ans préparée','DVF.fr consulté pour les ventes récentes','MeilleursAgents.com consulté','Deux agences contactées pour estimation gratuite'] },
+  { title: 'Documents à préparer avant publication', items: ['Titre de propriété','Diagnostics techniques (DPE, amiante, plomb...)','Taxe foncière dernière année','Charges de copropriété (si applicable)','Plans du bien','Factures travaux récents','Garanties décennales (si travaux < 10 ans)'] },
+  { title: 'Photos & Home staging', items: ['Ranger et désencombrer chaque pièce','Faire les vitres','Nettoyer les joints de salle de bain','Sortir la poubelle','Enlever les tapis si possible','Allumer toutes les lumières','Ouvrir rideaux et volets','Enlever les photos personnelles','Plan de travail cuisine dégagé','Abattant WC fermé','Salon de jardin sorti (si extérieur)','Voiture sortie (pour la façade)'] },
+  { title: 'Avant chaque visite', items: ['Maison rangée et dépersonnalisée','Toutes les lumières allumées','Vitres propres','Rideaux et volets ouverts','Plan de travail cuisine dégagé','Abattant WC fermé','Voiture sortie si devant la maison','Température agréable réglée','Dossier acheteur envoyé avant la visite','Documents de diagnostics disponibles'] },
+  { title: 'État des lieux de sortie', items: ['Relevé compteur électricité','Relevé compteur gaz','Relevé compteur eau','Codes boîte aux lettres','Codes digicode/interphone','Emplacement des compteurs expliqué','Clés remises en totalité','Notice chaudière transmise'] }
+];
+
+function renderTable(table) {
+  let html = `<table class="p-table"><thead><tr>${table.headers.map(h => `<th>${h}</th>`).join('')}</tr></thead><tbody>`;
+  table.rows.forEach(row => { html += `<tr>${row.map(c => `<td>${c}</td>`).join('')}</tr>`; });
+  return html + '</tbody></table>';
+}
+
+function renderScript(script) {
+  let html = `<div class="script-wrap"><div class="script-label">Script de dialogue</div>`;
+  script.forEach(s => {
+    html += `<div class="script-line"><span class="script-who ${s.who}">${s.who === 'v' ? 'Vendeur' : 'Acheteur'}</span><span>${s.line}</span></div>`;
+  });
+  return html + '</div>';
+}
+
+function render() {
+  const root = document.getElementById('plaquetteRoot');
+  let html = '';
+
+  // Cover
+  html += `
+  <div class="cover">
+    <div class="cover-badge">
+      <svg width="8" height="8" viewBox="0 0 32 32"><path d="M16 2L3 13v17h8v-8h10v8h8V13L16 2z" fill="#6BBF82"/></svg>
+      Vendu Par Moi — Usage interne
+    </div>
+    <div class="cover-title">Guide de formation<br>vendeur particulier</div>
+    <div class="cover-sub">6 modules · 18 étapes · Scripts, check-lists et modèles de messages pour vendre votre bien sans agence dans les meilleures conditions.</div>
+    <div class="cover-stats">
+      <div><div class="cover-stat-n">6</div><div class="cover-stat-l">Modules</div></div>
+      <div><div class="cover-stat-n">18</div><div class="cover-stat-l">Étapes</div></div>
+      <div><div class="cover-stat-n">38</div><div class="cover-stat-l">Mails types</div></div>
+      <div><div class="cover-stat-n">5</div><div class="cover-stat-l">Check-lists</div></div>
+    </div>
+  </div>`;
+
+  // Modules
+  MODULES.forEach(mod => {
+    html += `<div class="module-wrap">
+      <div class="module-header">
+        <div class="module-num">${mod.num}</div>
+        <div class="module-titles">
+          <div class="module-phase">${mod.phase}</div>
+          <div class="module-title">${mod.title}</div>
+          <div class="module-subtitle">${mod.subtitle}</div>
+        </div>
+      </div>
+      <div class="module-body">
+        <div class="kp-label">Points clés du module</div>
+        <div class="kp-list">${mod.keyPoints.map(k => `<div class="kp-item"><div class="kp-dot"></div><span>${k}</span></div>`).join('')}</div>`;
+
+    mod.steps.forEach(step => {
+      html += `<div class="step-wrap">
+        <div class="step-title">${step.title.replace('◆ ','')} <span class="step-meta">· ${step.meta}</span></div>
+        <div class="step-speak">${step.speak}</div>`;
+
+      if (step.table) html += renderTable(step.table);
+      if (step.script) html += renderScript(step.script);
+
+      if (step.tips && step.tips.length) {
+        html += `<div style="margin-top:8px;"><div class="tip-label">Conseils</div><div class="tip-list">${step.tips.map(t => `<div class="tip-item">💡 ${t}</div>`).join('')}</div></div>`;
+      }
+      if (step.warnings && step.warnings.length) {
+        html += `<div style="margin-top:6px;"><div class="warn-label">Vigilance</div><div class="warn-list">${step.warnings.map(w => `<div class="warn-item">⚠️ ${w}</div>`).join('')}</div></div>`;
+      }
+
+      html += '</div>';
+    });
+
+    html += '</div></div>';
+  });
+
+  // Mails
+  html += `<hr class="section-div">
+  <div class="mail-section">
+    <div class="section-title">Modèles de messages</div>
+    <div class="section-desc">38 messages prêts à copier-coller — personnalisez les [crochets] avec vos informations.</div>`;
+
+  Object.entries(MAILS).forEach(([cat, mails]) => {
+    html += `<div class="mail-cat"><div class="mail-cat-title">${cat}</div>`;
+    mails.forEach(m => {
+      html += `<div class="mail-card"><div class="mail-title">${m.title}</div><div class="mail-body">${m.body}</div></div>`;
+    });
+    html += '</div>';
+  });
+
+  html += '</div>';
+
+  // Checklists
+  html += `<hr class="section-div">
+  <div class="mail-section">
+    <div class="section-title">Check-lists</div>
+    <div class="section-desc">À cocher avant chaque étape clé.</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">`;
+
+  CHECKLISTS.forEach(ck => {
+    html += `<div class="ck-section">
+      <div class="ck-title">${ck.title}</div>
+      <div class="ck-items">${ck.items.map(i => `<div class="ck-item"><div class="ck-box"></div><span>${i}</span></div>`).join('')}</div>
+    </div>`;
+  });
+
+  html += '</div></div>';
+
+  root.innerHTML = html;
+}
+
+render();
+</script>
+</body>
+</html>
