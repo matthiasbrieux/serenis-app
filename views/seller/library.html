@@ -998,9 +998,6 @@
       /* Supprime les transitions coûteuses en scroll */
       .step-card, .step-hdr, .step-body, .mod-car-wrap, .f-pillar, .ck-box, .tts-btn, .ask-coach-btn, .mail-cat-tab { transition: none !important; }
 
-      /* Animation modFadeIn simplifiée — sans translateY pour éviter les repaints */
-      .mod-content.active { animation: modFadeInMobile 0.18s ease; }
-
       /* Désactive les animations infinies hors focus */
       .iphone:not(.speaking) { animation: none; }
       .wave-bar { animation-play-state: paused; }
@@ -1045,7 +1042,11 @@
 
     /* ── Module fade-in ── */
     @keyframes modFadeIn { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
-    .mod-content.active { animation: modFadeIn 0.24s cubic-bezier(0.16,1,0.3,1); }
+    .mod-content.active { animation: modFadeIn 0.32s cubic-bezier(0.16,1,0.3,1) forwards; }
+    /* Sur mobile/tactile, la version sans translateY évite les repaints et le double-effet visuel */
+    @media (pointer: coarse) {
+      .mod-content.active { animation: modFadeInMobile 0.22s ease forwards; }
+    }
 
     /* ── Module tab progress bar ── */
     .mod-tab-prog { height:2px; background:rgba(0,0,0,0.07); border-radius:2px; margin-top:5px; overflow:hidden; }
