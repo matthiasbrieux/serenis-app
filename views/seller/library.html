@@ -338,10 +338,14 @@
     /* ── Mails ── */
     .section-hdr { font-size: 0.68rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: #888; margin: 36px 0 16px; }
     .section-sub { font-size: 0.82rem; color: #666; margin-top: -10px; margin-bottom: 16px; }
-    .mail-cat-tabs { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 16px; }
+    .mail-cat-tabs { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
     .mail-cat-tab { padding: 6px 14px; border-radius: 100px; font-size: 0.76rem; font-weight: 600; border: 1.5px solid #DDD6CC; background: #fff; cursor: pointer; transition: all 0.15s; color: #555; font-family: 'DM Sans', sans-serif; white-space: nowrap; }
     .mail-cat-tab:hover { border-color: #3D5A47; color: #3D5A47; }
     .mail-cat-tab.active { background: #3D5A47; color: #fff; border-color: #3D5A47; }
+    .mail-sub-tabs { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 14px; padding: 8px 10px; background: #F5F2EE; border-radius: 10px; }
+    .mail-sub-tab { padding: 4px 12px; border-radius: 100px; font-size: 0.72rem; font-weight: 600; border: 1.5px solid #D8D2C8; background: transparent; cursor: pointer; transition: all 0.15s; color: #666; font-family: 'DM Sans', sans-serif; white-space: nowrap; }
+    .mail-sub-tab:hover { border-color: #3D5A47; color: #3D5A47; background: #fff; }
+    .mail-sub-tab.active { background: #fff; color: #3D5A47; border-color: #3D5A47; font-weight: 700; }
     .mail-item { border: 1.5px solid #E8E3DB; border-radius: 10px; margin-bottom: 8px; overflow: hidden; }
     .mail-hdr { display: flex; align-items: center; padding: 12px 14px; cursor: pointer; gap: 10px; }
     .mail-num { width: 22px; height: 22px; border-radius: 50%; background: #3D5A47; color: #fff; font-size: 0.68rem; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
@@ -1562,7 +1566,7 @@ let _progAnimating = false;
 // ══════════════════════════════════════════
 const MODULES = [
   {
-    phase:'avant', mailCat:'visite', num:'01', title:'Estimer son bien', subtitle:'Fixer le bon prix dès le départ — et déclencher des offres rapides',
+    phase:'avant', mailCat:'visite-avant', num:'01', title:'Estimer son bien', subtitle:'Fixer le bon prix dès le départ — et déclencher des offres rapides',
     keyPoints:['Utilisez DVF.fr + 2 agences + MeilleursAgents pour trianguler','Prix juste dès le départ = plus de visites + offres rapides','Un bien >45j sans offre doit être réévalué','DPE F/G peut impacter le prix de -10% à -20%'],
     aiMsg:'Pour l\'estimation, commencez par DVF.fr — ce sont les prix réels des ventes notariées, pas les prix demandés. Comparez avec deux agences gratuites.',
     steps:[
@@ -1691,7 +1695,7 @@ const MODULES = [
     ]
   },
   {
-    phase:'avant', mailCat:'visite', num:'03', title:'Annonce & Photos', subtitle:'Déclencher 2x plus de visites qualifiées grâce à une annonce qui donne envie et des photos qui vendent',
+    phase:'avant', mailCat:'visite-avant', num:'03', title:'Annonce & Photos', subtitle:'Déclencher 2x plus de visites qualifiées grâce à une annonce qui donne envie et des photos qui vendent',
     videoSrc:'/videos/formation-annonce.mp4', agentVideo:'/videos/agent-annonce.mp4',
     keyPoints:['90% des acheteurs décident de visiter en 8 secondes sur les photos','Ne jamais écrire "prix négociable" — invite les offres basses','Titre idéal : type + surface + ville + prix + 1 atout (< 60 car.)','Dépersonnalisez votre bien — l\'acheteur doit se projeter, pas vous voir'],
     aiMsg:'Les photos sont votre seul argument de vente en ligne. Prenez-les après avoir dépersonnalisé — enlever toutes les photos personnelles fait une différence énorme sur le ressenti de l\'acheteur.',
@@ -1727,7 +1731,7 @@ const MODULES = [
     ]
   },
   {
-    phase:'apres', mailCat:'visite', num:'04', title:'Préparer sa visite', subtitle:'Ne recevoir que des acheteurs vraiment finançables — et arrêter de perdre du temps',
+    phase:'apres', mailCat:'visite-qualification', num:'04', title:'Préparer sa visite', subtitle:'Ne recevoir que des acheteurs vraiment finançables — et arrêter de perdre du temps',
     keyPoints:['Qualifiez l\'acheteur AVANT d\'ouvrir votre porte (financement !)','20 minutes suffisent pour préparer une visite parfaite','Confirmez par SMS la veille avec l\'adresse exacte'],
     aiMsg:'La qualification avant visite est cruciale. Posez discrètement la question du financement — un acheteur non finançable peut vous faire perdre 3 à 6 mois.',
     steps:[
@@ -1782,7 +1786,7 @@ const MODULES = [
     ]
   },
   {
-    phase:'apres', mailCat:'visite', num:'05', title:'Les visites', subtitle:'Guider chaque acheteur pour qu\'il se projette — et savoir répondre aux questions pièges sans se déstabiliser',
+    phase:'apres', mailCat:'visite-apres', num:'05', title:'Les visites', subtitle:'Guider chaque acheteur pour qu\'il se projette — et savoir répondre aux questions pièges sans se déstabiliser',
     keyPoints:['Commencez par la meilleure pièce, terminez par la deuxième meilleure','Restez un pas en retrait — laissez l\'acheteur explorer librement','Les silences sont positifs — ne les remplissez pas','Préparez vos réponses aux questions pièges à l\'avance'],
     aiMsg:'Votre rôle en visite est de guider, pas de vendre. L\'acheteur doit se projeter — laissez-lui l\'espace pour le faire.',
     steps:[
@@ -1800,7 +1804,7 @@ const MODULES = [
     ]
   },
   {
-    phase:'apres', mailCat:'negociation', num:'06', title:'Négocier & Conclure', subtitle:'Défendre votre prix face aux offres basses et mener la vente jusqu\'à la signature sans agence',
+    phase:'apres', mailCat:'offres', num:'06', title:'Négocier & Conclure', subtitle:'Défendre votre prix face aux offres basses et mener la vente jusqu\'à la signature sans agence',
     keyPoints:['Ne jamais refuser sèchement une offre — toujours contre-proposer','Répondez dans les 24h — au-delà, l\'acheteur cherche ailleurs','Le DDT complet doit être remis avant le compromis','Comptez ~3 mois entre compromis et acte de vente'],
     aiMsg:'Recevoir une offre est une excellente nouvelle, même en dessous de votre prix. C\'est le début d\'une négociation. Voici comment contre-proposer de façon ferme et professionnelle.',
     steps:[
@@ -1859,38 +1863,39 @@ const MODULES = [
 ];
 
 const MAIL_CATS = [
-  { key:'visite',      label:'Visite' },
-  { key:'relances',    label:'Relances' },
-  { key:'offres',      label:'Offres' },
-  { key:'negociation', label:'Négociation' },
-  { key:'notaire',     label:'Notaire' },
-  { key:'financement', label:'Financement' },
-  { key:'signature',   label:'Signature' },
+  { key:'visite-avant',         label:'Avant visite',           group:'visite' },
+  { key:'visite-qualification', label:'Qualification',           group:'visite' },
+  { key:'visite-apres',         label:'Après visite',            group:'visite' },
+  { key:'offres',               label:'Offres' },
+  { key:'notaire',              label:'Notaire' },
+  { key:'financement',          label:'Financement' },
+  { key:'signature',            label:'Signature' },
 ];
 
 const MAILS_BY_CAT = {
-  visite: [
+  'visite-avant': [
     { title:'Premier contact acheteur', body:`Bonjour [Prénom],\n\nMerci pour votre intérêt pour mon bien au [Adresse].\n\nRésumé :\n- Surface : [X] m²\n- Pièces : [N]\n- DPE : [Lettre]\n- Taxe foncière : [X]€/an\n- Charges : [X]€/mois\n\nJe suis disponible [jours et horaires]. Merci de m'indiquer votre budget et situation de financement.\n\n[Votre prénom] — [Téléphone]` },
     { title:'Réponse à une demande de visite', body:`Bonjour [Prénom],\n\nMerci pour votre message concernant mon bien au [Adresse].\n\nAvant de fixer un rendez-vous, je vous transmets quelques informations importantes :\n\n→ [Lien dossier / diagnostics]\n\nMerci de prendre le temps de les consulter, puis de me confirmer que vous souhaitez maintenir la visite.\n\nDisponibilités : [vos créneaux].\n\nCordialement,\n[Votre prénom] — [Téléphone]` },
-    { title:'Envoi dossier de qualification avant visite', body:`Bonjour [Prénom],\n\nAvant notre rendez-vous du [Date], je vous transmets le lien vers les diagnostics techniques complets du bien :\n\n→ [Lien diagnostics]\n\nPrenez le temps de les consulter et confirmez-moi que vous souhaitez maintenir la visite. 🙂\n\nÀ bientôt,\n[Votre prénom]` },
     { title:'Confirmation de rendez-vous', body:`Bonjour [Prénom],\n\nJe confirme notre rendez-vous pour la visite du bien situé au [Adresse], le [Date] à [Heure].\n\nDurée estimée : 30 à 45 minutes. Sonnez au nom : [Votre nom].\n\nN'hésitez pas à me contacter si vous avez des questions.\n\nCordialement,\n[Votre prénom]` },
+  ],
+  'visite-qualification': [
+    { title:'Envoi dossier de qualification avant visite', body:`Bonjour [Prénom],\n\nAvant notre rendez-vous du [Date], je vous transmets le lien vers les diagnostics techniques complets du bien :\n\n→ [Lien diagnostics]\n\nPrenez le temps de les consulter et confirmez-moi que vous souhaitez maintenir la visite. 🙂\n\nÀ bientôt,\n[Votre prénom]` },
+    { title:'Demande de situation de financement', body:`Bonjour [Prénom],\n\nAvant de bloquer mon agenda pour une visite, pourriez-vous m'indiquer votre situation de financement ?\n\n- Achat comptant ou à crédit ?\n- Si crédit : avez-vous un accord de principe de votre banque ?\n- Quel est votre budget maximum ?\n\nCes informations me permettent de cibler les acheteurs réellement en mesure d'acquérir le bien.\n\nCordialement,\n[Votre prénom]` },
+  ],
+  'visite-apres': [
     { title:'Invitation à une seconde visite', body:`Bonjour [Prénom],\n\nSuite à votre première visite, je vous propose un second passage pour vous permettre de confirmer votre intérêt dans de meilleures conditions.\n\nJe suis disponible [créneaux]. Faites-moi savoir si l'un d'eux vous convient.\n\nCordialement,\n[Votre prénom]` },
     { title:'Envoi du dossier acheteur après visite', body:`Bonjour [Prénom],\n\nSuite à votre visite et afin de vous aider dans votre réflexion, je vous transmets les informations complémentaires sur mon bien :\n\n→ [Lien dossier acheteur]\n\nVous y trouverez : entretiens, travaux réalisés, diagnostics, documents administratifs.\n\nN'hésitez pas si vous avez des questions. 🙂\n\nCordialement,\n[Votre prénom] — [Téléphone]` },
-  ],
-  relances: [
     { title:'Relance après visite sans retour', body:`Bonjour [Prénom],\n\nJe me permets de vous recontacter suite à votre visite du [Date].\n\nAvez-vous eu le temps de réfléchir ? Je serais ravi(e) de répondre à vos questions ou d'organiser une seconde visite.\n\nMon bien est toujours disponible.\n\nCordialement,\n[Votre prénom]` },
     { title:'Alerte offre concurrente', body:`Bonjour [Prénom],\n\nJe vous contacte car j'ai reçu une offre sérieuse sur le bien que vous avez visité le [Date].\n\nSi votre projet est toujours d'actualité, je vous invite à me faire part de votre position dans les 48 heures.\n\nCordialement,\n[Votre prénom]` },
     { title:'Relance acheteur silencieux', body:`Bonjour [Prénom],\n\nJe me permets de revenir vers vous — je n'ai pas eu de nouvelles depuis notre visite du [Date].\n\nSi votre projet a évolué ou si vous avez des questions restées sans réponse, je suis disponible pour en discuter.\n\nCordialement,\n[Votre prénom] — [Téléphone]` },
   ],
   offres: [
-    { title:'Acceptation d\'une offre', body:`Bonjour [Prénom],\n\nJ'ai le plaisir d'accepter votre offre de [Montant]€ pour le bien au [Adresse].\n\nLa prochaine étape est la signature du compromis chez le notaire. Mon notaire : [Nom et coordonnées].\n\nMerci de me confirmer votre notaire afin de fixer une date.\n\nCordialement,\n[Votre prénom]` },
-    { title:'Refus d\'une offre', body:`Bonjour [Prénom],\n\nJe vous remercie pour votre offre concernant mon bien au [Adresse].\n\nCependant, après réflexion, je ne souhaite pas donner suite à cette proposition.\n\nJe reste vendeur et serai heureux(se) de retravailler avec vous si votre position évolue.\n\nCordialement,\n[Votre prénom]` },
-    { title:'Demande de documents à l\'acheteur', body:`Bonjour [Prénom],\n\nPour préparer le compromis, pourriez-vous me transmettre :\n\n✓ Pièce d'identité valide\n✓ Justificatif de domicile récent\n✓ Attestation de financement (accord banque ou attestation de fonds)\n\nCes documents sont nécessaires pour que le notaire puisse avancer rapidement.\n\nMerci,\n[Votre prénom]` },
-  ],
-  negociation: [
     { title:'Réponse à une offre trop basse', body:`Bonjour [Prénom],\n\nMerci pour votre offre de [Montant]€.\n\nAprès réflexion, je ne peux pas accepter ce prix compte tenu de [valorisation/travaux/marché]. Je serais prêt(e) à descendre à [Contre-offre]€.\n\nJe reste disponible si vous souhaitez en discuter.\n\nCordialement,\n[Votre prénom]` },
     { title:'Contre-proposition ferme', body:`Bonjour [Prénom],\n\nSuite à nos échanges, je vous transmets ma contre-proposition à [Montant]€, prix ferme et définitif.\n\nCe prix tient compte de [l'état du bien / des travaux réalisés / du marché local].\n\nJe vous laisse jusqu'au [Date] pour me confirmer votre position.\n\nCordialement,\n[Votre prénom]` },
     { title:'Maintien du prix — argumentation', body:`Bonjour [Prénom],\n\nJe comprends votre démarche, mais je me dois de maintenir mon prix de [Montant]€.\n\nVoici les éléments qui justifient ce positionnement :\n- [Argument 1 : surface, emplacement, état]\n- [Argument 2 : travaux récents]\n- [Argument 3 : prix du marché local]\n\nJe reste ouvert(e) à la discussion si votre situation évolue.\n\nCordialement,\n[Votre prénom]` },
+    { title:'Acceptation d\'une offre', body:`Bonjour [Prénom],\n\nJ'ai le plaisir d'accepter votre offre de [Montant]€ pour le bien au [Adresse].\n\nLa prochaine étape est la signature du compromis chez le notaire. Mon notaire : [Nom et coordonnées].\n\nMerci de me confirmer votre notaire afin de fixer une date.\n\nCordialement,\n[Votre prénom]` },
+    { title:'Refus d\'une offre', body:`Bonjour [Prénom],\n\nJe vous remercie pour votre offre concernant mon bien au [Adresse].\n\nCependant, après réflexion, je ne souhaite pas donner suite à cette proposition.\n\nJe reste vendeur et serai heureux(se) de retravailler avec vous si votre position évolue.\n\nCordialement,\n[Votre prénom]` },
+    { title:'Demande de documents à l\'acheteur', body:`Bonjour [Prénom],\n\nPour préparer le compromis, pourriez-vous me transmettre :\n\n✓ Pièce d'identité valide\n✓ Justificatif de domicile récent\n✓ Attestation de financement (accord banque ou attestation de fonds)\n\nCes documents sont nécessaires pour que le notaire puisse avancer rapidement.\n\nMerci,\n[Votre prénom]` },
   ],
   notaire: [
     { title:'Demande de copie de l\'acte notarial', body:`Objet : Demande de copie de mon acte de vente\n\nMadame, Monsieur,\n\nJe suis propriétaire du bien situé :\n[Adresse complète]\n\nacquis le : [Date d'acquisition]\npar acte signé au sein de votre étude.\n\nDans le cadre de la préparation de la revente, je souhaiterais obtenir une copie intégrale de l'acte authentique de vente.\n\nJe vous remercie par avance.\n\nCordialement,\n[Nom et prénom] — [Téléphone] — [E-mail]` },
@@ -1898,7 +1903,6 @@ const MAILS_BY_CAT = {
     { title:'Transmission du dossier au notaire', body:`Bonjour Maître,\n\nSuite à l'acceptation de l'offre d'achat pour le bien situé au [Adresse], je vous transmets les éléments nécessaires à la rédaction du compromis :\n\n✓ Titre de propriété\n✓ Diagnostics techniques complets\n✓ Taxe foncière\n✓ [Documents complémentaires]\n\nL'acheteur est [Nom Prénom], joignable au [Téléphone].\n\nJe reste disponible pour tout complément.\n\nCordialement,\n[Votre prénom] — [Téléphone]` },
   ],
   financement: [
-    { title:'Demande d\'attestation de financement', body:`Bonjour [Prénom],\n\nAvant de bloquer mon agenda pour une visite, pourriez-vous m'indiquer votre situation de financement ?\n\n- Achat comptant ou à crédit ?\n- Si crédit : avez-vous un accord de principe de votre banque ?\n- Quel est votre budget maximum ?\n\nCes informations me permettent de cibler les acheteurs réellement en mesure d'acquérir le bien.\n\nCordialement,\n[Votre prénom]` },
     { title:'Vérification financement avant offre', body:`Bonjour [Prénom],\n\nAvant d'étudier votre offre, je souhaite m'assurer de votre situation financière.\n\nPourriez-vous me transmettre :\n✓ Une attestation de financement de votre banque, ou\n✓ Une preuve de fonds disponibles (si achat comptant)\n\nCela me permettra de donner suite à votre proposition dans les meilleurs délais.\n\nCordialement,\n[Votre prénom]` },
   ],
   signature: [
@@ -2243,7 +2247,7 @@ async function copyLienAcheteur(btn) {
 
 // ── State ──
 let activeModule = -1;
-let activeMailCat = 'visite';
+let activeMailCat = 'visite-avant';
 const doneSteps = JSON.parse(localStorage.getItem('vpm_done_steps') || '{}');
 
 // ── Progress ──
@@ -2577,14 +2581,32 @@ function renderModules() {
 }
 
 // ── Mails ──
+const _VISITE_SUBS = ['visite-avant','visite-qualification','visite-apres'];
+const _MAIL_MAIN_TABS = [
+  { key:'visite-avant', label:'Visites', group:true },
+  { key:'offres',       label:'Offres' },
+  { key:'notaire',      label:'Notaire' },
+  { key:'financement',  label:'Financement' },
+  { key:'signature',    label:'Signature' },
+];
+
 function renderMails() {
   const mails = MAILS_BY_CAT[activeMailCat] || [];
   const total = Object.values(MAILS_BY_CAT).reduce((s, a) => s + a.length, 0);
   document.getElementById('mailsHdr').textContent = total + ' mails types prêts à copier';
 
-  const tabsHtml = MAIL_CATS.map(c =>
-    `<button class="mail-cat-tab${c.key === activeMailCat ? ' active' : ''}" data-cat="${c.key}">${c.label}</button>`
-  ).join('');
+  const isVisiteGroup = _VISITE_SUBS.includes(activeMailCat);
+
+  const tabsHtml = _MAIL_MAIN_TABS.map(t => {
+    const isActive = t.group ? isVisiteGroup : activeMailCat === t.key;
+    return `<button class="mail-cat-tab${isActive ? ' active' : ''}" data-cat="${t.key}">${t.label}</button>`;
+  }).join('');
+
+  const subTabsHtml = isVisiteGroup ? `<div class="mail-sub-tabs">
+    <button class="mail-sub-tab${activeMailCat==='visite-avant' ? ' active':''}" data-cat="visite-avant">Avant visite</button>
+    <button class="mail-sub-tab${activeMailCat==='visite-qualification' ? ' active':''}" data-cat="visite-qualification">Qualification</button>
+    <button class="mail-sub-tab${activeMailCat==='visite-apres' ? ' active':''}" data-cat="visite-apres">Après visite</button>
+  </div>` : '';
 
   const mailsHtml = mails.map((m, i) => `
     <div class="mail-item">
@@ -2599,9 +2621,12 @@ function renderMails() {
       </div>
     </div>`).join('');
 
-  document.getElementById('mailsList').innerHTML = `<div class="mail-cat-tabs">${tabsHtml}</div>${mailsHtml}`;
+  document.getElementById('mailsList').innerHTML = `<div class="mail-cat-tabs">${tabsHtml}</div>${subTabsHtml}${mailsHtml}`;
 
   document.querySelectorAll('.mail-cat-tab').forEach(btn => {
+    btn.addEventListener('click', () => { activeMailCat = btn.dataset.cat; renderMails(); });
+  });
+  document.querySelectorAll('.mail-sub-tab').forEach(btn => {
     btn.addEventListener('click', () => { activeMailCat = btn.dataset.cat; renderMails(); });
   });
 
