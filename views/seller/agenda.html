@@ -1305,11 +1305,18 @@ let _propertyAddress = '';
 // ── Tabs ──────────────────────────────────────────────
 // Tabs supprimés — tout est sur une seule page
 
+// ── Helpers date+heure ────────────────────────────────
+function isPastVisit(v) {
+  if (!v.visit_date) return false;
+  const dt = new Date(`${v.visit_date}T${(v.visit_time||'23:59').slice(0,5)}:00`);
+  return dt < new Date();
+}
+
 // ── Stats ─────────────────────────────────────────────
 function updateStats() {
   const today = new Date().toISOString().split('T')[0];
-  const upcoming = allVisits.filter(v => v.status !== 'cancelled' && v.visit_date >= today);
-  const past     = allVisits.filter(v => v.status !== 'cancelled' && v.visit_date < today);
+  const upcoming = allVisits.filter(v => v.status !== 'cancelled' && !isPastVisit(v));
+  const past     = allVisits.filter(v => v.status !== 'cancelled' && isPastVisit(v));
   const todayV   = allVisits.filter(v => v.visit_date === today && v.status !== 'cancelled');
   document.getElementById('statPending').textContent = upcoming.length;
   document.getElementById('statPast').textContent    = past.length;
@@ -1345,12 +1352,12 @@ function renderVisitsFiltered() {
   let filtered, filterLabel, gradientColors;
 
   if (activeStatFilter === 'avenir') {
-    filtered = allVisits.filter(v => v.status !== 'cancelled' && v.visit_date >= today)
+    filtered = allVisits.filter(v => v.status !== 'cancelled' && !isPastVisit(v))
       .sort((a,b) => (a.visit_date+a.visit_time).localeCompare(b.visit_date+b.visit_time));
     filterLabel = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:4px;"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg> Visites à venir';
     gradientColors = '#2c4f85, #3d6498';
   } else if (activeStatFilter === 'passees') {
-    filtered = allVisits.filter(v => v.status !== 'cancelled' && v.visit_date < today)
+    filtered = allVisits.filter(v => v.status !== 'cancelled' && isPastVisit(v))
       .sort((a,b) => b.visit_date.localeCompare(a.visit_date));
     filterLabel = '🕐 Visites passées';
     gradientColors = '#5b1490, #7b1fa2';
@@ -1541,8 +1548,8 @@ function buildVisitCompact(v) {
 
 function renderVisits() {
   const today = new Date().toISOString().split('T')[0];
-  const upcoming = allVisits.filter(v => v.status==='confirmed' && v.visit_date>=today).sort((a,b)=>(a.visit_date+a.visit_time).localeCompare(b.visit_date+b.visit_time));
-  const past = allVisits.filter(v => v.status==='done'||(v.status==='confirmed'&&v.visit_date<today)||(v.status==='pending'&&v.visit_date<today)).sort((a,b)=>b.visit_date.localeCompare(a.visit_date));
+  const upcoming = allVisits.filter(v => v.status==='confirmed' && !isPastVisit(v)).sort((a,b)=>(a.visit_date+a.visit_time).localeCompare(b.visit_date+b.visit_time));
+  const past = allVisits.filter(v => v.status==='done'||(v.status==='confirmed'&&isPastVisit(v))||(v.status==='pending'&&isPastVisit(v))).sort((a,b)=>b.visit_date.localeCompare(a.visit_date));
   const cancelled = allVisits.filter(v => v.status==='cancelled').sort((a,b)=>b.visit_date.localeCompare(a.visit_date));
 
   const upcomingSection = document.getElementById('upcomingSection');
