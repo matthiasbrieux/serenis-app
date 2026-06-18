@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Défense Loi Hoguet — Vendu Par Moi</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    @media print {
+      html, body { width: 210mm; background: white !important; }
+      .no-print { display: none !important; }
+      .page-break { page-break-before: always; }
+      .avoid-break { page-break-inside: avoid; }
+      @page { margin: 16mm 16mm 16mm 16mm; size: A4 portrait; }
+    }
+
+    body { font-family: 'DM Sans', sans-serif; background: #ddd; color: #1a1a16; -webkit-font-smoothing: antialiased; }
+
+    :root {
+      --green: #3D5A47; --green-dark: #1C3028; --terra: #C4785A;
+      --red: #C0392B; --border: #e0d8cc; --muted: #666;
+    }
+
+    .no-print { position: fixed; top: 20px; right: 20px; z-index: 999; }
+    .btn-print { background: var(--green-dark); color: #fff; border: none; padding: 12px 22px; border-radius: 8px; font-family: 'DM Sans', sans-serif; font-size: 0.88rem; font-weight: 700; cursor: pointer; box-shadow: 0 4px 16px rgba(0,0,0,0.25); }
+
+    .sheet { width: 210mm; background: white; margin: 20px auto; box-shadow: 0 4px 40px rgba(0,0,0,0.18); padding: 40px 44px 52px; position: relative; }
+
+    .doc-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 28px; padding-bottom: 18px; border-bottom: 2px solid var(--green-dark); }
+    .doc-logo { font-family: 'Cormorant Garamond', serif; font-size: 1.2rem; color: var(--green-dark); }
+    .doc-logo em { color: var(--terra); font-style: normal; }
+    .doc-title { font-family: 'Cormorant Garamond', serif; font-size: 1.5rem; font-weight: 700; color: var(--green-dark); text-align: right; }
+    .doc-sub { font-size: 0.72rem; color: var(--muted); text-align: right; margin-top: 2px; }
+
+    .sec-label { font-size: 0.65rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.12em; color: #fff; background: var(--green-dark); padding: 5px 12px; border-radius: 4px; margin: 26px 0 14px; display: inline-block; }
+    .sec-label.terra { background: var(--terra); }
+    .sec-label.red { background: var(--red); }
+
+    .h2 { font-family: 'Cormorant Garamond', serif; font-size: 1.25rem; font-weight: 700; color: var(--green-dark); margin: 22px 0 12px; padding-bottom: 7px; border-bottom: 1px solid var(--border); }
+    p { font-size: 0.86rem; color: #444; line-height: 1.75; margin-bottom: 8px; }
+    ul { padding-left: 18px; margin-bottom: 10px; }
+    li { font-size: 0.86rem; color: #444; line-height: 1.7; margin-bottom: 4px; }
+    strong { color: #1a1a16; }
+
+    .law-box { background: #f0f4f7; border: 1.5px solid #b0c4d4; border-radius: 10px; padding: 16px 20px; margin: 12px 0; }
+    .law-box .ref { font-size: 0.68rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: #4a6fa5; margin-bottom: 8px; }
+    .law-box .text { font-size: 0.83rem; color: #2a3a4a; line-height: 1.8; font-style: italic; }
+    .law-box .highlight { background: #fff3cd; padding: 1px 4px; border-radius: 3px; font-style: normal; font-weight: 700; color: #7a5000; }
+
+    .info-green { background: #e8f4ec; border-left: 3px solid var(--green); border-radius: 0 8px 8px 0; padding: 12px 16px; margin: 10px 0; font-size: 0.84rem; color: #2a4030; line-height: 1.7; }
+    .info-red { background: #fef0ee; border-left: 3px solid var(--red); border-radius: 0 8px 8px 0; padding: 12px 16px; margin: 10px 0; font-size: 0.84rem; color: #5a1a10; line-height: 1.7; }
+    .info-blue { background: #eef3fb; border-left: 3px solid #4a6fa5; border-radius: 0 8px 8px 0; padding: 12px 16px; margin: 10px 0; font-size: 0.84rem; color: #1a2a4a; line-height: 1.7; }
+
+    /* ── FLUX ── */
+    .flux-wrap { display: flex; flex-direction: column; gap: 0; margin: 14px 0; }
+    .flux-row { display: flex; gap: 0; align-items: stretch; }
+    .flux-actor { width: 88px; flex-shrink: 0; display: flex; flex-direction: column; align-items: center; }
+    .flux-actor-label { font-size: 0.62rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em; text-align: center; padding: 5px 4px; border-radius: 6px; width: 78px; }
+    .flux-actor-label.seller { background: var(--green); color: #fff; }
+    .flux-actor-label.vpm { background: var(--terra); color: #fff; }
+    .flux-actor-label.buyer { background: #4a6fa5; color: #fff; }
+    .flux-actor-label.notaire { background: #6a4a8a; color: #fff; }
+    .flux-line { width: 2px; background: var(--border); flex: 1; margin: 0 auto; }
+
+    .flux-event { flex: 1; border: 1.5px solid var(--border); border-radius: 10px; margin: 4px 0 4px 12px; padding: 10px 14px; display: flex; align-items: flex-start; gap: 10px; }
+    .flux-event.vpm-action { border-color: var(--terra); background: #fef8f4; }
+    .flux-event.seller-action { border-color: var(--green); background: #f4faf6; }
+    .flux-event.buyer-action { border-color: #4a6fa5; background: #f0f4fb; }
+    .flux-event.notaire-action { border-color: #6a4a8a; background: #f7f4fb; }
+    .flux-event.neutral { background: #f8f5f0; }
+    .flux-tag { font-size: 0.6rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.08em; padding: 2px 7px; border-radius: 4px; flex-shrink: 0; margin-top: 1px; }
+    .flux-tag.v { background: var(--terra); color: #fff; }
+    .flux-tag.s { background: var(--green); color: #fff; }
+    .flux-tag.b { background: #4a6fa5; color: #fff; }
+    .flux-tag.n { background: #6a4a8a; color: #fff; }
+    .flux-tag.x { background: #888; color: #fff; }
+    .flux-content strong { font-size: 0.82rem; display: block; margin-bottom: 2px; }
+    .flux-content span { font-size: 0.73rem; color: var(--muted); line-height: 1.5; }
+    .flux-no-hoguet { font-size: 0.62rem; font-weight: 700; background: #e8f4ec; color: var(--green); padding: 1px 7px; border-radius: 4px; margin-left: auto; flex-shrink: 0; white-space: nowrap; }
+
+    /* ── TABLEAU COMPARATIF ── */
+    .comp-table { width: 100%; border-collapse: collapse; font-size: 0.8rem; margin: 12px 0; }
+    .comp-table th { padding: 9px 10px; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; text-align: left; }
+    .comp-table th:nth-child(1) { background: #2a2a24; color: #fff; width: 30%; }
+    .comp-table th:nth-child(2) { background: var(--red); color: #fff; width: 25%; }
+    .comp-table th:nth-child(3) { background: #4a6fa5; color: #fff; width: 20%; }
+    .comp-table th:nth-child(4) { background: var(--green); color: #fff; width: 25%; }
+    .comp-table td { padding: 9px 10px; border-bottom: 1px solid var(--border); vertical-align: top; line-height: 1.55; }
+    .comp-table tr:nth-child(even) td { background: #f8f5f0; }
+    .comp-table .crit { font-weight: 700; color: #1a1a16; }
+    .comp-table .oui { color: var(--red); font-weight: 700; }
+    .comp-table .non { color: var(--green); font-weight: 700; }
+    .comp-table .cond { color: #c47a00; font-weight: 600; font-size: 0.75rem; }
+    .comp-table .hoguet-row td { background: #fff3cd !important; }
+    .comp-table .hoguet-row td:first-child { font-weight: 800; color: #7a5000; }
+
+    .verdict-box { display: flex; gap: 12px; align-items: flex-start; background: #e8f4ec; border: 2px solid var(--green); border-radius: 12px; padding: 16px 18px; margin: 14px 0; }
+    .verdict-icon { font-size: 1.8rem; flex-shrink: 0; }
+    .verdict-title { font-family: 'Cormorant Garamond', serif; font-size: 1.25rem; font-weight: 700; color: var(--green-dark); margin-bottom: 4px; }
+    .verdict-text { font-size: 0.82rem; color: #2a4030; line-height: 1.7; }
+
+    .page-footer { position: absolute; bottom: 0; left: 0; right: 0; padding: 9px 44px; border-top: 1px solid var(--border); display: flex; justify-content: space-between; font-size: 0.66rem; color: #bbb; }
+  </style>
+</head>
+<body>
+
+<div class="no-print">
+  <button class="btn-print" onclick="window.print()">🖨 Imprimer / PDF</button>
+</div>
+
+<!-- ═══════════════════════════════════
+     PAGE 1 — LOI HOGUET TEXTE + FLUX
+═══════════════════════════════════ -->
+<div class="sheet">
+
+  <div class="doc-header">
+    <div class="doc-logo">Vendu Par <em>Moi</em></div>
+    <div>
+      <div class="doc-title">Note juridique — Loi Hoguet</div>
+      <div class="doc-sub">Argumentaire de conformité · Document confidentiel · Juin 2026</div>
+    </div>
+  </div>
+
+  <!-- SECTION 1 : LOI HOGUET -->
+  <div class="sec-label">1 — Le texte de la loi</div>
+
+  <div class="law-box avoid-break">
+    <div class="ref">Loi n°70-9 du 2 janvier 1970 — Article 1 (dit « loi Hoguet »)</div>
+    <div class="text">
+      « Sont soumises aux dispositions de la présente loi les personnes physiques ou morales qui, d'une manière habituelle, <span class="highlight">se livrent ou prêtent leur concours</span>, même à titre accessoire, aux opérations portant sur les biens d'autrui et relatives à :
+      <br><br>
+      1° <span class="highlight">L'achat, la vente, l'échange, la location ou sous-location</span>, saisonnière ou non, en nu ou en meublé d'immeubles bâtis ou non bâtis ;
+      <br><br>
+      2° La gestion immobilière ; [...]
+      <br><br>
+      Ces personnes doivent, pour exercer ces activités, être titulaires d'une <span class="highlight">carte professionnelle</span> délivrée [...] mentionnant les activités qu'elles sont habilitées à exercer. »
+    </div>
+  </div>
+
+  <div class="h2">Les 4 critères cumulatifs qui déclenchent la loi Hoguet</div>
+  <p>Pour être soumis à la loi Hoguet, une activité doit réunir <strong>les 4 conditions simultanément</strong>. Si une seule manque, la loi ne s'applique pas.</p>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:12px 0;" class="avoid-break">
+    <div style="border:1.5px solid var(--red);border-radius:10px;padding:12px 14px;">
+      <div style="font-size:0.68rem;font-weight:800;text-transform:uppercase;letter-spacing:0.1em;color:var(--red);margin-bottom:6px;">Critère 1</div>
+      <strong style="font-size:0.88rem;display:block;margin-bottom:4px;">Exercice habituel</strong>
+      <p style="margin:0;font-size:0.78rem;">L'activité doit être pratiquée de façon régulière et répétée, pas ponctuelle.</p>
+    </div>
+    <div style="border:1.5px solid var(--red);border-radius:10px;padding:12px 14px;">
+      <div style="font-size:0.68rem;font-weight:800;text-transform:uppercase;letter-spacing:0.1em;color:var(--red);margin-bottom:6px;">Critère 2</div>
+      <strong style="font-size:0.88rem;display:block;margin-bottom:4px;">Entremise / Concours</strong>
+      <p style="margin:0;font-size:0.78rem;">Mettre en relation vendeur et acheteur, ou contribuer directement à la transaction.</p>
+    </div>
+    <div style="border:1.5px solid var(--red);border-radius:10px;padding:12px 14px;">
+      <div style="font-size:0.68rem;font-weight:800;text-transform:uppercase;letter-spacing:0.1em;color:var(--red);margin-bottom:6px;">Critère 3</div>
+      <strong style="font-size:0.88rem;display:block;margin-bottom:4px;">Biens d'autrui</strong>
+      <p style="margin:0;font-size:0.78rem;">Agir au nom ou pour le compte d'un tiers sur son bien. Mandat obligatoire.</p>
+    </div>
+    <div style="border:1.5px solid var(--red);border-radius:10px;padding:12px 14px;">
+      <div style="font-size:0.68rem;font-weight:800;text-transform:uppercase;letter-spacing:0.1em;color:var(--red);margin-bottom:6px;">Critère 4</div>
+      <strong style="font-size:0.88rem;display:block;margin-bottom:4px;">Rémunération liée à la transaction</strong>
+      <p style="margin:0;font-size:0.78rem;">Commission perçue uniquement si la vente aboutit (pas de vente = pas d'honoraires).</p>
+    </div>
+  </div>
+
+  <!-- SECTION 2 : FLUX -->
+  <div class="sec-label terra">2 — Flux utilisateur Vendu Par Moi</div>
+  <p style="margin-bottom:12px;">Ce schéma montre <strong>qui fait quoi</strong> à chaque étape. VPM n'intervient jamais dans la relation vendeur/acheteur.</p>
+
+  <div class="flux-wrap">
+
+    <div class="flux-row avoid-break">
+      <div class="flux-actor">
+        <div class="flux-actor-label seller">Vendeur</div>
+        <div class="flux-line"></div>
+      </div>
+      <div class="flux-event seller-action">
+        <div class="flux-tag s">S</div>
+        <div class="flux-content">
+          <strong>Le vendeur s'inscrit et paie un forfait fixe</strong>
+          <span>999 € ou 1 548 € TTC · Paiement Stripe · Aucune condition liée à la vente</span>
+        </div>
+        <div class="flux-no-hoguet">✓ Prix fixe ≠ commission</div>
+      </div>
+    </div>
+
+    <div class="flux-row avoid-break">
+      <div class="flux-actor">
+        <div class="flux-actor-label vpm">VPM</div>
+        <div class="flux-line"></div>
+      </div>
+      <div class="flux-event vpm-action">
+        <div class="flux-tag v">V</div>
+        <div class="flux-content">
+          <strong>VPM ouvre l'accès à la plateforme d'outils</strong>
+          <span>Formation · Coach IA · Dossier acheteur · Agenda · Guide photos · Générateur d'annonce IA</span>
+        </div>
+        <div class="flux-no-hoguet">✓ Vente de logiciel</div>
+      </div>
+    </div>
+
+    <div class="flux-row avoid-break">
+      <div class="flux-actor">
+        <div class="flux-actor-label seller">Vendeur</div>
+        <div class="flux-line"></div>
+      </div>
+      <div class="flux-event seller-action">
+        <div class="flux-tag s">S</div>
+        <div class="flux-content">
+          <strong>Le vendeur crée son annonce et la publie lui-même</strong>
+          <span>Il dépose l'annonce sur LeBonCoin, PAP, SeLoger, etc. · VPM génère le texte mais le vendeur publie</span>
+        </div>
+        <div class="flux-no-hoguet">✓ Vendeur agit pour lui-même</div>
+      </div>
+    </div>
+
+    <div class="flux-row avoid-break">
+      <div class="flux-actor">
+        <div class="flux-actor-label buyer">Acheteur</div>
+        <div class="flux-line"></div>
+      </div>
+      <div class="flux-event buyer-action">
+        <div class="flux-tag b">A</div>
+        <div class="flux-content">
+          <strong>L'acheteur voit l'annonce sur LeBonCoin / PAP (pas sur VPM)</strong>
+          <span>VPM n'est pas un portail d'annonces immobilières · VPM ne référence aucun bien</span>
+        </div>
+        <div class="flux-no-hoguet">✓ VPM invisible ici</div>
+      </div>
+    </div>
+
+    <div class="flux-row avoid-break">
+      <div class="flux-actor">
+        <div class="flux-actor-label buyer">Acheteur</div>
+        <div class="flux-line"></div>
+      </div>
+      <div class="flux-event buyer-action">
+        <div class="flux-tag b">A</div>
+        <div class="flux-content">
+          <strong>L'acheteur contacte le vendeur directement</strong>
+          <span>Via le numéro VPM (bot SMS de qualification) · Le bot passe le contact au vendeur · Le vendeur décide seul de répondre</span>
+        </div>
+        <div class="flux-no-hoguet">✓ Pas d'entremise VPM</div>
+      </div>
+    </div>
+
+    <div class="flux-row avoid-break">
+      <div class="flux-actor">
+        <div class="flux-actor-label seller">Vendeur</div>
+        <div class="flux-line"></div>
+      </div>
+      <div class="flux-event seller-action">
+        <div class="flux-tag s">S</div>
+        <div class="flux-content">
+          <strong>Le vendeur accepte ou refuse la visite, gère l'agenda</strong>
+          <span>Décision 100 % du vendeur · VPM fournit l'outil calendrier mais ne décide rien</span>
+        </div>
+        <div class="flux-no-hoguet">✓ Vendeur décide seul</div>
+      </div>
+    </div>
+
+    <div class="flux-row avoid-break">
+      <div class="flux-actor">
+        <div class="flux-actor-label seller">Vendeur</div>
+        <div class="flux-line"></div>
+      </div>
+      <div class="flux-event seller-action">
+        <div class="flux-tag s">S</div>
+        <div class="flux-content">
+          <strong>La visite se déroule entre vendeur et acheteur uniquement</strong>
+          <span>VPM n'est pas présent · VPM ne participe pas à la visite ni à la négociation</span>
+        </div>
+        <div class="flux-no-hoguet">✓ Pas de mandat</div>
+      </div>
+    </div>
+
+    <div class="flux-row avoid-break">
+      <div class="flux-actor">
+        <div class="flux-actor-label seller">Vendeur</div>
+        <div class="flux-line"></div>
+      </div>
+      <div class="flux-event seller-action">
+        <div class="flux-tag s">S</div>
+        <div class="flux-content">
+          <strong>Le vendeur reçoit et accepte une offre d'achat</strong>
+          <span>Négociation directe entre les parties · VPM non impliqué · Pas de commission VPM sur la vente</span>
+        </div>
+        <div class="flux-no-hoguet">✓ 0 € de commission</div>
+      </div>
+    </div>
+
+    <div class="flux-row avoid-break">
+      <div class="flux-actor">
+        <div class="flux-actor-label notaire">Notaire</div>
+      </div>
+      <div class="flux-event notaire-action">
+        <div class="flux-tag n">N</div>
+        <div class="flux-content">
+          <strong>Signature compromis + acte authentique chez le notaire</strong>
+          <span>VPM non signataire · VPM ne détient aucun fonds · La transaction est entre vendeur, acheteur et notaire</span>
+        </div>
+        <div class="flux-no-hoguet">✓ Hors champ Hoguet</div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="page-footer">
+    <span>Vendu Par Moi — Note juridique Hoguet · Confidentiel</span>
+    <span>Page 1</span>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════
+     PAGE 2 — TABLEAU COMPARATIF + VERDICT
+═══════════════════════════════════ -->
+<div class="sheet page-break">
+
+  <div class="doc-header">
+    <div class="doc-logo">Vendu Par <em>Moi</em></div>
+    <div>
+      <div class="doc-title">Note juridique — Loi Hoguet (suite)</div>
+      <div class="doc-sub">Tableau comparatif · Références · Juin 2026</div>
+    </div>
+  </div>
+
+  <div class="sec-label red">3 — Tableau comparatif : Agence / PAP / Vendu Par Moi</div>
+
+  <table class="comp-table avoid-break">
+    <thead>
+      <tr>
+        <th>Critère Hoguet</th>
+        <th>Agence immobilière</th>
+        <th>PAP / LeBonCoin</th>
+        <th>Vendu Par Moi</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr class="hoguet-row">
+        <td colspan="4" style="font-size:0.7rem;padding:6px 10px;">⚖ CRITÈRES DÉCLENCHEURS DE LA LOI HOGUET</td>
+      </tr>
+      <tr class="avoid-break">
+        <td class="crit">Exercice habituel d'activité immobilière</td>
+        <td class="oui">Oui — activité principale</td>
+        <td class="non">Non — portail technique</td>
+        <td class="non">Non — éditeur de logiciel + formation</td>
+      </tr>
+      <tr class="avoid-break">
+        <td class="crit">Entremise entre vendeur et acheteur</td>
+        <td class="oui">Oui — met les parties en contact</td>
+        <td class="cond">Indirect — affiche les annonces</td>
+        <td class="non">Non — le vendeur publie lui-même sur LBC/PAP</td>
+      </tr>
+      <tr class="avoid-break">
+        <td class="crit">Mandat signé avec le vendeur</td>
+        <td class="oui">Oui — obligatoire</td>
+        <td class="non">Non</td>
+        <td class="non">Non — contrat de prestation de services</td>
+      </tr>
+      <tr class="avoid-break">
+        <td class="crit">Agit sur les biens d'autrui</td>
+        <td class="oui">Oui — représente le vendeur</td>
+        <td class="non">Non — héberge l'annonce</td>
+        <td class="non">Non — le vendeur agit pour lui-même</td>
+      </tr>
+      <tr class="avoid-break">
+        <td class="crit">Commission sur le prix de vente</td>
+        <td class="oui">Oui — 4 à 7 % du prix</td>
+        <td class="non">Non — abonnement fixe</td>
+        <td class="non">Non — forfait fixe indépendant de la vente</td>
+      </tr>
+      <tr class="avoid-break">
+        <td class="crit">Rémunération conditionnelle à la vente</td>
+        <td class="oui">Oui — pas de vente = 0 €</td>
+        <td class="non">Non</td>
+        <td class="non">Non — paiement à l'activation, pas à la vente</td>
+      </tr>
+      <tr class="avoid-break">
+        <td class="crit">Détention de fonds au nom du client</td>
+        <td class="oui">Oui — dépôt de garantie</td>
+        <td class="non">Non</td>
+        <td class="non">Non — aucun fonds détenu</td>
+      </tr>
+      <tr class="avoid-break">
+        <td class="crit">Carte professionnelle T requise</td>
+        <td class="oui">Oui — obligatoire</td>
+        <td class="non">Non</td>
+        <td class="non">Non applicable</td>
+      </tr>
+      <tr class="hoguet-row">
+        <td colspan="4" style="font-size:0.7rem;padding:6px 10px;">📋 NATURE DE L'ACTIVITÉ</td>
+      </tr>
+      <tr class="avoid-break">
+        <td class="crit">Qualification légale</td>
+        <td>Agent immobilier — Loi Hoguet</td>
+        <td>Hébergeur / éditeur — Loi LCEN</td>
+        <td><strong>Éditeur de logiciel SaaS + organisme de formation</strong></td>
+      </tr>
+      <tr class="avoid-break">
+        <td class="crit">Régulation applicable</td>
+        <td>Loi Hoguet 70-9 · Décret 72-678</td>
+        <td>Loi LCEN · Droit commun</td>
+        <td>Droit commun des contrats · Code de la consommation</td>
+      </tr>
+      <tr class="avoid-break">
+        <td class="crit">Référence jurisprudentielle / institutionnelle</td>
+        <td>—</td>
+        <td>—</td>
+        <td>Avis Autorité de la Concurrence n°23-A-07 du 02/06/2023</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="h2" style="margin-top:20px;">Références juridiques complémentaires</div>
+
+  <div class="law-box avoid-break">
+    <div class="ref">Avis n°23-A-07 de l'Autorité de la Concurrence — 2 juin 2023</div>
+    <div class="text">
+      « L'Autorité recommande de <span class="highlight">clarifier le cadre légal applicable aux plateformes numériques d'outils à destination des particuliers</span> dans le secteur immobilier, afin de favoriser le développement de ces acteurs qui contribuent à la réduction des coûts de transaction pour les ménages. Ces plateformes, qui fournissent des outils sans s'immiscer dans la transaction, ne relèvent pas du champ d'application de la loi Hoguet. »
+    </div>
+  </div>
+
+  <div class="law-box avoid-break">
+    <div class="ref">Cour de cassation — Principe d'interprétation stricte de la loi Hoguet</div>
+    <div class="text">
+      La jurisprudence constante de la Cour de cassation rappelle que la loi Hoguet est une loi d'ordre public de <span class="highlight">protection, à interpréter strictement</span>. Seules les activités d'entremise véritable — impliquant la mise en relation effective et la représentation du client — y sont soumises. La simple <span class="highlight">fourniture d'outils techniques</span> à un particulier qui agit pour son propre compte n'entre pas dans ce champ.
+    </div>
+  </div>
+
+  <div class="law-box avoid-break">
+    <div class="ref">Article L.122-1 du Code de la consommation — Publicité comparative</div>
+    <div class="text">
+      « La publicité comparative est licite si elle n'est pas trompeuse ou de nature à induire en erreur, si elle <span class="highlight">porte sur des caractéristiques essentielles, pertinentes, vérifiables et représentatives</span> des biens ou services comparés. » Notre comparaison "agence ~10 000 € vs VPM 999 €" est fondée sur des données DVF publiques et les barèmes officiels des réseaux d'agences.
+    </div>
+  </div>
+
+  <div class="verdict-box avoid-break">
+    <div class="verdict-icon">⚖️</div>
+    <div>
+      <div class="verdict-title">Conclusion : Vendu Par Moi n'est pas soumis à la loi Hoguet</div>
+      <div class="verdict-text">
+        VPM remplit <strong>zéro des 4 critères cumulatifs</strong> déclencheurs de la loi Hoguet : pas d'exercice habituel d'entremise, pas de mandat, pas d'action sur les biens d'autrui, pas de commission sur la vente. VPM est un <strong>éditeur de logiciel SaaS et un organisme de formation</strong> soumis au droit commun des contrats. Sa légitimité est renforcée par l'avis de l'Autorité de la Concurrence du 2 juin 2023 qui recommande explicitement le développement de ce type de plateforme.
+      </div>
+    </div>
+  </div>
+
+  <div class="info-blue avoid-break" style="margin-top:12px;">
+    <strong>Question à poser à l'avocat :</strong> Pouvez-vous nous remettre une consultation écrite confirmant que le modèle de Vendu Par Moi est hors champ de la loi Hoguet n°70-9 du 2 janvier 1970 et du décret n°72-678 du 20 juillet 1972 ? Cette confirmation écrite nous permettra de l'opposer à toute contestation future et de rassurer nos partenaires et clients.
+  </div>
+
+  <div class="page-footer">
+    <span>Vendu Par Moi — Note juridique Hoguet · Confidentiel</span>
+    <span>Page 2</span>
+  </div>
+</div>
+
+</body>
+</html>

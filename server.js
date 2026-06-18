@@ -61,6 +61,7 @@ app.get('/register', (req, res) => { res.set('Cache-Control', 'no-store, no-cach
 app.get('/dossier-complet', (req, res) => { res.set('Cache-Control', 'no-store, no-cache, must-revalidate'); res.sendFile(path.join(__dirname, 'public', 'dossier-complet.html')); });
 app.get('/formation-complete', (req, res) => { res.set('Cache-Control', 'no-store, no-cache, must-revalidate'); res.sendFile(path.join(__dirname, 'public', 'formation-complete.html')); });
 app.get('/fiche-fondateurs', (req, res) => { res.set('Cache-Control', 'no-store, no-cache, must-revalidate'); res.sendFile(path.join(__dirname, 'public', 'fiche-fondateurs.html')); });
+app.get('/hoguet-defense', (req, res) => { res.set('Cache-Control', 'no-store, no-cache, must-revalidate'); res.sendFile(path.join(__dirname, 'public', 'hoguet-defense.html')); });
 
 app.use(express.static(path.join(__dirname, 'public'), {
   maxAge: '7d',
