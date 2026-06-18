@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Formation Complète — Vendu Par Moi</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    @media print {
+      html, body { width: 210mm; background: white !important; }
+      .no-print { display: none !important; }
+      .page-break { page-break-before: always; }
+      .avoid-break { page-break-inside: avoid; }
+      @page { margin: 18mm 18mm 18mm 18mm; size: A4 portrait; }
+      body { font-size: 10pt; }
+    }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: #ddd;
+      color: #1a1a16;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    :root {
+      --green: #3D5A47;
+      --green-dark: #1C3028;
+      --terra: #C4785A;
+      --beige: #F5F0E8;
+      --border: #e0d8cc;
+      --muted: #666;
+    }
+
+    .no-print {
+      position: fixed; top: 20px; right: 20px; z-index: 999;
+      display: flex; gap: 10px; flex-direction: column;
+    }
+    .btn-print {
+      background: var(--green-dark); color: #fff; border: none;
+      padding: 12px 22px; border-radius: 8px;
+      font-family: 'DM Sans', sans-serif; font-size: 0.88rem; font-weight: 700;
+      cursor: pointer; box-shadow: 0 4px 16px rgba(0,0,0,0.25);
+    }
+    .btn-print:hover { background: #2d4535; }
+
+    .sheet {
+      width: 210mm; min-height: 297mm;
+      background: white;
+      margin: 20px auto;
+      box-shadow: 0 4px 40px rgba(0,0,0,0.18);
+      position: relative; overflow: hidden;
+    }
+
+    /* COUVERTURE */
+    .cover {
+      background: linear-gradient(160deg, #0F1E13 0%, #1C3028 60%, #2d4535 100%);
+      min-height: 297mm; display: flex; flex-direction: column; color: #fff;
+    }
+    .cover-body { flex: 1; padding: 60px 56px; }
+    .cover-logo { font-family: 'Cormorant Garamond', serif; font-size: 1.4rem; color: rgba(255,255,255,0.6); margin-bottom: 80px; }
+    .cover-logo em { color: #C4785A; font-style: normal; }
+    .cover-eyebrow { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.12em; color: rgba(196,120,90,0.8); margin-bottom: 16px; }
+    .cover-title { font-family: 'Cormorant Garamond', serif; font-size: 3rem; font-weight: 700; line-height: 1.1; margin-bottom: 24px; }
+    .cover-title em { color: #f0b89a; font-style: italic; }
+    .cover-desc { font-size: 0.95rem; color: rgba(255,255,255,0.65); max-width: 420px; line-height: 1.75; margin-bottom: 48px; }
+    .cover-modules { display: flex; flex-direction: column; gap: 10px; }
+    .cover-mod { display: flex; gap: 14px; align-items: center; padding: 12px 16px; background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; }
+    .cover-mod-num { width: 28px; height: 28px; border-radius: 50%; background: rgba(196,120,90,0.3); color: #f0b89a; font-weight: 700; font-size: 0.78rem; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .cover-mod-title { font-size: 0.84rem; font-weight: 600; color: #fff; }
+    .cover-mod-sub { font-size: 0.7rem; color: rgba(255,255,255,0.45); }
+    .cover-footer { background: rgba(0,0,0,0.25); border-top: 1px solid rgba(255,255,255,0.08); padding: 20px 56px; display: flex; justify-content: space-between; font-size: 0.72rem; color: rgba(255,255,255,0.4); }
+
+    /* MODULE HEADER */
+    .mod-header {
+      padding: 40px 56px 32px;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 32px;
+    }
+    .mod-eyebrow { font-size: 0.65rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.12em; color: var(--terra); margin-bottom: 8px; }
+    .mod-title { font-family: 'Cormorant Garamond', serif; font-size: 2.2rem; font-weight: 700; color: var(--green-dark); line-height: 1.15; margin-bottom: 10px; }
+    .mod-intro { font-size: 0.88rem; color: var(--muted); line-height: 1.7; max-width: 520px; }
+
+    /* BODY */
+    .mod-body { padding: 0 56px 48px; }
+
+    .h2 { font-family: 'Cormorant Garamond', serif; font-size: 1.3rem; font-weight: 700; color: var(--green-dark); margin: 28px 0 14px; padding-bottom: 8px; border-bottom: 2px solid var(--border); }
+    .h3 { font-size: 0.82rem; font-weight: 700; color: var(--green); margin: 18px 0 8px; text-transform: uppercase; letter-spacing: 0.07em; }
+    p { font-size: 0.87rem; color: #444; line-height: 1.75; margin-bottom: 10px; }
+    ul, ol { padding-left: 20px; margin-bottom: 12px; }
+    li { font-size: 0.87rem; color: #444; line-height: 1.7; margin-bottom: 5px; }
+    strong { color: #1a1a16; }
+
+    .tip { background: #e8f4ec; border-left: 3px solid var(--green); border-radius: 0 8px 8px 0; padding: 12px 16px; margin: 14px 0; }
+    .tip strong { color: var(--green); display: block; margin-bottom: 4px; font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.06em; }
+    .warning { background: #fff8e7; border-left: 3px solid #f0a500; border-radius: 0 8px 8px 0; padding: 12px 16px; margin: 14px 0; }
+    .warning strong { color: #a06800; display: block; margin-bottom: 4px; font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.06em; }
+    .danger { background: #fef0ee; border-left: 3px solid #e05c3a; border-radius: 0 8px 8px 0; padding: 12px 16px; margin: 14px 0; }
+    .danger strong { color: #b03a20; display: block; margin-bottom: 4px; font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.06em; }
+
+    .script-box {
+      background: #f8f5f0; border-radius: 10px; padding: 16px 20px; margin: 14px 0;
+      border: 1px solid var(--border);
+    }
+    .script-label { font-size: 0.68rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--terra); margin-bottom: 8px; }
+    .script-text { font-size: 0.84rem; color: #333; line-height: 1.8; font-style: italic; }
+
+    .checklist { background: #f8f5f0; border-radius: 10px; padding: 16px 20px; margin: 14px 0; }
+    .checklist-title { font-size: 0.78rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--green-dark); margin-bottom: 12px; }
+    .check-item { display: flex; gap: 10px; padding: 6px 0; border-bottom: 1px solid #e8e0d6; font-size: 0.84rem; color: #444; }
+    .check-item:last-child { border-bottom: none; }
+    .check-box { width: 16px; height: 16px; border: 1.5px solid #bbb; border-radius: 3px; flex-shrink: 0; margin-top: 2px; }
+
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin: 14px 0; }
+    .card { background: #f8f5f0; border-radius: 10px; padding: 14px 16px; }
+    .card strong { display: block; margin-bottom: 4px; font-size: 0.85rem; }
+    .card p { margin: 0; font-size: 0.8rem; }
+
+    .step-row { display: flex; gap: 14px; margin-bottom: 14px; align-items: flex-start; }
+    .step-num { width: 32px; height: 32px; border-radius: 50%; background: var(--green); color: #fff; font-weight: 700; font-size: 0.82rem; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 2px; }
+    .step-content strong { font-size: 0.88rem; display: block; margin-bottom: 3px; }
+    .step-content p { margin: 0; font-size: 0.82rem; }
+
+    .page-footer { position: absolute; bottom: 0; left: 0; right: 0; padding: 10px 56px; border-top: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; font-size: 0.68rem; color: #bbb; }
+
+    hr.divider { border: none; border-top: 1px solid var(--border); margin: 24px 0; }
+  </style>
+</head>
+<body>
+
+<div class="no-print">
+  <button class="btn-print" onclick="window.print()">🖨 Imprimer / PDF</button>
+  <a href="/dossier-complet" style="display:block;background:#1C3028;color:#fff;text-align:center;padding:10px 14px;border-radius:8px;font-size:0.82rem;font-weight:700;text-decoration:none;">Dossier complet →</a>
+</div>
+
+<!-- ═══════════════════════════════════
+     COUVERTURE
+═══════════════════════════════════ -->
+<div class="sheet">
+  <div class="cover">
+    <div class="cover-body">
+      <div class="cover-logo">Vendu Par <em>Moi</em></div>
+      <div class="cover-eyebrow">Formation complète — Version écrite</div>
+      <h1 class="cover-title">Vendre son bien<br>sans agence.<br><em>La méthode complète.</em></h1>
+      <p class="cover-desc">Formation en 6 modules pour vendre votre bien immobilier entre particuliers, de l'estimation à la signature chez le notaire. Rédigée par des professionnels de l'immobilier.</p>
+      <div class="cover-modules">
+        <div class="cover-mod">
+          <div class="cover-mod-num">01</div>
+          <div><div class="cover-mod-title">Estimer son bien au juste prix</div><div class="cover-mod-sub">DVF, comparatifs, DPE, fixer le bon prix dès le départ</div></div>
+        </div>
+        <div class="cover-mod">
+          <div class="cover-mod-num">02</div>
+          <div><div class="cover-mod-title">Préparer sa vente</div><div class="cover-mod-sub">Documents, diagnostics, dossiers — tout rassembler avant de publier</div></div>
+        </div>
+        <div class="cover-mod">
+          <div class="cover-mod-num">03</div>
+          <div><div class="cover-mod-title">Annonce & Photos</div><div class="cover-mod-sub">Rédiger une annonce qui accroche, réussir ses photos au smartphone</div></div>
+        </div>
+        <div class="cover-mod">
+          <div class="cover-mod-num">04</div>
+          <div><div class="cover-mod-title">Qualifier & Préparer les visites</div><div class="cover-mod-sub">Filtrer les vrais acheteurs, confirmer les visites, préparer l'accueil</div></div>
+        </div>
+        <div class="cover-mod">
+          <div class="cover-mod-num">05</div>
+          <div><div class="cover-mod-title">Réussir ses visites</div><div class="cover-mod-sub">Se comporter en pro, guider, répondre aux questions pièges</div></div>
+        </div>
+        <div class="cover-mod">
+          <div class="cover-mod-num">06</div>
+          <div><div class="cover-mod-title">Négocier & Conclure</div><div class="cover-mod-sub">Analyser une offre, contre-proposer, signer jusqu'au notaire</div></div>
+        </div>
+      </div>
+    </div>
+    <div class="cover-footer">
+      <span>Vendu Par Moi — Formation confidentielle</span>
+      <span>venduparmo.fr</span>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════
+     MODULE 1 — ESTIMER
+═══════════════════════════════════ -->
+<div class="sheet page-break">
+  <div class="mod-header">
+    <div class="mod-eyebrow">Module 01 / 06</div>
+    <div class="mod-title">Estimer son bien au juste prix</div>
+    <p class="mod-intro">L'estimation est la décision la plus importante de votre vente. Un bien surestimé de 10 % reste sur le marché 3 fois plus longtemps et finit par se vendre en dessous de sa valeur réelle. Un juste prix dès le départ vous fait vendre vite et au meilleur prix.</p>
+  </div>
+  <div class="mod-body">
+
+    <div class="h2">1.1 — Comprendre la valeur de marché</div>
+    <p>La valeur d'un bien immobilier n'est pas ce que vous pensez qu'il vaut, ni ce que vous avez payé, ni ce qu'il vous a coûté en travaux. C'est <strong>ce qu'un acheteur informé est prêt à payer aujourd'hui</strong>, compte tenu de ce qui se vend réellement autour de vous.</p>
+    <div class="tip"><strong>Le principe clé</strong> La valeur de marché = la médiane des prix de vente réels des biens comparables dans votre secteur sur les 12 derniers mois.</div>
+
+    <div class="h2">1.2 — Utiliser DVF (Demande de Valeurs Foncières)</div>
+    <p><strong>DVF</strong> est la base de données officielle du gouvernement français qui recense toutes les transactions immobilières réalisées depuis 2014. C'est l'outil de référence utilisé par les notaires et les professionnels.</p>
+    <div class="step-row avoid-break">
+      <div class="step-num">1</div>
+      <div class="step-content"><strong>Accédez à app.dvf.etalab.gouv.fr</strong><p>Gratuit, sans inscription. Entrez votre adresse.</p></div>
+    </div>
+    <div class="step-row avoid-break">
+      <div class="step-num">2</div>
+      <div class="step-content"><strong>Filtrez par type de bien et surface</strong><p>Sélectionnez "appartement" ou "maison" et la surface ± 20 % de la vôtre.</p></div>
+    </div>
+    <div class="step-row avoid-break">
+      <div class="step-num">3</div>
+      <div class="step-content"><strong>Relevez les prix au m² des 6 à 12 derniers mois</strong><p>Écartez les extrêmes. La médiane est votre référence.</p></div>
+    </div>
+    <div class="step-row avoid-break">
+      <div class="step-num">4</div>
+      <div class="step-content"><strong>Appliquez votre surface habitable</strong><p>Prix au m² médian × votre surface = estimation de base.</p></div>
+    </div>
+
+    <div class="h2">1.3 — Les ajustements à appliquer</div>
+    <p>Votre estimation de base doit être ajustée selon les caractéristiques spécifiques de votre bien :</p>
+    <div class="grid-2">
+      <div class="card avoid-break"><strong>✅ Qui augmente la valeur</strong><p>Étage élevé avec ascenseur (+3-8%) · Bon DPE (A-C) (+5-10%) · Exposition Sud/Est (+2-5%) · Rénovation récente (+5-15%) · Vue dégagée (+2-8%) · Cave ou parking inclus (+3-6%) · Pas vis-à-vis · Calme</p></div>
+      <div class="card avoid-break"><strong>⚠️ Qui diminue la valeur</strong><p>Rez-de-chaussée (-5-15%) · DPE F ou G (-10-20%) · Exposition Nord (-3-8%) · Travaux importants à prévoir (-10-20%) · Bruit de rue (-3-8%) · Vis-à-vis direct (-2-5%) · Pas d'ascenseur au-delà du 3e</p></div>
+    </div>
+
+    <div class="h2">1.4 — Le DPE et son impact majeur depuis 2022</div>
+    <p>Le Diagnostic de Performance Énergétique est devenu <strong>un facteur déterminant du prix</strong>. Depuis la loi Climat et Résilience :</p>
+    <ul>
+      <li><strong>DPE G</strong> : interdiction de louer dès 2025, valeur dépréciée de 15 à 25 % · Acheteurs très prudents</li>
+      <li><strong>DPE F</strong> : interdiction de louer dès 2028, décote de 8 à 15 %</li>
+      <li><strong>DPE D-E</strong> : valeur normale, pas de décote particulière</li>
+      <li><strong>DPE A-B-C</strong> : peut se négocier avec une prime de 5 à 10 % selon le secteur</li>
+    </ul>
+    <div class="warning"><strong>Attention</strong> Si votre bien est en DPE F ou G, anticipez les questions des acheteurs sur le coût des travaux de rénovation. Demandez des devis avant la mise en vente pour pouvoir répondre avec des chiffres précis.</div>
+
+    <div class="h2">1.5 — Fixer le bon prix : la règle des 3 prix</div>
+    <div class="grid-2">
+      <div class="card avoid-break"><strong>Prix de publication</strong><p>Votre estimation de marché + 3 à 5 % maximum. C'est le prix que vous affichez. Il laisse une marge de négociation sans être dissuasif.</p></div>
+      <div class="card avoid-break"><strong>Prix plancher</strong><p>Le minimum en dessous duquel vous ne vendez pas. Définissez-le avant de commencer. Permet de ne pas céder sous pression émotionnelle.</p></div>
+    </div>
+    <div class="danger"><strong>Le piège à éviter</strong> Ne vous basez pas sur le prix des annonces en ligne — elles affichent des prix demandés, pas des prix réels de vente. Les prix DVF sont les seules transactions effectives. Un bien peut rester des mois en ligne à un prix trop élevé avant d'être retiré sans avoir été vendu.</div>
+  </div>
+  <div class="page-footer"><span>Vendu Par Moi — Formation</span><span>Module 01 — Page 2</span></div>
+</div>
+
+<!-- ═══════════════════════════════════
+     MODULE 2 — PRÉPARER
+═══════════════════════════════════ -->
+<div class="sheet page-break">
+  <div class="mod-header">
+    <div class="mod-eyebrow">Module 02 / 06</div>
+    <div class="mod-title">Préparer sa vente</div>
+    <p class="mod-intro">La préparation est la différence entre une vente qui traîne et une vente qui décolle. Rassemblez tous vos documents avant de publier la première annonce. Un acheteur sérieux demande tout — autant l'avoir sous la main.</p>
+  </div>
+  <div class="mod-body">
+
+    <div class="h2">2.1 — Les diagnostics immobiliers obligatoires</div>
+    <p>Ces diagnostics doivent être réalisés par un diagnostiqueur certifié avant toute mise en vente. Leur coût varie selon la surface et les diagnostics requis (200 à 600 € en moyenne pour un appartement).</p>
+    <div class="checklist avoid-break">
+      <div class="checklist-title">Diagnostics obligatoires (selon votre bien)</div>
+      <div class="check-item"><div class="check-box"></div> DPE — Diagnostic de Performance Énergétique (obligatoire pour tous)</div>
+      <div class="check-item"><div class="check-box"></div> Amiante (biens dont le permis de construire date d'avant juillet 1997)</div>
+      <div class="check-item"><div class="check-box"></div> Plomb / CREP (biens construits avant 1949)</div>
+      <div class="check-item"><div class="check-box"></div> Électricité (installations de plus de 15 ans)</div>
+      <div class="check-item"><div class="check-box"></div> Gaz (installations de plus de 15 ans)</div>
+      <div class="check-item"><div class="check-box"></div> État parasitaire / Termites (selon zone géographique)</div>
+      <div class="check-item"><div class="check-box"></div> État des risques naturels et technologiques (ERNT — gratuit en mairie)</div>
+      <div class="check-item"><div class="check-box"></div> Loi Carrez (surface exacte — pour copropriété uniquement)</div>
+      <div class="check-item"><div class="check-box"></div> Assainissement (maison individuelle non raccordée au tout-à-l'égout)</div>
+    </div>
+
+    <div class="h2">2.2 — Documents à rassembler pour le dossier</div>
+    <div class="grid-2">
+      <div class="checklist avoid-break">
+        <div class="checklist-title">Documents du bien</div>
+        <div class="check-item"><div class="check-box"></div> Titre de propriété (acte de vente)</div>
+        <div class="check-item"><div class="check-box"></div> Plans du logement (si disponibles)</div>
+        <div class="check-item"><div class="check-box"></div> Surface Carrez (copropriété)</div>
+        <div class="check-item"><div class="check-box"></div> Taxe foncière (dernière année)</div>
+        <div class="check-item"><div class="check-box"></div> Factures travaux (moins de 10 ans)</div>
+        <div class="check-item"><div class="check-box"></div> Entretien chaudière / cheminée</div>
+        <div class="check-item"><div class="check-box"></div> Garantie décennale (travaux récents)</div>
+      </div>
+      <div class="checklist avoid-break">
+        <div class="checklist-title">Documents copropriété (si concerné)</div>
+        <div class="check-item"><div class="check-box"></div> 3 derniers PV d'assemblée générale</div>
+        <div class="check-item"><div class="check-box"></div> Règlement de copropriété</div>
+        <div class="check-item"><div class="check-box"></div> État daté (montant charges annuelles)</div>
+        <div class="check-item"><div class="check-box"></div> Carnet d'entretien de l'immeuble</div>
+        <div class="check-item"><div class="check-box"></div> Pré-état daté (demandé au syndic)</div>
+        <div class="check-item"><div class="check-box"></div> Fonds de travaux (article 14-2)</div>
+      </div>
+    </div>
+
+    <div class="h2">2.3 — Préparer le bien physiquement</div>
+    <p>Un bien propre et ordonné se vend plus vite et à un meilleur prix. Ce n'est pas une question d'argent — c'est une question d'organisation.</p>
+    <div class="checklist avoid-break">
+      <div class="checklist-title">Checklist home staging minimum</div>
+      <div class="check-item"><div class="check-box"></div> Désencombrer : less is more — retirez la moitié des meubles si possible</div>
+      <div class="check-item"><div class="check-box"></div> Nettoyer en profondeur (joints de salle de bain, hotte, fenêtres)</div>
+      <div class="check-item"><div class="check-box"></div> Dépersonnaliser : retirer les photos de famille, objets religieux, déco trop personnelle</div>
+      <div class="check-item"><div class="check-box"></div> Réparer les petits défauts visibles (poignée cassée, robinet qui fuit, ampoule grillée)</div>
+      <div class="check-item"><div class="check-box"></div> Aérer le logement 30 minutes avant chaque visite</div>
+      <div class="check-item"><div class="check-box"></div> Maximiser la lumière naturelle (rideaux ouverts, ampoules à changer si nécessaire)</div>
+      <div class="check-item"><div class="check-box"></div> Soigner l'entrée — c'est la première impression</div>
+    </div>
+    <div class="tip"><strong>Conseil pro</strong> Une couche de peinture blanche dans les pièces sombres ou défraîchies rapporte souvent 3 à 5 fois son coût en valeur perçue. C'est l'investissement home staging le plus rentable.</div>
+  </div>
+  <div class="page-footer"><span>Vendu Par Moi — Formation</span><span>Module 02 — Page 3</span></div>
+</div>
+
+<!-- ═══════════════════════════════════
+     MODULE 3 — ANNONCE & PHOTOS
+═══════════════════════════════════ -->
+<div class="sheet page-break">
+  <div class="mod-header">
+    <div class="mod-eyebrow">Module 03 / 06</div>
+    <div class="mod-title">Annonce & Photos</div>
+    <p class="mod-intro">Votre annonce est votre vitrine. Les acheteurs décident de vous contacter ou non en moins de 10 secondes. Des photos médiocres ou un texte générique condamnent votre bien à l'invisibilité, même au bon prix.</p>
+  </div>
+  <div class="mod-body">
+
+    <div class="h2">3.1 — Réussir ses photos au smartphone</div>
+    <p>Des photos professionnelles augmentent le nombre de contacts de 40 % en moyenne. Voici comment en faire de bonnes avec votre téléphone.</p>
+
+    <div class="h3">Les règles d'or de la photo immobilière</div>
+    <ul>
+      <li><strong>Lumière naturelle uniquement</strong> — jamais de flash. Éteignez les lumières artificielles, ouvrez les volets et rideaux au maximum. Photographiez en milieu de matinée (10h-12h) quand la lumière est douce.</li>
+      <li><strong>Mode paysage obligatoire</strong> — jamais en portrait. Tenez votre téléphone horizontalement, à hauteur des yeux ou légèrement en dessous.</li>
+      <li><strong>Grand angle</strong> — utilisez le mode grand angle de votre smartphone (×0.5) pour donner de l'espace aux pièces. Mais évitez l'ultra grand angle qui déforme trop.</li>
+      <li><strong>Appuyez-vous sur un mur ou un coin</strong> pour stabiliser et maximiser la profondeur de champ.</li>
+      <li><strong>Nettoyer avant de photographier</strong> — comptoir de cuisine rangé, lit fait, salle de bain sans produits apparents.</li>
+    </ul>
+
+    <div class="checklist avoid-break">
+      <div class="checklist-title">Ordre des photos à prendre</div>
+      <div class="check-item"><div class="check-box"></div> Photo de façade / extérieur (si maison)</div>
+      <div class="check-item"><div class="check-box"></div> Pièce à vivre / salon (vue principale + coin détail)</div>
+      <div class="check-item"><div class="check-box"></div> Cuisine (vue d'ensemble, pas les détails d'électroménager)</div>
+      <div class="check-item"><div class="check-box"></div> Chambre(s) (une photo large chacune)</div>
+      <div class="check-item"><div class="check-box"></div> Salle de bain / WC (propre, sans produits)</div>
+      <div class="check-item"><div class="check-box"></div> Vue depuis les fenêtres (si belle vue)</div>
+      <div class="check-item"><div class="check-box"></div> Cave, parking, jardin, balcon (si existant)</div>
+      <div class="check-item"><div class="check-box"></div> Hall d'entrée de l'immeuble (si copropriété propre)</div>
+    </div>
+
+    <div class="h2">3.2 — Rédiger une annonce efficace</div>
+    <p>Une bonne annonce répond à une seule question : <strong>"Est-ce que ce bien correspond à ma recherche ?"</strong> Elle doit être factuelle, précise et mettre en valeur les points forts sans mentir.</p>
+
+    <div class="h3">Structure d'une annonce qui convertit</div>
+    <div class="script-box avoid-break">
+      <div class="script-label">Structure type</div>
+      <div class="script-text">
+        [Ligne 1 — accroche] : Chiffres clés + point fort principal<br>
+        Ex : "Appartement 3 pièces 68 m² — lumineux, vue dégagée, balcon"<br><br>
+        [Corps] : Description factuelle pièce par pièce, état du bien, points forts<br>
+        [Quartier] : 2-3 lignes sur les commodités proches (transports, commerces, écoles)<br>
+        [Technique] : DPE, charges mensuelles, taxe foncière, étage, ascenseur<br>
+        [Appel à l'action] : "Visites possibles en semaine et week-end sur rendez-vous"
+      </div>
+    </div>
+
+    <div class="tip"><strong>Ce qui fonctionne</strong> Les mots qui attirent l'œil : lumineux · traversant · calme · rénové · double vitrage · parquet · hauteur sous plafond · sans vis-à-vis · cellier · placards intégrés</div>
+    <div class="danger"><strong>Ce qui fait fuir</strong> "Cachet à rénover" (= vieux et abîmé) · "À saisir" (= désespéré) · "Prix négociable" (= on n'est pas sûr de notre prix) · Les fautes d'orthographe</div>
+
+    <div class="h2">3.3 — Où publier</div>
+    <div class="grid-2">
+      <div class="card avoid-break"><strong>À publier obligatoirement</strong><p>LeBonCoin Immobilier · PAP.fr · SeLoger Particuliers · Logic-Immo · Bien'ici</p></div>
+      <div class="card avoid-break"><strong>En bonus</strong><p>Facebook Marketplace · Groupes Facebook locaux · Logic-Immo · MeilleursAgents (estimation + annonce)</p></div>
+    </div>
+    <div class="tip"><strong>Conseil</strong> Rafraîchissez votre annonce sur LeBonCoin toutes les 2 semaines pour remonter dans les résultats. Publiez le mardi ou mercredi soir (pics de consultation) et jamais le vendredi soir.</div>
+  </div>
+  <div class="page-footer"><span>Vendu Par Moi — Formation</span><span>Module 03 — Page 4</span></div>
+</div>
+
+<!-- ═══════════════════════════════════
+     MODULE 4 — QUALIFIER
+═══════════════════════════════════ -->
+<div class="sheet page-break">
+  <div class="mod-header">
+    <div class="mod-eyebrow">Module 04 / 06</div>
+    <div class="mod-title">Qualifier & Préparer les visites</div>
+    <p class="mod-intro">Ne faites pas visiter votre bien à n'importe qui. Chaque visite d'un acheteur non qualifié vous coûte du temps, de l'énergie et crée de la déception. La qualification est la sélection professionnelle qui vous protège.</p>
+  </div>
+  <div class="mod-body">
+
+    <div class="h2">4.1 — Pourquoi qualifier avant de faire visiter</div>
+    <p>Un agent immobilier professionnel qualifie systématiquement ses acheteurs avant d'organiser une visite. Il filtre les curieux, les touristes de l'immobilier, et les acheteurs qui n'ont pas les moyens. Vous devez faire exactement la même chose.</p>
+    <div class="grid-2">
+      <div class="card avoid-break"><strong>Acheteur qualifié</strong><p>A un budget défini · A fait une simulation de prêt · Cherche dans votre secteur depuis 1+ mois · Peut visiter rapidement · Pose des questions précises</p></div>
+      <div class="card avoid-break"><strong>Acheteur non qualifié</strong><p>Budget flou · Pas encore de banque contactée · "On cherche depuis peu" · Annule souvent · Pose des questions très générales</p></div>
+    </div>
+
+    <div class="h2">4.2 — Les questions à poser avant d'accepter une visite</div>
+    <p>Par SMS ou téléphone, posez ces 4 questions. Les réponses vous permettront de décider si la visite vaut la peine.</p>
+
+    <div class="script-box avoid-break">
+      <div class="script-label">Script de qualification (SMS ou téléphone)</div>
+      <div class="script-text">
+        "Bonjour, merci pour votre intérêt. Avant de fixer un rendez-vous, j'aimerais mieux comprendre votre projet :<br><br>
+        1. Quel est votre budget maximum pour cet achat ?<br>
+        2. Vous achetez à crédit ou comptant ? (Si crédit : avez-vous déjà eu un accord de principe de votre banque ?)<br>
+        3. Vous avez un bien à vendre avant d'acheter ?<br>
+        4. Dans quel délai souhaitez-vous emménager idéalement ?<br><br>
+        Merci d'avance pour vos réponses !"
+      </div>
+    </div>
+
+    <div class="h3">Comment interpréter les réponses</div>
+    <ul>
+      <li><strong>Budget inférieur à votre prix</strong> → Refusez poliment ou proposez une négociation uniquement si vous êtes prêt à baisser</li>
+      <li><strong>Acheteur avec bien à vendre non compromis</strong> → Risque élevé de désistement. Faites visiter mais ne refusez pas d'autres acheteurs</li>
+      <li><strong>Pas de simulation de prêt faite</strong> → Demandez-lui de la faire d'abord, ou faites quand même visiter si vous avez peu de contacts</li>
+      <li><strong>Délai très long (12+ mois)</strong> → Curieux, faible probabilité d'achat immédiat</li>
+    </ul>
+
+    <div class="h2">4.3 — Confirmer la visite et préparer l'accueil</div>
+    <div class="script-box avoid-break">
+      <div class="script-label">SMS de confirmation (48h avant la visite)</div>
+      <div class="script-text">
+        "Bonjour [Prénom], je vous confirme notre rendez-vous [jour] à [heure] au [adresse]. Si vous avez des questions avant la visite, n'hésitez pas. À bientôt !"
+      </div>
+    </div>
+    <div class="script-box avoid-break">
+      <div class="script-label">SMS de rappel (le matin de la visite)</div>
+      <div class="script-text">
+        "Bonjour [Prénom], juste un petit rappel pour notre rendez-vous cet après-midi à [heure]. Je serai sur place 10 minutes avant. À tout à l'heure !"
+      </div>
+    </div>
+
+    <div class="checklist avoid-break">
+      <div class="checklist-title">Checklist préparation avant chaque visite</div>
+      <div class="check-item"><div class="check-box"></div> Aérez 30 min avant (même en hiver)</div>
+      <div class="check-item"><div class="check-box"></div> Allumez toutes les lumières (y compris placard, cave)</div>
+      <div class="check-item"><div class="check-box"></div> Ouvrez tous les volets et rideaux</div>
+      <div class="check-item"><div class="check-box"></div> Rangez les affaires personnelles de la chambre</div>
+      <div class="check-item"><div class="check-box"></div> Préparez le dossier acheteur imprimé (diagnostics, plans, charges)</div>
+      <div class="check-item"><div class="check-box"></div> Prévoyez le lien vers votre dossier numérique à partager</div>
+      <div class="check-item"><div class="check-box"></div> Températurez le logement (pas trop chaud, pas trop froid)</div>
+    </div>
+
+    <div class="tip"><strong>Astuce pro</strong> Préparez une feuille récapitulative A4 que vous donnez à chaque visiteur : adresse, surface, DPE, charges, taxe foncière, prix. Les acheteurs sérieux la gardent et y reviennent.</div>
+  </div>
+  <div class="page-footer"><span>Vendu Par Moi — Formation</span><span>Module 04 — Page 5</span></div>
+</div>
+
+<!-- ═══════════════════════════════════
+     MODULE 5 — VISITES
+═══════════════════════════════════ -->
+<div class="sheet page-break">
+  <div class="mod-header">
+    <div class="mod-eyebrow">Module 05 / 06</div>
+    <div class="mod-title">Réussir ses visites</div>
+    <p class="mod-intro">La visite est un moment de vente, pas une simple présentation. Votre comportement, vos mots et votre façon de guider l'acheteur feront la différence entre "on va y réfléchir" et "on est intéressés".</p>
+  </div>
+  <div class="mod-body">
+
+    <div class="h2">5.1 — L'état d'esprit du vendeur professionnel</div>
+    <p>Pendant la visite, vous n'êtes pas chez vous — vous êtes dans un logement que vous présentez à un futur acheteur. Mettez de côté l'attachement émotionnel. Soyez chaleureux, disponible et factuel.</p>
+    <div class="grid-2">
+      <div class="card avoid-break"><strong>À faire</strong><p>Accueillir avec le sourire · Laisser l'acheteur prendre son temps · Répondre aux questions factuellement · Guider sans pousser · Souligner les points forts naturellement</p></div>
+      <div class="card avoid-break"><strong>À ne pas faire</strong><p>Parler de la raison pour laquelle vous vendez (séparation, deuil, urgence) · Suivre l'acheteur de trop près · Commenter chaque pièce · Défendre votre prix si non questionné · Rire nerveusement</p></div>
+    </div>
+
+    <div class="h2">5.2 — Le parcours de visite idéal</div>
+    <p>Ne laissez pas l'acheteur errer librement dès l'entrée. Guidez le parcours stratégiquement : commencez par le point fort, terminez par le deuxième point fort.</p>
+    <div class="step-row avoid-break">
+      <div class="step-num">1</div>
+      <div class="step-content"><strong>Commencez par la pièce à vivre / salon</strong><p>C'est souvent le point fort. Cela crée une première impression positive.</p></div>
+    </div>
+    <div class="step-row avoid-break">
+      <div class="step-num">2</div>
+      <div class="step-content"><strong>Cuisine, chambres, salle de bain dans l'ordre logique</strong><p>Laissez l'acheteur entrer dans chaque pièce en premier, puis rejoignez-le.</p></div>
+    </div>
+    <div class="step-row avoid-break">
+      <div class="step-num">3</div>
+      <div class="step-content"><strong>Terminez par la terrasse, le balcon, la cave ou le jardin</strong><p>Un "bonus" en fin de visite laisse un souvenir positif.</p></div>
+    </div>
+    <div class="step-row avoid-break">
+      <div class="step-num">4</div>
+      <div class="step-content"><strong>Temps libre et questions</strong><p>"Je vous laisse un moment pour ressentir le logement. N'hésitez pas si vous avez des questions."</p></div>
+    </div>
+
+    <div class="h2">5.3 — Répondre aux questions pièges</div>
+
+    <div class="script-box avoid-break">
+      <div class="script-label">Question : "Pourquoi vous vendez ?"</div>
+      <div class="script-text">"Nous avons un projet familial qui nous amène à déménager." (Si séparation, mutation, deuil, urgence financière : ne le dites jamais. Cela donne un levier de négociation à l'acheteur.)</div>
+    </div>
+
+    <div class="script-box avoid-break">
+      <div class="script-label">Question : "C'est négociable ?"</div>
+      <div class="script-text">"Le prix est fixé au plus près du marché. Je suis ouvert à une discussion si votre offre est sérieuse et que vous avez votre financement en place." (Ne cédez jamais sur le prix pendant la visite. L'offre se fait par écrit.)</div>
+    </div>
+
+    <div class="script-box avoid-break">
+      <div class="script-label">Question : "Il y a des travaux ?"</div>
+      <div class="script-text">"Comme tout logement, il y a toujours de petites choses à personnaliser selon vos goûts. [Nommez uniquement ce qui est visible ou obligatoirement déclaré.] L'ensemble est en bon état général, comme vous pouvez le voir." (Ne mentez jamais — les vices cachés vous exposent à des poursuites judiciaires.)</div>
+    </div>
+
+    <div class="script-box avoid-break">
+      <div class="script-label">Question : "Les voisins sont comment ?"</div>
+      <div class="script-text">"On a de très bons rapports avec les voisins. L'immeuble est calme." (Ne parlez pas des conflits de voisinage — sauf si vous êtes légalement obligé de le faire.)</div>
+    </div>
+
+    <div class="h2">5.4 — Clôturer la visite professionnellement</div>
+    <div class="script-box avoid-break">
+      <div class="script-label">En fin de visite</div>
+      <div class="script-text">
+        "Avez-vous toutes les informations dont vous avez besoin ? [Donnez le dossier acheteur] Je vous envoie également le lien vers notre dossier numérique complet — vous y trouverez les diagnostics, les plans et les photos. Si vous souhaitez faire une offre, elle se fait par écrit à mon email. Je me laisse 48h pour vous répondre. Des questions ?"
+      </div>
+    </div>
+  </div>
+  <div class="page-footer"><span>Vendu Par Moi — Formation</span><span>Module 05 — Page 6</span></div>
+</div>
+
+<!-- ═══════════════════════════════════
+     MODULE 6 — NÉGOCIER & CONCLURE
+═══════════════════════════════════ -->
+<div class="sheet page-break">
+  <div class="mod-header">
+    <div class="mod-eyebrow">Module 06 / 06</div>
+    <div class="mod-title">Négocier & Conclure</div>
+    <p class="mod-intro">Recevoir une offre d'achat, c'est le moment décisif. La façon dont vous répondez — et dans quel délai — détermine si la vente aboutit. Restez professionnel, calme et stratégique.</p>
+  </div>
+  <div class="mod-body">
+
+    <div class="h2">6.1 — Recevoir et analyser une offre</div>
+    <p>Une offre d'achat sérieuse doit toujours être <strong>formulée par écrit</strong> (email ou courrier). Elle doit mentionner : le montant proposé, les modalités de financement (apport + emprunt ou comptant), le délai souhaité pour le compromis, et les éventuelles conditions suspensives.</p>
+    <div class="grid-2">
+      <div class="card avoid-break"><strong>Offre à prendre au sérieux</strong><p>Par écrit · Budget confirmé par banque · Pas de bien à vendre · Délai de signature rapide (< 3 semaines) · Sans conditions excessives</p></div>
+      <div class="card avoid-break"><strong>Offre à traiter avec prudence</strong><p>Uniquement à l'oral · Acheteur avec bien à vendre non compromis · Délai très long · "On fera une offre si vous baissez à X" (non engagé)</p></div>
+    </div>
+
+    <div class="h2">6.2 — Comment répondre à une offre</div>
+    <div class="warning avoid-break"><strong>Règle absolue</strong> Ne répondez jamais à chaud. Prenez 24 à 48h pour analyser et répondre. Cela montre du professionnalisme et vous protège des décisions émotionnelles.</div>
+
+    <div class="h3">Scénario 1 — Offre au prix demandé</div>
+    <div class="script-box avoid-break">
+      <div class="script-label">Réponse par email</div>
+      <div class="script-text">
+        "Bonjour [Prénom], je vous remercie pour votre offre d'achat reçue ce [date]. J'ai le plaisir de vous confirmer son acceptation au prix de [montant] €. Je transmets l'ensemble des éléments à mon notaire pour rédaction du compromis de vente. Pourriez-vous me communiquer les coordonnées de votre notaire ou souhaitez-vous utiliser le mien ? Je reste disponible pour la suite. Cordialement."
+      </div>
+    </div>
+
+    <div class="h3">Scénario 2 — Offre en dessous du prix</div>
+    <div class="script-box avoid-break">
+      <div class="script-label">Contre-proposition par email</div>
+      <div class="script-text">
+        "Bonjour [Prénom], merci pour votre offre du [date]. J'ai bien pris connaissance de votre proposition à [montant offert] €. Après réflexion, je ne peux pas accepter ce montant qui ne correspond pas à la valeur de marché du bien. Je vous propose un prix de [votre contre-offre] €, ce qui représente déjà un effort de ma part. Cette contre-proposition est valable jusqu'au [date dans 5 jours]. N'hésitez pas à me recontacter si vous avez des questions."
+      </div>
+    </div>
+
+    <div class="h2">6.3 — Le compromis de vente</div>
+    <p>Une fois l'offre acceptée, le compromis de vente est rédigé par le notaire (le vôtre ou celui de l'acheteur — idéalement les deux). C'est un acte juridique important : <strong>faites toujours appel à un notaire, jamais à un modèle internet</strong>.</p>
+    <div class="checklist avoid-break">
+      <div class="checklist-title">Ce que le compromis doit mentionner</div>
+      <div class="check-item"><div class="check-box"></div> Identité complète du vendeur et de l'acheteur</div>
+      <div class="check-item"><div class="check-box"></div> Description exacte du bien (surface Carrez, adresse, lot de copropriété)</div>
+      <div class="check-item"><div class="check-box"></div> Prix de vente et modalités de paiement</div>
+      <div class="check-item"><div class="check-box"></div> Conditions suspensives (prêt bancaire, absence de servitude…)</div>
+      <div class="check-item"><div class="check-box"></div> Date limite de levée des conditions suspensives</div>
+      <div class="check-item"><div class="check-box"></div> Dépôt de garantie (5-10 % du prix, versé à la signature)</div>
+      <div class="check-item"><div class="check-box"></div> Date de signature de l'acte authentique (chez le notaire, 2-3 mois après)</div>
+      <div class="check-item"><div class="check-box"></div> Liste des diagnostics annexés</div>
+    </div>
+
+    <div class="h2">6.4 — De la signature à la remise des clés</div>
+    <div class="step-row avoid-break">
+      <div class="step-num">J</div>
+      <div class="step-content"><strong>Signature du compromis</strong><p>L'acheteur dispose de 10 jours pour se rétracter (délai légal SRU). Après ces 10 jours, le compromis est définitif.</p></div>
+    </div>
+    <div class="step-row avoid-break">
+      <div class="step-num">J+45</div>
+      <div class="step-content"><strong>Obtention du prêt immobilier</strong><p>L'acheteur dépose son dossier de prêt. La condition suspensive est levée quand la banque accorde le prêt.</p></div>
+    </div>
+    <div class="step-row avoid-break">
+      <div class="step-num">J+60/90</div>
+      <div class="step-content"><strong>Signature de l'acte authentique</strong><p>Chez le notaire. C'est là que vous remettez les clés et recevez le solde du prix. La vente est définitive.</p></div>
+    </div>
+    <div class="tip"><strong>Félicitations</strong> Vous venez de vendre votre bien sans agence, en gardant l'intégralité de votre prix de vente. La plateforme Vendu Par Moi reste accessible pendant toute la durée du processus pour répondre à vos questions via le coach IA.</div>
+
+    <hr class="divider">
+    <div style="text-align:center;padding:20px 0;">
+      <div style="font-family:'Cormorant Garamond',serif;font-size:1.6rem;color:#1C3028;margin-bottom:6px;">Besoin d'aide en cours de vente ?</div>
+      <p style="font-size:0.82rem;color:#888;">Votre coach IA Alex est disponible 24h/24 sur votre espace vendeur · venduparmo.fr</p>
+    </div>
+  </div>
+  <div class="page-footer"><span>Vendu Par Moi — Formation</span><span>Module 06 — Page 7</span></div>
+</div>
+
+</body>
+</html>

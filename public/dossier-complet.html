@@ -1,0 +1,1024 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dossier Complet — Vendu Par Moi</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --green: #3D5A47;
+      --green-dark: #1C3028;
+      --terra: #C4785A;
+      --beige: #F5F0E8;
+      --cream: #FDFCF8;
+      --text: #1a1a16;
+      --muted: #666;
+      --border: #e0d8cc;
+    }
+
+    @media print {
+      html, body { width: 210mm; background: white !important; }
+      .no-print { display: none !important; }
+      .page-break { page-break-before: always; }
+      .avoid-break { page-break-inside: avoid; }
+      @page { margin: 18mm 18mm 18mm 18mm; size: A4 portrait; }
+      body { font-size: 10pt; }
+      .cover { min-height: 100vh; }
+    }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: #ddd;
+      color: var(--text);
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .no-print {
+      position: fixed; top: 20px; right: 20px; z-index: 999;
+      display: flex; gap: 12px; flex-direction: column;
+    }
+    .btn-print {
+      background: var(--green-dark); color: #fff; border: none;
+      padding: 12px 22px; border-radius: 8px; font-family: 'DM Sans', sans-serif;
+      font-size: 0.88rem; font-weight: 700; cursor: pointer;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.25);
+    }
+    .btn-print:hover { background: #2d4535; }
+
+    .sheet {
+      width: 210mm; min-height: 297mm;
+      background: white;
+      margin: 20px auto;
+      box-shadow: 0 4px 40px rgba(0,0,0,0.18);
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* ── COUVERTURE ── */
+    .cover {
+      background: linear-gradient(160deg, #0F1E13 0%, #1C3028 50%, #2a4535 100%);
+      min-height: 297mm;
+      display: flex; flex-direction: column;
+      padding: 0;
+      color: #fff;
+      position: relative;
+    }
+    .cover-top { padding: 52px 56px 0; flex: 1; }
+    .cover-logo {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.5rem; letter-spacing: 0.04em;
+      margin-bottom: 60px; color: rgba(255,255,255,0.7);
+    }
+    .cover-logo em { color: var(--terra); font-style: normal; }
+    .cover-badge {
+      display: inline-block; background: rgba(196,120,90,0.2);
+      border: 1px solid rgba(196,120,90,0.4); color: #f0b89a;
+      font-size: 0.72rem; font-weight: 700; letter-spacing: 0.1em;
+      text-transform: uppercase; padding: 5px 14px; border-radius: 100px;
+      margin-bottom: 28px;
+    }
+    .cover-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 3.2rem; font-weight: 700; line-height: 1.1;
+      margin-bottom: 24px;
+    }
+    .cover-title em { color: #f0b89a; font-style: italic; }
+    .cover-sub {
+      font-size: 1rem; color: rgba(255,255,255,0.65);
+      max-width: 420px; line-height: 1.7; margin-bottom: 48px;
+    }
+    .cover-meta {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 16px; max-width: 500px; margin-bottom: 48px;
+    }
+    .cover-meta-item {
+      background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 10px; padding: 14px 18px;
+    }
+    .cover-meta-label { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.1em; color: rgba(255,255,255,0.4); margin-bottom: 4px; }
+    .cover-meta-val { font-size: 0.88rem; font-weight: 600; color: #fff; }
+    .cover-bottom {
+      background: rgba(0,0,0,0.25); border-top: 1px solid rgba(255,255,255,0.08);
+      padding: 22px 56px;
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .cover-conf { font-size: 0.72rem; color: rgba(255,255,255,0.35); }
+    .cover-date { font-size: 0.78rem; color: rgba(255,255,255,0.5); }
+
+    /* ── SOMMAIRE ── */
+    .toc-sheet { padding: 52px 56px; min-height: 297mm; }
+    .section-eyebrow {
+      font-size: 0.65rem; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.12em; color: var(--terra); margin-bottom: 10px;
+    }
+    .section-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 2.4rem; font-weight: 700; color: var(--green-dark);
+      margin-bottom: 36px; line-height: 1.15;
+    }
+    .toc-item {
+      display: flex; align-items: flex-start; gap: 18px;
+      padding: 14px 0; border-bottom: 1px solid var(--border);
+    }
+    .toc-num {
+      width: 32px; height: 32px; border-radius: 50%;
+      background: var(--green); color: #fff;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.78rem; font-weight: 700; flex-shrink: 0;
+    }
+    .toc-text h3 { font-size: 0.95rem; font-weight: 700; color: var(--text); }
+    .toc-text p { font-size: 0.78rem; color: var(--muted); margin-top: 2px; }
+
+    /* ── SECTIONS ── */
+    .section-sheet { padding: 48px 56px; min-height: 297mm; }
+
+    .s-header {
+      border-left: 4px solid var(--terra); padding-left: 20px;
+      margin-bottom: 32px;
+    }
+    .s-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 2rem; font-weight: 700; color: var(--green-dark); line-height: 1.2;
+    }
+    .s-sub { font-size: 0.85rem; color: var(--muted); margin-top: 6px; }
+
+    .h2 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.35rem; font-weight: 700; color: var(--green-dark);
+      margin: 28px 0 14px; padding-bottom: 8px;
+      border-bottom: 1px solid var(--border);
+    }
+    .h3 {
+      font-size: 0.9rem; font-weight: 700; color: var(--green);
+      margin: 18px 0 8px; text-transform: uppercase; letter-spacing: 0.06em;
+      font-size: 0.75rem;
+    }
+    p { font-size: 0.88rem; color: #444; line-height: 1.75; margin-bottom: 10px; }
+    ul, ol { padding-left: 20px; margin-bottom: 12px; }
+    li { font-size: 0.88rem; color: #444; line-height: 1.7; margin-bottom: 4px; }
+    strong { color: var(--text); }
+
+    /* Cards */
+    .card { background: #f8f5f0; border-radius: 12px; padding: 20px 22px; margin-bottom: 14px; }
+    .card-green { background: #e8f4ec; border-left: 3px solid var(--green); }
+    .card-terra { background: #fef3e8; border-left: 3px solid var(--terra); }
+    .card-alert { background: #fff8e7; border-left: 3px solid #f0a500; }
+    .card-red { background: #fef0ee; border-left: 3px solid #e05c3a; }
+
+    /* Grid 2 cols */
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px; }
+
+    /* Pack cards */
+    .pack-box {
+      border: 2px solid var(--border); border-radius: 14px; overflow: hidden;
+      margin-bottom: 20px;
+    }
+    .pack-box.featured { border-color: var(--green); }
+    .pack-head {
+      background: var(--green-dark); color: #fff;
+      padding: 18px 22px;
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .pack-head.terra { background: var(--terra); }
+    .pack-name-big { font-family: 'Cormorant Garamond', serif; font-size: 1.4rem; font-weight: 700; }
+    .pack-price-big { font-family: 'Cormorant Garamond', serif; font-size: 1.8rem; font-weight: 700; }
+    .pack-body { padding: 18px 22px; }
+    .pack-feat { display: flex; align-items: flex-start; gap: 10px; font-size: 0.84rem; color: #444; padding: 5px 0; border-bottom: 1px solid #f0ece6; }
+    .pack-feat:last-child { border-bottom: none; }
+    .pack-check { color: var(--green); font-weight: 700; flex-shrink: 0; }
+    .pack-check.t { color: var(--terra); }
+
+    /* Feature grid */
+    .feat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px; }
+    .feat-card {
+      border: 1px solid var(--border); border-radius: 10px; padding: 14px 16px;
+      display: flex; gap: 12px; align-items: flex-start;
+    }
+    .feat-icon {
+      width: 34px; height: 34px; border-radius: 8px;
+      background: #e8f4ec; color: var(--green);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1rem; flex-shrink: 0;
+    }
+    .feat-icon.t { background: #fef3e8; }
+    .feat-title { font-weight: 700; font-size: 0.82rem; color: var(--text); margin-bottom: 2px; }
+    .feat-desc { font-size: 0.73rem; color: var(--muted); line-height: 1.5; }
+
+    /* Modèle éco */
+    .eco-table { width: 100%; border-collapse: collapse; margin-bottom: 20px; font-size: 0.84rem; }
+    .eco-table th { background: var(--green-dark); color: #fff; padding: 10px 14px; text-align: left; font-size: 0.78rem; }
+    .eco-table td { padding: 10px 14px; border-bottom: 1px solid var(--border); }
+    .eco-table tr:nth-child(even) td { background: #f8f5f0; }
+    .eco-table .highlight td { background: #e8f4ec; font-weight: 700; }
+
+    /* Todo */
+    .todo-item {
+      display: flex; align-items: flex-start; gap: 14px;
+      padding: 10px 14px; border-radius: 8px; margin-bottom: 8px;
+    }
+    .todo-item.done { background: #e8f4ec; }
+    .todo-item.todo { background: #fef3e8; }
+    .todo-item.urgent { background: #fef0ee; }
+    .todo-check { font-size: 1rem; flex-shrink: 0; }
+    .todo-text strong { font-size: 0.84rem; display: block; }
+    .todo-text span { font-size: 0.75rem; color: var(--muted); }
+
+    /* Questions avocat */
+    .q-block {
+      border: 1px solid var(--border); border-radius: 10px;
+      padding: 16px 18px; margin-bottom: 12px;
+    }
+    .q-num { font-size: 0.65rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--terra); margin-bottom: 4px; }
+    .q-title { font-size: 0.92rem; font-weight: 700; color: var(--text); margin-bottom: 6px; }
+    .q-detail { font-size: 0.78rem; color: var(--muted); line-height: 1.6; }
+
+    /* Comparaison */
+    .compare-row {
+      display: grid; grid-template-columns: 1fr 1fr 1fr;
+      gap: 0; border-bottom: 1px solid var(--border);
+    }
+    .compare-row.header { background: var(--green-dark); color: #fff; }
+    .compare-row.header .c { color: #fff; font-weight: 700; font-size: 0.8rem; }
+    .c { padding: 10px 14px; font-size: 0.82rem; }
+    .compare-row.alt { background: #f8f5f0; }
+    .c-g { color: var(--green); font-weight: 600; }
+    .c-r { color: #c0392b; }
+
+    hr.divider { border: none; border-top: 1px solid var(--border); margin: 28px 0; }
+
+    /* Footer de page */
+    .page-footer {
+      position: absolute; bottom: 0; left: 0; right: 0;
+      padding: 10px 56px;
+      border-top: 1px solid var(--border);
+      display: flex; justify-content: space-between; align-items: center;
+      font-size: 0.68rem; color: #bbb;
+    }
+
+    /* CGV inline */
+    .cgv-art { margin-bottom: 22px; }
+    .cgv-art h3 { font-size: 0.82rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--green); margin-bottom: 8px; padding-bottom: 6px; border-bottom: 1px solid var(--border); }
+  </style>
+</head>
+<body>
+
+<div class="no-print">
+  <button class="btn-print" onclick="window.print()">🖨 Imprimer / PDF</button>
+  <a href="/formation-complete" style="display:block;background:#C4785A;color:#fff;text-align:center;padding:10px 14px;border-radius:8px;font-size:0.82rem;font-weight:700;text-decoration:none;">Formation PDF →</a>
+  <a href="/flyer" style="display:block;background:#1C3028;color:#fff;text-align:center;padding:10px 14px;border-radius:8px;font-size:0.82rem;font-weight:700;text-decoration:none;">Flyer →</a>
+</div>
+
+<!-- ═══════════════════════════════════════
+     PAGE 1 — COUVERTURE
+═══════════════════════════════════════ -->
+<div class="sheet">
+  <div class="cover">
+    <div class="cover-top">
+      <div class="cover-logo">Vendu Par <em>Moi</em></div>
+      <div class="cover-badge">Document confidentiel · Dossier complet</div>
+      <h1 class="cover-title">Dossier de<br>présentation<br><em>Vendu Par Moi</em></h1>
+      <p class="cover-sub">Plateforme numérique d'outils et de formation pour la vente immobilière entre particuliers. Document destiné à la présentation aux associés et aux conseils juridiques.</p>
+      <div class="cover-meta">
+        <div class="cover-meta-item">
+          <div class="cover-meta-label">Fondateur</div>
+          <div class="cover-meta-val">Matthias Brieux</div>
+        </div>
+        <div class="cover-meta-item">
+          <div class="cover-meta-label">Date</div>
+          <div class="cover-meta-val">Juin 2026</div>
+        </div>
+        <div class="cover-meta-item">
+          <div class="cover-meta-label">Secteur</div>
+          <div class="cover-meta-val">PropTech · Formation</div>
+        </div>
+        <div class="cover-meta-item">
+          <div class="cover-meta-label">Statut</div>
+          <div class="cover-meta-val">Pré-lancement</div>
+        </div>
+      </div>
+    </div>
+    <div class="cover-bottom">
+      <div class="cover-conf">Document confidentiel — Ne pas diffuser</div>
+      <div class="cover-date">venduparmo.fr · contact@venduparmo.fr · 06 95 44 36 54</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     PAGE 2 — SOMMAIRE
+═══════════════════════════════════════ -->
+<div class="sheet page-break">
+  <div class="toc-sheet">
+    <div class="section-eyebrow">Dossier complet</div>
+    <h1 class="section-title">Sommaire</h1>
+
+    <div class="toc-item avoid-break">
+      <div class="toc-num">1</div>
+      <div class="toc-text">
+        <h3>L'entreprise — Vision & Marché</h3>
+        <p>Concept, positionnement légal, opportunité de marché, avantage concurrentiel</p>
+      </div>
+    </div>
+    <div class="toc-item avoid-break">
+      <div class="toc-num">2</div>
+      <div class="toc-text">
+        <h3>Nos services & tarifs</h3>
+        <p>Pack Autonome 999 € · Pack Sérénité 1 548 € · Comparaison agence vs VPM</p>
+      </div>
+    </div>
+    <div class="toc-item avoid-break">
+      <div class="toc-num">3</div>
+      <div class="toc-text">
+        <h3>Notre logiciel — Fonctionnalités</h3>
+        <p>10 fonctionnalités détaillées, stack technique, sécurité</p>
+      </div>
+    </div>
+    <div class="toc-item avoid-break">
+      <div class="toc-num">4</div>
+      <div class="toc-text">
+        <h3>Modèle économique</h3>
+        <p>Revenus, projections à 3 mois / 6 mois / 12 mois, charges estimées</p>
+      </div>
+    </div>
+    <div class="toc-item avoid-break">
+      <div class="toc-num">5</div>
+      <div class="toc-text">
+        <h3>Ce qui reste à faire</h3>
+        <p>Checklist site web · Checklist vie réelle & entreprise</p>
+      </div>
+    </div>
+    <div class="toc-item avoid-break">
+      <div class="toc-num">6</div>
+      <div class="toc-text">
+        <h3>Questions pour l'avocat</h3>
+        <p>Structure juridique, contrat d'association, protection de marque, CGV, loi Hoguet, RGPD</p>
+      </div>
+    </div>
+    <div class="toc-item avoid-break">
+      <div class="toc-num">7</div>
+      <div class="toc-text">
+        <h3>Conditions Générales de Vente complètes</h3>
+        <p>CGV + Mentions légales — version imprimable pour validation par l'avocat</p>
+      </div>
+    </div>
+
+    <div style="margin-top:48px; background: linear-gradient(135deg, #1C3028, #3D5A47); border-radius: 14px; padding: 24px 28px; color: #fff;">
+      <div style="font-size:0.7rem;text-transform:uppercase;letter-spacing:0.1em;color:rgba(255,255,255,0.5);margin-bottom:8px;">Résumé exécutif</div>
+      <p style="color:rgba(255,255,255,0.85);font-size:0.88rem;line-height:1.75;margin:0;">
+        <strong style="color:#fff;">Vendu Par Moi</strong> est une plateforme numérique qui permet à des particuliers de vendre leur bien immobilier <strong style="color:#f0b89a;">sans agence</strong>, en leur fournissant les outils et la méthode des professionnels. Face à des frais d'agence moyens de <strong style="color:#f0b89a;">10 000 à 25 000 € par transaction</strong>, la plateforme propose un forfait unique à <strong style="color:#f0b89a;">999 € ou 1 548 €</strong>. Elle n'est pas une agence immobilière et n'est pas soumise à la loi Hoguet : elle vend des outils numériques et de la formation.
+      </p>
+    </div>
+  </div>
+  <div class="page-footer">
+    <span>Vendu Par Moi — Dossier confidentiel</span>
+    <span>Page 2</span>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     PAGE 3 — L'ENTREPRISE
+═══════════════════════════════════════ -->
+<div class="sheet page-break">
+  <div class="section-sheet">
+    <div class="section-eyebrow">Section 1</div>
+    <div class="s-header">
+      <div class="s-title">L'entreprise — Vision & Marché</div>
+      <div class="s-sub">Concept, positionnement légal et opportunité</div>
+    </div>
+
+    <div class="h2">Notre vision</div>
+    <p>Permettre à tout propriétaire de vendre son bien immobilier <strong>comme un professionnel</strong>, en conservant l'intégralité du prix de vente, sans payer une commission d'agence.</p>
+    <p>Nous croyons que les frais d'agence immobilière — souvent entre 4 % et 7 % du prix de vente — représentent une charge injustifiée pour les particuliers à l'heure où les outils numériques permettent de faire ce travail soi-même, avec la bonne méthode.</p>
+
+    <div class="h2">L'opportunité de marché</div>
+    <div class="grid-2">
+      <div class="card card-terra avoid-break">
+        <div style="font-family:'Cormorant Garamond',serif;font-size:2rem;font-weight:700;color:#C4785A;">~800 000</div>
+        <div style="font-size:0.8rem;font-weight:600;margin-bottom:4px;">transactions immobilières / an en France</div>
+        <div style="font-size:0.75rem;color:#888;">Source : Notaires de France 2024</div>
+      </div>
+      <div class="card card-terra avoid-break">
+        <div style="font-family:'Cormorant Garamond',serif;font-size:2rem;font-weight:700;color:#C4785A;">~35 %</div>
+        <div style="font-size:0.8rem;font-weight:600;margin-bottom:4px;">des ventes se font entre particuliers</div>
+        <div style="font-size:0.75rem;color:#888;">280 000 transactions/an sans agence</div>
+      </div>
+      <div class="card card-green avoid-break">
+        <div style="font-family:'Cormorant Garamond',serif;font-size:2rem;font-weight:700;color:#3D5A47;">10 000 €</div>
+        <div style="font-size:0.8rem;font-weight:600;margin-bottom:4px;">Commission d'agence moyenne</div>
+        <div style="font-size:0.75rem;color:#888;">4 à 7 % sur un bien à 200 000 €</div>
+      </div>
+      <div class="card card-green avoid-break">
+        <div style="font-family:'Cormorant Garamond',serif;font-size:2rem;font-weight:700;color:#3D5A47;">999 €</div>
+        <div style="font-size:0.8rem;font-weight:600;margin-bottom:4px;">Notre forfait d'entrée</div>
+        <div style="font-size:0.75rem;color:#888;">Économie de 90 % par rapport à l'agence</div>
+      </div>
+    </div>
+
+    <div class="h2">Positionnement légal — Ce que nous sommes</div>
+    <div class="card card-green avoid-break">
+      <strong>Vendu Par Moi est une plateforme d'outils numériques et de formation.</strong>
+      <p style="margin:8px 0 0;">Elle n'exerce <em>aucune</em> activité d'entremise immobilière au sens de la loi Hoguet n°70-9 du 2 janvier 1970. Elle ne met pas en relation vendeurs et acheteurs, ne négocie pas, ne signe pas de mandat. Elle vend des logiciels, des formations et des templates — exactement comme un éditeur de logiciels SaaS.</p>
+    </div>
+    <div class="card card-alert avoid-break">
+      <strong>Référence juridique :</strong> L'Autorité de la concurrence, dans son avis n°23-A-07 du 2 juin 2023, reconnaît explicitement la légalité des plateformes d'outils pour particuliers dans l'immobilier et recommande leur développement pour réduire les frais de transaction.
+    </div>
+
+    <div class="h2">Notre avantage concurrentiel</div>
+    <div style="overflow:hidden;border-radius:10px;border:1px solid var(--border);margin-bottom:16px;">
+      <div class="compare-row header">
+        <div class="c"></div>
+        <div class="c">Agence traditionnelle</div>
+        <div class="c">Vendu Par Moi</div>
+      </div>
+      <div class="compare-row">
+        <div class="c"><strong>Coût</strong></div>
+        <div class="c c-r">10 000 – 25 000 €</div>
+        <div class="c c-g">999 – 1 548 €</div>
+      </div>
+      <div class="compare-row alt">
+        <div class="c"><strong>Commission sur vente</strong></div>
+        <div class="c c-r">Oui (4 à 7 %)</div>
+        <div class="c c-g">Non — prix fixe</div>
+      </div>
+      <div class="compare-row">
+        <div class="c"><strong>Contrôle du vendeur</strong></div>
+        <div class="c c-r">Délégué à l'agence</div>
+        <div class="c c-g">Total</div>
+      </div>
+      <div class="compare-row alt">
+        <div class="c"><strong>Formation</strong></div>
+        <div class="c c-r">Aucune</div>
+        <div class="c c-g">6 modules complets</div>
+      </div>
+      <div class="compare-row">
+        <div class="c"><strong>Coach IA 24h/24</strong></div>
+        <div class="c c-r">Non</div>
+        <div class="c c-g">Inclus</div>
+      </div>
+      <div class="compare-row alt">
+        <div class="c"><strong>Agenda de visites en ligne</strong></div>
+        <div class="c c-r">Non</div>
+        <div class="c c-g">Inclus</div>
+      </div>
+      <div class="compare-row">
+        <div class="c"><strong>Dossier acheteur digital</strong></div>
+        <div class="c c-r">Non</div>
+        <div class="c c-g">Inclus</div>
+      </div>
+    </div>
+  </div>
+  <div class="page-footer">
+    <span>Vendu Par Moi — Dossier confidentiel</span>
+    <span>Page 3</span>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     PAGE 4 — SERVICES & TARIFS
+═══════════════════════════════════════ -->
+<div class="sheet page-break">
+  <div class="section-sheet">
+    <div class="section-eyebrow">Section 2</div>
+    <div class="s-header">
+      <div class="s-title">Nos services & tarifs</div>
+      <div class="s-sub">Deux offres, un seul paiement, zéro commission</div>
+    </div>
+
+    <!-- Pack Autonome -->
+    <div class="pack-box avoid-break">
+      <div class="pack-head">
+        <div class="pack-name-big">Pack Autonome</div>
+        <div class="pack-price-big">999 € TTC</div>
+      </div>
+      <div class="pack-body">
+        <p style="font-size:0.82rem;color:#666;margin-bottom:14px;">Tout ce qu'il faut pour vendre efficacement, en autonomie totale. Formation complète + outils numériques.</p>
+        <div class="pack-feat"><span class="pack-check">✓</span> Numéro dédié Vendu Par Moi — bot SMS automatique pour répondre aux acheteurs</div>
+        <div class="pack-feat"><span class="pack-check">✓</span> Dossier acheteur numérique partageable (photos organisées, diagnostics, DPE, documents)</div>
+        <div class="pack-feat"><span class="pack-check">✓</span> Dossier notaire numérique (factures travaux, entretien, taxe foncière…)</div>
+        <div class="pack-feat"><span class="pack-check">✓</span> Agenda intelligent : le vendeur renseigne ses disponibilités, les acheteurs réservent en ligne</div>
+        <div class="pack-feat"><span class="pack-check">✓</span> Formation complète 6 modules (estimation → signature notaire)</div>
+        <div class="pack-feat"><span class="pack-check">✓</span> Coach IA personnalisé (conseils en temps réel 24h/24)</div>
+        <div class="pack-feat"><span class="pack-check">✓</span> Génération de texte d'annonce par intelligence artificielle</div>
+        <div class="pack-feat"><span class="pack-check">✓</span> Guide photos immersives pièce par pièce (avec smartphone)</div>
+        <div class="pack-feat"><span class="pack-check">✓</span> Suivi des offres reçues centralisé dans le tableau de bord</div>
+        <div class="pack-feat"><span class="pack-check">✓</span> Modèles d'emails et SMS prêts à envoyer à chaque étape</div>
+        <div class="pack-feat"><span class="pack-check">✓</span> Rappels automatiques des visiteurs pour déclencher des offres</div>
+        <div class="pack-feat"><span class="pack-check">✓</span> Statistiques en temps réel (vues, contacts, visites)</div>
+      </div>
+    </div>
+
+    <!-- Pack Sérénité -->
+    <div class="pack-box featured avoid-break">
+      <div class="pack-head terra">
+        <div class="pack-name-big">Pack Sérénité ⭐ Le plus choisi</div>
+        <div class="pack-price-big">1 548 € TTC</div>
+      </div>
+      <div class="pack-body">
+        <p style="font-size:0.82rem;color:#666;margin-bottom:14px;">Tout le Pack Autonome + séance photo professionnelle incluse (photographe Meero, livraison 48h).</p>
+        <div class="pack-feat"><span class="pack-check">✓</span> Tout le contenu du Pack Autonome</div>
+        <div class="pack-feat"><span class="pack-check t">✓</span> <strong>Photographe professionnel (réseau Meero)</strong> — déplacement à domicile</div>
+        <div class="pack-feat"><span class="pack-check t">✓</span> <strong>Photos retouchées livrées sous 48h</strong> — format HD prêt pour toutes les plateformes</div>
+        <div class="pack-feat"><span class="pack-check">✓</span> Option paiement en 4× 387 € sans frais</div>
+      </div>
+    </div>
+
+    <div class="h2">Ce que nous ne faisons pas (important légalement)</div>
+    <div class="card card-red avoid-break">
+      <ul style="margin:0;">
+        <li>Nous ne mettons <strong>pas en relation</strong> vendeurs et acheteurs</li>
+        <li>Nous ne négocions <strong>pas</strong> au nom du vendeur</li>
+        <li>Nous ne signons <strong>pas</strong> de mandat de vente</li>
+        <li>Nous ne percevons <strong>pas</strong> de commission sur le prix de vente</li>
+        <li>Le compromis de vente est toujours signé <strong>chez le notaire</strong>, entre vendeur et acheteur</li>
+      </ul>
+    </div>
+  </div>
+  <div class="page-footer">
+    <span>Vendu Par Moi — Dossier confidentiel</span>
+    <span>Page 4</span>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     PAGE 5 — FONCTIONNALITÉS LOGICIEL
+═══════════════════════════════════════ -->
+<div class="sheet page-break">
+  <div class="section-sheet">
+    <div class="section-eyebrow">Section 3</div>
+    <div class="s-header">
+      <div class="s-title">Notre logiciel — Fonctionnalités</div>
+      <div class="s-sub">Plateforme web complète, accessible depuis tout appareil</div>
+    </div>
+
+    <div class="feat-grid">
+      <div class="feat-card avoid-break">
+        <div class="feat-icon">📚</div>
+        <div>
+          <div class="feat-title">Formation 6 modules</div>
+          <div class="feat-desc">De l'estimation à la signature chez le notaire. Vidéos + fiches écrites + quiz + check-lists à chaque étape.</div>
+        </div>
+      </div>
+      <div class="feat-card avoid-break">
+        <div class="feat-icon t">🤖</div>
+        <div>
+          <div class="feat-title">Coach IA Alex</div>
+          <div class="feat-desc">Propulsé par Claude (Anthropic). Répond à toutes les questions du vendeur en temps réel, 24h/24, avec le contexte de son bien.</div>
+        </div>
+      </div>
+      <div class="feat-card avoid-break">
+        <div class="feat-icon">📄</div>
+        <div>
+          <div class="feat-title">Dossier acheteur digital</div>
+          <div class="feat-desc">Lien unique partageable. Photos organisées (pro, extérieur, immersive, technique), diagnostics, DPE coloré, surface, prix.</div>
+        </div>
+      </div>
+      <div class="feat-card avoid-break">
+        <div class="feat-icon t">📅</div>
+        <div>
+          <div class="feat-title">Agenda de visites intelligent</div>
+          <div class="feat-desc">Le vendeur renseigne ses créneaux. Les acheteurs réservent en ligne. SMS et emails de confirmation automatiques.</div>
+        </div>
+      </div>
+      <div class="feat-card avoid-break">
+        <div class="feat-icon">✍️</div>
+        <div>
+          <div class="feat-title">Génération d'annonce IA</div>
+          <div class="feat-desc">En 30 secondes, le logiciel génère un texte d'annonce professionnel à partir des caractéristiques du bien renseignées.</div>
+        </div>
+      </div>
+      <div class="feat-card avoid-break">
+        <div class="feat-icon t">💬</div>
+        <div>
+          <div class="feat-title">Bot SMS automatique</div>
+          <div class="feat-desc">Numéro dédié Twilio. Répond automatiquement aux demandes d'acheteurs par SMS. Qualifie le contact avant transmission.</div>
+        </div>
+      </div>
+      <div class="feat-card avoid-break">
+        <div class="feat-icon">📊</div>
+        <div>
+          <div class="feat-title">Tableau de bord & stats</div>
+          <div class="feat-desc">Nombre de vues, contacts reçus, visites planifiées/confirmées, appels reçus. Tout en temps réel sur une seule page.</div>
+        </div>
+      </div>
+      <div class="feat-card avoid-break">
+        <div class="feat-icon t">💼</div>
+        <div>
+          <div class="feat-title">Suivi des offres</div>
+          <div class="feat-desc">Toutes les offres reçues centralisées. Historique, statut (en attente, acceptée, refusée), montants comparés.</div>
+        </div>
+      </div>
+      <div class="feat-card avoid-break">
+        <div class="feat-icon">📷</div>
+        <div>
+          <div class="feat-title">Guide photos pièce par pièce</div>
+          <div class="feat-desc">Conseils précis pour chaque pièce, avec exemples bons/mauvais. Réalisable avec un simple smartphone récent.</div>
+        </div>
+      </div>
+      <div class="feat-card avoid-break">
+        <div class="feat-icon t">📁</div>
+        <div>
+          <div class="feat-title">Dossier notaire</div>
+          <div class="feat-desc">Centralise les documents de valeur : factures travaux, entretien chaudière, taxe foncière, PV assemblée générale copro.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="h2">Stack technique</div>
+    <div class="grid-2">
+      <div class="card avoid-break">
+        <strong>Backend</strong>
+        <p style="margin:6px 0 0;font-size:0.8rem;color:#555;">Node.js + Express + SQLite (better-sqlite3) · Déployé sur Render (cloud)</p>
+      </div>
+      <div class="card avoid-break">
+        <strong>Services externes</strong>
+        <p style="margin:6px 0 0;font-size:0.8rem;color:#555;">Stripe (paiement) · Twilio (SMS/voix) · SendGrid (emails) · Cloudinary (photos) · Anthropic Claude (IA)</p>
+      </div>
+    </div>
+    <div class="card card-green avoid-break" style="margin-top:4px;">
+      <strong>Sécurité :</strong> Audit complet réalisé — rate limiting IA, protection double paiement Stripe, transactions SQLite atomiques, validation RGPD, JWT sécurisés.
+    </div>
+  </div>
+  <div class="page-footer">
+    <span>Vendu Par Moi — Dossier confidentiel</span>
+    <span>Page 5</span>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     PAGE 6 — MODÈLE ÉCONOMIQUE
+═══════════════════════════════════════ -->
+<div class="sheet page-break">
+  <div class="section-sheet">
+    <div class="section-eyebrow">Section 4</div>
+    <div class="s-header">
+      <div class="s-title">Modèle économique</div>
+      <div class="s-sub">Revenus, projections et charges</div>
+    </div>
+
+    <div class="h2">Structure de revenus</div>
+    <div class="card card-green avoid-break">
+      <p style="margin:0;"><strong>Modèle simple :</strong> paiement unique à l'activation. Pas d'abonnement, pas de commission sur la vente, pas de frais cachés. Le client paie une fois, accède à vie à sa plateforme pour la durée de sa vente.</p>
+    </div>
+
+    <div class="grid-2" style="margin-top:16px;">
+      <div class="card avoid-break" style="text-align:center;">
+        <div style="font-size:0.7rem;text-transform:uppercase;letter-spacing:0.1em;color:#888;margin-bottom:6px;">Pack Autonome</div>
+        <div style="font-family:'Cormorant Garamond',serif;font-size:2.2rem;font-weight:700;color:#1C3028;">999 €</div>
+        <div style="font-size:0.75rem;color:#888;">par vente / par client</div>
+      </div>
+      <div class="card avoid-break" style="text-align:center;">
+        <div style="font-size:0.7rem;text-transform:uppercase;letter-spacing:0.1em;color:#888;margin-bottom:6px;">Pack Sérénité</div>
+        <div style="font-family:'Cormorant Garamond',serif;font-size:2.2rem;font-weight:700;color:#C4785A;">1 548 €</div>
+        <div style="font-size:0.75rem;color:#888;">par vente / par client</div>
+      </div>
+    </div>
+
+    <div class="h2">Projections de chiffre d'affaires</div>
+    <p style="font-size:0.8rem;color:#888;margin-bottom:12px;">Hypothèse : 60 % Pack Autonome (999€) · 40 % Pack Sérénité (1 548€) · CA moyen pondéré ≈ 1 219 €</p>
+    <table class="eco-table">
+      <thead>
+        <tr>
+          <th>Clients / mois</th>
+          <th>CA mensuel estimé</th>
+          <th>CA annuel estimé</th>
+          <th>Objectif</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>5 clients</td>
+          <td>~6 000 €</td>
+          <td>~72 000 €</td>
+          <td>Lancement (mois 1-3)</td>
+        </tr>
+        <tr>
+          <td>15 clients</td>
+          <td>~18 000 €</td>
+          <td>~216 000 €</td>
+          <td>Mois 3-6</td>
+        </tr>
+        <tr class="highlight">
+          <td>30 clients</td>
+          <td>~36 500 €</td>
+          <td>~438 000 €</td>
+          <td>Mois 6-12 (objectif)</td>
+        </tr>
+        <tr>
+          <td>50 clients</td>
+          <td>~61 000 €</td>
+          <td>~732 000 €</td>
+          <td>An 2</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="h2">Charges fixes estimées (mensuel)</div>
+    <table class="eco-table">
+      <thead>
+        <tr>
+          <th>Poste</th>
+          <th>Coût estimé / mois</th>
+          <th>Note</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Hébergement Render</td>
+          <td>~25 €</td>
+          <td>Plan Standard (pas de freeze)</td>
+        </tr>
+        <tr>
+          <td>Twilio (SMS + numéros)</td>
+          <td>~30-80 € selon volume</td>
+          <td>~0,08 € / SMS</td>
+        </tr>
+        <tr>
+          <td>SendGrid (emails)</td>
+          <td>~20 €</td>
+          <td>Plan Essentials 50k emails</td>
+        </tr>
+        <tr>
+          <td>Cloudinary (photos)</td>
+          <td>~0-25 €</td>
+          <td>Gratuit jusqu'à 25 Go</td>
+        </tr>
+        <tr>
+          <td>Anthropic API (IA)</td>
+          <td>~10-50 € selon usage</td>
+          <td>Claude Haiku, très économique</td>
+        </tr>
+        <tr>
+          <td>Photographe Meero (Pack Sérénité)</td>
+          <td>Variable</td>
+          <td>~150-300 € par séance (à confirmer)</td>
+        </tr>
+        <tr>
+          <td>Domaine + email pro</td>
+          <td>~15 €</td>
+          <td>venduparmo.fr + Google Workspace</td>
+        </tr>
+        <tr class="highlight">
+          <td><strong>Total charges fixes</strong></td>
+          <td><strong>~150-220 € / mois</strong></td>
+          <td>Hors coût photographe variable</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="card card-green avoid-break">
+      <strong>Seuil de rentabilité :</strong> 1 à 2 clients par mois couvrent toutes les charges fixes. Le modèle est rentable dès les premières semaines.
+    </div>
+  </div>
+  <div class="page-footer">
+    <span>Vendu Par Moi — Dossier confidentiel</span>
+    <span>Page 6</span>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     PAGE 7 — TODO LIST
+═══════════════════════════════════════ -->
+<div class="sheet page-break">
+  <div class="section-sheet">
+    <div class="section-eyebrow">Section 5</div>
+    <div class="s-header">
+      <div class="s-title">Ce qui reste à faire</div>
+      <div class="s-sub">Checklist complète avant le lancement officiel</div>
+    </div>
+
+    <div class="h2">Site web & technique</div>
+
+    <div class="todo-item done avoid-break">
+      <div class="todo-check">✅</div>
+      <div class="todo-text"><strong>Application web complète</strong><span>19 pages vendeur, admin, paiement Stripe, emails, SMS — fonctionnel et audité</span></div>
+    </div>
+    <div class="todo-item done avoid-break">
+      <div class="todo-check">✅</div>
+      <div class="todo-text"><strong>CGV + Mentions légales + Politique de confidentialité</strong><span>Rédigées et publiées sur le site</span></div>
+    </div>
+    <div class="todo-item done avoid-break">
+      <div class="todo-check">✅</div>
+      <div class="todo-text"><strong>Landing page, page tarifs, FAQ</strong><span>Publiées et à jour (999 € / 1 548 €)</span></div>
+    </div>
+    <div class="todo-item done avoid-break">
+      <div class="todo-check">✅</div>
+      <div class="todo-text"><strong>Audit sécurité complet (P1→P3)</strong><span>Rate limiting, anti double-paiement, RGPD, JWT — tout corrigé</span></div>
+    </div>
+    <div class="todo-item urgent avoid-break">
+      <div class="todo-check">⚠️</div>
+      <div class="todo-text"><strong>Configurer les variables Render (production)</strong><span>Stripe live, SendGrid, Twilio, Cloudinary, Anthropic API — sans ça le site ne fonctionne pas en prod</span></div>
+    </div>
+    <div class="todo-item urgent avoid-break">
+      <div class="todo-check">⚠️</div>
+      <div class="todo-text"><strong>Acheter le domaine venduparmo.fr</strong><span>OVH ~10 €/an · Configurer DNS → Render · SSL automatique</span></div>
+    </div>
+    <div class="todo-item urgent avoid-break">
+      <div class="todo-check">⚠️</div>
+      <div class="todo-text"><strong>Compte Stripe live (mode production)</strong><span>Vérification KYC obligatoire (pièce d'identité + IBAN) · Créer 2 produits · Configurer webhook URL prod</span></div>
+    </div>
+    <div class="todo-item todo avoid-break">
+      <div class="todo-check">🔲</div>
+      <div class="todo-text"><strong>Vérification domaine SendGrid (SPF/DKIM)</strong><span>Indispensable pour que les emails n'arrivent pas en spam</span></div>
+    </div>
+    <div class="todo-item todo avoid-break">
+      <div class="todo-check">🔲</div>
+      <div class="todo-text"><strong>Numéro Twilio français + webhook</strong><span>TWILIO_FROM_NUMBER — sans ça les SMS vendeurs sont silencieux</span></div>
+    </div>
+    <div class="todo-item todo avoid-break">
+      <div class="todo-check">🔲</div>
+      <div class="todo-text"><strong>Test end-to-end du tunnel de paiement</strong><span>Inscription → Stripe → activation → accès plateforme → email de bienvenue</span></div>
+    </div>
+    <div class="todo-item todo avoid-break">
+      <div class="todo-check">🔲</div>
+      <div class="todo-text"><strong>SIRET à renseigner dans la CGV</strong><span>Remplacer [à compléter avant lancement] dès réception de l'immatriculation</span></div>
+    </div>
+
+    <div class="h2" style="margin-top:28px;">Vie réelle & entreprise</div>
+
+    <div class="todo-item urgent avoid-break">
+      <div class="todo-check">⚠️</div>
+      <div class="todo-text"><strong>Immatriculation de la société</strong><span>Auto-entrepreneur (URSSAF) ou SASU/SAS (INPI) → à décider avec l'avocat · Délai : 1 à 7 jours</span></div>
+    </div>
+    <div class="todo-item urgent avoid-break">
+      <div class="todo-check">⚠️</div>
+      <div class="todo-text"><strong>Compte bancaire professionnel</strong><span>Requis par Stripe au-delà d'un certain seuil · Shine, Qonto ou banque classique</span></div>
+    </div>
+    <div class="todo-item urgent avoid-break">
+      <div class="todo-check">⚠️</div>
+      <div class="todo-text"><strong>Contrat d'association entre fondateurs</strong><span>Répartition des parts, rôles, rémunérations, clauses de sortie — à valider par l'avocat</span></div>
+    </div>
+    <div class="todo-item todo avoid-break">
+      <div class="todo-check">🔲</div>
+      <div class="todo-text"><strong>Assurance RC Pro</strong><span>Responsabilité civile professionnelle — fortement recommandée · ~300-600 €/an</span></div>
+    </div>
+    <div class="todo-item todo avoid-break">
+      <div class="todo-check">🔲</div>
+      <div class="todo-text"><strong>Email professionnel contact@venduparmo.fr</strong><span>Google Workspace ~6 €/mois ou ProtonMail Business</span></div>
+    </div>
+    <div class="todo-item todo avoid-break">
+      <div class="todo-check">🔲</div>
+      <div class="todo-text"><strong>Flyers imprimés</strong><span>Le flyer recto/verso est prêt sur le site (/flyer) · À envoyer à un imprimeur</span></div>
+    </div>
+    <div class="todo-item todo avoid-break">
+      <div class="todo-check">🔲</div>
+      <div class="todo-text"><strong>Réseaux sociaux</strong><span>TikTok, Instagram, Facebook Page Pro — premiers contenus avant lancement</span></div>
+    </div>
+    <div class="todo-item todo avoid-break">
+      <div class="todo-check">🔲</div>
+      <div class="todo-text"><strong>Accord partenariat Meero (photographes)</strong><span>Pour le Pack Sérénité — tarifs, zones géographiques, délais, facturation</span></div>
+    </div>
+  </div>
+  <div class="page-footer">
+    <span>Vendu Par Moi — Dossier confidentiel</span>
+    <span>Page 7</span>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     PAGE 8 — QUESTIONS POUR L'AVOCAT
+═══════════════════════════════════════ -->
+<div class="sheet page-break">
+  <div class="section-sheet">
+    <div class="section-eyebrow">Section 6</div>
+    <div class="s-header">
+      <div class="s-title">Questions pour l'avocat</div>
+      <div class="s-sub">Points à valider avant le lancement officiel</div>
+    </div>
+
+    <div class="q-block avoid-break">
+      <div class="q-num">Question 1 — Structure juridique</div>
+      <div class="q-title">Quelle forme juridique choisir : Auto-entrepreneur, SASU ou SAS ?</div>
+      <div class="q-detail">Nous sommes deux fondateurs. L'auto-entrepreneur ne permet pas l'association à deux. Il faudra donc probablement une SASU (si un seul associé à terme) ou une SAS (si deux associés à parts égales ou non). Nous souhaitons comprendre les implications fiscales, sociales et la flexibilité de chaque forme pour lever des fonds ultérieurement si nécessaire.</div>
+    </div>
+
+    <div class="q-block avoid-break">
+      <div class="q-num">Question 2 — Contrat entre associés</div>
+      <div class="q-title">Rédaction du pacte d'associés / statuts entre les deux fondateurs</div>
+      <div class="q-detail">Nous devons formaliser : la répartition des parts (à définir), les rôles et responsabilités de chacun, la politique de rémunération, les conditions de sortie d'un associé (clause de préemption, drag-along, tag-along), et ce qu'il se passe en cas de désaccord ou de dissolution.</div>
+    </div>
+
+    <div class="q-block avoid-break">
+      <div class="q-num">Question 3 — Loi Hoguet & conformité</div>
+      <div class="q-title">Confirmez-vous que notre activité n'est pas soumise à la loi Hoguet ?</div>
+      <div class="q-detail">Notre plateforme vend des outils numériques et de la formation. Elle ne signe pas de mandats, ne met pas en relation vendeurs et acheteurs, et ne perçoit pas de commission sur la vente. Nous nous appuyons sur l'avis n°23-A-07 de l'Autorité de la concurrence (2 juin 2023). Nous souhaitons une validation juridique formelle que notre modèle est licite et hors champ de la loi Hoguet.</div>
+    </div>
+
+    <div class="q-block avoid-break">
+      <div class="q-num">Question 4 — Validation des CGV</div>
+      <div class="q-title">Nos CGV sont-elles conformes et suffisamment protectrices ?</div>
+      <div class="q-detail">Nos CGV sont jointes en section 7. Points à vérifier : la clause de renonciation au droit de rétractation (article L.221-28 Code conso), la limitation de responsabilité, la clause de médiation, la conformité RGPD, et la formulation exacte de ce que nous vendons (outils + formation, pas un service d'intermédiaire).</div>
+    </div>
+
+    <div class="q-block avoid-break">
+      <div class="q-num">Question 5 — Protection de la marque</div>
+      <div class="q-title">Comment protéger la marque "Vendu Par Moi" ?</div>
+      <div class="q-detail">Nous souhaitons déposer la marque "Vendu Par Moi" à l'INPI (classes 35, 36, 41 — services immobiliers, formation, logiciels). Coût, délai, procédure, et étendue de la protection sur le territoire français et européen.</div>
+    </div>
+
+    <div class="q-block avoid-break">
+      <div class="q-num">Question 6 — RGPD</div>
+      <div class="q-title">Notre politique de confidentialité et notre collecte de données sont-elles conformes au RGPD ?</div>
+      <div class="q-detail">Nous collectons : emails, mots de passe (hashés), photos de biens immobiliers, informations sur le bien (adresse, prix, surface), et données de contact des acheteurs transmises au vendeur. Sous-traitants : Stripe, SendGrid, Cloudinary, Twilio, Anthropic. Nous avons une page /confidentialite sur le site. Faut-il nommer un DPO ? Faire une déclaration CNIL ?</div>
+    </div>
+
+    <div class="q-block avoid-break">
+      <div class="q-num">Question 7 — Publicité comparative</div>
+      <div class="q-title">Notre comparaison "agence ~10 000€ vs Vendu Par Moi 999€" est-elle légale ?</div>
+      <div class="q-detail">Nous utilisons une comparaison publicitaire générique (pas de nom d'agence spécifique). La loi L.122-1 du Code de la consommation autorise la publicité comparative si elle est objective, vérifiable et non trompeuse. Nous souhaitons valider que notre formulation est correcte et suffisamment étayée par les données disponibles (DVF, barèmes des agences, etc.).</div>
+    </div>
+  </div>
+  <div class="page-footer">
+    <span>Vendu Par Moi — Dossier confidentiel</span>
+    <span>Page 8</span>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     PAGE 9 — CGV COMPLÈTES
+═══════════════════════════════════════ -->
+<div class="sheet page-break">
+  <div class="section-sheet">
+    <div class="section-eyebrow">Section 7</div>
+    <div class="s-header">
+      <div class="s-title">Conditions Générales de Vente</div>
+      <div class="s-sub">Version à valider par l'avocat — Dernière mise à jour : 18 juin 2026</div>
+    </div>
+
+    <div class="cgv-art avoid-break">
+      <h3>Article 1 — Définitions et objet</h3>
+      <p>Les présentes Conditions Générales de Vente (ci-après « CGV ») régissent les relations entre <strong>Vendu Par Moi</strong>, plateforme numérique éditée par Matthias Brieux (ci-après « le Prestataire ») et toute personne physique ou morale accédant à la plateforme venduparmo.fr (ci-après « le Client »).</p>
+      <p>Vendu Par Moi est une <strong>plateforme numérique d'outils et de formation</strong> destinée à accompagner les vendeurs particuliers dans leur démarche de vente immobilière. Le Prestataire n'exerce aucune activité d'agent immobilier, de mandataire ou d'intermédiaire au sens de la loi Hoguet n°70-9 du 2 janvier 1970.</p>
+    </div>
+
+    <div class="cgv-art avoid-break">
+      <h3>Article 2 — Offres et prix</h3>
+      <p>Le Prestataire propose les offres suivantes :</p>
+      <ul>
+        <li><strong>Pack Autonome — 999 € TTC</strong> : accès complet à la plateforme numérique, formation 6 modules, coach IA, dossier acheteur, agenda de visites, bot SMS, suivi des offres.</li>
+        <li><strong>Pack Sérénité — 1 548 € TTC</strong> : tout le Pack Autonome + séance photo professionnelle par un photographe partenaire (réseau Meero), photos retouchées livrées sous 48h. Option paiement en 4 × 387 € sans frais.</li>
+      </ul>
+      <p>Les prix sont exprimés en euros toutes taxes comprises (TTC). Le Prestataire se réserve le droit de modifier ses tarifs à tout moment ; les modifications n'affectent pas les commandes déjà validées. <strong>Aucune commission</strong> n'est prélevée sur le prix de vente du bien immobilier.</p>
+    </div>
+
+    <div class="cgv-art avoid-break">
+      <h3>Article 3 — Processus de commande et paiement</h3>
+      <p>La commande est validée après saisie des informations de paiement et confirmation par le Client. Le paiement est traité par <strong>Stripe</strong>, prestataire de paiement sécurisé. Le Prestataire ne conserve aucune donnée bancaire. L'accès à la plateforme est ouvert <strong>immédiatement après confirmation du paiement</strong>.</p>
+    </div>
+
+    <div class="cgv-art avoid-break">
+      <h3>Article 4 — Droit de rétractation</h3>
+      <p>Conformément à l'article L.221-28 du Code de la consommation, le droit de rétractation ne s'applique pas aux contenus numériques fournis immédiatement après l'achat et dont l'exécution a commencé avec l'accord exprès du consommateur. En validant sa commande et en accédant immédiatement aux services, le Client renonce expressément à son droit de rétractation. Toutefois, en cas d'insatisfaction, le Client peut contacter le Prestataire à l'adresse contact@venduparmo.fr.</p>
+    </div>
+
+    <div class="cgv-art avoid-break">
+      <h3>Article 5 — Obligations et responsabilité du Client</h3>
+      <p>Le Client est seul responsable de : la véracité des informations renseignées dans sa fiche bien, la légalité de son annonce immobilière, la réalisation des diagnostics obligatoires, les négociations et décisions prises avec les acheteurs, et la rédaction/signature du compromis de vente (avec notaire). Le Prestataire fournit des outils d'aide à la vente mais n'intervient pas comme intermédiaire.</p>
+    </div>
+
+    <div class="cgv-art avoid-break">
+      <h3>Article 6 — Limitation de responsabilité</h3>
+      <p>La responsabilité du Prestataire est strictement limitée au montant payé par le Client. Le Prestataire ne peut être tenu responsable de l'échec d'une vente, du délai de vente, ou du prix obtenu. Les informations fournies (formations, conseils, scripts) sont à titre indicatif et éducatif. Elles ne constituent pas un conseil juridique, fiscal ou financier.</p>
+    </div>
+
+    <div class="cgv-art avoid-break">
+      <h3>Article 7 — Protection des données (RGPD)</h3>
+      <p>Les données personnelles collectées sont nécessaires à l'exécution du service. Elles sont traitées conformément au RGPD (UE 2016/679). Le Client dispose des droits d'accès, rectification, suppression, portabilité et opposition, exercéables à contact@venduparmo.fr. Les données ne sont pas revendues à des tiers. Sous-traitants : Stripe, Cloudinary, SendGrid, Twilio (soumis à clauses contractuelles de protection).</p>
+    </div>
+
+    <div class="cgv-art avoid-break">
+      <h3>Article 8 — Propriété intellectuelle</h3>
+      <p>Le contenu de la plateforme (formations, guides, templates, interfaces, logiciel) est la propriété exclusive du Prestataire. Toute reproduction ou diffusion sans autorisation écrite préalable est interdite.</p>
+    </div>
+
+    <div class="cgv-art avoid-break">
+      <h3>Article 9 — Droit applicable et litiges</h3>
+      <p>Les présentes CGV sont soumises au droit français. En cas de litige, les parties rechercheront une solution amiable avant toute action judiciaire. À défaut, le tribunal compétent est celui du ressort de Douai (59). Conformément aux articles L.612-1 et suivants du Code de la consommation, le Client peut recourir gratuitement à un médiateur de la consommation : mediationconso-ame.com.</p>
+    </div>
+
+    <hr class="divider">
+
+    <div class="cgv-art avoid-break">
+      <h3>Mentions légales</h3>
+      <p>
+        <strong>Vendu Par Moi</strong> — exploité par Matthias Brieux<br>
+        Adresse : Douai, Nord (59)<br>
+        Téléphone : 06 95 44 36 54<br>
+        Email : contact@venduparmo.fr<br>
+        Statut : <strong>[À compléter après immatriculation]</strong><br>
+        SIRET : <strong>[À compléter après immatriculation]</strong><br>
+        Hébergeur : Render Services, Inc. — 525 Brannan Street, San Francisco, CA 94107, USA
+      </p>
+    </div>
+  </div>
+  <div class="page-footer">
+    <span>Vendu Par Moi — Dossier confidentiel</span>
+    <span>Page 9</span>
+  </div>
+</div>
+
+</body>
+</html>
