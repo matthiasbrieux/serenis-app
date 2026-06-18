@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fiche Fondateurs — Vendu Par Moi</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    @media print {
+      html, body { width: 210mm; background: white !important; }
+      .no-print { display: none !important; }
+      .page-break { page-break-before: always; }
+      .avoid-break { page-break-inside: avoid; }
+      @page { margin: 16mm 16mm 16mm 16mm; size: A4 portrait; }
+      body { font-size: 10pt; }
+    }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: #ddd;
+      color: #1a1a16;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    :root {
+      --green: #3D5A47;
+      --green-dark: #1C3028;
+      --terra: #C4785A;
+      --border: #e0d8cc;
+      --muted: #666;
+      --fill: #f8f5f0;
+    }
+
+    .no-print {
+      position: fixed; top: 20px; right: 20px; z-index: 999;
+    }
+    .btn-print {
+      background: var(--green-dark); color: #fff; border: none;
+      padding: 12px 22px; border-radius: 8px;
+      font-family: 'DM Sans', sans-serif; font-size: 0.88rem; font-weight: 700;
+      cursor: pointer; box-shadow: 0 4px 16px rgba(0,0,0,0.25);
+    }
+
+    .sheet {
+      width: 210mm;
+      background: white;
+      margin: 20px auto;
+      box-shadow: 0 4px 40px rgba(0,0,0,0.18);
+      padding: 40px 44px 48px;
+      min-height: 297mm;
+      position: relative;
+    }
+
+    /* HEADER */
+    .doc-header {
+      display: flex; justify-content: space-between; align-items: flex-start;
+      margin-bottom: 28px; padding-bottom: 20px;
+      border-bottom: 2px solid var(--green-dark);
+    }
+    .doc-logo { font-family: 'Cormorant Garamond', serif; font-size: 1.3rem; color: var(--green-dark); }
+    .doc-logo em { color: var(--terra); font-style: normal; }
+    .doc-title-block { text-align: right; }
+    .doc-title { font-family: 'Cormorant Garamond', serif; font-size: 1.6rem; font-weight: 700; color: var(--green-dark); }
+    .doc-sub { font-size: 0.75rem; color: var(--muted); margin-top: 2px; }
+
+    /* SECTION */
+    .sec-title {
+      font-size: 0.68rem; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.12em; color: #fff;
+      background: var(--green-dark); padding: 6px 14px;
+      border-radius: 4px; margin: 24px 0 14px;
+      display: inline-block;
+    }
+    .sec-title.terra { background: var(--terra); }
+    .sec-title.orange { background: #e07a2a; }
+
+    /* GRILLE 2 FONDATEURS */
+    .founders-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px;
+    }
+    .founder-col {
+      border: 2px solid var(--border); border-radius: 10px; overflow: hidden;
+    }
+    .founder-col.f1 { border-color: var(--green); }
+    .founder-col.f2 { border-color: var(--terra); }
+    .founder-head {
+      padding: 10px 14px;
+      font-size: 0.72rem; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.09em; color: #fff;
+    }
+    .founder-head.f1 { background: var(--green); }
+    .founder-head.f2 { background: var(--terra); }
+    .founder-body { padding: 12px 14px; display: flex; flex-direction: column; gap: 9px; }
+
+    /* CHAMPS */
+    .field { display: flex; flex-direction: column; gap: 3px; }
+    .field-label { font-size: 0.62rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: #aaa; }
+    .field-value {
+      font-size: 0.84rem; color: #1a1a16; font-weight: 500;
+      border-bottom: 1px solid var(--border); padding: 3px 0 4px;
+      min-height: 22px;
+    }
+    .field-value.filled { color: var(--green-dark); font-weight: 600; }
+    .field-value.blank { color: #bbb; font-style: italic; }
+    .field-value.important { color: var(--terra); font-weight: 700; }
+
+    /* TABLEAU PACTE */
+    .pacte-table { width: 100%; border-collapse: collapse; margin-bottom: 14px; }
+    .pacte-table th {
+      background: var(--green-dark); color: #fff;
+      padding: 8px 12px; font-size: 0.72rem; text-align: left;
+      font-weight: 600;
+    }
+    .pacte-table td { padding: 9px 12px; border-bottom: 1px solid var(--border); font-size: 0.83rem; vertical-align: top; }
+    .pacte-table tr:nth-child(even) td { background: #f8f5f0; }
+    .pacte-table .label { font-weight: 700; color: #1a1a16; width: 38%; }
+    .pacte-table .val { color: var(--green-dark); font-weight: 600; width: 30%; }
+    .pacte-table .note { color: var(--muted); font-size: 0.76rem; width: 32%; }
+
+    /* IP TABLE */
+    .ip-row {
+      display: flex; gap: 12px; align-items: flex-start;
+      padding: 9px 12px; border-bottom: 1px solid var(--border);
+      font-size: 0.83rem;
+    }
+    .ip-row:last-child { border-bottom: none; }
+    .ip-item { font-weight: 700; width: 38%; color: #1a1a16; }
+    .ip-owner { color: var(--green-dark); font-weight: 600; width: 30%; }
+    .ip-note { color: var(--muted); font-size: 0.76rem; width: 32%; }
+
+    /* QUESTIONS / BLOC */
+    .q-row {
+      display: flex; gap: 12px; align-items: flex-start;
+      padding: 10px 12px; border-bottom: 1px solid var(--border);
+    }
+    .q-row:last-child { border-bottom: none; }
+    .q-check { width: 16px; height: 16px; border: 1.5px solid #bbb; border-radius: 3px; flex-shrink: 0; margin-top: 2px; }
+    .q-label { font-size: 0.84rem; font-weight: 700; color: #1a1a16; flex: 1; }
+    .q-sub { font-size: 0.74rem; color: var(--muted); display: block; margin-top: 2px; font-weight: 400; }
+
+    .info-box {
+      border-radius: 8px; padding: 12px 14px; margin: 10px 0;
+      font-size: 0.8rem; line-height: 1.65;
+    }
+    .info-box.green { background: #e8f4ec; border-left: 3px solid var(--green); color: #2a4030; }
+    .info-box.terra { background: #fef3e8; border-left: 3px solid var(--terra); color: #5a3018; }
+    .info-box.warn { background: #fff8e7; border-left: 3px solid #f0a500; color: #5a4000; }
+
+    .badge-50 {
+      display: inline-flex; align-items: center; justify-content: center;
+      background: var(--green); color: #fff;
+      font-weight: 800; font-size: 1rem;
+      width: 44px; height: 44px; border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .split-visual {
+      display: flex; align-items: center; gap: 16px;
+      background: var(--fill); border-radius: 10px; padding: 14px 18px;
+      margin: 12px 0;
+    }
+    .split-bar { flex: 1; height: 10px; border-radius: 5px; overflow: hidden; display: flex; }
+    .split-bar-g { flex: 1; background: var(--green); }
+    .split-bar-t { flex: 1; background: var(--terra); }
+    .split-label { font-size: 0.78rem; font-weight: 700; }
+    .split-label.g { color: var(--green); }
+    .split-label.t { color: var(--terra); }
+
+    .page-footer {
+      position: absolute; bottom: 0; left: 0; right: 0;
+      padding: 10px 44px;
+      border-top: 1px solid var(--border);
+      display: flex; justify-content: space-between;
+      font-size: 0.66rem; color: #bbb;
+    }
+  </style>
+</head>
+<body>
+
+<div class="no-print">
+  <button class="btn-print" onclick="window.print()">🖨 Imprimer / PDF</button>
+</div>
+
+<!-- ═══════════════════════════════════
+     PAGE 1
+═══════════════════════════════════ -->
+<div class="sheet">
+
+  <div class="doc-header">
+    <div class="doc-logo">Vendu Par <em>Moi</em></div>
+    <div class="doc-title-block">
+      <div class="doc-title">Fiche Fondateurs</div>
+      <div class="doc-sub">Document confidentiel · À remettre à l'avocat · Juin 2026</div>
+    </div>
+  </div>
+
+  <!-- IDENTITÉ FONDATEURS -->
+  <div class="sec-title">1 — Identité des fondateurs</div>
+
+  <div class="founders-grid avoid-break">
+    <div class="founder-col f1">
+      <div class="founder-head f1">Fondateur 1</div>
+      <div class="founder-body">
+        <div class="field"><div class="field-label">Nom & Prénom</div><div class="field-value filled">BRIEUX Matthias</div></div>
+        <div class="field"><div class="field-label">Date de naissance</div><div class="field-value filled">26 / 05 / 1998</div></div>
+        <div class="field"><div class="field-label">Nationalité</div><div class="field-value filled">Française</div></div>
+        <div class="field"><div class="field-label">Adresse</div><div class="field-value filled">Douai, Nord (59)</div></div>
+        <div class="field"><div class="field-label">Email</div><div class="field-value filled">matthiasbrieux260598@gmail.com</div></div>
+        <div class="field"><div class="field-label">Téléphone</div><div class="field-value filled">06 95 44 36 54</div></div>
+        <div class="field"><div class="field-label">Rôle dans la société</div><div class="field-value filled">Co-dirigeant · Technique & Produit</div></div>
+        <div class="field"><div class="field-label">Apport en capital</div><div class="field-value blank">À compléter (€)</div></div>
+      </div>
+    </div>
+    <div class="founder-col f2">
+      <div class="founder-head f2">Fondateur 2</div>
+      <div class="founder-body">
+        <div class="field"><div class="field-label">Nom & Prénom</div><div class="field-value blank">À compléter</div></div>
+        <div class="field"><div class="field-label">Date de naissance</div><div class="field-value blank">JJ / MM / AAAA</div></div>
+        <div class="field"><div class="field-label">Nationalité</div><div class="field-value blank">À compléter</div></div>
+        <div class="field"><div class="field-label">Adresse</div><div class="field-value blank">À compléter</div></div>
+        <div class="field"><div class="field-label">Email</div><div class="field-value blank">À compléter</div></div>
+        <div class="field"><div class="field-label">Téléphone</div><div class="field-value blank">À compléter</div></div>
+        <div class="field"><div class="field-label">Rôle dans la société</div><div class="field-value blank">Co-dirigeant · Commercial & Terrain</div></div>
+        <div class="field"><div class="field-label">Apport en capital</div><div class="field-value blank">À compléter (€)</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RÉPARTITION -->
+  <div class="sec-title terra">2 — Répartition des parts sociales</div>
+
+  <div class="split-visual avoid-break">
+    <div class="badge-50">50%</div>
+    <div style="flex:1;">
+      <div class="split-bar" style="margin-bottom:6px;">
+        <div class="split-bar-g"></div>
+        <div class="split-bar-t"></div>
+      </div>
+      <div style="display:flex;justify-content:space-between;">
+        <span class="split-label g">Matthias Brieux — 50 %</span>
+        <span class="split-label t">Fondateur 2 — 50 %</span>
+      </div>
+    </div>
+    <div class="badge-50" style="background:var(--terra);">50%</div>
+  </div>
+
+  <table class="pacte-table avoid-break">
+    <thead>
+      <tr><th>Élément</th><th>Décision</th><th>Note pour l'avocat</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td class="label">Répartition des parts</td>
+        <td class="val">50 % / 50 %</td>
+        <td class="note">Égalitaire entre les deux fondateurs</td>
+      </tr>
+      <tr>
+        <td class="label">Capital social envisagé</td>
+        <td class="val" style="color:#bbb;font-style:italic;">À décider</td>
+        <td class="note">Recommandation : 1 000 € à 5 000 €</td>
+      </tr>
+      <tr>
+        <td class="label">Forme juridique souhaitée</td>
+        <td class="val" style="color:#bbb;font-style:italic;">À conseiller</td>
+        <td class="note">SAS ? SARL ? Demander à l'avocat</td>
+      </tr>
+      <tr>
+        <td class="label">Siège social</td>
+        <td class="val" style="color:#bbb;font-style:italic;">À décider</td>
+        <td class="note">Domicile Matthias (Douai 59) ou domiciliation</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- PACTE ASSOCIÉS -->
+  <div class="sec-title">3 — Pacte d'associés — termes souhaités</div>
+
+  <table class="pacte-table avoid-break">
+    <thead>
+      <tr><th>Clause</th><th>Position souhaitée</th><th>Note</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td class="label">Vesting (acquisition progressive des parts)</td>
+        <td class="val">3 ans · cliff 1 an</td>
+        <td class="note">Si un fondateur part avant 1 an : 0 part. Entre 1 et 3 ans : proportionnel.</td>
+      </tr>
+      <tr>
+        <td class="label">Rachat de parts en cas de sortie</td>
+        <td class="val">Valeur de marché</td>
+        <td class="note">Prix déterminé par expert indépendant ou formule convenue</td>
+      </tr>
+      <tr>
+        <td class="label">Droit de préemption</td>
+        <td class="val">Oui</td>
+        <td class="note">L'autre associé a priorité pour racheter les parts avant tout tiers</td>
+      </tr>
+      <tr>
+        <td class="label">Clause de non-concurrence post-sortie</td>
+        <td class="val">2 ans · secteur immobilier</td>
+        <td class="note">Périmètre géographique et temporel à préciser par l'avocat</td>
+      </tr>
+      <tr>
+        <td class="label">Décisions à l'unanimité</td>
+        <td class="val">Cession de parts · Levée de fonds · Dissolution</td>
+        <td class="note">Les décisions courantes prises par chaque dirigeant dans son domaine</td>
+      </tr>
+      <tr>
+        <td class="label">Blocage 50/50 (deadlock)</td>
+        <td class="val">Médiation obligatoire</td>
+        <td class="note">En cas de désaccord persistant : médiateur désigné avant tout recours judiciaire</td>
+      </tr>
+      <tr>
+        <td class="label">Rémunération des dirigeants</td>
+        <td class="val" style="color:#bbb;font-style:italic;">À décider ensemble</td>
+        <td class="note">Prévoir dès les statuts les modalités de vote sur les rémunérations</td>
+      </tr>
+      <tr>
+        <td class="label">Drag-along (entraînement)</td>
+        <td class="val">Oui, à 75 %</td>
+        <td class="note">Si un acquéreur veut 100 % et que 75 % des associés acceptent, les autres doivent suivre</td>
+      </tr>
+      <tr>
+        <td class="label">Tag-along (co-sortie)</td>
+        <td class="val">Oui</td>
+        <td class="note">Si un associé vend ses parts, l'autre peut exiger de vendre les siennes aux mêmes conditions</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="page-footer">
+    <span>Vendu Par Moi — Fiche Fondateurs · Confidentiel</span>
+    <span>Page 1</span>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════
+     PAGE 2
+═══════════════════════════════════ -->
+<div class="sheet page-break">
+
+  <div class="doc-header">
+    <div class="doc-logo">Vendu Par <em>Moi</em></div>
+    <div class="doc-title-block">
+      <div class="doc-title">Fiche Fondateurs — suite</div>
+      <div class="doc-sub">Propriété intellectuelle · Actifs · Questions avocat</div>
+    </div>
+  </div>
+
+  <!-- PROPRIÉTÉ INTELLECTUELLE -->
+  <div class="sec-title">4 — Propriété intellectuelle & actifs existants</div>
+
+  <div class="info-box warn avoid-break">
+    <strong>Point critique :</strong> Tout le développement a été réalisé avant la création de la société. Il faut clarifier juridiquement à qui appartient le logiciel et comment il sera apporté à la future société.
+  </div>
+
+  <div style="border:1px solid var(--border);border-radius:10px;overflow:hidden;margin-bottom:16px;" class="avoid-break">
+    <div style="background:var(--green-dark);color:#fff;padding:8px 14px;font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;display:grid;grid-template-columns:38% 30% 32%;gap:0;">
+      <div>Actif</div><div>Propriétaire actuel</div><div>À faire</div>
+    </div>
+    <div class="ip-row">
+      <div class="ip-item">Logiciel / Code source (serenis-app)</div>
+      <div class="ip-owner">Matthias Brieux</div>
+      <div class="ip-note">Apport en nature à la société à valoriser</div>
+    </div>
+    <div class="ip-row">
+      <div class="ip-item">Nom de domaine venduparmo.fr</div>
+      <div class="ip-owner" style="color:#bbb;font-style:italic;">À acheter</div>
+      <div class="ip-note">À acheter au nom de la société (pas d'un fondateur)</div>
+    </div>
+    <div class="ip-row">
+      <div class="ip-item">Marque "Vendu Par Moi"</div>
+      <div class="ip-owner" style="color:#bbb;font-style:italic;">Non déposée</div>
+      <div class="ip-note">Dépôt INPI dès création société · Classes 35, 36, 41</div>
+    </div>
+    <div class="ip-row">
+      <div class="ip-item">Compte GitHub matthiasbrieux/serenis-app</div>
+      <div class="ip-owner">Matthias Brieux</div>
+      <div class="ip-note">Transférer à un compte GitHub de la société</div>
+    </div>
+    <div class="ip-row">
+      <div class="ip-item">Compte Stripe (paiements)</div>
+      <div class="ip-owner" style="color:#bbb;font-style:italic;">À créer</div>
+      <div class="ip-note">Ouvrir au nom de la société avec SIRET</div>
+    </div>
+    <div class="ip-row">
+      <div class="ip-item">Compte Render (hébergement)</div>
+      <div class="ip-owner">Matthias Brieux</div>
+      <div class="ip-note">Migrer vers email pro de la société</div>
+    </div>
+    <div class="ip-row">
+      <div class="ip-item">Email contact@venduparmo.fr</div>
+      <div class="ip-owner" style="color:#bbb;font-style:italic;">À créer</div>
+      <div class="ip-note">Google Workspace ou ProtonMail Business</div>
+    </div>
+    <div class="ip-row">
+      <div class="ip-item">Base de données utilisateurs (SQLite)</div>
+      <div class="ip-owner">Matthias Brieux</div>
+      <div class="ip-note">Actif de la société · Déclaration CNIL si nécessaire</div>
+    </div>
+    <div class="ip-row">
+      <div class="ip-item">Contenus marketing (30+ documents MD)</div>
+      <div class="ip-owner">Matthias Brieux</div>
+      <div class="ip-note">Apport en nature ou cession à la société</div>
+    </div>
+  </div>
+
+  <div class="info-box green avoid-break">
+    <strong>Recommandation :</strong> Demander à l'avocat comment valoriser l'apport en nature du logiciel (nécessite souvent un commissaire aux apports pour les apports > 30 000 €). Alternative : cession du logiciel à la société à un prix convenu lors de la création.
+  </div>
+
+  <!-- MARQUE INPI -->
+  <div class="sec-title terra">5 — Dépôt de marque INPI</div>
+
+  <table class="pacte-table avoid-break">
+    <thead>
+      <tr><th>Élément</th><th>Information</th><th>Note</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td class="label">Marque à déposer</td>
+        <td class="val">"Vendu Par Moi"</td>
+        <td class="note">Marque verbale + logo (si logo finalisé)</td>
+      </tr>
+      <tr>
+        <td class="label">Classe 35</td>
+        <td class="val">Services commerciaux</td>
+        <td class="note">Plateforme de mise en relation, publicité, marketing</td>
+      </tr>
+      <tr>
+        <td class="label">Classe 36</td>
+        <td class="val">Services immobiliers</td>
+        <td class="note">Informations et conseils immobiliers (hors mandat)</td>
+      </tr>
+      <tr>
+        <td class="label">Classe 41</td>
+        <td class="val">Formation & éducation</td>
+        <td class="note">Formation en ligne, coaching, contenus éducatifs</td>
+      </tr>
+      <tr>
+        <td class="label">Classe 42</td>
+        <td class="val">Services informatiques</td>
+        <td class="note">Logiciel SaaS, développement, IA — à confirmer avec l'avocat</td>
+      </tr>
+      <tr>
+        <td class="label">Territoire</td>
+        <td class="val">France (INPI)</td>
+        <td class="note">Extension UE (EUIPO) possible ultérieurement</td>
+      </tr>
+      <tr>
+        <td class="label">Coût estimé</td>
+        <td class="val">~200-400 €</td>
+        <td class="note">Par classe INPI · Valable 10 ans renouvelable</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- CHECKLIST AVOCAT -->
+  <div class="sec-title orange">6 — À valider / décider lors du RDV</div>
+
+  <div style="border:1px solid var(--border);border-radius:10px;overflow:hidden;" class="avoid-break">
+    <div class="q-row">
+      <div class="q-check"></div>
+      <div class="q-label">Forme juridique retenue (SAS recommandée pour flexibilité future)
+        <span class="q-sub">SAS = plus flexible pour lever des fonds. SARL = plus simple et moins coûteuse à gérer. Auto-entrepreneur impossible à deux.</span>
+      </div>
+    </div>
+    <div class="q-row">
+      <div class="q-check"></div>
+      <div class="q-label">Montant du capital social
+        <span class="q-sub">1 € légalement suffisant, mais 1 000 à 5 000 € recommandé pour la crédibilité bancaire. Chaque fondateur apporte 50 %.</span>
+      </div>
+    </div>
+    <div class="q-row">
+      <div class="q-check"></div>
+      <div class="q-label">Valorisation de l'apport en nature du logiciel
+        <span class="q-sub">Le code représente plusieurs mois de développement. Doit être évalué et formalisé juridiquement pour être apporté à la société.</span>
+      </div>
+    </div>
+    <div class="q-row">
+      <div class="q-check"></div>
+      <div class="q-label">Confirmation de la non-soumission à la loi Hoguet
+        <span class="q-sub">Notre modèle = vente d'outils + formation. Pas de mandat, pas d'entremise, pas de commission sur vente. L'avocat doit le confirmer par écrit.</span>
+      </div>
+    </div>
+    <div class="q-row">
+      <div class="q-check"></div>
+      <div class="q-label">Validation des CGV et mentions légales
+        <span class="q-sub">CGV jointes dans le dossier complet. À relire notamment : clause rétractation L.221-28, limitation responsabilité, clause médiateur.</span>
+      </div>
+    </div>
+    <div class="q-row">
+      <div class="q-check"></div>
+      <div class="q-label">Démarche dépôt marque INPI "Vendu Par Moi"
+        <span class="q-sub">À déposer dès la création de la société, pas avant (sinon dépôt au nom d'un fondateur, pas de la société).</span>
+      </div>
+    </div>
+    <div class="q-row">
+      <div class="q-check"></div>
+      <div class="q-label">Conformité RGPD — faut-il nommer un DPO ?
+        <span class="q-sub">Nous collectons données personnelles + photos de biens. Sous-traitants : Stripe, SendGrid, Cloudinary, Twilio, Anthropic.</span>
+      </div>
+    </div>
+    <div class="q-row">
+      <div class="q-check"></div>
+      <div class="q-label">Légalité de la publicité comparative "agence 10 000 € vs VPM 999 €"
+        <span class="q-sub">Loi L.122-1 Code conso. Notre comparaison est générique (pas de marque citée) et basée sur des données officielles DVF / barèmes agences.</span>
+      </div>
+    </div>
+    <div class="q-row">
+      <div class="q-check"></div>
+      <div class="q-label">Assurance RC Pro — montant et couverture conseillés
+        <span class="q-sub">Pour une plateforme numérique vendant des conseils / formation dans l'immobilier. Quelle garantie minimale recommandez-vous ?</span>
+      </div>
+    </div>
+    <div class="q-row" style="border-bottom:none;">
+      <div class="q-check"></div>
+      <div class="q-label">Contrat avec photographes partenaires (Pack Sérénité)
+        <span class="q-sub">Partenariat avec réseau Meero ou photographes indépendants. Quelle structure contractuelle ? Statut de sous-traitant ? Portage salarial ?</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="info-box terra" style="margin-top:14px;" class="avoid-break">
+    <strong>Documents à apporter au RDV :</strong> Ce dossier · Dossier complet Vendu Par Moi (9 pages) · CGV imprimées · Pièces d'identité des deux fondateurs · RIB personnel de chaque fondateur
+  </div>
+
+  <div class="page-footer">
+    <span>Vendu Par Moi — Fiche Fondateurs · Confidentiel</span>
+    <span>Page 2</span>
+  </div>
+</div>
+
+</body>
+</html>
