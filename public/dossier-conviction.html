@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dossier Conviction — Vendu Par Moi</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    @media print {
+      html, body { width: 210mm; background: white !important; }
+      .no-print { display: none !important; }
+      .page-break { page-break-before: always; }
+      .avoid-break { page-break-inside: avoid; }
+      @page { margin: 14mm 14mm 18mm 14mm; size: A4 portrait; }
+    }
+
+    body { font-family: 'DM Sans', sans-serif; background: #ddd; color: #1a1a16; -webkit-font-smoothing: antialiased; }
+
+    :root {
+      --green: #3D5A47; --green-dark: #1C3028; --terra: #C4785A;
+      --blue: #2c5f8a; --border: #e0d8cc; --muted: #666;
+    }
+
+    .no-print { position: fixed; top: 20px; right: 20px; z-index: 999; display: flex; flex-direction: column; gap: 8px; }
+    .btn-print { background: var(--green-dark); color: #fff; border: none; padding: 12px 22px; border-radius: 8px; font-family: 'DM Sans', sans-serif; font-size: 0.88rem; font-weight: 700; cursor: pointer; }
+
+    .sheet { width: 210mm; background: white; margin: 20px auto; box-shadow: 0 4px 40px rgba(0,0,0,0.18); padding: 36px 42px 50px; position: relative; }
+
+    /* BANDEAU DESTINATAIRE */
+    .for-tag {
+      display: flex; align-items: center; gap: 10px;
+      padding: 7px 14px; border-radius: 6px; margin-bottom: 20px;
+      font-size: 0.7rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.12em;
+    }
+    .for-tag.avocat { background: #1C3028; color: #fff; }
+    .for-tag.associe { background: var(--terra); color: #fff; }
+    .for-tag.both { background: #555; color: #fff; }
+    .for-tag-dot { width: 8px; height: 8px; border-radius: 50%; background: rgba(255,255,255,0.5); }
+
+    /* HEADER */
+    .doc-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 24px; padding-bottom: 16px; border-bottom: 2px solid var(--green-dark); }
+    .doc-logo { font-family: 'Cormorant Garamond', serif; font-size: 1.2rem; color: var(--green-dark); }
+    .doc-logo em { color: var(--terra); font-style: normal; }
+    .doc-title { font-family: 'Cormorant Garamond', serif; font-size: 1.5rem; font-weight: 700; color: var(--green-dark); text-align: right; }
+    .doc-sub { font-size: 0.7rem; color: var(--muted); text-align: right; margin-top: 2px; }
+
+    /* COVER */
+    .cover-inner { background: linear-gradient(160deg, #0F1E13 0%, #1C3028 60%, #2a4535 100%); border-radius: 16px; padding: 48px 44px; color: #fff; margin-bottom: 24px; }
+    .cover-eyebrow { font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.12em; color: rgba(196,120,90,0.8); margin-bottom: 14px; }
+    .cover-big { font-family: 'Cormorant Garamond', serif; font-size: 2.8rem; font-weight: 700; line-height: 1.1; margin-bottom: 16px; }
+    .cover-big em { color: #f0b89a; font-style: italic; }
+    .cover-desc { font-size: 0.88rem; color: rgba(255,255,255,0.65); line-height: 1.75; max-width: 440px; margin-bottom: 32px; }
+    .cover-guide { background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); border-radius: 12px; padding: 18px 20px; }
+    .cover-guide-title { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: rgba(255,255,255,0.5); margin-bottom: 12px; }
+    .cover-guide-row { display: flex; align-items: center; gap: 12px; padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.08); font-size: 0.82rem; }
+    .cover-guide-row:last-child { border-bottom: none; }
+    .cover-guide-badge { font-size: 0.6rem; font-weight: 800; text-transform: uppercase; padding: 2px 8px; border-radius: 4px; flex-shrink: 0; width: 68px; text-align: center; }
+    .cover-guide-badge.av { background: var(--green-dark); color: #fff; }
+    .cover-guide-badge.as { background: var(--terra); color: #fff; }
+    .cover-guide-badge.b2 { background: #555; color: #fff; }
+    .cover-guide-text { color: rgba(255,255,255,0.75); }
+    .cover-guide-pages { color: rgba(255,255,255,0.35); font-size: 0.72rem; margin-left: auto; }
+
+    /* SECTIONS */
+    .sec-label { font-size: 0.63rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.12em; color: #fff; padding: 4px 11px; border-radius: 4px; margin: 22px 0 12px; display: inline-block; }
+    .sec-label.g { background: var(--green-dark); }
+    .sec-label.t { background: var(--terra); }
+    .sec-label.b { background: var(--blue); }
+
+    .h2 { font-family: 'Cormorant Garamond', serif; font-size: 1.2rem; font-weight: 700; color: var(--green-dark); margin: 20px 0 10px; padding-bottom: 6px; border-bottom: 1px solid var(--border); }
+    p { font-size: 0.85rem; color: #444; line-height: 1.75; margin-bottom: 8px; }
+    ul { padding-left: 18px; margin-bottom: 10px; }
+    li { font-size: 0.85rem; color: #444; line-height: 1.7; margin-bottom: 4px; }
+    strong { color: #1a1a16; }
+
+    .info-green { background: #e8f4ec; border-left: 3px solid var(--green); border-radius: 0 8px 8px 0; padding: 11px 14px; margin: 10px 0; font-size: 0.83rem; color: #2a4030; line-height: 1.7; }
+    .info-terra { background: #fef3e8; border-left: 3px solid var(--terra); border-radius: 0 8px 8px 0; padding: 11px 14px; margin: 10px 0; font-size: 0.83rem; color: #5a3018; line-height: 1.7; }
+    .info-blue { background: #eef3fb; border-left: 3px solid var(--blue); border-radius: 0 8px 8px 0; padding: 11px 14px; margin: 10px 0; font-size: 0.83rem; color: #1a2a4a; line-height: 1.7; }
+
+    /* MARCHÉ */
+    .stat-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin: 12px 0; }
+    .stat-box { background: #f8f5f0; border-radius: 10px; padding: 14px 12px; text-align: center; }
+    .stat-box.hl { background: var(--green-dark); }
+    .stat-num { font-family: 'Cormorant Garamond', serif; font-size: 1.8rem; font-weight: 700; color: var(--terra); line-height: 1; margin-bottom: 4px; }
+    .stat-box.hl .stat-num { color: #f0b89a; }
+    .stat-label { font-size: 0.65rem; color: var(--muted); line-height: 1.4; font-weight: 600; }
+    .stat-box.hl .stat-label { color: rgba(255,255,255,0.6); }
+
+    /* CONCURRENTS */
+    .comp-row { display: grid; grid-template-columns: 22% 14% 14% 50%; gap: 0; border-bottom: 1px solid var(--border); align-items: start; }
+    .comp-row.header { background: var(--green-dark); border-radius: 8px 8px 0 0; }
+    .comp-row.header .cc { color: #fff; font-size: 0.68rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em; }
+    .cc { padding: 9px 10px; font-size: 0.8rem; }
+    .comp-row:nth-child(even) .cc { background: #f8f5f0; }
+    .comp-row.vpm-row .cc { background: #e8f4ec !important; }
+    .comp-row.vpm-row .cc:first-child { font-weight: 800; color: var(--green-dark); }
+    .badge-hoguet { font-size: 0.6rem; font-weight: 700; padding: 2px 6px; border-radius: 4px; display: inline-block; margin-top: 3px; }
+    .badge-hoguet.oui { background: #fef0ee; color: #c0392b; }
+    .badge-hoguet.non { background: #e8f4ec; color: var(--green); }
+    .price-tag { font-weight: 700; color: var(--terra); }
+    .price-tag.green { color: var(--green); }
+
+    /* PLAN 90J */
+    .plan-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin: 12px 0; }
+    .plan-month { border-radius: 10px; overflow: hidden; }
+    .plan-month-head { padding: 10px 14px; font-size: 0.72rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.08em; }
+    .plan-month-head.m1 { background: var(--green-dark); color: #fff; }
+    .plan-month-head.m2 { background: var(--green); color: #fff; }
+    .plan-month-head.m3 { background: var(--terra); color: #fff; }
+    .plan-month-body { background: #f8f5f0; padding: 12px 14px; display: flex; flex-direction: column; gap: 7px; }
+    .plan-item { font-size: 0.78rem; color: #333; line-height: 1.5; display: flex; gap: 7px; }
+    .plan-item::before { content: '→'; color: var(--terra); flex-shrink: 0; font-weight: 700; }
+    .plan-target { background: var(--green-dark); color: #fff; font-size: 0.72rem; font-weight: 700; padding: 6px 10px; text-align: center; margin-top: 6px; border-radius: 0 0 6px 6px; }
+    .plan-target.t2 { background: var(--green); }
+    .plan-target.t3 { background: var(--terra); }
+
+    /* ANTÉRIORITÉ */
+    .date-row { display: flex; gap: 14px; align-items: flex-start; padding: 9px 12px; border-bottom: 1px solid var(--border); }
+    .date-badge { font-size: 0.72rem; font-weight: 700; color: var(--green-dark); background: #e8f4ec; padding: 3px 10px; border-radius: 5px; flex-shrink: 0; white-space: nowrap; }
+    .date-event { font-size: 0.83rem; font-weight: 600; color: #1a1a16; }
+    .date-proof { font-size: 0.72rem; color: var(--muted); margin-top: 2px; }
+
+    /* PREUVES MARCHÉ */
+    .actor-row { display: flex; gap: 12px; align-items: center; padding: 9px 12px; border-bottom: 1px solid var(--border); }
+    .actor-name { font-weight: 700; font-size: 0.84rem; width: 120px; flex-shrink: 0; }
+    .actor-founded { font-size: 0.72rem; color: var(--muted); width: 60px; flex-shrink: 0; }
+    .actor-card { font-size: 0.68rem; font-weight: 700; padding: 2px 7px; border-radius: 4px; flex-shrink: 0; }
+    .actor-card.no { background: #e8f4ec; color: var(--green); }
+    .actor-card.yes { background: #fef0ee; color: #c0392b; }
+    .actor-desc { font-size: 0.78rem; color: #555; flex: 1; }
+
+    /* PROJECTIONS */
+    .proj-table { width: 100%; border-collapse: collapse; font-size: 0.82rem; }
+    .proj-table th { background: var(--green-dark); color: #fff; padding: 8px 12px; text-align: left; font-size: 0.72rem; }
+    .proj-table td { padding: 9px 12px; border-bottom: 1px solid var(--border); }
+    .proj-table tr:nth-child(even) td { background: #f8f5f0; }
+    .proj-table tr.highlight td { background: #e8f4ec; font-weight: 700; }
+    .pos { color: var(--green); font-weight: 700; }
+    .neg { color: #c0392b; }
+
+    .page-footer { position: absolute; bottom: 0; left: 0; right: 0; padding: 9px 42px; border-top: 1px solid var(--border); display: flex; justify-content: space-between; font-size: 0.65rem; color: #bbb; }
+  </style>
+</head>
+<body>
+
+<div class="no-print">
+  <button class="btn-print" onclick="window.print()">🖨 Imprimer / PDF</button>
+</div>
+
+<!-- ═══════════════════════════
+     PAGE 1 — COUVERTURE GUIDE
+═══════════════════════════ -->
+<div class="sheet">
+  <div class="for-tag both"><div class="for-tag-dot"></div>Guide d'impression — Toutes pages</div>
+
+  <div class="doc-header">
+    <div class="doc-logo">Vendu Par <em>Moi</em></div>
+    <div>
+      <div class="doc-title">Dossier complet · Juin 2026</div>
+      <div class="doc-sub">Matthias Brieux &amp; Guillaume Girod</div>
+    </div>
+  </div>
+
+  <div class="cover-inner">
+    <div class="cover-eyebrow">Dossier de lancement · Confidentiel</div>
+    <div class="cover-big">On révolutionne<br>l'immobilier<br><em>entre particuliers.</em></div>
+    <p class="cover-desc">Vendu Par Moi est la première plateforme qui donne à chaque propriétaire tous les outils des professionnels de l'immobilier — sans carte T, sans commission, sans loi Hoguet.</p>
+    <div class="cover-guide">
+      <div class="cover-guide-title">Plan d'impression — séparer les feuilles après impression</div>
+      <div class="cover-guide-row">
+        <div class="cover-guide-badge av">Avocat</div>
+        <div class="cover-guide-text">Fiche fondateurs</div>
+        <div class="cover-guide-pages">2 pages</div>
+      </div>
+      <div class="cover-guide-row">
+        <div class="cover-guide-badge av">Avocat</div>
+        <div class="cover-guide-text">Note juridique Loi Hoguet (argumentaire + tableau)</div>
+        <div class="cover-guide-pages">2 pages</div>
+      </div>
+      <div class="cover-guide-row">
+        <div class="cover-guide-badge av">Avocat</div>
+        <div class="cover-guide-text">Preuve antériorité marque + acteurs légaux similaires</div>
+        <div class="cover-guide-pages">1 page</div>
+      </div>
+      <div class="cover-guide-row">
+        <div class="cover-guide-badge av">Avocat</div>
+        <div class="cover-guide-text">CGV complètes à valider</div>
+        <div class="cover-guide-pages">2 pages</div>
+      </div>
+      <div class="cover-guide-row">
+        <div class="cover-guide-badge b2">Les deux</div>
+        <div class="cover-guide-text">Concept, services 999€/1548€, fonctionnalités logiciel</div>
+        <div class="cover-guide-pages">3 pages</div>
+      </div>
+      <div class="cover-guide-row">
+        <div class="cover-guide-badge as">Associé</div>
+        <div class="cover-guide-text">Analyse de marché — chiffres, taille, opportunité</div>
+        <div class="cover-guide-pages">1 page</div>
+      </div>
+      <div class="cover-guide-row">
+        <div class="cover-guide-badge as">Associé</div>
+        <div class="cover-guide-text">Analyse concurrentielle — qui existe, pourquoi VPM gagne</div>
+        <div class="cover-guide-pages">1 page</div>
+      </div>
+      <div class="cover-guide-row">
+        <div class="cover-guide-badge as">Associé</div>
+        <div class="cover-guide-text">Plan de lancement 90 jours + projections financières</div>
+        <div class="cover-guide-pages">1 page</div>
+      </div>
+      <div class="cover-guide-row">
+        <div class="cover-guide-badge as">Associé</div>
+        <div class="cover-guide-text">Formation complète 6 modules rédigés</div>
+        <div class="cover-guide-pages">7 pages</div>
+      </div>
+      <div class="cover-guide-row">
+        <div class="cover-guide-badge as">Associé</div>
+        <div class="cover-guide-text">Flyer recto/verso A4 imprimable</div>
+        <div class="cover-guide-pages">2 pages</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════
+     PAGE 2 — ANTÉRIORITÉ + ACTEURS LÉGAUX
+     AVOCAT
+═══════════════════════════ -->
+<div class="sheet page-break">
+  <div class="for-tag avocat"><div class="for-tag-dot"></div>Pour l'avocat — Preuves marché &amp; antériorité</div>
+
+  <div class="doc-header">
+    <div class="doc-logo">Vendu Par <em>Moi</em></div>
+    <div>
+      <div class="doc-title">Preuves — Antériorité &amp; Marché légal</div>
+      <div class="doc-sub">Dépôt de marque INPI · Précédents légaux</div>
+    </div>
+  </div>
+
+  <div class="sec-label g">Antériorité de la marque "Vendu Par Moi"</div>
+  <p>Dates prouvant la création et l'utilisation de la marque avant tout dépôt concurrent.</p>
+
+  <div style="border:1px solid var(--border);border-radius:10px;overflow:hidden;margin-bottom:16px;" class="avoid-break">
+    <div style="background:var(--green-dark);color:#fff;padding:8px 12px;font-size:0.68rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;display:grid;grid-template-columns:130px 1fr 140px;">
+      <div>Date</div><div>Événement</div><div>Preuve disponible</div>
+    </div>
+    <div class="date-row">
+      <div class="date-badge">Mai 2026</div>
+      <div><div class="date-event">Premier commit GitHub — serenis-app</div><div class="date-proof">Création du dépôt GitHub matthiasbrieux/serenis-app</div></div>
+      <div style="font-size:0.72rem;color:var(--green);font-weight:600;flex-shrink:0;">GitHub log ✓</div>
+    </div>
+    <div class="date-row">
+      <div class="date-badge">Mai 2026</div>
+      <div><div class="date-event">Création du compte Render (hébergement)</div><div class="date-proof">serenis-app.onrender.com — premier déploiement</div></div>
+      <div style="font-size:0.72rem;color:var(--green);font-weight:600;flex-shrink:0;">Email Render ✓</div>
+    </div>
+    <div class="date-row">
+      <div class="date-badge">Mai 2026</div>
+      <div><div class="date-event">Création compte Stripe — Vendu Par Moi</div><div class="date-proof">Compte ouvert au nom du projet avant tout revenu</div></div>
+      <div style="font-size:0.72rem;color:var(--green);font-weight:600;flex-shrink:0;">Email Stripe ✓</div>
+    </div>
+    <div class="date-row">
+      <div class="date-badge">Juin 2026</div>
+      <div><div class="date-event">Publication site venduparmoi.fr + CGV + Flyer</div><div class="date-proof">Marque "Vendu Par Moi" utilisée publiquement</div></div>
+      <div style="font-size:0.72rem;color:var(--green);font-weight:600;flex-shrink:0;">Archive web ✓</div>
+    </div>
+  </div>
+
+  <div class="info-blue avoid-break">
+    <strong>Pour l'avocat :</strong> Ces dates constituent la preuve de première utilisation de la marque. Le dépôt INPI devra intervenir au nom de la société dès sa création. Classes visées : 35 (services commerciaux), 36 (services immobiliers), 41 (formation), 42 (logiciel SaaS).
+  </div>
+
+  <div class="sec-label t" style="margin-top:24px;">Acteurs similaires légaux — preuve que le modèle existe et est reconnu</div>
+  <p style="margin-bottom:10px;">Ces plateformes exercent depuis des années sans carte professionnelle. Elles valident que notre modèle est légal et reconnu par le marché.</p>
+
+  <div style="border:1px solid var(--border);border-radius:10px;overflow:hidden;" class="avoid-break">
+    <div style="background:var(--green-dark);color:#fff;padding:8px 12px;font-size:0.68rem;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;display:grid;grid-template-columns:120px 60px 80px 1fr;gap:0;">
+      <div>Acteur</div><div>Depuis</div><div>Carte T ?</div><div>Modèle</div>
+    </div>
+    <div class="actor-row">
+      <div class="actor-name">PAP.fr</div>
+      <div class="actor-founded">1998</div>
+      <div><span class="actor-card no">NON</span></div>
+      <div class="actor-desc">Portail d'annonces entre particuliers. Abonnement fixe ~35 €/mois. Ne met pas en contact, héberge les annonces.</div>
+    </div>
+    <div class="actor-row" style="background:#f8f5f0;">
+      <div class="actor-name">Leboncoin Immo</div>
+      <div class="actor-founded">2006</div>
+      <div><span class="actor-card no">NON</span></div>
+      <div class="actor-desc">Portail généraliste. Annonces gratuites ou payantes. N'intervient jamais dans la transaction.</div>
+    </div>
+    <div class="actor-row">
+      <div class="actor-name">HomeByMe</div>
+      <div class="actor-founded">2011</div>
+      <div><span class="actor-card no">NON</span></div>
+      <div class="actor-desc">Outils numériques d'aide à la mise en valeur immobilière. SaaS. Hors Hoguet.</div>
+    </div>
+    <div class="actor-row" style="background:#f8f5f0;">
+      <div class="actor-name">MeilleursAgents</div>
+      <div class="actor-founded">2008</div>
+      <div><span class="actor-card no">NON</span></div>
+      <div class="actor-desc">Estimation en ligne, données de marché. Outil d'aide à la décision. Pas de mandat.</div>
+    </div>
+    <div class="actor-row">
+      <div class="actor-name">Imop</div>
+      <div class="actor-founded">2018</div>
+      <div><span class="actor-card yes">OUI</span></div>
+      <div class="actor-desc">Agence digitale avec carte T. Commission réduite (~3 %). Soumis Hoguet — modèle différent de VPM.</div>
+    </div>
+    <div class="actor-row" style="background:#f8f5f0;">
+      <div class="actor-name">Proprioo</div>
+      <div class="actor-founded">2017</div>
+      <div><span class="actor-card yes">OUI</span></div>
+      <div class="actor-desc">Agence digitale. Carte T. Forfait fixe ~3 990 €. Signe des mandats — Hoguet.</div>
+    </div>
+    <div class="actor-row" style="border-bottom:none;background:#e8f4ec;">
+      <div class="actor-name" style="color:var(--green-dark);font-weight:800;">Vendu Par Moi</div>
+      <div class="actor-founded">2026</div>
+      <div><span class="actor-card no">NON</span></div>
+      <div class="actor-desc"><strong>Logiciel SaaS + formation. Forfait 999€/1548€. Zéro mandat, zéro commission, zéro entremise. Hors Hoguet.</strong></div>
+    </div>
+  </div>
+
+  <div class="info-green" style="margin-top:12px;" class="avoid-break">
+    <strong>Conclusion :</strong> PAP.fr et Leboncoin exercent depuis plus de 20 ans sans carte T et sans contestation judiciaire. VPM est encore plus protégé car il ne référence aucun bien — il vend uniquement des outils et de la formation au vendeur.
+  </div>
+
+  <div class="page-footer">
+    <span>Vendu Par Moi — Dossier Avocat · Confidentiel</span>
+    <span>Avocat · Page 1</span>
+  </div>
+</div>
+
+<!-- ═══════════════════════════
+     PAGE 3 — MARCHÉ
+     ASSOCIÉ
+═══════════════════════════ -->
+<div class="sheet page-break">
+  <div class="for-tag associe"><div class="for-tag-dot"></div>Pour l'associé — Analyse de marché</div>
+
+  <div class="doc-header">
+    <div class="doc-logo">Vendu Par <em>Moi</em></div>
+    <div>
+      <div class="doc-title">Le marché — Pourquoi maintenant</div>
+      <div class="doc-sub">Opportunité · Chiffres · Timing</div>
+    </div>
+  </div>
+
+  <div class="stat-grid avoid-break">
+    <div class="stat-box">
+      <div class="stat-num">800k</div>
+      <div class="stat-label">Transactions immobilières / an en France</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-num">35%</div>
+      <div class="stat-label">Ventes entre particuliers (sans agence)</div>
+    </div>
+    <div class="stat-box hl">
+      <div class="stat-num">280k</div>
+      <div class="stat-label">Vendeurs particuliers / an — notre cible</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-num">10k€</div>
+      <div class="stat-label">Commission agence moyenne par vente</div>
+    </div>
+  </div>
+
+  <div class="h2">Pourquoi le marché est prêt maintenant</div>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:12px 0;">
+    <div class="avoid-break" style="border:1px solid var(--border);border-radius:10px;padding:14px 16px;">
+      <div style="font-size:0.68rem;font-weight:800;text-transform:uppercase;letter-spacing:0.1em;color:var(--terra);margin-bottom:8px;">Tendance 1</div>
+      <strong style="font-size:0.88rem;display:block;margin-bottom:6px;">Le marché s'éduque</strong>
+      <p style="margin:0;font-size:0.8rem;">+47 % de recherches Google "vendre sans agence" entre 2020 et 2024. Les particuliers cherchent une alternative — ils n'ont jamais eu les bons outils.</p>
+    </div>
+    <div class="avoid-break" style="border:1px solid var(--border);border-radius:10px;padding:14px 16px;">
+      <div style="font-size:0.68rem;font-weight:800;text-transform:uppercase;letter-spacing:0.1em;color:var(--terra);margin-bottom:8px;">Tendance 2</div>
+      <strong style="font-size:0.88rem;display:block;margin-bottom:6px;">La crise immobilière</strong>
+      <p style="margin:0;font-size:0.8rem;">Marché en tension depuis 2022. Les vendeurs veulent maximiser leur prix net. Chaque euro de commission d'agence évitée est un euro de plus dans leur poche.</p>
+    </div>
+    <div class="avoid-break" style="border:1px solid var(--border);border-radius:10px;padding:14px 16px;">
+      <div style="font-size:0.68rem;font-weight:800;text-transform:uppercase;letter-spacing:0.1em;color:var(--terra);margin-bottom:8px;">Tendance 3</div>
+      <strong style="font-size:0.88rem;display:block;margin-bottom:6px;">L'IA change tout</strong>
+      <p style="margin:0;font-size:0.8rem;">Un particulier avec un coach IA, une annonce générée par IA et des outils pros peut maintenant rivaliser avec un agent immobilier. Ce n'était pas possible avant 2023.</p>
+    </div>
+    <div class="avoid-break" style="border:1px solid var(--border);border-radius:10px;padding:14px 16px;">
+      <div style="font-size:0.68rem;font-weight:800;text-transform:uppercase;letter-spacing:0.1em;color:var(--terra);margin-bottom:8px;">Tendance 4</div>
+      <strong style="font-size:0.88rem;display:block;margin-bottom:6px;">Notre expérience terrain</strong>
+      <p style="margin:0;font-size:0.8rem;">Deux professionnels de l'immobilier qui connaissent exactement les blocages des vendeurs particuliers. On a construit ce qu'on aurait voulu avoir.</p>
+    </div>
+  </div>
+
+  <div class="h2">Notre positionnement — le seul sur ce créneau</div>
+
+  <div style="overflow:hidden;border-radius:10px;border:1px solid var(--border);" class="avoid-break">
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;background:var(--green-dark);color:#fff;padding:9px 12px;font-size:0.68rem;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;">
+      <div></div><div>PAP / LBC</div><div>Agence digitale</div><div style="color:#f0b89a;">Vendu Par Moi</div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;padding:8px 12px;border-bottom:1px solid var(--border);font-size:0.8rem;">
+      <div style="font-weight:700;">Formation</div><div style="color:#c0392b;">✗</div><div style="color:#c0392b;">✗</div><div style="color:var(--green);font-weight:700;">✓ 6 modules</div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;padding:8px 12px;border-bottom:1px solid var(--border);font-size:0.8rem;background:#f8f5f0;">
+      <div style="font-weight:700;">Coach IA 24h/24</div><div style="color:#c0392b;">✗</div><div style="color:#c0392b;">✗</div><div style="color:var(--green);font-weight:700;">✓</div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;padding:8px 12px;border-bottom:1px solid var(--border);font-size:0.8rem;">
+      <div style="font-weight:700;">Agenda visites</div><div style="color:#c0392b;">✗</div><div style="color:var(--green);">✓</div><div style="color:var(--green);font-weight:700;">✓</div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;padding:8px 12px;border-bottom:1px solid var(--border);font-size:0.8rem;background:#f8f5f0;">
+      <div style="font-weight:700;">Dossier acheteur</div><div style="color:#c0392b;">✗</div><div style="color:var(--green);">✓</div><div style="color:var(--green);font-weight:700;">✓</div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;padding:8px 12px;border-bottom:1px solid var(--border);font-size:0.8rem;">
+      <div style="font-weight:700;">Prix</div><div>~35 €/mois</div><div style="color:#c0392b;">3 000–8 000 €</div><div style="color:var(--green);font-weight:700;">999 € fixe</div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;padding:8px 12px;font-size:0.8rem;background:#e8f4ec;">
+      <div style="font-weight:700;">Commission vente</div><div>Non</div><div style="color:#c0392b;">Oui (3–7 %)</div><div style="color:var(--green);font-weight:800;">Non — jamais</div>
+    </div>
+  </div>
+
+  <div class="info-green" style="margin-top:12px;" class="avoid-break">
+    <strong>Notre position unique :</strong> PAP donne une vitrine, les agences digitales font le travail à la place du vendeur. VPM est le seul qui donne au vendeur tous les outils pour le faire lui-même, comme un pro. C'est une catégorie nouvelle.
+  </div>
+
+  <div class="page-footer">
+    <span>Vendu Par Moi — Dossier Associé · Confidentiel</span>
+    <span>Associé · Page 1</span>
+  </div>
+</div>
+
+<!-- ═══════════════════════════
+     PAGE 4 — PLAN 90J + PROJECTIONS
+     ASSOCIÉ
+═══════════════════════════ -->
+<div class="sheet page-break">
+  <div class="for-tag associe"><div class="for-tag-dot"></div>Pour l'associé — Plan de lancement &amp; projections</div>
+
+  <div class="doc-header">
+    <div class="doc-logo">Vendu Par <em>Moi</em></div>
+    <div>
+      <div class="doc-title">Plan de lancement 90 jours</div>
+      <div class="doc-sub">Premiers clients · Acquisition · Projections</div>
+    </div>
+  </div>
+
+  <div class="plan-grid avoid-break">
+    <div class="plan-month">
+      <div class="plan-month-head m1">Mois 1 — Lancement local</div>
+      <div class="plan-month-body">
+        <div class="plan-item">Flyers dans les boîtes aux lettres — secteur Douai/Lens/Arras</div>
+        <div class="plan-item">Groupes Facebook locaux immobilier Nord (59)</div>
+        <div class="plan-item">Bouche à oreille réseau pro immobilier</div>
+        <div class="plan-item">Compte Google My Business activé</div>
+        <div class="plan-item">Premiers posts TikTok / Instagram</div>
+        <div class="plan-item">Offre lancement : 1er client à prix réduit pour témoignage</div>
+      </div>
+      <div class="plan-target">Objectif : 3 à 5 clients</div>
+    </div>
+    <div class="plan-month">
+      <div class="plan-month-head m2">Mois 2 — Preuve sociale</div>
+      <div class="plan-month-body">
+        <div class="plan-item">Témoignages vidéo des premiers clients</div>
+        <div class="plan-item">Contenus TikTok/Reels "comment j'ai vendu sans agence"</div>
+        <div class="plan-item">Partenariats notaires locaux (orientation clients)</div>
+        <div class="plan-item">Annonces Facebook Ads ciblées Nord-Pas-de-Calais</div>
+        <div class="plan-item">SEO local — "vendre sans agence Douai / Lille"</div>
+        <div class="plan-item">Programme parrainage : 50 € offert par client recommandé</div>
+      </div>
+      <div class="plan-target t2">Objectif : 10 à 15 clients</div>
+    </div>
+    <div class="plan-month">
+      <div class="plan-month-head m3">Mois 3 — Accélération</div>
+      <div class="plan-month-body">
+        <div class="plan-item">Google Ads — mots-clés "vendre sans agence"</div>
+        <div class="plan-item">Expansion géographique (Hauts-de-France)</div>
+        <div class="plan-item">Relations presse locale (Voix du Nord, etc.)</div>
+        <div class="plan-item">Partenariats diagnostiqueurs immobiliers</div>
+        <div class="plan-item">Offre Pack Sérénité poussée (photographe inclus)</div>
+        <div class="plan-item">Premier rapport hebdo automatique aux clients actifs</div>
+      </div>
+      <div class="plan-target t3">Objectif : 25 à 35 clients</div>
+    </div>
+  </div>
+
+  <div class="h2" style="margin-top:20px;">Projections financières — 12 mois</div>
+  <p style="font-size:0.78rem;color:#888;margin-bottom:10px;">Hypothèse : 60 % Pack Autonome (999 €) · 40 % Pack Sérénité (1 548 €) · CA moyen/client ≈ 1 219 € · Charges fixes ~200 €/mois</p>
+
+  <table class="proj-table avoid-break">
+    <thead>
+      <tr>
+        <th>Période</th>
+        <th>Clients / mois</th>
+        <th>CA mensuel</th>
+        <th>Charges</th>
+        <th>Résultat net</th>
+        <th>Cumulé</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Mois 1-2</td>
+        <td>3–5</td>
+        <td>~4 000 €</td>
+        <td>~350 €</td>
+        <td class="pos">~3 650 €</td>
+        <td class="pos">~7 300 €</td>
+      </tr>
+      <tr>
+        <td>Mois 3</td>
+        <td>10–15</td>
+        <td>~12 000 €</td>
+        <td>~400 €</td>
+        <td class="pos">~11 600 €</td>
+        <td class="pos">~19 000 €</td>
+      </tr>
+      <tr class="highlight">
+        <td>Mois 4-6</td>
+        <td>20–30</td>
+        <td>~25 000 €</td>
+        <td>~500 €</td>
+        <td class="pos">~24 500 €</td>
+        <td class="pos">~92 000 €</td>
+      </tr>
+      <tr>
+        <td>Mois 7-9</td>
+        <td>30–40</td>
+        <td>~36 000 €</td>
+        <td>~600 €</td>
+        <td class="pos">~35 400 €</td>
+        <td class="pos">~198 000 €</td>
+      </tr>
+      <tr class="highlight">
+        <td>Mois 10-12</td>
+        <td>40–50</td>
+        <td>~55 000 €</td>
+        <td>~800 €</td>
+        <td class="pos">~54 200 €</td>
+        <td class="pos">~360 000 €</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-top:14px;" class="avoid-break">
+    <div style="background:var(--green-dark);border-radius:10px;padding:14px 16px;text-align:center;color:#fff;">
+      <div style="font-family:'Cormorant Garamond',serif;font-size:1.8rem;font-weight:700;color:#f0b89a;">1-2</div>
+      <div style="font-size:0.7rem;color:rgba(255,255,255,0.6);margin-top:4px;">clients/mois pour couvrir toutes les charges</div>
+    </div>
+    <div style="background:#f8f5f0;border-radius:10px;padding:14px 16px;text-align:center;">
+      <div style="font-family:'Cormorant Garamond',serif;font-size:1.8rem;font-weight:700;color:var(--terra);">0 €</div>
+      <div style="font-size:0.7rem;color:var(--muted);margin-top:4px;">d'investissement initial requis — le logiciel est prêt</div>
+    </div>
+    <div style="background:var(--terra);border-radius:10px;padding:14px 16px;text-align:center;color:#fff;">
+      <div style="font-family:'Cormorant Garamond',serif;font-size:1.8rem;font-weight:700;">~360k€</div>
+      <div style="font-size:0.7rem;color:rgba(255,255,255,0.7);margin-top:4px;">CA prévisionnel an 1 (objectif conservateur)</div>
+    </div>
+  </div>
+
+  <div class="info-terra" style="margin-top:12px;" class="avoid-break">
+    <strong>Notre avantage clé :</strong> Le logiciel est déjà développé, testé et sécurisé. Il n'y a aucun coût de développement à financer. Le seul investissement c'est le temps de vente et d'acquisition client — et ça, c'est ce qu'on sait faire.
+  </div>
+
+  <div class="page-footer">
+    <span>Vendu Par Moi — Dossier Associé · Confidentiel</span>
+    <span>Associé · Page 2</span>
+  </div>
+</div>
+
+</body>
+</html>
