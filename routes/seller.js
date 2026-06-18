@@ -1132,9 +1132,9 @@ router.get('/api/notifications/all', requireAuth, (req, res) => {
   const notifications = db.prepare('SELECT * FROM notifications WHERE seller_id=? ORDER BY created_at DESC LIMIT 100').all(req.seller.id);
   let visits = [], offers = [], contacts = [];
   if (property) {
-    visits = db.prepare('SELECT *, "visit" as source_type FROM visits WHERE seller_id=? ORDER BY created_at DESC LIMIT 30').all(req.seller.id);
-    offers = db.prepare('SELECT *, "offer" as source_type FROM offers WHERE seller_id=? ORDER BY created_at DESC LIMIT 30').all(req.seller.id);
-    contacts = db.prepare('SELECT *, "contact" as source_type FROM buyer_contacts WHERE seller_id=? ORDER BY created_at DESC LIMIT 30').all(req.seller.id);
+    visits = db.prepare("SELECT *, 'visit' as source_type FROM visits WHERE seller_id=? ORDER BY created_at DESC LIMIT 30").all(req.seller.id);
+    offers = db.prepare("SELECT *, 'offer' as source_type FROM offers WHERE seller_id=? ORDER BY created_at DESC LIMIT 30").all(req.seller.id);
+    contacts = db.prepare("SELECT *, 'contact' as source_type FROM buyer_contacts WHERE seller_id=? ORDER BY created_at DESC LIMIT 30").all(req.seller.id);
   }
   res.json({ notifications, visits, offers, contacts });
 });
@@ -1304,7 +1304,7 @@ router.get('/api/pipeline', requireAuth, (req, res) => {
 router.get('/mon-guide-photos', requireAuth, (req, res) => res.sendFile('guide-photos.html', { root: './views/seller' }));
 
 router.get('/api/guide-photos', requireAuth, (req, res) => {
-  const property = db.prepare('SELECT id, type, rooms_count FROM properties WHERE seller_id = ?').get(req.seller.id);
+  const property = db.prepare('SELECT id, type, rooms FROM properties WHERE seller_id = ?').get(req.seller.id);
   if (!property) return res.json({ photos: [], property: null });
   const photos = db.prepare(
     "SELECT cloudinary_id, url, thumbnail_url, room, angle_label FROM property_photos WHERE property_id = ? AND category = 'decouverte' ORDER BY order_index"
