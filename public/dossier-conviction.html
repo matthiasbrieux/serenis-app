@@ -186,6 +186,11 @@
       </div>
       <div class="cover-guide-row">
         <div class="cover-guide-badge av">Avocat</div>
+        <div class="cover-guide-text">Données clients — hébergement, conservation, RGPD</div>
+        <div class="cover-guide-pages">1 page</div>
+      </div>
+      <div class="cover-guide-row">
+        <div class="cover-guide-badge av">Avocat</div>
         <div class="cover-guide-text">CGV complètes à valider</div>
         <div class="cover-guide-pages">2 pages</div>
       </div>
@@ -333,7 +338,157 @@
 </div>
 
 <!-- ═══════════════════════════
-     PAGE 3 — MARCHÉ
+     PAGE 3 — DONNÉES CLIENTS / RGPD
+     AVOCAT
+═══════════════════════════ -->
+<div class="sheet page-break">
+  <div class="for-tag avocat"><div class="for-tag-dot"></div>Pour l'avocat — Données clients &amp; RGPD</div>
+
+  <div class="doc-header">
+    <div class="doc-logo">Vendu Par <em>Moi</em></div>
+    <div>
+      <div class="doc-title">Données clients — Hébergement &amp; RGPD</div>
+      <div class="doc-sub">Architecture technique · Conservation · Conformité</div>
+    </div>
+  </div>
+
+  <div class="sec-label g">Architecture de données — où tout est stocké</div>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px;">
+    <div class="avoid-break" style="border:1px solid var(--border);border-radius:10px;overflow:hidden;">
+      <div style="background:var(--green-dark);color:#fff;padding:9px 14px;font-size:0.7rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;">Base de données</div>
+      <div style="padding:12px 14px;">
+        <p style="margin-bottom:6px;"><strong>Technologie :</strong> SQLite (better-sqlite3) — base de données relationnelle locale</p>
+        <p style="margin-bottom:6px;"><strong>Hébergeur :</strong> Render.com — serveur US-East (Oregon, USA)</p>
+        <p style="margin-bottom:6px;"><strong>Contenu :</strong> comptes vendeurs, visites, offres, notifications, contacts</p>
+        <p style="margin-bottom:0;"><strong>Backup :</strong> Sauvegarde automatique quotidienne (export chiffré)</p>
+      </div>
+    </div>
+    <div class="avoid-break" style="border:1px solid var(--border);border-radius:10px;overflow:hidden;">
+      <div style="background:var(--terra);color:#fff;padding:9px 14px;font-size:0.7rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;">Photos &amp; Documents</div>
+      <div style="padding:12px 14px;">
+        <p style="margin-bottom:6px;"><strong>Technologie :</strong> Cloudinary — CDN cloud sécurisé</p>
+        <p style="margin-bottom:6px;"><strong>Hébergeur :</strong> Cloudinary Ltd — infrastructure multi-régions (EU disponible)</p>
+        <p style="margin-bottom:6px;"><strong>Contenu :</strong> photos du bien, diagnostics DPE/ERP, documents notariaux</p>
+        <p style="margin-bottom:0;"><strong>Suppression :</strong> à la demande du vendeur ou fin de prestation</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="sec-label g">Données collectées par catégorie</div>
+  <div style="border:1px solid var(--border);border-radius:10px;overflow:hidden;margin-bottom:14px;" class="avoid-break">
+    <div style="background:var(--green-dark);color:#fff;padding:8px 12px;font-size:0.68rem;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;display:grid;grid-template-columns:130px 1fr 140px;">
+      <div>Catégorie</div><div>Données collectées</div><div>Base légale (RGPD)</div>
+    </div>
+    <div style="display:grid;grid-template-columns:130px 1fr 140px;padding:9px 12px;border-bottom:1px solid var(--border);align-items:start;">
+      <div style="font-weight:700;font-size:0.82rem;">Vendeurs</div>
+      <div style="font-size:0.78rem;color:#444;">Nom, email, téléphone, mot de passe (hashé bcrypt), adresse du bien, photos, diagnostics</div>
+      <div style="font-size:0.75rem;color:var(--green);font-weight:600;">Contrat (art. 6.1.b)</div>
+    </div>
+    <div style="display:grid;grid-template-columns:130px 1fr 140px;padding:9px 12px;border-bottom:1px solid var(--border);background:#f8f5f0;align-items:start;">
+      <div style="font-weight:700;font-size:0.82rem;">Acheteurs visiteurs</div>
+      <div style="font-size:0.78rem;color:#444;">Nom, téléphone, email (optionnel), date/heure visite, retours après visite</div>
+      <div style="font-size:0.75rem;color:var(--green);font-weight:600;">Intérêt légitime (art. 6.1.f)</div>
+    </div>
+    <div style="display:grid;grid-template-columns:130px 1fr 140px;padding:9px 12px;border-bottom:1px solid var(--border);align-items:start;">
+      <div style="font-weight:700;font-size:0.82rem;">Formulaire contact</div>
+      <div style="font-size:0.78rem;color:#444;">Nom, email, téléphone, message, ville, offre d'intérêt</div>
+      <div style="font-size:0.75rem;color:var(--green);font-weight:600;">Consentement (art. 6.1.a)</div>
+    </div>
+    <div style="display:grid;grid-template-columns:130px 1fr 140px;padding:9px 12px;align-items:start;">
+      <div style="font-weight:700;font-size:0.82rem;">Logs techniques</div>
+      <div style="font-size:0.78rem;color:#444;">Adresse IP (rate limiting), horodatages requêtes</div>
+      <div style="font-size:0.75rem;color:var(--green);font-weight:600;">Sécurité (art. 6.1.f)</div>
+    </div>
+  </div>
+
+  <div class="sec-label t">Durées de conservation</div>
+  <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:14px;">
+    <div class="avoid-break" style="background:#f8f5f0;border-radius:10px;padding:12px 14px;">
+      <div style="font-size:0.65rem;font-weight:800;text-transform:uppercase;letter-spacing:0.1em;color:var(--green-dark);margin-bottom:6px;">Compte vendeur actif</div>
+      <div style="font-family:'Cormorant Garamond',serif;font-size:1.5rem;font-weight:700;color:var(--terra);">Durée contrat</div>
+      <div style="font-size:0.75rem;color:#666;margin-top:4px;">Puis 3 ans archivé (obligations fiscales)</div>
+    </div>
+    <div class="avoid-break" style="background:#f8f5f0;border-radius:10px;padding:12px 14px;">
+      <div style="font-size:0.65rem;font-weight:800;text-transform:uppercase;letter-spacing:0.1em;color:var(--green-dark);margin-bottom:6px;">Données acheteurs</div>
+      <div style="font-family:'Cormorant Garamond',serif;font-size:1.5rem;font-weight:700;color:var(--terra);">12 mois</div>
+      <div style="font-size:0.75rem;color:#666;margin-top:4px;">Après dernière interaction — puis suppression automatique</div>
+    </div>
+    <div class="avoid-break" style="background:#f8f5f0;border-radius:10px;padding:12px 14px;">
+      <div style="font-size:0.65rem;font-weight:800;text-transform:uppercase;letter-spacing:0.1em;color:var(--green-dark);margin-bottom:6px;">Notifications lues</div>
+      <div style="font-family:'Cormorant Garamond',serif;font-size:1.5rem;font-weight:700;color:var(--terra);">60 jours</div>
+      <div style="font-size:0.75rem;color:#666;margin-top:4px;">Suppression automatique programmée dans le code</div>
+    </div>
+  </div>
+
+  <div class="sec-label b">Sécurité technique implémentée</div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px;">
+    <div style="display:flex;gap:10px;align-items:flex-start;padding:9px 12px;background:#f8f5f0;border-radius:8px;font-size:0.8rem;">
+      <div style="color:var(--green);font-weight:700;flex-shrink:0;">✓</div>
+      <div><strong>HTTPS obligatoire</strong> — Render force le SSL, certificat TLS géré automatiquement</div>
+    </div>
+    <div style="display:flex;gap:10px;align-items:flex-start;padding:9px 12px;background:#f8f5f0;border-radius:8px;font-size:0.8rem;">
+      <div style="color:var(--green);font-weight:700;flex-shrink:0;">✓</div>
+      <div><strong>Mots de passe hashés bcrypt</strong> — 12 rounds de salt, jamais stockés en clair</div>
+    </div>
+    <div style="display:flex;gap:10px;align-items:flex-start;padding:9px 12px;background:#f8f5f0;border-radius:8px;font-size:0.8rem;">
+      <div style="color:var(--green);font-weight:700;flex-shrink:0;">✓</div>
+      <div><strong>JWT sécurisés</strong> — tokens expirés après 30 jours, stockés en cookie HttpOnly</div>
+    </div>
+    <div style="display:flex;gap:10px;align-items:flex-start;padding:9px 12px;background:#f8f5f0;border-radius:8px;font-size:0.8rem;">
+      <div style="color:var(--green);font-weight:700;flex-shrink:0;">✓</div>
+      <div><strong>Rate limiting</strong> — 300 req/15min globales, 20 req/min pour webhooks SMS</div>
+    </div>
+    <div style="display:flex;gap:10px;align-items:flex-start;padding:9px 12px;background:#f8f5f0;border-radius:8px;font-size:0.8rem;">
+      <div style="color:var(--green);font-weight:700;flex-shrink:0;">✓</div>
+      <div><strong>Headers sécurité Helmet.js</strong> — CSP, HSTS, X-Frame-Options, XSS Protection</div>
+    </div>
+    <div style="display:flex;gap:10px;align-items:flex-start;padding:9px 12px;background:#f8f5f0;border-radius:8px;font-size:0.8rem;">
+      <div style="color:var(--green);font-weight:700;flex-shrink:0;">✓</div>
+      <div><strong>Paiements Stripe</strong> — aucune donnée bancaire stockée par VPM, tout passe par Stripe PCI-DSS</div>
+    </div>
+  </div>
+
+  <div class="sec-label b">Sous-traitants RGPD (article 28)</div>
+  <div style="border:1px solid var(--border);border-radius:10px;overflow:hidden;margin-bottom:14px;" class="avoid-break">
+    <div style="background:#2c5f8a;color:#fff;padding:8px 12px;font-size:0.68rem;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;display:grid;grid-template-columns:120px 100px 1fr;">
+      <div>Sous-traitant</div><div>Localisation</div><div>Finalité</div>
+    </div>
+    <div style="display:grid;grid-template-columns:120px 100px 1fr;padding:8px 12px;border-bottom:1px solid var(--border);font-size:0.8rem;">
+      <div style="font-weight:700;">Render.com</div><div style="color:#888;">USA (Oregon)</div><div>Hébergement serveur et base de données</div>
+    </div>
+    <div style="display:grid;grid-template-columns:120px 100px 1fr;padding:8px 12px;border-bottom:1px solid var(--border);font-size:0.8rem;background:#f8f5f0;">
+      <div style="font-weight:700;">Cloudinary</div><div style="color:#888;">USA / EU</div><div>Stockage photos et documents</div>
+    </div>
+    <div style="display:grid;grid-template-columns:120px 100px 1fr;padding:8px 12px;border-bottom:1px solid var(--border);font-size:0.8rem;">
+      <div style="font-weight:700;">Stripe</div><div style="color:#888;">USA (PCI-DSS)</div><div>Traitement des paiements — aucune CB stockée par VPM</div>
+    </div>
+    <div style="display:grid;grid-template-columns:120px 100px 1fr;padding:8px 12px;border-bottom:1px solid var(--border);font-size:0.8rem;background:#f8f5f0;">
+      <div style="font-weight:700;">SendGrid (Twilio)</div><div style="color:#888;">USA / EU</div><div>Envoi emails transactionnels</div>
+    </div>
+    <div style="display:grid;grid-template-columns:120px 100px 1fr;padding:8px 12px;font-size:0.8rem;">
+      <div style="font-weight:700;">Anthropic (Claude)</div><div style="color:#888;">USA</div><div>IA — coach, génération annonces (données transmises ponctuellement)</div>
+    </div>
+  </div>
+
+  <div class="info-terra avoid-break">
+    <strong>Questions à poser à l'avocat :</strong>
+    <ul style="margin-top:6px;padding-left:16px;">
+      <li style="margin-bottom:4px;">Hébergement US (Render) → les clauses contractuelles types (CCT) du DPA Render suffisent-elles ou faut-il migrer vers un hébergeur EU ?</li>
+      <li style="margin-bottom:4px;">Durées de conservation à ajuster selon les obligations sectorielles immobilières (mandat, compromis…) ?</li>
+      <li style="margin-bottom:4px;">Politique de confidentialité actuelle sur le site est-elle conforme — faut-il la compléter ?</li>
+      <li>Obligation de tenir un registre des traitements dès le lancement (recommandé même en dessous de 250 salariés dans l'immobilier) ?</li>
+    </ul>
+  </div>
+
+  <div class="page-footer">
+    <span>Vendu Par Moi — Dossier Avocat · Confidentiel</span>
+    <span>Avocat · Page 2</span>
+  </div>
+</div>
+
+<!-- ═══════════════════════════
+     PAGE 4 — MARCHÉ
      ASSOCIÉ
 ═══════════════════════════ -->
 <div class="sheet page-break">
