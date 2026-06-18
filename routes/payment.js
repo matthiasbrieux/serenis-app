@@ -155,7 +155,7 @@ async function assignPhoneNumber(seller) {
   if (!process.env.TWILIO_ACCOUNT_SID || !process.env.TWILIO_AUTH_TOKEN) return null;
   try {
     const twilio = require('twilio')(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN);
-    const base = process.env.BASE_URL || 'https://venduparmo.fr';
+    const base = process.env.BASE_URL || 'https://venduparmoi.fr';
 
     // Chercher un numéro disponible (France en priorité, sinon international)
     let availables = [];
@@ -250,7 +250,7 @@ async function activateSeller(session) {
       const resetToken = crypto.randomBytes(32).toString('hex');
       const expires = new Date(Date.now() + 7 * 24 * 3600 * 1000).toISOString();
       db.prepare('INSERT INTO password_reset_tokens (seller_id, token, expires_at) VALUES (?,?,?)').run(seller.id, resetToken, expires);
-      const base = process.env.BASE_URL || 'https://venduparmo.fr';
+      const base = process.env.BASE_URL || 'https://venduparmoi.fr';
       await sendWelcomeImproved({ to: seller.email, firstName: seller.first_name, pack: pack || 'serenite', resetUrl: `${base}/reset-password?token=${resetToken}` });
     } else {
       await sendWelcomeImproved({ to: seller.email, firstName: seller.first_name, pack: pack || 'serenite' });

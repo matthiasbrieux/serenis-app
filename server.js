@@ -91,7 +91,7 @@ app.use('/', require('./routes/partner'));
 
 // ── SEO : sitemap + robots ─────────────────────────────────────────
 app.get('/robots.txt', (req, res) => {
-  const base = process.env.BASE_URL || 'https://venduparmo.fr';
+  const base = process.env.BASE_URL || 'https://venduparmoi.fr';
   res.type('text/plain');
   res.send([
     'User-agent: *',
@@ -117,7 +117,7 @@ app.get('/robots.txt', (req, res) => {
 
 app.get('/sitemap.xml', (req, res) => {
   const db = require('./database');
-  const base = process.env.BASE_URL || 'https://venduparmo.fr';
+  const base = process.env.BASE_URL || 'https://venduparmoi.fr';
   const properties = db.prepare('SELECT slug, updated_at FROM properties WHERE published=1').all();
   const today = new Date().toISOString().split('T')[0];
   const staticUrls = ['/', '/tarifs', '/faq', '/cgv'].map(p =>

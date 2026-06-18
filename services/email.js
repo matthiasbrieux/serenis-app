@@ -1,8 +1,8 @@
 const sgMail = require('@sendgrid/mail');
 
-const FROM_EMAIL = process.env.SENDGRID_FROM_EMAIL || 'contact@venduparmo.fr';
+const FROM_EMAIL = process.env.SENDGRID_FROM_EMAIL || 'contact@venduparmoi.fr';
 const FROM_NAME  = 'Vendu Par Moi';
-const BASE_URL   = process.env.BASE_URL || 'https://venduparmo.fr';
+const BASE_URL   = process.env.BASE_URL || 'https://venduparmoi.fr';
 
 if (process.env.SENDGRID_API_KEY) {
   sgMail.setApiKey(process.env.SENDGRID_API_KEY);
@@ -51,8 +51,8 @@ ${preheader ? `<div style="display:none;max-height:0;overflow:hidden;color:#F5F0
 
       <!-- Footer -->
       <tr><td align="center" style="padding:28px 0 0;font-size:12px;color:#9a9087;line-height:1.7;">
-        <a href="${BASE_URL}" style="color:#3D5A47;text-decoration:none;font-weight:600;">venduparmo.fr</a> &nbsp;·&nbsp;
-        <a href="mailto:contact@venduparmo.fr" style="color:#9a9087;text-decoration:none;">contact@venduparmo.fr</a><br/>
+        <a href="${BASE_URL}" style="color:#3D5A47;text-decoration:none;font-weight:600;">venduparmoi.fr</a> &nbsp;·&nbsp;
+        <a href="mailto:contact@venduparmoi.fr" style="color:#9a9087;text-decoration:none;">contact@venduparmoi.fr</a><br/>
         Vous recevez cet email car vous utilisez la plateforme Vendu Par Moi.
       </td></tr>
 
@@ -319,7 +319,7 @@ async function sendInvoiceEmail({ email, firstName, amount, pack, invoiceNumber,
     `)}
     ${p('Cette facture fait foi pour votre comptabilité. Conservez-la précieusement.')}
     ${divider()}
-    ${muted('Pour toute question, contactez-nous à <a href="mailto:contact@venduparmo.fr" style="color:#3D5A47;">contact@venduparmo.fr</a>')}
+    ${muted('Pour toute question, contactez-nous à <a href="mailto:contact@venduparmoi.fr" style="color:#3D5A47;">contact@venduparmoi.fr</a>')}
   `, { preheader: `Votre facture Vendu Par Moi — ${amountTTC} € TTC` });
   return send(email, `🧾 Facture Vendu Par Moi — ${amountTTC} € TTC`, html);
 }
@@ -338,7 +338,7 @@ async function sendContractRenewal({ email, firstName, expiryDate, daysLeft }) {
     ${btn('Renouveler mon accès', `${BASE_URL}/tarifs`, '#C4785A')}
     ${p('Si votre vente est finalisée, félicitations ! Vous pouvez nous le signaler depuis votre espace vendeur.')}
     ${divider()}
-    ${muted('Une question ? Contactez-nous à <a href="mailto:contact@venduparmo.fr" style="color:#3D5A47;">contact@venduparmo.fr</a>')}
+    ${muted('Une question ? Contactez-nous à <a href="mailto:contact@venduparmoi.fr" style="color:#3D5A47;">contact@venduparmoi.fr</a>')}
   `, { preheader: `Votre accès Vendu Par Moi expire dans ${daysLeft} jours.` });
   return send(email, `⚠️ Votre accès expire dans ${daysLeft} jours`, html);
 }
@@ -420,7 +420,7 @@ async function sendMissionReminderJ1(clientEmail, clientName, mission, photograp
     `)}
     ${p('Conseils de dernière minute : ouvrez les volets, allumez les lumières, rangez les objets personnels dans les pièces.')}
     ${divider()}
-    ${muted('En cas d\'imprévu, contactez-nous à <a href="mailto:contact@venduparmo.fr" style="color:#3D5A47;">contact@venduparmo.fr</a>')}
+    ${muted('En cas d\'imprévu, contactez-nous à <a href="mailto:contact@venduparmoi.fr" style="color:#3D5A47;">contact@venduparmoi.fr</a>')}
   `, { preheader: 'Rappel — votre photographe arrive demain.' });
   return send(clientEmail, '⏰ Rappel — Votre séance photo est demain', html);
 }

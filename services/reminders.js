@@ -259,7 +259,7 @@ async function sendPostVisitBuyerNudges() {
 
 async function sendWeeklyAdminReportEmail() {
   const { sendWeeklyAdminReport } = require('./email');
-  const adminEmail = process.env.ADMIN_EMAIL || process.env.SENDGRID_FROM_EMAIL || 'contact@venduparmo.fr';
+  const adminEmail = process.env.ADMIN_EMAIL || process.env.SENDGRID_FROM_EMAIL || 'contact@venduparmoi.fr';
 
   try {
     const newClients = db.prepare(`SELECT COUNT(*) as c FROM sellers WHERE paid_at >= date('now', '-7 days')`).get()?.c || 0;
@@ -406,7 +406,7 @@ async function chargeInstallments() {
 // ── Envoi dossier acheteur sérieux J+1 après visite ──────────
 async function sendPostVisitDossierNudges() {
   const { sendPostVisitDossierNudge } = require('./email');
-  const base = process.env.BASE_URL || 'https://venduparmo.fr';
+  const base = process.env.BASE_URL || 'https://venduparmoi.fr';
 
   const yesterday = new Date();
   yesterday.setDate(yesterday.getDate() - 1);
@@ -441,7 +441,7 @@ async function sendPostVisitDossierNudges() {
 // ── Relance acheteurs post-visite J+3 ────────────────────────
 async function sendPostVisitJ3Nudges() {
   const { sendPostVisitJ3Nudge } = require('./email');
-  const base = process.env.BASE_URL || 'https://venduparmo.fr';
+  const base = process.env.BASE_URL || 'https://venduparmoi.fr';
 
   const threeDaysAgo = new Date();
   threeDaysAgo.setDate(threeDaysAgo.getDate() - 3);
@@ -478,7 +478,7 @@ async function sendPostVisitJ3Nudges() {
 // ── Rapport hebdomadaire vendeurs (lundi 8h) ─────────────────
 async function sendWeeklySellerReportEmail() {
   const { sendWeeklySellerReport } = require('./email');
-  const base = process.env.BASE_URL || 'https://venduparmo.fr';
+  const base = process.env.BASE_URL || 'https://venduparmoi.fr';
 
   const sellers = db.prepare(`
     SELECT s.id, s.email, s.first_name, p.id as prop_id, p.published_at, p.acheteur_token

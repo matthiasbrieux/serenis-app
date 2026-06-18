@@ -165,7 +165,7 @@ router.post('/api/dossier/notaire/send-email', requireAuth, async (req, res) => 
     `).get(req.seller.id);
     if (!prop || !prop.notaire_token) return res.status(404).json({ error: 'Bien ou token introuvable' });
 
-    const base = process.env.BASE_URL || 'https://venduparmo.fr';
+    const base = process.env.BASE_URL || 'https://venduparmoi.fr';
     const dossierUrl = `${base}/dossier/notaire/${prop.notaire_token}`;
     const sellerName = [prop.first_name, prop.last_name].filter(Boolean).join(' ') || 'Votre client';
 

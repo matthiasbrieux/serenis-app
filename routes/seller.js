@@ -822,7 +822,7 @@ router.get('/api/visits/:id/calendar.ics', requireAuth, (req, res) => {
     'CALSCALE:GREGORIAN',
     'METHOD:PUBLISH',
     'BEGIN:VEVENT',
-    `UID:visit-${v.id}@venduparmo.fr`,
+    `UID:visit-${v.id}@venduparmoi.fr`,
     `DTSTAMP:${now}Z`,
     `DTSTART:${dtStart}`,
     `DTEND:${dtEnd}`,
@@ -876,7 +876,7 @@ router.get('/api/agenda/feed.ics', (req, res) => {
     const description = `Acquéreur : ${v.buyer_name || ''}\\nTél : ${v.buyer_phone || '—'}\\nEmail : ${v.buyer_email || '—'}`;
     return [
       'BEGIN:VEVENT',
-      `UID:visit-${v.id}@venduparmo.fr`,
+      `UID:visit-${v.id}@venduparmoi.fr`,
       `DTSTAMP:${now}Z`,
       `DTSTART:${dtStart}`,
       `DTEND:${dtEnd}`,
