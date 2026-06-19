@@ -83,14 +83,53 @@ app.post('/webhook/voice', smsLimit, express.urlencoded({ extended: false }), re
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
-// ── Routes ──
-app.use('/', require('./routes/auth'));
-app.use('/', require('./routes/payment').router);
-app.use('/', require('./routes/seller'));
-app.use('/', require('./routes/buyer').router);
-app.use('/admin', require('./routes/admin'));
-app.use('/', require('./routes/dossier'));
-app.use('/', require('./routes/partner'));
+// ── Restauration DB depuis Cloudinary si vide (Render éphémère) ──
+async function restoreFromCloudinary() {
+  if (!process.env.CLOUDINARY_URL) return;
+  const DB_PATH = path.resolve(process.env.DATABASE_URL || './database.db');
+  try {
+    const Database = require('better-sqlite3');
+    const tmpDb = new Database(DB_PATH, { readonly: true });
+    const count = tmpDb.prepare('SELECT COUNT(*) as n FROM sellers').get();
+    tmpDb.close();
+    if (count.n > 0) return; // DB déjà peuplée, pas besoin de restaurer
+  } catch(e) { /* DB vide ou inexistante, on restaure */ }
+
+  console.log('🔄 Base de données vide — restauration depuis Cloudinary...');
+  try {
+    const cloudinary = require('cloudinary').v2;
+    cloudinary.config(true);
+    const { resources } = await cloudinary.api.resources({
+      type: 'upload', resource_type: 'raw', prefix: 'venduparmo-backups/', max_results: 50
+    });
+    if (!resources.length) { console.log('Aucun backup Cloudinary trouvé.'); return; }
+    resources.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+    const latest = resources[0];
+    console.log(`Restauration depuis ${latest.public_id}...`);
+    const https = require('https');
+    await new Promise((resolve, reject) => {
+      const file = fs.createWriteStream(DB_PATH);
+      https.get(latest.secure_url, (response) => {
+        response.pipe(file);
+        file.on('finish', () => { file.close(); resolve(); });
+        file.on('error', reject);
+      }).on('error', reject);
+    });
+    console.log('✓ Base de données restaurée depuis Cloudinary');
+  } catch(e) { console.error('Restore Cloudinary error:', e.message); }
+}
+
+// ── Chargement des routes (après restauration DB) ──
+async function loadRoutes() {
+  await restoreFromCloudinary();
+  app.use('/', require('./routes/auth'));
+  app.use('/', require('./routes/payment').router);
+  app.use('/', require('./routes/seller'));
+  app.use('/', require('./routes/buyer').router);
+  app.use('/admin', require('./routes/admin'));
+  app.use('/', require('./routes/dossier'));
+  app.use('/', require('./routes/partner'));
+}
 
 // ── SEO : sitemap + robots ─────────────────────────────────────────
 app.get('/robots.txt', (req, res) => {
@@ -207,6 +246,7 @@ async function seedSellerAccount() {
   } catch(e) { console.error('Seed error:', e.message); }
 }
 
+loadRoutes().then(() => {
 app.listen(PORT, () => {
   console.log(`✓ Vendu Par Moi démarré — http://localhost:${PORT}`);
   cleanLocalPhotos();
@@ -273,3 +313,4 @@ app.listen(PORT, () => {
   }
   scheduleWeeklyReport();
 });
+}).catch(e => { console.error('Erreur démarrage:', e.message); process.exit(1); });
