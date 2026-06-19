@@ -153,7 +153,16 @@ router.get('/api/debug-photos', requireAuth, (req, res) => {
   const property = db.prepare('SELECT id FROM properties WHERE seller_id=?').get(req.seller.id);
   const photos = property ? db.prepare('SELECT id, url, category FROM property_photos WHERE property_id=?').all(property.id) : [];
   const cloudinaryUrl = process.env.CLOUDINARY_URL ? 'configuré (' + process.env.CLOUDINARY_URL.split('@')[1] + ')' : 'NON CONFIGURÉ';
-  res.json({ seller_id: req.seller.id, property_id: property?.id || null, photo_count: photos.length, cloudinary: cloudinaryUrl, photos });
+  const html = `<!DOCTYPE html><html><body style="font-family:sans-serif;padding:20px;background:#111;color:#fff;">
+    <h2>Debug photos — seller ${req.seller.id} — ${photos.length} photo(s)</h2>
+    <p>Cloudinary: ${cloudinaryUrl}</p>
+    ${photos.map(p => `
+      <div style="margin:16px 0;border:1px solid #444;padding:12px;border-radius:8px;">
+        <p style="font-size:12px;color:#aaa;word-break:break-all;">${p.url}</p>
+        <img src="${p.url}" style="max-width:300px;height:200px;object-fit:cover;border-radius:6px;display:block;margin-top:8px;" onerror="this.style.border='2px solid red';this.after(' ❌ URL CASSÉE')">
+      </div>`).join('')}
+  </body></html>`;
+  res.send(html);
 });
 
 // Property CRUD
