@@ -176,6 +176,15 @@ app.use((err, req, res, next) => {
   res.status(500).json({ error: 'Erreur serveur. Réessayez dans un instant.' });
 });
 
+// Nettoyage des photos avec URLs locales (non persistantes sur Render)
+function cleanLocalPhotos() {
+  try {
+    const db = require('./database');
+    const result = db.prepare("DELETE FROM property_photos WHERE url LIKE '/uploads/%'").run();
+    if (result.changes > 0) console.log(`✓ ${result.changes} photo(s) locale(s) supprimée(s) de la base`);
+  } catch(e) { console.error('Clean local photos error:', e.message); }
+}
+
 // Seed compte vendeur de démo au démarrage si aucun compte n'existe
 async function seedSellerAccount() {
   try {
@@ -200,6 +209,7 @@ async function seedSellerAccount() {
 
 app.listen(PORT, () => {
   console.log(`✓ Vendu Par Moi démarré — http://localhost:${PORT}`);
+  cleanLocalPhotos();
   seedSellerAccount();
 
   // Rappels visites + nudges automatiques — tourne chaque jour à 18h
