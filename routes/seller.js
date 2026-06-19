@@ -147,6 +147,15 @@ router.get('/api/config', requireAuth, (req, res) => {
   res.json({ base_url: base });
 });
 
+// Debug photos — à supprimer après diagnostic
+router.get('/api/debug-photos', requireAuth, (req, res) => {
+  const db = require('../database');
+  const property = db.prepare('SELECT id FROM properties WHERE seller_id=?').get(req.seller.id);
+  const photos = property ? db.prepare('SELECT id, url, category FROM property_photos WHERE property_id=?').all(property.id) : [];
+  const cloudinaryUrl = process.env.CLOUDINARY_URL ? 'configuré (' + process.env.CLOUDINARY_URL.split('@')[1] + ')' : 'NON CONFIGURÉ';
+  res.json({ seller_id: req.seller.id, property_id: property?.id || null, photo_count: photos.length, cloudinary: cloudinaryUrl, photos });
+});
+
 // Property CRUD
 router.get('/api/property', requireAuth, (req, res) => {
   const property = db.prepare('SELECT * FROM properties WHERE seller_id = ?').get(req.seller.id);
