@@ -32,11 +32,7 @@ if (process.env.CLOUDINARY_URL) {
   try {
     const _cloudinary = require('cloudinary').v2;
     const { CloudinaryStorage } = require('multer-storage-cloudinary');
-    _cloudinary.config({
-      cloud_name: process.env.CLOUDINARY_URL.split('@')[1],
-      api_key: process.env.CLOUDINARY_URL.split('://')[1].split(':')[0],
-      api_secret: process.env.CLOUDINARY_URL.split(':')[2].split('@')[0],
-    });
+    _cloudinary.config(true); // Lit CLOUDINARY_URL automatiquement via le SDK officiel
     cloudinary = _cloudinary;
 
     const photoStorage = new CloudinaryStorage({
