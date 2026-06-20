@@ -5,6 +5,10 @@ const DB_PATH = path.resolve(process.env.DATABASE_URL || './database.db');
 const BACKUP_DIR = path.resolve('./backups');
 const MAX_BACKUPS = 7;
 
+// Render sets RENDER=true automatically — use it to distinguish prod from local
+const IS_PROD = !!process.env.RENDER;
+const CLOUD_PREFIX = IS_PROD ? 'venduparmo-backups/prod' : 'venduparmo-backups/dev';
+
 async function backupDatabase() {
   if (!fs.existsSync(DB_PATH)) { console.warn('Backup: DB file not found at', DB_PATH); return null; }
   if (!fs.existsSync(BACKUP_DIR)) fs.mkdirSync(BACKUP_DIR, { recursive: true });
@@ -28,21 +32,21 @@ async function backupDatabase() {
   if (process.env.CLOUDINARY_URL) {
     try {
       const cloudinary = require('cloudinary').v2;
-      cloudinary.config({ secure: true });
-      const publicId = `venduparmo-backups/db-${ts}`;
+      cloudinary.config(true);
+      const publicId = `${CLOUD_PREFIX}/db-${ts}`;
       await cloudinary.uploader.upload(dest, {
         resource_type: 'raw',
         public_id: publicId,
         overwrite: true,
-        tags: ['backup', 'sqlite'],
+        tags: ['backup', 'sqlite', IS_PROD ? 'prod' : 'dev'],
       });
       console.log(`✓ Backup uploadé sur Cloudinary : ${publicId}`);
 
-      // Supprimer les backups Cloudinary de plus de 7 jours
+      // Supprimer les backups de cet env de plus de 7 jours
       const cutoff = new Date();
       cutoff.setDate(cutoff.getDate() - 7);
       const { resources } = await cloudinary.api.resources({
-        type: 'upload', resource_type: 'raw', prefix: 'venduparmo-backups/', max_results: 50,
+        type: 'upload', resource_type: 'raw', prefix: CLOUD_PREFIX + '/', max_results: 50,
       });
       for (const r of resources) {
         if (new Date(r.created_at) < cutoff) {
@@ -59,4 +63,4 @@ async function backupDatabase() {
   return dest;
 }
 
-module.exports = { backupDatabase };
+module.exports = { backupDatabase, CLOUD_PREFIX };

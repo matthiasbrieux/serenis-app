@@ -100,7 +100,7 @@ async function restoreFromCloudinary() {
     const cloudinary = require('cloudinary').v2;
     cloudinary.config(true);
     const { resources } = await cloudinary.api.resources({
-      type: 'upload', resource_type: 'raw', prefix: 'venduparmo-backups/', max_results: 50
+      type: 'upload', resource_type: 'raw', prefix: 'venduparmo-backups/prod/', max_results: 50
     });
     if (!resources.length) { console.log('Aucun backup Cloudinary trouvé.'); return; }
     resources.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
