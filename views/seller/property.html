@@ -3719,6 +3719,12 @@ function initPhotoFolders() {
     head.addEventListener('click', function(e) {
       if (e.target.closest('button,label,input,a')) return;
       folder.classList.toggle('collapsed');
+      // Force lazy images to load after folder is revealed
+      if (!folder.classList.contains('collapsed')) {
+        folder.querySelectorAll('img[loading="lazy"]').forEach(img => {
+          if (img.src) { const s = img.src; img.src = ''; img.src = s; }
+        });
+      }
     });
   });
 }

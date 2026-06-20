@@ -211,17 +211,6 @@ app.get('/health', (req, res) => {
   }
 });
 
-// 404
-app.use((req, res) => {
-  res.status(404).sendFile('404.html', { root: './public' });
-});
-
-// Erreurs serveur
-app.use((err, req, res, next) => {
-  console.error(err.stack);
-  res.status(500).json({ error: 'Erreur serveur. Réessayez dans un instant.' });
-});
-
 // Nettoyage des photos avec URLs locales (non persistantes sur Render)
 function cleanLocalPhotos() {
   try {
@@ -254,6 +243,15 @@ async function seedSellerAccount() {
 }
 
 loadRoutes().then(() => {
+  // 404 et erreurs enregistrés APRÈS les routes
+  app.use((req, res) => {
+    res.status(404).sendFile('404.html', { root: './public' });
+  });
+  app.use((err, req, res, next) => {
+    console.error(err.stack);
+    res.status(500).json({ error: 'Erreur serveur. Réessayez dans un instant.' });
+  });
+
 app.listen(PORT, () => {
   console.log(`✓ Vendu Par Moi démarré — http://localhost:${PORT}`);
   cleanLocalPhotos();
