@@ -242,7 +242,7 @@ router.post('/api/property/photos', requireAuth, uploadPhoto.array('photos', 150
     const cid = file.filename;
     db.prepare('INSERT INTO property_photos (property_id, cloudinary_id, url, thumbnail_url, order_index, category, room, angle_label) VALUES (?,?,?,?,?,?,?,?)')
       .run(property.id, cid, url, thumb, existing.count + i, category, room, angle_label);
-    inserted.push({ url, cloudinary_id: cid, category, room, angle_label });
+    inserted.push({ url, cloudinary_id: cid, category, room, angle_label, thumbnail_url: thumb });
   });
 
   // Auto-CRM hook: ≥5 photos → photographer_done = 1
