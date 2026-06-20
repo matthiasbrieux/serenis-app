@@ -3036,6 +3036,12 @@
 
 <script>
 // ── Tab system ────────────────────────────────────────
+function forceReloadPhotoImages() {
+  document.querySelectorAll('#tab-photos .photo-folder:not(.collapsed) img').forEach(function(img) {
+    if (img.src) { var s = img.src; img.src = ''; img.src = s; }
+  });
+}
+
 document.querySelectorAll('.tab-btn').forEach(btn => {
   btn.addEventListener('click', () => {
     document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
@@ -3043,6 +3049,7 @@ document.querySelectorAll('.tab-btn').forEach(btn => {
     btn.classList.add('active');
     document.getElementById('tab-' + btn.dataset.tab).classList.remove('hidden');
     if (btn.dataset.tab === 'fiche') generateFiche();
+    if (btn.dataset.tab === 'photos') forceReloadPhotoImages();
     // Scroller vers le tab actif sur mobile (scroll-into-view dans la tabs-row)
     try { btn.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' }); } catch(e) {}
   });
@@ -6293,6 +6300,7 @@ function switchTab(name) {
   if (btn) btn.classList.add('active');
   const content = document.getElementById('tab-' + name);
   if (content) content.classList.remove('hidden');
+  if (name === 'photos') forceReloadPhotoImages();
 }
 
 // ── Command palette ───────────────────────────────────
