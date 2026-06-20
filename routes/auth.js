@@ -66,19 +66,27 @@ router.post('/admin/login', express.json(), (req, res) => {
 
 router.get('/creer-compte-test', async (req, res) => {
   try {
-    const email = 'associe@test.fr';
-    const hashed = await bcrypt.hash('Test2025', 12);
-    const existing = db.prepare('SELECT id FROM sellers WHERE email = ?').get(email);
-    if (existing) {
-      db.prepare('UPDATE sellers SET password=?, paid_at=CURRENT_TIMESTAMP WHERE email=?').run(hashed, email);
-      return res.send('OK — Compte mis a jour. Email: associe@test.fr — Mot de passe: Test2025');
-    }
     const { v4: uuidv4 } = require('uuid');
-    const r = db.prepare('INSERT INTO sellers (uuid, email, password, pack, paid_at) VALUES (?,?,?,?,CURRENT_TIMESTAMP)')
-      .run(uuidv4(), email, hashed, 'serenite');
-    db.prepare('INSERT INTO properties (uuid, seller_id, slug, acheteur_token, notaire_token, status) VALUES (?,?,?,?,?,?)')
-      .run(uuidv4(), r.lastInsertRowid, 'bien-test', uuidv4(), uuidv4(), 'preparation');
-    res.send('OK — Compte cree. Email: associe@test.fr — Mot de passe: Test2025');
+    const accounts = [
+      { email: 'matthiasbrieux260598@gmail.com', password: 'VPM2026!', pack: 'serenite' },
+      { email: 'associe@test.fr', password: 'Test2025', pack: 'serenite' },
+    ];
+    const results = [];
+    for (const acc of accounts) {
+      const hashed = await bcrypt.hash(acc.password, 12);
+      const existing = db.prepare('SELECT id FROM sellers WHERE email = ?').get(acc.email);
+      if (existing) {
+        db.prepare('UPDATE sellers SET password=?, paid_at=CURRENT_TIMESTAMP WHERE email=?').run(hashed, acc.email);
+        results.push(`MàJ: ${acc.email} — mdp: ${acc.password}`);
+      } else {
+        const r = db.prepare('INSERT INTO sellers (uuid, email, password, pack, paid_at) VALUES (?,?,?,?,CURRENT_TIMESTAMP)')
+          .run(uuidv4(), acc.email, hashed, acc.pack);
+        db.prepare('INSERT INTO properties (uuid, seller_id, slug, acheteur_token, notaire_token, status) VALUES (?,?,?,?,?,?)')
+          .run(uuidv4(), r.lastInsertRowid, `bien-${r.lastInsertRowid}`, uuidv4(), uuidv4(), 'preparation');
+        results.push(`Créé: ${acc.email} — mdp: ${acc.password}`);
+      }
+    }
+    res.send(results.join('<br>'));
   } catch(e) { res.status(500).send('Erreur: ' + e.message); }
 });
 

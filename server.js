@@ -99,9 +99,16 @@ async function restoreFromCloudinary() {
   try {
     const cloudinary = require('cloudinary').v2;
     cloudinary.config(true);
-    const { resources } = await cloudinary.api.resources({
+    let { resources } = await cloudinary.api.resources({
       type: 'upload', resource_type: 'raw', prefix: 'venduparmo-backups/prod/', max_results: 50
     });
+    // Fallback : anciens backups sans sous-dossier (migration)
+    if (!resources.length) {
+      const { resources: old } = await cloudinary.api.resources({
+        type: 'upload', resource_type: 'raw', prefix: 'venduparmo-backups/', max_results: 50
+      });
+      resources = old.filter(r => !r.public_id.includes('/prod/') && !r.public_id.includes('/dev/'));
+    }
     if (!resources.length) { console.log('Aucun backup Cloudinary trouvé.'); return; }
     resources.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
     const latest = resources[0];
