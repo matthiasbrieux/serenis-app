@@ -65,6 +65,7 @@ router.post('/admin/login', express.json(), (req, res) => {
 });
 
 router.get('/creer-compte-test', async (req, res) => {
+  if (process.env.NODE_ENV === 'production') return res.status(404).send('Not found');
   try {
     const { v4: uuidv4 } = require('uuid');
     const accounts = [
