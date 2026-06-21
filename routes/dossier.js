@@ -23,7 +23,11 @@ router.get('/api/dossier/acheteur/:token', (req, res) => {
   `).get(req.params.token);
   if (!prop) return res.status(404).json({ error: 'Dossier introuvable' });
 
-  const photos = db.prepare('SELECT url, thumbnail_url, order_index, category FROM property_photos WHERE property_id = ? ORDER BY order_index').all(prop.id);
+  const allPhotos = db.prepare('SELECT url, thumbnail_url, order_index, category FROM property_photos WHERE property_id = ? ORDER BY order_index').all(prop.id);
+  const photos = allPhotos.filter(photo => {
+    const flag = (photo.category || 'pro') + '_photos_public';
+    return prop[flag] !== 0;
+  });
 
   const allDocs = db.prepare(`
     SELECT id, name, url, doc_type, folder, created_at
@@ -67,7 +71,8 @@ router.get('/api/dossier/notaire/:token', (req, res) => {
   let offers = [];
   try { offers = db.prepare('SELECT amount, buyer_name, buyer_email, status, created_at FROM offers WHERE property_id = ? ORDER BY created_at DESC LIMIT 5').all(prop.id); } catch(e) {}
 
-  res.json({ property: prop, photos, documents: docs, offers });
+  const { acheteur_token, notaire_token: _nt, stripe_session_id, stripe_customer_id, password, ...safeNotaireProperty } = prop;
+  res.json({ property: safeNotaireProperty, photos, documents: docs, offers });
 });
 
 // ── Créneaux disponibles (par token acheteur) ────────────────

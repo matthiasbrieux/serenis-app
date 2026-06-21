@@ -3876,7 +3876,7 @@ async function savePhotoOrder(photos) {
     await fetch('/api/property/photos/reorder', {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ photos }),
+      body: JSON.stringify({ order: photos.map(p => p.cloudinary_id) }),
     });
   } catch(e) { console.error('Reorder save error:', e); }
 }
