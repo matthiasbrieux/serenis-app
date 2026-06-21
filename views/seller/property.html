@@ -3668,8 +3668,12 @@ async function uploadPhotos(files, category) {
         allPhotos[category] = allPhotos[category].filter(p => p.cloudinary_id !== tempIds[i]);
       } else if (data.photos && data.photos[0]) {
         const idx = allPhotos[category].findIndex(p => p.cloudinary_id === tempIds[i]);
-        if (idx !== -1) allPhotos[category][idx] = { ...data.photos[0], category };
-        else allPhotos[category] = allPhotos[category].filter(p => p.cloudinary_id !== tempIds[i]);
+        if (idx !== -1) {
+          const blobUrl = allPhotos[category][idx].url; // blob URL du fichier local — affichage immédiat sans attendre la génération Cloudinary
+          allPhotos[category][idx] = { ...data.photos[0], category, _blobUrl: blobUrl };
+        } else {
+          allPhotos[category] = allPhotos[category].filter(p => p.cloudinary_id !== tempIds[i]);
+        }
       }
     }
   } finally {
@@ -3773,7 +3777,7 @@ function renderGrid(category) {
 
   const makeItem = (p, i) => {
     const imgSrc = p.url || p.thumbnail_url || '';
-    const thumbSrc = p.thumbnail_url || imgSrc;
+    const thumbSrc = p._blobUrl || p.thumbnail_url || imgSrc;
     const cidSafe = (p.cloudinary_id || '').replace(/'/g, "\\'");
     const rawSrc = imgSrc.replace(/'/g, "\\'");
     const isSel = !!(_selectMode[category] && (_selectedCids[category] || new Set()).has(p.cloudinary_id));
