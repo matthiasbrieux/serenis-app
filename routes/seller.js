@@ -316,6 +316,32 @@ router.delete('/api/property/documents/:id', requireAuth, async (req, res) => {
   res.json({ success: true });
 });
 
+// ── Proxy document vendeur (force Content-Type: application/pdf) ──
+router.get('/api/property/document/:docId', requireAuth, async (req, res) => {
+  const property = db.prepare('SELECT id FROM properties WHERE seller_id = ?').get(req.seller.id);
+  if (!property) return res.status(404).json({ error: 'Bien introuvable' });
+  const doc = db.prepare('SELECT * FROM property_documents WHERE id = ? AND property_id = ?').get(req.params.docId, property.id);
+  if (!doc) return res.status(404).json({ error: 'Document introuvable' });
+
+  try {
+    if (!doc.url.startsWith('http')) {
+      return res.sendFile(require('path').join(__dirname, '../public', doc.url));
+    }
+    const response = await fetch(doc.url);
+    if (!response.ok) return res.status(502).json({ error: 'Impossible de récupérer le document' });
+    const ext = (doc.name || '').split('.').pop().toLowerCase();
+    const isPdf = ext === 'pdf' || doc.url.includes('/raw/upload/');
+    let safeName = (doc.name || 'document').replace(/[^a-zA-Z0-9._-]/g, '_');
+    if (isPdf && !safeName.toLowerCase().endsWith('.pdf')) safeName += '.pdf';
+    res.setHeader('Content-Type', isPdf ? 'application/pdf' : 'application/octet-stream');
+    res.setHeader('Content-Disposition', `inline; filename="${safeName}"`);
+    res.send(Buffer.from(await response.arrayBuffer()));
+  } catch (e) {
+    console.error('Document proxy error:', e.message);
+    res.status(502).json({ error: 'Erreur proxy document' });
+  }
+});
+
 // Publish property
 router.post('/api/property/publish', requireAuth, async (req, res) => {
   const property = db.prepare('SELECT * FROM properties WHERE seller_id = ?').get(req.seller.id);

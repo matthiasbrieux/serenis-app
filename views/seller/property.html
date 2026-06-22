@@ -4550,7 +4550,7 @@ function _docsCard(d) {
 
   var view = document.createElement('a');
   view.className = 'docs-card-view';
-  view.href = d.url;
+  view.href = '/api/property/document/' + d.id;
   view.target = '_blank';
   view.rel = 'noopener';
   view.textContent = 'Ouvrir';
@@ -4594,7 +4594,7 @@ function _renderSlotFilled(card, acts, doc, folder) {
   check.textContent = '✓';
   var viewLink = document.createElement('a');
   viewLink.className = 'conf-view-btn';
-  viewLink.href = doc.url;
+  viewLink.href = '/api/property/document/' + doc.id;
   viewLink.target = '_blank';
   viewLink.rel = 'noopener';
   viewLink.textContent = 'Ouvrir';
@@ -4682,7 +4682,7 @@ function renderDocuments(docs) {
     name.style.cssText = 'flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#2a4030;font-weight:500;';
     name.title = doc.name; name.textContent = doc.name;
     var open = document.createElement('a');
-    open.href = doc.url; open.target = '_blank'; open.rel = 'noopener';
+    open.href = '/api/property/document/' + doc.id; open.target = '_blank'; open.rel = 'noopener';
     open.textContent = 'Ouvrir'; open.style.cssText = 'color:#3D5A47;font-weight:600;text-decoration:none;white-space:nowrap;';
     var del = document.createElement('button');
     del.type = 'button';
@@ -4718,7 +4718,7 @@ function renderDocuments(docs) {
       var dcIco = document.createElement('span'); dcIco.innerHTML = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>';
       var dcName = document.createElement('span'); dcName.textContent = diagCompleteDoc.name; dcName.style.flex='1';
       var dcOpen = document.createElement('a');
-      dcOpen.href = diagCompleteDoc.url; dcOpen.target='_blank'; dcOpen.rel='noopener';
+      dcOpen.href = '/api/property/document/' + diagCompleteDoc.id; dcOpen.target='_blank'; dcOpen.rel='noopener';
       dcOpen.textContent = 'Ouvrir'; dcOpen.style.cssText='color:#3D5A47;font-weight:600;';
       var dcDel = document.createElement('button');
       dcDel.type='button'; dcDel.style.cssText='border:none;background:none;cursor:pointer;color:#c62828;font-size:0.8rem;padding:2px 6px;';
@@ -5390,7 +5390,7 @@ function buildFicheHtml() {
         <div style="display:flex;flex-direction:column;gap:7px;">
           ${publicDocs.map(function(doc){
             var m=DOC_META[doc.doc_type]||DOC_META.autre;
-            return '<a href="'+doc.url+'" target="_blank" rel="noopener" style="display:flex;align-items:center;gap:9px;padding:8px 10px;background:#F9F9FB;border-radius:10px;text-decoration:none;color:inherit;">'
+            return '<a href="/api/property/document/'+doc.id+'" target="_blank" rel="noopener" style="display:flex;align-items:center;gap:9px;padding:8px 10px;background:#F9F9FB;border-radius:10px;text-decoration:none;color:inherit;">'
               +'<div style="width:30px;height:30px;border-radius:8px;background:'+m.color+';display:flex;align-items:center;justify-content:center;flex-shrink:0;color:'+m.text+';">'+fi.clip+'</div>'
               +'<div style="min-width:0;"><div style="font-size:0.76rem;font-weight:700;color:#1C2E22;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" title="'+doc.name+'">'+doc.name+'</div>'
               +'<div style="font-size:0.58rem;color:'+m.text+';background:'+m.color+';padding:1px 7px;border-radius:10px;display:inline-block;margin-top:2px;font-weight:700;text-transform:uppercase;">'+m.label+'</div></div></a>';
