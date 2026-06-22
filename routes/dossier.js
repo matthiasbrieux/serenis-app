@@ -34,7 +34,8 @@ router.get('/api/dossier/acheteur/:token/document/:docId', async (req, res) => {
 
     const ext = (doc.name || '').split('.').pop().toLowerCase();
     const isPdf = ext === 'pdf' || doc.url.includes('/raw/upload/');
-    const safeName = (doc.name || 'document').replace(/[^a-zA-Z0-9._-]/g, '_');
+    let safeName = (doc.name || 'document').replace(/[^a-zA-Z0-9._-]/g, '_');
+    if (isPdf && !safeName.toLowerCase().endsWith('.pdf')) safeName += '.pdf';
 
     res.setHeader('Content-Type', isPdf ? 'application/pdf' : 'application/octet-stream');
     res.setHeader('Content-Disposition', `inline; filename="${safeName}"`);
