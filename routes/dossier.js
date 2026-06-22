@@ -13,6 +13,38 @@ const publicActionLimit = rateLimit({
   handler: (req, res) => res.status(429).json({ error: 'Trop de tentatives. Réessayez dans 15 minutes.' }),
 });
 
+// ── Proxy document (sert le fichier avec Content-Type: application/pdf) ──
+router.get('/api/dossier/acheteur/:token/document/:docId', async (req, res) => {
+  const prop = db.prepare('SELECT * FROM properties WHERE acheteur_token = ?').get(req.params.token);
+  if (!prop) return res.status(404).json({ error: 'Dossier introuvable' });
+
+  const doc = db.prepare('SELECT * FROM property_documents WHERE id = ? AND property_id = ?').get(req.params.docId, prop.id);
+  if (!doc) return res.status(404).json({ error: 'Document introuvable' });
+
+  const f = doc.folder || '';
+  const allowed =
+    (f === 'diagnostics' && prop.diagnostics_in_dossier !== 0) ||
+    (f === 'acheteur_serieux' && prop.acheteur_docs_visible === 1) ||
+    ((f === '' || f === null) && prop.plan_docs_visible !== 0);
+  if (!allowed) return res.status(403).json({ error: 'Document non accessible' });
+
+  try {
+    const response = await fetch(doc.url);
+    if (!response.ok) return res.status(502).json({ error: 'Impossible de récupérer le document' });
+
+    const ext = (doc.name || '').split('.').pop().toLowerCase();
+    const isPdf = ext === 'pdf' || doc.url.includes('/raw/upload/');
+    const safeName = (doc.name || 'document').replace(/[^a-zA-Z0-9._-]/g, '_');
+
+    res.setHeader('Content-Type', isPdf ? 'application/pdf' : 'application/octet-stream');
+    res.setHeader('Content-Disposition', `inline; filename="${safeName}"`);
+    res.send(Buffer.from(await response.arrayBuffer()));
+  } catch (e) {
+    console.error('Document proxy error:', e.message);
+    res.status(502).json({ error: 'Erreur proxy document' });
+  }
+});
+
 // ── Données dossier acheteur (token public) ───────────────────
 router.get('/api/dossier/acheteur/:token', (req, res) => {
   const prop = db.prepare(`
