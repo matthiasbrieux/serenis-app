@@ -49,6 +49,8 @@ if (process.env.CLOUDINARY_URL) {
           folder: 'serenis/documents',
           allowed_formats: ['pdf', 'jpg', 'jpeg', 'png', 'webp'],
           resource_type: isPdf ? 'raw' : 'image',
+          use_filename: true,
+          unique_filename: true,
         };
       },
     });
