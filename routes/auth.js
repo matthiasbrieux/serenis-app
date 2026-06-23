@@ -109,7 +109,7 @@ router.post('/api/forgot-password', forgotLimit, express.json(), async (req, res
     const expires = new Date(Date.now() + 3600 * 1000).toISOString(); // +1h
     db.prepare('INSERT INTO password_reset_tokens (seller_id, token, expires_at) VALUES (?,?,?)').run(seller.id, token, expires);
     const base = process.env.BASE_URL || 'https://venduparmoi.fr';
-    await sendPasswordResetEmail({ email: email.toLowerCase().trim(), resetUrl: `${base}/reset-password?token=${token}` }).catch(() => {});
+    await sendPasswordResetEmail(email.toLowerCase().trim(), `${base}/reset-password?token=${token}`).catch(() => {});
   }
   res.json({ success: true });
 });
