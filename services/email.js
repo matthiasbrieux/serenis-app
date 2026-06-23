@@ -807,11 +807,34 @@ async function previewEmail(templateName) {
 }
 
 // ─────────────────────────────────────────────────────────────
+// Contact form — notification admin
+// ─────────────────────────────────────────────────────────────
+async function sendContactNotification({ name, phone, email, offer, city, message }) {
+  const adminEmail = process.env.ADMIN_EMAIL || FROM_EMAIL;
+  const row = (label, value) => value ? `<tr><td style="padding:6px 0;font-size:14px;color:#666;width:140px;vertical-align:top;">${label}</td><td style="padding:6px 0;font-size:14px;color:#1a1a1a;font-weight:600;">${value}</td></tr>` : '';
+  const html = layout(`
+    ${h1('Nouveau contact')}
+    ${p('Un visiteur a rempli le formulaire de contact.')}
+    <table style="width:100%;border-collapse:collapse;margin:16px 0;">
+      ${row('Nom', name)}
+      ${row('Téléphone', phone)}
+      ${row('Email', email)}
+      ${row('Offre', offer)}
+      ${row('Ville', city)}
+      ${row('Message', message)}
+    </table>
+  `, { preheader: `Nouveau contact de ${name} — ${phone}` });
+  return send(adminEmail, `Nouveau contact — ${name}`, html);
+}
+
+// ─────────────────────────────────────────────────────────────
 // Exports
 // ─────────────────────────────────────────────────────────────
 module.exports = {
   // Auth
   sendPasswordResetEmail,
+  // Contact
+  sendContactNotification,
   // Bienvenue / Paiement
   sendWelcomeEmail,
   sendWelcomeImproved,
