@@ -449,7 +449,7 @@ const MAILS = {
     { title: 'Maintien du prix — argumentation', body: `Bonjour [Prénom],\n\nMerci pour votre proposition.\n\nAprès réflexion, j'ai choisi de maintenir le prix de vente à [Montant] €.\n\nJe pense qu'il reflète justement la valeur du bien compte tenu de ses prestations, de son emplacement et du marché local.\n\nSi vous restez intéressé(e), n'hésitez pas à revenir vers moi. Je serai heureux(se) d'échanger avec vous sur la suite du projet.\n\nBien cordialement,\n[__prenom_nom__]` },
     { title: 'Acceptation d\'une offre', body: `Bonjour [Prénom],\n\nBonne nouvelle, j'ai le plaisir d'accepter votre offre de [Montant] € pour mon bien situé à [__adresse__].\n\nMerci pour votre confiance. Je suis heureux(se) que nous soyons parvenus à un accord.\n\nNous pouvons désormais préparer la signature du compromis de vente. Mon notaire est :\n[Nom et coordonnées du notaire]\n\nDe votre côté, n'hésitez pas à me communiquer les coordonnées de votre notaire si vous en avez un.\n\nJe reste à votre disposition pour la suite des démarches et me réjouis de mener ce projet à son terme avec vous.\n\nÀ bientôt,\n[__prenom_nom__]` },
     { title: 'Refus d\'une offre', body: `Bonjour [Prénom],\n\nMerci pour votre offre concernant mon bien situé à [__adresse__] ainsi que pour l'intérêt que vous lui portez.\n\nAprès réflexion, je ne vais malheureusement pas pouvoir donner une suite favorable à votre proposition.\n\nJe vous remercie néanmoins pour nos échanges et le temps consacré à votre démarche.\n\nSi votre projet évolue ou si vous souhaitez revenir vers moi avec une nouvelle proposition, n'hésitez pas à me recontacter.\n\nJe vous souhaite une excellente continuation dans votre recherche.\n\nBien cordialement,\n[__prenom_nom__]` },
-    { title: 'Demande de documents à l\'acheteur', body: `Bonjour [Prénom],\n\nPour préparer le compromis, pourriez-vous me transmettre :\n\n✓ Pièce d'identité valide\n✓ Justificatif de domicile récent\n✓ Attestation de financement (accord banque ou attestation de fonds)\n\nCes documents sont nécessaires pour que le notaire puisse avancer rapidement.\n\nMerci,\n[Votre prénom]` }
+    { title: 'Demande de documents à l\'acheteur', body: `Bonjour [Prénom],\n\nAfin de préparer le compromis de vente, pourriez-vous me transmettre les informations et documents demandés via le lien ci-dessous :\n\n[__lien_compromis__]\n\nJe les transmettrai ensuite à notre notaire afin qu'il puisse préparer le dossier.\n\nSi vous préférez, je peux également vous communiquer directement les coordonnées de notre notaire afin que vous lui adressiez ces éléments vous-même. Bien entendu, si vous êtes déjà accompagné(e) par votre propre notaire, vous pouvez également lui transmettre ces informations.\n\nMerci par avance pour votre retour.\n\nÀ bientôt,\n[__prenom_nom__]` }
   ],
   'Notaire': [
     { title: 'Demande de copie de l\'acte notarial', body: `Objet : Demande de copie de mon acte de vente\n\nMadame, Monsieur,\n\nJe suis propriétaire du bien situé :\n[Adresse complète]\n\nAcquis le : [Date d'acquisition]\nPar acte signé au sein de votre étude.\n\nJe souhaiterais obtenir une copie intégrale de l'acte authentique de vente.\n\n[Nom et prénom] — [Téléphone] — [E-mail]` },
@@ -593,7 +593,8 @@ function fillAuto(body, sd) {
     .replace('[__lien_dossier__]', sd.lienDossier)
     .replace('[__disponibilites__]', sd.disponibilites)
     .replace('[__prenom_nom__]', sd.prenomNom)
-    .replace('[__telephone__]', sd.telephone);
+    .replace('[__telephone__]', sd.telephone)
+    .replace('[__lien_compromis__]', sd.lienCompromis);
 }
 
 async function init() {
@@ -610,6 +611,7 @@ async function init() {
     sd.disponibilites = formatSlots(agenda.slots);
     sd.prenomNom = [s.first_name, s.last_name].filter(Boolean).join(' ') || '[Prénom Nom]';
     sd.telephone = s.phone || '[Téléphone]';
+    sd.lienCompromis = window.location.origin + '/downloads/compromis-elements.html';
   } catch(e) {}
 
   // Patch MAILS avant render
@@ -620,6 +622,7 @@ async function init() {
   MAILS['Offres'][2].body = fillAuto(MAILS['Offres'][2].body, sd);
   MAILS['Offres'][3].body = fillAuto(MAILS['Offres'][3].body, sd);
   MAILS['Offres'][4].body = fillAuto(MAILS['Offres'][4].body, sd);
+  MAILS['Offres'][5].body = fillAuto(MAILS['Offres'][5].body, sd);
 
   render();
 }
