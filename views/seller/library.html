@@ -1731,7 +1731,7 @@ const MODULES = [
     ]
   },
   {
-    phase:'apres', mailCat:'visite-qualification', num:'04', title:'Préparer sa visite', subtitle:'Ne recevoir que des acheteurs vraiment finançables — et arrêter de perdre du temps',
+    phase:'apres', mailCat:'visite-avant', num:'04', title:'Préparer sa visite', subtitle:'Ne recevoir que des acheteurs vraiment finançables — et arrêter de perdre du temps',
     keyPoints:['Qualifiez l\'acheteur AVANT d\'ouvrir votre porte (financement !)','20 minutes suffisent pour préparer une visite parfaite','Confirmez par SMS la veille avec l\'adresse exacte'],
     aiMsg:'La qualification avant visite est cruciale. Posez discrètement la question du financement — un acheteur non finançable peut vous faire perdre 3 à 6 mois.',
     steps:[
@@ -1864,7 +1864,6 @@ const MODULES = [
 
 const MAIL_CATS = [
   { key:'visite-avant',         label:'Avant visite',           group:'visite' },
-  { key:'visite-qualification', label:'Qualification',           group:'visite' },
   { key:'visite-apres',         label:'Après visite',            group:'visite' },
   { key:'offres',               label:'Offres' },
   { key:'notaire',              label:'Notaire' },
@@ -1875,10 +1874,6 @@ const MAILS_BY_CAT = {
   'visite-avant': [
     { title:'Premier contact acheteur', body:`Bonjour [Prénom],\n\nMerci pour votre message et pour l'intérêt que vous portez à mon logement situé à [__adresse__].\n\nAvant de convenir d'une visite, je vous invite à consulter les informations et documents concernant le bien :\n\n[__lien_dossier__]\n\nN'hésitez pas à les parcourir tranquillement et à revenir vers moi si vous avez la moindre question.\n\nSi le bien correspond toujours à votre recherche après lecture, je serai ravi(e) d'organiser une visite. Vous pouvez réserver directement un créneau ici :\n\n[__lien_agenda__]\n\nAu plaisir d'échanger avec vous,\n[__prenom_nom__]` },
     { title:'Confirmation de rendez-vous', body:`Bonjour [Prénom],\n\nMerci pour votre retour.\n\nJe vous confirme notre rendez-vous pour la visite du bien situé à [__adresse__], le [Date] à [Heure].\n\nÀ votre arrivée, n'hésitez pas à m'envoyer un SMS ou à m'appeler directement.\n\nSi vous avez la moindre question d'ici là ou si un imprévu survient, n'hésitez pas à me contacter.\n\nAu plaisir de vous rencontrer,\n[__prenom_nom__]\n[__telephone__]` },
-  ],
-  'visite-qualification': [
-    { title:'Envoi dossier de qualification avant visite', body:`Bonjour [Prénom],\n\nAvant notre rendez-vous du [Date], je vous transmets le lien vers les diagnostics techniques complets du bien :\n\n→ [Lien diagnostics]\n\nPrenez le temps de les consulter et confirmez-moi que vous souhaitez maintenir la visite.\n\nÀ bientôt,\n[Votre prénom]` },
-    { title:'Demande de situation de financement', body:`Bonjour [Prénom],\n\nAvant de bloquer mon agenda pour une visite, pourriez-vous m'indiquer votre situation de financement ?\n\n- Achat comptant ou à crédit ?\n- Si crédit : avez-vous un accord de principe de votre banque ?\n- Quel est votre budget maximum ?\n\nCes informations me permettent de cibler les acheteurs réellement en mesure d'acquérir le bien.\n\nCordialement,\n[Votre prénom]` },
   ],
   'visite-apres': [
     { title:'Invitation à une seconde visite', body:`Bonjour [Prénom],\n\nMerci encore pour votre visite et pour l'intérêt que vous portez à mon bien.\n\nSi vous souhaitez effectuer une seconde visite, seul(e) ou accompagné(e), je serai ravi(e) de vous accueillir à nouveau.\n\nPour choisir le créneau qui vous convient le mieux, vous pouvez réserver directement ici :\n\n[__lien_agenda__]\n\nAu plaisir de vous revoir,\n[__prenom_nom__]` },
@@ -2577,7 +2572,7 @@ function renderModules() {
 }
 
 // ── Mails ──
-const _VISITE_SUBS = ['visite-avant','visite-qualification','visite-apres'];
+const _VISITE_SUBS = ['visite-avant','visite-apres'];
 const _MAIL_MAIN_TABS = [
   { key:'visite-avant', label:'Visites', group:true },
   { key:'offres',       label:'Offres' },
@@ -2599,7 +2594,6 @@ function renderMails() {
 
   const subTabsHtml = isVisiteGroup ? `<div class="mail-sub-tabs">
     <button class="mail-sub-tab${activeMailCat==='visite-avant' ? ' active':''}" data-cat="visite-avant">Avant visite</button>
-    <button class="mail-sub-tab${activeMailCat==='visite-qualification' ? ' active':''}" data-cat="visite-qualification">Qualification</button>
     <button class="mail-sub-tab${activeMailCat==='visite-apres' ? ' active':''}" data-cat="visite-apres">Après visite</button>
   </div>` : '';
 
