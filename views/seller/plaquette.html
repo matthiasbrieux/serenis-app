@@ -453,7 +453,7 @@ const MAILS = {
   ],
   'Notaire': [
     { title: 'Demande de copie de l\'acte notarial', body: `Objet : Demande de copie de mon acte de vente\n\nMadame, Monsieur,\n\nJe suis propriétaire du bien situé :\n[Adresse complète]\n\nAcquis le : [Date d'acquisition]\nPar acte signé au sein de votre étude.\n\nJe souhaiterais obtenir une copie intégrale de l'acte authentique de vente.\n\n[Nom et prénom] — [Téléphone] — [E-mail]` },
-    { title: 'Transmission du dossier au notaire', body: `Bonjour Maître,\n\nSuite à l'acceptation de l'offre d'achat pour le bien au [Adresse], je vous transmets les éléments nécessaires à la rédaction du compromis :\n\n✓ Titre de propriété\n✓ Diagnostics techniques complets\n✓ Taxe foncière\n✓ [Documents complémentaires]\n\nL'acheteur est [Nom Prénom], joignable au [Téléphone].\n\n[Votre prénom] — [Téléphone]` }
+    { title: 'Transmission du dossier au notaire', body: `Bonjour Maître,\n\nSuite à notre accord sur la vente du bien situé à [__adresse__], je vous transmets le dossier complet incluant le titre de propriété, les diagnostics, et l'ensemble des documents nécessaires à la rédaction du compromis.\n\nLien sécurisé :\n[__lien_notaire__]\n\nRestant à votre disposition,\n[__prenom_nom__]` }
   ],
   'Signature': [
     { title: 'Confirmation de date de signature', body: `Bonjour [Prénom],\n\nJe vous confirme notre rendez-vous chez le notaire pour la signature [du compromis / de l'acte définitif] :\n\n📅 Date : [Date]\n🕐 Heure : [Heure]\n📍 Adresse : [Étude notariale]\n\nPensez à apporter une pièce d'identité valide.\n\nÀ bientôt,\n[Votre prénom]` },
@@ -594,7 +594,8 @@ function fillAuto(body, sd) {
     .replace('[__disponibilites__]', sd.disponibilites)
     .replace('[__prenom_nom__]', sd.prenomNom)
     .replace('[__telephone__]', sd.telephone)
-    .replace('[__lien_compromis__]', sd.lienCompromis);
+    .replace('[__lien_compromis__]', sd.lienCompromis)
+    .replace('[__lien_notaire__]', sd.lienNotaire);
 }
 
 async function init() {
@@ -612,6 +613,7 @@ async function init() {
     sd.prenomNom = [s.first_name, s.last_name].filter(Boolean).join(' ') || '[Prénom Nom]';
     sd.telephone = s.phone || '[Téléphone]';
     sd.lienCompromis = window.location.origin + '/downloads/compromis-elements.html';
+    sd.lienNotaire = p.notaire_token ? window.location.origin + '/dossier/notaire/' + p.notaire_token : '[Lien dossier notaire]';
   } catch(e) {}
 
   // Patch MAILS avant render
@@ -623,6 +625,7 @@ async function init() {
   MAILS['Offres'][3].body = fillAuto(MAILS['Offres'][3].body, sd);
   MAILS['Offres'][4].body = fillAuto(MAILS['Offres'][4].body, sd);
   MAILS['Offres'][5].body = fillAuto(MAILS['Offres'][5].body, sd);
+  MAILS['Notaire'][1].body = fillAuto(MAILS['Notaire'][1].body, sd);
 
   render();
 }
