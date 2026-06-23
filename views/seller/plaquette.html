@@ -430,7 +430,7 @@ const MODULES = [
 const MAILS = {
   'Avant visite': [
     { title: 'Premier contact acheteur', body: `Bonjour [Prénom],\n\nMerci pour votre message et pour l'intérêt que vous portez à mon logement situé à [__adresse__].\n\nAvant de convenir d'une visite, je vous invite à consulter les informations et documents concernant le bien :\n\n[__lien_dossier__]\n\nN'hésitez pas à les parcourir tranquillement et à revenir vers moi si vous avez la moindre question.\n\nSi le bien correspond toujours à votre recherche après lecture, je serai ravi(e) d'organiser une visite. Je suis disponible aux créneaux suivants :\n\n[__disponibilites__]\n\nAu plaisir d'échanger avec vous,\n[__prenom_nom__]` },
-    { title: 'Confirmation de rendez-vous', body: `Bonjour [Prénom],\n\nJe confirme notre rendez-vous pour la visite du bien situé au [Adresse], le [Date] à [Heure].\n\nDurée estimée : 30 à 45 minutes. Sonnez au nom : [Votre nom].\n\nCordialement,\n[Votre prénom]` }
+    { title: 'Confirmation de rendez-vous', body: `Bonjour [Prénom],\n\nMerci pour votre retour.\n\nJe vous confirme notre rendez-vous pour la visite du bien situé à [__adresse__], le [Date] à [Heure].\n\nÀ votre arrivée, n'hésitez pas à m'envoyer un SMS ou à m'appeler directement.\n\nSi vous avez la moindre question d'ici là ou si un imprévu survient, n'hésitez pas à me contacter.\n\nAu plaisir de vous rencontrer,\n[__prenom_nom__]\n[__telephone__]` }
   ],
   'Qualification avant visite': [
     { title: 'Envoi dossier de qualification avant visite', body: `Bonjour [Prénom],\n\nAvant notre rendez-vous du [Date], je vous transmets le lien vers les diagnostics techniques complets du bien :\n→ [Lien diagnostics]\n\nPrenez le temps de les consulter et confirmez-moi que vous souhaitez maintenir la visite. 🙂\n\nÀ bientôt,\n[Votre prénom]` },
@@ -592,7 +592,8 @@ function fillAuto(body, sd) {
     .replace('[__adresse__]', sd.adresse)
     .replace('[__lien_dossier__]', sd.lienDossier)
     .replace('[__disponibilites__]', sd.disponibilites)
-    .replace('[__prenom_nom__]', sd.prenomNom);
+    .replace('[__prenom_nom__]', sd.prenomNom)
+    .replace('[__telephone__]', sd.telephone);
 }
 
 async function init() {
@@ -608,10 +609,12 @@ async function init() {
     sd.lienDossier = p.acheteur_token ? base + '/dossier/acheteur/' + p.acheteur_token : '[Lien dossier / diagnostics]';
     sd.disponibilites = formatSlots(agenda.slots);
     sd.prenomNom = [s.first_name, s.last_name].filter(Boolean).join(' ') || '[Prénom Nom]';
+    sd.telephone = s.phone || '[Téléphone]';
   } catch(e) {}
 
   // Patch MAILS avant render
   MAILS['Avant visite'][0].body = fillAuto(MAILS['Avant visite'][0].body, sd);
+  MAILS['Avant visite'][1].body = fillAuto(MAILS['Avant visite'][1].body, sd);
 
   render();
 }
