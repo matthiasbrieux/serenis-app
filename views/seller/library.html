@@ -1868,47 +1868,43 @@ const MAIL_CATS = [
   { key:'visite-apres',         label:'Après visite',            group:'visite' },
   { key:'offres',               label:'Offres' },
   { key:'notaire',              label:'Notaire' },
-  { key:'financement',          label:'Financement' },
   { key:'signature',            label:'Signature' },
 ];
 
 const MAILS_BY_CAT = {
   'visite-avant': [
-    { title:'Premier contact acheteur', body:`Bonjour [Prénom],\n\nMerci pour votre intérêt pour mon bien au [Adresse].\n\nRésumé :\n- Surface : [X] m²\n- Pièces : [N]\n- DPE : [Lettre]\n- Taxe foncière : [X]€/an\n- Charges : [X]€/mois\n\nJe suis disponible [jours et horaires]. Merci de m'indiquer votre budget et situation de financement.\n\n[Votre prénom] — [Téléphone]` },
-    { title:'Réponse à une demande de visite', body:`Bonjour [Prénom],\n\nMerci pour votre message concernant mon bien au [Adresse].\n\nAvant de fixer un rendez-vous, je vous transmets quelques informations importantes :\n\n→ [Lien dossier / diagnostics]\n\nMerci de prendre le temps de les consulter, puis de me confirmer que vous souhaitez maintenir la visite.\n\nDisponibilités : [vos créneaux].\n\nCordialement,\n[Votre prénom] — [Téléphone]` },
-    { title:'Confirmation de rendez-vous', body:`Bonjour [Prénom],\n\nJe confirme notre rendez-vous pour la visite du bien situé au [Adresse], le [Date] à [Heure].\n\nDurée estimée : 30 à 45 minutes. Sonnez au nom : [Votre nom].\n\nN'hésitez pas à me contacter si vous avez des questions.\n\nCordialement,\n[Votre prénom]` },
+    { title:'Premier contact acheteur', body:`Bonjour [Prénom],\n\nMerci pour votre message et pour l'intérêt que vous portez à mon logement situé à [__adresse__].\n\nAvant de convenir d'une visite, je vous invite à consulter les informations et documents concernant le bien :\n\n[__lien_dossier__]\n\nN'hésitez pas à les parcourir tranquillement et à revenir vers moi si vous avez la moindre question.\n\nSi le bien correspond toujours à votre recherche après lecture, je serai ravi(e) d'organiser une visite. Je suis disponible aux créneaux suivants :\n\n[__disponibilites__]\n\nAu plaisir d'échanger avec vous,\n[__prenom_nom__]` },
+    { title:'Confirmation de rendez-vous', body:`Bonjour [Prénom],\n\nMerci pour votre retour.\n\nJe vous confirme notre rendez-vous pour la visite du bien situé à [__adresse__], le [Date] à [Heure].\n\nÀ votre arrivée, n'hésitez pas à m'envoyer un SMS ou à m'appeler directement.\n\nSi vous avez la moindre question d'ici là ou si un imprévu survient, n'hésitez pas à me contacter.\n\nAu plaisir de vous rencontrer,\n[__prenom_nom__]\n[__telephone__]` },
   ],
   'visite-qualification': [
-    { title:'Envoi dossier de qualification avant visite', body:`Bonjour [Prénom],\n\nAvant notre rendez-vous du [Date], je vous transmets le lien vers les diagnostics techniques complets du bien :\n\n→ [Lien diagnostics]\n\nPrenez le temps de les consulter et confirmez-moi que vous souhaitez maintenir la visite. 🙂\n\nÀ bientôt,\n[Votre prénom]` },
+    { title:'Envoi dossier de qualification avant visite', body:`Bonjour [Prénom],\n\nAvant notre rendez-vous du [Date], je vous transmets le lien vers les diagnostics techniques complets du bien :\n\n→ [Lien diagnostics]\n\nPrenez le temps de les consulter et confirmez-moi que vous souhaitez maintenir la visite.\n\nÀ bientôt,\n[Votre prénom]` },
     { title:'Demande de situation de financement', body:`Bonjour [Prénom],\n\nAvant de bloquer mon agenda pour une visite, pourriez-vous m'indiquer votre situation de financement ?\n\n- Achat comptant ou à crédit ?\n- Si crédit : avez-vous un accord de principe de votre banque ?\n- Quel est votre budget maximum ?\n\nCes informations me permettent de cibler les acheteurs réellement en mesure d'acquérir le bien.\n\nCordialement,\n[Votre prénom]` },
   ],
   'visite-apres': [
-    { title:'Invitation à une seconde visite', body:`Bonjour [Prénom],\n\nSuite à votre première visite, je vous propose un second passage pour vous permettre de confirmer votre intérêt dans de meilleures conditions.\n\nJe suis disponible [créneaux]. Faites-moi savoir si l'un d'eux vous convient.\n\nCordialement,\n[Votre prénom]` },
-    { title:'Envoi du dossier acheteur après visite', body:`Bonjour [Prénom],\n\nSuite à votre visite et afin de vous aider dans votre réflexion, je vous transmets les informations complémentaires sur mon bien :\n\n→ [Lien dossier acheteur]\n\nVous y trouverez : entretiens, travaux réalisés, diagnostics, documents administratifs.\n\nN'hésitez pas si vous avez des questions. 🙂\n\nCordialement,\n[Votre prénom] — [Téléphone]` },
-    { title:'Relance après visite sans retour', body:`Bonjour [Prénom],\n\nJe me permets de vous recontacter suite à votre visite du [Date].\n\nAvez-vous eu le temps de réfléchir ? Je serais ravi(e) de répondre à vos questions ou d'organiser une seconde visite.\n\nMon bien est toujours disponible.\n\nCordialement,\n[Votre prénom]` },
-    { title:'Alerte offre concurrente', body:`Bonjour [Prénom],\n\nJe vous contacte car j'ai reçu une offre sérieuse sur le bien que vous avez visité le [Date].\n\nSi votre projet est toujours d'actualité, je vous invite à me faire part de votre position dans les 48 heures.\n\nCordialement,\n[Votre prénom]` },
-    { title:'Relance acheteur silencieux', body:`Bonjour [Prénom],\n\nJe me permets de revenir vers vous — je n'ai pas eu de nouvelles depuis notre visite du [Date].\n\nSi votre projet a évolué ou si vous avez des questions restées sans réponse, je suis disponible pour en discuter.\n\nCordialement,\n[Votre prénom] — [Téléphone]` },
+    { title:'Invitation à une seconde visite', body:`Bonjour [Prénom],\n\nMerci encore pour votre visite et pour l'intérêt que vous portez à mon bien.\n\nSi vous souhaitez effectuer une seconde visite, seul(e) ou accompagné(e), je serai ravi(e) de vous accueillir à nouveau.\n\nPour choisir le créneau qui vous convient le mieux, vous pouvez réserver directement ici :\n\n[__lien_agenda__]\n\nAu plaisir de vous revoir,\n[__prenom_nom__]` },
+    { title:'Envoi dossier acheteur après visite', body:`Bonjour [Prénom],\n\nMerci pour votre visite de mon bien.\n\nAfin de vous aider dans votre réflexion, je vous partage le dossier complet du logement :\n\n[__lien_dossier__]\n\nVous y trouverez l'ensemble des informations utiles concernant le bien : diagnostics, documents administratifs, factures de travaux, garanties, contrats d'entretien (chaudière, équipements…), ainsi que les différents documents permettant de mieux connaître le logement.\n\nPrenez le temps de le parcourir à votre rythme et n'hésitez pas à revenir vers moi si vous avez des questions ou besoin d'un complément d'information.\n\nAu plaisir d'échanger avec vous,\n[__prenom_nom__]\n[__telephone__]` },
+    { title:'Relance après visite sans retour', body:`Bonjour [Prénom],\n\nMerci encore pour votre visite et pour l'intérêt que vous avez porté à mon bien.\n\nJe me permets simplement de vous transmettre ce petit message au cas où certaines questions vous seraient venues après la visite. N'hésitez pas à me contacter si vous souhaitez des précisions sur le logement, les documents du dossier ou tout autre point.\n\nJe reste bien entendu à votre disposition.\n\nAu plaisir d'échanger avec vous,\n[__prenom_nom__]` },
+    { title:'Alerte offre concurrente', body:`Bonjour [Prénom],\n\nJe souhaitais simplement vous informer que j'ai récemment reçu une autre proposition concernant mon bien.\n\nComme vous avez pris le temps de le visiter et que vous aviez manifesté votre intérêt, il me semblait normal de vous en informer avant de prendre une décision.\n\nSi votre projet est toujours d'actualité et que vous souhaitez en discuter, n'hésitez pas à revenir vers moi.\n\nÀ bientôt,\n[__prenom_nom__]` },
+    { title:'Relance acheteur silencieux', body:`Bonjour [Prénom],\n\nMerci encore pour votre visite et l'intérêt que vous avez porté à mon bien.\n\nJe me permets de revenir vers vous afin de savoir où vous en êtes dans votre réflexion.\n\nSi vous avez des questions ou besoin d'informations complémentaires, je reste bien entendu à votre disposition. Et si vous avez pris une autre direction dans votre projet, n'hésitez pas à me le faire savoir également.\n\nUn simple retour, quel qu'il soit, me permettra de mieux m'organiser pour la suite.\n\nAu plaisir de vous lire,\n[__prenom_nom__]\n[__telephone__]` },
   ],
   offres: [
-    { title:'Réponse à une offre trop basse', body:`Bonjour [Prénom],\n\nMerci pour votre offre de [Montant]€.\n\nAprès réflexion, je ne peux pas accepter ce prix compte tenu de [valorisation/travaux/marché]. Je serais prêt(e) à descendre à [Contre-offre]€.\n\nJe reste disponible si vous souhaitez en discuter.\n\nCordialement,\n[Votre prénom]` },
-    { title:'Contre-proposition ferme', body:`Bonjour [Prénom],\n\nSuite à nos échanges, je vous transmets ma contre-proposition à [Montant]€, prix ferme et définitif.\n\nCe prix tient compte de [l'état du bien / des travaux réalisés / du marché local].\n\nJe vous laisse jusqu'au [Date] pour me confirmer votre position.\n\nCordialement,\n[Votre prénom]` },
-    { title:'Maintien du prix — argumentation', body:`Bonjour [Prénom],\n\nJe comprends votre démarche, mais je me dois de maintenir mon prix de [Montant]€.\n\nVoici les éléments qui justifient ce positionnement :\n- [Argument 1 : surface, emplacement, état]\n- [Argument 2 : travaux récents]\n- [Argument 3 : prix du marché local]\n\nJe reste ouvert(e) à la discussion si votre situation évolue.\n\nCordialement,\n[Votre prénom]` },
-    { title:'Acceptation d\'une offre', body:`Bonjour [Prénom],\n\nJ'ai le plaisir d'accepter votre offre de [Montant]€ pour le bien au [Adresse].\n\nLa prochaine étape est la signature du compromis chez le notaire. Mon notaire : [Nom et coordonnées].\n\nMerci de me confirmer votre notaire afin de fixer une date.\n\nCordialement,\n[Votre prénom]` },
-    { title:'Refus d\'une offre', body:`Bonjour [Prénom],\n\nJe vous remercie pour votre offre concernant mon bien au [Adresse].\n\nCependant, après réflexion, je ne souhaite pas donner suite à cette proposition.\n\nJe reste vendeur et serai heureux(se) de retravailler avec vous si votre position évolue.\n\nCordialement,\n[Votre prénom]` },
-    { title:'Demande de documents à l\'acheteur', body:`Bonjour [Prénom],\n\nPour préparer le compromis, pourriez-vous me transmettre :\n\n✓ Pièce d'identité valide\n✓ Justificatif de domicile récent\n✓ Attestation de financement (accord banque ou attestation de fonds)\n\nCes documents sont nécessaires pour que le notaire puisse avancer rapidement.\n\nMerci,\n[Votre prénom]` },
+    { title:'Vérification financement avant offre', body:`Bonjour [Prénom],\n\nMerci pour votre intérêt concernant mon bien.\n\nAvant d'étudier votre offre, pourriez-vous me transmettre un justificatif de votre mode de financement :\n\n- Une attestation de financement de votre banque, ou\n- Une preuve des fonds disponibles (en cas d'achat comptant)\n\nCela me permettra d'aborder votre proposition avec tous les éléments nécessaires et de vous répondre rapidement.\n\nMerci par avance pour votre retour.\n\nAu plaisir d'échanger avec vous,\n[__prenom_nom__]` },
+    { title:'Réponse à une offre trop basse', body:`Bonjour [Prénom],\n\nMerci pour votre offre et le temps que vous avez consacré à la visite.\n\nJ'ai bien étudié votre proposition de [Montant] €, mais elle reste un peu éloignée du prix auquel je souhaite vendre le bien.\n\nSi cela peut permettre d'avancer, je serais prêt(e) à faire un effort et à envisager une vente à [Contre-offre] €.\n\nN'hésitez pas à revenir vers moi si vous souhaitez en discuter.\n\nAu plaisir d'échanger avec vous,\n[__prenom_nom__]` },
+    { title:'Contre-proposition ferme', body:`Bonjour [Prénom],\n\nMerci pour l'intérêt que vous portez au bien et pour nos échanges.\n\nAprès avoir étudié votre proposition, je peux vous proposer un prix de [Montant] €.\n\nC'est le montant qui me paraît le plus juste compte tenu du bien et des conditions actuelles du marché. Je ne pourrai malheureusement pas aller en dessous.\n\nPrenez le temps d'y réfléchir et n'hésitez pas à revenir vers moi d'ici le [Date] pour me faire part de votre décision.\n\nAu plaisir d'échanger avec vous,\n[__prenom_nom__]` },
+    { title:'Maintien du prix — argumentation', body:`Bonjour [Prénom],\n\nMerci pour votre proposition.\n\nAprès réflexion, j'ai choisi de maintenir le prix de vente à [Montant] €.\n\nJe pense qu'il reflète justement la valeur du bien compte tenu de ses prestations, de son emplacement et du marché local.\n\nSi vous restez intéressé(e), n'hésitez pas à revenir vers moi. Je serai heureux(se) d'échanger avec vous sur la suite du projet.\n\nBien cordialement,\n[__prenom_nom__]` },
+    { title:'Acceptation d\'une offre', body:`Bonjour [Prénom],\n\nBonne nouvelle, j'ai le plaisir d'accepter votre offre de [Montant] € pour mon bien situé à [__adresse__].\n\nMerci pour votre confiance. Je suis heureux(se) que nous soyons parvenus à un accord.\n\nNous pouvons désormais préparer la signature du compromis de vente. Mon notaire est :\n[Nom et coordonnées du notaire]\n\nDe votre côté, n'hésitez pas à me communiquer les coordonnées de votre notaire si vous en avez un.\n\nJe reste à votre disposition pour la suite des démarches et me réjouis de mener ce projet à son terme avec vous.\n\nÀ bientôt,\n[__prenom_nom__]` },
+    { title:'Refus d\'une offre', body:`Bonjour [Prénom],\n\nMerci pour votre offre concernant mon bien situé à [__adresse__] ainsi que pour l'intérêt que vous lui portez.\n\nAprès réflexion, je ne vais malheureusement pas pouvoir donner une suite favorable à votre proposition.\n\nJe vous remercie néanmoins pour nos échanges et le temps consacré à votre démarche.\n\nSi votre projet évolue ou si vous souhaitez revenir vers moi avec une nouvelle proposition, n'hésitez pas à me recontacter.\n\nJe vous souhaite une excellente continuation dans votre recherche.\n\nBien cordialement,\n[__prenom_nom__]` },
+    { title:'Demande de documents à l\'acheteur', body:`Bonjour [Prénom],\n\nAfin de préparer le compromis de vente, pourriez-vous me transmettre les informations et documents demandés via le lien ci-dessous :\n\n[__lien_compromis__]\n\nJe les transmettrai ensuite à notre notaire afin qu'il puisse préparer le dossier.\n\nSi vous préférez, je peux également vous communiquer directement les coordonnées de notre notaire afin que vous lui adressiez ces éléments vous-même. Bien entendu, si vous êtes déjà accompagné(e) par votre propre notaire, vous pouvez également lui transmettre ces informations.\n\nMerci par avance pour votre retour.\n\nÀ bientôt,\n[__prenom_nom__]` },
   ],
   notaire: [
-    { title:'Demande de copie de l\'acte notarial', body:`Objet : Demande de copie de mon acte de vente\n\nMadame, Monsieur,\n\nJe suis propriétaire du bien situé :\n[Adresse complète]\n\nacquis le : [Date d'acquisition]\npar acte signé au sein de votre étude.\n\nDans le cadre de la préparation de la revente, je souhaiterais obtenir une copie intégrale de l'acte authentique de vente.\n\nJe vous remercie par avance.\n\nCordialement,\n[Nom et prénom] — [Téléphone] — [E-mail]` },
+    { title:'Demande de copie de l\'acte notarial', body:`Objet : Demande de copie de mon acte de vente\n\nMadame, Monsieur,\n\nJe suis propriétaire du bien situé :\n[Adresse complète]\n\nAcquis le : [Date d'acquisition]\nPar acte signé au sein de votre étude.\n\nJe souhaiterais obtenir une copie intégrale de l'acte authentique de vente.\n\n[Nom et prénom] — [Téléphone] — [E-mail]` },
     { title:'Relance notaire / accélération compromis', body:`Bonjour [Prénom / Maître],\n\nJe me permets de vous contacter afin de faire le point sur l'avancement du compromis pour le bien situé au [Adresse].\n\nNous avons accepté l'offre le [Date] et souhaitons avancer aussi rapidement que possible.\n\nPourriez-vous m'indiquer les prochaines étapes et les documents encore attendus ?\n\nCordialement,\n[Votre prénom] — [Téléphone]` },
-    { title:'Transmission du dossier au notaire', body:`Bonjour Maître,\n\nSuite à l'acceptation de l'offre d'achat pour le bien situé au [Adresse], je vous transmets les éléments nécessaires à la rédaction du compromis :\n\n✓ Titre de propriété\n✓ Diagnostics techniques complets\n✓ Taxe foncière\n✓ [Documents complémentaires]\n\nL'acheteur est [Nom Prénom], joignable au [Téléphone].\n\nJe reste disponible pour tout complément.\n\nCordialement,\n[Votre prénom] — [Téléphone]` },
-  ],
-  financement: [
-    { title:'Vérification financement avant offre', body:`Bonjour [Prénom],\n\nAvant d'étudier votre offre, je souhaite m'assurer de votre situation financière.\n\nPourriez-vous me transmettre :\n✓ Une attestation de financement de votre banque, ou\n✓ Une preuve de fonds disponibles (si achat comptant)\n\nCela me permettra de donner suite à votre proposition dans les meilleurs délais.\n\nCordialement,\n[Votre prénom]` },
+    { title:'Transmission du dossier au notaire', body:`Bonjour Maître,\n\nSuite à notre accord sur la vente du bien situé à [__adresse__], je vous transmets le dossier complet incluant le titre de propriété, les diagnostics, et l'ensemble des documents nécessaires à la rédaction du compromis.\n\nLien sécurisé :\n[__lien_notaire__]\n\nRestant à votre disposition,\n[__prenom_nom__]` },
   ],
   signature: [
-    { title:'Confirmation de date de signature', body:`Bonjour [Prénom],\n\nJe vous confirme notre rendez-vous chez le notaire pour la signature [du compromis / de l'acte définitif] :\n\n📅 Date : [Date]\n🕐 Heure : [Heure]\n📍 Adresse : [Étude notariale]\n\nPensez à apporter une pièce d'identité valide.\n\nÀ bientôt,\n[Votre prénom]` },
+    { title:'Confirmation de date de signature', body:`Bonjour [Prénom],\n\nJe vous confirme notre rendez-vous chez le notaire pour la signature [du compromis / de l'acte définitif] :\n\nDate : [Date]\nHeure : [Heure]\nAdresse : [Étude notariale]\n\nPensez à apporter une pièce d'identité valide.\n\nÀ bientôt,\n[Votre prénom]` },
     { title:'Rappel avant signature — documents à apporter', body:`Bonjour [Prénom],\n\nNotre rendez-vous de signature est demain, [Date] à [Heure].\n\nMerci de prévoir :\n✓ Pièce d'identité en cours de validité\n✓ RIB pour le versement du dépôt de garantie\n✓ [Tout autre document demandé par le notaire]\n\nÀ demain,\n[Votre prénom]` },
-    { title:'Message post-signature — remise des clés', body:`Bonjour [Prénom],\n\nToutes nos félicitations pour l'acquisition de votre nouveau bien ! 🏡\n\nComme convenu, voici ce que je vous remets ce jour :\n✓ [X] jeux de clés\n✓ Codes [digicode / portail / boîte aux lettres]\n✓ Notice chaudière\n✓ [Autres documents utiles]\n\nBonne installation et n'hésitez pas si vous avez des questions.\n\nCordialement,\n[Votre prénom]` },
+    { title:'Message post-signature — remise des clés', body:`Bonjour [Prénom],\n\nToutes nos félicitations pour l'acquisition !\n\nJe vous remets ce jour :\n✓ [X] jeux de clés\n✓ Codes [digicode / portail / boîte aux lettres]\n✓ Notice chaudière\n✓ [Autres documents utiles]\n\nBonne installation !\n\n[Votre prénom]` },
   ],
 };
 
@@ -2586,7 +2582,6 @@ const _MAIL_MAIN_TABS = [
   { key:'visite-avant', label:'Visites', group:true },
   { key:'offres',       label:'Offres' },
   { key:'notaire',      label:'Notaire' },
-  { key:'financement',  label:'Financement' },
   { key:'signature',    label:'Signature' },
 ];
 
@@ -2616,7 +2611,7 @@ function renderMails() {
         <span class="mail-ic">+</span>
       </div>
       <div class="mail-bd" id="mb${i}">
-        <pre class="mail-pre">${m.body}</pre>
+        <pre class="mail-pre">${_injectLibSeller(m.body)}</pre>
         <button class="mail-copy" id="mc${i}">Copier ce mail</button>
       </div>
     </div>`).join('');
@@ -3427,17 +3422,54 @@ setTimeout(function() {
 
 window._libSellerPrenom = '';
 window._libSellerFullName = '';
-fetch('/api/me').then(r=>r.json()).then(d=>{
-  if (d.seller) {
-    window._libSellerPrenom = d.seller.first_name || '';
-    window._libSellerFullName = [d.seller.first_name, d.seller.last_name].filter(Boolean).join(' ') || '';
-  }
-}).catch(()=>{});
+window._libSellerPhone = '';
+window._libSellerAdresse = '';
+window._libSellerLienDossier = '';
+window._libSellerDisponibilites = '';
+window._libSellerLienCompromis = '';
+window._libSellerLienNotaire = '';
+window._libSellerLienAgenda = '';
+
+function _formatLibSlots(slots) {
+  const JOURS = ['Dimanche','Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi'];
+  if (!slots || !slots.length) return '[Vos disponibilités]';
+  return slots.map(s => {
+    const label = s.is_recurring
+      ? JOURS[s.day_of_week]
+      : (s.specific_date ? new Date(s.specific_date + 'T00:00:00').toLocaleDateString('fr-FR', { day: 'numeric', month: 'long' }) : '');
+    return label + ' de ' + s.start_time + ' à ' + s.end_time;
+  }).join('\n');
+}
+
+Promise.all([fetch('/api/me'), fetch('/api/agenda')])
+  .then(([r1, r2]) => Promise.all([r1.json(), r2.json()]))
+  .then(([d, agenda]) => {
+    const s = d.seller || d;
+    const p = d.property || {};
+    const base = window.location.origin;
+    window._libSellerPrenom = s.first_name || '';
+    window._libSellerFullName = [s.first_name, s.last_name].filter(Boolean).join(' ') || '';
+    window._libSellerPhone = s.phone || '';
+    window._libSellerAdresse = [p.address, p.city].filter(Boolean).join(', ') || '';
+    window._libSellerLienDossier = p.acheteur_token ? base + '/dossier/acheteur/' + p.acheteur_token : '';
+    window._libSellerDisponibilites = _formatLibSlots(agenda.slots);
+    window._libSellerLienCompromis = base + '/downloads/compromis-elements.html';
+    window._libSellerLienNotaire = p.notaire_token ? base + '/dossier/notaire/' + p.notaire_token : '';
+    window._libSellerLienAgenda = p.acheteur_token ? base + '/dossier/acheteur/' + p.acheteur_token + '#booking' : '';
+  }).catch(() => {});
 
 function _injectLibSeller(text) {
   return text
     .replace(/\[Votre prénom\]/g, window._libSellerPrenom || '[Votre prénom]')
-    .replace(/\[Nom et prénom\]/g, window._libSellerFullName || '[Nom et prénom]');
+    .replace(/\[Nom et prénom\]/g, window._libSellerFullName || '[Nom et prénom]')
+    .replace(/\[__adresse__\]/g, window._libSellerAdresse || '[adresse]')
+    .replace(/\[__lien_dossier__\]/g, window._libSellerLienDossier || '[Lien dossier / diagnostics]')
+    .replace(/\[__disponibilites__\]/g, window._libSellerDisponibilites || '[Vos disponibilités]')
+    .replace(/\[__prenom_nom__\]/g, window._libSellerFullName || '[Prénom Nom]')
+    .replace(/\[__telephone__\]/g, window._libSellerPhone || '[Téléphone]')
+    .replace(/\[__lien_compromis__\]/g, window._libSellerLienCompromis || '[Lien éléments compromis]')
+    .replace(/\[__lien_notaire__\]/g, window._libSellerLienNotaire || '[Lien dossier notaire]')
+    .replace(/\[__lien_agenda__\]/g, window._libSellerLienAgenda || '[Lien agenda]');
 }
 </script>
 <script src="/js/seller-nav.js"></script>
