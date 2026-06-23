@@ -437,7 +437,7 @@ const MAILS = {
     { title: 'Demande de situation de financement', body: `Bonjour [Prénom],\n\nAvant de bloquer mon agenda pour une visite, pourriez-vous m'indiquer votre situation de financement ?\n\n- Achat comptant ou à crédit ?\n- Si crédit : avez-vous un accord de principe de votre banque ?\n- Quel est votre budget maximum ?\n\nCes informations me permettent de cibler les acheteurs réellement en mesure d'acquérir le bien.\n\nCordialement,\n[Votre prénom]` }
   ],
   'Après visite': [
-    { title: 'Invitation à une seconde visite', body: `Bonjour [Prénom],\n\nSuite à votre première visite, je vous propose un second passage pour vous permettre de confirmer votre intérêt dans de meilleures conditions.\n\nJe suis disponible [créneaux]. Faites-moi savoir si l'un d'eux vous convient.\n\nCordialement,\n[Votre prénom]` },
+    { title: 'Invitation à une seconde visite', body: `Bonjour [Prénom],\n\nMerci encore pour votre visite et pour l'intérêt que vous portez à mon bien.\n\nSi vous souhaitez effectuer une seconde visite, seul(e) ou accompagné(e), je serai ravi(e) de vous accueillir à nouveau.\n\nPour choisir le créneau qui vous convient le mieux, vous pouvez réserver directement ici :\n\n[__lien_agenda__]\n\nAu plaisir de vous revoir,\n[__prenom_nom__]` },
     { title: 'Envoi dossier acheteur après visite', body: `Bonjour [Prénom],\n\nSuite à votre visite, je vous transmets les informations complémentaires sur mon bien :\n→ [Lien dossier acheteur]\n\nVous y trouverez : entretiens, travaux réalisés, diagnostics, documents administratifs.\n\nN'hésitez pas si vous avez des questions. 🙂\n\n[Votre prénom] — [Téléphone]` },
     { title: 'Relance après visite sans retour', body: `Bonjour [Prénom],\n\nJe me permets de vous recontacter suite à votre visite du [Date].\n\nAvez-vous eu le temps de réfléchir ? Je serais ravi(e) de répondre à vos questions ou d'organiser une seconde visite.\n\nMon bien est toujours disponible.\n\nCordialement,\n[Votre prénom]` },
     { title: 'Alerte offre concurrente', body: `Bonjour [Prénom],\n\nJe vous contacte car j'ai reçu une offre sérieuse sur le bien que vous avez visité le [Date].\n\nSi votre projet est toujours d'actualité, je vous invite à me faire part de votre position dans les 48 heures.\n\nCordialement,\n[Votre prénom]` },
@@ -596,7 +596,8 @@ function fillAuto(body, sd) {
     .replace('[__prenom_nom__]', sd.prenomNom)
     .replace('[__telephone__]', sd.telephone)
     .replace('[__lien_compromis__]', sd.lienCompromis)
-    .replace('[__lien_notaire__]', sd.lienNotaire);
+    .replace('[__lien_notaire__]', sd.lienNotaire)
+    .replace('[__lien_agenda__]', sd.lienAgenda);
 }
 
 async function init() {
@@ -615,11 +616,13 @@ async function init() {
     sd.telephone = s.phone || '[Téléphone]';
     sd.lienCompromis = window.location.origin + '/downloads/compromis-elements.html';
     sd.lienNotaire = p.notaire_token ? window.location.origin + '/dossier/notaire/' + p.notaire_token : '[Lien dossier notaire]';
+    sd.lienAgenda = p.acheteur_token ? window.location.origin + '/dossier/acheteur/' + p.acheteur_token + '#booking' : '[Lien agenda]';
   } catch(e) {}
 
   // Patch MAILS avant render
   MAILS['Avant visite'][0].body = fillAuto(MAILS['Avant visite'][0].body, sd);
   MAILS['Avant visite'][1].body = fillAuto(MAILS['Avant visite'][1].body, sd);
+  MAILS['Après visite'][0].body = fillAuto(MAILS['Après visite'][0].body, sd);
   MAILS['Offres'][0].body = fillAuto(MAILS['Offres'][0].body, sd);
   MAILS['Offres'][1].body = fillAuto(MAILS['Offres'][1].body, sd);
   MAILS['Offres'][2].body = fillAuto(MAILS['Offres'][2].body, sd);
