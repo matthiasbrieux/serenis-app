@@ -1811,17 +1811,19 @@ function sendReminder(id) {
   const time = m&&m!=='00' ? `${h}h${m}` : `${h}h`;
   const adresseText = _propertyAddress ? `\nAdresse : ${_propertyAddress}` : '';
   const sellerNom = [_data?.seller?.first_name, _data?.seller?.last_name].filter(Boolean).join(' ');
+  const sellerPhone = _data?.seller?.phone || '';
   const lienText = _mcAcheteurUrl ? `\n\nVotre dossier complet : ${_mcAcheteurUrl}` : '';
   const _n2=new Date(); const _todayStr=`${_n2.getFullYear()}-${String(_n2.getMonth()+1).padStart(2,'0')}-${String(_n2.getDate()).padStart(2,'0')}`;
   const _tomorrow=new Date(_n2); _tomorrow.setDate(_tomorrow.getDate()+1);
   const _tomorrowStr=`${_tomorrow.getFullYear()}-${String(_tomorrow.getMonth()+1).padStart(2,'0')}-${String(_tomorrow.getDate()).padStart(2,'0')}`;
   const isPast = v.visit_date < _todayStr;
   const isReallyTomorrow = v.visit_date === _tomorrowStr;
+  const adresse = _propertyAddress || '[adresse]';
   const smsText = isPast
     ? `Bonjour ${v.buyer_name||prenom}, suite à notre visite du ${dateLabel}, je me permets de vous demander où vous en êtes dans votre réflexion.\n\nN'hésitez pas à me contacter si vous avez des questions ou souhaitez organiser une deuxième visite.${lienText}\n\n${sellerNom || 'Votre vendeur'}`
     : isReallyTomorrow
-      ? `Bonjour ${v.buyer_name||prenom}, je vous rappelle notre visite prévue demain ${dateLabel} à ${time}.${adresseText}${lienText}\n\nN'hésitez pas à me prévenir si vous avez un empêchement.\n${sellerNom || 'Votre vendeur'}`
-      : `Bonjour ${v.buyer_name||prenom}, je vous rappelle notre visite prévue le ${dateLabel} à ${time}.${adresseText}${lienText}\n\nN'hésitez pas à me prévenir si vous avez un empêchement.\n${sellerNom || 'Votre vendeur'}`;
+      ? `Bonjour ${prenom},\n\nJe vous confirme notre rendez-vous pour la visite du bien situé à ${adresse}, demain ${dateLabel} à ${time}.\n\nÀ votre arrivée, n'hésitez pas à m'envoyer un SMS ou à m'appeler directement.\n\nSi vous avez la moindre question d'ici là ou si un imprévu survient, n'hésitez pas à me contacter.\n\nAu plaisir de vous rencontrer,\n${sellerNom || 'Votre vendeur'}${sellerPhone ? '\n' + sellerPhone : ''}`
+      : `Bonjour ${prenom},\n\nJe vous confirme notre rendez-vous pour la visite du bien situé à ${adresse}, le ${dateLabel} à ${time}.\n\nÀ votre arrivée, n'hésitez pas à m'envoyer un SMS ou à m'appeler directement.\n\nSi vous avez la moindre question d'ici là ou si un imprévu survient, n'hésitez pas à me contacter.\n\nAu plaisir de vous rencontrer,\n${sellerNom || 'Votre vendeur'}${sellerPhone ? '\n' + sellerPhone : ''}`;
   const titleEl = document.getElementById('rappelSmsTitle');
   if (titleEl) titleEl.textContent = isPast ? 'Relance après visite' : 'Rappel de visite';
 
