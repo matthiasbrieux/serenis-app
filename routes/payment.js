@@ -78,8 +78,8 @@ router.post('/create-checkout', express.json(), checkoutLimit, async (req, res) 
       }],
       mode: 'payment',
       customer_email: email,
-      success_url: `${process.env.BASE_URL}/paiement-succes?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${process.env.BASE_URL}/#offres`,
+      success_url: `${process.env.BASE_URL || 'https://serenis-app.onrender.com'}/paiement-succes?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${process.env.BASE_URL || 'https://serenis-app.onrender.com'}/#offres`,
       metadata: { pack, email, seller_id: String(seller.id), plan: plan || 'unique', installment: '1', total_installments: is4x ? '4' : '1', needs_password_reset: needsPasswordReset ? 'true' : 'false' },
       locale: 'fr',
     };
