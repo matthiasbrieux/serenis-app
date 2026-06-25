@@ -1904,7 +1904,15 @@ const MAILS_BY_CAT = {
 };
 
 const CHECKLISTS = {
-  estimation:['Surface habitable exacte connue','Liste des travaux réalisés ces 10 ans préparée','DVF.fr consulté pour les ventes récentes','MeilleursAgents.com consulté','Avis de deux agences (facultatif)'],
+  estimation:[
+    { section: 'DONNÉES DU BIEN' },
+    { label: 'Surface habitable exacte connue', sub: 'LOI CARREZ SI APPLICABLE' },
+    { label: 'Liste des travaux réalisés ces 10 ans préparée', sub: 'POUR AJUSTER LE PRIX AU M²' },
+    { section: 'ÉTUDE DE MARCHÉ' },
+    { label: 'DVF.fr consulté pour les ventes récentes' },
+    { label: 'MeilleursAgents.com consulté' },
+    { label: 'Avis de deux agences (facultatif)', sub: 'POUR CONFIRMER, SI BESOIN D\'ÊTRE RASSURÉ' },
+  ],
   docs:['Titre de propriété','Diagnostics techniques (DPE, amiante, plomb...)','Taxe foncière dernière année','Charges de copropriété (si applicable)','Plans du bien','Factures travaux récents','Garanties décennales (si travaux < 10 ans)'],
   photos:['Ranger et désencombrer chaque pièce','Faire les vitres','Nettoyer les joints de salle de bain','Sortir la poubelle','Enlever les tapis si possible','Allumer toutes les lumières','Ouvrir rideaux et volets','Enlever les photos personnelles','Plan de travail cuisine dégagé','Abattant WC fermé','Salon de jardin sorti (si extérieur)','Voiture sortie (pour la façade)'],
   visite:['Maison rangée et dépersonnalisée','Toutes les lumières allumées','Vitres propres','Rideaux et volets ouverts','Plan de travail cuisine dégagé','Abattant WC fermé','Voiture sortie si devant la maison','Température agréable réglée','Dossier acheteur envoyé avant la visite','Documents de diagnostics disponibles'],
@@ -2640,11 +2648,32 @@ const CK_ICONS = { estimation:'📊', docs:'📁', photos:'📸', visite:'🏡',
 
 function renderChecklist(type, title, containerId) {
   const saved = JSON.parse(localStorage.getItem(`ck_${type}`) || '{}');
-  const items = CHECKLISTS[type];
+  const rawItems = CHECKLISTS[type];
+  const items = rawItems.filter(it => typeof it === 'string' || !it.section);
   const total = items.length;
   const doneCnt = Object.values(saved).filter(Boolean).length;
   const pct = Math.round((doneCnt / total) * 100);
   const el = document.getElementById(containerId);
+  let itemIdx = 0;
+  const listRows = rawItems.map(it => {
+    if (typeof it === 'object' && it.section) {
+      return `<div style="padding:10px 20px 5px;font-size:0.62rem;font-weight:700;color:#aaa;letter-spacing:0.12em;text-transform:uppercase;background:#FAFAF8;border-bottom:1px solid #F0EDE8;">${it.section}</div>`;
+    }
+    const label = typeof it === 'string' ? it : it.label;
+    const sub = typeof it === 'object' && it.sub ? it.sub : null;
+    const i = itemIdx++;
+    return `
+      <div class="ck-row${saved[i] ? ' ck-done' : ''}" data-i="${i}"${sub ? ' style="align-items:flex-start;"' : ''}>
+        <div class="ck-box"${sub ? ' style="margin-top:2px;"' : ''}>
+          <svg class="ck-chk" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+        </div>
+        <div style="flex:1;min-width:0;">
+          <span class="ck-label">${label}</span>
+          ${sub ? `<div style="font-size:0.62rem;font-weight:700;color:#C4785A;text-transform:uppercase;letter-spacing:0.08em;margin-top:3px;">${sub}</div>` : ''}
+        </div>
+        <span class="ck-num">${i + 1}</span>
+      </div>`;
+  }).join('');
   el.innerHTML = `
     <div class="ck-card">
       <div class="ck-hdr">
@@ -2662,14 +2691,7 @@ function renderChecklist(type, title, containerId) {
         </div>
       </div>
       <div class="ck-list">
-        ${items.map((item, i) => `
-          <div class="ck-row${saved[i] ? ' ck-done' : ''}" data-i="${i}">
-            <div class="ck-box">
-              <svg class="ck-chk" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-            </div>
-            <span class="ck-label">${item}</span>
-            <span class="ck-num">${i + 1}</span>
-          </div>`).join('')}
+        ${listRows}
         <div class="ck-done-banner${doneCnt === total && total > 0 ? ' show' : ''}">
           <div class="ck-done-banner-icon">🎯</div>
           <div><div class="ck-done-banner-t">Check-list complète !</div><div class="ck-done-banner-s">Toutes les étapes sont validées — parfait.</div></div>
