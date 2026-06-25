@@ -807,6 +807,52 @@ async function previewEmail(templateName) {
 }
 
 // ─────────────────────────────────────────────────────────────
+// 17. AVANT PREMIER RENDEZ-VOUS
+// ─────────────────────────────────────────────────────────────
+
+async function sendFirstMeetingEmail({ email, firstName }) {
+  const html = layout(`
+    <div style="background:#0F1E13;border-radius:10px;padding:24px 28px;margin-bottom:28px;">
+      <div style="font-size:10px;font-weight:700;color:#6BBF82;letter-spacing:0.15em;text-transform:uppercase;margin-bottom:8px;">Vendu Par Moi</div>
+      <div style="font-size:21px;font-weight:700;color:#F5F0E8;line-height:1.35;margin-bottom:8px;">Préparons votre dossier,<br><span style="font-style:italic;color:#6BBF82;">ensemble.</span></div>
+      <div style="font-size:13px;color:rgba(212,228,216,0.60);">Quelques éléments utiles avant notre premier rendez-vous</div>
+    </div>
+
+    ${p(`Bonjour${firstName ? ` ${firstName}` : ''},`)}
+    ${p('Nous sommes ravis de vous accompagner dans la vente de votre bien, de particulier à particulier. Notre objectif : vous donner toutes les clés pour vendre vous-même, sereinement, en limitant les frais habituellement liés à une vente immobilière. <strong>Vous restez maître de votre vente, nous sommes simplement à vos côtés.</strong>')}
+    ${p('Pour que notre premier rendez-vous soit le plus efficace possible, voici quelques éléments qu\'il serait utile d\'avoir sous la main. <strong>Rien d\'urgent ni de figé</strong> : ce que nous n\'aurons pas, nous le peaufinerons ensemble.')}
+
+    ${h2('À réunir si possible')}
+    <ul style="font-size:14px;color:#4a4540;line-height:2;padding-left:20px;margin:0 0 20px;">
+      <li>Dernier avis de taxe foncière</li>
+      <li>Liste des travaux réalisés <em style="color:#9a9087;">(même approximative, cela nous aide à valoriser le bien)</em></li>
+      <li>Déclarations de travaux ou permis de construire <em style="color:#9a9087;">(si des travaux ont nécessité une autorisation)</em></li>
+      <li>Diagnostics techniques complets <em style="color:#9a9087;">(DPE, amiante, plomb… pour une estimation précise)</em></li>
+      <li>Charges de copropriété <em style="color:#9a9087;">(si applicable)</em></li>
+      <li>Plans du bien <em style="color:#9a9087;">(si vous en disposez)</em></li>
+      <li>Garanties et factures des travaux récents <em style="color:#9a9087;">(si des travaux ont été réalisés dans les 10 dernières années)</em></li>
+      <li>Un intérieur bien rangé <em style="color:#9a9087;">(pour visualiser ensemble le potentiel de chaque pièce)</em></li>
+    </ul>
+
+    ${divider()}
+    ${h2('Pour vos diagnostics')}
+    ${p('Nous travaillons habituellement avec un diagnostiqueur de confiance :')}
+    <div style="background:#F4F1EC;border-radius:10px;padding:16px 20px;margin:0 0 12px;">
+      <div style="font-size:15px;font-weight:700;color:#1a1a1a;margin-bottom:4px;">PL Diagnostic — M. Leroy</div>
+      <div style="font-size:14px;color:#3D5A47;font-weight:600;">06 07 99 25 10</div>
+    </div>
+    ${muted('<em>Vous n\'avez bien sûr aucune obligation de passer par lui : c\'est une recommandation, pas une condition.</em>')}
+
+    ${divider()}
+    <div style="background:#0F1E13;border-radius:10px;padding:16px 24px;text-align:center;">
+      <div style="font-size:13px;font-weight:700;color:#F5F0E8;margin-bottom:4px;">Vendu Par Moi</div>
+      <div style="font-size:12px;color:rgba(212,228,216,0.55);font-style:italic;">À très bientôt — nous préparons la suite ensemble.</div>
+    </div>
+  `, { preheader: 'Quelques éléments à réunir avant notre premier rendez-vous — rien d\'urgent.' });
+  return send(email, 'Avant notre premier rendez-vous — quelques éléments à préparer', html);
+}
+
+// ─────────────────────────────────────────────────────────────
 // Contact form — notification admin
 // ─────────────────────────────────────────────────────────────
 async function sendContactNotification({ name, phone, email, offer, city, message }) {
@@ -876,6 +922,8 @@ module.exports = {
   sendPriceDropNudge,
   // Rapport vendeur
   sendWeeklySellerReport,
+  // Avant premier RDV
+  sendFirstMeetingEmail,
   // Admin
   sendAdminDirectEmail,
   sendWeeklyAdminReport,

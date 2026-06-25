@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Mot premier RDV — Vendu Par Moi</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600&family=DM+Sans:wght@300;400;500;600&display=swap');
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: #F5F0E8;
+    min-height: 100vh;
+    padding: 40px 20px;
+    color: #2a2520;
+  }
+
+  .page {
+    max-width: 680px;
+    margin: 0 auto;
+    background: #fff;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 4px 32px rgba(0,0,0,0.10);
+  }
+
+  /* Header dark */
+  .header {
+    background: linear-gradient(135deg, #0C1910 0%, #1D3A28 100%);
+    padding: 36px 44px 32px;
+    position: relative;
+  }
+  .header-brand {
+    font-size: 10px;
+    font-weight: 700;
+    color: #6BBF82;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    margin-bottom: 14px;
+  }
+  .header-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 34px;
+    font-weight: 600;
+    color: #F5F0E8;
+    line-height: 1.25;
+    margin-bottom: 10px;
+  }
+  .header-title em {
+    color: #6BBF82;
+    font-style: italic;
+  }
+  .header-sub {
+    font-size: 13px;
+    color: rgba(212,228,216,0.60);
+    font-weight: 400;
+  }
+
+  /* Body */
+  .body {
+    padding: 40px 44px;
+  }
+
+  .intro-p {
+    font-size: 14.5px;
+    color: #3a3530;
+    line-height: 1.75;
+    margin-bottom: 16px;
+  }
+  .intro-p strong {
+    font-weight: 600;
+    color: #1a1a1a;
+  }
+
+  /* Section */
+  .section-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 19px;
+    font-weight: 700;
+    color: #1D3A28;
+    margin: 32px 0 14px;
+    padding-bottom: 8px;
+    border-bottom: 1.5px solid #e8e2d8;
+  }
+
+  /* List */
+  .doc-list {
+    list-style: none;
+    margin: 0 0 4px;
+  }
+  .doc-list li {
+    font-size: 14px;
+    color: #3a3530;
+    line-height: 1.6;
+    padding: 9px 0 9px 28px;
+    border-bottom: 1px solid #f0ebe4;
+    position: relative;
+  }
+  .doc-list li::before {
+    content: '•';
+    position: absolute;
+    left: 8px;
+    color: #6BBF82;
+    font-size: 14px;
+    font-weight: 700;
+    top: 9px;
+  }
+  .doc-list li:last-child { border-bottom: none; }
+  .doc-list li em {
+    color: #9a9087;
+    font-style: italic;
+    font-size: 13px;
+  }
+
+  /* Diag card */
+  .diag-card {
+    background: #F4F1EC;
+    border-radius: 10px;
+    padding: 18px 22px;
+    margin: 16px 0 12px;
+  }
+  .diag-name {
+    font-size: 15px;
+    font-weight: 700;
+    color: #1a1a1a;
+    margin-bottom: 4px;
+  }
+  .diag-phone {
+    font-size: 15px;
+    font-weight: 600;
+    color: #3D5A47;
+  }
+  .diag-note {
+    font-size: 13px;
+    color: #9a9087;
+    font-style: italic;
+    margin-top: 12px;
+    line-height: 1.6;
+  }
+
+  /* Footer dark */
+  .footer {
+    background: #0F1E13;
+    padding: 20px 44px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .footer-brand {
+    font-size: 13px;
+    font-weight: 700;
+    color: #F5F0E8;
+  }
+  .footer-tagline {
+    font-size: 12px;
+    color: rgba(212,228,216,0.55);
+    font-style: italic;
+  }
+
+  /* Print button — not printed */
+  .print-bar {
+    text-align: center;
+    padding: 24px;
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+  }
+  .print-btn {
+    background: #1D3A28;
+    color: #fff;
+    border: none;
+    padding: 12px 28px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+  }
+  .print-btn:hover { background: #3D5A47; }
+
+  @media print {
+    body { background: #fff; padding: 0; }
+    .page { box-shadow: none; border-radius: 0; max-width: 100%; }
+    .print-bar { display: none; }
+    .header { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .footer { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .diag-card { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  }
+</style>
+</head>
+<body>
+
+<div class="print-bar">
+  <button class="print-btn" onclick="window.print()">🖨️ Imprimer / Enregistrer en PDF</button>
+  <button class="print-btn" style="background:#555;" onclick="window.history.back()">← Retour</button>
+</div>
+
+<div class="page">
+
+  <div class="header">
+    <div class="header-brand">Vendu Par Moi</div>
+    <div class="header-title">Préparons votre dossier,<br><em>ensemble.</em></div>
+    <div class="header-sub">Quelques éléments utiles avant notre premier rendez-vous</div>
+  </div>
+
+  <div class="body">
+
+    <p class="intro-p">Bonjour,</p>
+    <p class="intro-p">Nous sommes ravis de vous accompagner dans la vente de votre bien, de particulier à particulier. Notre objectif : vous donner toutes les clés pour vendre vous-même, sereinement, en limitant les frais habituellement liés à une vente immobilière. <strong>Vous restez maître de votre vente, nous sommes simplement à vos côtés.</strong></p>
+    <p class="intro-p">Pour que notre premier rendez-vous soit le plus efficace possible, voici quelques éléments qu'il serait utile d'avoir sous la main. <strong>Rien d'urgent ni de figé</strong> : ce que nous n'aurons pas, nous le peaufinerons ensemble.</p>
+
+    <div class="section-title">À réunir si possible</div>
+    <ul class="doc-list">
+      <li>Dernier avis de taxe foncière</li>
+      <li>Liste des travaux réalisés <em>(même approximative, cela nous aide à valoriser le bien)</em></li>
+      <li>Déclarations de travaux ou permis de construire <em>(si des travaux ont nécessité une autorisation)</em></li>
+      <li>Diagnostics techniques complets <em>(DPE, amiante, plomb… pour une estimation précise)</em></li>
+      <li>Charges de copropriété <em>(si applicable)</em></li>
+      <li>Plans du bien <em>(si vous en disposez)</em></li>
+      <li>Garanties et factures des travaux récents <em>(si des travaux ont été réalisés dans les 10 dernières années)</em></li>
+      <li>Un intérieur bien rangé <em>(pour visualiser ensemble le potentiel de chaque pièce)</em></li>
+    </ul>
+
+    <div class="section-title">Pour vos diagnostics</div>
+    <p class="intro-p">Nous travaillons habituellement avec un diagnostiqueur de confiance :</p>
+    <div class="diag-card">
+      <div class="diag-name">PL Diagnostic — M. Leroy</div>
+      <div class="diag-phone">06 07 99 25 10</div>
+    </div>
+    <p class="diag-note">Vous n'avez bien sûr aucune obligation de passer par lui : c'est une recommandation, pas une condition.</p>
+
+  </div>
+
+  <div class="footer">
+    <div class="footer-brand">Vendu Par Moi</div>
+    <div class="footer-tagline">À très bientôt — nous préparons la suite ensemble.</div>
+  </div>
+
+</div>
+
+</body>
+</html>

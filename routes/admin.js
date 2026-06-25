@@ -37,6 +37,10 @@ router.get('/parcours', requireAdmin, (req, res) => {
   res.sendFile('parcours.html', { root: './views/admin' });
 });
 
+router.get('/documents/mot-premier-rdv', requireAdmin, (req, res) => {
+  res.sendFile('mot-premier-rdv.html', { root: './views/admin' });
+});
+
 router.get('/guide', requireAdmin, (req, res) => {
   const mdPath = path.join(__dirname, '../PARCOURS.md');
   let content = '';

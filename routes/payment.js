@@ -6,7 +6,7 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { v4: uuidv4 } = require('uuid');
 const db = require('../database');
-const { sendWelcomeImproved, sendInvoiceEmail } = require('../services/email');
+const { sendWelcomeImproved, sendInvoiceEmail, sendFirstMeetingEmail } = require('../services/email');
 const crypto = require('crypto');
 
 const checkoutLimit = rateLimit({
@@ -256,6 +256,11 @@ async function activateSeller(session) {
       await sendWelcomeImproved({ to: seller.email, firstName: seller.first_name, pack: pack || 'serenite' });
     }
   } catch(e) { console.error('Welcome email error:', e.message); }
+
+  // Email avant premier rendez-vous
+  try {
+    await sendFirstMeetingEmail({ email: seller.email, firstName: seller.first_name });
+  } catch(e) { console.error('First meeting email error:', e.message); }
 
   // Facture automatique
   try {
