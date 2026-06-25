@@ -25,10 +25,6 @@ router.get('/marketing', requireAdmin, (req, res) => {
   res.sendFile('marketing.html', { root: './views/admin' });
 });
 
-router.get('/documents', requireAdmin, (req, res) => {
-  res.sendFile('documents.html', { root: './views/admin' });
-});
-
 router.get('/finance', requireAdmin, (req, res) => {
   res.sendFile('finance.html', { root: './views/admin' });
 });

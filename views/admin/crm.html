@@ -85,7 +85,7 @@
 
     /* Table */
     .tbl-outer{flex:1;overflow:auto}
-    table{width:100%;min-width:1700px;border-collapse:collapse;font-size:0.79rem}
+    table{width:100%;min-width:2500px;border-collapse:collapse;font-size:0.79rem}
     thead th{position:sticky;top:0;z-index:10;background:#F8F7F5;text-align:left;padding:8px 11px;font-size:0.61rem;text-transform:uppercase;letter-spacing:.07em;color:var(--text3);font-weight:600;border-bottom:1px solid var(--border);white-space:nowrap}
     thead th.auto-h{color:var(--auto-clr)}
     thead th:first-child{position:sticky;left:0;z-index:20;background:#F8F7F5;min-width:210px;box-shadow:2px 0 6px rgba(0,0,0,.05)}
@@ -221,6 +221,19 @@
     .prog-fill{height:100%;border-radius:3px;transition:width .4s}
     .prog-pct{font-size:0.66rem;font-weight:700;line-height:1}
 
+    .btn-sm{padding:4px 10px;border-radius:6px;border:none;font-size:0.72rem;font-weight:600;cursor:pointer;transition:opacity .15s;font-family:'DM Sans',sans-serif;white-space:nowrap}
+    .btn-action{background:#1A1A16;color:#F5F0E8}.btn-action:hover{opacity:.8}
+    .btn-avis{background:#C4603A;color:#fff}.btn-avis:hover{opacity:.85}
+    .btn-sent{background:#f0ebe3;color:#888;cursor:default}
+    .ct-overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:1200;display:none;align-items:center;justify-content:center}
+    .ct-overlay.open{display:flex}
+    .ct-modal{background:#fff;border-radius:16px;padding:28px;max-width:420px;width:95%;box-shadow:0 20px 60px rgba(0,0,0,.2)}
+    .ct-modal h3{font-family:'Cormorant Garamond',serif;font-size:1.2rem;margin-bottom:12px}
+    .ct-modal p{color:#555;font-size:0.88rem;line-height:1.6;margin-bottom:18px}
+    .ct-modal-act{display:flex;gap:8px;justify-content:flex-end}
+    .ct-modal-act button{padding:8px 18px;border-radius:8px;border:none;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif}
+    .ct-cancel{background:#f3f4f6;color:#555}.ct-confirm{background:#C4603A;color:#fff}
+
     /* Empty */
     .empty-center{text-align:center;padding:72px 20px}
 
@@ -326,7 +339,6 @@
       <a href="/admin/emails">📧 Emails</a>
       <a href="/admin#clients">👤 Clients</a>
       <a href="/admin#contacts">📨 Contacts</a>
-      <a href="/admin/documents">📝 Documents légaux</a>
       <a href="/admin/finance">💰 Finance</a>
     </nav>
     <div class="nav-out"><a href="/admin/marketing">📣 Marketing & Docs IA</a>
@@ -367,6 +379,11 @@
       <div class="chip"><div class="c-lbl" id="cContratsLbl">📝 Contrats signés</div><div class="c-val" id="cContrats">—</div></div>
       <div class="chip green"><div class="c-lbl">📢 En ligne</div><div class="c-val" id="cOnline">—</div></div>
       <div class="chip purple"><div class="c-lbl">📅 Visites à venir</div><div class="c-val" id="cVisits">—</div></div>
+      <div class="chip green"><div class="c-lbl">✓ Actifs (contrats)</div><div class="c-val" id="cCtActifs">—</div></div>
+      <div class="chip amber"><div class="c-lbl">⏰ Expire 14j</div><div class="c-val" id="cCtExpire14">—</div></div>
+      <div class="chip red"><div class="c-lbl">✗ Expirés</div><div class="c-val" id="cCtExpired">—</div></div>
+      <div class="chip purple"><div class="c-lbl">🏡 Ventes</div><div class="c-val" id="cCtVentes">—</div></div>
+      <div class="chip blue"><div class="c-lbl">⌀ Jours vente</div><div class="c-val" id="cCtMoy">—</div></div>
     </div>
 
     <!-- Filters -->
@@ -425,6 +442,11 @@
       <button class="crm-filter" data-filter="missing-docs">Sans diagnostics</button>
       <button class="crm-filter" data-filter="not-published">Non publiés</button>
       <button class="crm-filter alert-filter" data-filter="en-alerte">⚠ En alerte (+30j sans activité)</button>
+      <button class="crm-filter" data-filter="contrat-actif">✓ Contrat actif</button>
+      <button class="crm-filter" data-filter="contrat-expire14">⏰ Expire 14j</button>
+      <button class="crm-filter" data-filter="contrat-expire">✗ Expiré</button>
+      <button class="crm-filter" data-filter="vendu">🏡 Vendu</button>
+      <button class="crm-filter" data-filter="avis-pending">⭐ Avis à demander</button>
     </div>
 
     <!-- Table -->
@@ -447,6 +469,12 @@
             <th class="auto-h sortable" data-sort="visits" title="Trier par visites">⚡ Visites<i class="si"></i></th>
             <th class="auto-h" title="Auto — prochaine visite planifiée">⚡ Prochaine visite</th>
             <th class="auto-h sortable" data-sort="published" title="Trier par publication">⚡ Annonce<i class="si"></i></th>
+            <th>Signature contrat</th>
+            <th>Échéance</th>
+            <th>Jours restants</th>
+            <th>Statut contrat</th>
+            <th>J. pour vendre</th>
+            <th>Actions contrat</th>
             <th>Alertes</th>
             <th></th>
           </tr>
@@ -534,6 +562,7 @@ function toast(msg, type='ok') {
 }
 function scoreClr(s) { return s>=75?'#16a34a':s>=40?'#d97706':'#dc2626'; }
 function statusCls(s) { return s>=75?'sg':s>=40?'sa':'sr'; }
+function escHtml(s) { return (s || '').replace(/'/g, "\\'"); }
 
 /* ══════════════════════════════════════════════
    SCORE (uses server-side computed fields)
@@ -578,10 +607,103 @@ let activeCrmFilter = 'all';
 let lastRefresh = Date.now();
 let refreshTimer = null;
 
+/* ══════════════════════════════════════════════
+   HELPERS CONTRAT
+══════════════════════════════════════════════ */
+function buildCtBadge(days, vendu) {
+  if (vendu) return '<span class="badge" style="background:#ede9fe;color:#5b21b6">🏡 Vendu</span>';
+  if (days == null) return '<span style="color:#D0CEC9;font-size:0.7rem">—</span>';
+  if (days > 60) return '<span class="badge" style="background:#dcfce7;color:#065f46">✓ Actif</span>';
+  if (days > 14) return '<span class="badge" style="background:#fef3c7;color:#92400e">⚠ Bientôt</span>';
+  if (days > 0) return `<span class="badge" style="background:#fee2e2;color:#991b1b">🔔 J-${days}</span>`;
+  return `<span class="badge" style="background:#fee2e2;color:#991b1b">✗ Expiré</span>`;
+}
+function buildCtBar(days) {
+  if (days == null) return '<span style="color:#D0CEC9;font-size:0.7rem">—</span>';
+  const pct = Math.max(0, Math.min(100, (days / 365) * 100));
+  const color = days > 60 ? '#10b981' : days > 14 ? '#f59e0b' : '#ef4444';
+  const label = days > 0 ? `${days}j` : `${Math.abs(days)}j ✗`;
+  return `<div style="min-width:90px"><div style="font-size:0.7rem;font-weight:700;color:${color}">${label}</div><div style="height:4px;background:#EEECEA;border-radius:2px;overflow:hidden;margin-top:2px"><div style="width:${pct}%;height:100%;background:${color};border-radius:2px"></div></div></div>`;
+}
+function buildCtActions(c) {
+  const relCls = c.vente_realisee ? 'btn-sm btn-sent' : 'btn-sm btn-action';
+  const relDis = c.vente_realisee ? 'disabled' : '';
+  const relLbl = c.relance_extension_at ? '✓ Relancé' : '📧 Extension';
+  const avisCls = c.avis_demande_at ? 'btn-sm btn-sent' : 'btn-sm btn-avis';
+  const avisDis = c.avis_demande_at ? 'disabled' : '';
+  const avisLbl = c.avis_demande_at ? '✓ Avis envoyé' : '⭐ Avis';
+  return `<div style="display:flex;gap:4px;flex-wrap:wrap;align-items:center">
+    <button class="${relCls}" ${relDis} onclick="event.stopPropagation();confirmCtRelance(${c.id},'${escHtml(c.email)}')">${relLbl}</button>
+    ${c.vente_realisee ? `<button class="${avisCls}" ${avisDis} onclick="event.stopPropagation();confirmCtAvis(${c.id},'${escHtml(c.email)}')">${avisLbl}</button>` : ''}
+  </div>`;
+}
+
+let ctPendingAction = null;
+function confirmCtRelance(id, email) {
+  const c = sellers.find(x => x.id === id);
+  const name = [c?.first_name, c?.last_name].filter(Boolean).join(' ') || email;
+  const days = c?.jours_restants;
+  document.getElementById('ctModalTitle').textContent = 'Relance extension de contrat';
+  document.getElementById('ctModalBody').textContent = `Envoyer un email de relance à ${name} (${email}) pour prolonger son contrat (${days != null ? days + ' jours restants' : 'date inconnue'}) ?`;
+  ctPendingAction = async () => {
+    const r = await fetch(`/admin/api/contrats/${id}/relance-extension`, { method: 'POST' });
+    const d = await r.json();
+    if (d.success) { const s = sellers.find(x => x.id === id); if (s) s.relance_extension_at = new Date().toISOString(); renderTable(); toast('Email de relance envoyé ✓','ok'); }
+    else toast('Erreur envoi email','err');
+  };
+  document.getElementById('ctOverlay').classList.add('open');
+}
+function confirmCtAvis(id, email) {
+  const c = sellers.find(x => x.id === id);
+  const name = [c?.first_name, c?.last_name].filter(Boolean).join(' ') || email;
+  document.getElementById('ctModalTitle').textContent = "Demande d'avis client";
+  document.getElementById('ctModalBody').textContent = `Envoyer un email de demande d'avis à ${name} (${email})${c?.jours_pour_vendre ? ` — vendu en ${c.jours_pour_vendre} jours` : ''} ?`;
+  ctPendingAction = async () => {
+    const r = await fetch(`/admin/api/contrats/${id}/demande-avis`, { method: 'POST' });
+    const d = await r.json();
+    if (d.success) { const s = sellers.find(x => x.id === id); if (s) s.avis_demande_at = new Date().toISOString(); renderTable(); toast("Email d'avis envoyé ✓",'ok'); }
+    else toast('Erreur envoi email','err');
+  };
+  document.getElementById('ctOverlay').classList.add('open');
+}
+function closeCtModal() { document.getElementById('ctOverlay').classList.remove('open'); }
+
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('ctModalConfirm').addEventListener('click', async () => {
+    closeCtModal();
+    if (ctPendingAction) { await ctPendingAction(); ctPendingAction = null; }
+  });
+  document.getElementById('ctOverlay').addEventListener('click', e => { if (e.target === e.currentTarget) closeCtModal(); });
+});
+
 async function loadAll(quiet = false) {
   try {
-    const r = await fetch('/admin/api/crm').then(r => r.json());
-    sellers = r.crm || [];
+    const [crmRes, contratsRes] = await Promise.all([
+      fetch('/admin/api/crm').then(r => r.json()),
+      fetch('/admin/api/contrats').then(r => r.json()),
+    ]);
+    sellers = crmRes.crm || [];
+    const contratsMap = {};
+    (contratsRes.contrats || []).forEach(ct => { contratsMap[ct.id] = ct; });
+    sellers.forEach(s => {
+      const ct = contratsMap[s.id];
+      if (ct) {
+        s.jours_restants = ct.jours_restants;
+        s.contrat_echeance = ct.contrat_echeance;
+        s.jours_pour_vendre = ct.jours_pour_vendre;
+        s.relance_extension_at = ct.relance_extension_at;
+        s.avis_demande_at = ct.avis_demande_at;
+        s.avis_recu = ct.avis_recu;
+      } else if (s.contrat_signe_at) {
+        const echeance = new Date(s.contrat_signe_at);
+        echeance.setFullYear(echeance.getFullYear() + 1);
+        s.contrat_echeance = echeance.toISOString().split('T')[0];
+        s.jours_restants = Math.round((echeance - new Date()) / (1000 * 3600 * 24));
+        if (s.vente_realisee && s.vente_date && s.paid_at) {
+          s.jours_pour_vendre = Math.round((new Date(s.vente_date) - new Date(s.paid_at)) / (1000*3600*24));
+        }
+      }
+    });
     lastRefresh = Date.now();
     applyFilters(); // calls updateStats + render
     updateRefreshInfo();
@@ -648,6 +770,20 @@ function updateStats() {
   const chipLbl = document.getElementById('cContratsLbl');
   if (chipLbl) chipLbl.textContent = `📝 Contrats signés${periodeLabels[activePeriode]||''}`;
 
+  let ctActifs = 0, ctExpire14 = 0, ctExpired = 0, ctVentes = 0, ctTotalJ = 0, ctCountJ = 0;
+  sellers.forEach(s => {
+    const days = s.jours_restants;
+    if (days != null && days > 0 && !s.vente_realisee) ctActifs++;
+    if (days != null && days > 0 && days <= 14 && !s.vente_realisee) ctExpire14++;
+    if (days != null && days <= 0 && !s.vente_realisee) ctExpired++;
+    if (s.vente_realisee) { ctVentes++; if (s.jours_pour_vendre) { ctTotalJ += s.jours_pour_vendre; ctCountJ++; } }
+  });
+  const ctActifsEl = document.getElementById('cCtActifs'); if (ctActifsEl) ctActifsEl.textContent = ctActifs;
+  const ctExpire14El = document.getElementById('cCtExpire14'); if (ctExpire14El) ctExpire14El.textContent = ctExpire14;
+  const ctExpiredEl = document.getElementById('cCtExpired'); if (ctExpiredEl) ctExpiredEl.textContent = ctExpired;
+  const ctVentesEl = document.getElementById('cCtVentes'); if (ctVentesEl) ctVentesEl.textContent = ctVentes;
+  const ctMoyEl = document.getElementById('cCtMoy'); if (ctMoyEl) ctMoyEl.textContent = ctCountJ ? Math.round(ctTotalJ/ctCountJ)+'j' : '—';
+
   const hasDemo = sellers.some(c => (c.email||'').endsWith('@demo.serenis'));
   document.getElementById('demoTag').style.display      = hasDemo ? 'inline' : 'none';
   document.getElementById('clearDemoBtn').style.display = hasDemo ? 'inline-flex' : 'none';
@@ -679,6 +815,11 @@ function matchesCrmFilter(c, filter) {
       return (c.doc_count||c.docs_count||0) < 2;
     case 'contract-not-signed':
       return !!(c.paid_at && !c.contrat_signe);
+    case 'contrat-actif': return (c.jours_restants != null && c.jours_restants > 0 && !c.vente_realisee);
+    case 'contrat-expire14': return (c.jours_restants != null && c.jours_restants > 0 && c.jours_restants <= 14 && !c.vente_realisee);
+    case 'contrat-expire': return (c.jours_restants != null && c.jours_restants <= 0 && !c.vente_realisee);
+    case 'vendu': return !!c.vente_realisee;
+    case 'avis-pending': return (!!c.vente_realisee && !c.avis_demande_at);
     default:
       return true;
   }
@@ -1074,7 +1215,7 @@ function renderTable() {
 
   if (!filtered.length) {
     if (!sellers.length) {
-      tbody.innerHTML = `<tr><td colspan="17">
+      tbody.innerHTML = `<tr><td colspan="23">
         <div class="empty-center">
           <div style="font-size:3rem;margin-bottom:14px">📊</div>
           <div style="font-size:1.1rem;font-weight:600;font-family:'Cormorant Garamond',serif;margin-bottom:8px">Aucun vendeur enregistré</div>
@@ -1084,7 +1225,7 @@ function renderTable() {
         </div>
       </td></tr>`;
     } else {
-      tbody.innerHTML = `<tr><td colspan="17"><div class="empty-center" style="padding:40px 20px">
+      tbody.innerHTML = `<tr><td colspan="23"><div class="empty-center" style="padding:40px 20px">
         <div style="font-size:1.8rem;margin-bottom:8px">🔍</div>
         <div style="font-size:0.88rem;font-weight:500">Aucun vendeur ne correspond aux filtres</div>
       </div></td></tr>`;
@@ -1170,6 +1311,14 @@ function renderTable() {
       ? alerts.map(a => `<span class="badge alert-${a.t}" style="display:block;margin-bottom:2px">${a.m}</span>`).join('')
       : '<span style="color:#D0CEC9;font-size:0.7rem">—</span>';
 
+    // Contrat columns
+    const ctSignedAt = c.contrat_signe_at ? fd(c.contrat_signe_at) : '<span style="color:#D0CEC9">—</span>';
+    const ctEcheance = c.contrat_echeance ? fd(c.contrat_echeance) : '<span style="color:#D0CEC9">—</span>';
+    const ctBar = buildCtBar(c.jours_restants);
+    const ctBadge = buildCtBadge(c.jours_restants, c.vente_realisee);
+    const ctJVendre = c.jours_pour_vendre != null ? `<strong style="color:#7c3aed">${c.jours_pour_vendre}j</strong>` : (c.vente_realisee && c.vente_date ? `<span style="font-size:0.7rem;color:#aaa">${fd(c.vente_date)}</span>` : '<span style="color:#D0CEC9;font-size:0.7rem">—</span>');
+    const ctActionsCell = buildCtActions(c);
+
     // Contrat toggle (manual)
     const contratCell = `<button class="tog ${c.contrat_signe?'on':'off'}" data-id="${c.id}" data-field="contrat_signe" data-val="${c.contrat_signe?1:0}" title="${c.contrat_signe?'Contrat signé':'Non signé'}">${c.contrat_signe?CHK:DSH}</button>`;
 
@@ -1237,6 +1386,12 @@ function renderTable() {
       <td style="text-align:center">${visitsCell}</td>
       <td>${nextVisitCell}</td>
       <td>${annonceCell}</td>
+      <td>${ctSignedAt}</td>
+      <td>${ctEcheance}</td>
+      <td>${ctBar}</td>
+      <td>${ctBadge}</td>
+      <td style="text-align:center">${ctJVendre}</td>
+      <td>${ctActionsCell}</td>
       <td style="min-width:120px">${alertsCell}</td>
       <td><button class="open-btn" data-sid="${c.id}">${ARR}</button></td>
     </tr>`;
@@ -1686,5 +1841,16 @@ async function clearDemo() {
 loadAll();
 startAutoRefresh();
 </script>
+
+<div class="ct-overlay" id="ctOverlay">
+  <div class="ct-modal">
+    <h3 id="ctModalTitle">Confirmer l'action</h3>
+    <p id="ctModalBody">Êtes-vous sûr(e) ?</p>
+    <div class="ct-modal-act">
+      <button class="ct-cancel" onclick="closeCtModal()">Annuler</button>
+      <button class="ct-confirm" id="ctModalConfirm">Confirmer</button>
+    </div>
+  </div>
+</div>
 </body>
 </html>
