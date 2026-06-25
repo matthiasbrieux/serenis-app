@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<link rel="icon" href="/favicon.ico" sizes="any"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Prospection — Vendu Par Moi Admin</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:#F5F4F1;--surface:#fff;--border:#E9E7E3;
+    --dark:#1A1A16;--text2:#68665E;--text3:#A09C95;
+    --green:#16a34a;--green-bg:#dcfce7;
+    --amber:#d97706;--amber-bg:#fef3c7;
+    --red:#dc2626;--red-bg:#fee2e2;
+    --blue:#2563eb;--blue-bg:#dbeafe;
+    --purple:#7c3aed;--purple-bg:#ede9fe;
+    --terra:#C4603A;--terra-bg:#FFF2EE;
+  }
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--dark);font-size:13.5px;height:100vh;overflow:hidden}
+  a{text-decoration:none;color:inherit}
+
+  .layout{display:flex;height:100vh;overflow:hidden}
+
+  /* Sidebar */
+  .sidebar{width:220px;flex-shrink:0;background:#1A1A16;display:flex;flex-direction:column;overflow-y:auto}
+  .logo{padding:24px 22px 20px;font-family:'Cormorant Garamond',serif;font-size:1.35rem;color:#FDFCF8;border-bottom:1px solid rgba(255,255,255,.08)}
+  .nav{flex:1;padding:12px 0}
+  .nav a{display:flex;align-items:center;gap:9px;padding:10px 22px;color:rgba(255,255,255,.5);font-size:0.82rem;transition:all .12s}
+  .nav a:hover{color:#fff;background:rgba(255,255,255,.06)}
+  .nav a.active{color:#fff;background:rgba(255,255,255,.1);border-right:2px solid #C4785A}
+  .sep{height:1px;background:rgba(255,255,255,.06);margin:10px 16px}
+  .nav-out{padding:16px 22px;border-top:1px solid rgba(255,255,255,.06)}
+  .nav-out a{display:block;color:rgba(255,255,255,.3);font-size:0.78rem;padding:4px 0}
+  .nav-out a:hover{color:rgba(255,255,255,.6)}
+
+  /* Main */
+  .main{flex:1;display:flex;flex-direction:column;overflow:hidden}
+
+  /* Topbar */
+  .topbar{flex-shrink:0;padding:16px 28px;background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+  .topbar h1{font-family:'Cormorant Garamond',serif;font-size:1.6rem;font-weight:600}
+  .topbar .sub{font-size:0.73rem;color:var(--text3);margin-top:2px}
+
+  /* Tab bar */
+  .tab-bar{flex-shrink:0;display:flex;gap:0;background:var(--surface);border-bottom:2px solid var(--border);padding:0 28px}
+  .tab-btn{padding:13px 20px;font-size:0.83rem;font-weight:600;color:var(--text3);border:none;background:none;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;font-family:'DM Sans',sans-serif;transition:all .15s;white-space:nowrap}
+  .tab-btn:hover{color:var(--dark)}
+  .tab-btn.active{color:var(--terra);border-bottom-color:var(--terra)}
+
+  /* Content */
+  .content{flex:1;overflow-y:auto;padding:28px}
+
+  /* Tab panels */
+  .tab-panel{display:none}
+  .tab-panel.active{display:block}
+
+  /* ── Section title ── */
+  .section-title{font-family:'Cormorant Garamond',serif;font-size:1.25rem;font-weight:600;color:var(--dark);margin-bottom:6px}
+  .section-sub{font-size:0.8rem;color:var(--text3);margin-bottom:20px}
+
+  /* ── Objection cards ── */
+  .objections-grid{display:flex;flex-direction:column;gap:12px;max-width:900px}
+  .obj-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden;cursor:pointer;transition:box-shadow .15s}
+  .obj-card:hover{box-shadow:0 4px 16px rgba(0,0,0,.08)}
+  .obj-hdr{display:flex;align-items:center;gap:14px;padding:16px 20px}
+  .obj-icon{width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0}
+  .obj-label{flex:1;font-weight:600;font-size:0.88rem;color:var(--dark)}
+  .obj-tag{font-size:0.7rem;font-weight:700;padding:3px 10px;border-radius:20px}
+  .obj-chevron{color:var(--text3);font-size:0.75rem;transition:transform .2s;flex-shrink:0}
+  .obj-card.open .obj-chevron{transform:rotate(180deg)}
+  .obj-body{display:none;border-top:1px solid var(--border);padding:20px}
+  .obj-card.open .obj-body{display:block}
+
+  .obj-context{font-size:0.8rem;color:var(--text3);margin-bottom:14px;font-style:italic}
+
+  .response-tabs{display:flex;gap:6px;margin-bottom:14px}
+  .rtab{padding:5px 14px;border-radius:20px;border:1.5px solid var(--border);font-size:0.76rem;font-weight:600;cursor:pointer;background:var(--bg);color:var(--text2);font-family:'DM Sans',sans-serif;transition:all .12s}
+  .rtab.active{background:var(--dark);color:#fff;border-color:var(--dark)}
+
+  .response-panel{display:none}
+  .response-panel.active{display:block}
+
+  .script-box{background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:16px;font-size:0.84rem;color:var(--dark);line-height:1.75;white-space:pre-wrap;word-break:break-word;font-family:'DM Sans',sans-serif;position:relative}
+  .copy-btn{position:absolute;top:10px;right:10px;background:var(--dark);color:#fff;border:none;border-radius:6px;padding:5px 12px;font-size:0.72rem;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;transition:opacity .15s;white-space:nowrap}
+  .copy-btn:hover{opacity:.8}
+  .copy-btn.copied{background:var(--green)}
+
+  .tips-box{background:#F8F6F2;border-left:3px solid var(--terra);border-radius:0 8px 8px 0;padding:12px 16px;margin-top:12px;font-size:0.8rem;color:var(--text2);line-height:1.65}
+  .tips-box strong{color:var(--dark)}
+
+  /* ── Templates SMS / Email grid ── */
+  .templates-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(380px,1fr));gap:16px;max-width:1200px}
+  .tpl-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden}
+  .tpl-hdr{padding:14px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:10px}
+  .tpl-title{font-weight:600;font-size:0.85rem;color:var(--dark)}
+  .tpl-badge{font-size:0.68rem;font-weight:700;padding:3px 9px;border-radius:20px}
+  .tpl-body{padding:16px 18px;font-size:0.82rem;color:var(--dark);line-height:1.75;white-space:pre-wrap;word-break:break-word;min-height:80px}
+  .tpl-foot{padding:10px 18px;border-top:1px solid var(--border);display:flex;justify-content:flex-end}
+  .tpl-copy{background:var(--dark);color:#fff;border:none;border-radius:7px;padding:6px 16px;font-size:0.76rem;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;transition:opacity .12s}
+  .tpl-copy:hover{opacity:.8}
+  .tpl-copy.copied{background:var(--green)}
+
+  /* Toast */
+  .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(10px);background:var(--dark);color:#fff;padding:9px 22px;border-radius:50px;font-size:0.82rem;font-weight:500;opacity:0;pointer-events:none;z-index:9999;transition:all .3s cubic-bezier(0.16,1,.3,1)}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+  .toast.ok{background:var(--green)}
+</style>
+</head>
+<body>
+<div class="layout">
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="logo">Vendu Par Moi Admin</div>
+    <nav class="nav">
+      <a href="/admin">📊 Dashboard</a>
+      <a href="/admin/crm">🎯 CRM Vendeurs</a>
+      <div class="sep"></div>
+      <a href="/admin/emails">📧 Emails</a>
+      <a href="/admin#clients">👤 Clients</a>
+      <a href="/admin#contacts">📨 Contacts</a>
+      <a href="/admin/finance">💰 Finance</a>
+      <div class="sep"></div>
+      <a href="/admin/prospection" class="active">🎯 Prospection</a>
+    </nav>
+    <div class="nav-out">
+      <a href="/admin/marketing">📣 Marketing & Docs IA</a>
+      <a href="/admin/parcours">🗺️ Parcours client</a>
+      <a href="/admin/logout">← Déconnexion</a>
+    </div>
+  </aside>
+
+  <!-- Main -->
+  <div class="main">
+    <div class="topbar">
+      <div>
+        <h1>Prospection</h1>
+        <div class="sub">Scripts · Objections · Templates SMS & Email — à usage interne VRP</div>
+      </div>
+    </div>
+
+    <!-- Tabs -->
+    <div class="tab-bar">
+      <button class="tab-btn active" data-tab="objections">💬 Objections</button>
+      <button class="tab-btn" data-tab="sms">📱 Scripts SMS</button>
+      <button class="tab-btn" data-tab="email">📧 Scripts Email</button>
+    </div>
+
+    <div class="content">
+
+      <!-- ══════════════════ OBJECTIONS ══════════════════ -->
+      <div class="tab-panel active" id="panel-objections">
+        <div class="section-title">Réponses aux objections courantes</div>
+        <p class="section-sub">Cliquez sur une objection pour afficher la réponse conseillée — SMS, appel ou email selon la situation.</p>
+
+        <div class="objections-grid">
+
+          <!-- Objection 1 -->
+          <div class="obj-card">
+            <div class="obj-hdr">
+              <div class="obj-icon" style="background:#fee2e2">🏢</div>
+              <div class="obj-label">« Je vais passer par une agence, c'est plus simple »</div>
+              <span class="obj-tag" style="background:#fee2e2;color:#991b1b">Fréquente</span>
+              <span class="obj-chevron">▼</span>
+            </div>
+            <div class="obj-body">
+              <p class="obj-context">L'acheteur ou prospect hésite car il associe "agence" à plus de sécurité ou moins d'effort.</p>
+              <div class="response-tabs">
+                <button class="rtab active" data-panel="o1-appel">📞 Appel</button>
+                <button class="rtab" data-panel="o1-sms">📱 SMS</button>
+              </div>
+              <div class="response-panel active" id="o1-appel">
+                <div class="script-box">« Je comprends tout à fait. Ce que vous perdez avec une agence, c'est en moyenne 4 à 6 % du prix de vente. Sur un bien à 300 000 €, c'est 12 000 à 18 000 € qui partent en commission.
+
+Nous, on vous donne exactement les mêmes outils qu'un professionnel — dossier acheteur, agenda en ligne, relances automatiques, coach IA — mais vous gardez tout le prix.
+
+Ce n'est pas plus compliqué, c'est juste différent. Et on est là à chaque étape si vous avez une question. »<button class="copy-btn" onclick="copyScript(this)">Copier</button></div>
+                <div class="tips-box"><strong>Conseil :</strong> Chiffrez toujours la commission en euros réels — le pourcentage parle moins que le montant concret. Proposez une démonstration de la plateforme en 10 minutes.</div>
+              </div>
+              <div class="response-panel" id="o1-sms">
+                <div class="script-box">Bonjour [Prénom], je comprends votre réflexe. Sachez qu'avec Vendu Par Moi vous disposez des mêmes outils qu'une agence (dossier acheteur, agenda, relances auto) mais sans commission — soit souvent 10 000 à 20 000 € économisés. Je serais ravi de vous montrer la plateforme en 10 min. Disponible cette semaine ?<button class="copy-btn" onclick="copyScript(this)">Copier</button></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Objection 2 -->
+          <div class="obj-card">
+            <div class="obj-hdr">
+              <div class="obj-icon" style="background:#fef3c7">⏰</div>
+              <div class="obj-label">« Je n'ai pas le temps de gérer les visites »</div>
+              <span class="obj-tag" style="background:#fef3c7;color:#92400e">Fréquente</span>
+              <span class="obj-chevron">▼</span>
+            </div>
+            <div class="obj-body">
+              <p class="obj-context">Le prospect a peur que la vente en direct soit chronophage.</p>
+              <div class="response-tabs">
+                <button class="rtab active" data-panel="o2-appel">📞 Appel</button>
+                <button class="rtab" data-panel="o2-sms">📱 SMS</button>
+              </div>
+              <div class="response-panel active" id="o2-appel">
+                <div class="script-box">« C'est exactement pour ça qu'on a créé la plateforme. Les acheteurs consultent votre dossier en ligne, réservent leur créneau directement dans votre agenda — vous n'avez pas à répondre à 50 messages pour caler une visite.
+
+Les rappels sont automatiques, les acheteurs vous contactent via un numéro dédié, et le coach IA répond aux questions courantes à votre place. Vous intervenez uniquement au moment de la visite. »<button class="copy-btn" onclick="copyScript(this)">Copier</button></div>
+                <div class="tips-box"><strong>Conseil :</strong> Montrez concrètement l'agenda en ligne et le dossier acheteur. Une démonstration visuelle vaut 10 explications.</div>
+              </div>
+              <div class="response-panel" id="o2-sms">
+                <div class="script-box">Bonjour [Prénom], la plateforme gère ça pour vous : les acheteurs réservent eux-mêmes dans votre agenda, reçoivent des rappels auto et consultent tout le dossier en ligne. Vous n'intervenez qu'au moment de la visite. Je vous montre comment en 10 min ?<button class="copy-btn" onclick="copyScript(this)">Copier</button></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Objection 3 -->
+          <div class="obj-card">
+            <div class="obj-hdr">
+              <div class="obj-icon" style="background:#ede9fe">🤔</div>
+              <div class="obj-label">« Les acheteurs font plus confiance aux agences »</div>
+              <span class="obj-tag" style="background:#ede9fe;color:#5b21b6">Psychologique</span>
+              <span class="obj-chevron">▼</span>
+            </div>
+            <div class="obj-body">
+              <p class="obj-context">Le prospect pense que vendre en direct décrédibilise son bien.</p>
+              <div class="response-tabs">
+                <button class="rtab active" data-panel="o3-appel">📞 Appel</button>
+                <button class="rtab" data-panel="o3-sms">📱 SMS</button>
+              </div>
+              <div class="response-panel active" id="o3-appel">
+                <div class="script-box">« C'était vrai il y a 10 ans. Aujourd'hui, le PAP représente plus de 30 % des transactions en France. Les acheteurs cherchent sur LeBonCoin, SeLoger, PAP.fr — peu leur importe si c'est une agence ou un particulier, ce qui compte c'est la qualité du dossier.
+
+Avec Vendu Par Moi, votre dossier est aussi professionnel — photos, diagnostics, descriptions, agenda — voire plus soigné que la plupart des annonces d'agences. »<button class="copy-btn" onclick="copyScript(this)">Copier</button></div>
+                <div class="tips-box"><strong>Conseil :</strong> Si possible, montrez un exemple de dossier acheteur VPM pour illustrer le niveau de professionnel.</div>
+              </div>
+              <div class="response-panel" id="o3-sms">
+                <div class="script-box">Bonjour [Prénom], plus de 30 % des ventes se font entre particuliers aujourd'hui. Ce qui rassure les acheteurs c'est un dossier complet et professionnel — c'est exactement ce que Vendu Par Moi vous permet de construire. Je peux vous montrer un exemple ?<button class="copy-btn" onclick="copyScript(this)">Copier</button></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Objection 4 -->
+          <div class="obj-card">
+            <div class="obj-hdr">
+              <div class="obj-icon" style="background:#dcfce7">💰</div>
+              <div class="obj-label">« C'est trop cher pour ce que c'est »</div>
+              <span class="obj-tag" style="background:#dcfce7;color:#065f46">Prix</span>
+              <span class="obj-chevron">▼</span>
+            </div>
+            <div class="obj-body">
+              <p class="obj-context">Le prospect compare le prix VPM à "zéro" — c'est-à-dire vendre seul sans aide.</p>
+              <div class="response-tabs">
+                <button class="rtab active" data-panel="o4-appel">📞 Appel</button>
+                <button class="rtab" data-panel="o4-sms">📱 SMS</button>
+              </div>
+              <div class="response-panel active" id="o4-appel">
+                <div class="script-box">« Je comprends. On est à 1 548 € pour une vente complète. Une agence, c'est entre 10 000 et 25 000 € selon le prix du bien. Donc la question c'est : est-ce que 1 500 € d'outils et d'accompagnement valent la peine pour économiser 10 à 20 fois plus ?
+
+Et si pour une raison ou une autre vous ne vendez pas, vous avez quand même tous les outils — dossier acheteur, agenda, coach — pour relancer à votre rythme. »<button class="copy-btn" onclick="copyScript(this)">Copier</button></div>
+                <div class="tips-box"><strong>Conseil :</strong> Proposez le paiement en 4x (390 € × 4) si le prix est un frein — ça ramène à moins de 400 € pour commencer.</div>
+              </div>
+              <div class="response-panel" id="o4-sms">
+                <div class="script-box">Bonjour [Prénom], je comprends l'hésitation. Pour vous donner un ordre d'idée : une agence prend 3 à 5 % soit 10 000 à 25 000 € sur la plupart des ventes. Vendu Par Moi c'est 1 548 € avec possibilité de payer en 4x. Je peux vous envoyer le détail ?<button class="copy-btn" onclick="copyScript(this)">Copier</button></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Objection 5 -->
+          <div class="obj-card">
+            <div class="obj-hdr">
+              <div class="obj-icon" style="background:#dbeafe">📋</div>
+              <div class="obj-label">« Je ne connais pas les démarches légales »</div>
+              <span class="obj-tag" style="background:#dbeafe;color:#1e40af">Pratique</span>
+              <span class="obj-chevron">▼</span>
+            </div>
+            <div class="obj-body">
+              <p class="obj-context">Le prospect a peur de se retrouver seul face aux aspects juridiques (compromis, notaire…).</p>
+              <div class="response-tabs">
+                <button class="rtab active" data-panel="o5-appel">📞 Appel</button>
+                <button class="rtab" data-panel="o5-sms">📱 SMS</button>
+              </div>
+              <div class="response-panel active" id="o5-appel">
+                <div class="script-box">« C'est une préoccupation légitime. Mais gardez à l'esprit que dans tous les cas, c'est le notaire qui rédige et sécurise la transaction — avec ou sans agence. Le compromis est toujours fait par un notaire.
+
+Notre rôle, c'est tout ce qui se passe avant : l'estimation, les visites, les négociations, les offres. La partie juridique reste entre vous et votre notaire, comme si vous aviez vendu via une agence. »<button class="copy-btn" onclick="copyScript(this)">Copier</button></div>
+                <div class="tips-box"><strong>Conseil :</strong> Rassurez sur le rôle du notaire qui sécurise tout. La formation VPM couvre aussi les étapes légales étape par étape.</div>
+              </div>
+              <div class="response-panel" id="o5-sms">
+                <div class="script-box">Bonjour [Prénom], la bonne nouvelle c'est que c'est toujours le notaire qui sécurise la transaction — avec ou sans agence. Notre accompagnement couvre toutes les étapes pratiques avant le notaire. Je peux vous expliquer en détail ?<button class="copy-btn" onclick="copyScript(this)">Copier</button></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Objection 6 -->
+          <div class="obj-card">
+            <div class="obj-hdr">
+              <div class="obj-icon" style="background:#FFF2EE">💬</div>
+              <div class="obj-label">« L'acheteur demande une explication sur Vendu Par Moi »</div>
+              <span class="obj-tag" style="background:#FFF2EE;color:#C4603A">Présentation</span>
+              <span class="obj-chevron">▼</span>
+            </div>
+            <div class="obj-body">
+              <p class="obj-context">Un acheteur ou contact interroge le vendeur sur ce qu'est Vendu Par Moi et pourquoi il y est inscrit.</p>
+              <div class="response-tabs">
+                <button class="rtab active" data-panel="o6-sms">📱 SMS vendeur → acheteur</button>
+                <button class="rtab" data-panel="o6-appel">📞 À l'oral</button>
+              </div>
+              <div class="response-panel active" id="o6-sms">
+                <div class="script-box">Bonjour, je suis [Votre prénom et nom], [votre profession] et [votre situation personnelle : parent de deux enfants, jeune retraité, etc.].
+
+Je vends mon bien directement de particulier à particulier, ce qui permet de simplifier nos échanges et d'éviter les frais de commercialisation habituellement intégrés lors d'une vente.
+
+Pour des raisons d'organisation et afin de pouvoir répondre au mieux à vos questions concernant mon bien, j'ai choisi d'être accompagné par Vendu Par Moi, qui m'aide à centraliser toutes les informations importantes.
+
+Vous trouverez dans le lien ci-dessous une fiche de renseignements complète regroupant les photos détaillées, les principales caractéristiques du bien ainsi que mes disponibilités pour vous faire visiter le bien.
+
+N'hésitez pas à me recontacter si vous avez des questions complémentaires.
+Au plaisir d'échanger avec vous,
+[Votre prénom]<button class="copy-btn" onclick="copyScript(this)">Copier</button></div>
+                <div class="tips-box"><strong>À personnaliser :</strong> Remplacer les crochets par les vraies informations du vendeur. Le lien vers le dossier acheteur se trouve dans son espace vendeur → Mon bien.</div>
+              </div>
+              <div class="response-panel" id="o6-appel">
+                <div class="script-box">« Vendu Par Moi, c'est une plateforme qui m'accompagne pour vendre mon bien moi-même, sans passer par une agence. Ça me permet d'avoir un dossier complet en ligne, un agenda pour les visites, et un suivi des acheteurs — exactement comme une agence, mais sans commission.
+
+Vous pouvez consulter tout le dossier de mon bien en ligne, avec les photos, les caractéristiques et mes disponibilités pour une visite. »<button class="copy-btn" onclick="copyScript(this)">Copier</button></div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- ══════════════════ SMS ══════════════════ -->
+      <div class="tab-panel" id="panel-sms">
+        <div class="section-title">Templates SMS de prospection</div>
+        <p class="section-sub">Messages courts prêts à envoyer. Personnalisez les crochets [ ] avant d'envoyer.</p>
+
+        <div class="templates-grid">
+
+          <div class="tpl-card">
+            <div class="tpl-hdr">
+              <div class="tpl-title">Premier contact — acheteur froid</div>
+              <span class="tpl-badge" style="background:#dbeafe;color:#1e40af">Prospection</span>
+            </div>
+            <div class="tpl-body">Bonjour [Prénom], j'ai eu votre contact via [source]. Je vends mon bien au [adresse ou ville] — [surface] m², [nb pièces] pièces, [prix] €. Je dispose d'un dossier complet en ligne avec photos et diagnostics. Souhaiteriez-vous que je vous l'envoie ?</div>
+            <div class="tpl-foot"><button class="tpl-copy" onclick="copyTpl(this)">📋 Copier</button></div>
+          </div>
+
+          <div class="tpl-card">
+            <div class="tpl-hdr">
+              <div class="tpl-title">Relance après silence</div>
+              <span class="tpl-badge" style="background:#fef3c7;color:#92400e">Relance</span>
+            </div>
+            <div class="tpl-body">Bonjour [Prénom], je voulais m'assurer que vous aviez bien reçu les informations sur mon bien à [ville]. Êtes-vous toujours à la recherche d'un bien dans ce secteur ? Je reste disponible si vous souhaitez visiter ou poser des questions.</div>
+            <div class="tpl-foot"><button class="tpl-copy" onclick="copyTpl(this)">📋 Copier</button></div>
+          </div>
+
+          <div class="tpl-card">
+            <div class="tpl-hdr">
+              <div class="tpl-title">Invitation à visiter</div>
+              <span class="tpl-badge" style="background:#dcfce7;color:#065f46">Visite</span>
+            </div>
+            <div class="tpl-body">Bonjour [Prénom], si vous souhaitez visiter mon bien, vous pouvez réserver directement un créneau en ligne via ce lien : [lien agenda]. Je serai disponible [jours dispo]. Au plaisir de vous accueillir !</div>
+            <div class="tpl-foot"><button class="tpl-copy" onclick="copyTpl(this)">📋 Copier</button></div>
+          </div>
+
+          <div class="tpl-card">
+            <div class="tpl-hdr">
+              <div class="tpl-title">Acheteur réticent — explication VPM</div>
+              <span class="tpl-badge" style="background:#FFF2EE;color:#C4603A">Objection</span>
+            </div>
+            <div class="tpl-body">Bonjour, je suis [Prénom Nom], [profession]. Je vends mon bien directement de particulier à particulier, ce qui permet d'éviter les frais de commercialisation habituels. J'ai choisi d'être accompagné par Vendu Par Moi pour centraliser toutes les informations. Vous trouverez ici une fiche complète avec photos, caractéristiques et mes disponibilités : [lien dossier]. N'hésitez pas si vous avez des questions. [Prénom]</div>
+            <div class="tpl-foot"><button class="tpl-copy" onclick="copyTpl(this)">📋 Copier</button></div>
+          </div>
+
+          <div class="tpl-card">
+            <div class="tpl-hdr">
+              <div class="tpl-title">Baisse de prix — réactivation</div>
+              <span class="tpl-badge" style="background:#ede9fe;color:#5b21b6">Réactivation</span>
+            </div>
+            <div class="tpl-body">Bonjour [Prénom], suite à vos retours, j'ai ajusté le prix de mon bien à [ville] : il est désormais à [nouveau prix] €. Si cette opportunité vous intéresse, je serais heureux de vous faire visiter. Le dossier complet est disponible ici : [lien].</div>
+            <div class="tpl-foot"><button class="tpl-copy" onclick="copyTpl(this)">📋 Copier</button></div>
+          </div>
+
+          <div class="tpl-card">
+            <div class="tpl-hdr">
+              <div class="tpl-title">Post-visite — prise de décision</div>
+              <span class="tpl-badge" style="background:#dcfce7;color:#065f46">Suivi</span>
+            </div>
+            <div class="tpl-body">Bonjour [Prénom], j'espère que votre visite vous a plu. Avez-vous eu le temps de réfléchir ? Je reste disponible pour répondre à vos questions ou vous fournir des informations complémentaires. Au plaisir, [Prénom vendeur]</div>
+            <div class="tpl-foot"><button class="tpl-copy" onclick="copyTpl(this)">📋 Copier</button></div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- ══════════════════ EMAIL ══════════════════ -->
+      <div class="tab-panel" id="panel-email">
+        <div class="section-title">Templates Email de prospection</div>
+        <p class="section-sub">Emails prêts à adapter et envoyer. Personnalisez les crochets [ ] avant d'utiliser.</p>
+
+        <div class="templates-grid">
+
+          <div class="tpl-card">
+            <div class="tpl-hdr">
+              <div class="tpl-title">Présentation VPM — prospect froid</div>
+              <span class="tpl-badge" style="background:#dbeafe;color:#1e40af">Prospection</span>
+            </div>
+            <div class="tpl-body">Objet : Vendez votre bien sans agence — et gardez tout le prix
+
+Bonjour [Prénom],
+
+Je me permets de vous contacter car vous êtes propriétaire et peut-être en réflexion sur la vente de votre bien.
+
+Vendu Par Moi est une plateforme qui accompagne les particuliers pour vendre eux-mêmes, avec les mêmes outils qu'un professionnel — dossier acheteur, agenda en ligne, relances automatiques, coach IA — mais sans commission d'agence.
+
+En moyenne, nos clients économisent entre 10 000 et 25 000 € par rapport à une vente classique en agence.
+
+Je serais ravi de vous présenter la plateforme en 15 minutes. Êtes-vous disponible cette semaine ?
+
+Bien cordialement,
+[Votre prénom]</div>
+            <div class="tpl-foot"><button class="tpl-copy" onclick="copyTpl(this)">📋 Copier</button></div>
+          </div>
+
+          <div class="tpl-card">
+            <div class="tpl-hdr">
+              <div class="tpl-title">Réponse à objection "trop cher"</div>
+              <span class="tpl-badge" style="background:#FFF2EE;color:#C4603A">Objection</span>
+            </div>
+            <div class="tpl-body">Objet : Re : Vendu Par Moi — quelques précisions
+
+Bonjour [Prénom],
+
+Je comprends votre réserve sur le tarif. Voici comment le voir autrement :
+
+Notre offre Sérénité est à 1 548 €. Une agence prend entre 3 et 5 % du prix de vente — soit 12 000 à 25 000 € sur un bien standard.
+
+En choisissant Vendu Par Moi, vous gardez l'intégralité de la différence. Et si vous préférez, l'offre est disponible en 4 fois sans frais (390 € / mois).
+
+Je reste disponible pour en discuter à votre convenance.
+
+Bien cordialement,
+[Votre prénom]</div>
+            <div class="tpl-foot"><button class="tpl-copy" onclick="copyTpl(this)">📋 Copier</button></div>
+          </div>
+
+          <div class="tpl-card">
+            <div class="tpl-hdr">
+              <div class="tpl-title">Suivi après démonstration</div>
+              <span class="tpl-badge" style="background:#fef3c7;color:#92400e">Relance</span>
+            </div>
+            <div class="tpl-body">Objet : Suite à notre échange — Vendu Par Moi
+
+Bonjour [Prénom],
+
+Merci pour notre échange de [date / hier / la semaine dernière]. J'espère que la démonstration de la plateforme vous a donné une idée claire de ce que vous pouvez accomplir.
+
+Pour résumer ce que vous aurez à disposition dès votre inscription :
+— Un dossier acheteur professionnel (photos, diagnostics, description IA)
+— Un agenda en ligne avec réservation et rappels automatiques
+— Un numéro dédié à votre bien
+— Un coach IA disponible 7j/7
+— Une formation complète étape par étape
+
+Si vous avez des questions ou souhaitez démarrer, n'hésitez pas à me recontacter.
+
+Bien cordialement,
+[Votre prénom]</div>
+            <div class="tpl-foot"><button class="tpl-copy" onclick="copyTpl(this)">📋 Copier</button></div>
+          </div>
+
+          <div class="tpl-card">
+            <div class="tpl-hdr">
+              <div class="tpl-title">Envoi du lien dossier acheteur</div>
+              <span class="tpl-badge" style="background:#dcfce7;color:#065f46">Dossier</span>
+            </div>
+            <div class="tpl-body">Objet : Dossier complet de mon bien à [ville]
+
+Bonjour [Prénom],
+
+Suite à notre contact, je vous transmets le lien vers le dossier complet de mon bien :
+[lien dossier]
+
+Vous y trouverez :
+— Les photos détaillées
+— Les caractéristiques principales
+— Les diagnostics disponibles
+— Mes créneaux de disponibilité pour une visite
+
+N'hésitez pas à réserver directement un créneau depuis la page, ou à me contacter si vous avez des questions.
+
+Au plaisir d'échanger,
+[Votre prénom]</div>
+            <div class="tpl-foot"><button class="tpl-copy" onclick="copyTpl(this)">📋 Copier</button></div>
+          </div>
+
+        </div>
+      </div>
+
+    </div><!-- /.content -->
+  </div><!-- /.main -->
+</div><!-- /.layout -->
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ── Tabs ── */
+document.querySelectorAll('.tab-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('panel-' + btn.dataset.tab).classList.add('active');
+  });
+});
+
+/* ── Objection accordion ── */
+document.querySelectorAll('.obj-hdr').forEach(hdr => {
+  hdr.addEventListener('click', () => {
+    const card = hdr.closest('.obj-card');
+    const wasOpen = card.classList.contains('open');
+    document.querySelectorAll('.obj-card').forEach(c => c.classList.remove('open'));
+    if (!wasOpen) card.classList.add('open');
+  });
+});
+
+/* ── Response sub-tabs ── */
+document.addEventListener('click', e => {
+  const rtab = e.target.closest('.rtab');
+  if (!rtab) return;
+  e.stopPropagation();
+  const body = rtab.closest('.obj-body');
+  body.querySelectorAll('.rtab').forEach(t => t.classList.remove('active'));
+  body.querySelectorAll('.response-panel').forEach(p => p.classList.remove('active'));
+  rtab.classList.add('active');
+  const target = body.querySelector('#' + rtab.dataset.panel);
+  if (target) target.classList.add('active');
+});
+
+/* ── Copy script (in objections) ── */
+function copyScript(btn) {
+  const box = btn.closest('.script-box');
+  const clone = box.cloneNode(true);
+  clone.querySelector('.copy-btn')?.remove();
+  const text = clone.textContent.trim();
+  navigator.clipboard.writeText(text).then(() => {
+    btn.textContent = '✓ Copié !';
+    btn.classList.add('copied');
+    toast('Copié dans le presse-papier ✓');
+    setTimeout(() => { btn.textContent = 'Copier'; btn.classList.remove('copied'); }, 2000);
+  });
+}
+
+/* ── Copy template ── */
+function copyTpl(btn) {
+  const body = btn.closest('.tpl-card').querySelector('.tpl-body');
+  navigator.clipboard.writeText(body.textContent.trim()).then(() => {
+    btn.textContent = '✓ Copié !';
+    btn.classList.add('copied');
+    toast('Copié dans le presse-papier ✓');
+    setTimeout(() => { btn.textContent = '📋 Copier'; btn.classList.remove('copied'); }, 2000);
+  });
+}
+
+/* ── Toast ── */
+function toast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show','ok');
+  setTimeout(() => t.classList.remove('show','ok'), 2500);
+}
+</script>
+</body>
+</html>
