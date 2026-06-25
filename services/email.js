@@ -482,8 +482,7 @@ async function sendNoPhotosNudge({ email }) {
   const html = layout(`
     ${badge('📷 Photos manquantes', '#C4785A')}
     ${h1('Ajoutez vos photos pour attirer les acheteurs')}
-    ${p('Les biens avec des photos reçoivent en moyenne 3× plus de contacts que ceux sans visuels. Votre bien est bien renseigné, mais il manque encore des photos.')}
-    ${p('Ajoutez au minimum 5 photos pour maximiser votre visibilité. Si vous avez besoin d\'un photographe professionnel, nous pouvons vous en proposer un.')}
+    ${p('Pensez à ajouter vos photos dès maintenant — elles seront intégrées automatiquement à votre dossier acheteur, prêt à être envoyé dès le premier contact.')}
     ${btn('Ajouter mes photos', `${BASE_URL}/mon-bien`)}
   `, { preheader: 'Vos photos sont manquantes — ajoutez-les pour attirer plus d\'acheteurs.' });
   return send(email, '📷 Ajoutez vos photos pour attirer plus d\'acheteurs', html);
