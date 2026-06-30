@@ -199,14 +199,14 @@
     <div class="separator">CHOISISSEZ VOTRE FORMULE</div>
 
     <div class="plan-grid">
-      <button class="plan-btn primary" id="btn4x" onclick="submit4x()">
+      <button class="plan-btn primary" id="btn2x" onclick="submit2x()">
         <div>
-          <div class="plan-label">Paiement en 4 fois</div>
+          <div class="plan-label">Paiement en 2 fois</div>
           <div class="plan-detail">Sans frais — prélevé automatiquement</div>
         </div>
         <div class="plan-price">
-          390&nbsp;€
-          <small>× 4 versements</small>
+          774&nbsp;€
+          <small>× 2 versements</small>
         </div>
       </button>
       <button class="plan-btn secondary" id="btnUnique" onclick="submitUnique()">
@@ -259,13 +259,13 @@
       const btn = document.getElementById(btnId);
       if (loading) {
         btn.disabled = true;
-        document.getElementById('btn4x').disabled = true;
+        document.getElementById('btn2x').disabled = true;
         document.getElementById('btnUnique').disabled = true;
         const orig = btn.innerHTML;
         btn.dataset.orig = orig;
         btn.innerHTML = '<span class="spinner"></span>Redirection vers le paiement…';
       } else {
-        document.getElementById('btn4x').disabled = false;
+        document.getElementById('btn2x').disabled = false;
         document.getElementById('btnUnique').disabled = false;
         btn.innerHTML = btn.dataset.orig || btn.innerHTML;
       }
@@ -275,7 +275,7 @@
       const data = getFormData();
       if (!data) return;
 
-      const btnId = plan === '4x' ? 'btn4x' : 'btnUnique';
+      const btnId = plan === '2x' ? 'btn2x' : 'btnUnique';
       setLoading(btnId, true);
 
       try {
@@ -304,7 +304,7 @@
       }
     }
 
-    function submit4x()     { checkout('4x'); }
+    function submit2x()     { checkout('2x'); }
     function submitUnique() { checkout('unique'); }
   </script>
 </body>

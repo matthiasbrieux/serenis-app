@@ -40,14 +40,14 @@ router.post('/create-checkout', express.json(), checkoutLimit, async (req, res) 
   }
 
   const isSerenite = pack === 'serenite';
-  const is4x = plan === '4x' && isSerenite; // paiement 4x uniquement pour Sérénité
+  const is2x = plan === '2x' && isSerenite; // paiement 2x uniquement pour Sérénité
 
   let amount, productName, productDesc;
   if (isSerenite) {
-    amount = is4x ? 39000 : 154800; // 390€ × 4 ou 1548€
-    productName = is4x ? 'Vendu Par Moi — 1er versement sur 4' : 'Vendu Par Moi — Paiement intégral';
-    productDesc = is4x
-      ? '1er versement sur 4 · 390€ × 4 = 1 560€ TTC · sans frais ni intérêts'
+    amount = is2x ? 77400 : 154800; // 774€ × 2 ou 1548€
+    productName = is2x ? 'Vendu Par Moi — 1er versement sur 2' : 'Vendu Par Moi — Paiement intégral';
+    productDesc = is2x
+      ? '1er versement sur 2 · 774€ × 2 = 1 548€ TTC · sans frais ni intérêts'
       : 'Fiche descriptive · Agenda intelligent · SMS automatiques · Formation complète · Coach IA';
   } else {
     amount = 154800; // 1548€
@@ -80,11 +80,11 @@ router.post('/create-checkout', express.json(), checkoutLimit, async (req, res) 
       customer_email: email,
       success_url: `${process.env.BASE_URL || 'https://serenis-app.onrender.com'}/paiement-succes?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${process.env.BASE_URL || 'https://serenis-app.onrender.com'}/#offres`,
-      metadata: { pack, email, seller_id: String(seller.id), plan: plan || 'unique', installment: '1', total_installments: is4x ? '4' : '1', needs_password_reset: needsPasswordReset ? 'true' : 'false' },
+      metadata: { pack, email, seller_id: String(seller.id), plan: plan || 'unique', installment: '1', total_installments: is2x ? '2' : '1', needs_password_reset: needsPasswordReset ? 'true' : 'false' },
       locale: 'fr',
     };
-    // Pour le 4x : sauvegarder la carte pour les 3 versements suivants
-    if (is4x) {
+    // Pour le 2x : sauvegarder la carte pour le 2e versement
+    if (is2x) {
       sessionParams.payment_intent_data = { setup_future_usage: 'off_session' };
     }
     const session = await stripe.checkout.sessions.create(sessionParams);
@@ -224,9 +224,9 @@ async function activateSeller(session) {
     }
   }
 
-  // Gestion plan 4x — sauvegarder la carte + initialiser le suivi des mensualités
-  const is4xPlan = session.metadata?.total_installments === '4';
-  if (is4xPlan) {
+  // Gestion plan 2x — sauvegarder la carte + initialiser le suivi des mensualités
+  const is2xPlan = session.metadata?.total_installments === '2';
+  if (is2xPlan) {
     try {
       const customerId = session.customer || seller.stripe_customer_id;
       if (customerId) {
@@ -235,12 +235,12 @@ async function activateSeller(session) {
         if (pmId) {
           const _nd = new Date(Date.now() + 30 * 24 * 3600 * 1000);
           const nextDate = `${_nd.getFullYear()}-${String(_nd.getMonth()+1).padStart(2,'0')}-${String(_nd.getDate()).padStart(2,'0')}`;
-          db.prepare('UPDATE sellers SET stripe_payment_method_id=?, installments_paid=1, installments_total=4, next_installment_date=? WHERE id=?')
+          db.prepare('UPDATE sellers SET stripe_payment_method_id=?, installments_paid=1, installments_total=2, next_installment_date=? WHERE id=?')
             .run(pmId, nextDate, seller.id);
-          console.log(`✓ Carte sauvegardée pour paiement 4x — seller ${seller.id}`);
+          console.log(`✓ Carte sauvegardée pour paiement 2x — seller ${seller.id}`);
         }
       }
-    } catch(e) { console.error('4x setup error:', e.message); }
+    } catch(e) { console.error('2x setup error:', e.message); }
   }
 
   // Email de bienvenue — avec lien reset si mot de passe auto-généré

@@ -374,7 +374,7 @@ async function chargeInstallments() {
     const installmentNum = seller.installments_paid + 1;
     try {
       const pi = await stripe.paymentIntents.create({
-        amount: 24900, // 249 € — chaque mensualité Sérénité 4x
+        amount: 77400, // 774 € — 2e versement Sérénité 2x
         currency: 'eur',
         customer: seller.stripe_customer_id,
         payment_method: seller.stripe_payment_method_id,
@@ -392,13 +392,13 @@ async function chargeInstallments() {
         db.prepare('UPDATE sellers SET installments_paid=?, next_installment_date=? WHERE id=?')
           .run(newPaid, nextDate, seller.id);
         const invoiceNumber = `SER-${new Date().getFullYear()}-${String(seller.id).padStart(5, '0')}-V${installmentNum}`;
-        await sendInvoiceEmail({ email: seller.email, firstName: seller.first_name, amount: 24900, pack: 'serenite', invoiceNumber, date: new Date() }).catch(() => {});
-        console.log(`✓ 4x versement ${installmentNum}/${seller.installments_total} encaissé — seller ${seller.id} (${seller.email})`);
+        await sendInvoiceEmail({ email: seller.email, firstName: seller.first_name, amount: 77400, pack: 'serenite', invoiceNumber, date: new Date() }).catch(() => {});
+        console.log(`✓ 2x versement ${installmentNum}/${seller.installments_total} encaissé — seller ${seller.id} (${seller.email})`);
       }
     } catch(e) {
-      console.error(`4x charge error seller ${seller.id}:`, e.message);
+      console.error(`2x charge error seller ${seller.id}:`, e.message);
       // Alerte admin si carte refusée (log serveur — seller_id=0 invalide en base)
-      console.error(`⚠️  Échec mensualité 4x — ${seller.email} (id=${seller.id}) versement ${installmentNum}/${seller.installments_total} : ${e.message}`);
+      console.error(`⚠️  Échec mensualité 2x — ${seller.email} (id=${seller.id}) versement ${installmentNum}/${seller.installments_total} : ${e.message}`);
     }
   }
 }
