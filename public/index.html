@@ -1334,6 +1334,12 @@
 
       </div>
 
+      <div style="text-align:center;margin:0 0 24px;">
+        <button onclick="openCallback()" style="background:none;border:1.5px solid rgba(245,240,232,0.4);border-radius:10px;color:rgba(245,240,232,0.7);padding:11px 28px;font-size:.88rem;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;transition:.2s;" onmouseover="this.style.borderColor='rgba(196,120,90,.8)';this.style.color='#C4785A'" onmouseout="this.style.borderColor='rgba(245,240,232,0.4)';this.style.color='rgba(245,240,232,0.7)'">
+          📞 Être rappelé par l'équipe avant de souscrire
+        </button>
+      </div>
+
       <div class="pricing-trust">
         <span class="pricing-trust-item">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -1564,5 +1570,103 @@
 </script>
 
 <script>if('serviceWorker' in navigator) navigator.serviceWorker.register('/sw.js');</script>
+
+<!-- Modal rappel -->
+<div id="callbackModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:9999;align-items:center;justify-content:center;padding:16px;">
+  <div style="background:#FDFCF8;border-radius:20px;padding:36px 32px;max-width:420px;width:100%;position:relative;box-shadow:0 20px 60px rgba(0,0,0,.3);">
+    <button onclick="closeCallback()" style="position:absolute;top:16px;right:16px;background:none;border:none;font-size:1.4rem;color:#888;cursor:pointer;">×</button>
+    <div id="cbForm">
+      <h2 style="font-family:'Cormorant Garamond',serif;font-size:1.6rem;color:#1A1A16;margin:0 0 4px;">Être rappelé</h2>
+      <p style="font-size:.85rem;color:#888;margin:0 0 22px;">Un membre de notre équipe vous contacte sous 24h.</p>
+      <label style="display:block;font-size:.82rem;font-weight:600;color:#1A1A16;margin-bottom:6px;">Votre nom *</label>
+      <input id="cbName" type="text" placeholder="Jean Dupont" style="width:100%;padding:11px 13px;border:1.5px solid #ddd;border-radius:8px;font-size:.92rem;box-sizing:border-box;font-family:'DM Sans',sans-serif;margin-bottom:12px;">
+      <label style="display:block;font-size:.82rem;font-weight:600;color:#1A1A16;margin-bottom:6px;">Votre téléphone *</label>
+      <input id="cbPhone" type="tel" placeholder="06 12 34 56 78" style="width:100%;padding:11px 13px;border:1.5px solid #ddd;border-radius:8px;font-size:.92rem;box-sizing:border-box;font-family:'DM Sans',sans-serif;margin-bottom:12px;">
+      <label style="display:block;font-size:.82rem;font-weight:600;color:#1A1A16;margin-bottom:6px;">Email (optionnel)</label>
+      <input id="cbEmail" type="email" placeholder="jean@exemple.fr" style="width:100%;padding:11px 13px;border:1.5px solid #ddd;border-radius:8px;font-size:.92rem;box-sizing:border-box;font-family:'DM Sans',sans-serif;margin-bottom:12px;">
+      <label style="display:block;font-size:.82rem;font-weight:600;color:#1A1A16;margin-bottom:8px;">Créneau préféré</label>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:16px;">
+        <div class="cb-slot active" onclick="selectSlot(this,'matin')" style="padding:10px 6px;border:1.5px solid #C4785A;border-radius:8px;text-align:center;font-size:.82rem;font-weight:500;color:#C4785A;cursor:pointer;background:#FDF4EF;">🌅 Matin</div>
+        <div class="cb-slot" onclick="selectSlot(this,'après-midi')" style="padding:10px 6px;border:1.5px solid #e0d8cf;border-radius:8px;text-align:center;font-size:.82rem;font-weight:500;color:#555;cursor:pointer;background:#fff;">☀️ Après-midi</div>
+        <div class="cb-slot" onclick="selectSlot(this,'peu importe')" style="padding:10px 6px;border:1.5px solid #e0d8cf;border-radius:8px;text-align:center;font-size:.82rem;font-weight:500;color:#555;cursor:pointer;background:#fff;">🕐 Peu importe</div>
+      </div>
+      <div id="cbError" style="display:none;color:#c0392b;font-size:.83rem;margin-bottom:12px;padding:9px 12px;background:#fdf2f0;border-radius:6px;"></div>
+      <button onclick="submitCallback()" id="cbBtn" style="width:100%;padding:13px;background:#C4785A;color:#fff;border:none;border-radius:10px;font-weight:700;font-size:.95rem;cursor:pointer;font-family:'DM Sans',sans-serif;">Demander à être rappelé →</button>
+      <p style="text-align:center;font-size:.73rem;color:#bbb;margin:10px 0 0;">Aucun engagement · Rappel gratuit</p>
+    </div>
+    <div id="cbConfirm" style="display:none;text-align:center;padding:16px 0;">
+      <div style="font-size:2.5rem;margin-bottom:16px;">✅</div>
+      <h2 style="font-family:'Cormorant Garamond',serif;font-size:1.5rem;color:#1A1A16;margin:0 0 10px;">Demande enregistrée</h2>
+      <p style="font-size:.88rem;color:#666;line-height:1.7;margin:0 0 24px;">Merci ! Un membre de notre équipe vous recontacte sous 24h.</p>
+      <button onclick="closeCallback()" style="padding:11px 28px;background:#3D5A47;color:#fff;border:none;border-radius:8px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;">Fermer</button>
+    </div>
+  </div>
+</div>
+<script>
+  let _cbSlot = 'matin';
+  function openCallback() {
+    document.getElementById('cbName').value = '';
+    document.getElementById('cbPhone').value = '';
+    document.getElementById('cbEmail').value = '';
+    document.getElementById('cbError').style.display = 'none';
+    document.getElementById('cbForm').style.display = 'block';
+    document.getElementById('cbConfirm').style.display = 'none';
+    document.getElementById('cbBtn').textContent = 'Demander à être rappelé →';
+    document.getElementById('cbBtn').disabled = false;
+    document.querySelectorAll('.cb-slot').forEach((s,i) => {
+      s.style.borderColor = i===0 ? '#C4785A' : '#e0d8cf';
+      s.style.color = i===0 ? '#C4785A' : '#555';
+      s.style.background = i===0 ? '#FDF4EF' : '#fff';
+    });
+    _cbSlot = 'matin';
+    const m = document.getElementById('callbackModal');
+    m.style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+  }
+  function closeCallback() {
+    document.getElementById('callbackModal').style.display = 'none';
+    document.body.style.overflow = '';
+  }
+  function selectSlot(el, val) {
+    document.querySelectorAll('.cb-slot').forEach(s => {
+      s.style.borderColor = '#e0d8cf'; s.style.color = '#555'; s.style.background = '#fff';
+    });
+    el.style.borderColor = '#C4785A'; el.style.color = '#C4785A'; el.style.background = '#FDF4EF';
+    _cbSlot = val;
+  }
+  document.getElementById('callbackModal').addEventListener('click', function(e) {
+    if (e.target === this) closeCallback();
+  });
+  async function submitCallback() {
+    const name = document.getElementById('cbName').value.trim();
+    const phone = document.getElementById('cbPhone').value.trim();
+    const email = document.getElementById('cbEmail').value.trim();
+    const errDiv = document.getElementById('cbError');
+    const btn = document.getElementById('cbBtn');
+    errDiv.style.display = 'none';
+    if (!name) { errDiv.textContent = 'Veuillez indiquer votre nom.'; errDiv.style.display = 'block'; return; }
+    if (!phone) { errDiv.textContent = 'Veuillez indiquer votre téléphone.'; errDiv.style.display = 'block'; return; }
+    btn.textContent = 'Envoi en cours…'; btn.disabled = true;
+    try {
+      const res = await fetch('/api/callback-request', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, phone, email, creneau: _cbSlot })
+      });
+      const data = await res.json();
+      if (data.success) {
+        document.getElementById('cbForm').style.display = 'none';
+        document.getElementById('cbConfirm').style.display = 'block';
+      } else {
+        errDiv.textContent = data.error || 'Erreur. Appelez le 06 95 44 36 54.';
+        errDiv.style.display = 'block';
+        btn.textContent = 'Demander à être rappelé →'; btn.disabled = false;
+      }
+    } catch {
+      errDiv.textContent = 'Erreur réseau. Réessayez.';
+      errDiv.style.display = 'block';
+      btn.textContent = 'Demander à être rappelé →'; btn.disabled = false;
+    }
+  }
+</script>
 </body>
 </html>
