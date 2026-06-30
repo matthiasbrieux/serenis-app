@@ -783,6 +783,7 @@ async function previewEmail(templateName) {
     price_drop:            () => sendPriceDropNudge({ email: fakeSellerEmail, firstName: 'Sophie', daysPublished: 47, currentPrice: 320000, propertyCity: 'Lyon' }),
     weekly_seller:         () => sendWeeklySellerReport({ email: fakeSellerEmail, firstName: 'Sophie', stats: { views: 24, viewsPrev: 18, contacts: 3, contactsAll: 11, visits: 2, visitsAll: 5, upcoming: 1, offers: 0, offersAll: 0, daysOnline: 32 } }),
     weekly_admin:          () => sendWeeklyAdminReport({ to: fakeSellerEmail, stats: { newClients: 4, newOffers: 2, newVisits: 9, publishedProps: 3, totalRevenue: 249600, totalActive: 47 } }),
+    first_meeting:         () => sendFirstMeetingEmail({ email: fakeSellerEmail, firstName: 'Sophie' }),
     review_request:        () => sendReviewRequest({ email: fakeSellerEmail, firstName: 'Sophie' }),
     sold_congrats:         () => sendSoldCongrats({ email: fakeSellerEmail, firstName: 'Sophie', property: fakeProp }),
   };
