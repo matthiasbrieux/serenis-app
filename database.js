@@ -330,6 +330,8 @@ const newCols = [
   "ALTER TABLE properties ADD COLUMN rooms_detail TEXT",
   "ALTER TABLE properties ADD COLUMN acheteur_token TEXT",
   "ALTER TABLE properties ADD COLUMN notaire_token TEXT",
+  "ALTER TABLE contact_requests ADD COLUMN source TEXT DEFAULT 'contact'",
+  "ALTER TABLE contact_requests ADD COLUMN creneau TEXT",
 ];
 newCols.forEach(sql => { try { db.exec(sql); } catch(e) {} });
 

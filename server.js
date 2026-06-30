@@ -182,6 +182,19 @@ app.get('/sitemap.xml', (req, res) => {
 
 
 // Contact form
+app.post('/api/callback-request', async (req, res) => {
+  const { name, phone, email, creneau } = req.body;
+  if (!name || !phone) return res.status(400).json({ error: 'Nom et téléphone requis' });
+  const db = require('./database');
+  db.prepare('INSERT INTO contact_requests (name, phone, email, source, creneau, message) VALUES (?,?,?,?,?,?)')
+    .run(name, phone || '', email || '', 'rappel', creneau || 'peu importe', `Demande de rappel — créneau : ${creneau || 'peu importe'}`);
+  try {
+    const msg = `Créneau souhaité : ${creneau || 'peu importe'}`;
+    await require('./services/email').sendContactNotification({ name, phone, email: email || 'non renseigné', offer: 'Demande de rappel', city: '', message: msg });
+  } catch(e) { console.error('Callback email error:', e.message); }
+  res.json({ success: true });
+});
+
 app.post('/api/contact', async (req, res) => {
   const { name, phone, email, offer, city, message } = req.body;
   if (!name || !phone || !email) return res.json({ error: 'Champs requis manquants' });

@@ -73,6 +73,14 @@
     details[open] summary::after { content:'−'; }
     details p { font-size:.88rem;color:#555;line-height:1.75;margin:12px 0 0;padding-left:0; }
     footer { background:#1A1A16;color:rgba(253,252,248,.4);padding:28px 32px;font-size:.76rem;text-align:center;line-height:1.7; }
+    .btn-callback { display:block;width:100%;margin-top:10px;padding:11px 20px;background:none;border:1.5px solid #C4785A;border-radius:10px;color:#C4785A;font-size:.88rem;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;transition:.2s; }
+    .btn-callback:hover { background:rgba(196,120,90,.06); }
+    .cb-label { display:block;font-size:.82rem;font-weight:600;color:#1A1A16;margin-bottom:6px; }
+    .cb-input { width:100%;padding:11px 13px;border:1.5px solid #ddd;border-radius:8px;font-size:.92rem;box-sizing:border-box;font-family:'DM Sans',sans-serif;margin-bottom:12px; }
+    .cb-input:focus { outline:none;border-color:#C4785A; }
+    .cb-grid { display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:16px; }
+    .cb-slot { padding:10px 6px;border:1.5px solid #e0d8cf;border-radius:8px;text-align:center;font-size:.82rem;font-weight:500;color:#555;cursor:pointer;transition:.15s;background:#fff; }
+    .cb-slot:hover, .cb-slot.active { border-color:#C4785A;background:#FDF4EF;color:#C4785A; }
   </style>
 </head>
 <body>
@@ -109,6 +117,7 @@
       </div>
       <div class="pack-cta">
         <button onclick="openCheckout('autonome')" class="btn-pack secondary" style="cursor:pointer;border:none;width:100%;">Choisir le Pack Autonome</button>
+        <button onclick="openCallback()" class="btn-callback">📞 Être rappelé par l'équipe</button>
         <p class="comparison">Économisez ~20 000 € vs agence</p>
       </div>
     </div>
@@ -138,6 +147,7 @@
         <div style="text-align:center;margin-top:10px;">
           <button onclick="openCheckout('serenite', true)" style="background:none;border:none;color:#3D5A47;font-size:.82rem;cursor:pointer;text-decoration:underline;text-underline-offset:3px;font-family:'DM Sans',sans-serif;">ou payer en 4× 387 € sans frais</button>
         </div>
+        <button onclick="openCallback()" class="btn-callback">📞 Être rappelé par l'équipe</button>
         <p class="comparison">Économisez ~19 000 € vs agence · Photo pro incluse</p>
       </div>
     </div>
@@ -280,6 +290,110 @@
     <p>Matthias Brieux — 06 95 44 36 54 — contact@venduparmoi.fr — Douai (59)</p>
     <p style="margin-top:8px;"><a href="/cgv" style="color:inherit;">CGV</a> · <a href="/mentions-legales" style="color:inherit;">Mentions légales</a> · <a href="/faq" style="color:inherit;">FAQ</a> · <a href="/" style="color:inherit;">Accueil</a></p>
   </footer>
+  <!-- Modal rappel -->
+  <div id="callbackModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:2000;align-items:center;justify-content:center;padding:16px;">
+    <div style="background:#FDFCF8;border-radius:20px;padding:36px 32px;max-width:420px;width:100%;position:relative;box-shadow:0 20px 60px rgba(0,0,0,.2);">
+      <button onclick="closeCallback()" style="position:absolute;top:16px;right:16px;background:none;border:none;font-size:1.4rem;color:#888;cursor:pointer;">×</button>
+
+      <div id="cbForm">
+        <h2 style="font-family:'Cormorant Garamond',serif;font-size:1.6rem;color:#1A1A16;margin:0 0 4px;">Être rappelé</h2>
+        <p style="font-size:.85rem;color:#888;margin:0 0 22px;">Un membre de notre équipe vous contacte sous 24h.</p>
+
+        <label class="cb-label">Votre nom *</label>
+        <input id="cbName" class="cb-input" type="text" placeholder="Jean Dupont" required>
+
+        <label class="cb-label">Votre téléphone *</label>
+        <input id="cbPhone" class="cb-input" type="tel" placeholder="06 12 34 56 78" required>
+
+        <label class="cb-label">Email (optionnel)</label>
+        <input id="cbEmail" class="cb-input" type="email" placeholder="jean@exemple.fr">
+
+        <label class="cb-label">Créneau préféré</label>
+        <div class="cb-grid">
+          <div class="cb-slot active" onclick="selectSlot(this,'matin')">🌅 Matin</div>
+          <div class="cb-slot" onclick="selectSlot(this,'après-midi')">☀️ Après-midi</div>
+          <div class="cb-slot" onclick="selectSlot(this,'peu importe')">🕐 Peu importe</div>
+        </div>
+
+        <div id="cbError" style="display:none;color:#c0392b;font-size:.83rem;margin-bottom:12px;padding:9px 12px;background:#fdf2f0;border-radius:6px;"></div>
+        <button onclick="submitCallback()" id="cbBtn" style="width:100%;padding:13px;background:#C4785A;color:#fff;border:none;border-radius:10px;font-weight:700;font-size:.95rem;cursor:pointer;font-family:'DM Sans',sans-serif;">Demander à être rappelé →</button>
+        <p style="text-align:center;font-size:.73rem;color:#bbb;margin:10px 0 0;">Aucun engagement · Rappel gratuit</p>
+      </div>
+
+      <div id="cbConfirm" style="display:none;text-align:center;padding:16px 0;">
+        <div style="font-size:2.5rem;margin-bottom:16px;">✅</div>
+        <h2 style="font-family:'Cormorant Garamond',serif;font-size:1.5rem;color:#1A1A16;margin:0 0 10px;">Demande enregistrée</h2>
+        <p style="font-size:.88rem;color:#666;line-height:1.7;margin:0 0 24px;">Merci ! Un membre de notre équipe vous recontacte sous 24h.</p>
+        <button onclick="closeCallback()" style="padding:11px 28px;background:#3D5A47;color:#fff;border:none;border-radius:8px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;">Fermer</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let _cbSlot = 'matin';
+    function openCallback() {
+      document.getElementById('cbName').value = '';
+      document.getElementById('cbPhone').value = '';
+      document.getElementById('cbEmail').value = '';
+      document.getElementById('cbError').style.display = 'none';
+      document.getElementById('cbForm').style.display = 'block';
+      document.getElementById('cbConfirm').style.display = 'none';
+      document.getElementById('cbBtn').textContent = 'Demander à être rappelé →';
+      document.getElementById('cbBtn').disabled = false;
+      document.querySelectorAll('.cb-slot').forEach((s,i) => s.classList.toggle('active', i === 0));
+      _cbSlot = 'matin';
+      const m = document.getElementById('callbackModal');
+      m.style.display = 'flex';
+      document.body.style.overflow = 'hidden';
+    }
+    function closeCallback() {
+      document.getElementById('callbackModal').style.display = 'none';
+      document.body.style.overflow = '';
+    }
+    function selectSlot(el, val) {
+      document.querySelectorAll('.cb-slot').forEach(s => s.classList.remove('active'));
+      el.classList.add('active');
+      _cbSlot = val;
+    }
+    document.getElementById('callbackModal').addEventListener('click', function(e) {
+      if (e.target === this) closeCallback();
+    });
+    async function submitCallback() {
+      const name = document.getElementById('cbName').value.trim();
+      const phone = document.getElementById('cbPhone').value.trim();
+      const email = document.getElementById('cbEmail').value.trim();
+      const errDiv = document.getElementById('cbError');
+      const btn = document.getElementById('cbBtn');
+      errDiv.style.display = 'none';
+      if (!name) { errDiv.textContent = 'Veuillez indiquer votre nom.'; errDiv.style.display = 'block'; return; }
+      if (!phone) { errDiv.textContent = 'Veuillez indiquer votre téléphone.'; errDiv.style.display = 'block'; return; }
+      btn.textContent = 'Envoi en cours…';
+      btn.disabled = true;
+      try {
+        const res = await fetch('/api/callback-request', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name, phone, email, creneau: _cbSlot })
+        });
+        const data = await res.json();
+        if (data.success) {
+          document.getElementById('cbForm').style.display = 'none';
+          document.getElementById('cbConfirm').style.display = 'block';
+        } else {
+          errDiv.textContent = data.error || 'Erreur. Réessayez ou appelez le 06 95 44 36 54.';
+          errDiv.style.display = 'block';
+          btn.textContent = 'Demander à être rappelé →';
+          btn.disabled = false;
+        }
+      } catch {
+        errDiv.textContent = 'Erreur réseau. Réessayez.';
+        errDiv.style.display = 'block';
+        btn.textContent = 'Demander à être rappelé →';
+        btn.disabled = false;
+      }
+    }
+  </script>
+
   <script type="application/ld+json">
   [
     {
