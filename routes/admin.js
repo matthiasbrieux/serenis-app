@@ -6,7 +6,7 @@ const path = require('path');
 const fs = require('fs');
 const db = require('../database');
 const { requireAdmin } = require('../middleware/auth');
-const { sendWelcomeEmail, sendPhotographerAvailabilityRequest, sendPostFirstVisitFeedbackSeller, sendCheckInNoOffer, sendNoPhotosNudge, sendMissingDocNudge, sendNotPublishedNudge, sendProspectNudge, sendContractRenewal, sendReviewRequest, sendAdminDirectEmail } = require('../services/email');
+const { sendWelcomeEmail, sendPhotographerAvailabilityRequest, sendPostFirstVisitFeedbackSeller, sendCheckInNoOffer, sendNoPhotosNudge, sendMissingDocNudge, sendNotPublishedNudge, sendProspectNudge, sendContractRenewal, sendReviewRequest, sendAdminDirectEmail, sendFirstMeetingEmail } = require('../services/email');
 
 router.get('/', requireAdmin, (req, res) => {
   res.sendFile('dashboard.html', { root: './views/admin' });
@@ -1064,6 +1064,7 @@ router.get('/emails', requireAdmin, (req, res) => {
 
 const EMAIL_CATALOG = [
   { id: 'welcome',               label: 'Bienvenue + accès espace',         trigger: 'Création de compte',               recipient: 'Vendeur',  auto: true },
+  { id: 'first_meeting',        label: 'Préparation 1er rendez-vous',       trigger: 'Après paiement',                   recipient: 'Vendeur',  auto: true },
   { id: 'no_property',           label: 'Pas encore de bien créé',           trigger: 'J+3 sans fiche',                   recipient: 'Vendeur',  auto: true },
   { id: 'no_photos',             label: 'Photos manquantes',                 trigger: 'J+3 payé sans photos',             recipient: 'Vendeur',  auto: true },
   { id: 'photographer_request',  label: 'Demande de dispos photographe',     trigger: 'J+3 payé sans photos (manuel)',    recipient: 'Vendeur',  auto: false },
@@ -1154,7 +1155,9 @@ router.post('/api/emails/send', requireAdmin, async (req, res) => {
 
   try {
     let ok = false;
-    if (email_type === 'no_photos') {
+    if (email_type === 'first_meeting') {
+      ok = await sendFirstMeetingEmail({ email: seller.email, firstName: seller.first_name });
+    } else if (email_type === 'no_photos') {
       ok = await sendNoPhotosNudge({ email: seller.email, firstName: seller.first_name });
     } else if (email_type === 'photographer_request') {
       ok = await sendPhotographerAvailabilityRequest({ email: seller.email, firstName: seller.first_name });
