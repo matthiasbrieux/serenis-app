@@ -788,9 +788,14 @@ async function previewEmail(templateName) {
     sold_congrats:         () => sendSoldCongrats({ email: fakeSellerEmail, firstName: 'Sophie', property: fakeProp }),
   };
 
-  // Ces fonctions envoient vraiment l'email — on intercepte via un wrapper sans envoi
-  // On appelle sgMail.send en mode "dry run" en lisant juste le HTML généré
+  // Intercepte sgMail.send pour capturer le HTML sans envoyer
+  // Force aussi le passage du check SENDGRID_API_KEY en injectant une clé factice si absente
   const originalSend = sgMail.send.bind(sgMail);
+  const hadKey = !!process.env.SENDGRID_API_KEY;
+  if (!hadKey) {
+    process.env.SENDGRID_API_KEY = 'preview-mode';
+    sgMail.setApiKey('preview-mode');
+  }
   let capturedHtml = null;
   sgMail.send = async (msg) => { capturedHtml = msg.html; };
 
@@ -801,6 +806,9 @@ async function previewEmail(templateName) {
     await fn();
   } finally {
     sgMail.send = originalSend;
+    if (!hadKey) {
+      delete process.env.SENDGRID_API_KEY;
+    }
   }
 
   return capturedHtml || `<p style="font-family:sans-serif;padding:20px;color:#c00;">Rendu indisponible pour ce template.</p>`;
