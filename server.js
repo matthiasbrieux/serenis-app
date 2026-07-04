@@ -53,6 +53,7 @@ app.get('/', (req, res) => {
 
 // Pages publiques statiques
 app.get('/cgv', (req, res) => { res.set('Cache-Control', 'no-store, no-cache, must-revalidate'); res.sendFile(path.join(__dirname, 'public', 'cgv.html')); });
+app.get('/cgv-mandat', (req, res) => { res.set('Cache-Control', 'no-store, no-cache, must-revalidate'); res.sendFile(path.join(__dirname, 'public', 'cgv-mandat.html')); });
 app.get('/mentions-legales', (req, res) => { res.set('Cache-Control', 'no-store, no-cache, must-revalidate'); res.sendFile(path.join(__dirname, 'public', 'mentions-legales.html')); });
 app.get('/confidentialite', (req, res) => { res.set('Cache-Control', 'no-store, no-cache, must-revalidate'); res.sendFile(path.join(__dirname, 'public', 'confidentialite.html')); });
 app.get('/tarifs', (req, res) => { res.set('Cache-Control', 'no-store, no-cache, must-revalidate'); res.sendFile(path.join(__dirname, 'public', 'tarifs.html')); });
