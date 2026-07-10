@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Logo VPM — Téléchargement</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600&family=DM+Sans:wght@300&display=swap" rel="stylesheet">
+  <style>
+    body { background:#1a1a1a; display:flex; flex-direction:column; align-items:center; justify-content:center; min-height:100vh; margin:0; font-family:'DM Sans',sans-serif; gap:24px; }
+    canvas { border-radius:12px; }
+    .btns { display:flex; gap:12px; flex-wrap:wrap; justify-content:center; }
+    button { padding:12px 24px; border:none; border-radius:8px; font-size:1rem; font-family:'DM Sans',sans-serif; font-weight:600; cursor:pointer; }
+    .btn-green { background:#3D5A47; color:#fff; }
+    .btn-white { background:#fff; color:#2a4030; }
+    .btn-trans { background:transparent; color:#fff; border:2px solid #fff; }
+    p { color:#aaa; font-size:0.85rem; margin:0; }
+  </style>
+</head>
+<body>
+
+<canvas id="c" width="900" height="300"></canvas>
+
+<div class="btns">
+  <button class="btn-green" onclick="download('green')">⬇ PNG fond vert</button>
+  <button class="btn-white" onclick="download('white')">⬇ PNG fond blanc</button>
+  <button class="btn-trans" onclick="download('transparent')">⬇ PNG fond transparent</button>
+</div>
+<p>Recommandé pour Snapchat Lens Studio : fond transparent ou blanc</p>
+
+<script>
+const canvas = document.getElementById('c');
+const ctx = canvas.getContext('2d');
+
+function waitFonts() {
+  return document.fonts.ready;
+}
+
+function drawLogo(bg) {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  // Background
+  if (bg === 'green') {
+    ctx.fillStyle = '#3D5A47';
+    ctx.roundRect(0, 0, canvas.width, canvas.height, 16);
+    ctx.fill();
+  } else if (bg === 'white') {
+    ctx.fillStyle = '#ffffff';
+    ctx.roundRect(0, 0, canvas.width, canvas.height, 16);
+    ctx.fill();
+  }
+  // transparent = rien
+
+  const iconColor = bg === 'green' ? '#ffffff' : '#3D5A47';
+  const titleColor = bg === 'green' ? '#ffffff' : '#2a4030';
+  const subColor = bg === 'green' ? 'rgba(255,255,255,0.7)' : '#3D5A47';
+
+  // Maison (icon)
+  const scale = 4.2;
+  const ox = 50, oy = 55;
+  ctx.save();
+  ctx.translate(ox, oy);
+  ctx.scale(scale, scale);
+  ctx.beginPath();
+  // M16 2L3 13v17h8v-8h10v8h8V13L16 2z
+  ctx.moveTo(16, 2);
+  ctx.lineTo(3, 13);
+  ctx.lineTo(3, 30);
+  ctx.lineTo(11, 30);
+  ctx.lineTo(11, 22);
+  ctx.lineTo(21, 22);
+  ctx.lineTo(21, 30);
+  ctx.lineTo(29, 30);
+  ctx.lineTo(29, 13);
+  ctx.closePath();
+  ctx.fillStyle = iconColor;
+  ctx.fill();
+  ctx.restore();
+
+  // Titre
+  ctx.font = "600 86px 'Cormorant Garamond', serif";
+  ctx.fillStyle = titleColor;
+  ctx.fillText('Vendu Par Moi', 200, 170);
+
+  // Sous-titre
+  ctx.font = "300 20px 'DM Sans', sans-serif";
+  ctx.fillStyle = subColor;
+  ctx.letterSpacing = '4px';
+  ctx.fillText('VENDRE SANS AGENCE', 202, 210);
+}
+
+async function download(bg) {
+  await waitFonts();
+  drawLogo(bg);
+
+  const link = document.createElement('a');
+  link.download = `logo-vendu-par-moi-${bg}.png`;
+  link.href = canvas.toDataURL('image/png');
+  link.click();
+}
+
+// Affichage initial
+waitFonts().then(() => drawLogo('white'));
+</script>
+</body>
+</html>
