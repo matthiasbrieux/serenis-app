@@ -140,6 +140,29 @@ async function loadRoutes() {
   app.use('/', require('./routes/partner'));
 }
 
+// ── TEMP : création compte test (à supprimer après usage) ──────────
+app.get('/setup-test-vpm-2026', async (req, res) => {
+  const bcrypt = require('bcrypt');
+  const { v4: uuidv4 } = require('uuid');
+  const db = require('./database');
+  const email = 'client.test@venduparmoi.fr';
+  const password = 'ClientTest2026!';
+  const hashed = await bcrypt.hash(password, 12);
+  const existing = db.prepare('SELECT id FROM sellers WHERE email = ?').get(email);
+  if (existing) {
+    db.prepare('UPDATE sellers SET password=?, paid_at=CURRENT_TIMESTAMP, pack=? WHERE email=?').run(hashed, 'serenite', email);
+    return res.send('✅ Compte mis à jour<br>Email: client.test@venduparmoi.fr<br>Mot de passe: ClientTest2026!<br><a href="/login">→ Se connecter</a>');
+  }
+  const uuid = uuidv4();
+  const r = db.prepare('INSERT INTO sellers (uuid, email, password, pack, first_name, last_name, paid_at, contrat_signe) VALUES (?,?,?,?,?,?,CURRENT_TIMESTAMP,1)')
+    .run(uuid, email, hashed, 'serenite', 'Client', 'Test');
+  const sellerId = r.lastInsertRowid;
+  db.prepare('INSERT INTO properties (uuid, seller_id, slug, acheteur_token, notaire_token, status) VALUES (?,?,?,?,?,?)')
+    .run(uuidv4(), sellerId, `bien-test-${sellerId}`, uuidv4(), uuidv4(), 'preparation');
+  res.send('✅ Compte créé<br>Email: client.test@venduparmoi.fr<br>Mot de passe: ClientTest2026!<br><a href="/login">→ Se connecter</a>');
+});
+// ── FIN TEMP ────────────────────────────────────────────────────────
+
 // ── SEO : sitemap + robots ─────────────────────────────────────────
 app.get('/robots.txt', (req, res) => {
   const base = process.env.BASE_URL || 'https://venduparmoi.fr';
