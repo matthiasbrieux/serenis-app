@@ -151,15 +151,28 @@ app.get('/setup-test-vpm-2026', async (req, res) => {
     const hashed = await bcrypt.hash(password, 12);
     const existing = db.prepare('SELECT id FROM sellers WHERE email = ?').get(email);
     if (existing) {
-      db.prepare('UPDATE sellers SET password=?, paid_at=CURRENT_TIMESTAMP, pack=?, contrat_signe=1 WHERE email=?').run(hashed, 'serenite', email);
-      return res.send('<h2>✅ Compte mis à jour</h2><p>Email : test@venduparmoi.fr</p><p>Mot de passe : Test1234!</p><p><a href="/login">→ Se connecter</a></p>');
+      const sellerId = existing.id;
+      // Supprime toutes les données liées
+      const props = db.prepare('SELECT id FROM properties WHERE seller_id = ?').all(sellerId);
+      props.forEach(p => {
+        db.prepare('DELETE FROM photos WHERE property_id = ?').run(p.id);
+        db.prepare('DELETE FROM documents WHERE property_id = ?').run(p.id);
+        db.prepare('DELETE FROM visits WHERE property_id = ?').run(p.id);
+        db.prepare('DELETE FROM buyer_contacts WHERE property_id = ?').run(p.id);
+        db.prepare('DELETE FROM offers WHERE property_id = ?').run(p.id);
+      });
+      db.prepare('DELETE FROM properties WHERE seller_id = ?').run(sellerId);
+      db.prepare('DELETE FROM notifications WHERE seller_id = ?').run(sellerId);
+      // Recrée compte et bien vides
+      db.prepare('UPDATE sellers SET password=?, paid_at=CURRENT_TIMESTAMP, pack=?, contrat_signe=1, first_name=?, last_name=? WHERE id=?').run(hashed, 'serenite', 'Client', 'Test', sellerId);
+      db.prepare('INSERT INTO properties (uuid, seller_id, slug, acheteur_token, notaire_token, status) VALUES (?,?,?,?,?,?)').run(uuidv4(), sellerId, `bien-test-${sellerId}`, uuidv4(), uuidv4(), 'preparation');
+      return res.send('<h2>✅ Compte remis à zéro</h2><p>Email : test@venduparmoi.fr</p><p>Mot de passe : Test1234!</p><p><a href="/login">→ Se connecter</a></p>');
     }
     const uuid = uuidv4();
     const r = db.prepare('INSERT INTO sellers (uuid, email, password, pack, first_name, last_name, paid_at, contrat_signe) VALUES (?,?,?,?,?,?,CURRENT_TIMESTAMP,1)')
       .run(uuid, email, hashed, 'serenite', 'Client', 'Test');
     const sellerId = r.lastInsertRowid;
-    db.prepare('INSERT INTO properties (uuid, seller_id, slug, acheteur_token, notaire_token, status) VALUES (?,?,?,?,?,?)')
-      .run(uuidv4(), sellerId, `bien-test-${sellerId}`, uuidv4(), uuidv4(), 'preparation');
+    db.prepare('INSERT INTO properties (uuid, seller_id, slug, acheteur_token, notaire_token, status) VALUES (?,?,?,?,?,?)').run(uuidv4(), sellerId, `bien-test-${sellerId}`, uuidv4(), uuidv4(), 'preparation');
     res.send('<h2>✅ Compte créé</h2><p>Email : test@venduparmoi.fr</p><p>Mot de passe : Test1234!</p><p><a href="/login">→ Se connecter</a></p>');
   } catch(e) {
     res.status(500).send('Erreur : ' + e.message);
