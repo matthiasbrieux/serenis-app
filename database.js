@@ -496,6 +496,9 @@ try {
 // ── Notifications — colonne link ───────────────────────────────
 try { db.exec("ALTER TABLE notifications ADD COLUMN link TEXT"); } catch(e) {}
 
+// ── Nom du constructeur ─────────────────────────────────────────
+try { db.exec("ALTER TABLE properties ADD COLUMN constructeur TEXT"); } catch(e) {}
+
 // ── Compromis de vente — jalons calendrier ─────────────────────
 try { db.exec("ALTER TABLE properties ADD COLUMN compromis_date DATE"); } catch(e) {}
 try { db.exec("ALTER TABLE properties ADD COLUMN compromis_conditions_delay INTEGER DEFAULT 45"); } catch(e) {}

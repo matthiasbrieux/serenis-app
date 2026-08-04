@@ -183,7 +183,7 @@ router.post('/api/property', requireAuth, express.json(), (req, res) => {
   const slug = uuidv4().split('-')[0] + '-' + (req.body.city || 'bien').toLowerCase().replace(/\s+/g, '-');
   const fields = [
     'type','address','city','postal_code','surface_habitable','surface_terrain',
-    'rooms','bedrooms','year_built','heating_type','heating_details','heating_mechanism','heating_year',
+    'rooms','bedrooms','year_built','constructeur','heating_type','heating_details','heating_mechanism','heating_year',
     'hauteur_plafond','dpe_class','taxe_fonciere','exposition','garden','terrace',
     'assainissement_type','certificat_assainissement','toiture_couverture',
     'fenetres_type','volets_type','sols_dalle','stationnement_type','garage_motorise','garage_sol','garage_surface',

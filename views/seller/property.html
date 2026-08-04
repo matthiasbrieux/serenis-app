@@ -1442,6 +1442,10 @@
             <div style="text-align:center"><span class="year-badge moderne" id="yearBadge">Construction standard</span></div>
           </div>
         </div>
+        <div class="form-group" style="margin-top:16px;">
+          <label>Nom du constructeur <span style="font-size:0.75rem;color:#aaa;font-weight:400;">(optionnel)</span></label>
+          <input type="text" name="constructeur" id="field-constructeur" placeholder="Ex : Maisons Pierre, Bouygues Immobilier…" style="width:100%;padding:10px 14px;border:1px solid #ddd;border-radius:10px;font-size:0.92rem;font-family:'DM Sans',sans-serif;">
+        </div>
 
         <!-- Chauffage et DPE -->
         <div class="section-divider" style="margin-top:32px;"><h3>Chauffage</h3></div>
@@ -3346,6 +3350,8 @@ async function loadProperty() {
 
   var yrSlider = document.getElementById('yearSlider');
   if (yrSlider && p.year_built) { yrSlider.value = p.year_built; yrSlider.dispatchEvent(new Event('input')); }
+  var constructeurField = document.getElementById('field-constructeur');
+  if (constructeurField && p.constructeur) constructeurField.value = p.constructeur;
 
   // Restore equipment from saved value
   if (p.equipment) {
