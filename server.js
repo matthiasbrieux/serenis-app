@@ -79,6 +79,7 @@ app.get('/questionnaire-satisfaction', (req, res) => { res.set('Cache-Control', 
 app.get('/kit-bienvenue', (req, res) => { res.set('Cache-Control', 'no-store, no-cache, must-revalidate'); res.sendFile(path.join(__dirname, 'public', 'kit-bienvenue.html')); });
 app.get('/flyer-demarchage', (req, res) => { res.set('Cache-Control', 'no-store, no-cache, must-revalidate'); res.sendFile(path.join(__dirname, 'public', 'flyer-demarchage.html')); });
 app.get('/simulateur-economies', (req, res) => { res.set('Cache-Control', 'no-store, no-cache, must-revalidate'); res.sendFile(path.join(__dirname, 'public', 'simulateur-economies.html')); });
+app.get('/facture-vpm', (req, res) => { res.set('Cache-Control', 'no-store, no-cache, must-revalidate'); res.sendFile(path.join(__dirname, 'public', 'facture-vpm.html')); });
 
 app.use(express.static(path.join(__dirname, 'public'), {
   maxAge: '7d',

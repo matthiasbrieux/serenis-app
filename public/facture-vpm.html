@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Facture — Vendu Par Moi</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after {
+  margin: 0; padding: 0; box-sizing: border-box;
+  -webkit-print-color-adjust: exact !important;
+  print-color-adjust: exact !important;
+  color-adjust: exact !important;
+}
+
+body {
+  font-family: 'DM Sans', sans-serif; font-weight: 300;
+  background: #E8E4DC; min-height: 100vh;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  padding: 3rem 2rem; gap: 1.5rem;
+}
+
+.no-print {
+  background: #1D3A28; color: #fff; border: none;
+  padding: 11px 26px; border-radius: 8px;
+  font-family: 'DM Sans', sans-serif; font-size: .88rem; font-weight: 600;
+  cursor: pointer;
+}
+.no-print:hover { background: #3D5A47; }
+
+@media print {
+  body { background: #fff; padding: 0; gap: 0; }
+  .no-print, .page-label, .print-note { display: none; }
+  .facture { box-shadow: none; width: 210mm; height: 297mm; }
+  @page { margin: 0; size: A4 portrait; }
+}
+
+/* ── DOCUMENT A4 ── */
+.facture {
+  width: 794px; height: 1123px;
+  background: #FAFAF8;
+  position: relative; overflow: hidden;
+  box-shadow: 0 20px 80px rgba(0,0,0,.2), 0 4px 20px rgba(0,0,0,.1);
+  display: flex; flex-direction: column;
+}
+
+/* Trait gauche */
+.trait-gauche {
+  position: absolute; left: 0; top: 0; bottom: 0; width: 5px;
+  background: linear-gradient(to bottom,
+    transparent 0%, #C4603A 15%, #C4603A 85%, transparent 100%);
+  z-index: 2;
+}
+
+/* Filigrane */
+.watermark {
+  position: absolute; top: 50%; left: 50%;
+  transform: translate(-50%,-50%) rotate(-25deg);
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 7rem; font-weight: 900;
+  color: rgba(29,58,40,.04);
+  white-space: nowrap; pointer-events: none; z-index: 0;
+  letter-spacing: .1em; user-select: none;
+}
+
+/* ── HEADER ── */
+.fac-header {
+  padding: 2.5rem 3.5rem 2rem 4rem;
+  display: flex; justify-content: space-between; align-items: flex-start;
+  border-bottom: 2px solid #1D3A28;
+  position: relative; z-index: 1; flex-shrink: 0;
+}
+
+.header-logo {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.5rem; font-weight: 700; color: #1D3A28;
+  margin-bottom: .4rem;
+}
+.header-logo em { color: #C4603A; font-style: italic; }
+.header-societe {
+  font-size: .72rem; color: #888; line-height: 1.7;
+  letter-spacing: .02em;
+}
+
+.header-right { text-align: right; }
+.facture-label {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 2rem; font-weight: 700; color: #1D3A28;
+  letter-spacing: .04em; margin-bottom: .3rem;
+}
+.facture-num {
+  font-size: .72rem; color: #888; line-height: 1.8;
+}
+.facture-num strong { color: #333; font-weight: 600; }
+
+/* ── PARTIES ── */
+.fac-parties {
+  padding: 1.8rem 3.5rem 1.5rem 4rem;
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 3rem;
+  border-bottom: 1px solid #E0D8CC;
+  position: relative; z-index: 1; flex-shrink: 0;
+}
+
+.partie-label {
+  font-size: .6rem; font-weight: 600; letter-spacing: .2em;
+  text-transform: uppercase; color: #C4603A; margin-bottom: .8rem;
+}
+.partie-nom {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.05rem; font-weight: 700; color: #1D3A28;
+  margin-bottom: .3rem;
+}
+.partie-detail {
+  font-size: .78rem; color: #666; line-height: 1.75;
+}
+.partie-detail span { display: block; }
+
+.field {
+  border-bottom: 1px solid #C8C0B8;
+  min-height: 1.4rem; margin-bottom: .3rem;
+  font-size: .82rem; color: #333;
+}
+.field-label {
+  font-size: .62rem; letter-spacing: .1em; text-transform: uppercase;
+  color: #BBB; margin-bottom: .15rem; display: block;
+}
+
+/* ── OBJET ── */
+.fac-objet {
+  padding: 1rem 3.5rem 1rem 4rem;
+  background: #F5F0E8;
+  display: flex; align-items: center; gap: 1.5rem;
+  border-bottom: 1px solid #E0D8CC;
+  position: relative; z-index: 1; flex-shrink: 0;
+}
+.objet-label {
+  font-size: .6rem; font-weight: 600; letter-spacing: .18em;
+  text-transform: uppercase; color: #C4603A; flex-shrink: 0;
+}
+.objet-texte {
+  font-family: 'Cormorant Garamond', serif;
+  font-style: italic; font-size: .95rem; color: #444;
+}
+.objet-date {
+  margin-left: auto; font-size: .75rem; color: #888; flex-shrink: 0;
+}
+.objet-date strong { color: #333; }
+
+/* ── TABLEAU ── */
+.fac-tableau {
+  padding: 1.5rem 3.5rem 0 4rem;
+  position: relative; z-index: 1; flex-shrink: 0;
+}
+
+table { width: 100%; border-collapse: collapse; }
+
+thead tr { background: #1D3A28; }
+thead th {
+  font-size: .62rem; font-weight: 600; letter-spacing: .14em;
+  text-transform: uppercase; color: rgba(245,240,232,.75);
+  padding: .7rem 1rem; text-align: left;
+}
+thead th:last-child,
+thead th:nth-child(3),
+thead th:nth-child(4) { text-align: right; }
+
+tbody tr { border-bottom: 1px solid #E0D8CC; }
+tbody tr:last-child { border-bottom: 2px solid #1D3A28; }
+tbody tr:nth-child(even) { background: #F8F5F0; }
+
+tbody td {
+  padding: .9rem 1rem;
+  font-size: .82rem; color: #333;
+  vertical-align: top;
+}
+tbody td:nth-child(3),
+tbody td:nth-child(4),
+tbody td:last-child { text-align: right; }
+
+.td-desc { font-size: .82rem; color: #1D3A28; font-weight: 600; }
+.td-detail { font-size: .72rem; color: #888; margin-top: .2rem; line-height: 1.5; }
+
+/* ── TOTAUX ── */
+.fac-totaux {
+  padding: 1rem 3.5rem 0 4rem;
+  position: relative; z-index: 1; flex-shrink: 0;
+}
+
+.totaux-grid {
+  display: flex; flex-direction: column;
+  align-items: flex-end;
+}
+
+.total-ligne {
+  display: flex; width: 280px;
+}
+.total-ligne-label {
+  flex: 1; font-size: .78rem; color: #666;
+  padding: .55rem .8rem; border-bottom: 1px solid #E0D8CC;
+}
+.total-ligne-val {
+  width: 100px; font-size: .82rem; color: #333; font-weight: 500;
+  padding: .55rem .8rem; text-align: right;
+  border-bottom: 1px solid #E0D8CC;
+}
+
+.total-ttc {
+  display: flex; width: 280px;
+  background: #0C1910; margin-top: 2px;
+}
+.total-ttc-label {
+  flex: 1; font-size: .82rem; font-weight: 600; color: rgba(245,240,232,.8);
+  padding: .7rem .8rem;
+  letter-spacing: .04em; text-transform: uppercase;
+}
+.total-ttc-val {
+  width: 100px;
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.1rem; font-weight: 700; color: #C4603A;
+  padding: .7rem .8rem; text-align: right;
+}
+
+.echeances-note {
+  margin-top: .6rem; width: 280px;
+  background: #F5F0E8; border-left: 3px solid #C4603A;
+  padding: .6rem .8rem;
+  font-size: .7rem; color: #666; line-height: 1.6;
+}
+.echeances-note strong { color: #333; }
+
+/* ── PAIEMENT ── */
+.fac-paiement {
+  padding: 1.2rem 3.5rem 0 4rem;
+  position: relative; z-index: 1; flex-shrink: 0;
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+}
+
+.paiement-bloc {
+  border: 1px solid #E0D8CC; padding: 1rem 1.2rem;
+}
+.paiement-titre {
+  font-size: .6rem; font-weight: 600; letter-spacing: .16em;
+  text-transform: uppercase; color: #C4603A; margin-bottom: .7rem;
+}
+.paiement-detail {
+  font-size: .76rem; color: #555; line-height: 1.7;
+}
+.paiement-detail strong { color: #1D3A28; font-weight: 600; }
+
+/* ── MENTIONS LÉGALES ── */
+.fac-mentions {
+  padding: 1rem 3.5rem 0 4rem;
+  position: relative; z-index: 1; flex-shrink: 0;
+}
+
+.mentions-box {
+  background: #F8F5F0; border: 1px solid #E0D8CC;
+  padding: .9rem 1.2rem;
+}
+.mentions-titre {
+  font-size: .58rem; font-weight: 600; letter-spacing: .16em;
+  text-transform: uppercase; color: #BBB; margin-bottom: .5rem;
+}
+.mentions-texte {
+  font-size: .68rem; color: #999; line-height: 1.7;
+}
+.mentions-texte strong { color: #666; font-weight: 600; }
+
+/* ── FOOTER ── */
+.fac-footer {
+  margin-top: auto;
+  padding: 1rem 3.5rem 1.2rem 4rem;
+  border-top: 1px solid #E0D8CC;
+  background: #F5F0E8;
+  display: flex; justify-content: space-between; align-items: center;
+  position: relative; z-index: 1; flex-shrink: 0;
+}
+.ff-logo {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: .95rem; font-weight: 700; color: #3D5A47;
+}
+.ff-logo em { color: #C4603A; font-style: italic; }
+.ff-contact {
+  font-size: .62rem; color: #AAA;
+  letter-spacing: .05em; text-align: center; line-height: 1.7;
+}
+.ff-legal {
+  font-size: .6rem; color: #BBB;
+  text-align: right; line-height: 1.7;
+}
+
+.page-label {
+  font-size: .7rem; letter-spacing: .14em; text-transform: uppercase;
+  color: #999; text-align: center;
+}
+.print-note {
+  font-size: .7rem; color: #AAA; text-align: center;
+  font-style: italic; max-width: 600px; line-height: 1.7;
+}
+</style>
+</head>
+<body>
+
+<p class="page-label">Modèle de Facture — Vendu Par Moi · Format A4 · À compléter avant impression</p>
+<button class="no-print" onclick="window.print()">⬇ Télécharger en PDF</button>
+
+<div class="facture">
+  <div class="trait-gauche"></div>
+  <div class="watermark">FACTURE</div>
+
+  <!-- HEADER -->
+  <div class="fac-header">
+    <div>
+      <div class="header-logo"><em>Vendu</em> Par Moi</div>
+      <div class="header-societe">
+        SAS Vendu Par Moi<br>
+        Capital social : __________ €<br>
+        SIRET : ________________________________<br>
+        RCS : ________________________________<br>
+        N° TVA intracommunautaire : FR __________________<br>
+        Siège social : _________________________________________<br>
+        06 95 44 36 54 · 06 84 34 06 11 · contact@venduparmoi.fr
+      </div>
+    </div>
+    <div class="header-right">
+      <div class="facture-label">FACTURE</div>
+      <div class="facture-num">
+        N° <strong>VPM-______-2026</strong><br>
+        Date d'émission : <strong>__ / __ / 2026</strong><br>
+        Date d'échéance : <strong>__ / __ / 2026</strong><br>
+        Réf. contrat : <strong>VPM-______-2026</strong>
+      </div>
+    </div>
+  </div>
+
+  <!-- PARTIES -->
+  <div class="fac-parties">
+    <div>
+      <div class="partie-label">Émetteur (Prestataire)</div>
+      <div class="partie-nom">SAS Vendu Par Moi</div>
+      <div class="partie-detail">
+        <span>Représentée par Guillaume Girod &amp; Matthias Brieux</span>
+        <span>_________________________________ (adresse)</span>
+        <span>_________________________________ (CP, Ville)</span>
+        <span>SIRET : ________________________________</span>
+        <span>TVA : FR __________________</span>
+      </div>
+    </div>
+    <div>
+      <div class="partie-label">Destinataire (Client)</div>
+      <div class="partie-nom" style="font-size:.9rem">
+        <div class="field-label">Nom et Prénom</div>
+        <div class="field">_________________________________</div>
+      </div>
+      <div class="partie-detail" style="margin-top:.5rem">
+        <div class="field-label">Adresse</div>
+        <div class="field">_________________________________</div>
+        <div class="field-label" style="margin-top:.4rem">Code postal &amp; Ville</div>
+        <div class="field">_________________________________</div>
+        <div class="field-label" style="margin-top:.4rem">Adresse du bien concerné</div>
+        <div class="field">_________________________________</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- OBJET -->
+  <div class="fac-objet">
+    <div class="objet-label">Objet</div>
+    <div class="objet-texte">Formation à la vente immobilière entre particuliers — Séance __ sur 2</div>
+    <div class="objet-date">Séance réalisée le : <strong>__ / __ / 2026</strong></div>
+  </div>
+
+  <!-- TABLEAU -->
+  <div class="fac-tableau">
+    <table>
+      <thead>
+        <tr>
+          <th style="width:45%">Désignation</th>
+          <th style="width:15%">Qté</th>
+          <th style="width:15%">P.U. HT</th>
+          <th style="width:10%">TVA</th>
+          <th style="width:15%">Total TTC</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>
+            <div class="td-desc">Formation vente immobilière PAP — Séance 1</div>
+            <div class="td-detail">Estimation DVF · Mesures loi Carrez · Reportage photo<br>Rédaction &amp; publication annonce · Remise kit documentaire</div>
+          </td>
+          <td>1</td>
+          <td>645,00 €</td>
+          <td>20 %</td>
+          <td>774,00 €</td>
+        </tr>
+        <tr>
+          <td>
+            <div class="td-desc" style="color:#CCC">Formation vente immobilière PAP — Séance 2</div>
+            <div class="td-detail" style="color:#CCC">À facturer lors de la deuxième séance</div>
+          </td>
+          <td style="color:#CCC">1</td>
+          <td style="color:#CCC">645,00 €</td>
+          <td style="color:#CCC">20 %</td>
+          <td style="color:#CCC">774,00 €</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- TOTAUX -->
+  <div class="fac-totaux">
+    <div class="totaux-grid">
+      <div class="total-ligne">
+        <div class="total-ligne-label">Montant HT</div>
+        <div class="total-ligne-val">645,00 €</div>
+      </div>
+      <div class="total-ligne">
+        <div class="total-ligne-label">TVA (20 %)</div>
+        <div class="total-ligne-val">129,00 €</div>
+      </div>
+      <div class="total-ttc">
+        <div class="total-ttc-label">Total TTC</div>
+        <div class="total-ttc-val">774,00 €</div>
+      </div>
+      <div class="echeances-note">
+        <strong>Cette facture correspond à la 1re échéance</strong> (séance 1 sur 2).<br>
+        La 2e facture de 774,00 € TTC sera émise lors de la séance 2.
+      </div>
+    </div>
+  </div>
+
+  <!-- PAIEMENT -->
+  <div class="fac-paiement">
+    <div class="paiement-bloc">
+      <div class="paiement-titre">Conditions de paiement</div>
+      <div class="paiement-detail">
+        <strong>Paiement à réception</strong> — le jour de la séance<br>
+        Pas d'escompte pour paiement anticipé<br>
+        Pénalités de retard : taux légal en vigueur<br>
+        Indemnité forfaitaire recouvrement : <strong>40 €</strong> (B2B)
+      </div>
+    </div>
+    <div class="paiement-bloc">
+      <div class="paiement-titre">Modes de paiement acceptés</div>
+      <div class="paiement-detail">
+        <strong>Espèces</strong> — jusqu'à 1 000 € (réglementation en vigueur)<br>
+        <strong>Virement bancaire</strong> — IBAN : FR__ ____ ____ ____ ____ ____ ___<br>
+        BIC : ____________<br>
+        <strong>Chèque</strong> — à l'ordre de SAS Vendu Par Moi
+      </div>
+    </div>
+  </div>
+
+  <!-- MENTIONS LÉGALES -->
+  <div class="fac-mentions">
+    <div class="mentions-box">
+      <div class="mentions-titre">Mentions légales obligatoires</div>
+      <div class="mentions-texte">
+        <strong>SAS Vendu Par Moi</strong> — Société par Actions Simplifiée au capital de __________ € —
+        SIRET : ________________________________ — RCS : ________________________________ —
+        N° TVA intracommunautaire : FR __________________ —
+        Siège social : _________________________________________, France.<br>
+        <strong>Nature de la prestation :</strong> formation et coaching pédagogique à la vente immobilière entre particuliers.
+        La SAS Vendu Par Moi n'exerce pas d'activité d'entremise immobilière au sens de la loi n° 70-9 du 2 janvier 1970 dite « loi Hoguet ».
+        Aucun mandat de vente — aucune rémunération liée au résultat de la transaction.<br>
+        <strong>Médiateur de la consommation :</strong> _______________________________ —
+        <strong>En cas de litige :</strong> contact@venduparmoi.fr avant toute procédure judiciaire.
+        Conformément à l'art. L.441-10 C.com., tout retard de paiement entraîne des pénalités au taux légal en vigueur, exigibles sans mise en demeure préalable.
+      </div>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <div class="fac-footer">
+    <div class="ff-logo"><em>Vendu</em> Par Moi</div>
+    <div class="ff-contact">
+      06 95 44 36 54 · 06 84 34 06 11 · contact@venduparmoi.fr · venduparmoi.fr
+    </div>
+    <div class="ff-legal">
+      SAS Vendu Par Moi<br>
+      SIRET : ________________<br>
+      TVA : FR ______________
+    </div>
+  </div>
+
+</div>
+
+<p class="print-note">
+  Modèle de facture · Format A4 · Complétez les champs avant impression ou export PDF<br>
+  Une facture par séance · Numérotation chronologique obligatoire · Conservez un double
+</p>
+
+</body>
+</html>
