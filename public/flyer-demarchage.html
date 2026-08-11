@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Flyer Démarchage — Vendu Par Moi</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after {
+  box-sizing: border-box; margin: 0; padding: 0;
+  -webkit-print-color-adjust: exact !important;
+  print-color-adjust: exact !important;
+  color-adjust: exact !important;
+}
+
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: #E8E4DC;
+  display: flex; flex-direction: column;
+  align-items: center;
+  padding: 32px 20px 60px;
+  gap: 20px;
+}
+
+.no-print {
+  background: #1D3A28; color: #fff; border: none;
+  padding: 11px 26px; border-radius: 8px;
+  font-family: 'DM Sans', sans-serif; font-size: .88rem; font-weight: 600;
+  cursor: pointer;
+}
+.no-print:hover { background: #3D5A47; }
+
+@media print {
+  body { background: #fff; padding: 0; gap: 0; }
+  .no-print { display: none; }
+  .page { box-shadow: none; }
+  @page { margin: 0; size: A4 portrait; }
+}
+
+/* ── PAGE ── */
+.page {
+  width: 210mm; min-height: 297mm;
+  background: #fff;
+  display: flex; flex-direction: column;
+  box-shadow: 0 8px 40px rgba(0,0,0,.15);
+  overflow: hidden;
+  position: relative;
+}
+
+/* ── HEADER ── */
+.header {
+  background: linear-gradient(160deg, #0C1910 0%, #1D3A28 60%, #2d5040 100%);
+  padding: 40px 52px 36px;
+  position: relative;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+.header::before {
+  content: '';
+  position: absolute; top: -60px; right: -60px;
+  width: 280px; height: 280px; border-radius: 50%;
+  background: rgba(196,120,90,.08);
+  pointer-events: none;
+}
+.header-brand {
+  display: flex; align-items: center; gap: 9px;
+  margin-bottom: 22px;
+}
+.header-brand-icon {
+  width: 22px; height: 22px; opacity: .7;
+}
+.header-brand-text {
+  font-family: 'DM Sans', sans-serif;
+  font-size: .68rem; font-weight: 700;
+  letter-spacing: .2em; text-transform: uppercase;
+  color: rgba(245,240,232,.45);
+}
+.header-h1 {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 2.55rem; font-weight: 700; line-height: 1.1;
+  color: #F5F0E8;
+  margin-bottom: 4px;
+}
+.header-h1-accent {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 2.55rem; font-weight: 700; line-height: 1.1;
+  color: #C4603A;
+  font-style: italic;
+}
+
+/* ── BODY ── */
+.body {
+  flex: 1; padding: 36px 52px 28px;
+  display: flex; flex-direction: column;
+  gap: 22px;
+}
+
+/* Intro */
+.intro {
+  font-size: .88rem; color: #444; line-height: 1.75;
+}
+
+/* Stats */
+.stats-grid {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+.stat-box {
+  border-left: 4px solid #3D5A47;
+  background: #F5F0E8;
+  padding: 18px 20px;
+}
+.stat-val {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 2rem; font-weight: 700;
+  color: #1D3A28; line-height: 1.1;
+  margin-bottom: 8px;
+}
+.stat-desc {
+  font-size: .76rem; color: #666; line-height: 1.6;
+}
+
+.disclaimer {
+  font-size: .65rem; color: #AAA; line-height: 1.6;
+  font-style: italic;
+}
+
+/* Parcours */
+.section-title {
+  font-family: 'DM Sans', sans-serif;
+  font-size: .82rem; font-weight: 700; color: #1D3A28;
+  padding-bottom: 8px;
+  border-bottom: 1.5px solid #E0D8CC;
+}
+
+.parcours {
+  display: grid; grid-template-columns: 1fr 1fr 1fr;
+  gap: 12px; text-align: center;
+  position: relative;
+}
+.parcours::before {
+  content: '';
+  position: absolute; top: 20px; left: 15%; right: 15%;
+  height: 1.5px; background: #D0E4D9; z-index: 0;
+}
+.step { display: flex; flex-direction: column; align-items: center; gap: 10px; }
+.step-circle {
+  width: 42px; height: 42px; border-radius: 50%;
+  background: #1D3A28;
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.1rem; font-weight: 700; color: #C4603A;
+  position: relative; z-index: 1;
+  flex-shrink: 0;
+}
+.step-label {
+  font-size: .76rem; color: #555; line-height: 1.5;
+}
+
+/* Body text */
+.body-text {
+  font-size: .88rem; color: #444; line-height: 1.75;
+}
+.body-text strong { color: #1D3A28; font-weight: 700; }
+
+/* Bullets */
+.bullets {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 8px 20px;
+}
+.bullet {
+  display: flex; align-items: flex-start; gap: 8px;
+  font-size: .84rem; color: #444; line-height: 1.5;
+}
+.bullet::before {
+  content: '';
+  width: 8px; height: 8px; border-radius: 50%;
+  background: #3D5A47; flex-shrink: 0; margin-top: 5px;
+}
+
+/* Résumé */
+.resume {
+  font-size: .88rem; color: #444; line-height: 1.75;
+}
+.resume strong { color: #1D3A28; font-weight: 700; }
+
+/* CTA text */
+.cta-text {
+  font-size: .88rem; color: #444; line-height: 1.75;
+}
+
+/* Contact box */
+.contact-box {
+  background: #F0F5F1;
+  border-left: 4px solid #3D5A47;
+  padding: 18px 24px;
+  text-align: center;
+}
+.contact-cta {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.1rem; font-weight: 700; color: #1D3A28;
+  margin-bottom: 6px;
+  font-style: italic;
+}
+.contact-names {
+  font-size: .82rem; color: #555; line-height: 1.7;
+}
+.contact-names strong { color: #1D3A28; font-weight: 700; }
+.contact-info {
+  font-size: .82rem; color: #3D5A47; font-weight: 500;
+  margin-top: 2px;
+}
+
+/* ── FOOTER ── */
+.footer {
+  background: #0C1910;
+  padding: 14px 52px;
+  display: flex; justify-content: space-between; align-items: center;
+  gap: 20px; flex-shrink: 0;
+}
+.footer-logo {
+  display: flex; align-items: center; gap: 8px;
+}
+.footer-logo-text {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: .95rem; font-weight: 700;
+  color: rgba(245,240,232,.4);
+}
+.footer-logo-text em { color: #C4603A; font-style: italic; }
+.footer-tag {
+  font-size: .65rem; color: rgba(245,240,232,.2);
+  letter-spacing: .04em; text-align: right;
+}
+</style>
+</head>
+<body>
+
+<button class="no-print" onclick="window.print()">⬇ Télécharger en PDF</button>
+
+<div class="page">
+
+  <!-- HEADER -->
+  <div class="header">
+    <div class="header-brand">
+      <svg class="header-brand-icon" viewBox="0 0 24 24" fill="rgba(245,240,232,.6)">
+        <path d="M3 9.5L12 3L21 9.5V20C21 20.55 20.55 21 20 21H15V16H9V21H4C3.45 21 3 20.55 3 20V9.5Z"/>
+      </svg>
+      <span class="header-brand-text">Vendu Par Moi</span>
+    </div>
+    <div class="header-h1">Vendez votre bien vous-même,</div>
+    <div class="header-h1-accent">avec les outils des professionnels.</div>
+  </div>
+
+  <!-- BODY -->
+  <div class="body">
+
+    <p class="intro">
+      En France, un propriétaire réalise en moyenne trois projets immobiliers au cours de sa vie : un premier achat, une maison familiale, puis un dernier projet adapté à une nouvelle étape de vie. Trois achats, trois ventes, soit six transactions — et à chacune, des frais d'agence.
+    </p>
+
+    <div class="stats-grid">
+      <div class="stat-box">
+        <div class="stat-val">6 % – 10 %</div>
+        <div class="stat-desc">de frais pratiqués par les agences traditionnelles (Century 21, Laforêt, ORPI…) à chaque transaction</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-val">126 000 €</div>
+        <div class="stat-desc">de frais cumulés sur les 6 transactions d'un parcours immobilier type (3 achats + 3 ventes), pour un bien moyen à 300 000 € et des frais à 7 %</div>
+      </div>
+    </div>
+
+    <p class="disclaimer">
+      Estimation indicative pour un bien moyen à 300 000 € et des frais d'agence à 7 %, à l'achat comme à la vente. Les frais réels varient selon le prix du bien, la région et le type de mandat.
+    </p>
+
+    <div class="section-title">Le parcours immobilier type</div>
+
+    <div class="parcours">
+      <div class="step">
+        <div class="step-circle">1</div>
+        <div class="step-label">Premier achat — appartement ou maison mitoyenne</div>
+      </div>
+      <div class="step">
+        <div class="step-circle">2</div>
+        <div class="step-label">Deuxième achat — maison familiale</div>
+      </div>
+      <div class="step">
+        <div class="step-circle">3</div>
+        <div class="step-label">Dernier projet — adapté à une nouvelle étape de vie</div>
+      </div>
+    </div>
+
+    <p class="body-text">
+      C'est précisément pour répondre à ce constat que nous avons créé <strong>Vendu Par Moi</strong>. Notre objectif est simple : vous permettre de vendre de particulier à particulier, tout en bénéficiant des méthodes et des outils utilisés par les professionnels de l'immobilier.
+    </p>
+
+    <p class="body-text">
+      Avec notre accompagnement, vous gardez la maîtrise de votre vente tout en gagnant du temps grâce à :
+    </p>
+
+    <div class="bullets">
+      <div class="bullet">Une stratégie de mise en vente claire</div>
+      <div class="bullet">Des outils pour présenter efficacement votre bien</div>
+      <div class="bullet">Un accompagnement pas à pas</div>
+      <div class="bullet">Une méthode conçue pour vendre sereinement</div>
+    </div>
+
+    <p class="resume">En résumé : <strong>vous vendez vous-même, mais vous n'êtes pas seul.</strong></p>
+
+    <p class="cta-text">
+      Si vous envisagez de vendre votre bien aujourd'hui ou dans les prochains mois, nous serions ravis d'échanger quelques minutes avec vous afin de vous montrer concrètement comment notre méthode peut vous aider à réaliser des économies sur votre vente.
+    </p>
+
+    <div class="contact-box">
+      <div class="contact-cta">Parlons de votre projet — sans engagement.</div>
+      <div class="contact-names">
+        <strong>Matthias Brieux</strong> &amp; <strong>Guillaume Girod</strong> · Fondateurs de Vendu Par Moi
+      </div>
+      <div class="contact-info">contact@venduparmoi.fr &nbsp;·&nbsp; 06 95 44 36 54</div>
+    </div>
+
+  </div>
+
+  <!-- FOOTER -->
+  <div class="footer">
+    <div class="footer-logo">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="rgba(245,240,232,.3)">
+        <path d="M3 9.5L12 3L21 9.5V20C21 20.55 20.55 21 20 21H15V16H9V21H4C3.45 21 3 20.55 3 20V9.5Z"/>
+      </svg>
+      <span class="footer-logo-text"><em>Vendu</em> Par Moi</span>
+    </div>
+    <div class="footer-tag">Vendez de particulier à particulier, accompagné comme un professionnel</div>
+  </div>
+
+</div>
+
+</body>
+</html>
