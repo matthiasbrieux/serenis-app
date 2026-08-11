@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Simulateur d'Économies — Vendu Par Moi</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after {
+  margin: 0; padding: 0; box-sizing: border-box;
+  -webkit-print-color-adjust: exact !important;
+  print-color-adjust: exact !important;
+  color-adjust: exact !important;
+}
+
+body {
+  font-family: 'DM Sans', sans-serif;
+  font-weight: 300;
+  background: #E8E4DC;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem 1rem;
+  gap: 16px;
+}
+
+.no-print {
+  background: #1D3A28; color: #fff; border: none;
+  padding: 10px 24px; border-radius: 8px;
+  font-family: 'DM Sans', sans-serif; font-size: .85rem; font-weight: 600;
+  cursor: pointer;
+}
+.no-print:hover { background: #3D5A47; }
+
+@media print {
+  body { background: #E8E4DC; padding: 1rem; }
+  .no-print { display: none; }
+  @page { margin: 0; size: A4 portrait; }
+}
+
+/* ── WIDGET ── */
+.widget {
+  width: 100%; max-width: 560px;
+  background: #FAFAF8;
+  box-shadow: 0 20px 60px rgba(0,0,0,.18);
+  overflow: hidden;
+}
+
+/* ── HEADER ── */
+.w-header {
+  background: linear-gradient(160deg, #0C1910 0%, #1D3A28 60%, #2d5040 100%);
+  padding: 2rem 2.5rem 1.8rem;
+  position: relative; overflow: hidden;
+}
+.w-header::before {
+  content: '';
+  position: absolute;
+  width: 300px; height: 300px; border-radius: 50%;
+  background: radial-gradient(circle, rgba(196,96,58,.12) 0%, transparent 70%);
+  top: -100px; right: -80px; pointer-events: none;
+}
+.w-header::after {
+  content: '';
+  position: absolute;
+  width: 200px; height: 200px; border-radius: 50%;
+  background: radial-gradient(circle, rgba(107,191,130,.07) 0%, transparent 70%);
+  bottom: -80px; left: -60px; pointer-events: none;
+}
+.w-brand {
+  display: flex; align-items: center; gap: 8px;
+  margin-bottom: 1.2rem;
+}
+.w-brand-icon { width: 18px; height: 18px; opacity: .5; }
+.w-kicker {
+  font-size: .65rem; font-weight: 700; letter-spacing: .2em;
+  text-transform: uppercase;
+  color: #C4603A;
+  display: inline-block;
+  border: 1px solid rgba(196,96,58,.35);
+  padding: 3px 10px; border-radius: 20px;
+}
+.w-titre {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.7rem; font-weight: 700; color: #F5F0E8;
+  line-height: 1.15; margin-top: .7rem; margin-bottom: .5rem;
+}
+.w-titre em { font-style: italic; color: #f0b89a; }
+.w-sous {
+  font-family: 'Cormorant Garamond', serif;
+  font-style: italic; font-size: .9rem;
+  color: rgba(245,240,232,.45); line-height: 1.65;
+}
+
+/* ── BODY ── */
+.w-body { padding: 2rem 2.5rem; }
+
+/* ── SLIDER ── */
+.slider-label {
+  display: flex; justify-content: space-between; align-items: baseline;
+  margin-bottom: .8rem;
+}
+.sl-txt {
+  font-size: .72rem; font-weight: 600; color: #888;
+  letter-spacing: .07em; text-transform: uppercase;
+}
+.sl-val {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.8rem; font-weight: 700; color: #1D3A28;
+  line-height: 1; transition: all .15s;
+}
+
+input[type=range] {
+  -webkit-appearance: none; appearance: none;
+  width: 100%; height: 4px;
+  background: linear-gradient(to right, #3D5A47 0%, #3D5A47 var(--pct, 20%), #E8E4DC var(--pct, 20%), #E8E4DC 100%);
+  border-radius: 2px; outline: none; cursor: pointer;
+  margin-bottom: 1.4rem;
+}
+input[type=range]::-webkit-slider-thumb {
+  -webkit-appearance: none; appearance: none;
+  width: 22px; height: 22px; border-radius: 50%;
+  background: #1D3A28; border: 3px solid #C4603A;
+  box-shadow: 0 2px 8px rgba(0,0,0,.25);
+  cursor: pointer; transition: transform .15s;
+}
+input[type=range]::-webkit-slider-thumb:hover { transform: scale(1.15); }
+input[type=range]::-moz-range-thumb {
+  width: 22px; height: 22px; border-radius: 50%;
+  background: #1D3A28; border: 3px solid #C4603A; cursor: pointer;
+}
+
+.range-scale {
+  display: flex; justify-content: space-between;
+  font-size: .62rem; color: #BBB;
+  margin-top: -.6rem; margin-bottom: 1.8rem;
+}
+
+/* ── RÉSULTATS ── */
+.resultats { display: flex; flex-direction: column; gap: .7rem; margin-bottom: 1.6rem; }
+
+.result-item {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: .95rem 1.2rem;
+  border-left: 3px solid #E8E4DC;
+  background: #F8F5F0;
+  transition: all .3s;
+}
+.result-item.highlight {
+  border-left-color: #C4603A;
+  background: #FEF5F2;
+}
+.result-item.winner {
+  border-left-color: #3D5A47;
+  background: #F0F5F1;
+}
+.ri-label { font-size: .76rem; color: #777; line-height: 1.4; }
+.ri-label strong { color: #1a1a16; font-weight: 600; display: block; margin-bottom: .1rem; font-size: .8rem; }
+.ri-val {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.4rem; font-weight: 700; color: #1a1a16;
+  text-align: right; white-space: nowrap;
+}
+.ri-val.rouge { color: #C4603A; }
+.ri-val.terra { color: #C4603A; }
+.ri-val.vert { color: #3D5A47; }
+
+/* ── ÉCONOMIE TOTALE ── */
+.eco-total {
+  background: linear-gradient(135deg, #0C1910, #1D3A28);
+  padding: 1.5rem 1.8rem;
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 1.6rem;
+  position: relative; overflow: hidden;
+}
+.eco-total::before {
+  content: '';
+  position: absolute;
+  width: 200px; height: 200px; border-radius: 50%;
+  background: radial-gradient(circle, rgba(196,96,58,.1) 0%, transparent 70%);
+  right: -60px; top: -60px; pointer-events: none;
+}
+.et-label {
+  font-size: .6rem; font-weight: 600; letter-spacing: .18em;
+  text-transform: uppercase; color: rgba(245,240,232,.35);
+  margin-bottom: .4rem;
+}
+.et-val {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 2.8rem; font-weight: 700; color: #C4603A;
+  line-height: 1; transition: all .3s;
+}
+.et-note { font-size: .68rem; color: rgba(245,240,232,.3); margin-top: .3rem; }
+.et-right { text-align: center; flex-shrink: 0; }
+.et-roi {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 2rem; font-weight: 700; color: #6BBF82;
+  line-height: 1; margin-bottom: .2rem;
+}
+.et-roi-label { font-size: .58rem; color: rgba(245,240,232,.3); letter-spacing: .1em; text-transform: uppercase; }
+
+/* ── BARRES COMPARAISON ── */
+.compare { margin-bottom: 1.6rem; }
+.compare-label {
+  font-size: .63rem; font-weight: 600; letter-spacing: .14em;
+  text-transform: uppercase; color: #999; margin-bottom: .8rem;
+}
+.barre-wrap { display: flex; flex-direction: column; gap: .5rem; }
+.barre-row { display: flex; align-items: center; gap: .8rem; }
+.barre-nom { font-size: .73rem; color: #666; width: 7rem; flex-shrink: 0; }
+.barre-bg { flex: 1; background: #EEECEA; border-radius: 2px; overflow: hidden; height: 6px; }
+.barre-fill { height: 100%; border-radius: 2px; transition: width .5s ease; }
+.barre-agence { background: #C4603A; }
+.barre-vpm { background: #3D5A47; }
+.barre-prix {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: .9rem; font-weight: 700; color: #333;
+  width: 6rem; text-align: right;
+}
+.barre-prix.rouge { color: #C4603A; }
+
+.eco-banner {
+  margin-top: .8rem; padding: .7rem 1rem;
+  background: #F0F5F1; border-left: 3px solid #3D5A47;
+}
+.eco-banner-txt { font-size: .76rem; color: #3D5A47; font-weight: 600; }
+.eco-banner-num {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.1rem; font-weight: 700;
+}
+
+/* ── CTA ── */
+.w-cta {
+  display: block; text-align: center;
+  background: #1D3A28; color: #F5F0E8;
+  font-size: .75rem; font-weight: 600; letter-spacing: .1em; text-transform: uppercase;
+  padding: 1.1rem 2rem; text-decoration: none;
+  transition: background .2s;
+  margin-bottom: .9rem;
+}
+.w-cta:hover { background: #3D5A47; }
+.w-cta-icon { color: #C4603A; margin-right: .4rem; }
+
+.w-garantie {
+  text-align: center;
+  font-size: .68rem; color: #AAA; line-height: 1.6;
+}
+
+/* ── FOOTER ── */
+.w-footer {
+  background: #F5F0E8;
+  padding: .8rem 2.5rem;
+  display: flex; justify-content: space-between; align-items: center;
+  border-top: 1px solid #E8E4DC;
+}
+.wf-logo {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: .95rem; font-weight: 700;
+  color: #3D5A47;
+  display: flex; align-items: center; gap: 6px;
+}
+.wf-logo em { color: #C4603A; font-style: italic; }
+.wf-contact { font-size: .7rem; color: #AAA; letter-spacing: .05em; }
+
+@keyframes pop { 0%{transform:scale(1);}50%{transform:scale(1.08);}100%{transform:scale(1);} }
+.pop { animation: pop .25s ease; }
+</style>
+</head>
+<body>
+
+<button class="no-print" onclick="window.print()">⬇ Télécharger en PDF</button>
+
+<div class="widget">
+
+  <!-- HEADER -->
+  <div class="w-header">
+    <div class="w-brand">
+      <svg class="w-brand-icon" viewBox="0 0 24 24" fill="rgba(245,240,232,.5)">
+        <path d="M3 9.5L12 3L21 9.5V20C21 20.55 20.55 21 20 21H15V16H9V21H4C3.45 21 3 20.55 3 20V9.5Z"/>
+      </svg>
+      <span class="w-kicker">Simulateur gratuit</span>
+    </div>
+    <div class="w-titre">Combien allez-vous<br><em>économiser ?</em></div>
+    <p class="w-sous">Entrez le prix estimé de votre bien et voyez instantanément ce que vous gardez dans votre poche en vendant par vous-même.</p>
+  </div>
+
+  <!-- BODY -->
+  <div class="w-body">
+
+    <!-- SLIDER -->
+    <div class="slider-label">
+      <span class="sl-txt">Prix estimé de votre bien</span>
+      <span class="sl-val" id="prixDisplay">200 000 €</span>
+    </div>
+    <input type="range" id="slider" min="50000" max="800000" step="5000" value="200000" style="--pct: 20%;">
+    <div class="range-scale">
+      <span>50 000 €</span>
+      <span>200 000 €</span>
+      <span>400 000 €</span>
+      <span>600 000 €</span>
+      <span>800 000 €</span>
+    </div>
+
+    <!-- RÉSULTATS -->
+    <div class="resultats">
+      <div class="result-item highlight">
+        <div class="ri-label">
+          <strong>Frais d'agence traditionnelle</strong>
+          En moyenne 5 % du prix de vente
+        </div>
+        <div class="ri-val rouge" id="fraisAgence">10 000 €</div>
+      </div>
+      <div class="result-item">
+        <div class="ri-label">
+          <strong>Formation Vendu Par Moi</strong>
+          2 séances · méthode complète · garantie
+        </div>
+        <div class="ri-val terra">1 548 €</div>
+      </div>
+      <div class="result-item winner">
+        <div class="ri-label">
+          <strong>Vous économisez</strong>
+          Ce qui reste dans votre poche
+        </div>
+        <div class="ri-val vert" id="economie">8 452 €</div>
+      </div>
+    </div>
+
+    <!-- ÉCONOMIE TOTALE -->
+    <div class="eco-total">
+      <div class="et-left">
+        <div class="et-label">Économie nette réalisée</div>
+        <div class="et-val" id="ecoTotal">8 452 €</div>
+        <div class="et-note" id="ecoNote">soit 4.2 % du prix de vente récupérés</div>
+      </div>
+      <div class="et-right">
+        <div class="et-roi" id="roiVal">× 6.5</div>
+        <div class="et-roi-label">retour sur<br>investissement</div>
+      </div>
+    </div>
+
+    <!-- COMPARAISON VISUELLE -->
+    <div class="compare">
+      <div class="compare-label">Ce que vous coûte chaque option</div>
+      <div class="barre-wrap">
+        <div class="barre-row">
+          <span class="barre-nom">Agence (5 %)</span>
+          <div class="barre-bg"><div class="barre-fill barre-agence" id="barreAgence" style="width:100%"></div></div>
+          <span class="barre-prix rouge" id="bpAgence">10 000 €</span>
+        </div>
+        <div class="barre-row">
+          <span class="barre-nom">Vendu Par Moi</span>
+          <div class="barre-bg"><div class="barre-fill barre-vpm" id="barreVpm" style="width:15%"></div></div>
+          <span class="barre-prix" style="color:#3D5A47;">1 548 €</span>
+        </div>
+      </div>
+      <div class="eco-banner">
+        <span class="eco-banner-txt">✓ Vous économisez <span class="eco-banner-num" id="bpEco">8 452 €</span> en choisissant Vendu Par Moi</span>
+      </div>
+    </div>
+
+    <!-- CTA -->
+    <a href="tel:0684340611" class="w-cta">
+      <span class="w-cta-icon">📞</span> Appel gratuit de 15 min — 06 84 34 06 11
+    </a>
+    <p class="w-garantie">🛡️ Satisfait ou remboursé après la 1re séance · Aucun engagement avant de nous avoir rencontrés</p>
+
+  </div>
+
+  <!-- FOOTER -->
+  <div class="w-footer">
+    <div class="wf-logo">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="#3D5A47">
+        <path d="M3 9.5L12 3L21 9.5V20C21 20.55 20.55 21 20 21H15V16H9V21H4C3.45 21 3 20.55 3 20V9.5Z"/>
+      </svg>
+      <em>Vendu</em> Par Moi
+    </div>
+    <div class="wf-contact">contact@venduparmoi.fr · venduparmoi.fr</div>
+  </div>
+
+</div>
+
+<script>
+const slider = document.getElementById('slider');
+const FORMATION = 1548;
+
+function fmt(n) {
+  return new Intl.NumberFormat('fr-FR').format(Math.round(n)) + ' €';
+}
+
+function animPop(el) {
+  el.classList.remove('pop');
+  void el.offsetWidth;
+  el.classList.add('pop');
+}
+
+function update() {
+  const prix = parseInt(slider.value);
+  const pct = (prix - 50000) / (800000 - 50000) * 100;
+
+  slider.style.setProperty('--pct', pct + '%');
+
+  const fraisAgence = prix * 0.05;
+  const eco = fraisAgence - FORMATION;
+  const roi = (fraisAgence / FORMATION).toFixed(1);
+  const pctEco = (eco / prix * 100).toFixed(1);
+
+  document.getElementById('prixDisplay').textContent = fmt(prix);
+  document.getElementById('fraisAgence').textContent = fmt(fraisAgence);
+  document.getElementById('economie').textContent = fmt(eco);
+  document.getElementById('ecoTotal').textContent = fmt(eco);
+  document.getElementById('ecoNote').textContent = `soit ${pctEco} % du prix de vente récupérés`;
+  document.getElementById('roiVal').textContent = '× ' + roi;
+
+  document.getElementById('barreAgence').style.width = '100%';
+  const pctVpm = Math.min((FORMATION / fraisAgence * 100), 100);
+  document.getElementById('barreVpm').style.width = pctVpm + '%';
+
+  document.getElementById('bpAgence').textContent = fmt(fraisAgence);
+  document.getElementById('bpEco').textContent = fmt(eco);
+
+  animPop(document.getElementById('ecoTotal'));
+  animPop(document.getElementById('roiVal'));
+}
+
+slider.addEventListener('input', update);
+update();
+</script>
+
+</body>
+</html>
