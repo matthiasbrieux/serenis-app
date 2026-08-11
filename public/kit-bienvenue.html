@@ -23,19 +23,22 @@
 }
 
 :root {
-  --noir: #0F1E13;
-  --noir-pur: #0A0A0A;
+  --noir: #0C1910;
+  --noir-pur: #1a1a16;
   --blanc: #FAFAF8;
   --sable: #F5F0E8;
   --sable-f: #EDE8DF;
   --gris: #666;
-  --gris-cl: #E0D8CC;
+  --gris-cl: #E8E0D6;
   --gris-m: #333;
   --terra: #C4603A;
-  --terra-cl: #D9836A;
-  --terra-pal: #FAE8E2;
+  --terra-cl: #C4785A;
+  --terra-light: #f0b89a;
+  --terra-pal: #fef8f4;
   --vert: #3D5A47;
-  --vert-dark: #1C3028;
+  --vert-dark: #1D3A28;
+  --vert-med: #2d5040;
+  --vert-bright: #6BBF82;
   --vert-cl: #D0E4D9;
   --vert-pal: #EAF2EE;
 }
@@ -65,7 +68,7 @@ body {
 /* ── PAGE 1 — COUVERTURE ── */
 .cover {
   min-height: 100vh;
-  background: linear-gradient(160deg, #0A1A0E 0%, #0F1E13 55%, #1C3028 100%);
+  background: linear-gradient(160deg, #0C1910 0%, #1D3A28 60%, #2d5040 100%);
   display: flex; flex-direction: column;
   justify-content: space-between;
   padding: 7vw 10vw;
@@ -73,8 +76,16 @@ body {
 }
 .cover::before {
   content: '';
-  position: absolute; inset: 0;
-  background: radial-gradient(ellipse 60% 50% at 85% 30%, rgba(196,96,58,.1) 0%, transparent 65%);
+  position: absolute; top: -80px; right: -80px;
+  width: 380px; height: 380px; border-radius: 50%;
+  background: rgba(196,120,90,0.08);
+  pointer-events: none;
+}
+.cover::after {
+  content: '';
+  position: absolute; bottom: 80px; left: -60px;
+  width: 260px; height: 260px; border-radius: 50%;
+  background: rgba(107,191,130,0.06);
   pointer-events: none;
 }
 .cover-trait {
@@ -102,28 +113,25 @@ body {
 }
 
 .cover-kicker {
-  font-size: .7rem; font-weight: 500; letter-spacing: .22em;
+  font-size: .7rem; font-weight: 700; letter-spacing: .22em;
   text-transform: uppercase; color: var(--terra-cl);
   margin-bottom: 2rem;
-  display: flex; align-items: center; gap: .8rem;
-}
-.cover-kicker::before {
-  content: ''; display: inline-block;
-  width: 2rem; height: 1.5px; background: var(--terra);
+  display: inline-block; border: 1px solid rgba(196,120,90,0.4);
+  padding: 5px 14px; border-radius: 20px;
 }
 
 .cover-h1 {
   font-family: 'Cormorant Garamond', serif;
-  font-size: clamp(3rem,7vw,5.5rem);
-  font-weight: 300; line-height: 1.08;
-  color: var(--blanc); margin-bottom: 1rem;
+  font-size: clamp(3rem,7vw,5rem);
+  font-weight: 700; line-height: 1.05;
+  color: var(--sable); margin-bottom: 1rem;
 }
 .cover-h1 em {
-  font-style: italic; color: var(--terra-cl);
-  display: block; font-weight: 300;
+  font-style: italic; color: var(--terra-light);
+  display: block; font-weight: 400;
 }
 .cover-h1 strong {
-  font-weight: 700; color: var(--blanc);
+  font-weight: 700; color: var(--sable);
 }
 
 .cover-trait-h {
@@ -165,7 +173,7 @@ body {
 .section-blanc { background: var(--blanc); }
 .section-sable { background: var(--sable); }
 .section-dark {
-  background: linear-gradient(160deg, #0A1A0E 0%, #0F1E13 60%, #1C3028 100%);
+  background: linear-gradient(160deg, #0C1910 0%, #1D3A28 60%, #2d5040 100%);
 }
 
 .eyebrow {
@@ -184,8 +192,8 @@ h2 {
   margin-bottom: .8rem;
 }
 h2.blanc { color: var(--blanc); }
-h2 em { font-style: italic; font-weight: 300; color: var(--terra); }
-h2.blanc em { color: var(--terra-cl); }
+h2 em { font-style: italic; font-weight: 400; color: var(--terra); }
+h2.blanc em { color: var(--terra-light); }
 
 .intro {
   font-size: .92rem; color: var(--gris); line-height: 1.95;
@@ -406,7 +414,7 @@ h2.blanc em { color: var(--terra-cl); }
 .livrable-icon { font-size: 1.4rem; margin-bottom: .8rem; display: block; }
 .livrable-seance {
   font-size: .6rem; font-weight: 600; letter-spacing: .16em;
-  text-transform: uppercase; color: var(--terra-cl);
+  text-transform: uppercase; color: var(--terra-light);
   margin-bottom: .4rem;
 }
 .livrable h4 { font-size: .9rem; font-weight: 600; color: var(--blanc); margin-bottom: .4rem; }
@@ -419,7 +427,7 @@ h2.blanc em { color: var(--terra-cl); }
 }
 .lt-icon { font-size: 1.5rem; flex-shrink: 0; }
 .lt-text { font-size: .85rem; color: rgba(255,255,255,.65); line-height: 1.6; }
-.lt-text strong { color: var(--terra-cl); display: block; margin-bottom: .2rem; font-size: .92rem; }
+.lt-text strong { color: var(--vert-bright); display: block; margin-bottom: .2rem; font-size: .92rem; }
 
 /* ── PAGE 6 — COORDONNÉES ── */
 .coords-grid {
@@ -493,7 +501,7 @@ h2.blanc em { color: var(--terra-cl); }
 
 /* FOOTER */
 footer {
-  background: var(--vert-dark); padding: 2.5rem 10vw;
+  background: #0C1910; padding: 2.5rem 10vw;
   display: flex; justify-content: space-between;
   align-items: center; flex-wrap: wrap; gap: 1rem;
   border-top: 1px solid rgba(255,255,255,.04);
@@ -545,7 +553,7 @@ footer p { font-size: .68rem; color: rgba(255,255,255,.2); letter-spacing: .05em
   <div class="cover-bottom">
     <div class="cover-bottom-left">
       <p><strong>Guillaume</strong> · 06 84 34 06 11</p>
-      <p><strong>Matthias</strong> · 06 84 34 06 11</p>
+      <p><strong>Matthias</strong> · 06 95 44 36 54</p>
       <p>contact@venduparmo.fr</p>
     </div>
     <div class="cover-bottom-right">
@@ -904,7 +912,7 @@ footer p { font-size: .68rem; color: rgba(255,255,255,.2); letter-spacing: .05em
       <div class="coord-items">
         <div class="coord-item">
           <span class="coord-item-icon">📞</span>
-          <a href="tel:0684340611">06 84 34 06 11</a>
+          <a href="tel:0695443654">06 95 44 36 54</a>
         </div>
         <div class="coord-item">
           <span class="coord-item-icon">✉</span>
@@ -945,7 +953,7 @@ footer p { font-size: .68rem; color: rgba(255,255,255,.2); letter-spacing: .05em
 <div class="citation-finale">
   <p class="cf-texte">Comme au marché de producteurs — vous achetez notre savoir-faire. La recette, c'est nous. La cuisine, c'est vous. <strong>La récolte vous appartient.</strong></p>
   <div class="cf-trait"></div>
-  <div class="cf-auteur">Guillaume &amp; Matthias — Vendu Par Moi · 06 84 34 06 11</div>
+  <div class="cf-auteur">Guillaume · 06 84 34 06 11 &nbsp;—&nbsp; Matthias · 06 95 44 36 54 &nbsp;—&nbsp; Vendu Par Moi</div>
 </div>
 
 <!-- FOOTER -->
