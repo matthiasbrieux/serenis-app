@@ -57,6 +57,8 @@ app.get('/contrat-prestation', (req, res) => { res.set('Cache-Control', 'no-stor
 app.get('/cgv-mandat', (req, res) => { res.set('Cache-Control', 'no-store, no-cache, must-revalidate'); res.sendFile(path.join(__dirname, 'public', 'cgv-mandat.html')); });
 app.get('/mentions-legales', (req, res) => { res.set('Cache-Control', 'no-store, no-cache, must-revalidate'); res.sendFile(path.join(__dirname, 'public', 'mentions-legales.html')); });
 app.get('/confidentialite', (req, res) => { res.set('Cache-Control', 'no-store, no-cache, must-revalidate'); res.sendFile(path.join(__dirname, 'public', 'confidentialite.html')); });
+app.get('/grille-tarifaire', (req, res) => { res.set('Cache-Control', 'no-store, no-cache, must-revalidate'); res.sendFile(path.join(__dirname, 'public', 'grille-tarifaire.html')); });
+app.get('/charte-graphique', (req, res) => { res.set('Cache-Control', 'no-store, no-cache, must-revalidate'); res.sendFile(path.join(__dirname, 'public', 'charte-graphique.html')); });
 app.get('/tarifs', (req, res) => { res.set('Cache-Control', 'no-store, no-cache, must-revalidate'); res.sendFile(path.join(__dirname, 'public', 'tarifs.html')); });
 app.get('/faq', (req, res) => { res.set('Cache-Control', 'no-store, no-cache, must-revalidate'); res.sendFile(path.join(__dirname, 'public', 'faq.html')); });
 app.get('/register', (req, res) => { res.set('Cache-Control', 'no-store, no-cache, must-revalidate'); res.sendFile(path.join(__dirname, 'public', 'register.html')); });
@@ -67,6 +69,13 @@ app.get('/hoguet-defense', (req, res) => { res.set('Cache-Control', 'no-store, n
 app.get('/dossier-conviction', (req, res) => { res.set('Cache-Control', 'no-store, no-cache, must-revalidate'); res.sendFile(path.join(__dirname, 'public', 'dossier-conviction.html')); });
 app.get('/dossier', (req, res) => { res.set('Cache-Control', 'no-store, no-cache, must-revalidate'); res.sendFile(path.join(__dirname, 'public', 'dossier.html')); });
 app.get('/flyer', (req, res) => { res.set('Cache-Control', 'no-store, no-cache, must-revalidate'); res.sendFile(path.join(__dirname, 'public', 'flyer.html')); });
+app.get('/pdf-objections', (req, res) => { res.set('Cache-Control', 'no-store, no-cache, must-revalidate'); res.sendFile(path.join(__dirname, 'public', 'pdf-objections.html')); });
+app.get('/pdf-sms', (req, res) => { res.set('Cache-Control', 'no-store, no-cache, must-revalidate'); res.sendFile(path.join(__dirname, 'public', 'pdf-sms.html')); });
+app.get('/pdf-email', (req, res) => { res.set('Cache-Control', 'no-store, no-cache, must-revalidate'); res.sendFile(path.join(__dirname, 'public', 'pdf-email.html')); });
+app.get('/pdf-presentation', (req, res) => { res.set('Cache-Control', 'no-store, no-cache, must-revalidate'); res.sendFile(path.join(__dirname, 'public', 'pdf-presentation.html')); });
+app.get('/guide-diagnostics', (req, res) => { res.set('Cache-Control', 'no-store, no-cache, must-revalidate'); res.sendFile(path.join(__dirname, 'public', 'guide-diagnostics.html')); });
+app.get('/fiche-estimation', (req, res) => { res.set('Cache-Control', 'no-store, no-cache, must-revalidate'); res.sendFile(path.join(__dirname, 'public', 'fiche-estimation.html')); });
+app.get('/questionnaire-satisfaction', (req, res) => { res.set('Cache-Control', 'no-store, no-cache, must-revalidate'); res.sendFile(path.join(__dirname, 'public', 'questionnaire-satisfaction.html')); });
 
 app.use(express.static(path.join(__dirname, 'public'), {
   maxAge: '7d',

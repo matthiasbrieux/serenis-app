@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fiche Estimation — Vendu Par Moi</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;0,700;1,400&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; color-adjust: exact !important; }
+
+    body { font-family: 'DM Sans', sans-serif; background: #e8e4de; display: flex; flex-direction: column; align-items: center; padding: 32px 20px 60px; gap: 24px; }
+
+    .no-print { background: #3D5A47; color: #fff; border: none; padding: 11px 26px; border-radius: 8px; font-family: 'DM Sans', sans-serif; font-size: 0.88rem; font-weight: 600; cursor: pointer; }
+    .no-print:hover { background: #2d4535; }
+
+    @media print {
+      body { background: #fff; padding: 0; gap: 0; }
+      .no-print { display: none; }
+      .sheet { box-shadow: none !important; page-break-after: always; }
+      .sheet:last-child { page-break-after: avoid; }
+      @page { margin: 0; size: A4 portrait; }
+    }
+
+    /* ── FEUILLE ── */
+    .sheet {
+      width: 210mm;
+      min-height: 297mm;
+      background: #fff;
+      box-shadow: 0 6px 32px rgba(0,0,0,0.14);
+      padding: 18mm 16mm 14mm;
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+    }
+
+    /* ── HEADER ── */
+    .doc-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 6mm;
+    }
+    .header-logo { display: flex; align-items: center; gap: 8px; }
+    .header-logo-text { font-family: 'Cormorant Garamond', serif; font-size: 1rem; color: #3D5A47; font-weight: 600; }
+    .doc-title-block { text-align: center; flex: 1; }
+    .doc-title { font-family: 'Cormorant Garamond', serif; font-size: 1.9rem; font-weight: 700; color: #1C3028; letter-spacing: 0.04em; line-height: 1; }
+    .doc-subtitle { font-size: 0.78rem; color: #888; margin-top: 3px; }
+
+    /* ── SECTION TITLE ── */
+    .section-title {
+      font-size: 0.72rem;
+      font-weight: 700;
+      color: #3D5A47;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      border-bottom: 1.5px solid #3D5A47;
+      padding-bottom: 3px;
+      margin-bottom: 5mm;
+      margin-top: 5mm;
+    }
+
+    /* ── FIELD LINE ── */
+    .field-row { display: flex; gap: 4mm; margin-bottom: 4mm; align-items: flex-end; }
+    .field { display: flex; align-items: flex-end; gap: 3px; flex: 1; }
+    .field-label { font-size: 0.7rem; color: #333; font-weight: 600; white-space: nowrap; flex-shrink: 0; }
+    .field-line { flex: 1; border-bottom: 1px solid #bbb; min-width: 20mm; height: 14px; }
+    .field-line-long { flex: 3; border-bottom: 1px solid #bbb; height: 14px; }
+
+    /* ── CHECKBOXES ── */
+    .cb-row { display: flex; align-items: center; gap: 5mm; }
+    .cb-item { display: flex; align-items: center; gap: 2px; font-size: 0.7rem; color: #333; }
+    .cb { width: 11px; height: 11px; border: 1.5px solid #888; border-radius: 2px; flex-shrink: 0; }
+
+    /* ── TWO-COL VENDEURS ── */
+    .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 6mm; }
+
+    /* ── BOTTOM GRID ── */
+    .bottom-grid { display: grid; grid-template-columns: 38mm 1fr 55mm; gap: 3mm; margin-top: 5mm; flex: 1; }
+
+    .box-left { display: flex; flex-direction: column; gap: 3mm; }
+    .label-box { border: 1px solid #ccc; border-radius: 4px; padding: 3px 6px 14px; }
+    .label-box-title { font-size: 0.65rem; font-weight: 700; color: #444; }
+
+    .travaux-circle {
+      border: 1.5px solid #bbb;
+      border-radius: 50%;
+      width: 44mm; height: 44mm;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 3mm;
+      margin: auto;
+      padding: 6mm;
+    }
+    .travaux-title { font-size: 0.65rem; font-weight: 700; color: #444; text-align: center; }
+    .travaux-line { width: 100%; border-bottom: 1px solid #ccc; }
+
+    .consignes-box {
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      padding: 4px 6px;
+      display: flex;
+      flex-direction: column;
+    }
+    .consignes-title { font-size: 0.65rem; font-weight: 700; color: #444; margin-bottom: 4px; }
+
+    /* ── CLASSIFICATION ── */
+    .classif-row { display: flex; align-items: center; gap: 4mm; margin-top: 4mm; }
+    .classif-label { font-size: 0.72rem; font-weight: 700; color: #333; }
+    .classif-badge {
+      width: 22px; height: 22px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.7rem; font-weight: 700; color: #fff;
+    }
+    .badge-i { background: #C4603A; }
+    .badge-m { background: #d4a020; }
+    .badge-l { background: #3D5A47; }
+
+    /* ══════════════════════
+       PAGE 2 — DESCRIPTIF
+    ══════════════════════ */
+    .desc-grid { display: grid; grid-template-columns: 1fr 52mm; gap: 5mm; flex: 1; }
+
+    /* Table pièces */
+    .pieces-table { width: 100%; border-collapse: collapse; font-size: 0.68rem; }
+    .pieces-table thead tr { background: #3D5A47; }
+    .pieces-table thead th { color: #fff; padding: 5px 6px; font-weight: 600; font-size: 0.66rem; text-align: left; }
+    .pieces-table tbody td { border-bottom: 1px solid #e8e0d6; padding: 4px 6px; height: 9mm; color: #333; font-size: 0.66rem; }
+    .pieces-table tbody tr:nth-child(even) td { background: #faf8f5; }
+    .col-niv { width: 10mm; }
+    .col-piece { width: 28mm; }
+    .col-surf { width: 16mm; }
+    .col-comment { }
+
+    /* Right column */
+    .right-col { font-size: 0.68rem; }
+    .right-field { display: flex; align-items: flex-end; gap: 3px; margin-bottom: 2.5mm; }
+    .right-label { font-weight: 600; color: #333; white-space: nowrap; flex-shrink: 0; font-size: 0.66rem; }
+    .right-line { flex: 1; border-bottom: 1px solid #bbb; height: 12px; }
+
+    .right-section { font-size: 0.66rem; font-weight: 700; color: #3D5A47; text-transform: uppercase; letter-spacing: 0.06em; border-bottom: 1px solid #3D5A47; padding-bottom: 2px; margin: 4mm 0 3mm; }
+
+    .equip-row { display: flex; align-items: center; gap: 3px; margin-bottom: 2.5mm; justify-content: space-between; }
+    .equip-label { font-size: 0.66rem; color: #333; }
+    .equip-line { flex: 1; border-bottom: 1px solid #ccc; margin-left: 3px; height: 12px; }
+
+    /* Points / observations */
+    .points-section { margin-top: 4mm; }
+    .points-title { font-size: 0.7rem; font-weight: 700; color: #3D5A47; margin-bottom: 2mm; }
+    .write-line { border-bottom: 1px solid #ccc; height: 7mm; margin-bottom: 2mm; }
+    .write-line-tall { border-bottom: 1px solid #ccc; height: 7mm; margin-bottom: 2mm; }
+
+    /* Estimation annonce multi-line */
+    .annonce-lines { margin-top: 2mm; }
+    .annonce-line { border-bottom: 1px solid #bbb; height: 8mm; margin-bottom: 2mm; }
+  </style>
+</head>
+<body>
+
+<button class="no-print" onclick="window.print()">⬇ Télécharger en PDF</button>
+
+<!-- ══════════════════════════════════
+     PAGE 1 — FICHE ESTIMATION
+══════════════════════════════════ -->
+<div class="sheet">
+
+  <div class="doc-header">
+    <div class="header-logo">
+      <svg width="26" height="26" viewBox="0 0 32 32"><path d="M16 2L3 13v17h8v-8h10v8h8V13L16 2z" fill="#3D5A47"/></svg>
+      <span class="header-logo-text">Vendu Par Moi</span>
+    </div>
+    <div class="doc-title-block">
+      <div class="doc-title">FICHE ESTIMATION</div>
+      <div class="doc-subtitle">Maison / Appartement</div>
+    </div>
+    <div style="width:80px;"></div>
+  </div>
+
+  <!-- VENDEURS -->
+  <div class="section-title">Vendeur(s)</div>
+  <div class="two-col">
+    <div>
+      <div class="field-row" style="margin-bottom:3mm;">
+        <span class="field-label">Vendeur 1 :</span>
+        <div class="cb-row">
+          <div class="cb-item"><div class="cb"></div> Mr</div>
+          <div class="cb-item"><div class="cb"></div> Mme</div>
+          <div class="cb-item"><div class="cb"></div> Succession</div>
+        </div>
+      </div>
+      <div class="field-row">
+        <div class="field"><span class="field-label">Nom :</span><div class="field-line"></div></div>
+        <div class="field"><span class="field-label">Prénom :</span><div class="field-line"></div></div>
+      </div>
+      <div class="field-row">
+        <div class="field"><span class="field-label">Adresse :</span><div class="field-line-long"></div></div>
+      </div>
+      <div class="field-row">
+        <div class="field" style="flex:0 0 auto"><span class="field-label">Code postal :</span><div class="field-line" style="min-width:18mm"></div></div>
+        <div class="field"><span class="field-label">Ville :</span><div class="field-line"></div></div>
+      </div>
+      <div class="field-row">
+        <div class="field"><span class="field-label">Tél :</span><div class="field-line-long"></div></div>
+      </div>
+      <div class="field-row">
+        <div class="field"><span class="field-label">Mail :</span><div class="field-line-long"></div></div>
+      </div>
+    </div>
+    <div>
+      <div class="field-row" style="margin-bottom:3mm;">
+        <span class="field-label">Vendeur 2 :</span>
+        <div class="cb-row">
+          <div class="cb-item"><div class="cb"></div> Mr</div>
+          <div class="cb-item"><div class="cb"></div> Mme</div>
+          <div class="cb-item"><div class="cb"></div> Succession</div>
+        </div>
+      </div>
+      <div class="field-row">
+        <div class="field"><span class="field-label">Nom :</span><div class="field-line"></div></div>
+        <div class="field"><span class="field-label">Prénom :</span><div class="field-line"></div></div>
+      </div>
+      <div class="field-row">
+        <div class="field"><span class="field-label">Adresse :</span><div class="field-line-long"></div></div>
+      </div>
+      <div class="field-row">
+        <div class="field" style="flex:0 0 auto"><span class="field-label">Code postal :</span><div class="field-line" style="min-width:18mm"></div></div>
+        <div class="field"><span class="field-label">Ville :</span><div class="field-line"></div></div>
+      </div>
+      <div class="field-row">
+        <div class="field"><span class="field-label">Tél :</span><div class="field-line-long"></div></div>
+      </div>
+      <div class="field-row">
+        <div class="field"><span class="field-label">Mail :</span><div class="field-line-long"></div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- COORDONNÉES DU BIEN -->
+  <div class="section-title">Coordonnées du bien à vendre</div>
+  <div class="field-row">
+    <div class="field"><span class="field-label">Adresse :</span><div class="field-line-long"></div></div>
+  </div>
+  <div class="field-row">
+    <div class="field" style="flex:0 0 auto"><span class="field-label">Code postal :</span><div class="field-line" style="min-width:20mm"></div></div>
+    <div class="field"><span class="field-label">Ville :</span><div class="field-line"></div></div>
+  </div>
+
+  <!-- INFORMATIONS TECHNIQUES -->
+  <div class="section-title">Informations techniques</div>
+  <div class="field-row">
+    <div class="field"><span class="field-label">Taxe foncière :</span><div class="field-line"></div></div>
+    <div class="field"><span class="field-label">DPE :</span><div class="field-line"></div></div>
+  </div>
+  <div class="field-row">
+    <div class="field"><span class="field-label">Diagnostics :</span><div class="field-line"></div></div>
+    <div class="field"><span class="field-label">Notaire :</span><div class="field-line"></div></div>
+  </div>
+  <div class="field-row">
+    <div class="field"><span class="field-label">Conso EDF :</span><div class="field-line"></div></div>
+    <div class="field"><span class="field-label">Conso GDF :</span><div class="field-line"></div></div>
+  </div>
+
+  <!-- ESTIMATION & ANNONCE -->
+  <div class="section-title">Estimation &amp; annonce</div>
+  <div class="field-row">
+    <div class="field"><span class="field-label" style="color:#3D5A47;font-size:0.72rem;">Prix estimé :</span><div class="field-line-long"></div></div>
+  </div>
+  <div class="field-row">
+    <div class="field" style="flex:0 0 auto"><span class="field-label" style="color:#3D5A47;font-size:0.72rem;">Mise en vente le :</span><div class="field-line" style="min-width:24mm"></div></div>
+    <div class="field"><span class="field-label" style="color:#3D5A47;font-size:0.72rem;">N° dossier :</span><div class="field-line"></div></div>
+  </div>
+  <div class="field-row" style="align-items:flex-start;flex-direction:column;gap:0;">
+    <span class="field-label" style="color:#3D5A47;font-size:0.72rem;margin-bottom:2mm;">Texte annonce :</span>
+    <div class="annonce-lines">
+      <div class="annonce-line"></div>
+      <div class="annonce-line"></div>
+    </div>
+  </div>
+
+  <!-- BOTTOM GRID -->
+  <div class="bottom-grid">
+
+    <div class="box-left">
+      <div class="label-box">
+        <div class="label-box-title">Date du rendez-vous :</div>
+      </div>
+      <div class="label-box">
+        <div class="label-box-title">Origine du contact :</div>
+      </div>
+      <div class="label-box">
+        <div class="label-box-title">Conseiller VPM :</div>
+      </div>
+      <div class="label-box">
+        <div class="label-box-title">Date du R2 :</div>
+      </div>
+    </div>
+
+    <div style="display:flex;align-items:center;justify-content:center;">
+      <div class="travaux-circle">
+        <div class="travaux-title">Travaux – 10 ans ?</div>
+        <div class="travaux-line"></div>
+        <div class="travaux-line"></div>
+        <div class="travaux-line"></div>
+        <div class="travaux-line"></div>
+        <div class="travaux-line"></div>
+      </div>
+    </div>
+
+    <div class="consignes-box">
+      <div class="consignes-title">Consignes de visites :</div>
+    </div>
+
+  </div>
+
+  <!-- CLASSIFICATION -->
+  <div class="classif-row">
+    <span class="classif-label">Classification du projet :</span>
+    <div class="classif-badge badge-i">I</div>
+    <div class="classif-badge badge-m">M</div>
+    <div class="classif-badge badge-l">L</div>
+  </div>
+
+</div>
+
+<!-- ══════════════════════════════════
+     PAGE 2 — DESCRIPTIF DU BIEN
+══════════════════════════════════ -->
+<div class="sheet">
+
+  <div class="doc-header">
+    <div class="header-logo">
+      <svg width="26" height="26" viewBox="0 0 32 32"><path d="M16 2L3 13v17h8v-8h10v8h8V13L16 2z" fill="#3D5A47"/></svg>
+      <span class="header-logo-text">Vendu Par Moi</span>
+    </div>
+    <div class="doc-title-block">
+      <div class="doc-title">DESCRIPTIF DU BIEN</div>
+    </div>
+    <div style="width:80px;"></div>
+  </div>
+
+  <div class="desc-grid">
+
+    <!-- TABLE PIÈCES -->
+    <div>
+      <table class="pieces-table">
+        <thead>
+          <tr>
+            <th class="col-niv">Niv.</th>
+            <th class="col-piece">Pièce</th>
+            <th class="col-surf">Surface</th>
+            <th class="col-comment">Commentaire</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td></td><td></td><td></td><td></td></tr>
+          <tr><td></td><td></td><td></td><td></td></tr>
+          <tr><td></td><td></td><td></td><td></td></tr>
+          <tr><td></td><td></td><td></td><td></td></tr>
+          <tr><td></td><td></td><td></td><td></td></tr>
+          <tr><td></td><td></td><td></td><td></td></tr>
+          <tr><td></td><td></td><td></td><td></td></tr>
+          <tr><td></td><td></td><td></td><td></td></tr>
+          <tr><td></td><td></td><td></td><td></td></tr>
+          <tr><td></td><td></td><td></td><td></td></tr>
+          <tr><td></td><td></td><td></td><td></td></tr>
+          <tr><td></td><td></td><td></td><td></td></tr>
+          <tr><td></td><td></td><td></td><td></td></tr>
+          <tr><td></td><td></td><td></td><td></td></tr>
+          <tr><td></td><td></td><td></td><td></td></tr>
+          <tr><td></td><td></td><td></td><td></td></tr>
+          <tr><td></td><td></td><td></td><td></td></tr>
+          <tr><td></td><td></td><td></td><td></td></tr>
+          <tr><td></td><td></td><td></td><td></td></tr>
+          <tr><td></td><td></td><td></td><td></td></tr>
+          <tr><td></td><td></td><td></td><td></td></tr>
+          <tr><td></td><td></td><td></td><td></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- COLONNE DROITE -->
+    <div class="right-col">
+
+      <div class="right-field"><span class="right-label">Surface hab. :</span><div class="right-line"></div></div>
+      <div class="right-field"><span class="right-label">Nb de pièces :</span><div class="right-line"></div></div>
+      <div class="right-field"><span class="right-label">Nb de ch. :</span><div class="right-line"></div></div>
+      <div class="right-field"><span class="right-label">Surface terrain :</span><div class="right-line"></div></div>
+      <div class="right-field"><span class="right-label">Type construction :</span><div class="right-line"></div></div>
+      <div class="right-field"><span class="right-label">Façade :</span><div class="right-line"></div></div>
+      <div class="right-field"><span class="right-label">Couverture :</span><div class="right-line"></div></div>
+      <div class="right-field"><span class="right-label">Année construction :</span><div class="right-line"></div></div>
+      <div class="right-field"><span class="right-label">Fenêtres :</span><div class="right-line"></div></div>
+      <div class="right-field"><span class="right-label">Volets :</span><div class="right-line"></div></div>
+      <div class="right-field"><span class="right-label">Mitoyenneté :</span><div class="right-line"></div></div>
+      <div class="right-field"><span class="right-label">Tout à l'égout :</span><div class="right-line"></div></div>
+      <div class="right-field"><span class="right-label">Chauffage :</span><div class="right-line"></div></div>
+      <div class="right-field"><span class="right-label">Année :</span><div class="right-line"></div></div>
+      <div class="right-field"><span class="right-label">Eau chaude :</span><div class="right-line"></div></div>
+      <div class="right-field"><span class="right-label">Débit internet :</span><div class="right-line"></div></div>
+
+      <div class="right-section">Équipements</div>
+      <div class="equip-row"><div class="cb"></div><span class="equip-label">Parking</span><div class="equip-line"></div></div>
+      <div class="equip-row"><div class="cb"></div><span class="equip-label">Garage</span><div class="equip-line"></div></div>
+      <div class="equip-row"><div class="cb"></div><span class="equip-label">Terrasse</span><div class="equip-line"></div></div>
+      <div class="equip-row"><div class="cb"></div><span class="equip-label">Cave</span><div class="equip-line"></div></div>
+      <div class="equip-row"><div class="cb"></div><span class="equip-label">Grenier</span><div class="equip-line"></div></div>
+      <div class="equip-row"><div class="cb"></div><span class="equip-label">Cheminée</span><div class="equip-line"></div></div>
+      <div class="equip-row"><div class="cb"></div><span class="equip-label">Alarme</span><div class="equip-line"></div></div>
+      <div class="equip-row"><div class="cb"></div><span class="equip-label">Piscine</span><div class="equip-line"></div></div>
+
+      <div class="right-section">État intérieur &amp; extérieur</div>
+      <div class="equip-row"><div class="cb"></div><span class="equip-label">Très bon</span></div>
+      <div class="equip-row"><div class="cb"></div><span class="equip-label">Bon</span></div>
+      <div class="equip-row"><div class="cb"></div><span class="equip-label">À rafraîchir</span></div>
+      <div class="equip-row"><div class="cb"></div><span class="equip-label">Travaux à prévoir</span></div>
+
+    </div>
+  </div>
+
+  <!-- POINTS + / - / OBS -->
+  <div class="points-section">
+    <div class="points-title">Points +</div>
+    <div class="write-line"></div>
+    <div class="write-line"></div>
+    <div class="points-title">Points –</div>
+    <div class="write-line"></div>
+    <div class="write-line"></div>
+    <div class="points-title">Observations :</div>
+    <div class="write-line"></div>
+    <div class="write-line"></div>
+    <div class="write-line"></div>
+    <div class="write-line"></div>
+  </div>
+
+</div>
+
+</body>
+</html>

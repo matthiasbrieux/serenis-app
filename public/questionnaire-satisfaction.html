@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Questionnaire de Satisfaction — Vendu Par Moi</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; -webkit-print-color-adjust:exact !important; print-color-adjust:exact !important; color-adjust:exact !important; }
+html { background:#E8E4DC; }
+body { font-family:'DM Sans',sans-serif; font-weight:300; background:#E8E4DC; min-height:100vh; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:3rem 2rem; gap:1.5rem; }
+.page-label { font-size:.7rem; letter-spacing:.2em; text-transform:uppercase; color:#999; text-align:center; }
+
+.doc { width:794px; min-height:1123px; background:#FAFAF8; position:relative; overflow:hidden; box-shadow:0 20px 80px rgba(0,0,0,.2); display:flex; flex-direction:column; }
+.trait-gauche { position:absolute; left:0; top:0; bottom:0; width:4px; background:linear-gradient(to bottom,transparent,#3D5A47 15%,#3D5A47 85%,transparent); z-index:2; }
+.watermark { position:absolute; top:50%; left:50%; transform:translate(-50%,-50%) rotate(-25deg); font-family:'Cormorant Garamond',serif; font-size:6rem; font-weight:900; color:rgba(61,90,71,.04); white-space:nowrap; pointer-events:none; z-index:0; user-select:none; }
+
+/* HEADER */
+.doc-header { padding:2.5rem 3.5rem 2rem 4rem; display:flex; justify-content:space-between; align-items:flex-start; border-bottom:2px solid #0A0A0A; position:relative; z-index:1; flex-shrink:0; }
+.header-logo { display:flex; align-items:center; gap:8px; }
+.header-logo-text { font-family:'Cormorant Garamond',serif; font-size:1.2rem; font-weight:700; color:#1C3028; }
+.header-right { text-align:right; }
+.header-doc-title { font-family:'Cormorant Garamond',serif; font-size:1.4rem; font-weight:700; color:#0A0A0A; margin-bottom:.3rem; }
+.header-ref { font-size:.7rem; color:#888; line-height:1.8; }
+.header-ref strong { color:#333; }
+
+/* INTRO */
+.intro-bloc { padding:2rem 3.5rem 1.5rem 4rem; position:relative; z-index:1; flex-shrink:0; }
+.intro-kicker { font-size:.62rem; font-weight:600; letter-spacing:.2em; text-transform:uppercase; color:#3D5A47; margin-bottom:.8rem; }
+.intro-texte { font-family:'Cormorant Garamond',serif; font-style:italic; font-size:.95rem; color:#666; line-height:1.7; max-width:60ch; }
+
+/* CLIENT INFO */
+.client-bloc { margin:0 3.5rem 1.5rem 4rem; background:#F0F5F1; border-left:4px solid #3D5A47; padding:1.2rem 1.8rem; position:relative; z-index:1; flex-shrink:0; }
+.client-grid { display:grid; grid-template-columns:1fr 1fr; gap:.8rem; }
+.client-field-label { font-size:.6rem; letter-spacing:.12em; text-transform:uppercase; color:#AAA; margin-bottom:.2rem; }
+.client-field-value { border-bottom:1px solid #C8DDD0; min-height:1.4rem; font-size:.82rem; color:#333; }
+
+/* BODY */
+.doc-body { padding:1.5rem 3.5rem 2rem 4rem; position:relative; z-index:1; flex:1; }
+
+/* SECTION */
+.q-section-title { font-size:.62rem; font-weight:600; letter-spacing:.18em; text-transform:uppercase; color:#888; margin-bottom:1.2rem; display:flex; align-items:center; gap:.8rem; margin-top:1.8rem; }
+.q-section-title:first-child { margin-top:0; }
+.q-section-title::after { content:''; flex:1; height:1px; background:#EEECEA; }
+
+/* QUESTION */
+.question-bloc { margin-bottom:1.8rem; }
+.q-label { font-size:.9rem; font-weight:600; color:#0A0A0A; margin-bottom:1rem; line-height:1.4; }
+.q-num { font-family:'Cormorant Garamond',serif; font-size:1.1rem; font-weight:700; color:#C4603A; margin-right:.5rem; }
+
+/* NOTE 1-10 couleurs */
+.note-row { display:flex; gap:.5rem; flex-wrap:wrap; }
+.note-box { width:2.2rem; height:2.2rem; border:1.5px solid #DDDDDD; display:flex; align-items:center; justify-content:center; font-family:'Cormorant Garamond',serif; font-size:.95rem; font-weight:700; color:#888; }
+
+/* CHOIX MULTIPLES */
+.choices { display:flex; flex-direction:column; gap:.6rem; }
+.choice { display:flex; align-items:center; gap:.7rem; }
+.choice-box { width:1rem; height:1rem; border:1.5px solid #CCC; border-radius:2px; flex-shrink:0; }
+.choice-label { font-size:.82rem; color:#555; }
+
+/* TEXTE LIBRE */
+.texte-libre { border:1px solid #EEECEA; background:#F8F6F2; padding:.8rem; min-height:4rem; font-size:.82rem; color:#AAA; font-style:italic; line-height:1.7; }
+
+/* NPS */
+.nps-row { display:flex; gap:.3rem; }
+.nps-box { flex:1; height:2rem; border:1.5px solid #DDDDDD; display:flex; align-items:center; justify-content:center; font-size:.78rem; font-weight:600; color:#888; }
+
+/* AUTORISATION */
+.autorisation-bloc { background:#F0F5F1; border-left:3px solid #3D5A47; padding:1rem 1.5rem; margin-bottom:1.5rem; }
+.auto-titre { font-size:.7rem; font-weight:600; letter-spacing:.14em; text-transform:uppercase; color:#3D5A47; margin-bottom:.6rem; }
+.auto-texte { font-size:.78rem; color:#555; line-height:1.65; }
+.auto-cases { display:flex; gap:2rem; margin-top:.8rem; }
+.auto-case { display:flex; align-items:center; gap:.5rem; }
+.auto-box { width:1rem; height:1rem; border:1.5px solid #CCC; border-radius:2px; }
+.auto-label { font-size:.82rem; color:#555; font-weight:500; }
+
+/* SIGNATURES */
+.sig-grid { display:grid; grid-template-columns:1fr 1fr; gap:2rem; margin-top:1.5rem; }
+.sig-titre { font-size:.6rem; font-weight:600; letter-spacing:.14em; text-transform:uppercase; color:#AAA; margin-bottom:.8rem; }
+.sig-line { border-bottom:1px solid #CCC; height:2rem; margin-bottom:.4rem; }
+.sig-name { font-size:.7rem; color:#AAA; text-align:center; }
+
+/* FOOTER */
+.doc-footer { padding:1.2rem 3.5rem 1.5rem 4rem; border-top:1px solid #EEECEA; background:#F0F5F1; display:flex; justify-content:space-between; align-items:center; position:relative; z-index:1; flex-shrink:0; }
+.df-logo { display:flex; align-items:center; gap:7px; }
+.df-logo-text { font-family:'Cormorant Garamond',serif; font-size:.95rem; font-weight:700; color:#1C3028; }
+.df-contact { font-size:.62rem; color:#BBB; letter-spacing:.06em; text-align:center; line-height:1.7; }
+.df-legal { font-size:.6rem; color:#CCC; text-align:right; line-height:1.7; }
+
+.print-note { font-size:.7rem; color:#AAA; text-align:center; font-style:italic; max-width:600px; line-height:1.7; }
+
+.no-print { background:#3D5A47; color:#fff; border:none; padding:11px 26px; border-radius:8px; font-family:'DM Sans',sans-serif; font-size:.88rem; font-weight:600; cursor:pointer; }
+.no-print:hover { background:#2d4535; }
+
+@media print {
+  body { background:white; padding:0; }
+  .page-label, .print-note, .no-print { display:none; }
+  .doc { box-shadow:none; width:210mm; min-height:297mm; }
+  @page { margin:0; size:A4 portrait; }
+}
+</style>
+</head>
+<body>
+
+<button class="no-print" onclick="window.print()">⬇ Télécharger en PDF</button>
+<p class="page-label">Questionnaire de Satisfaction — Vendu Par Moi · À envoyer J+7 après la séance</p>
+
+<div class="doc">
+  <div class="trait-gauche"></div>
+  <div class="watermark">SATISFACTION</div>
+
+  <!-- HEADER -->
+  <div class="doc-header">
+    <div class="header-logo">
+      <svg width="28" height="28" viewBox="0 0 32 32"><path d="M16 2L3 13v17h8v-8h10v8h8V13L16 2z" fill="#3D5A47"/></svg>
+      <span class="header-logo-text">Vendu Par Moi</span>
+    </div>
+    <div class="header-right">
+      <div class="header-doc-title">Questionnaire de Satisfaction</div>
+      <div class="header-ref">
+        <span>Date d'envoi : <strong>__ / __ / 2026</strong></span><br>
+        <span>Réf. client : <strong>VPM-______-2026</strong></span>
+      </div>
+    </div>
+  </div>
+
+  <!-- INTRO -->
+  <div class="intro-bloc">
+    <div class="intro-kicker">Votre avis compte</div>
+    <p class="intro-texte">Vous avez suivi notre accompagnement il y a quelques jours. 5 questions simples — 3 minutes maximum. Votre retour nous aide à nous améliorer et, si vous l'acceptez, à témoigner pour de futurs clients.</p>
+  </div>
+
+  <!-- CLIENT INFO -->
+  <div class="client-bloc">
+    <div class="client-grid">
+      <div>
+        <div class="client-field-label">Nom et Prénom</div>
+        <div class="client-field-value"></div>
+      </div>
+      <div>
+        <div class="client-field-label">Ville</div>
+        <div class="client-field-value"></div>
+      </div>
+      <div>
+        <div class="client-field-label">Type de bien vendu</div>
+        <div class="client-field-value"></div>
+      </div>
+      <div>
+        <div class="client-field-label">Date d'inscription</div>
+        <div class="client-field-value"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BODY -->
+  <div class="doc-body">
+
+    <div class="q-section-title">Votre expérience de la plateforme</div>
+
+    <!-- Q1 -->
+    <div class="question-bloc">
+      <div class="q-label"><span class="q-num">1.</span>Comment évaluez-vous la qualité globale de la formation et des outils ?</div>
+      <div class="note-row">
+        <div class="nps-box" style="border-color:#E8C4C0;color:#B03A2E">1</div>
+        <div class="nps-box" style="border-color:#E8C4C0;color:#B03A2E">2</div>
+        <div class="nps-box" style="border-color:#F5E8CC;color:#C4603A">3</div>
+        <div class="nps-box" style="border-color:#F5E8CC;color:#C4603A">4</div>
+        <div class="nps-box" style="border-color:#F5E8CC;color:#C4603A">5</div>
+        <div class="nps-box" style="border-color:#C4E0D0;color:#3D5A47">6</div>
+        <div class="nps-box" style="border-color:#C4E0D0;color:#3D5A47">7</div>
+        <div class="nps-box" style="border-color:#C4E0D0;color:#3D5A47">8</div>
+        <div class="nps-box" style="background:#3D5A47;border-color:#3D5A47;color:#fff">9</div>
+        <div class="nps-box" style="background:#3D5A47;border-color:#3D5A47;color:#fff">10</div>
+      </div>
+      <div style="display:flex;justify-content:space-between;margin-top:.4rem;">
+        <span style="font-size:.65rem;color:#AAA">Décevant</span>
+        <span style="font-size:.65rem;color:#AAA">Excellent</span>
+      </div>
+    </div>
+
+    <!-- Q2 -->
+    <div class="question-bloc">
+      <div class="q-label"><span class="q-num">2.</span>Quel outil ou module vous a apporté le plus de valeur ?</div>
+      <div class="choices">
+        <div class="choice"><div class="choice-box"></div><span class="choice-label">Estimation — méthode de pricing DVF</span></div>
+        <div class="choice"><div class="choice-box"></div><span class="choice-label">Dossier acheteur numérique &amp; photos professionnelles</span></div>
+        <div class="choice"><div class="choice-box"></div><span class="choice-label">Agenda de visites en ligne &amp; rappels automatiques</span></div>
+        <div class="choice"><div class="choice-box"></div><span class="choice-label">Coach IA — scripts et conseils personnalisés</span></div>
+        <div class="choice"><div class="choice-box"></div><span class="choice-label">Formation à la conduite de visites &amp; négociation</span></div>
+        <div class="choice"><div class="choice-box"></div><span class="choice-label">Étapes juridiques — du compromis au notaire</span></div>
+      </div>
+    </div>
+
+    <!-- Q3 -->
+    <div class="question-bloc">
+      <div class="q-label"><span class="q-num">3.</span>Depuis votre inscription, avez-vous déjà eu des résultats concrets ?</div>
+      <div class="choices">
+        <div class="choice"><div class="choice-box"></div><span class="choice-label">Oui — j'ai déjà reçu des contacts sérieux</span></div>
+        <div class="choice"><div class="choice-box"></div><span class="choice-label">Oui — j'ai déjà réalisé des visites</span></div>
+        <div class="choice"><div class="choice-box"></div><span class="choice-label">Oui — mon bien est vendu !</span></div>
+        <div class="choice"><div class="choice-box"></div><span class="choice-label">Pas encore — je viens de publier l'annonce</span></div>
+        <div class="choice"><div class="choice-box"></div><span class="choice-label">Pas encore — j'attends les premiers contacts</span></div>
+      </div>
+    </div>
+
+    <!-- Q4 bonus si vendu -->
+    <div class="question-bloc" style="background:#F0F5F1;padding:1rem 1.2rem;border-left:3px solid #3D5A47;">
+      <div class="q-label" style="font-size:.82rem;"><span class="q-num" style="font-size:.95rem">4.</span>Si votre bien est vendu — précisez (facultatif) :</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-top:.6rem;">
+        <div>
+          <div class="client-field-label">Délai de vente (semaines)</div>
+          <div class="client-field-value"></div>
+        </div>
+        <div>
+          <div class="client-field-label">Prix obtenu vs prix annoncé</div>
+          <div class="client-field-value"></div>
+        </div>
+        <div>
+          <div class="client-field-label">Frais d'intermédiation économisés (€)</div>
+          <div class="client-field-value"></div>
+        </div>
+        <div>
+          <div class="client-field-label">Avez-vous recommandé Vendu Par Moi ?</div>
+          <div class="client-field-value"></div>
+        </div>
+      </div>
+    </div>
+
+    <div style="height:1rem;"></div>
+
+    <!-- Q5 -->
+    <div class="question-bloc">
+      <div class="q-label"><span class="q-num">5.</span>En une phrase — qu'est-ce que vous diriez à quelqu'un qui hésite à faire appel à Vendu Par Moi ?</div>
+      <div class="texte-libre">Votre réponse ici...</div>
+    </div>
+
+    <!-- NPS -->
+    <div class="question-bloc">
+      <div class="q-label" style="font-size:.85rem;">Sur une échelle de 0 à 10, quelle est la probabilité que vous recommandiez Vendu Par Moi à un proche ?</div>
+      <div class="nps-row">
+        <div class="nps-box">0</div><div class="nps-box">1</div><div class="nps-box">2</div><div class="nps-box">3</div><div class="nps-box">4</div><div class="nps-box">5</div><div class="nps-box">6</div><div class="nps-box">7</div><div class="nps-box">8</div><div class="nps-box">9</div><div class="nps-box">10</div>
+      </div>
+    </div>
+
+    <!-- AUTORISATION TÉMOIGNAGE -->
+    <div class="autorisation-bloc">
+      <div class="auto-titre">Autorisation d'utilisation du témoignage</div>
+      <div class="auto-texte">J'autorise Vendu Par Moi à utiliser ma réponse à la question 5, mon prénom, ma ville et les données de vente (délai, économies réalisées) à des fins de communication commerciale.</div>
+      <div class="auto-cases">
+        <div class="auto-case"><div class="auto-box"></div><span class="auto-label">✓ Oui, j'autorise</span></div>
+        <div class="auto-case"><div class="auto-box"></div><span class="auto-label">✗ Non, usage interne uniquement</span></div>
+      </div>
+    </div>
+
+    <!-- SIGNATURES -->
+    <div class="sig-grid">
+      <div class="sig-bloc">
+        <div class="sig-titre">Signature du client</div>
+        <div class="sig-line"></div>
+        <div class="sig-name">Nom, prénom &amp; date</div>
+      </div>
+      <div class="sig-bloc" style="display:flex;align-items:center;justify-content:center;">
+        <div style="text-align:center;">
+          <div style="font-family:'Cormorant Garamond',serif;font-style:italic;font-size:.88rem;color:#888;line-height:1.6;">"Vendre avec transparence,<br>c'est vendre avec confiance."</div>
+          <div style="font-size:.62rem;color:#BBB;margin-top:.5rem;letter-spacing:.1em;text-transform:uppercase;">Guillaume &amp; Matthias</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- FOOTER -->
+  <div class="doc-footer">
+    <div class="df-logo">
+      <svg width="18" height="18" viewBox="0 0 32 32"><path d="M16 2L3 13v17h8v-8h10v8h8V13L16 2z" fill="#3D5A47"/></svg>
+      <span class="df-logo-text">Vendu Par Moi</span>
+    </div>
+    <div class="df-contact">06 95 44 36 54 · contact@venduparmoi.fr · venduparmoi.fr</div>
+    <div class="df-legal">Vendu Par Moi<br>SIRET : ________________</div>
+  </div>
+</div>
+
+<p class="print-note">Format A4 · À envoyer par email J+7 après la vente · Ou à remplir en fin d'accompagnement si le client accepte</p>
+
+</body>
+</html>

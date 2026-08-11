@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dossier de présentation — Vendu Par Moi</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; color-adjust: exact !important; }
+
+    body { font-family: 'DM Sans', sans-serif; background: #e8e4de; display: flex; flex-direction: column; align-items: center; padding: 32px 20px 60px; gap: 24px; }
+
+    .no-print { background: #3D5A47; color: #fff; border: none; padding: 12px 28px; border-radius: 8px; font-family: 'DM Sans', sans-serif; font-size: 0.9rem; font-weight: 600; cursor: pointer; margin-bottom: 8px; }
+    .no-print:hover { background: #2d4535; }
+
+    /* ── PAGE BASE ── */
+    .page {
+      width: 210mm; min-height: 297mm;
+      background: #fff;
+      display: flex; flex-direction: column;
+      overflow: hidden;
+      box-shadow: 0 8px 40px rgba(0,0,0,0.15);
+      position: relative;
+    }
+
+    @media print {
+      body { background: #fff; padding: 0; gap: 0; }
+      .no-print { display: none; }
+      .page { box-shadow: none; page-break-after: always; min-height: 297mm; width: 210mm; }
+      .page:last-child { page-break-after: avoid; }
+      @page { margin: 0; size: A4 portrait; }
+    }
+
+    /* ══════════════════════════════════════
+       PAGE 1 — COUVERTURE
+    ══════════════════════════════════════ */
+    .cover {
+      background: linear-gradient(160deg, #0C1910 0%, #1D3A28 60%, #2d5040 100%);
+      min-height: 297mm;
+      display: flex; flex-direction: column;
+      justify-content: space-between;
+      padding: 56px 52px 44px;
+      color: #F5F0E8;
+      position: relative;
+      overflow: hidden;
+    }
+    .cover::before {
+      content: '';
+      position: absolute; top: -80px; right: -80px;
+      width: 380px; height: 380px; border-radius: 50%;
+      background: rgba(196,120,90,0.08);
+    }
+    .cover::after {
+      content: '';
+      position: absolute; bottom: 80px; left: -60px;
+      width: 260px; height: 260px; border-radius: 50%;
+      background: rgba(107,191,130,0.06);
+    }
+    .cover-top { z-index: 1; }
+    .cover-logo { display: flex; align-items: center; gap: 12px; margin-bottom: 80px; }
+    .cover-logo-icon { width: 36px; height: 36px; }
+    .cover-logo-text { font-family: 'Cormorant Garamond', serif; font-size: 1.3rem; color: #F5F0E8; }
+    .cover-tag { display: inline-block; font-size: 0.68rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.14em; color: #C4785A; border: 1px solid rgba(196,120,90,0.4); padding: 5px 14px; border-radius: 20px; margin-bottom: 22px; }
+    .cover-h1 { font-family: 'Cormorant Garamond', serif; font-size: 3.6rem; font-weight: 700; line-height: 1.05; margin-bottom: 20px; }
+    .cover-h1 em { color: #f0b89a; font-style: italic; }
+    .cover-sub { font-size: 0.92rem; color: rgba(245,240,232,0.6); line-height: 1.7; max-width: 380px; }
+
+    .cover-stats { display: flex; gap: 32px; z-index: 1; margin-top: 60px; }
+    .cstat { }
+    .cstat-val { font-family: 'Cormorant Garamond', serif; font-size: 2.4rem; font-weight: 700; color: #6BBF82; line-height: 1; }
+    .cstat-lbl { font-size: 0.72rem; color: rgba(245,240,232,0.45); margin-top: 4px; text-transform: uppercase; letter-spacing: 0.06em; }
+
+    .cover-bottom { z-index: 1; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 24px; display: flex; justify-content: space-between; align-items: flex-end; }
+    .cover-contact { font-size: 0.8rem; color: rgba(245,240,232,0.45); line-height: 1.8; }
+    .cover-date { font-size: 0.72rem; color: rgba(245,240,232,0.25); text-align: right; }
+
+    /* ══════════════════════════════════════
+       PAGE 2 — LE PROBLÈME & LA SOLUTION
+    ══════════════════════════════════════ */
+    .p2-header { background: #f8f5f0; padding: 36px 48px 28px; border-bottom: 1px solid #e8e0d6; }
+    .page-label { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.14em; font-weight: 700; color: #C4785A; margin-bottom: 6px; }
+    .page-title { font-family: 'Cormorant Garamond', serif; font-size: 2rem; font-weight: 700; color: #1C3028; }
+
+    .p2-body { flex: 1; padding: 36px 48px; display: flex; flex-direction: column; gap: 28px; }
+
+    .problem-section {}
+    .section-label { font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.1em; font-weight: 700; color: #888; margin-bottom: 14px; }
+    .problem-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; }
+    .problem-card { background: #fef8f4; border: 1px solid #f5d9c8; border-radius: 12px; padding: 18px 16px; }
+    .problem-card-ico { font-size: 1.4rem; margin-bottom: 10px; }
+    .problem-card-title { font-weight: 700; font-size: 0.85rem; color: #7a3a20; margin-bottom: 6px; }
+    .problem-card-text { font-size: 0.76rem; color: #9a6040; line-height: 1.6; }
+
+    .divider { border: none; border-top: 1px solid #e8e0d6; }
+
+    .solution-section {}
+    .solution-box {
+      background: linear-gradient(135deg, #1C3028, #2d4a38);
+      border-radius: 14px; padding: 28px 28px; color: #fff;
+      display: flex; gap: 28px; align-items: flex-start;
+    }
+    .solution-icon { font-size: 2.4rem; flex-shrink: 0; margin-top: 4px; }
+    .solution-text {}
+    .solution-title { font-family: 'Cormorant Garamond', serif; font-size: 1.6rem; font-weight: 700; margin-bottom: 10px; }
+    .solution-desc { font-size: 0.85rem; color: rgba(255,255,255,0.7); line-height: 1.75; margin-bottom: 16px; }
+    .solution-pills { display: flex; flex-wrap: wrap; gap: 8px; }
+    .pill { background: rgba(107,191,130,0.15); border: 1px solid rgba(107,191,130,0.3); border-radius: 20px; padding: 4px 12px; font-size: 0.72rem; font-weight: 600; color: #6BBF82; }
+
+    .comparison { display: flex; gap: 0; border-radius: 14px; overflow: hidden; border: 1px solid #e8e0d6; }
+    .comp-col { flex: 1; padding: 20px; }
+    .comp-col.vs-label { flex: 0 0 40px; background: #1C3028; display: flex; align-items: center; justify-content: center; font-family: 'Cormorant Garamond', serif; font-size: 1rem; color: rgba(255,255,255,0.4); font-style: italic; }
+    .comp-col:first-child { background: #fff8f5; border-right: none; }
+    .comp-col:last-child { background: #f0f8f2; border-left: none; }
+    .comp-title { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 12px; }
+    .comp-col:first-child .comp-title { color: #C4603A; }
+    .comp-col:last-child .comp-title { color: #1B6B35; }
+    .comp-price { font-family: 'Cormorant Garamond', serif; font-size: 2rem; font-weight: 700; margin-bottom: 12px; }
+    .comp-col:first-child .comp-price { color: #C4603A; }
+    .comp-col:last-child .comp-price { color: #1B6B35; }
+    .comp-item { font-size: 0.76rem; line-height: 1.8; }
+    .comp-col:first-child .comp-item { color: #C4603A; }
+    .comp-col:last-child .comp-item { color: #1B6B35; }
+
+    /* ══════════════════════════════════════
+       PAGE 3 — FONCTIONNALITÉS
+    ══════════════════════════════════════ */
+    .p3-header { background: #1C3028; padding: 32px 48px 28px; }
+    .p3-header .page-label { color: #6BBF82; }
+    .p3-header .page-title { color: #F5F0E8; }
+    .p3-header .page-sub { font-size: 0.83rem; color: rgba(245,240,232,0.5); margin-top: 6px; }
+
+    .p3-body { flex: 1; padding: 32px 48px; }
+    .feat-grid-3 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 24px; }
+    .feat-card { border: 1px solid #e8e0d6; border-radius: 12px; padding: 20px; background: #fff; }
+    .feat-card-top { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+    .feat-card-ico { width: 42px; height: 42px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; flex-shrink: 0; }
+    .feat-card-name { font-weight: 700; font-size: 0.9rem; color: #1A1A16; }
+    .feat-card-desc { font-size: 0.78rem; color: #777; line-height: 1.65; }
+    .feat-card-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+    .feat-tag { font-size: 0.65rem; font-weight: 600; padding: 2px 9px; border-radius: 20px; background: #f0f5f1; color: #3D5A47; }
+
+    .serenite-banner { background: linear-gradient(135deg, #C4603A, #d4724a); border-radius: 12px; padding: 18px 22px; color: #fff; display: flex; align-items: center; gap: 18px; }
+    .serenite-ico { font-size: 1.8rem; flex-shrink: 0; }
+    .serenite-title { font-family: 'Cormorant Garamond', serif; font-size: 1.2rem; font-weight: 700; margin-bottom: 4px; }
+    .serenite-desc { font-size: 0.78rem; color: rgba(255,255,255,0.8); line-height: 1.6; }
+
+    /* ══════════════════════════════════════
+       PAGE 4 — TARIFS & PROCESSUS
+    ══════════════════════════════════════ */
+    .p4-header { background: #f8f5f0; padding: 32px 48px 28px; border-bottom: 1px solid #e8e0d6; }
+    .p4-header .page-label { color: #C4785A; }
+    .p4-header .page-title { color: #1C3028; }
+
+    .p4-body { flex: 1; padding: 32px 48px; display: flex; flex-direction: column; gap: 28px; }
+
+    .packs-row { display: flex; gap: 16px; }
+    .pack { flex: 1; border-radius: 14px; padding: 24px; border: 2px solid #e8e0d6; }
+    .pack.highlight { border-color: #3D5A47; background: #f0f5f1; }
+    .pack-badge { font-size: 0.65rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.12em; color: #888; margin-bottom: 8px; }
+    .pack.highlight .pack-badge { color: #C4603A; }
+    .pack-name { font-family: 'Cormorant Garamond', serif; font-size: 1.5rem; font-weight: 700; color: #1C3028; margin-bottom: 4px; }
+    .pack-price { font-size: 2rem; font-weight: 700; color: #1A1A16; margin: 12px 0 4px; }
+    .pack-price-sub { font-size: 0.75rem; color: #888; margin-bottom: 16px; }
+    .pack-features { list-style: none; }
+    .pack-features li { font-size: 0.78rem; color: #444; line-height: 1.6; padding: 4px 0 4px 18px; position: relative; border-bottom: 1px solid #f0ebe3; }
+    .pack-features li:last-child { border-bottom: none; }
+    .pack-features li::before { content: '✓'; position: absolute; left: 0; color: #3D5A47; font-weight: 700; }
+    .pack-features li.plus::before { content: '+'; color: #C4603A; }
+
+    .process-title { font-family: 'Cormorant Garamond', serif; font-size: 1.3rem; font-weight: 700; color: #1C3028; margin-bottom: 16px; }
+    .process-steps { display: flex; gap: 0; position: relative; }
+    .process-steps::before { content: ''; position: absolute; top: 20px; left: 20px; right: 20px; height: 2px; background: #e0ead8; z-index: 0; }
+    .proc-step { flex: 1; text-align: center; z-index: 1; }
+    .proc-dot { width: 40px; height: 40px; border-radius: 50%; background: #3D5A47; color: #fff; font-weight: 700; font-size: 0.82rem; display: flex; align-items: center; justify-content: center; margin: 0 auto 10px; box-shadow: 0 2px 10px rgba(61,90,71,0.3); }
+    .proc-label { font-size: 0.7rem; font-weight: 600; color: #3D5A47; line-height: 1.5; text-transform: uppercase; letter-spacing: 0.05em; }
+    .proc-sub { font-size: 0.65rem; color: #999; margin-top: 3px; line-height: 1.5; }
+
+    .guarantee-bar { background: #f0f5f1; border: 1px solid #d0e4d8; border-radius: 12px; padding: 16px 20px; display: flex; align-items: center; gap: 16px; }
+    .guarantee-ico { font-size: 1.6rem; flex-shrink: 0; }
+    .guarantee-title { font-weight: 700; font-size: 0.88rem; color: #1C3028; margin-bottom: 3px; }
+    .guarantee-text { font-size: 0.76rem; color: #555; line-height: 1.6; }
+
+    /* ══════════════════════════════════════
+       PAGE 5 — FONDATEURS & CONTACT
+    ══════════════════════════════════════ */
+    .p5 {
+      background: linear-gradient(160deg, #0C1910 0%, #1D3A28 100%);
+      min-height: 297mm;
+      display: flex; flex-direction: column;
+      color: #F5F0E8;
+      overflow: hidden;
+      position: relative;
+    }
+    .p5::before {
+      content: '';
+      position: absolute; top: -60px; right: -60px;
+      width: 300px; height: 300px; border-radius: 50%;
+      background: rgba(196,120,90,0.06);
+    }
+    .p5-header { padding: 44px 52px 32px; border-bottom: 1px solid rgba(255,255,255,0.08); z-index: 1; }
+    .p5-header .page-label { color: #6BBF82; }
+    .p5-header .page-title { color: #F5F0E8; font-size: 1.9rem; }
+    .p5-header .page-sub { font-size: 0.83rem; color: rgba(245,240,232,0.45); margin-top: 6px; }
+
+    .p5-body { flex: 1; padding: 36px 52px; z-index: 1; display: flex; flex-direction: column; gap: 32px; }
+
+    .founders-row { display: flex; gap: 20px; }
+    .founder-card { flex: 1; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); border-radius: 14px; padding: 24px; }
+    .founder-name { font-family: 'Cormorant Garamond', serif; font-size: 1.4rem; font-weight: 700; color: #F5F0E8; margin-bottom: 4px; }
+    .founder-role { font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: #C4785A; margin-bottom: 14px; }
+    .founder-bio { font-size: 0.78rem; color: rgba(245,240,232,0.6); line-height: 1.75; }
+    .founder-contact { margin-top: 14px; font-size: 0.76rem; color: rgba(245,240,232,0.4); }
+    .founder-contact strong { color: rgba(245,240,232,0.7); }
+
+    .values-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
+    .value-card { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 18px; text-align: center; }
+    .value-ico { font-size: 1.5rem; margin-bottom: 8px; }
+    .value-title { font-weight: 700; font-size: 0.82rem; color: #F5F0E8; margin-bottom: 4px; }
+    .value-desc { font-size: 0.72rem; color: rgba(245,240,232,0.45); line-height: 1.6; }
+
+    .p5-footer { padding: 32px 52px 44px; background: rgba(0,0,0,0.25); border-top: 1px solid rgba(255,255,255,0.08); z-index: 1; }
+    .cta-title { font-family: 'Cormorant Garamond', serif; font-size: 2rem; font-weight: 700; color: #C4785A; margin-bottom: 8px; }
+    .cta-sub { font-size: 0.85rem; color: rgba(245,240,232,0.5); margin-bottom: 24px; }
+    .contact-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
+    .contact-item { }
+    .contact-label { font-size: 0.65rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: rgba(245,240,232,0.35); margin-bottom: 4px; }
+    .contact-val { font-size: 0.9rem; font-weight: 600; color: #F5F0E8; }
+    .contact-val-sub { font-size: 0.75rem; color: rgba(245,240,232,0.4); margin-top: 2px; }
+
+    /* PAGE HEADER BAND for inner pages */
+    .inner-header-band { height: 5px; background: linear-gradient(90deg, #3D5A47, #6BBF82, #C4785A); }
+    .inner-footer { height: 5px; background: linear-gradient(90deg, #C4785A, #6BBF82, #3D5A47); margin-top: auto; }
+    .page-num { font-size: 0.65rem; color: #ccc; text-align: right; padding: 8px 48px; }
+  </style>
+</head>
+<body>
+
+<button class="no-print" onclick="window.print()">⬇ Télécharger en PDF</button>
+
+<!-- ══════════════════════════════════════
+     PAGE 1 — COUVERTURE
+══════════════════════════════════════ -->
+<div class="page">
+  <div class="cover">
+    <div class="cover-top">
+      <div class="cover-logo">
+        <svg class="cover-logo-icon" viewBox="0 0 32 32"><path d="M16 2L3 13v17h8v-8h10v8h8V13L16 2z" fill="#6BBF82"/></svg>
+        <span class="cover-logo-text">Vendu Par Moi</span>
+      </div>
+      <div class="cover-tag">Dossier de présentation — Confidentiel</div>
+      <div class="cover-h1">Vendez votre bien<br>sans frais de<br>commercialisation.<br><em>Gardez tout le prix.</em></div>
+      <div class="cover-sub">La seule plateforme qui donne aux particuliers les outils, la méthode et l'accompagnement des professionnels de l'immobilier — sans commission d'agence.</div>
+
+      <div class="cover-stats">
+        <div class="cstat">
+          <div class="cstat-val">15 000€</div>
+          <div class="cstat-lbl">économisés<br>en moyenne</div>
+        </div>
+        <div class="cstat">
+          <div class="cstat-val">30%</div>
+          <div class="cstat-lbl">des ventes<br>entre particuliers</div>
+        </div>
+        <div class="cstat">
+          <div class="cstat-val">9 étapes</div>
+          <div class="cstat-lbl">pour vendre<br>comme un pro</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="cover-bottom">
+      <div class="cover-contact">
+        Matthias Brieux — 06 95 44 36 54<br>
+        Guillaume Girod<br>
+        contact@venduparmoi.fr
+      </div>
+      <div class="cover-date">
+        Août 2026<br>
+        venduparmoi.fr
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     PAGE 2 — LE PROBLÈME & LA SOLUTION
+══════════════════════════════════════ -->
+<div class="page">
+  <div class="inner-header-band"></div>
+  <div class="p2-header">
+    <div class="page-label">01 — Le constat</div>
+    <div class="page-title">Vendre seul : le problème, et notre réponse</div>
+  </div>
+  <div class="p2-body">
+
+    <div class="problem-section">
+      <div class="section-label">Pourquoi vendre sans agence est difficile</div>
+      <div class="problem-grid">
+        <div class="problem-card">
+          <div class="problem-card-ico">💸</div>
+          <div class="problem-card-title">Les frais sont énormes</div>
+          <div class="problem-card-text">4 à 6 % du prix de vente partent en commission. Sur un bien à 300 000 €, c'est entre 12 000 et 18 000 € perdus.</div>
+        </div>
+        <div class="problem-card">
+          <div class="problem-card-ico">🧭</div>
+          <div class="problem-card-title">On ne sait pas par où commencer</div>
+          <div class="problem-card-text">Estimation, diagnostics, annonce, visites, offres, compromis… Sans guide, chaque étape peut devenir un obstacle.</div>
+        </div>
+        <div class="problem-card">
+          <div class="problem-card-ico">🛠️</div>
+          <div class="problem-card-title">Les outils manquent</div>
+          <div class="problem-card-text">Pas d'agenda de visites, pas de dossier acheteur pro, pas de script pour négocier. Le particulier est livré à lui-même.</div>
+        </div>
+      </div>
+    </div>
+
+    <hr class="divider">
+
+    <div class="solution-section">
+      <div class="section-label">Notre solution</div>
+      <div class="solution-box">
+        <div class="solution-icon">🏡</div>
+        <div class="solution-text">
+          <div class="solution-title">Vendu Par Moi — La méthode pro pour particuliers</div>
+          <div class="solution-desc">Nous donnons aux vendeurs particuliers exactement ce qu'un agent immobilier utilise au quotidien : formation complète, outils numériques, coach IA, dossier acheteur pro, agenda connecté — mais sans vous faire payer une commission.</div>
+          <div class="solution-pills">
+            <span class="pill">Formation 9 étapes</span>
+            <span class="pill">Coach IA 7j/7</span>
+            <span class="pill">Agenda connecté</span>
+            <span class="pill">Dossier acheteur</span>
+            <span class="pill">Relances automatiques</span>
+            <span class="pill">Suivi des offres</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="comparison">
+      <div class="comp-col">
+        <div class="comp-title">Agence traditionnelle</div>
+        <div class="comp-price">10 000 €+</div>
+        <div class="comp-item">✗ Commission à la vente</div>
+        <div class="comp-item">✗ Vous perdez le contrôle</div>
+        <div class="comp-item">✗ Peu de transparence</div>
+        <div class="comp-item">✗ Agenda imposé</div>
+        <div class="comp-item">✗ Pas de formation</div>
+      </div>
+      <div class="comp-col vs-label">vs</div>
+      <div class="comp-col">
+        <div class="comp-title">Vendu Par Moi</div>
+        <div class="comp-price">dès 999 €</div>
+        <div class="comp-item">✓ Frais fixes, aucune commission</div>
+        <div class="comp-item">✓ Vous restez maître de la vente</div>
+        <div class="comp-item">✓ Outils transparents</div>
+        <div class="comp-item">✓ Agenda en ligne libre</div>
+        <div class="comp-item">✓ Formation complète incluse</div>
+      </div>
+    </div>
+
+  </div>
+  <div class="page-num">2 / 5</div>
+  <div class="inner-footer"></div>
+</div>
+
+<!-- ══════════════════════════════════════
+     PAGE 3 — FONCTIONNALITÉS
+══════════════════════════════════════ -->
+<div class="page">
+  <div class="inner-header-band"></div>
+  <div class="p3-header">
+    <div class="page-label">02 — La plateforme</div>
+    <div class="page-title">Tout ce dont vous avez besoin pour vendre</div>
+    <div class="p3-header page-sub" style="color:rgba(245,240,232,0.5);font-size:0.82rem;margin-top:6px;">Un espace vendeur complet, accessible 24h/24 depuis votre smartphone ou ordinateur.</div>
+  </div>
+  <div class="p3-body">
+    <div class="feat-grid-3">
+
+      <div class="feat-card">
+        <div class="feat-card-top">
+          <div class="feat-card-ico" style="background:#e8f4ec;">📚</div>
+          <div class="feat-card-name">Formation 9 étapes</div>
+        </div>
+        <div class="feat-card-desc">De la préparation du bien jusqu'à la signature chez le notaire. Chaque étape est guidée, avec des check-lists et des modèles prêts à l'emploi.</div>
+        <div class="feat-card-tags"><span class="feat-tag">Vidéos</span><span class="feat-tag">Check-lists</span><span class="feat-tag">Scripts</span></div>
+      </div>
+
+      <div class="feat-card">
+        <div class="feat-card-top">
+          <div class="feat-card-ico" style="background:#fef3e2;">🤖</div>
+          <div class="feat-card-name">Coach IA personnel</div>
+        </div>
+        <div class="feat-card-desc">Un assistant IA disponible à toute heure pour répondre aux questions du vendeur, rédiger des emails, analyser une offre ou préparer une négociation.</div>
+        <div class="feat-card-tags"><span class="feat-tag">7j/7</span><span class="feat-tag">Contextuel</span><span class="feat-tag">Rédaction</span></div>
+      </div>
+
+      <div class="feat-card">
+        <div class="feat-card-top">
+          <div class="feat-card-ico" style="background:#e8f4ec;">📋</div>
+          <div class="feat-card-name">Dossier acheteur pro</div>
+        </div>
+        <div class="feat-card-desc">Un lien partageable avec photos organisées, diagnostics, DPE, description générée par IA et disponibilités pour visiter. Professionnel et complet.</div>
+        <div class="feat-card-tags"><span class="feat-tag">Photos</span><span class="feat-tag">Diagnostics</span><span class="feat-tag">IA</span></div>
+      </div>
+
+      <div class="feat-card">
+        <div class="feat-card-top">
+          <div class="feat-card-ico" style="background:#fef3e2;">📅</div>
+          <div class="feat-card-name">Agenda de visites</div>
+        </div>
+        <div class="feat-card-desc">Le vendeur indique ses disponibilités, les acheteurs réservent directement en ligne. Confirmations et rappels automatiques par SMS et email.</div>
+        <div class="feat-card-tags"><span class="feat-tag">Réservation</span><span class="feat-tag">Rappels auto</span></div>
+      </div>
+
+      <div class="feat-card">
+        <div class="feat-card-top">
+          <div class="feat-card-ico" style="background:#e8f4ec;">📊</div>
+          <div class="feat-card-name">Suivi des offres</div>
+        </div>
+        <div class="feat-card-desc">Toutes les offres reçues centralisées dans un tableau de bord. Comparer, accepter, refuser ou contre-proposer en quelques clics.</div>
+        <div class="feat-card-tags"><span class="feat-tag">Comparaison</span><span class="feat-tag">Historique</span></div>
+      </div>
+
+      <div class="feat-card">
+        <div class="feat-card-top">
+          <div class="feat-card-ico" style="background:#fef3e2;">📱</div>
+          <div class="feat-card-name">Relances automatiques</div>
+        </div>
+        <div class="feat-card-desc">Après chaque visite, les acheteurs reçoivent automatiquement un message de relance pour déclencher une offre au bon moment.</div>
+        <div class="feat-card-tags"><span class="feat-tag">SMS/Email</span><span class="feat-tag">Timing</span></div>
+      </div>
+
+    </div>
+
+    <div class="serenite-banner">
+      <div class="serenite-ico">⭐</div>
+      <div>
+        <div class="serenite-title">Pack Sérénité — L'offre la plus complète</div>
+        <div class="serenite-desc">En plus de tous les outils : photos professionnelles du bien, visite virtuelle 360°, rédaction de l'annonce par nos soins, accompagnement personnalisé et numéro intelligent dédié (VPM Connect).</div>
+      </div>
+    </div>
+
+  </div>
+  <div class="page-num">3 / 5</div>
+  <div class="inner-footer"></div>
+</div>
+
+<!-- ══════════════════════════════════════
+     PAGE 4 — TARIFS & PROCESSUS
+══════════════════════════════════════ -->
+<div class="page">
+  <div class="inner-header-band"></div>
+  <div class="p4-header">
+    <div class="page-label">03 — Tarifs</div>
+    <div class="page-title">Des offres transparentes, sans surprise</div>
+  </div>
+  <div class="p4-body">
+
+    <div class="packs-row">
+      <div class="pack">
+        <div class="pack-badge">Pack</div>
+        <div class="pack-name">Autonome</div>
+        <div class="pack-price">999 €</div>
+        <div class="pack-price-sub">TTC · Paiement unique · Sans abonnement</div>
+        <ul class="pack-features">
+          <li>Espace vendeur numérique complet</li>
+          <li>Formation pas à pas (9 étapes)</li>
+          <li>Coach IA intégré</li>
+          <li>Agenda connecté (visites en ligne)</li>
+          <li>Dossier acheteur numérique partageable</li>
+          <li>Bibliothèque de modèles (emails, SMS, scripts)</li>
+          <li>Générateur d'annonce par IA</li>
+          <li>Suivi des offres centralisé</li>
+          <li>Accès 6 mois renouvelable</li>
+        </ul>
+      </div>
+
+      <div class="pack highlight">
+        <div class="pack-badge">Pack — Le plus complet</div>
+        <div class="pack-name">Sérénité</div>
+        <div class="pack-price">1 548 €</div>
+        <div class="pack-price-sub">TTC · Ou 2 × 774 € sans frais</div>
+        <ul class="pack-features">
+          <li>Tout le Pack Autonome inclus</li>
+          <li class="plus">Photos professionnelles du bien</li>
+          <li class="plus">Visite virtuelle 360°</li>
+          <li class="plus">Rédaction de l'annonce par nos soins</li>
+          <li class="plus">Accompagnement personnalisé</li>
+          <li class="plus">Constitution complète du dossier acheteur</li>
+          <li class="plus">Numéro intelligent dédié (VPM Connect)</li>
+          <li class="plus">Relances automatiques des visiteurs</li>
+          <li>Accès 6 mois renouvelable</li>
+        </ul>
+      </div>
+    </div>
+
+    <div>
+      <div class="process-title">Comment ça se passe après inscription ?</div>
+      <div class="process-steps">
+        <div class="proc-step">
+          <div class="proc-dot">1</div>
+          <div class="proc-label">Inscription</div>
+          <div class="proc-sub">Accès immédiat à la plateforme</div>
+        </div>
+        <div class="proc-step">
+          <div class="proc-dot">2</div>
+          <div class="proc-label">Mon bien</div>
+          <div class="proc-sub">Saisie des infos, photos, diagnostics</div>
+        </div>
+        <div class="proc-step">
+          <div class="proc-dot">3</div>
+          <div class="proc-label">Formation</div>
+          <div class="proc-sub">9 étapes guidées à son rythme</div>
+        </div>
+        <div class="proc-step">
+          <div class="proc-dot">4</div>
+          <div class="proc-label">Visites</div>
+          <div class="proc-sub">Agenda + dossier acheteur pro</div>
+        </div>
+        <div class="proc-step">
+          <div class="proc-dot">5</div>
+          <div class="proc-label">Offre & Notaire</div>
+          <div class="proc-sub">Négociation accompagnée</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="guarantee-bar">
+      <div class="guarantee-ico">🛡️</div>
+      <div>
+        <div class="guarantee-title">Garantie satisfaction 48h</div>
+        <div class="guarantee-text">Si dans les 48h suivant votre inscription vous n'êtes pas satisfait, nous vous remboursons intégralement — sans justification. Paiements sécurisés par Stripe (certifié PCI-DSS).</div>
+      </div>
+    </div>
+
+  </div>
+  <div class="page-num">4 / 5</div>
+  <div class="inner-footer"></div>
+</div>
+
+<!-- ══════════════════════════════════════
+     PAGE 5 — FONDATEURS & CONTACT
+══════════════════════════════════════ -->
+<div class="page">
+  <div class="p5">
+    <div class="p5-header">
+      <div class="page-label">04 — L'équipe</div>
+      <div class="page-title">Deux professionnels de l'immobilier à votre service</div>
+      <div class="p5-header page-sub" style="color:rgba(245,240,232,0.45);font-size:0.82rem;margin-top:6px;">Vendu Par Moi est fondé par deux experts du terrain qui connaissent la vente immobilière de l'intérieur.</div>
+    </div>
+
+    <div class="p5-body">
+
+      <div class="founders-row">
+        <div class="founder-card">
+          <div class="founder-name">Matthias Brieux</div>
+          <div class="founder-role">Co-fondateur</div>
+          <div class="founder-bio">Professionnel de l'immobilier avec une expérience terrain solide. Matthias a conçu la méthode et les outils de Vendu Par Moi pour donner aux particuliers ce qu'il utilisait lui-même au quotidien pour vendre des biens.</div>
+          <div class="founder-contact"><strong>06 95 44 36 54</strong><br>matthias@venduparmoi.fr</div>
+        </div>
+        <div class="founder-card">
+          <div class="founder-name">Guillaume Girod</div>
+          <div class="founder-role">Co-fondateur</div>
+          <div class="founder-bio">Professionnel de l'immobilier, Guillaume apporte son expertise du marché et de la relation client. Ensemble, ils ont construit une plateforme qui reflète la réalité du terrain et les besoins concrets des vendeurs particuliers.</div>
+          <div class="founder-contact">guillaume@venduparmoi.fr</div>
+        </div>
+      </div>
+
+      <div class="values-row">
+        <div class="value-card">
+          <div class="value-ico">🎯</div>
+          <div class="value-title">Transparence totale</div>
+          <div class="value-desc">Prix fixe, sans commission cachée. Vous savez exactement ce que vous payez dès le départ.</div>
+        </div>
+        <div class="value-card">
+          <div class="value-ico">⚡</div>
+          <div class="value-title">Efficacité pro</div>
+          <div class="value-desc">Les mêmes outils qu'un agent immobilier, conçus pour être simples à utiliser par un particulier.</div>
+        </div>
+        <div class="value-card">
+          <div class="value-ico">🤝</div>
+          <div class="value-title">Accompagnement réel</div>
+          <div class="value-desc">Coach IA, formation et équipe disponible. Vous n'êtes jamais seul face à votre vente.</div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="p5-footer">
+      <div class="cta-title">Prêt à vendre sans frais de commercialisation ?</div>
+      <div class="cta-sub">Contactez-nous pour une présentation de la plateforme en 15 minutes, ou inscrivez-vous directement sur venduparmoi.fr</div>
+      <div class="contact-grid">
+        <div class="contact-item">
+          <div class="contact-label">Téléphone</div>
+          <div class="contact-val">06 95 44 36 54</div>
+          <div class="contact-val-sub">Matthias Brieux</div>
+        </div>
+        <div class="contact-item">
+          <div class="contact-label">Email</div>
+          <div class="contact-val">contact@venduparmoi.fr</div>
+          <div class="contact-val-sub">Réponse sous 24h</div>
+        </div>
+        <div class="contact-item">
+          <div class="contact-label">Site web</div>
+          <div class="contact-val">venduparmoi.fr</div>
+          <div class="contact-val-sub">Inscription en 2 minutes</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>
