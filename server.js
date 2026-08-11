@@ -76,6 +76,7 @@ app.get('/pdf-presentation', (req, res) => { res.set('Cache-Control', 'no-store,
 app.get('/guide-diagnostics', (req, res) => { res.set('Cache-Control', 'no-store, no-cache, must-revalidate'); res.sendFile(path.join(__dirname, 'public', 'guide-diagnostics.html')); });
 app.get('/fiche-estimation', (req, res) => { res.set('Cache-Control', 'no-store, no-cache, must-revalidate'); res.sendFile(path.join(__dirname, 'public', 'fiche-estimation.html')); });
 app.get('/questionnaire-satisfaction', (req, res) => { res.set('Cache-Control', 'no-store, no-cache, must-revalidate'); res.sendFile(path.join(__dirname, 'public', 'questionnaire-satisfaction.html')); });
+app.get('/kit-bienvenue', (req, res) => { res.set('Cache-Control', 'no-store, no-cache, must-revalidate'); res.sendFile(path.join(__dirname, 'public', 'kit-bienvenue.html')); });
 
 app.use(express.static(path.join(__dirname, 'public'), {
   maxAge: '7d',

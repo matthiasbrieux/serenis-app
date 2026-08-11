@@ -1,0 +1,992 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vendu Par Moi — Kit de Bienvenue</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after {
+  margin:0; padding:0; box-sizing:border-box;
+  -webkit-print-color-adjust: exact !important;
+  print-color-adjust: exact !important;
+  color-adjust: exact !important;
+}
+
+@media print {
+  html, body { width: 210mm; background: white !important; }
+  .no-print { display: none !important; }
+  @page { margin: 0; size: A4 portrait; }
+  .section { page-break-inside: avoid; }
+  .step-item { page-break-inside: avoid; }
+  .cl-groupe { page-break-inside: avoid; }
+}
+
+:root {
+  --noir: #0F1E13;
+  --noir-pur: #0A0A0A;
+  --blanc: #FAFAF8;
+  --sable: #F5F0E8;
+  --sable-f: #EDE8DF;
+  --gris: #666;
+  --gris-cl: #E0D8CC;
+  --gris-m: #333;
+  --terra: #C4603A;
+  --terra-cl: #D9836A;
+  --terra-pal: #FAE8E2;
+  --vert: #3D5A47;
+  --vert-dark: #1C3028;
+  --vert-cl: #D0E4D9;
+  --vert-pal: #EAF2EE;
+}
+
+html { scroll-behavior: smooth; }
+body {
+  font-family: 'DM Sans', sans-serif;
+  font-weight: 300;
+  background: var(--sable);
+  color: var(--noir-pur);
+  overflow-x: hidden;
+  line-height: 1.8;
+}
+
+/* ── NO PRINT BUTTON ── */
+.no-print {
+  position: fixed; top: 20px; right: 20px; z-index: 999;
+}
+.btn-print {
+  background: var(--vert-dark); color: #fff; border: none;
+  padding: 12px 22px; border-radius: 8px;
+  font-family: 'DM Sans', sans-serif; font-size: 0.88rem; font-weight: 700;
+  cursor: pointer; box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+}
+.btn-print:hover { background: var(--vert); }
+
+/* ── PAGE 1 — COUVERTURE ── */
+.cover {
+  min-height: 100vh;
+  background: linear-gradient(160deg, #0A1A0E 0%, #0F1E13 55%, #1C3028 100%);
+  display: flex; flex-direction: column;
+  justify-content: space-between;
+  padding: 7vw 10vw;
+  position: relative; overflow: hidden;
+}
+.cover::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: radial-gradient(ellipse 60% 50% at 85% 30%, rgba(196,96,58,.1) 0%, transparent 65%);
+  pointer-events: none;
+}
+.cover-trait {
+  position: absolute; left: 0; top: 0; bottom: 0; width: 4px;
+  background: linear-gradient(to bottom, transparent, var(--terra) 20%, var(--terra) 80%, transparent);
+}
+
+.cover-top { position: relative; z-index: 1; }
+.cover-logo {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.1rem; font-weight: 600;
+  color: rgba(255,255,255,.4);
+  letter-spacing: .08em;
+  display: flex; align-items: center; gap: .6rem;
+}
+.cover-logo-icon {
+  width: 22px; height: 22px; opacity: .5;
+}
+.cover-logo em { color: var(--terra-cl); font-style: italic; }
+
+.cover-body {
+  position: relative; z-index: 1;
+  flex: 1; display: flex; flex-direction: column; justify-content: center;
+  padding: 4rem 0;
+}
+
+.cover-kicker {
+  font-size: .7rem; font-weight: 500; letter-spacing: .22em;
+  text-transform: uppercase; color: var(--terra-cl);
+  margin-bottom: 2rem;
+  display: flex; align-items: center; gap: .8rem;
+}
+.cover-kicker::before {
+  content: ''; display: inline-block;
+  width: 2rem; height: 1.5px; background: var(--terra);
+}
+
+.cover-h1 {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(3rem,7vw,5.5rem);
+  font-weight: 300; line-height: 1.08;
+  color: var(--blanc); margin-bottom: 1rem;
+}
+.cover-h1 em {
+  font-style: italic; color: var(--terra-cl);
+  display: block; font-weight: 300;
+}
+.cover-h1 strong {
+  font-weight: 700; color: var(--blanc);
+}
+
+.cover-trait-h {
+  width: 3rem; height: 1.5px;
+  background: rgba(255,255,255,.15); margin: 2.5rem 0;
+}
+
+.cover-message {
+  font-family: 'Cormorant Garamond', serif;
+  font-style: italic; font-size: 1.1rem;
+  color: rgba(255,255,255,.55); max-width: 44ch;
+  line-height: 1.75;
+}
+.cover-message strong { color: rgba(255,255,255,.8); font-style: normal; font-weight: 600; }
+
+.cover-bottom {
+  position: relative; z-index: 1;
+  display: flex; justify-content: space-between;
+  align-items: flex-end; flex-wrap: wrap; gap: 2rem;
+  padding-top: 3rem;
+  border-top: 1px solid rgba(255,255,255,.08);
+}
+.cover-bottom-left p {
+  font-size: .75rem; color: rgba(255,255,255,.3);
+  letter-spacing: .06em; line-height: 1.9;
+}
+.cover-bottom-left strong { color: rgba(255,255,255,.6); }
+.cover-bottom-right {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1rem; font-style: italic;
+  color: rgba(255,255,255,.25); text-align: right;
+  line-height: 1.6;
+}
+
+/* ── SECTIONS ── */
+.section {
+  padding: 6rem 10vw;
+}
+.section-blanc { background: var(--blanc); }
+.section-sable { background: var(--sable); }
+.section-dark {
+  background: linear-gradient(160deg, #0A1A0E 0%, #0F1E13 60%, #1C3028 100%);
+}
+
+.eyebrow {
+  font-size: .68rem; font-weight: 600; letter-spacing: .22em;
+  text-transform: uppercase; color: var(--vert);
+  display: flex; align-items: center; gap: .8rem; margin-bottom: 1rem;
+}
+.eyebrow::after { content: ''; flex: 0 0 2rem; height: 1.5px; background: var(--vert-cl); }
+.eyebrow.blanc { color: var(--terra-cl); }
+.eyebrow.blanc::after { background: rgba(255,255,255,.2); }
+
+h2 {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(2rem,4vw,3rem);
+  font-weight: 700; line-height: 1.12; color: var(--noir);
+  margin-bottom: .8rem;
+}
+h2.blanc { color: var(--blanc); }
+h2 em { font-style: italic; font-weight: 300; color: var(--terra); }
+h2.blanc em { color: var(--terra-cl); }
+
+.intro {
+  font-size: .92rem; color: var(--gris); line-height: 1.95;
+  max-width: 58ch; margin-bottom: 3.5rem;
+}
+
+/* ── PAGE 2 — MOT DE BIENVENUE ── */
+.bienvenue-grid {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 5rem; align-items: start;
+}
+@media(max-width:860px){ .bienvenue-grid { grid-template-columns:1fr; gap:3rem; } }
+
+.bienvenue-lettre {
+  background: var(--sable);
+  padding: 3rem;
+  border-left: 4px solid var(--vert);
+  position: relative; overflow: hidden;
+}
+.bienvenue-lettre::before {
+  content: '"';
+  position: absolute; bottom: -2rem; right: 1rem;
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 12rem; font-weight: 900;
+  color: rgba(61,90,71,.06); line-height: 1; pointer-events: none;
+}
+.lettre-dest {
+  font-size: .72rem; font-weight: 500; letter-spacing: .14em;
+  text-transform: uppercase; color: var(--vert);
+  margin-bottom: 1.5rem;
+}
+.lettre-texte {
+  font-family: 'Cormorant Garamond', serif;
+  font-style: italic; font-size: 1.05rem;
+  color: var(--gris-m); line-height: 1.8;
+}
+.lettre-signature {
+  margin-top: 2.5rem; padding-top: 1.5rem;
+  border-top: 1px solid var(--gris-cl);
+}
+.lettre-signature p {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1rem; color: var(--noir); font-weight: 600;
+  margin-bottom: .2rem;
+}
+.lettre-signature span {
+  font-size: .7rem; letter-spacing: .1em; text-transform: uppercase;
+  color: var(--vert);
+}
+
+.bienvenue-infos { display: flex; flex-direction: column; gap: 1.5rem; }
+
+.info-card {
+  background: var(--blanc); padding: 1.8rem;
+  border-top: 3px solid var(--vert-cl);
+  transition: border-color .2s;
+}
+.info-card:hover { border-color: var(--vert); }
+.info-card-icon { font-size: 1.2rem; margin-bottom: .6rem; }
+.info-card h4 {
+  font-size: .88rem; font-weight: 600; color: var(--noir);
+  margin-bottom: .4rem;
+}
+.info-card p { font-size: .8rem; color: var(--gris); line-height: 1.7; }
+.info-card .highlight {
+  font-weight: 600; color: var(--vert); font-size: .9rem;
+}
+
+/* ── PAGE 3 — DÉROULÉ ── */
+.deroulé-steps { display: flex; flex-direction: column; gap: 0; }
+
+.step-item {
+  display: grid; grid-template-columns: 3.5rem 1fr;
+  gap: 2rem; padding: 2.5rem 0;
+  border-bottom: 1px solid var(--gris-cl);
+  position: relative;
+}
+.step-item:last-child { border-bottom: none; }
+
+.step-item:not(:last-child)::after {
+  content: '';
+  position: absolute; left: 1.55rem; top: 5rem; bottom: -1px;
+  width: 1.5px; background: var(--gris-cl);
+}
+
+.step-num {
+  width: 3.5rem; height: 3.5rem; flex-shrink: 0;
+  background: var(--noir); border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.3rem; font-weight: 700; color: var(--terra-cl);
+  position: relative; z-index: 1;
+}
+.step-num.terra { background: var(--terra); color: var(--blanc); }
+.step-num.vert { background: var(--vert); color: var(--blanc); font-size: 1rem; }
+
+.step-phase {
+  font-size: .65rem; font-weight: 600; letter-spacing: .16em;
+  text-transform: uppercase; color: var(--terra); margin-bottom: .4rem;
+}
+.step-titre {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.3rem; font-weight: 700; color: var(--noir);
+  margin-bottom: .6rem;
+}
+.step-desc { font-size: .85rem; color: var(--gris); line-height: 1.8; margin-bottom: 1rem; }
+
+.step-details { display: flex; flex-direction: column; gap: .4rem; }
+.step-detail {
+  display: flex; align-items: flex-start; gap: .7rem;
+  font-size: .8rem; color: var(--gris); line-height: 1.5;
+}
+.step-detail::before {
+  content: '→'; color: var(--vert-cl); flex-shrink: 0; margin-top: .05rem;
+}
+
+.step-badge {
+  display: inline-flex; align-items: center; gap: .4rem;
+  background: var(--vert-pal); border: 1px solid var(--vert-cl);
+  padding: .3rem .8rem; border-radius: 20px; margin-top: .8rem;
+  font-size: .68rem; font-weight: 600; color: var(--vert);
+}
+.step-badge.terra-badge {
+  background: var(--terra-pal); border-color: rgba(196,96,58,.3);
+  color: var(--terra);
+}
+
+/* ── PAGE 4 — CHECKLIST ── */
+.checklist-intro {
+  background: var(--sable);
+  border-left: 4px solid var(--vert);
+  padding: 1.8rem 2rem; margin-bottom: 3rem;
+}
+.checklist-intro p { font-size: .88rem; color: var(--gris-m); line-height: 1.7; }
+.checklist-intro strong { color: var(--noir); }
+
+.checklist-grid {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+}
+@media(max-width:760px){ .checklist-grid { grid-template-columns:1fr; } }
+
+.cl-titre {
+  display: flex; align-items: center; gap: .8rem;
+  font-size: .78rem; font-weight: 600; color: var(--blanc);
+  background: var(--vert-dark); padding: .8rem 1.2rem;
+  margin-bottom: 0;
+  letter-spacing: .04em;
+}
+.cl-titre-icon { font-size: .95rem; }
+
+.cl-items { display: flex; flex-direction: column; gap: 0; }
+
+.cl-item {
+  display: flex; align-items: flex-start; gap: .9rem;
+  padding: 1rem 1.2rem;
+  background: var(--blanc);
+  border-bottom: 1px solid var(--gris-cl);
+  cursor: pointer; transition: background .15s;
+}
+.cl-item:last-child { border-bottom: none; }
+.cl-item:hover { background: var(--sable); }
+
+.cl-box {
+  width: 1.1rem; height: 1.1rem; flex-shrink: 0;
+  border: 1.5px solid #ccc; border-radius: 3px;
+  display: flex; align-items: center; justify-content: center;
+  margin-top: .15rem; transition: all .2s; cursor: pointer;
+}
+.cl-box.checked { background: var(--vert); border-color: var(--vert); color: var(--blanc); font-size: .6rem; }
+
+.cl-label { font-size: .85rem; font-weight: 500; color: var(--noir); margin-bottom: .15rem; }
+.cl-label.done { text-decoration: line-through; color: var(--gris); }
+.cl-sublabel { font-size: .74rem; color: var(--gris); line-height: 1.5; }
+.cl-sublabel.done { opacity: .5; }
+
+.cl-tag {
+  display: inline-block; margin-top: .4rem;
+  font-size: .58rem; font-weight: 600; letter-spacing: .1em;
+  text-transform: uppercase; padding: .15rem .55rem;
+  border-radius: 10px;
+}
+.tag-oblig { background: rgba(196,96,58,.1); color: var(--terra); }
+.tag-utile { background: var(--vert-pal); color: var(--vert); }
+.tag-si { background: rgba(61,90,71,.08); color: var(--vert-dark); }
+
+.cl-progress {
+  background: var(--blanc); border-radius: 8px;
+  padding: 1.2rem 1.5rem; margin-bottom: 2rem;
+  display: flex; align-items: center; gap: 1.5rem;
+  box-shadow: 0 2px 12px rgba(0,0,0,.05);
+}
+.clp-label { font-size: .78rem; color: var(--gris); flex: 1; }
+.clp-pct {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.8rem; font-weight: 700; color: var(--vert); flex-shrink: 0;
+}
+.clp-bar { flex: 2; height: 5px; background: var(--gris-cl); border-radius: 3px; overflow: hidden; }
+.clp-fill { height: 100%; background: linear-gradient(to right, var(--vert), #6BBF82); border-radius: 3px; transition: width .5s ease; }
+
+/* ── PAGE 5 — LIVRABLES ── */
+.livrables-grid {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1.5rem; margin-bottom: 3rem;
+}
+
+.livrable {
+  background: rgba(255,255,255,.05);
+  border: 1px solid rgba(255,255,255,.1);
+  padding: 2rem 1.8rem;
+  transition: background .2s, border-color .2s;
+}
+.livrable:hover {
+  background: rgba(255,255,255,.08);
+  border-color: rgba(196,96,58,.4);
+}
+
+.livrable-icon { font-size: 1.4rem; margin-bottom: .8rem; display: block; }
+.livrable-seance {
+  font-size: .6rem; font-weight: 600; letter-spacing: .16em;
+  text-transform: uppercase; color: var(--terra-cl);
+  margin-bottom: .4rem;
+}
+.livrable h4 { font-size: .9rem; font-weight: 600; color: var(--blanc); margin-bottom: .4rem; }
+.livrable p { font-size: .78rem; color: rgba(255,255,255,.4); line-height: 1.6; }
+
+.livrables-total {
+  background: rgba(61,90,71,.15); border: 1px solid rgba(61,90,71,.3);
+  padding: 1.5rem 2rem;
+  display: flex; align-items: center; gap: 1.2rem;
+}
+.lt-icon { font-size: 1.5rem; flex-shrink: 0; }
+.lt-text { font-size: .85rem; color: rgba(255,255,255,.65); line-height: 1.6; }
+.lt-text strong { color: var(--terra-cl); display: block; margin-bottom: .2rem; font-size: .92rem; }
+
+/* ── PAGE 6 — COORDONNÉES ── */
+.coords-grid {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 2rem; margin-bottom: 3rem;
+}
+@media(max-width:680px){ .coords-grid { grid-template-columns:1fr; } }
+
+.coord-card {
+  background: var(--blanc); border-radius: 6px;
+  padding: 2.5rem;
+  border-bottom: 3px solid var(--vert);
+  transition: transform .2s, box-shadow .2s;
+}
+.coord-card:hover { transform: translateY(-3px); box-shadow: 0 12px 40px rgba(0,0,0,.08); }
+
+.coord-prenom {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.8rem; font-weight: 700; color: var(--noir); margin-bottom: .2rem;
+}
+.coord-role {
+  font-size: .66rem; font-weight: 500; letter-spacing: .14em;
+  text-transform: uppercase; color: var(--vert); margin-bottom: 1.5rem;
+}
+.coord-items { display: flex; flex-direction: column; gap: .7rem; }
+.coord-item {
+  display: flex; align-items: center; gap: .8rem;
+  font-size: .85rem; color: var(--gris-m);
+}
+.coord-item-icon { font-size: .9rem; flex-shrink: 0; opacity: .6; }
+.coord-item a { color: var(--gris-m); text-decoration: none; font-weight: 500; }
+.coord-item a:hover { color: var(--vert); }
+
+.disponibilites {
+  background: var(--sable); padding: 2rem;
+  border-left: 3px solid var(--vert);
+}
+.dispo-titre {
+  font-size: .72rem; font-weight: 600; letter-spacing: .14em;
+  text-transform: uppercase; color: var(--vert); margin-bottom: 1rem;
+}
+.dispo-items { display: flex; flex-direction: column; gap: .5rem; }
+.dispo-item { font-size: .84rem; color: var(--gris-m); display: flex; gap: .8rem; }
+.dispo-item span:first-child { font-weight: 600; color: var(--noir); min-width: 8rem; flex-shrink: 0; }
+
+/* ── CITATION FINALE ── */
+.citation-finale {
+  background: var(--sable-f);
+  padding: 6rem 10vw; text-align: center;
+  position: relative; overflow: hidden;
+}
+.citation-finale::before {
+  content: '"';
+  position: absolute; top: -3rem; left: 6vw;
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 18rem; color: rgba(0,0,0,.04); line-height: 1; pointer-events: none;
+}
+.cf-texte {
+  font-family: 'Cormorant Garamond', serif; font-style: italic;
+  font-size: clamp(1.6rem,4vw,2.6rem); font-weight: 300;
+  color: var(--noir); line-height: 1.45;
+  max-width: 22ch; margin: 0 auto 1.5rem;
+  position: relative; z-index: 1;
+}
+.cf-texte strong { font-weight: 700; font-style: normal; color: var(--terra); }
+.cf-trait { width: 3rem; height: 1.5px; background: var(--gris-cl); margin: 1.2rem auto; }
+.cf-auteur {
+  font-size: .68rem; letter-spacing: .18em; text-transform: uppercase;
+  color: var(--gris); position: relative; z-index: 1;
+}
+
+/* FOOTER */
+footer {
+  background: var(--vert-dark); padding: 2.5rem 10vw;
+  display: flex; justify-content: space-between;
+  align-items: center; flex-wrap: wrap; gap: 1rem;
+  border-top: 1px solid rgba(255,255,255,.04);
+}
+.foot-logo {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.1rem; font-weight: 700; color: rgba(255,255,255,.4);
+  display: flex; align-items: center; gap: .5rem;
+}
+.foot-logo em { color: var(--terra-cl); font-style: italic; }
+footer p { font-size: .68rem; color: rgba(255,255,255,.2); letter-spacing: .05em; }
+
+@keyframes pop { 0%{transform:scale(1);}50%{transform:scale(1.2);}100%{transform:scale(1);} }
+.pop { animation: pop .25s ease; }
+</style>
+</head>
+<body>
+
+<div class="no-print">
+  <button class="btn-print" onclick="window.print()">🖨 Imprimer / PDF</button>
+</div>
+
+<!-- ══ PAGE 1 — COUVERTURE ══ -->
+<section class="cover">
+  <div class="cover-trait"></div>
+
+  <div class="cover-top">
+    <div class="cover-logo">
+      <svg class="cover-logo-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M3 9.5L12 3L21 9.5V20C21 20.55 20.55 21 20 21H15V16H9V21H4C3.45 21 3 20.55 3 20V9.5Z" fill="currentColor"/>
+      </svg>
+      <em>Vendu</em>&nbsp;Par Moi
+    </div>
+  </div>
+
+  <div class="cover-body">
+    <div class="cover-kicker">Kit de bienvenue</div>
+    <h1 class="cover-h1">
+      <strong>Bienvenue</strong>
+      dans votre projet
+      <em>de vente.</em>
+    </h1>
+    <div class="cover-trait-h"></div>
+    <p class="cover-message">
+      Vous avez fait le choix de vendre <strong>par vous-même</strong>, avec les bons outils et le bon accompagnement. Ce guide est votre compagnon de route — de ce soir jusqu'à la signature chez le notaire.
+    </p>
+  </div>
+
+  <div class="cover-bottom">
+    <div class="cover-bottom-left">
+      <p><strong>Guillaume</strong> · 06 84 34 06 11</p>
+      <p><strong>Matthias</strong> · 06 84 34 06 11</p>
+      <p>contact@venduparmo.fr</p>
+    </div>
+    <div class="cover-bottom-right">
+      "Vendre avec transparence,<br>c'est vendre avec confiance."
+    </div>
+  </div>
+</section>
+
+<!-- ══ PAGE 2 — MOT DE BIENVENUE ══ -->
+<section class="section section-blanc">
+  <div class="eyebrow">Un mot de nous</div>
+  <h2>Vous avez pris<br><em>la bonne décision.</em></h2>
+  <p class="intro">Ce que vous avez choisi, c'est de garder le contrôle sur la vente la plus importante de votre vie — et d'avoir les armes pour le faire bien.</p>
+
+  <div class="bienvenue-grid">
+    <div class="bienvenue-lettre">
+      <div class="lettre-dest">À vous, notre client</div>
+      <div class="lettre-texte">
+        <p style="margin-bottom:1.2rem">Merci de nous avoir accordé votre confiance. Nous savons que cette décision n'est pas anodine — vendre son bien, c'est souvent des années de vie, des projets, des souvenirs.</p>
+        <p style="margin-bottom:1.2rem">Notre engagement est simple : vous donner exactement ce dont vous avez besoin pour réussir. Pas de théorie inutile, pas de jargon. Juste 22 ans d'expérience terrain, condensés en deux séances chez vous, à votre service.</p>
+        <p>Nous sommes là. Si vous avez la moindre question avant notre première séance, appelez-nous directement. C'est pour ça qu'on vous donne notre numéro personnel.</p>
+      </div>
+      <div class="lettre-signature">
+        <p>Guillaume &amp; Matthias</p>
+        <span>Co-fondateurs · Vendu Par Moi</span>
+      </div>
+    </div>
+
+    <div class="bienvenue-infos">
+      <div class="info-card">
+        <div class="info-card-icon">🛡️</div>
+        <h4>Votre garantie active</h4>
+        <p>Si après la première séance vous estimez que la formation ne vous convient pas, nous remboursons intégralement <span class="highlight">774 € TTC</span> — sans question, sous 7 jours.</p>
+      </div>
+      <div class="info-card">
+        <div class="info-card-icon">📅</div>
+        <h4>Vos séances planifiées</h4>
+        <p>Séance 1 — Date : <span class="highlight">__________________</span><br>Séance 2 — Date : <span class="highlight">__________________</span><br>Durée : 3 heures chacune · Chez vous</p>
+      </div>
+      <div class="info-card">
+        <div class="info-card-icon">💶</div>
+        <h4>Votre paiement</h4>
+        <p>774 € TTC le jour de la séance 1<br>774 € TTC le jour de la séance 2<br>Espèces, virement ou chèque acceptés</p>
+      </div>
+      <div class="info-card">
+        <div class="info-card-icon">📞</div>
+        <h4>Nous joindre</h4>
+        <p><span class="highlight">06 84 34 06 11</span><br>Lundi–Vendredi · 9h–18h<br>contact@venduparmo.fr</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ PAGE 3 — DÉROULÉ ══ -->
+<section class="section section-sable">
+  <div class="eyebrow">Ce qui vous attend</div>
+  <h2>Le déroulé<br><em>de votre vente.</em></h2>
+  <p class="intro">Voici exactement ce que nous allons faire ensemble — étape par étape, de notre première séance jusqu'à la remise des clés.</p>
+
+  <div class="deroulé-steps">
+
+    <div class="step-item">
+      <div class="step-num">1</div>
+      <div class="step-content">
+        <div class="step-phase">Avant la séance 1</div>
+        <div class="step-titre">Vous préparez vos documents</div>
+        <div class="step-desc">Pour que notre première séance soit productive à 100%, rassemblez les documents listés dans la checklist page suivante. Ce n'est pas une contrainte — c'est ce qui nous permettra d'aller directement à l'essentiel.</div>
+        <div class="step-details">
+          <div class="step-detail">Titre de propriété</div>
+          <div class="step-detail">Diagnostics existants (DPE, amiante, plomb...)</div>
+          <div class="step-detail">Dernières taxes foncières</div>
+          <div class="step-detail">Liste des travaux réalisés (avec ou sans déclaration)</div>
+        </div>
+        <span class="step-badge">📋 Checklist complète page suivante</span>
+      </div>
+    </div>
+
+    <div class="step-item">
+      <div class="step-num terra">2</div>
+      <div class="step-content">
+        <div class="step-phase">Séance 1 — 3 heures chez vous</div>
+        <div class="step-titre">Préparer &amp; Présenter</div>
+        <div class="step-desc">On arrive chez vous avec la méthode et les outils. Ensemble, on estime votre bien, on mesure, on fait les photos, on rédige l'annonce et on la publie. En 3 heures, votre bien est en vente — correctement présenté, correctement estimé.</div>
+        <div class="step-details">
+          <div class="step-detail">Estimation par comparables DVF — prix argumenté et défendable</div>
+          <div class="step-detail">Mesures loi Carrez pièce par pièce</div>
+          <div class="step-detail">Reportage photo &amp; home staging express</div>
+          <div class="step-detail">Rédaction et publication de l'annonce avec vous</div>
+          <div class="step-detail">Démarches urbanisme si travaux non déclarés</div>
+        </div>
+        <span class="step-badge terra-badge">💰 774 € TTC à régler ce jour</span>
+      </div>
+    </div>
+
+    <div class="step-item">
+      <div class="step-num">3</div>
+      <div class="step-content">
+        <div class="step-phase">Entre les deux séances</div>
+        <div class="step-titre">Vous recevez vos premiers contacts</div>
+        <div class="step-desc">Votre annonce est en ligne. Les premiers contacts arrivent. Vous utilisez les scripts remis en séance 1 pour répondre aux mails et qualifier les appels téléphoniques. Si vous bloquez sur quelque chose, appelez-nous.</div>
+        <div class="step-details">
+          <div class="step-detail">Réponses aux mails avec le modèle fourni</div>
+          <div class="step-detail">Qualification téléphonique selon le script remis</div>
+          <div class="step-detail">Premier planning de visites à organiser</div>
+        </div>
+        <span class="step-badge">📞 On reste disponibles entre les séances</span>
+      </div>
+    </div>
+
+    <div class="step-item">
+      <div class="step-num terra">4</div>
+      <div class="step-content">
+        <div class="step-phase">Séance 2 — 3 heures chez vous</div>
+        <div class="step-titre">Vendre &amp; Conclure</div>
+        <div class="step-desc">On revient pour la deuxième séance. On vous forme à conduire les visites, à négocier sereinement et à gérer toutes les étapes jusqu'au notaire. On fait des exercices pratiques ensemble — vous repartez confiant.</div>
+        <div class="step-details">
+          <div class="step-detail">Formation à la conduite de visites — exercice pratique complet</div>
+          <div class="step-detail">Techniques de négociation — défense du prix, traitement des offres</div>
+          <div class="step-detail">Conditions suspensives et compromis de vente expliqués</div>
+          <div class="step-detail">Checklist notaire complète remise</div>
+        </div>
+        <span class="step-badge terra-badge">💰 774 € TTC à régler ce jour</span>
+      </div>
+    </div>
+
+    <div class="step-item">
+      <div class="step-num vert">→</div>
+      <div class="step-content">
+        <div class="step-phase">Après les séances — vous êtes autonome</div>
+        <div class="step-titre">Vous vendez par vous-même</div>
+        <div class="step-desc">Vous avez tous les outils, toute la méthode. Vous gérez les visites, vous négociez, vous accompagnez la vente jusqu'à la signature chez le notaire. Vous n'avez plus besoin de personne — et c'est exactement l'objectif.</div>
+        <div class="step-details">
+          <div class="step-detail">Visites conduites avec la méthode apprise</div>
+          <div class="step-detail">Négociation maîtrisée — vous défendez votre prix</div>
+          <div class="step-detail">Dossier notaire constitué avec la checklist</div>
+          <div class="step-detail">Signature de l'acte authentique — vous gardez 100% du prix</div>
+        </div>
+        <span class="step-badge">🎉 Objectif : vente réussie, frais économisés</span>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ══ PAGE 4 — CHECKLIST PRÉPARATION ══ -->
+<section class="section section-blanc">
+  <div class="eyebrow">Avant la séance 1</div>
+  <h2>Votre checklist<br><em>de préparation.</em></h2>
+  <p class="intro">Rassemblez ces documents avant notre première séance. Plus vous serez préparé, plus on ira vite et plus la séance sera productive.</p>
+
+  <div class="cl-progress">
+    <div class="clp-label">Documents rassemblés</div>
+    <div class="clp-bar"><div class="clp-fill" id="clp-fill" style="width:0%"></div></div>
+    <div class="clp-pct" id="clp-pct">0%</div>
+  </div>
+
+  <div class="checklist-intro">
+    <p><strong>Comment utiliser cette checklist ?</strong> Cochez chaque document au fur et à mesure que vous le trouvez. Si vous ne trouvez pas un document, notez-le — on vous dira ensemble comment le récupérer lors de la séance 1.</p>
+  </div>
+
+  <div class="checklist-grid">
+    <div class="cl-groupe">
+      <div class="cl-titre">
+        <span class="cl-titre-icon">⚖️</span>
+        Documents obligatoires
+      </div>
+      <div class="cl-items">
+        <div class="cl-item" onclick="toggleCl(this)">
+          <div class="cl-box"></div>
+          <div class="cl-text">
+            <div class="cl-label">Titre de propriété</div>
+            <div class="cl-sublabel">Acte notarial prouvant votre propriété. Si perdu, votre notaire peut vous en fournir une copie.</div>
+            <span class="cl-tag tag-oblig">Obligatoire</span>
+          </div>
+        </div>
+        <div class="cl-item" onclick="toggleCl(this)">
+          <div class="cl-box"></div>
+          <div class="cl-text">
+            <div class="cl-label">DPE — Diagnostic de Performance Énergétique</div>
+            <div class="cl-sublabel">Obligatoire pour mettre en vente. Valable 10 ans. Si expiré ou absent, il faudra le commander avant la mise en vente.</div>
+            <span class="cl-tag tag-oblig">Obligatoire</span>
+          </div>
+        </div>
+        <div class="cl-item" onclick="toggleCl(this)">
+          <div class="cl-box"></div>
+          <div class="cl-text">
+            <div class="cl-label">Diagnostic amiante (si avant 1997)</div>
+            <div class="cl-sublabel">Obligatoire pour tout bien dont le permis de construire est antérieur au 1er juillet 1997.</div>
+            <span class="cl-tag tag-oblig">Obligatoire selon date</span>
+          </div>
+        </div>
+        <div class="cl-item" onclick="toggleCl(this)">
+          <div class="cl-box"></div>
+          <div class="cl-text">
+            <div class="cl-label">Diagnostic plomb (si avant 1949)</div>
+            <div class="cl-sublabel">Obligatoire pour tout bien construit avant le 1er janvier 1949.</div>
+            <span class="cl-tag tag-oblig">Obligatoire selon date</span>
+          </div>
+        </div>
+        <div class="cl-item" onclick="toggleCl(this)">
+          <div class="cl-box"></div>
+          <div class="cl-text">
+            <div class="cl-label">État des risques et pollutions (ERP)</div>
+            <div class="cl-sublabel">Document à télécharger gratuitement sur le site de votre mairie ou georisques.gouv.fr. Valable 6 mois.</div>
+            <span class="cl-tag tag-oblig">Obligatoire</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="cl-groupe">
+      <div class="cl-titre">
+        <span class="cl-titre-icon">📋</span>
+        Documents utiles
+      </div>
+      <div class="cl-items">
+        <div class="cl-item" onclick="toggleCl(this)">
+          <div class="cl-box"></div>
+          <div class="cl-text">
+            <div class="cl-label">Taxes foncières (2 dernières années)</div>
+            <div class="cl-sublabel">Les acheteurs demandent souvent le montant. Disponibles dans votre espace impots.gouv.fr.</div>
+            <span class="cl-tag tag-utile">Très utile</span>
+          </div>
+        </div>
+        <div class="cl-item" onclick="toggleCl(this)">
+          <div class="cl-box"></div>
+          <div class="cl-text">
+            <div class="cl-label">Factures des travaux récents</div>
+            <div class="cl-sublabel">Cuisine, salle de bain, toiture, isolation, chaudière... Elles valorisent votre bien et rassurent les acheteurs.</div>
+            <span class="cl-tag tag-utile">Valorisant</span>
+          </div>
+        </div>
+        <div class="cl-item" onclick="toggleCl(this)">
+          <div class="cl-box"></div>
+          <div class="cl-text">
+            <div class="cl-label">Plans du bien (si disponibles)</div>
+            <div class="cl-sublabel">Pas obligatoires, mais très utiles pour la présentation. On les refera ensemble si nécessaire lors de la séance 1.</div>
+            <span class="cl-tag tag-si">Si disponible</span>
+          </div>
+        </div>
+        <div class="cl-item" onclick="toggleCl(this)">
+          <div class="cl-box"></div>
+          <div class="cl-text">
+            <div class="cl-label">Règlement de copropriété (si applicable)</div>
+            <div class="cl-sublabel">Uniquement pour les appartements. Avec les 3 derniers procès-verbaux d'assemblée générale.</div>
+            <span class="cl-tag tag-si">Si copropriété</span>
+          </div>
+        </div>
+        <div class="cl-item" onclick="toggleCl(this)">
+          <div class="cl-box"></div>
+          <div class="cl-text">
+            <div class="cl-label">Liste des travaux sans déclaration</div>
+            <div class="cl-sublabel">Extension, véranda, abri de jardin, garage ajouté... On voit ensemble ce qui peut être régularisé avant la vente.</div>
+            <span class="cl-tag tag-si">Si concerné</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ PAGE 5 — CE QU'ON VOUS REMET ══ -->
+<section class="section section-dark">
+  <div class="eyebrow blanc">Ce que vous recevez</div>
+  <h2 class="blanc">Vos outils<br><em>inclus dans la formation.</em></h2>
+  <p class="intro" style="color:rgba(255,255,255,.45)">À l'issue des deux séances, vous disposez de l'ensemble de ces outils et documents — pour vendre seul, sereinement, jusqu'au bout.</p>
+
+  <div class="livrables-grid">
+    <div class="livrable">
+      <span class="livrable-icon">📊</span>
+      <div class="livrable-seance">Séance 1</div>
+      <h4>Rapport d'estimation personnalisé</h4>
+      <p>Votre fourchette de prix argumentée, vos comparables DVF, la méthode de pondération. Un document que vous pouvez montrer à tout acheteur.</p>
+    </div>
+    <div class="livrable">
+      <span class="livrable-icon">📸</span>
+      <div class="livrable-seance">Séance 1</div>
+      <h4>Photos sélectionnées &amp; annonce publiée</h4>
+      <p>Vos photos retravaillées, l'annonce rédigée et en ligne sur Leboncoin et PAP. Votre bien est visible dès la fin de la séance.</p>
+    </div>
+    <div class="livrable">
+      <span class="livrable-icon">📝</span>
+      <div class="livrable-seance">Séance 1</div>
+      <h4>Modèle d'annonce rédigée</h4>
+      <p>Votre texte d'annonce personnalisé, prêt à être republié ou modifié selon les retours du marché.</p>
+    </div>
+    <div class="livrable">
+      <span class="livrable-icon">📧</span>
+      <div class="livrable-seance">Séance 1</div>
+      <h4>Script de réponse mail</h4>
+      <p>Modèle de réponse aux premiers contacts. Copier-coller et adapter en 2 minutes. Ton professionnel et chaleureux.</p>
+    </div>
+    <div class="livrable">
+      <span class="livrable-icon">📞</span>
+      <div class="livrable-seance">Séance 2</div>
+      <h4>Script téléphonique — qualification</h4>
+      <p>Les 5 questions clés à poser à chaque contact. Filtre 70% des curieux avant la visite.</p>
+    </div>
+    <div class="livrable">
+      <span class="livrable-icon">🚪</span>
+      <div class="livrable-seance">Séance 2</div>
+      <h4>Guide de conduite de visites</h4>
+      <p>Votre parcours de visite défini, votre discours préparé, les réponses aux objections fréquentes.</p>
+    </div>
+    <div class="livrable">
+      <span class="livrable-icon">🤝</span>
+      <div class="livrable-seance">Séance 2</div>
+      <h4>Guide de négociation</h4>
+      <p>Votre prix plancher, les techniques de contre-offre, comment traiter une offre d'achat étape par étape.</p>
+    </div>
+    <div class="livrable">
+      <span class="livrable-icon">⚖️</span>
+      <div class="livrable-seance">Séance 2</div>
+      <h4>Checklist Dossier Notaire complète</h4>
+      <p>25 points à vérifier avant la signature. Rien ne manquera dans votre dossier — le notaire sera agréablement surpris.</p>
+    </div>
+  </div>
+
+  <div class="livrables-total">
+    <div class="lt-icon">🎁</div>
+    <div class="lt-text">
+      <strong>8 outils inclus dans votre formation</strong>
+      Tous personnalisés pour votre bien, votre situation et votre marché local. Vous les gardez définitivement — et vous pouvez les réutiliser pour une future vente.
+    </div>
+  </div>
+</section>
+
+<!-- ══ PAGE 6 — COORDONNÉES DIRECTES ══ -->
+<section class="section section-blanc">
+  <div class="eyebrow">Vos contacts directs</div>
+  <h2>Guillaume<br><em>&amp; Matthias.</em></h2>
+  <p class="intro">Ce sont vos numéros directs — pas un standard, pas une boîte mail générale. Vous avez une question, vous appelez directement.</p>
+
+  <div class="coords-grid">
+    <div class="coord-card">
+      <div class="coord-prenom">Guillaume</div>
+      <div class="coord-role">Co-fondateur · Expert immobilier · 14 ans</div>
+      <div class="coord-items">
+        <div class="coord-item">
+          <span class="coord-item-icon">📞</span>
+          <a href="tel:0684340611">06 84 34 06 11</a>
+        </div>
+        <div class="coord-item">
+          <span class="coord-item-icon">✉</span>
+          <a href="mailto:guillaume@venduparmo.fr">guillaume@venduparmo.fr</a>
+        </div>
+        <div class="coord-item">
+          <span class="coord-item-icon">🌐</span>
+          <a href="#">venduparmo.fr</a>
+        </div>
+      </div>
+    </div>
+    <div class="coord-card">
+      <div class="coord-prenom">Matthias</div>
+      <div class="coord-role">Co-fondateur · Spécialiste transaction · 8 ans</div>
+      <div class="coord-items">
+        <div class="coord-item">
+          <span class="coord-item-icon">📞</span>
+          <a href="tel:0684340611">06 84 34 06 11</a>
+        </div>
+        <div class="coord-item">
+          <span class="coord-item-icon">✉</span>
+          <a href="mailto:matthias@venduparmo.fr">matthias@venduparmo.fr</a>
+        </div>
+        <div class="coord-item">
+          <span class="coord-item-icon">🌐</span>
+          <a href="#">venduparmo.fr</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="disponibilites">
+    <div class="dispo-titre">Nos disponibilités</div>
+    <div class="dispo-items">
+      <div class="dispo-item">
+        <span>Lundi — Vendredi</span>
+        <span>9h00 à 18h00 · Appels &amp; messages</span>
+      </div>
+      <div class="dispo-item">
+        <span>Samedi matin</span>
+        <span>9h00 à 12h00 · Sur rendez-vous</span>
+      </div>
+      <div class="dispo-item">
+        <span>Réponse mail</span>
+        <span>Sous 24h ouvrées maximum</span>
+      </div>
+      <div class="dispo-item">
+        <span>Urgence séance</span>
+        <span>SMS au 06 84 34 06 11 · Réponse prioritaire</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ CITATION FINALE ══ -->
+<div class="citation-finale">
+  <p class="cf-texte">Comme au marché de producteurs — vous achetez notre savoir-faire. La recette, c'est nous. La cuisine, c'est vous. <strong>La récolte vous appartient.</strong></p>
+  <div class="cf-trait"></div>
+  <div class="cf-auteur">Guillaume &amp; Matthias — Vendu Par Moi · 06 84 34 06 11</div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="foot-logo">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="rgba(255,255,255,.3)"><path d="M3 9.5L12 3L21 9.5V20C21 20.55 20.55 21 20 21H15V16H9V21H4C3.45 21 3 20.55 3 20V9.5Z"/></svg>
+    <em>Vendu</em>&nbsp;Par Moi
+  </div>
+  <p>© 2026 · Kit de bienvenue · Vendu Par Moi · contact@venduparmo.fr</p>
+</footer>
+
+<script>
+let clTotal = 0;
+const clChecked = new Set();
+
+function toggleCl(item) {
+  const box = item.querySelector('.cl-box');
+  const label = item.querySelector('.cl-label');
+  const sub = item.querySelector('.cl-sublabel');
+  const idx = Array.from(document.querySelectorAll('.cl-item')).indexOf(item);
+  clTotal = document.querySelectorAll('.cl-item').length;
+
+  if (clChecked.has(idx)) {
+    clChecked.delete(idx);
+    box.classList.remove('checked'); box.textContent = '';
+    label.classList.remove('done');
+    if (sub) sub.classList.remove('done');
+  } else {
+    clChecked.add(idx);
+    box.classList.add('checked'); box.textContent = '✓';
+    label.classList.add('done');
+    if (sub) sub.classList.add('done');
+    box.style.animation = 'none';
+    requestAnimationFrame(() => { box.style.animation = 'pop .25s ease'; });
+  }
+
+  const pct = Math.round((clChecked.size / clTotal) * 100);
+  document.getElementById('clp-fill').style.width = pct + '%';
+  document.getElementById('clp-pct').textContent = pct + '%';
+}
+</script>
+
+</body>
+</html>
