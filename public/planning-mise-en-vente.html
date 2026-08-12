@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Planning Mise en Vente — Vendu Par Moi</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after {
+  margin: 0; padding: 0; box-sizing: border-box;
+  -webkit-print-color-adjust: exact !important;
+  print-color-adjust: exact !important;
+  color-adjust: exact !important;
+}
+body {
+  font-family: 'DM Sans', sans-serif; font-weight: 300;
+  background: #E8E4DC; min-height: 100vh;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  padding: 3rem 2rem; gap: 1.5rem;
+}
+.no-print {
+  background: #1D3A28; color: #fff; border: none;
+  padding: 11px 26px; border-radius: 8px;
+  font-family: 'DM Sans', sans-serif; font-size: .88rem; font-weight: 600;
+  cursor: pointer;
+}
+.no-print:hover { background: #3D5A47; }
+@media print {
+  body { background: #fff; padding: 0; gap: 0; }
+  .no-print { display: none; }
+  .doc { box-shadow: none; width: 210mm; height: 297mm; }
+  @page { margin: 0; size: A4 portrait; }
+}
+
+/* ── DOCUMENT ── */
+.doc {
+  width: 794px; height: 1123px;
+  background: #FAFAF8;
+  position: relative; overflow: hidden;
+  box-shadow: 0 20px 80px rgba(0,0,0,.2), 0 4px 20px rgba(0,0,0,.1);
+  display: flex; flex-direction: column;
+}
+
+/* HEADER */
+.doc-header {
+  background: linear-gradient(135deg, #0C1910 0%, #1D3A28 60%, #2d5040 100%);
+  padding: 2rem 3.5rem 1.8rem 4rem;
+  display: flex; justify-content: space-between; align-items: flex-end;
+  flex-shrink: 0;
+}
+.header-left { }
+.header-logo {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.2rem; font-weight: 700; color: rgba(245,240,232,.5);
+  margin-bottom: .8rem;
+}
+.header-logo em { color: #C4603A; font-style: italic; }
+.header-titre {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 2.2rem; font-weight: 700; color: #F5F0E8;
+  line-height: 1.1;
+}
+.header-titre em { color: #f0b89a; font-style: italic; }
+.header-sub { font-size: .78rem; color: rgba(245,240,232,.45); margin-top: .4rem; }
+
+.header-right { text-align: right; flex-shrink: 0; }
+.header-bien-label { font-size: .58rem; letter-spacing: .16em; text-transform: uppercase; color: rgba(245,240,232,.3); margin-bottom: .3rem; }
+.header-bien-val {
+  font-size: .82rem; color: rgba(245,240,232,.6);
+  border-bottom: 1px solid rgba(245,240,232,.2);
+  min-width: 220px; padding-bottom: .2rem; margin-bottom: .5rem;
+}
+.header-date-val {
+  font-size: .82rem; color: rgba(245,240,232,.6);
+  border-bottom: 1px solid rgba(245,240,232,.2);
+  min-width: 220px; padding-bottom: .2rem;
+}
+
+/* INTRO */
+.doc-intro {
+  padding: .9rem 3.5rem .9rem 4rem;
+  background: #F5F0E8;
+  border-bottom: 1px solid #E0D8CC;
+  display: flex; align-items: center; gap: 2rem;
+  flex-shrink: 0;
+}
+.intro-txt { font-size: .78rem; color: #666; line-height: 1.6; }
+.intro-txt strong { color: #1D3A28; }
+.intro-legend { display: flex; gap: 1.2rem; flex-shrink: 0; }
+.legend-item { display: flex; align-items: center; gap: .4rem; font-size: .65rem; color: #888; }
+.legend-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+
+/* TIMELINE */
+.timeline {
+  flex: 1; padding: 1.2rem 3.5rem 1rem 4rem;
+  display: flex; flex-direction: column;
+  gap: 0; position: relative; overflow: hidden;
+}
+
+/* Ligne verticale centrale */
+.timeline-line {
+  position: absolute; left: 4rem; top: 1.2rem; bottom: 1rem;
+  width: 2px; background: #E0D8CC;
+  transform: translateX(14px);
+  z-index: 0;
+}
+
+.phase {
+  margin-bottom: .5rem;
+}
+.phase-titre {
+  font-size: .6rem; font-weight: 700; letter-spacing: .2em;
+  text-transform: uppercase; color: #999;
+  padding-left: 46px; margin-bottom: .4rem;
+}
+
+.etape {
+  display: flex; align-items: flex-start; gap: 1rem;
+  padding: .6rem 0;
+  position: relative; z-index: 1;
+}
+
+.etape-dot-wrap {
+  flex-shrink: 0; width: 30px;
+  display: flex; align-items: center; justify-content: center;
+  padding-top: 2px;
+}
+.etape-dot {
+  width: 30px; height: 30px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Cormorant Garamond', serif;
+  font-size: .8rem; font-weight: 700;
+  flex-shrink: 0;
+}
+.etape-dot.vert { background: #1D3A28; color: #F5F0E8; }
+.etape-dot.terra { background: #C4603A; color: #fff; }
+.etape-dot.clair { background: #F5F0E8; border: 2px solid #1D3A28; color: #1D3A28; }
+
+.etape-body { flex: 1; }
+.etape-header { display: flex; align-items: baseline; gap: .8rem; margin-bottom: .15rem; }
+.etape-jour {
+  font-size: .6rem; font-weight: 700; letter-spacing: .1em;
+  text-transform: uppercase; flex-shrink: 0;
+}
+.etape-jour.vert { color: #1D3A28; }
+.etape-jour.terra { color: #C4603A; }
+.etape-jour.gris { color: #999; }
+.etape-titre { font-size: .84rem; font-weight: 600; color: #1D3A28; }
+.etape-detail { font-size: .74rem; color: #888; line-height: 1.5; }
+
+.etape-date-box {
+  display: flex; align-items: center; gap: .5rem;
+  margin-top: .3rem;
+}
+.date-label { font-size: .58rem; letter-spacing: .1em; text-transform: uppercase; color: #BBB; }
+.date-field { border-bottom: 1px solid #C8C0B8; min-width: 110px; height: 1.1rem; font-size: .75rem; }
+
+.etape-check {
+  flex-shrink: 0; width: 18px; height: 18px;
+  border: 1.5px solid #C8C0B8; border-radius: 3px;
+  margin-top: 3px;
+}
+
+/* PUBLI HIGHLIGHT */
+.etape-publi {
+  background: #1D3A28;
+  border-radius: 4px;
+  padding: .8rem 1rem;
+  display: flex; align-items: center; gap: 1rem;
+  margin-top: .3rem;
+}
+.publi-badge {
+  background: #C4603A; color: #fff;
+  font-size: .62rem; font-weight: 700; letter-spacing: .12em;
+  text-transform: uppercase; padding: .25rem .7rem;
+  border-radius: 2px; flex-shrink: 0;
+}
+.publi-txt { font-size: .78rem; color: rgba(245,240,232,.8); }
+.publi-date { margin-left: auto; flex-shrink: 0; }
+.publi-date-label { font-size: .55rem; letter-spacing: .1em; text-transform: uppercase; color: rgba(245,240,232,.3); margin-bottom: .2rem; }
+.publi-date-val { border-bottom: 1px solid rgba(245,240,232,.2); min-width: 120px; height: 1.1rem; font-size: .78rem; color: rgba(245,240,232,.7); }
+
+/* FOOTER */
+.doc-footer {
+  padding: .8rem 3.5rem .9rem 4rem;
+  background: #F5F0E8; border-top: 1px solid #E0D8CC;
+  display: flex; justify-content: space-between; align-items: center;
+  flex-shrink: 0;
+}
+.ff-logo { font-family: 'Cormorant Garamond', serif; font-size: .9rem; font-weight: 700; color: #3D5A47; }
+.ff-logo em { color: #C4603A; font-style: italic; }
+.ff-contact { font-size: .62rem; color: #AAA; letter-spacing: .05em; }
+</style>
+</head>
+<body>
+
+<button class="no-print" onclick="window.print()">⬇ Télécharger en PDF</button>
+
+<div class="doc">
+
+  <!-- HEADER -->
+  <div class="doc-header">
+    <div class="header-left">
+      <div class="header-logo"><em>Vendu</em> Par Moi</div>
+      <div class="header-titre">Planning <em>Mise en Vente</em></div>
+      <div class="header-sub">De la décision à la publication de l'annonce</div>
+    </div>
+    <div class="header-right">
+      <div class="header-bien-label">Adresse du bien</div>
+      <div class="header-bien-val">&nbsp;</div>
+      <div class="header-bien-label" style="margin-top:.5rem">Vendeur</div>
+      <div class="header-date-val">&nbsp;</div>
+    </div>
+  </div>
+
+  <!-- INTRO -->
+  <div class="doc-intro">
+    <div class="intro-txt">
+      Complétez les dates réelles au fil de l'avancement. <strong>La date de publication (J0) est votre objectif central</strong> — tout le reste s'organise en remontant depuis cette date.
+    </div>
+    <div class="intro-legend">
+      <div class="legend-item"><div class="legend-dot" style="background:#1D3A28"></div>Étape clé</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#C4603A"></div>Action VPM</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#E0D8CC; border: 1.5px solid #1D3A28"></div>À faire</div>
+    </div>
+  </div>
+
+  <!-- TIMELINE -->
+  <div class="timeline">
+    <div class="timeline-line"></div>
+
+    <!-- PHASE 1 -->
+    <div class="phase">
+      <div class="phase-titre">Phase 1 — Préparation (J-30 à J-21)</div>
+
+      <div class="etape">
+        <div class="etape-dot-wrap"><div class="etape-dot vert">1</div></div>
+        <div class="etape-body">
+          <div class="etape-header">
+            <span class="etape-jour vert">J — 30</span>
+            <span class="etape-titre">Décision de vendre</span>
+          </div>
+          <div class="etape-detail">Définir le projet (achat simultané ? délai souhaité ?) · Premier contact Vendu Par Moi</div>
+          <div class="etape-date-box"><span class="date-label">Date réelle</span><div class="date-field"></div></div>
+        </div>
+        <div class="etape-check"></div>
+      </div>
+
+      <div class="etape">
+        <div class="etape-dot-wrap"><div class="etape-dot clair">2</div></div>
+        <div class="etape-body">
+          <div class="etape-header">
+            <span class="etape-jour gris">J — 25</span>
+            <span class="etape-titre">Commander les diagnostics immobiliers</span>
+          </div>
+          <div class="etape-detail">DPE · Électricité · Gaz · Amiante · Plomb · Termites (selon zone) · ERP · Mesurage Carrez</div>
+          <div class="etape-date-box"><span class="date-label">Date réelle</span><div class="date-field"></div></div>
+        </div>
+        <div class="etape-check"></div>
+      </div>
+
+      <div class="etape">
+        <div class="etape-dot-wrap"><div class="etape-dot clair">3</div></div>
+        <div class="etape-body">
+          <div class="etape-header">
+            <span class="etape-jour gris">J — 21</span>
+            <span class="etape-titre">Réunir les documents administratifs</span>
+          </div>
+          <div class="etape-detail">Titre de propriété · Taxe foncière · Charges copropriété · PV AG · Règlement de copropriété (si applicable)</div>
+          <div class="etape-date-box"><span class="date-label">Date réelle</span><div class="date-field"></div></div>
+        </div>
+        <div class="etape-check"></div>
+      </div>
+    </div>
+
+    <!-- PHASE 2 -->
+    <div class="phase">
+      <div class="phase-titre">Phase 2 — Séance 1 Vendu Par Moi (J-14 à J-7)</div>
+
+      <div class="etape">
+        <div class="etape-dot-wrap"><div class="etape-dot terra">4</div></div>
+        <div class="etape-body">
+          <div class="etape-header">
+            <span class="etape-jour terra">J — 14</span>
+            <span class="etape-titre">Séance 1 — Estimation &amp; préparation</span>
+          </div>
+          <div class="etape-detail">Analyse DVF · Prix de vente défini · Mesures loi Carrez · Reportage photo · Remise du kit documentaire</div>
+          <div class="etape-date-box"><span class="date-label">Date réelle</span><div class="date-field"></div></div>
+        </div>
+        <div class="etape-check"></div>
+      </div>
+
+      <div class="etape">
+        <div class="etape-dot-wrap"><div class="etape-dot clair">5</div></div>
+        <div class="etape-body">
+          <div class="etape-header">
+            <span class="etape-jour gris">J — 10</span>
+            <span class="etape-titre">Préparer le bien pour les visites</span>
+          </div>
+          <div class="etape-detail">Home staging léger · Dépersonnalisation · Rangement · Petites réparations visibles</div>
+          <div class="etape-date-box"><span class="date-label">Date réelle</span><div class="date-field"></div></div>
+        </div>
+        <div class="etape-check"></div>
+      </div>
+
+      <div class="etape">
+        <div class="etape-dot-wrap"><div class="etape-dot clair">6</div></div>
+        <div class="etape-body">
+          <div class="etape-header">
+            <span class="etape-jour gris">J — 7</span>
+            <span class="etape-titre">Rédiger l'annonce</span>
+          </div>
+          <div class="etape-detail">Titre accrocheur · Description valorisante · Sélection des 10 meilleures photos · Vérification des informations légales</div>
+          <div class="etape-date-box"><span class="date-label">Date réelle</span><div class="date-field"></div></div>
+        </div>
+        <div class="etape-check"></div>
+      </div>
+    </div>
+
+    <!-- PHASE 3 -->
+    <div class="phase">
+      <div class="phase-titre">Phase 3 — Publication (J-3 à J0)</div>
+
+      <div class="etape">
+        <div class="etape-dot-wrap"><div class="etape-dot clair">7</div></div>
+        <div class="etape-body">
+          <div class="etape-header">
+            <span class="etape-jour gris">J — 3</span>
+            <span class="etape-titre">Créer le dossier acheteur Vendu Par Moi</span>
+          </div>
+          <div class="etape-detail">Uploader photos · Diagnostics · Documents · Générer le lien partageable · Tester l'affichage</div>
+          <div class="etape-date-box"><span class="date-label">Date réelle</span><div class="date-field"></div></div>
+        </div>
+        <div class="etape-check"></div>
+      </div>
+
+      <div class="etape">
+        <div class="etape-dot-wrap"><div class="etape-dot clair">8</div></div>
+        <div class="etape-body">
+          <div class="etape-header">
+            <span class="etape-jour gris">J — 1</span>
+            <span class="etape-titre">Relecture finale &amp; validation</span>
+          </div>
+          <div class="etape-detail">Vérifier prix · Orthographe annonce · Cohérence photos · Disponibilités agenda visites configurées</div>
+          <div class="etape-date-box"><span class="date-label">Date réelle</span><div class="date-field"></div></div>
+        </div>
+        <div class="etape-check"></div>
+      </div>
+
+      <div class="etape">
+        <div class="etape-dot-wrap"><div class="etape-dot terra">9</div></div>
+        <div class="etape-body">
+          <div class="etape-publi">
+            <div class="publi-badge">J 0</div>
+            <div class="publi-txt"><strong style="color:#F5F0E8">Publication de l'annonce</strong><br>LeBonCoin · PAP · SeLoger · Logic-Immo · Réseaux sociaux</div>
+            <div class="publi-date">
+              <div class="publi-date-label">Date de mise en ligne</div>
+              <div class="publi-date-val"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- FOOTER -->
+  <div class="doc-footer">
+    <div class="ff-logo"><em>Vendu</em> Par Moi</div>
+    <div class="ff-contact">contact@venduparmoi.fr · 06 95 44 36 54 · 06 84 34 06 11</div>
+    <div style="font-size:.62rem;color:#BBB;">Planning mise en vente · 1/2</div>
+  </div>
+
+</div>
+
+</body>
+</html>

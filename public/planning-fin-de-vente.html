@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Planning Fin de Vente — Vendu Par Moi</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after {
+  margin: 0; padding: 0; box-sizing: border-box;
+  -webkit-print-color-adjust: exact !important;
+  print-color-adjust: exact !important;
+  color-adjust: exact !important;
+}
+body {
+  font-family: 'DM Sans', sans-serif; font-weight: 300;
+  background: #E8E4DC; min-height: 100vh;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  padding: 3rem 2rem; gap: 1.5rem;
+}
+.no-print {
+  background: #1D3A28; color: #fff; border: none;
+  padding: 11px 26px; border-radius: 8px;
+  font-family: 'DM Sans', sans-serif; font-size: .88rem; font-weight: 600;
+  cursor: pointer;
+}
+.no-print:hover { background: #3D5A47; }
+@media print {
+  body { background: #fff; padding: 0; gap: 0; }
+  .no-print { display: none; }
+  .doc { box-shadow: none; width: 210mm; height: 297mm; }
+  @page { margin: 0; size: A4 portrait; }
+}
+
+/* ── DOCUMENT ── */
+.doc {
+  width: 794px; height: 1123px;
+  background: #FAFAF8;
+  position: relative; overflow: hidden;
+  box-shadow: 0 20px 80px rgba(0,0,0,.2), 0 4px 20px rgba(0,0,0,.1);
+  display: flex; flex-direction: column;
+}
+
+/* HEADER */
+.doc-header {
+  background: linear-gradient(135deg, #1a0a04 0%, #4a1a0a 40%, #C4603A 100%);
+  padding: 2rem 3.5rem 1.8rem 4rem;
+  display: flex; justify-content: space-between; align-items: flex-end;
+  flex-shrink: 0;
+}
+.header-logo {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.2rem; font-weight: 700; color: rgba(245,240,232,.5);
+  margin-bottom: .8rem;
+}
+.header-logo em { color: #f0b89a; font-style: italic; }
+.header-titre {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 2.2rem; font-weight: 700; color: #F5F0E8;
+  line-height: 1.1;
+}
+.header-titre em { color: #f0b89a; font-style: italic; }
+.header-sub { font-size: .78rem; color: rgba(245,240,232,.45); margin-top: .4rem; }
+
+.header-right { text-align: right; flex-shrink: 0; }
+.header-bien-label { font-size: .58rem; letter-spacing: .16em; text-transform: uppercase; color: rgba(245,240,232,.3); margin-bottom: .3rem; }
+.header-bien-val {
+  font-size: .82rem; color: rgba(245,240,232,.6);
+  border-bottom: 1px solid rgba(245,240,232,.2);
+  min-width: 220px; padding-bottom: .2rem; margin-bottom: .5rem;
+}
+.header-prix-val {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.4rem; font-weight: 700; color: #f0b89a;
+  border-bottom: 1px solid rgba(245,240,232,.2);
+  min-width: 220px; padding-bottom: .2rem;
+}
+
+/* ALERTE DÉPART */
+.doc-depart {
+  background: #C4603A;
+  padding: .8rem 3.5rem .8rem 4rem;
+  display: flex; align-items: center; gap: 1.5rem;
+  flex-shrink: 0;
+}
+.depart-badge {
+  background: #fff; color: #C4603A;
+  font-size: .7rem; font-weight: 700; letter-spacing: .12em;
+  text-transform: uppercase; padding: .3rem .9rem;
+  border-radius: 2px; flex-shrink: 0;
+}
+.depart-txt { font-size: .8rem; color: rgba(255,255,255,.9); font-weight: 500; }
+.depart-date { margin-left: auto; flex-shrink: 0; text-align: right; }
+.depart-date-label { font-size: .55rem; letter-spacing: .12em; text-transform: uppercase; color: rgba(255,255,255,.5); margin-bottom: .2rem; }
+.depart-date-val { border-bottom: 1px solid rgba(255,255,255,.3); min-width: 150px; height: 1.2rem; font-size: .82rem; color: #fff; }
+
+/* TIMELINE */
+.timeline {
+  flex: 1; padding: 1rem 3.5rem 1rem 4rem;
+  display: flex; flex-direction: column;
+  position: relative; overflow: hidden;
+}
+.timeline-line {
+  position: absolute; left: 4rem; top: 1rem; bottom: 1rem;
+  width: 2px; background: #E0D8CC;
+  transform: translateX(14px); z-index: 0;
+}
+
+.phase { margin-bottom: .3rem; }
+.phase-titre {
+  font-size: .6rem; font-weight: 700; letter-spacing: .2em;
+  text-transform: uppercase; color: #999;
+  padding-left: 46px; margin-bottom: .3rem;
+}
+
+.etape {
+  display: flex; align-items: flex-start; gap: 1rem;
+  padding: .5rem 0;
+  position: relative; z-index: 1;
+}
+.etape-dot-wrap { flex-shrink: 0; width: 30px; display: flex; align-items: center; justify-content: center; padding-top: 2px; }
+.etape-dot {
+  width: 30px; height: 30px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Cormorant Garamond', serif;
+  font-size: .8rem; font-weight: 700; flex-shrink: 0;
+}
+.etape-dot.vert { background: #1D3A28; color: #F5F0E8; }
+.etape-dot.terra { background: #C4603A; color: #fff; }
+.etape-dot.clair { background: #F5F0E8; border: 2px solid #1D3A28; color: #1D3A28; }
+.etape-dot.gold { background: #0C1910; color: #6BBF82; }
+
+.etape-body { flex: 1; }
+.etape-header { display: flex; align-items: baseline; gap: .8rem; margin-bottom: .1rem; }
+.etape-jour { font-size: .6rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; flex-shrink: 0; }
+.etape-jour.vert { color: #1D3A28; }
+.etape-jour.terra { color: #C4603A; }
+.etape-jour.gris { color: #999; }
+.etape-titre { font-size: .84rem; font-weight: 600; color: #1D3A28; }
+.etape-detail { font-size: .73rem; color: #888; line-height: 1.45; }
+
+.etape-date-box { display: flex; align-items: center; gap: .5rem; margin-top: .25rem; }
+.date-label { font-size: .58rem; letter-spacing: .1em; text-transform: uppercase; color: #BBB; }
+.date-field { border-bottom: 1px solid #C8C0B8; min-width: 110px; height: 1.1rem; font-size: .75rem; }
+
+.etape-check { flex-shrink: 0; width: 18px; height: 18px; border: 1.5px solid #C8C0B8; border-radius: 3px; margin-top: 3px; }
+
+/* ATTENTION BOX */
+.attention-box {
+  background: #FEF5F0; border-left: 3px solid #C4603A;
+  padding: .5rem .9rem; margin-top: .3rem;
+  font-size: .7rem; color: #C4603A; line-height: 1.5;
+}
+.attention-box strong { font-weight: 600; }
+
+/* ÉTAPE FINALE */
+.etape-finale {
+  background: linear-gradient(135deg, #0C1910, #1D3A28);
+  border-radius: 4px; padding: .9rem 1.2rem;
+  display: flex; align-items: center; gap: 1rem;
+  margin-top: .2rem;
+}
+.finale-badge {
+  background: #6BBF82; color: #0C1910;
+  font-size: .62rem; font-weight: 700; letter-spacing: .12em;
+  text-transform: uppercase; padding: .3rem .8rem;
+  border-radius: 2px; flex-shrink: 0; white-space: nowrap;
+}
+.finale-txt { font-size: .8rem; color: rgba(245,240,232,.85); }
+.finale-txt strong { color: #F5F0E8; }
+.finale-date { margin-left: auto; flex-shrink: 0; text-align: right; }
+.finale-date-label { font-size: .55rem; letter-spacing: .1em; text-transform: uppercase; color: rgba(245,240,232,.3); margin-bottom: .2rem; }
+.finale-date-val { border-bottom: 1px solid rgba(245,240,232,.2); min-width: 130px; height: 1.1rem; font-size: .78rem; color: rgba(245,240,232,.7); }
+
+/* FOOTER */
+.doc-footer {
+  padding: .8rem 3.5rem .9rem 4rem;
+  background: #F5F0E8; border-top: 1px solid #E0D8CC;
+  display: flex; justify-content: space-between; align-items: center;
+  flex-shrink: 0;
+}
+.ff-logo { font-family: 'Cormorant Garamond', serif; font-size: .9rem; font-weight: 700; color: #3D5A47; }
+.ff-logo em { color: #C4603A; font-style: italic; }
+.ff-contact { font-size: .62rem; color: #AAA; letter-spacing: .05em; }
+</style>
+</head>
+<body>
+
+<button class="no-print" onclick="window.print()">⬇ Télécharger en PDF</button>
+
+<div class="doc">
+
+  <!-- HEADER -->
+  <div class="doc-header">
+    <div class="header-left">
+      <div class="header-logo"><em>Vendu</em> Par Moi</div>
+      <div class="header-titre">Planning <em>Fin de Vente</em></div>
+      <div class="header-sub">De l'offre acceptée à la signature chez le notaire</div>
+    </div>
+    <div class="header-right">
+      <div class="header-bien-label">Adresse du bien</div>
+      <div class="header-bien-val">&nbsp;</div>
+      <div class="header-bien-label" style="margin-top:.5rem">Prix de vente accepté</div>
+      <div class="header-prix-val">&nbsp;</div>
+    </div>
+  </div>
+
+  <!-- DÉPART -->
+  <div class="doc-depart">
+    <div class="depart-badge">Point de départ</div>
+    <div class="depart-txt">Offre d'achat acceptée par le vendeur — accord verbal ou écrit</div>
+    <div class="depart-date">
+      <div class="depart-date-label">Date d'acceptation de l'offre</div>
+      <div class="depart-date-val"></div>
+    </div>
+  </div>
+
+  <!-- TIMELINE -->
+  <div class="timeline">
+    <div class="timeline-line"></div>
+
+    <!-- PHASE 1 -->
+    <div class="phase">
+      <div class="phase-titre">Phase 1 — Mise en place (J0 à J+15)</div>
+
+      <div class="etape">
+        <div class="etape-dot-wrap"><div class="etape-dot terra">1</div></div>
+        <div class="etape-body">
+          <div class="etape-header">
+            <span class="etape-jour terra">J + 2</span>
+            <span class="etape-titre">Choisir le notaire</span>
+          </div>
+          <div class="etape-detail">Notaire du vendeur + notaire de l'acheteur (possible et sans surcoût) · Transmettre les coordonnées des deux parties</div>
+          <div class="etape-date-box"><span class="date-label">Date réelle</span><div class="date-field"></div></div>
+        </div>
+        <div class="etape-check"></div>
+      </div>
+
+      <div class="etape">
+        <div class="etape-dot-wrap"><div class="etape-dot clair">2</div></div>
+        <div class="etape-body">
+          <div class="etape-header">
+            <span class="etape-jour gris">J + 5</span>
+            <span class="etape-titre">Envoyer le dossier complet au notaire</span>
+          </div>
+          <div class="etape-detail">Titre de propriété · Diagnostics · Taxe foncière · Règlement copropriété · PV AG · Identités des parties</div>
+          <div class="etape-date-box"><span class="date-label">Date réelle</span><div class="date-field"></div></div>
+        </div>
+        <div class="etape-check"></div>
+      </div>
+
+      <div class="etape">
+        <div class="etape-dot-wrap"><div class="etape-dot vert">3</div></div>
+        <div class="etape-body">
+          <div class="etape-header">
+            <span class="etape-jour vert">J + 15</span>
+            <span class="etape-titre">Signature du compromis de vente</span>
+          </div>
+          <div class="etape-detail">Chez le notaire ou sous seing privé · Dépôt de garantie (5-10 %) versé par l'acheteur · Délai de rétractation 10 jours</div>
+          <div class="etape-date-box"><span class="date-label">Date réelle</span><div class="date-field"></div></div>
+          <div class="attention-box">⚠ <strong>Délai de rétractation de 10 jours</strong> à compter de la réception du compromis par l'acheteur — la vente n'est définitive qu'à l'issue de ce délai.</div>
+        </div>
+        <div class="etape-check"></div>
+      </div>
+    </div>
+
+    <!-- PHASE 2 -->
+    <div class="phase">
+      <div class="phase-titre">Phase 2 — Financement acheteur (J+15 à J+60)</div>
+
+      <div class="etape">
+        <div class="etape-dot-wrap"><div class="etape-dot clair">4</div></div>
+        <div class="etape-body">
+          <div class="etape-header">
+            <span class="etape-jour gris">J + 30</span>
+            <span class="etape-titre">Dossier de financement déposé en banque</span>
+          </div>
+          <div class="etape-detail">L'acheteur dépose son dossier · Délai légal d'obtention du prêt : 45 jours à compter du compromis (négociable)</div>
+          <div class="etape-date-box"><span class="date-label">Date limite estimée</span><div class="date-field"></div></div>
+        </div>
+        <div class="etape-check"></div>
+      </div>
+
+      <div class="etape">
+        <div class="etape-dot-wrap"><div class="etape-dot clair">5</div></div>
+        <div class="etape-body">
+          <div class="etape-header">
+            <span class="etape-jour gris">J + 45</span>
+            <span class="etape-titre">Accord de principe de la banque</span>
+          </div>
+          <div class="etape-detail">La banque donne son accord de principe · Édition de l'offre de prêt officielle · Délai de réflexion légal : 10 jours</div>
+          <div class="etape-date-box"><span class="date-label">Date réelle</span><div class="date-field"></div></div>
+        </div>
+        <div class="etape-check"></div>
+      </div>
+
+      <div class="etape">
+        <div class="etape-dot-wrap"><div class="etape-dot terra">6</div></div>
+        <div class="etape-body">
+          <div class="etape-header">
+            <span class="etape-jour terra">J + 55</span>
+            <span class="etape-titre">Séance 2 — Accompagnement fin de vente</span>
+          </div>
+          <div class="etape-detail">Préparation de la visite de pré-remise des clés · Vérification du dossier notaire · Points à régler avant la signature</div>
+          <div class="etape-date-box"><span class="date-label">Date réelle</span><div class="date-field"></div></div>
+        </div>
+        <div class="etape-check"></div>
+      </div>
+    </div>
+
+    <!-- PHASE 3 -->
+    <div class="phase">
+      <div class="phase-titre">Phase 3 — Signature finale (J+60 à J+90)</div>
+
+      <div class="etape">
+        <div class="etape-dot-wrap"><div class="etape-dot clair">7</div></div>
+        <div class="etape-body">
+          <div class="etape-header">
+            <span class="etape-jour gris">J + 60</span>
+            <span class="etape-titre">Levée des conditions suspensives</span>
+          </div>
+          <div class="etape-detail">Financement obtenu · Absence de droit de préemption (DPU) · Toutes conditions remplies → vente certaine</div>
+          <div class="etape-date-box"><span class="date-label">Date réelle</span><div class="date-field"></div></div>
+        </div>
+        <div class="etape-check"></div>
+      </div>
+
+      <div class="etape">
+        <div class="etape-dot-wrap"><div class="etape-dot clair">8</div></div>
+        <div class="etape-body">
+          <div class="etape-header">
+            <span class="etape-jour gris">J + 75</span>
+            <span class="etape-titre">Visite de pré-remise des clés</span>
+          </div>
+          <div class="etape-detail">État des lieux contradictoire · Vérification équipements restants · Relevés compteurs (eau, gaz, électricité)</div>
+          <div class="etape-date-box"><span class="date-label">Date réelle</span><div class="date-field"></div></div>
+        </div>
+        <div class="etape-check"></div>
+      </div>
+
+      <div class="etape">
+        <div class="etape-dot-wrap"><div class="etape-dot gold">9</div></div>
+        <div class="etape-body">
+          <div class="etape-finale">
+            <div class="finale-badge">Signature !</div>
+            <div class="finale-txt"><strong>Acte authentique de vente chez le notaire</strong><br>Remise des clés · Virement du prix de vente sous 48-72h</div>
+            <div class="finale-date">
+              <div class="finale-date-label">Date de signature</div>
+              <div class="finale-date-val"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- FOOTER -->
+  <div class="doc-footer">
+    <div class="ff-logo"><em>Vendu</em> Par Moi</div>
+    <div class="ff-contact">contact@venduparmoi.fr · 06 95 44 36 54 · 06 84 34 06 11</div>
+    <div style="font-size:.62rem;color:#BBB;">Planning fin de vente · 2/2</div>
+  </div>
+
+</div>
+
+</body>
+</html>
