@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Présentation commerciale — Vendu Par Moi</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400;1,600&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: #e8e4de;
+      padding: 32px 20px 60px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0;
+    }
+
+    .no-print {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+    .btn { padding: 10px 22px; border-radius: 8px; font-family: 'DM Sans', sans-serif; font-size: 0.85rem; font-weight: 600; cursor: pointer; border: none; }
+    .btn-print { background: #1D3A28; color: #fff; }
+    .btn-back  { background: #fff; color: #1D3A28; border: 1px solid #1D3A28; }
+
+    /* ══ PAGE 1 ══════════════════════════════════════════════════ */
+    .page {
+      width: 210mm;
+      height: 297mm;
+      background: #fff;
+      overflow: hidden;
+      box-shadow: 0 4px 32px rgba(0,0,0,0.14);
+      position: relative;
+      display: flex;
+      flex-direction: column;
+    }
+    .page + .page { margin-top: 20px; }
+
+    /* ── Hero ── */
+    .hero {
+      background: linear-gradient(160deg, #0C1910 0%, #1D3A28 55%, #2d4f3a 100%);
+      padding: 36px 44px 32px;
+      position: relative;
+      overflow: hidden;
+      flex-shrink: 0;
+    }
+    .hero-deco {
+      position: absolute;
+      right: -60px;
+      top: -60px;
+      width: 280px;
+      height: 280px;
+      border-radius: 50%;
+      background: rgba(196,96,58,0.12);
+    }
+    .hero-deco2 {
+      position: absolute;
+      right: 60px;
+      bottom: -80px;
+      width: 160px;
+      height: 160px;
+      border-radius: 50%;
+      background: rgba(107,191,130,0.08);
+    }
+    .hero-tag {
+      display: inline-block;
+      background: #C4603A;
+      color: #fff;
+      font-size: 0.65rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      padding: 4px 12px;
+      border-radius: 20px;
+      margin-bottom: 16px;
+    }
+    .hero h1 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 3rem;
+      color: #F5F0E8;
+      font-weight: 600;
+      line-height: 1.1;
+      margin-bottom: 10px;
+      position: relative;
+      z-index: 1;
+    }
+    .hero h1 em { color: #C4603A; font-style: italic; }
+    .hero .tagline {
+      font-size: 0.95rem;
+      color: rgba(245,240,232,0.75);
+      line-height: 1.5;
+      max-width: 420px;
+      position: relative;
+      z-index: 1;
+    }
+    .hero .stat-row {
+      display: flex;
+      gap: 28px;
+      margin-top: 24px;
+      position: relative;
+      z-index: 1;
+    }
+    .stat { }
+    .stat-val {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 2rem;
+      color: #6BBF82;
+      font-weight: 600;
+      line-height: 1;
+    }
+    .stat-lbl {
+      font-size: 0.68rem;
+      color: rgba(245,240,232,0.55);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-top: 2px;
+    }
+
+    /* ── Body page 1 ── */
+    .p1-body {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      padding: 28px 44px 24px;
+      gap: 22px;
+    }
+
+    .section-label {
+      font-size: 0.65rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: #C4603A;
+      font-weight: 700;
+      margin-bottom: 12px;
+    }
+
+    /* Problème / Solution */
+    .ps-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+    .ps-card {
+      border-radius: 10px;
+      padding: 16px 18px;
+    }
+    .ps-card.problem {
+      background: #fdf5f3;
+      border: 1px solid #f0d0c6;
+    }
+    .ps-card.solution {
+      background: #f0f7f2;
+      border: 1px solid #c5e0cd;
+    }
+    .ps-card h3 {
+      font-size: 0.8rem;
+      font-weight: 700;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .ps-card.problem h3 { color: #C4603A; }
+    .ps-card.solution h3 { color: #1D3A28; }
+    .ps-card ul { list-style: none; padding: 0; }
+    .ps-card ul li {
+      font-size: 0.78rem;
+      color: #555;
+      padding: 4px 0;
+      border-bottom: 1px solid rgba(0,0,0,0.05);
+      padding-left: 14px;
+      position: relative;
+      line-height: 1.4;
+    }
+    .ps-card ul li:last-child { border-bottom: none; }
+    .ps-card.problem ul li::before { content: '✗'; position: absolute; left: 0; color: #C4603A; font-size: 0.7rem; top: 5px; }
+    .ps-card.solution ul li::before { content: '✓'; position: absolute; left: 0; color: #1D3A28; font-size: 0.7rem; top: 5px; }
+
+    /* Comment ça marche */
+    .steps-row {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 8px;
+      position: relative;
+    }
+    .steps-row::before {
+      content: '';
+      position: absolute;
+      top: 18px;
+      left: 10%;
+      right: 10%;
+      height: 1px;
+      background: #e0dbd4;
+      z-index: 0;
+    }
+    .step {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      position: relative;
+      z-index: 1;
+    }
+    .step-num {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: #1D3A28;
+      color: #F5F0E8;
+      font-size: 0.78rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 8px;
+      flex-shrink: 0;
+    }
+    .step:nth-child(3) .step-num { background: #C4603A; }
+    .step-label { font-size: 0.7rem; color: #555; line-height: 1.3; }
+    .step-label strong { display: block; color: #1A1A16; font-size: 0.72rem; margin-bottom: 2px; }
+
+    /* Inclus dans le pack */
+    .inclus-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+    }
+    .inclus-item {
+      background: #f9f7f4;
+      border-radius: 8px;
+      padding: 10px 12px;
+      border: 1px solid #e8e4de;
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+    }
+    .inclus-icon { font-size: 1rem; flex-shrink: 0; margin-top: 1px; }
+    .inclus-text { font-size: 0.72rem; color: #444; line-height: 1.4; }
+    .inclus-text strong { display: block; color: #1A1A16; margin-bottom: 1px; font-size: 0.74rem; }
+
+    /* Footer p1 */
+    .p1-footer {
+      background: #0C1910;
+      padding: 12px 44px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-shrink: 0;
+    }
+    .p1-footer .brand {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1rem;
+      color: #F5F0E8;
+    }
+    .p1-footer .brand em { color: #C4603A; font-style: italic; }
+    .p1-footer .page-num { font-size: 0.65rem; color: rgba(245,240,232,0.4); }
+
+    /* ══ PAGE 2 ══════════════════════════════════════════════════ */
+    .p2-header {
+      background: #F5F0E8;
+      padding: 22px 44px 18px;
+      border-bottom: 2px solid #0C1910;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-shrink: 0;
+    }
+    .p2-header .brand {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.1rem;
+      color: #0C1910;
+    }
+    .p2-header .brand em { color: #C4603A; font-style: italic; }
+    .p2-header h2 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.4rem;
+      color: #1A1A16;
+    }
+
+    .p2-body {
+      flex: 1;
+      padding: 26px 44px 22px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    /* Tarifs */
+    .tarifs-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+    .tarif-card {
+      border-radius: 12px;
+      padding: 20px 22px;
+      border: 2px solid #e8e4de;
+      position: relative;
+    }
+    .tarif-card.featured {
+      border-color: #1D3A28;
+      background: linear-gradient(135deg, #f0f7f2 0%, #e8f3ec 100%);
+    }
+    .tarif-badge {
+      position: absolute;
+      top: -10px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #C4603A;
+      color: #fff;
+      font-size: 0.62rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 3px 12px;
+      border-radius: 20px;
+      white-space: nowrap;
+    }
+    .tarif-name {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.3rem;
+      color: #1A1A16;
+      margin-bottom: 4px;
+    }
+    .tarif-price {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 2.2rem;
+      color: #1D3A28;
+      font-weight: 600;
+      line-height: 1;
+      margin-bottom: 2px;
+    }
+    .tarif-price span { font-size: 0.9rem; color: #888; font-family: 'DM Sans', sans-serif; font-weight: 400; }
+    .tarif-alt { font-size: 0.72rem; color: #888; margin-bottom: 12px; }
+    .tarif-features { list-style: none; padding: 0; }
+    .tarif-features li {
+      font-size: 0.74rem;
+      color: #555;
+      padding: 4px 0;
+      padding-left: 14px;
+      position: relative;
+      border-bottom: 1px solid rgba(0,0,0,0.05);
+      line-height: 1.35;
+    }
+    .tarif-features li:last-child { border-bottom: none; }
+    .tarif-features li::before { content: '✓'; position: absolute; left: 0; color: #1D3A28; font-size: 0.7rem; top: 5px; }
+
+    /* Économies */
+    .eco-box {
+      background: linear-gradient(135deg, #0C1910, #1D3A28);
+      border-radius: 12px;
+      padding: 20px 24px;
+      display: flex;
+      align-items: center;
+      gap: 24px;
+      color: #F5F0E8;
+    }
+    .eco-left { flex-shrink: 0; text-align: center; }
+    .eco-amount {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 3rem;
+      color: #6BBF82;
+      font-weight: 600;
+      line-height: 1;
+    }
+    .eco-lbl { font-size: 0.68rem; color: rgba(245,240,232,0.55); text-transform: uppercase; letter-spacing: 0.06em; margin-top: 2px; }
+    .eco-right { font-size: 0.8rem; line-height: 1.6; color: rgba(245,240,232,0.8); }
+    .eco-right strong { color: #6BBF82; }
+
+    /* Témoignage */
+    .temoignage-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+    .temoignage {
+      background: #f9f7f4;
+      border-radius: 10px;
+      padding: 14px 16px;
+      border-left: 3px solid #C4603A;
+      font-size: 0.78rem;
+      color: #555;
+      line-height: 1.55;
+      font-style: italic;
+    }
+    .temoignage .temo-author {
+      font-style: normal;
+      font-weight: 600;
+      color: #1A1A16;
+      font-size: 0.72rem;
+      margin-top: 8px;
+      display: block;
+    }
+
+    /* Contact / CTA */
+    .cta-box {
+      background: #F5F0E8;
+      border-radius: 10px;
+      padding: 16px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border: 1px solid #e0dbd4;
+    }
+    .cta-text h3 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.15rem;
+      color: #1A1A16;
+      margin-bottom: 3px;
+    }
+    .cta-text p { font-size: 0.75rem; color: #888; }
+    .cta-contacts { display: flex; flex-direction: column; gap: 4px; text-align: right; }
+    .cta-contacts span { font-size: 0.78rem; color: #1A1A16; font-weight: 500; }
+    .cta-contacts a { font-size: 0.75rem; color: #C4603A; text-decoration: none; }
+
+    /* Footer p2 */
+    .p2-footer {
+      background: #0C1910;
+      padding: 10px 44px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-shrink: 0;
+    }
+    .p2-footer span { font-size: 0.65rem; color: rgba(245,240,232,0.35); }
+
+    /* Print */
+    @media print {
+      body { background: #fff; padding: 0; gap: 0; }
+      .no-print { display: none; }
+      .page { width: 210mm; height: 297mm; box-shadow: none; page-break-after: always; }
+      .page:last-child { page-break-after: avoid; }
+      @page { margin: 0; size: A4 portrait; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="no-print">
+  <button class="btn btn-back" onclick="history.back()">← Retour</button>
+  <button class="btn btn-print" onclick="window.print()">Imprimer / Enregistrer PDF</button>
+</div>
+
+<!-- ══ PAGE 1 ══ -->
+<div class="page">
+
+  <!-- Hero -->
+  <div class="hero">
+    <div class="hero-deco"></div>
+    <div class="hero-deco2"></div>
+    <div class="hero-tag">Présentation commerciale</div>
+    <h1>Vendez votre bien.<br>Gardez <em>chaque euro.</em></h1>
+    <p class="tagline">Vendu Par Moi vous donne accès aux outils et à la méthode des professionnels de l'immobilier — sans commission, sans intermédiaire.</p>
+    <div class="stat-row">
+      <div class="stat">
+        <div class="stat-val">0 %</div>
+        <div class="stat-lbl">de commission</div>
+      </div>
+      <div class="stat">
+        <div class="stat-val">15 000 €</div>
+        <div class="stat-lbl">économisés en moyenne</div>
+      </div>
+      <div class="stat">
+        <div class="stat-val">100 %</div>
+        <div class="stat-lbl">de votre prix conservé</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Body -->
+  <div class="p1-body">
+
+    <!-- Problème / Solution -->
+    <div>
+      <div class="section-label">Le constat</div>
+      <div class="ps-grid">
+        <div class="ps-card problem">
+          <h3>⚠ Vendre avec une agence</h3>
+          <ul>
+            <li>3 à 7 % de commission sur le prix de vente</li>
+            <li>Peu de visibilité sur le processus</li>
+            <li>Dépendance à un agent que vous ne choisissez pas</li>
+            <li>Mandat exclusif — vous n'avez plus la main</li>
+          </ul>
+        </div>
+        <div class="ps-card solution">
+          <h3>✓ Vendre avec Vendu Par Moi</h3>
+          <ul>
+            <li>Forfait fixe — zéro commission sur la vente</li>
+            <li>Tableau de bord en temps réel — vous suivez tout</li>
+            <li>Vous restez maître de votre bien et de vos visites</li>
+            <li>Mandat simple — liberté totale</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- Étapes -->
+    <div>
+      <div class="section-label">Comment ça marche</div>
+      <div class="steps-row">
+        <div class="step">
+          <div class="step-num">1</div>
+          <div class="step-label"><strong>Inscription</strong>Accès immédiat à la plateforme</div>
+        </div>
+        <div class="step">
+          <div class="step-num">2</div>
+          <div class="step-label"><strong>Séance photo</strong>Pro à domicile + visite 360°</div>
+        </div>
+        <div class="step">
+          <div class="step-num">3</div>
+          <div class="step-label"><strong>Publication</strong>Annonce sur les portails + dossier acheteur</div>
+        </div>
+        <div class="step">
+          <div class="step-num">4</div>
+          <div class="step-label"><strong>Visites</strong>Agenda intelligent + relances auto</div>
+        </div>
+        <div class="step">
+          <div class="step-num">5</div>
+          <div class="step-label"><strong>Signature</strong>Offre centralisée + suivi notaire</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Inclus -->
+    <div>
+      <div class="section-label">Ce qui est inclus</div>
+      <div class="inclus-grid">
+        <div class="inclus-item"><div class="inclus-icon">📸</div><div class="inclus-text"><strong>Photos professionnelles</strong>Séance à domicile + visite virtuelle 360°</div></div>
+        <div class="inclus-item"><div class="inclus-icon">📋</div><div class="inclus-text"><strong>Dossier acheteur</strong>Photos, diagnostics, documents — partageable en 1 clic</div></div>
+        <div class="inclus-item"><div class="inclus-icon">📅</div><div class="inclus-text"><strong>Agenda intelligent</strong>Réservation en ligne, rappels automatiques</div></div>
+        <div class="inclus-item"><div class="inclus-icon">🤖</div><div class="inclus-text"><strong>Coach IA</strong>Accompagnement à chaque étape de la vente</div></div>
+        <div class="inclus-item"><div class="inclus-icon">📊</div><div class="inclus-text"><strong>Suivi des offres</strong>Toutes vos offres centralisées dans votre espace</div></div>
+        <div class="inclus-item"><div class="inclus-icon">🎓</div><div class="inclus-text"><strong>Formation complète</strong>Méthode pro de A à Z — préparation à signature</div></div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Footer p1 -->
+  <div class="p1-footer">
+    <div class="brand">Vendu Par <em>Moi</em></div>
+    <div class="page-num">1 / 2</div>
+  </div>
+
+</div>
+
+<!-- ══ PAGE 2 ══ -->
+<div class="page">
+
+  <div class="p2-header">
+    <div class="brand">Vendu Par <em>Moi</em></div>
+    <h2>Tarifs & témoignages</h2>
+  </div>
+
+  <div class="p2-body">
+
+    <!-- Tarifs -->
+    <div>
+      <div class="section-label">Nos formules</div>
+      <div class="tarifs-grid">
+        <div class="tarif-card">
+          <div class="tarif-name">Pack Autonome</div>
+          <div class="tarif-price">499 € <span>TTC</span></div>
+          <div class="tarif-alt">Paiement unique · sans frais cachés</div>
+          <ul class="tarif-features">
+            <li>Accès complet à la plateforme</li>
+            <li>Formation pas à pas (préparation → notaire)</li>
+            <li>Dossier acheteur partageable</li>
+            <li>Agenda de visites en ligne</li>
+            <li>Coach IA & générateur d'annonce</li>
+            <li>Suivi des offres</li>
+          </ul>
+        </div>
+        <div class="tarif-card featured">
+          <div class="tarif-badge">Le plus choisi</div>
+          <div class="tarif-name">Pack Sérénité</div>
+          <div class="tarif-price">999 € <span>TTC</span></div>
+          <div class="tarif-alt">ou 4 × 249 € sans frais</div>
+          <ul class="tarif-features">
+            <li>Tout le Pack Autonome inclus</li>
+            <li>Séance photo professionnelle à domicile</li>
+            <li>Visite virtuelle 360°</li>
+            <li>Accompagnement personnalisé VPM</li>
+            <li>Relances automatiques des visiteurs</li>
+            <li>Durée 12 mois · mandat simple</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- Économies -->
+    <div class="eco-box">
+      <div class="eco-left">
+        <div class="eco-amount">15 000 €</div>
+        <div class="eco-lbl">économisés en moyenne</div>
+      </div>
+      <div class="eco-right">
+        Sur un bien vendu <strong>300 000 €</strong>, une agence facture entre <strong>9 000 € et 21 000 €</strong> de commission.<br>
+        Avec Vendu Par Moi, vous payez un forfait fixe et conservez <strong>l'intégralité du reste</strong>.<br>
+        Pour la plupart de nos clients, la plateforme est remboursée en quelques semaines.
+      </div>
+    </div>
+
+    <!-- Témoignages -->
+    <div>
+      <div class="section-label">Ils ont vendu avec Vendu Par Moi</div>
+      <div class="temoignage-grid">
+        <div class="temoignage">
+          "J'avais peur de me retrouver seule face aux acheteurs, mais la plateforme m'a vraiment guidée à chaque étape. J'ai vendu en 6 semaines et économisé plus de 12 000 €."
+          <span class="temo-author">— Sophie M., Lyon · Appartement 3 pièces</span>
+        </div>
+        <div class="temoignage">
+          "Le dossier acheteur en ligne a fait toute la différence. Les acheteurs arrivaient aux visites déjà convaincus. Offre acceptée au bout de la 3e visite."
+          <span class="temo-author">— Pierre & Aurélie D., Bordeaux · Maison 5 pièces</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- CTA -->
+    <div class="cta-box">
+      <div class="cta-text">
+        <h3>Prêt à vendre par vous-même ?</h3>
+        <p>Démarrez aujourd'hui — accès immédiat à votre espace vendeur · sans engagement</p>
+      </div>
+      <div class="cta-contacts">
+        <span>06 95 44 36 54 — Matthias</span>
+        <span>06 84 34 06 11 — Guillaume</span>
+        <a href="mailto:contact@venduparmoi.fr">contact@venduparmoi.fr</a>
+        <a href="#">www.venduparmoi.fr</a>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="p2-footer">
+    <span>Vendu Par Moi · contact@venduparmoi.fr · 06 95 44 36 54</span>
+    <span>2 / 2</span>
+  </div>
+
+</div>
+
+</body>
+</html>
