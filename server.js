@@ -80,6 +80,9 @@ app.get('/kit-bienvenue', (req, res) => { res.set('Cache-Control', 'no-store, no
 app.get('/flyer-demarchage', (req, res) => { res.set('Cache-Control', 'no-store, no-cache, must-revalidate'); res.sendFile(path.join(__dirname, 'public', 'flyer-demarchage.html')); });
 app.get('/simulateur-economies', (req, res) => { res.set('Cache-Control', 'no-store, no-cache, must-revalidate'); res.sendFile(path.join(__dirname, 'public', 'simulateur-economies.html')); });
 app.get('/facture-vpm', (req, res) => { res.set('Cache-Control', 'no-store, no-cache, must-revalidate'); res.sendFile(path.join(__dirname, 'public', 'facture-vpm.html')); });
+app.get('/devis-vpm', (req, res) => { res.set('Cache-Control', 'no-store, no-cache, must-revalidate'); res.sendFile(path.join(__dirname, 'public', 'devis-vpm.html')); });
+app.get('/attestation-formation', (req, res) => { res.set('Cache-Control', 'no-store, no-cache, must-revalidate'); res.sendFile(path.join(__dirname, 'public', 'attestation-formation.html')); });
+app.get('/recu-paiement', (req, res) => { res.set('Cache-Control', 'no-store, no-cache, must-revalidate'); res.sendFile(path.join(__dirname, 'public', 'recu-paiement.html')); });
 
 app.use(express.static(path.join(__dirname, 'public'), {
   maxAge: '7d',

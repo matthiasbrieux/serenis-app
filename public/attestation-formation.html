@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Attestation de Formation — Vendu Par Moi</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after {
+  margin: 0; padding: 0; box-sizing: border-box;
+  -webkit-print-color-adjust: exact !important;
+  print-color-adjust: exact !important;
+  color-adjust: exact !important;
+}
+body {
+  font-family: 'DM Sans', sans-serif; font-weight: 300;
+  background: #E8E4DC; min-height: 100vh;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  padding: 3rem 2rem; gap: 1.5rem;
+}
+.no-print {
+  background: #1D3A28; color: #fff; border: none;
+  padding: 11px 26px; border-radius: 8px;
+  font-family: 'DM Sans', sans-serif; font-size: .88rem; font-weight: 600;
+  cursor: pointer;
+}
+.no-print:hover { background: #3D5A47; }
+.page-label { font-size: .7rem; letter-spacing: .14em; text-transform: uppercase; color: #999; text-align: center; }
+@media print {
+  body { background: #fff; padding: 0; gap: 0; }
+  .no-print, .page-label { display: none; }
+  .attestation { box-shadow: none; width: 210mm; height: 297mm; }
+  @page { margin: 0; size: A4 portrait; }
+}
+
+/* ── DOCUMENT ── */
+.attestation {
+  width: 794px; height: 1123px;
+  background: #FAFAF8;
+  position: relative; overflow: hidden;
+  box-shadow: 0 20px 80px rgba(0,0,0,.2), 0 4px 20px rgba(0,0,0,.1);
+  display: flex; flex-direction: column;
+}
+
+/* Bordure décorative */
+.border-top {
+  height: 8px;
+  background: linear-gradient(90deg, #0C1910 0%, #1D3A28 50%, #C4603A 100%);
+  flex-shrink: 0;
+}
+.border-bottom {
+  height: 6px;
+  background: linear-gradient(90deg, #C4603A 0%, #1D3A28 50%, #0C1910 100%);
+  flex-shrink: 0; margin-top: auto;
+}
+
+/* Filigrane */
+.watermark {
+  position: absolute; top: 50%; left: 50%;
+  transform: translate(-50%,-50%) rotate(-25deg);
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 5.5rem; font-weight: 900;
+  color: rgba(29,58,40,.03);
+  white-space: nowrap; pointer-events: none; z-index: 0;
+  letter-spacing: .05em; user-select: none;
+}
+
+/* HEADER */
+.att-header {
+  padding: 2.5rem 4rem 2rem;
+  display: flex; justify-content: space-between; align-items: flex-start;
+  border-bottom: 1px solid #E0D8CC;
+  position: relative; z-index: 1; flex-shrink: 0;
+}
+.header-logo {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.5rem; font-weight: 700; color: #1D3A28;
+}
+.header-logo em { color: #C4603A; font-style: italic; }
+.header-societe { font-size: .7rem; color: #999; line-height: 1.7; margin-top: .3rem; }
+
+.num-att {
+  text-align: right;
+  font-size: .7rem; color: #999; line-height: 1.8;
+}
+.num-att strong { color: #555; font-weight: 600; }
+
+/* TITRE */
+.att-titre {
+  padding: 2.8rem 4rem 1.8rem;
+  text-align: center;
+  position: relative; z-index: 1; flex-shrink: 0;
+}
+.titre-kicker {
+  font-size: .65rem; font-weight: 600; letter-spacing: .25em;
+  text-transform: uppercase; color: #C4603A;
+  margin-bottom: 1rem;
+}
+.titre-principal {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 2.6rem; font-weight: 700; color: #1D3A28;
+  line-height: 1.1; margin-bottom: .5rem;
+}
+.titre-sub {
+  font-family: 'Cormorant Garamond', serif;
+  font-style: italic; font-size: 1rem; color: #888;
+}
+
+/* LIGNE ORNEMENTALE */
+.ornement {
+  display: flex; align-items: center; gap: 1rem;
+  padding: 0 4rem; margin-bottom: 2rem;
+  position: relative; z-index: 1; flex-shrink: 0;
+}
+.ornement-line { flex: 1; height: 1px; background: #E0D8CC; }
+.ornement-diamond {
+  width: 8px; height: 8px;
+  background: #C4603A;
+  transform: rotate(45deg); flex-shrink: 0;
+}
+
+/* CORPS */
+.att-corps {
+  padding: 0 4rem;
+  position: relative; z-index: 1; flex-shrink: 0;
+}
+.corps-intro {
+  font-size: .9rem; color: #444; line-height: 1.9; margin-bottom: 1.8rem;
+  text-align: justify;
+}
+.corps-intro strong {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.05rem; font-weight: 700; color: #1D3A28;
+}
+
+/* NOM CLIENT */
+.client-bloc {
+  background: #F5F0E8;
+  border-left: 4px solid #C4603A;
+  padding: 1.2rem 1.8rem;
+  margin-bottom: 1.8rem;
+  display: flex; align-items: center; gap: 2rem;
+}
+.client-nom-label { font-size: .6rem; font-weight: 600; letter-spacing: .18em; text-transform: uppercase; color: #C4603A; margin-bottom: .3rem; }
+.client-nom-val {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.6rem; font-weight: 700; color: #1D3A28;
+  border-bottom: 1px solid #C8C0B8; min-width: 300px;
+  padding-bottom: .2rem;
+}
+.client-date-bloc { flex-shrink: 0; }
+.client-date-label { font-size: .6rem; font-weight: 600; letter-spacing: .18em; text-transform: uppercase; color: #999; margin-bottom: .3rem; }
+.client-date-val { font-size: .85rem; color: #555; font-weight: 500; border-bottom: 1px solid #C8C0B8; padding-bottom: .2rem; min-width: 180px; }
+
+/* PROGRAMME */
+.programme-titre {
+  font-size: .65rem; font-weight: 600; letter-spacing: .2em;
+  text-transform: uppercase; color: #999; margin-bottom: 1rem;
+  position: relative; z-index: 1;
+  padding: 0 4rem;
+  flex-shrink: 0;
+}
+.programme-grid {
+  padding: 0 4rem;
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: .5rem 2rem; margin-bottom: 1.8rem;
+  position: relative; z-index: 1; flex-shrink: 0;
+}
+.prog-item {
+  display: flex; align-items: flex-start; gap: .6rem;
+  font-size: .78rem; color: #555; line-height: 1.5;
+  padding: .4rem 0; border-bottom: 1px solid #F0EBE3;
+}
+.prog-check {
+  width: 16px; height: 16px; border-radius: 50%;
+  background: #1D3A28;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0; margin-top: 1px;
+}
+.prog-check svg { width: 8px; height: 8px; }
+
+/* DURÉE */
+.duree-bloc {
+  padding: 0 4rem; margin-bottom: 1.8rem;
+  position: relative; z-index: 1; flex-shrink: 0;
+  display: grid; grid-template-columns: repeat(3,1fr); gap: 1rem;
+}
+.duree-item {
+  border: 1px solid #E0D8CC; padding: .8rem 1rem; text-align: center;
+}
+.duree-val {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.4rem; font-weight: 700; color: #1D3A28;
+  line-height: 1; margin-bottom: .3rem;
+}
+.duree-label { font-size: .62rem; color: #999; letter-spacing: .08em; text-transform: uppercase; }
+
+/* SIGNATURES */
+.att-signatures {
+  padding: 0 4rem;
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 2rem; margin-bottom: 1.5rem;
+  position: relative; z-index: 1; flex-shrink: 0;
+}
+.sig-bloc { }
+.sig-titre { font-size: .6rem; font-weight: 600; letter-spacing: .16em; text-transform: uppercase; color: #999; margin-bottom: .6rem; }
+.sig-zone { height: 64px; border-bottom: 1px solid #C8C0B8; margin-bottom: .4rem; }
+.sig-nom { font-size: .75rem; color: #555; }
+.sig-qualite { font-size: .65rem; color: #999; }
+
+/* FOOTER */
+.att-footer {
+  padding: 1rem 4rem 1.2rem;
+  border-top: 1px solid #E0D8CC;
+  background: #F5F0E8;
+  display: flex; justify-content: space-between; align-items: center;
+  position: relative; z-index: 1; flex-shrink: 0;
+}
+.ff-logo { font-family: 'Cormorant Garamond', serif; font-size: .95rem; font-weight: 700; color: #3D5A47; }
+.ff-logo em { color: #C4603A; font-style: italic; }
+.ff-contact { font-size: .62rem; color: #AAA; letter-spacing: .05em; text-align: center; line-height: 1.7; }
+.ff-legal { font-size: .6rem; color: #BBB; text-align: right; line-height: 1.7; }
+</style>
+</head>
+<body>
+
+<p class="page-label">Attestation de Formation — Vendu Par Moi · Format A4</p>
+<button class="no-print" onclick="window.print()">⬇ Télécharger en PDF</button>
+
+<div class="attestation">
+  <div class="border-top"></div>
+  <div class="watermark">ATTESTATION</div>
+
+  <!-- HEADER -->
+  <div class="att-header">
+    <div>
+      <div class="header-logo"><em>Vendu</em> Par Moi</div>
+      <div class="header-societe">
+        SAS Vendu Par Moi · SIRET : ________________<br>
+        contact@venduparmoi.fr · venduparmoi.fr
+      </div>
+    </div>
+    <div class="num-att">
+      N° <strong>ATT-______-2026</strong><br>
+      Délivrée le : <strong>__ / __ / 2026</strong>
+    </div>
+  </div>
+
+  <!-- TITRE -->
+  <div class="att-titre">
+    <div class="titre-kicker">Document officiel</div>
+    <div class="titre-principal">Attestation de Formation</div>
+    <div class="titre-sub">Vente immobilière entre particuliers — Programme complet</div>
+  </div>
+
+  <!-- ORNEMENT -->
+  <div class="ornement">
+    <div class="ornement-line"></div>
+    <div class="ornement-diamond"></div>
+    <div class="ornement-line"></div>
+  </div>
+
+  <!-- CORPS -->
+  <div class="att-corps">
+    <p class="corps-intro">
+      La société <strong>SAS Vendu Par Moi</strong>, organisme de formation et d'accompagnement à la vente immobilière entre particuliers, certifie que la personne désignée ci-dessous a suivi et complété avec succès l'intégralité du programme de formation à la vente immobilière de particulier à particulier.
+    </p>
+
+    <div class="client-bloc">
+      <div>
+        <div class="client-nom-label">Nom et prénom du bénéficiaire</div>
+        <div class="client-nom-val">_________________________________________</div>
+      </div>
+      <div class="client-date-bloc">
+        <div class="client-date-label">Adresse du bien concerné</div>
+        <div class="client-date-val">____________________________</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PROGRAMME -->
+  <div class="programme-titre" style="padding: 0 4rem;">Contenu de la formation suivie</div>
+  <div class="programme-grid">
+    <div class="prog-item">
+      <div class="prog-check"><svg viewBox="0 0 10 10" fill="none"><polyline points="2,5 4.5,7.5 8,3" stroke="#6BBF82" stroke-width="1.5"/></svg></div>
+      Estimation du bien — méthode DVF et comparatifs marché
+    </div>
+    <div class="prog-item">
+      <div class="prog-check"><svg viewBox="0 0 10 10" fill="none"><polyline points="2,5 4.5,7.5 8,3" stroke="#6BBF82" stroke-width="1.5"/></svg></div>
+      Mesures loi Carrez — protocole et relevé de surfaces
+    </div>
+    <div class="prog-item">
+      <div class="prog-check"><svg viewBox="0 0 10 10" fill="none"><polyline points="2,5 4.5,7.5 8,3" stroke="#6BBF82" stroke-width="1.5"/></svg></div>
+      Reportage photographique professionnel au smartphone
+    </div>
+    <div class="prog-item">
+      <div class="prog-check"><svg viewBox="0 0 10 10" fill="none"><polyline points="2,5 4.5,7.5 8,3" stroke="#6BBF82" stroke-width="1.5"/></svg></div>
+      Rédaction et publication de l'annonce immobilière
+    </div>
+    <div class="prog-item">
+      <div class="prog-check"><svg viewBox="0 0 10 10" fill="none"><polyline points="2,5 4.5,7.5 8,3" stroke="#6BBF82" stroke-width="1.5"/></svg></div>
+      Préparation et conduite des visites acquéreurs
+    </div>
+    <div class="prog-item">
+      <div class="prog-check"><svg viewBox="0 0 10 10" fill="none"><polyline points="2,5 4.5,7.5 8,3" stroke="#6BBF82" stroke-width="1.5"/></svg></div>
+      Gestion des offres et techniques de négociation
+    </div>
+    <div class="prog-item">
+      <div class="prog-check"><svg viewBox="0 0 10 10" fill="none"><polyline points="2,5 4.5,7.5 8,3" stroke="#6BBF82" stroke-width="1.5"/></svg></div>
+      Constitution du dossier acheteur et notaire
+    </div>
+    <div class="prog-item">
+      <div class="prog-check"><svg viewBox="0 0 10 10" fill="none"><polyline points="2,5 4.5,7.5 8,3" stroke="#6BBF82" stroke-width="1.5"/></svg></div>
+      Accompagnement jusqu'à la signature chez le notaire
+    </div>
+  </div>
+
+  <!-- DURÉE -->
+  <div class="duree-bloc">
+    <div class="duree-item">
+      <div class="duree-val">2</div>
+      <div class="duree-label">Séances</div>
+    </div>
+    <div class="duree-item">
+      <div class="duree-val">__ / __ / 2026</div>
+      <div class="duree-label" style="font-size:.58rem">Date séance 1</div>
+    </div>
+    <div class="duree-item">
+      <div class="duree-val">__ / __ / 2026</div>
+      <div class="duree-label" style="font-size:.58rem">Date séance 2</div>
+    </div>
+  </div>
+
+  <!-- SIGNATURES -->
+  <div class="att-signatures">
+    <div class="sig-bloc">
+      <div class="sig-titre">Signature du bénéficiaire</div>
+      <div class="sig-zone"></div>
+      <div class="sig-nom">_____________________________</div>
+      <div class="sig-qualite">Date : __ / __ / 2026</div>
+    </div>
+    <div class="sig-bloc">
+      <div class="sig-titre">Pour SAS Vendu Par Moi</div>
+      <div class="sig-zone"></div>
+      <div class="sig-nom">Guillaume Girod &amp; Matthias Brieux</div>
+      <div class="sig-qualite">Fondateurs · Formateurs</div>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <div class="att-footer">
+    <div class="ff-logo"><em>Vendu</em> Par Moi</div>
+    <div class="ff-contact">contact@venduparmoi.fr · venduparmoi.fr · 06 95 44 36 54</div>
+    <div class="ff-legal">SAS Vendu Par Moi<br>SIRET : ________________</div>
+  </div>
+  <div class="border-bottom"></div>
+
+</div>
+
+</body>
+</html>

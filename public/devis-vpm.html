@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Devis — Vendu Par Moi</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after {
+  margin: 0; padding: 0; box-sizing: border-box;
+  -webkit-print-color-adjust: exact !important;
+  print-color-adjust: exact !important;
+  color-adjust: exact !important;
+}
+body {
+  font-family: 'DM Sans', sans-serif; font-weight: 300;
+  background: #E8E4DC; min-height: 100vh;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  padding: 3rem 2rem; gap: 1.5rem;
+}
+.no-print {
+  background: #1D3A28; color: #fff; border: none;
+  padding: 11px 26px; border-radius: 8px;
+  font-family: 'DM Sans', sans-serif; font-size: .88rem; font-weight: 600;
+  cursor: pointer;
+}
+.no-print:hover { background: #3D5A47; }
+.page-label {
+  font-size: .7rem; letter-spacing: .14em; text-transform: uppercase;
+  color: #999; text-align: center;
+}
+@media print {
+  body { background: #fff; padding: 0; gap: 0; }
+  .no-print, .page-label, .print-note { display: none; }
+  .devis { box-shadow: none; width: 210mm; height: 297mm; }
+  @page { margin: 0; size: A4 portrait; }
+}
+
+/* ── DOCUMENT ── */
+.devis {
+  width: 794px; height: 1123px;
+  background: #FAFAF8;
+  position: relative; overflow: hidden;
+  box-shadow: 0 20px 80px rgba(0,0,0,.2), 0 4px 20px rgba(0,0,0,.1);
+  display: flex; flex-direction: column;
+}
+
+.trait-gauche {
+  position: absolute; left: 0; top: 0; bottom: 0; width: 5px;
+  background: linear-gradient(to bottom, transparent 0%, #C4603A 15%, #C4603A 85%, transparent 100%);
+  z-index: 2;
+}
+.watermark {
+  position: absolute; top: 50%; left: 50%;
+  transform: translate(-50%,-50%) rotate(-25deg);
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 7rem; font-weight: 900;
+  color: rgba(29,58,40,.04);
+  white-space: nowrap; pointer-events: none; z-index: 0;
+  letter-spacing: .1em; user-select: none;
+}
+
+/* HEADER */
+.dv-header {
+  padding: 2.5rem 3.5rem 2rem 4rem;
+  display: flex; justify-content: space-between; align-items: flex-start;
+  border-bottom: 2px solid #1D3A28;
+  position: relative; z-index: 1; flex-shrink: 0;
+}
+.header-logo {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.5rem; font-weight: 700; color: #1D3A28;
+  margin-bottom: .4rem;
+}
+.header-logo em { color: #C4603A; font-style: italic; }
+.header-societe { font-size: .72rem; color: #888; line-height: 1.7; }
+
+.header-right { text-align: right; }
+.devis-label {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 2rem; font-weight: 700; color: #1D3A28;
+  letter-spacing: .04em; margin-bottom: .3rem;
+}
+.devis-num { font-size: .72rem; color: #888; line-height: 1.8; }
+.devis-num strong { color: #333; font-weight: 600; }
+
+.validite-badge {
+  margin-top: .6rem;
+  background: #F5F0E8; border: 1px solid #C4603A;
+  padding: .35rem .8rem; display: inline-block; text-align: right;
+  font-size: .65rem; color: #C4603A; font-weight: 600;
+  letter-spacing: .08em; text-transform: uppercase;
+}
+
+/* PARTIES */
+.dv-parties {
+  padding: 1.8rem 3.5rem 1.5rem 4rem;
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 3rem;
+  border-bottom: 1px solid #E0D8CC;
+  position: relative; z-index: 1; flex-shrink: 0;
+}
+.partie-label {
+  font-size: .6rem; font-weight: 600; letter-spacing: .2em;
+  text-transform: uppercase; color: #C4603A; margin-bottom: .8rem;
+}
+.partie-nom {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.05rem; font-weight: 700; color: #1D3A28; margin-bottom: .3rem;
+}
+.partie-detail { font-size: .78rem; color: #666; line-height: 1.75; }
+.partie-detail span { display: block; }
+.field { border-bottom: 1px solid #C8C0B8; min-height: 1.4rem; margin-bottom: .3rem; font-size: .82rem; color: #333; }
+.field-label { font-size: .62rem; letter-spacing: .1em; text-transform: uppercase; color: #BBB; margin-bottom: .15rem; display: block; }
+
+/* OBJET */
+.dv-objet {
+  padding: 1rem 3.5rem 1rem 4rem;
+  background: #F5F0E8;
+  display: flex; align-items: center; gap: 1.5rem;
+  border-bottom: 1px solid #E0D8CC;
+  position: relative; z-index: 1; flex-shrink: 0;
+}
+.objet-label { font-size: .6rem; font-weight: 600; letter-spacing: .18em; text-transform: uppercase; color: #C4603A; flex-shrink: 0; }
+.objet-texte { font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: .95rem; color: #444; }
+
+/* TABLEAU */
+.dv-tableau { padding: 1.5rem 3.5rem 0 4rem; position: relative; z-index: 1; flex-shrink: 0; }
+table { width: 100%; border-collapse: collapse; }
+thead tr { background: #1D3A28; }
+thead th {
+  font-size: .62rem; font-weight: 600; letter-spacing: .14em;
+  text-transform: uppercase; color: rgba(245,240,232,.75);
+  padding: .7rem 1rem; text-align: left;
+}
+thead th:last-child, thead th:nth-child(3), thead th:nth-child(4) { text-align: right; }
+tbody tr { border-bottom: 1px solid #E0D8CC; }
+tbody tr:last-child { border-bottom: 2px solid #1D3A28; }
+tbody tr:nth-child(even) { background: #F8F5F0; }
+tbody td { padding: .9rem 1rem; font-size: .82rem; color: #333; vertical-align: top; }
+tbody td:nth-child(3), tbody td:nth-child(4), tbody td:last-child { text-align: right; }
+.td-desc { font-size: .82rem; color: #1D3A28; font-weight: 600; }
+.td-detail { font-size: .72rem; color: #888; margin-top: .2rem; line-height: 1.5; }
+
+/* TOTAUX */
+.dv-totaux { padding: 1rem 3.5rem 0 4rem; position: relative; z-index: 1; flex-shrink: 0; }
+.totaux-grid { display: flex; flex-direction: column; align-items: flex-end; }
+.total-ligne { display: flex; width: 300px; }
+.total-ligne-label { flex: 1; font-size: .78rem; color: #666; padding: .55rem .8rem; border-bottom: 1px solid #E0D8CC; }
+.total-ligne-val { width: 110px; font-size: .82rem; color: #333; font-weight: 500; padding: .55rem .8rem; text-align: right; border-bottom: 1px solid #E0D8CC; }
+.total-ttc { display: flex; width: 300px; background: #0C1910; margin-top: 2px; }
+.total-ttc-label { flex: 1; font-size: .82rem; font-weight: 600; color: rgba(245,240,232,.8); padding: .7rem .8rem; letter-spacing: .04em; text-transform: uppercase; }
+.total-ttc-val { width: 110px; font-family: 'Cormorant Garamond', serif; font-size: 1.1rem; font-weight: 700; color: #C4603A; padding: .7rem .8rem; text-align: right; }
+
+/* VALIDITÉ */
+.dv-validite {
+  padding: 1.2rem 3.5rem 0 4rem;
+  position: relative; z-index: 1; flex-shrink: 0;
+  display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;
+}
+.validite-bloc { border: 1px solid #E0D8CC; padding: 1rem 1.2rem; }
+.validite-titre { font-size: .6rem; font-weight: 600; letter-spacing: .16em; text-transform: uppercase; color: #C4603A; margin-bottom: .7rem; }
+.validite-detail { font-size: .76rem; color: #555; line-height: 1.7; }
+.validite-detail strong { color: #1D3A28; font-weight: 600; }
+
+/* SIGNATURE */
+.dv-signature {
+  padding: 1.2rem 3.5rem 0 4rem;
+  position: relative; z-index: 1; flex-shrink: 0;
+  display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;
+}
+.signature-bloc { border: 1px solid #E0D8CC; padding: 1rem 1.2rem; }
+.signature-titre { font-size: .6rem; font-weight: 600; letter-spacing: .16em; text-transform: uppercase; color: #999; margin-bottom: .5rem; }
+.signature-zone {
+  height: 56px; border-bottom: 1px solid #C8C0B8;
+  margin-bottom: .5rem;
+}
+.signature-mention { font-size: .65rem; color: #BBB; line-height: 1.5; }
+
+/* FOOTER */
+.dv-footer {
+  margin-top: auto;
+  padding: 1rem 3.5rem 1.2rem 4rem;
+  border-top: 1px solid #E0D8CC;
+  background: #F5F0E8;
+  display: flex; justify-content: space-between; align-items: center;
+  position: relative; z-index: 1; flex-shrink: 0;
+}
+.ff-logo { font-family: 'Cormorant Garamond', serif; font-size: .95rem; font-weight: 700; color: #3D5A47; }
+.ff-logo em { color: #C4603A; font-style: italic; }
+.ff-contact { font-size: .62rem; color: #AAA; letter-spacing: .05em; text-align: center; line-height: 1.7; }
+.ff-legal { font-size: .6rem; color: #BBB; text-align: right; line-height: 1.7; }
+
+.print-note { font-size: .7rem; color: #AAA; text-align: center; font-style: italic; max-width: 600px; line-height: 1.7; }
+</style>
+</head>
+<body>
+
+<p class="page-label">Modèle de Devis — Vendu Par Moi · Format A4 · À compléter avant envoi</p>
+<button class="no-print" onclick="window.print()">⬇ Télécharger en PDF</button>
+
+<div class="devis">
+  <div class="trait-gauche"></div>
+  <div class="watermark">DEVIS</div>
+
+  <!-- HEADER -->
+  <div class="dv-header">
+    <div>
+      <div class="header-logo"><em>Vendu</em> Par Moi</div>
+      <div class="header-societe">
+        SAS Vendu Par Moi<br>
+        SIRET : ________________________________<br>
+        06 95 44 36 54 · 06 84 34 06 11 · contact@venduparmoi.fr
+      </div>
+    </div>
+    <div class="header-right">
+      <div class="devis-label">DEVIS</div>
+      <div class="devis-num">
+        N° <strong>DEV-______-2026</strong><br>
+        Date d'émission : <strong>__ / __ / 2026</strong>
+      </div>
+      <div class="validite-badge">Valable 30 jours</div>
+    </div>
+  </div>
+
+  <!-- PARTIES -->
+  <div class="dv-parties">
+    <div>
+      <div class="partie-label">Prestataire</div>
+      <div class="partie-nom">SAS Vendu Par Moi</div>
+      <div class="partie-detail">
+        <span>Guillaume Girod &amp; Matthias Brieux</span>
+        <span>_________________________________ (adresse)</span>
+        <span>_________________________________ (CP, Ville)</span>
+        <span>SIRET : ________________________________</span>
+      </div>
+    </div>
+    <div>
+      <div class="partie-label">Client</div>
+      <div class="partie-nom" style="font-size:.9rem">
+        <div class="field-label">Nom et Prénom</div>
+        <div class="field">_________________________________</div>
+      </div>
+      <div class="partie-detail" style="margin-top:.5rem">
+        <div class="field-label">Adresse</div>
+        <div class="field">_________________________________</div>
+        <div class="field-label" style="margin-top:.4rem">Code postal &amp; Ville</div>
+        <div class="field">_________________________________</div>
+        <div class="field-label" style="margin-top:.4rem">Téléphone</div>
+        <div class="field">_________________________________</div>
+        <div class="field-label" style="margin-top:.4rem">Adresse du bien à vendre</div>
+        <div class="field">_________________________________</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- OBJET -->
+  <div class="dv-objet">
+    <div class="objet-label">Objet</div>
+    <div class="objet-texte">Formation accompagnée à la vente immobilière entre particuliers — 2 séances</div>
+  </div>
+
+  <!-- TABLEAU -->
+  <div class="dv-tableau">
+    <table>
+      <thead>
+        <tr>
+          <th style="width:48%">Désignation</th>
+          <th style="width:12%">Qté</th>
+          <th style="width:15%">P.U. HT</th>
+          <th style="width:10%">TVA</th>
+          <th style="width:15%">Total TTC</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>
+            <div class="td-desc">Séance 1 — Mise en vente</div>
+            <div class="td-detail">Estimation DVF · Mesures loi Carrez · Reportage photo<br>Rédaction &amp; publication annonce · Remise kit documentaire</div>
+          </td>
+          <td>1</td>
+          <td>645,00 €</td>
+          <td>20 %</td>
+          <td>774,00 €</td>
+        </tr>
+        <tr>
+          <td>
+            <div class="td-desc">Séance 2 — Accompagnement à la vente</div>
+            <div class="td-detail">Suivi des visites · Gestion des offres · Préparation compromis<br>Accompagnement jusqu'à la signature notaire</div>
+          </td>
+          <td>1</td>
+          <td>645,00 €</td>
+          <td>20 %</td>
+          <td>774,00 €</td>
+        </tr>
+        <tr>
+          <td>
+            <div class="td-desc">Accès plateforme Vendu Par Moi</div>
+            <div class="td-detail">Espace vendeur · Formation vidéo · Coach IA · Agenda en ligne · Dossier acheteur numérique</div>
+          </td>
+          <td>1</td>
+          <td>0,00 €</td>
+          <td>—</td>
+          <td>Inclus</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- TOTAUX -->
+  <div class="dv-totaux">
+    <div class="totaux-grid">
+      <div class="total-ligne">
+        <div class="total-ligne-label">Montant HT</div>
+        <div class="total-ligne-val">1 290,00 €</div>
+      </div>
+      <div class="total-ligne">
+        <div class="total-ligne-label">TVA (20 %)</div>
+        <div class="total-ligne-val">258,00 €</div>
+      </div>
+      <div class="total-ttc">
+        <div class="total-ttc-label">Total TTC</div>
+        <div class="total-ttc-val">1 548,00 €</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- VALIDITÉ & PAIEMENT -->
+  <div class="dv-validite">
+    <div class="validite-bloc">
+      <div class="validite-titre">Conditions de paiement</div>
+      <div class="validite-detail">
+        Paiement en <strong>2 fois</strong> — une facture par séance<br>
+        <strong>774,00 € TTC</strong> à réception de la séance 1<br>
+        <strong>774,00 € TTC</strong> à réception de la séance 2<br>
+        Modes acceptés : espèces, virement, chèque
+      </div>
+    </div>
+    <div class="validite-bloc">
+      <div class="validite-titre">Validité &amp; conditions</div>
+      <div class="validite-detail">
+        Devis valable <strong>30 jours</strong> à compter de la date d'émission<br>
+        Satisfait ou remboursé après la 1re séance<br>
+        Aucun engagement avant la 1re séance<br>
+        Pas de mandat — pas de commission sur la vente
+      </div>
+    </div>
+  </div>
+
+  <!-- SIGNATURES -->
+  <div class="dv-signature">
+    <div class="signature-bloc">
+      <div class="signature-titre">Bon pour accord — Client</div>
+      <div class="signature-zone"></div>
+      <div class="signature-mention">Date : __ / __ / 2026 &nbsp;·&nbsp; Signature précédée de la mention « Bon pour accord »</div>
+    </div>
+    <div class="signature-bloc">
+      <div class="signature-titre">Signature — Vendu Par Moi</div>
+      <div class="signature-zone"></div>
+      <div class="signature-mention">Guillaume Girod &amp; Matthias Brieux · Fondateurs</div>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <div class="dv-footer">
+    <div class="ff-logo"><em>Vendu</em> Par Moi</div>
+    <div class="ff-contact">06 95 44 36 54 · 06 84 34 06 11 · contact@venduparmoi.fr · venduparmoi.fr</div>
+    <div class="ff-legal">SAS Vendu Par Moi<br>SIRET : ________________<br>TVA : FR ______________</div>
+  </div>
+
+</div>
+
+<p class="print-note">Devis · Format A4 · Complétez les champs avant envoi · Conservez un double signé</p>
+
+</body>
+</html>

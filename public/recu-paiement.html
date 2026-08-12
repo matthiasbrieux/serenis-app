@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Reçu de Paiement — Vendu Par Moi</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after {
+  margin: 0; padding: 0; box-sizing: border-box;
+  -webkit-print-color-adjust: exact !important;
+  print-color-adjust: exact !important;
+  color-adjust: exact !important;
+}
+body {
+  font-family: 'DM Sans', sans-serif; font-weight: 300;
+  background: #E8E4DC; min-height: 100vh;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  padding: 3rem 2rem; gap: 1.5rem;
+}
+.no-print {
+  background: #1D3A28; color: #fff; border: none;
+  padding: 11px 26px; border-radius: 8px;
+  font-family: 'DM Sans', sans-serif; font-size: .88rem; font-weight: 600;
+  cursor: pointer;
+}
+.no-print:hover { background: #3D5A47; }
+.page-label { font-size: .7rem; letter-spacing: .14em; text-transform: uppercase; color: #999; text-align: center; }
+@media print {
+  body { background: #fff; padding: 0; gap: 0; }
+  .no-print, .page-label, .print-note { display: none; }
+  .page-wrapper { gap: 0; }
+  .recu { box-shadow: none; width: 210mm; }
+  .recu-souche { box-shadow: none; width: 210mm; }
+  @page { margin: 0; size: A4 portrait; }
+}
+
+/* ── WRAPPER (reçu + souche) ── */
+.page-wrapper {
+  display: flex; flex-direction: column;
+  gap: 2rem;
+}
+
+/* ── REÇU PRINCIPAL ── */
+.recu {
+  width: 794px;
+  background: #FAFAF8;
+  position: relative; overflow: hidden;
+  box-shadow: 0 20px 80px rgba(0,0,0,.2), 0 4px 20px rgba(0,0,0,.1);
+}
+
+.recu-header {
+  background: linear-gradient(135deg, #0C1910 0%, #1D3A28 60%, #2d5040 100%);
+  padding: 2.2rem 3.5rem 2rem 4rem;
+  display: flex; justify-content: space-between; align-items: flex-start;
+  position: relative;
+}
+.recu-logo {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.6rem; font-weight: 700; color: #F5F0E8;
+  margin-bottom: .3rem;
+}
+.recu-logo em { color: #C4603A; font-style: italic; }
+.recu-societe { font-size: .7rem; color: rgba(245,240,232,.45); line-height: 1.7; }
+
+.recu-badge {
+  text-align: right;
+}
+.recu-badge-label {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.7rem; font-weight: 700; color: #F5F0E8;
+  letter-spacing: .05em; line-height: 1;
+}
+.recu-badge-num {
+  font-size: .68rem; color: rgba(245,240,232,.4);
+  margin-top: .3rem; line-height: 1.7;
+}
+.recu-badge-num strong { color: rgba(245,240,232,.7); }
+
+/* MONTANT CENTRAL */
+.recu-montant {
+  background: #F5F0E8;
+  border-bottom: 3px solid #C4603A;
+  padding: 1.8rem 4rem;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.montant-label { font-size: .65rem; font-weight: 600; letter-spacing: .2em; text-transform: uppercase; color: #999; margin-bottom: .4rem; }
+.montant-val {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 3.2rem; font-weight: 700; color: #1D3A28;
+  line-height: 1;
+}
+.montant-lettres { font-size: .82rem; color: #888; margin-top: .4rem; font-style: italic; }
+.montant-right { text-align: right; }
+.montant-date-label { font-size: .6rem; letter-spacing: .14em; text-transform: uppercase; color: #BBB; margin-bottom: .3rem; }
+.montant-date-val { font-size: 1rem; font-weight: 600; color: #555; border-bottom: 1px solid #C8C0B8; min-width: 180px; padding-bottom: .2rem; }
+
+/* DÉTAILS */
+.recu-details {
+  padding: 1.8rem 4rem;
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 1.8rem;
+  border-bottom: 1px solid #E0D8CC;
+}
+.detail-group { }
+.detail-label { font-size: .6rem; font-weight: 600; letter-spacing: .18em; text-transform: uppercase; color: #C4603A; margin-bottom: .7rem; }
+.detail-field { border-bottom: 1px solid #C8C0B8; min-height: 1.4rem; margin-bottom: .5rem; font-size: .82rem; color: #333; }
+.detail-field-label { font-size: .6rem; letter-spacing: .1em; text-transform: uppercase; color: #BBB; margin-bottom: .15rem; }
+
+/* OBJET */
+.recu-objet {
+  padding: 1rem 4rem;
+  background: #F8F5F0;
+  display: flex; align-items: center; gap: 1.5rem;
+  border-bottom: 1px solid #E0D8CC;
+}
+.objet-kicker { font-size: .6rem; font-weight: 600; letter-spacing: .18em; text-transform: uppercase; color: #999; flex-shrink: 0; }
+.objet-val { font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: .95rem; color: #444; }
+.mode-badge {
+  margin-left: auto; flex-shrink: 0;
+  border: 1px solid #3D5A47; padding: .3rem .8rem;
+  font-size: .65rem; font-weight: 600; letter-spacing: .1em;
+  text-transform: uppercase; color: #3D5A47;
+}
+
+/* MODE PAIEMENT */
+.recu-mode {
+  padding: 1.2rem 4rem;
+  display: flex; gap: 1rem; flex-wrap: wrap;
+  border-bottom: 1px solid #E0D8CC;
+}
+.mode-item {
+  display: flex; align-items: center; gap: .5rem;
+  font-size: .76rem; color: #777;
+}
+.mode-item input[type=checkbox] { width: 14px; height: 14px; accent-color: #1D3A28; }
+.mode-item.selected { color: #1D3A28; font-weight: 600; }
+
+/* SIGNATURE */
+.recu-signature {
+  padding: 1.5rem 4rem;
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+}
+.sig-zone-label { font-size: .6rem; font-weight: 600; letter-spacing: .16em; text-transform: uppercase; color: #999; margin-bottom: .6rem; }
+.sig-zone { height: 60px; border-bottom: 1px solid #C8C0B8; margin-bottom: .4rem; }
+.sig-info { font-size: .7rem; color: #AAA; line-height: 1.5; }
+
+/* PIED */
+.recu-pied {
+  padding: .9rem 4rem 1.1rem;
+  background: #1D3A28;
+  display: flex; justify-content: space-between; align-items: center;
+}
+.pied-logo { font-family: 'Cormorant Garamond', serif; font-size: .9rem; font-weight: 700; color: rgba(245,240,232,.6); }
+.pied-logo em { color: #C4603A; font-style: italic; }
+.pied-contact { font-size: .62rem; color: rgba(245,240,232,.3); letter-spacing: .05em; }
+
+/* ── SOUCHE ── */
+.tirets {
+  width: 794px; text-align: center;
+  font-size: .7rem; color: #AAA; letter-spacing: .2em;
+  border-top: 2px dashed #C8C0B8;
+  padding-top: .6rem;
+  position: relative;
+}
+.tirets::before { content: '✂'; position: absolute; left: -14px; top: -.65rem; font-size: .9rem; color: #BBB; }
+
+.recu-souche {
+  width: 794px;
+  background: #FAFAF8;
+  box-shadow: 0 8px 30px rgba(0,0,0,.12);
+  display: flex; align-items: stretch;
+}
+.souche-band {
+  width: 8px;
+  background: linear-gradient(to bottom, #C4603A, #1D3A28);
+  flex-shrink: 0;
+}
+.souche-body {
+  flex: 1; padding: 1.2rem 2rem;
+  display: flex; align-items: center; gap: 2rem;
+}
+.souche-logo {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.1rem; font-weight: 700; color: #1D3A28;
+  flex-shrink: 0;
+}
+.souche-logo em { color: #C4603A; font-style: italic; }
+.souche-info { flex: 1; font-size: .76rem; color: #666; line-height: 1.7; }
+.souche-info strong { color: #1D3A28; font-weight: 600; }
+.souche-montant {
+  text-align: right; flex-shrink: 0;
+}
+.souche-montant-val {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.8rem; font-weight: 700; color: #1D3A28;
+}
+.souche-montant-label { font-size: .62rem; color: #999; letter-spacing: .08em; text-transform: uppercase; }
+
+.print-note { font-size: .7rem; color: #AAA; text-align: center; font-style: italic; max-width: 600px; line-height: 1.7; }
+</style>
+</head>
+<body>
+
+<p class="page-label">Reçu de Paiement — Vendu Par Moi · Format A4</p>
+<button class="no-print" onclick="window.print()">⬇ Télécharger en PDF</button>
+
+<div class="page-wrapper">
+
+  <!-- REÇU PRINCIPAL -->
+  <div class="recu">
+
+    <div class="recu-header">
+      <div>
+        <div class="recu-logo"><em>Vendu</em> Par Moi</div>
+        <div class="recu-societe">SAS Vendu Par Moi · contact@venduparmoi.fr</div>
+      </div>
+      <div class="recu-badge">
+        <div class="recu-badge-label">REÇU</div>
+        <div class="recu-badge-num">N° <strong>REC-______-2026</strong><br>Date : <strong>__ / __ / 2026</strong></div>
+      </div>
+    </div>
+
+    <div class="recu-montant">
+      <div>
+        <div class="montant-label">Montant perçu</div>
+        <div class="montant-val">774,00 €</div>
+        <div class="montant-lettres">Sept cent soixante-quatorze euros</div>
+      </div>
+      <div class="montant-right">
+        <div class="montant-date-label">Reçu le</div>
+        <div class="montant-date-val">__ / __ / 2026</div>
+      </div>
+    </div>
+
+    <div class="recu-details">
+      <div class="detail-group">
+        <div class="detail-label">Reçu de</div>
+        <div class="detail-field-label">Nom et prénom</div>
+        <div class="detail-field">_________________________________</div>
+        <div class="detail-field-label" style="margin-top:.4rem">Adresse</div>
+        <div class="detail-field">_________________________________</div>
+        <div class="detail-field-label" style="margin-top:.4rem">Code postal &amp; Ville</div>
+        <div class="detail-field">_________________________________</div>
+      </div>
+      <div class="detail-group">
+        <div class="detail-label">Pour</div>
+        <div class="detail-field-label">Adresse du bien concerné</div>
+        <div class="detail-field">_________________________________</div>
+        <div class="detail-field-label" style="margin-top:.4rem">Réf. contrat</div>
+        <div class="detail-field">VPM-______-2026</div>
+        <div class="detail-field-label" style="margin-top:.4rem">Réf. facture</div>
+        <div class="detail-field">VPM-______-2026</div>
+      </div>
+    </div>
+
+    <div class="recu-objet">
+      <div class="objet-kicker">Objet</div>
+      <div class="objet-val">Formation vente immobilière PAP — Séance __ sur 2</div>
+      <div class="mode-badge">□ Séance 1 &nbsp;&nbsp; □ Séance 2</div>
+    </div>
+
+    <div class="recu-mode">
+      <div class="mode-item"><input type="checkbox"> Espèces</div>
+      <div class="mode-item"><input type="checkbox"> Virement bancaire</div>
+      <div class="mode-item"><input type="checkbox"> Chèque n° ________________ — Banque : ________________</div>
+    </div>
+
+    <div class="recu-signature">
+      <div>
+        <div class="sig-zone-label">Signature du client</div>
+        <div class="sig-zone"></div>
+        <div class="sig-info">Précédée de la mention « Reçu »<br>Date : __ / __ / 2026</div>
+      </div>
+      <div>
+        <div class="sig-zone-label">Signature — Vendu Par Moi</div>
+        <div class="sig-zone"></div>
+        <div class="sig-info">Guillaume Girod &amp; Matthias Brieux<br>Fondateurs</div>
+      </div>
+    </div>
+
+    <div class="recu-pied">
+      <div class="pied-logo"><em>Vendu</em> Par Moi</div>
+      <div class="pied-contact">06 95 44 36 54 · 06 84 34 06 11 · contact@venduparmoi.fr</div>
+    </div>
+
+  </div>
+
+  <!-- SOUCHE -->
+  <div class="tirets">SOUCHE À CONSERVER PAR LE CLIENT</div>
+
+  <div class="recu-souche">
+    <div class="souche-band"></div>
+    <div class="souche-body">
+      <div class="souche-logo"><em>Vendu</em> Par Moi</div>
+      <div class="souche-info">
+        <strong>Reçu de paiement N° REC-______-2026</strong><br>
+        Client : _____________________________ · Séance __ sur 2<br>
+        Bien : _____________________________ · Date : __ / __ / 2026
+      </div>
+      <div class="souche-montant">
+        <div class="souche-montant-val">774,00 €</div>
+        <div class="souche-montant-label">Montant TTC</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<p class="print-note">Reçu de paiement · Conservez ce document · La souche est remise au client</p>
+
+</body>
+</html>
