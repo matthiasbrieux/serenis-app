@@ -858,7 +858,7 @@ router.get('/crm/:id/fiche', requireAdmin, (req, res) => {
   const s = db.prepare(`SELECT id, first_name, last_name, email, phone, pack, paid_at, contrat_signe, contrat_signe_at FROM sellers WHERE id=?`).get(+req.params.id);
   if (!s) return res.status(404).send('Vendeur introuvable');
   const p = db.prepare(`SELECT * FROM properties WHERE seller_id=?`).get(+req.params.id);
-  const photos = p ? db.prepare(`SELECT * FROM property_photos WHERE property_id=? ORDER BY "order" ASC, id ASC`).all(p.id) : [];
+  const photos = p ? db.prepare(`SELECT * FROM property_photos WHERE property_id=? ORDER BY \`order\` ASC, id ASC`).all(p.id) : [];
   const docs   = p ? db.prepare(`SELECT * FROM property_documents WHERE property_id=? ORDER BY id DESC`).all(p.id) : [];
   const nom = `${s.first_name||''} ${s.last_name||''}`.trim() || s.email;
 
