@@ -460,7 +460,7 @@
             <th class="sortable" data-sort="score" title="Trier par score">Score santé<i class="si"></i></th>
             <th class="sortable" data-sort="days" title="Trier par ancienneté">Pack · Inscription<i class="si"></i></th>
             <th title="Contrat de prestation signé — manuel">Contrat</th>
-            <th class="auto-h sortable" data-sort="rdv" title="Trier par RDV photo">⚡ RDV photo<i class="si"></i></th>
+            <th class="auto-h sortable" data-sort="rdv" title="Trier par RDV de formation">⚡ RDV de formation<i class="si"></i></th>
             <th class="auto-h">⚡ Photos faites</th>
             <th class="auto-h sortable" data-sort="photos" title="Trier par nb photos">⚡ Nb photos<i class="si"></i></th>
             <th>Rapport · 360°</th>
@@ -1319,8 +1319,13 @@ function renderTable() {
     const ctJVendre = c.jours_pour_vendre != null ? `<strong style="color:#7c3aed">${c.jours_pour_vendre}j</strong>` : (c.vente_realisee && c.vente_date ? `<span style="font-size:0.7rem;color:#aaa">${fd(c.vente_date)}</span>` : '<span style="color:#D0CEC9;font-size:0.7rem">—</span>');
     const ctActionsCell = buildCtActions(c);
 
-    // Contrat toggle (manual)
-    const contratCell = `<button class="tog ${c.contrat_signe?'on':'off'}" data-id="${c.id}" data-field="contrat_signe" data-val="${c.contrat_signe?1:0}" title="${c.contrat_signe?'Contrat signé':'Non signé'}">${c.contrat_signe?CHK:DSH}</button>`;
+    // Contrat toggle (manual) + date + lien
+    const contratCell = c.contrat_signe
+      ? `<div style="display:flex;flex-direction:column;align-items:center;gap:3px;">
+           <button class="tog on" data-id="${c.id}" data-field="contrat_signe" data-val="1" title="Contrat signé — cliquer pour annuler">${CHK}</button>
+           ${c.contrat_signe_at ? `<a href="/admin/crm/${c.id}/contrat" target="_blank" style="font-size:0.68rem;color:#1D3A28;text-decoration:underline;white-space:nowrap;">${fd(c.contrat_signe_at)}</a>` : `<span style="font-size:0.68rem;color:#aaa;">—</span>`}
+         </div>`
+      : `<button class="tog off" data-id="${c.id}" data-field="contrat_signe" data-val="0" title="Non signé">${DSH}</button>`;
 
     // IA Number
     const numCell = c.twilio_number

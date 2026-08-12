@@ -107,6 +107,136 @@ router.get('/api/parcours/tokens', requireAdmin, (req, res) => {
   res.json({ prop: prop || null });
 });
 
+// ── Vue contrat signé d'un vendeur (admin) ────────────────────
+router.get('/crm/:id/contrat', requireAdmin, (req, res) => {
+  const s = db.prepare(`SELECT id, first_name, last_name, email, phone, pack, contrat_signe_at, contrat_ip, paid_at FROM sellers WHERE id=?`).get(req.params.id);
+  if (!s) return res.status(404).send('Vendeur introuvable');
+  const nom = `${s.first_name || ''} ${s.last_name || ''}`.trim() || s.email;
+  const dateSignature = s.contrat_signe_at
+    ? new Date(s.contrat_signe_at).toLocaleDateString('fr-FR', { day: '2-digit', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' })
+    : '—';
+  res.send(`<!DOCTYPE html><html lang="fr"><head>
+    <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Contrat — ${nom}</title>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+    <style>
+      *{box-sizing:border-box;margin:0;padding:0}
+      body{background:#f5f0e8;font-family:'DM Sans',sans-serif;padding:40px 20px 80px;display:flex;flex-direction:column;align-items:center;}
+      .no-print{margin-bottom:24px;display:flex;gap:10px;}
+      .btn{padding:10px 20px;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:0.85rem;font-weight:600;cursor:pointer;border:none;}
+      .btn-print{background:#1D3A28;color:#fff;}
+      .btn-back{background:#fff;color:#1D3A28;border:1px solid #1D3A28;}
+      .card{background:#fff;border:1px solid #e0dbd4;border-radius:16px;width:100%;max-width:740px;padding:48px;}
+      .header{border-bottom:2px solid #0C1910;padding-bottom:24px;margin-bottom:32px;}
+      .logo{font-family:'Playfair Display',serif;font-size:1.4rem;color:#C4603A;margin-bottom:16px;}
+      h1{font-family:'Playfair Display',serif;font-size:1.6rem;color:#1A1A16;margin-bottom:6px;}
+      .subtitle{color:#888;font-size:0.88rem;}
+      .parties{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin:24px 0;padding:20px;background:#f9f7f4;border-radius:10px;border:1px solid #e8e4de;}
+      .partie-label{font-size:0.7rem;text-transform:uppercase;letter-spacing:0.07em;color:#aaa;margin-bottom:6px;}
+      .partie-val{font-weight:600;color:#1A1A16;font-size:0.9rem;}
+      .partie-sub{font-size:0.8rem;color:#666;margin-top:2px;}
+      .cgv{font-size:0.84rem;line-height:1.75;color:#444;}
+      .cgv h2{font-size:0.92rem;color:#1A1A16;margin:20px 0 8px;font-weight:600;}
+      .cgv h2:first-child{margin-top:0;}
+      .cgv p{margin-bottom:10px;}
+      .cgv ul{padding-left:20px;margin-bottom:10px;}
+      .cgv ul li{margin-bottom:4px;}
+      .signature-block{margin-top:36px;border-top:2px solid #0C1910;padding-top:24px;display:grid;grid-template-columns:1fr 1fr;gap:24px;}
+      .sig-box{background:#f9f7f4;border:1px solid #e8e4de;border-radius:10px;padding:20px;}
+      .sig-label{font-size:0.7rem;text-transform:uppercase;letter-spacing:0.07em;color:#aaa;margin-bottom:8px;}
+      .sig-val{font-family:'Playfair Display',serif;font-size:1.1rem;color:#1D3A28;margin-bottom:4px;}
+      .sig-meta{font-size:0.72rem;color:#888;}
+      .badge-signe{display:inline-block;background:#e8f5e9;color:#2e7d32;padding:4px 12px;border-radius:20px;font-size:0.75rem;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;margin-bottom:16px;}
+      @media print{.no-print{display:none!important}body{background:#fff;padding:20px}@page{margin:15mm}}
+    </style>
+  </head><body>
+    <div class="no-print">
+      <button class="btn btn-back" onclick="window.close()">← Fermer</button>
+      <button class="btn btn-print" onclick="window.print()">Imprimer / PDF</button>
+    </div>
+    <div class="card">
+      <div class="header">
+        <div class="logo">Vendu Par Moi</div>
+        <h1>Contrat de mandat simple</h1>
+        <p class="subtitle">Signé électroniquement · valeur juridique eIDAS (UE n°910/2014)</p>
+      </div>
+
+      <span class="badge-signe">✓ Contrat signé</span>
+
+      <div class="parties">
+        <div>
+          <div class="partie-label">Le Client (vendeur)</div>
+          <div class="partie-val">${nom}</div>
+          <div class="partie-sub">${s.email}</div>
+          ${s.phone ? `<div class="partie-sub">${s.phone}</div>` : ''}
+          <div class="partie-sub">Pack : ${s.pack || '—'}</div>
+        </div>
+        <div>
+          <div class="partie-label">La Plateforme</div>
+          <div class="partie-val">Vendu Par Moi</div>
+          <div class="partie-sub">contact@venduparmoi.fr</div>
+          <div class="partie-sub">06 95 44 36 54</div>
+        </div>
+      </div>
+
+      <div class="cgv">
+        <h2>1. Objet du contrat</h2>
+        <p>Le présent contrat a pour objet de définir les conditions dans lesquelles Vendu Par Moi (ci-après « la Plateforme ») met à disposition du vendeur (ci-après « le Client ») un ensemble de services destinés à faciliter la vente immobilière entre particuliers.</p>
+        <h2>2. Services inclus dans le Pack Sérénité</h2>
+        <ul>
+          <li>Séance photo professionnelle au domicile du Client</li>
+          <li>Visite virtuelle 360° du bien immobilier</li>
+          <li>Dossier acquéreur automatisé envoyé aux candidats acheteurs</li>
+          <li>Accès à l'espace vendeur (tableau de bord, agenda, bibliothèque)</li>
+          <li>Accompagnement par l'équipe Vendu Par Moi pendant toute la durée de la mise en vente</li>
+        </ul>
+        <h2>3. Mandat simple</h2>
+        <p>Le Client confie à Vendu Par Moi un mandat <strong>simple et non exclusif</strong> de mise en valeur et de diffusion de son bien immobilier. Le Client reste libre de vendre son bien par ses propres moyens ou via d'autres canaux.</p>
+        <p>Vendu Par Moi ne perçoit <strong>aucune commission</strong> sur la vente. Le prix du Pack Sérénité est forfaitaire et dû dès la souscription, indépendamment de la réalisation de la vente.</p>
+        <h2>4. Obligations du Client</h2>
+        <ul>
+          <li>Fournir des informations exactes et complètes sur le bien à vendre</li>
+          <li>Être disponible pour la séance photo dans un délai de 15 jours suivant la souscription</li>
+          <li>Transmettre l'ensemble des diagnostics obligatoires (DPE, assainissement, etc.)</li>
+          <li>Répondre aux demandes de visite dans un délai raisonnable</li>
+        </ul>
+        <h2>5. Obligations de Vendu Par Moi</h2>
+        <ul>
+          <li>Mettre en œuvre les services du Pack dans les délais convenus</li>
+          <li>Assurer la confidentialité des données personnelles du Client</li>
+          <li>Informer le Client de toute évolution majeure du service</li>
+        </ul>
+        <h2>6. Durée et résiliation</h2>
+        <p>Le contrat est conclu pour une durée de <strong>12 mois</strong> à compter de la date de signature. En cas de vente du bien avant l'échéance, le contrat prend fin de plein droit sans remboursement du forfait.</p>
+        <p>Le Client peut résilier dans un délai de <strong>14 jours</strong> suivant la souscription (délai légal de rétractation), sauf si la prestation photo a déjà été réalisée, conformément à l'article L221-28 du Code de la consommation.</p>
+        <h2>7. Tarification</h2>
+        <p>Le Pack Sérénité est proposé au tarif de <strong>999 € TTC</strong> (paiement unique) ou <strong>4 × 249 € TTC</strong> (paiement échelonné, sans frais). Ce tarif est définitif et ne comprend aucun frais caché.</p>
+        <h2>8. Données personnelles</h2>
+        <p>Les données collectées sont traitées conformément au RGPD, utilisées exclusivement pour la fourniture des services Vendu Par Moi et ne sont pas revendues à des tiers.</p>
+        <h2>9. Responsabilité</h2>
+        <p>Vendu Par Moi ne saurait être tenu responsable d'un défaut de vente du bien, d'une variation de marché ou de toute circonstance extérieure indépendante de sa volonté.</p>
+        <h2>10. Loi applicable et juridiction compétente</h2>
+        <p>Le présent contrat est soumis au droit français. En cas de litige, le tribunal compétent sera celui du siège social de Vendu Par Moi.</p>
+      </div>
+
+      <div class="signature-block">
+        <div class="sig-box">
+          <div class="sig-label">Signature du Client</div>
+          <div class="sig-val">${nom}</div>
+          <div class="sig-meta">Signé électroniquement le ${dateSignature}</div>
+          ${s.contrat_ip ? `<div class="sig-meta">IP : ${s.contrat_ip}</div>` : ''}
+        </div>
+        <div class="sig-box">
+          <div class="sig-label">Pour Vendu Par Moi</div>
+          <div class="sig-val">Matthias Brieux</div>
+          <div class="sig-meta">Gérant — Vendu Par Moi</div>
+          <div class="sig-meta">contact@venduparmoi.fr</div>
+        </div>
+      </div>
+    </div>
+  </body></html>`);
+});
+
 // ── API Documents légaux ──────────────────────────────────────
 router.get('/api/contrats', requireAdmin, (req, res) => {
   const contrats = db.prepare(`
