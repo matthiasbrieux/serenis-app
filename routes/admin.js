@@ -853,6 +853,104 @@ router.get('/api/crm/:id/performance', requireAdmin, (req, res) => {
   res.json({ property, perf, visits, photos: photos?.cnt||0, totalViews, totalFavs, totalMsgs });
 });
 
+// ── Fiche complète vendeur (admin) ───────────────────────────
+router.get('/crm/:id/fiche', requireAdmin, (req, res) => {
+  const s = db.prepare(`SELECT id, first_name, last_name, email, phone, pack, paid_at, contrat_signe, contrat_signe_at FROM sellers WHERE id=?`).get(+req.params.id);
+  if (!s) return res.status(404).send('Vendeur introuvable');
+  const p = db.prepare(`SELECT * FROM properties WHERE seller_id=?`).get(+req.params.id);
+  const photos = p ? db.prepare(`SELECT * FROM property_photos WHERE property_id=? ORDER BY "order" ASC, id ASC`).all(p.id) : [];
+  const docs   = p ? db.prepare(`SELECT * FROM property_documents WHERE property_id=? ORDER BY id DESC`).all(p.id) : [];
+  const nom = `${s.first_name||''} ${s.last_name||''}`.trim() || s.email;
+
+  const photoHtml = photos.length
+    ? photos.map(ph => `<div style="position:relative;border-radius:8px;overflow:hidden;aspect-ratio:4/3;background:#f0f0ed;"><img src="${ph.url}" style="width:100%;height:100%;object-fit:cover;" loading="lazy" onerror="this.style.display='none'"><div style="position:absolute;bottom:4px;left:6px;font-size:0.65rem;background:rgba(0,0,0,0.5);color:#fff;padding:2px 6px;border-radius:4px;">${ph.room||ph.angle_label||'Photo'}</div></div>`).join('')
+    : `<div style="padding:32px;text-align:center;color:#aaa;background:#f9f7f4;border-radius:10px;grid-column:1/-1;">Aucune photo uploadée</div>`;
+
+  const docHtml = docs.length
+    ? docs.map(d => `<a href="${d.url}" target="_blank" style="display:flex;align-items:center;gap:10px;padding:10px 14px;background:#f9f7f4;border-radius:8px;border:1px solid #e8e4de;text-decoration:none;color:#1A1A16;font-size:0.85rem;"><span style="font-size:1.2rem;">📄</span><span>${d.name||d.type||'Document'}</span></a>`).join('')
+    : `<div style="color:#aaa;font-size:0.85rem;">Aucun document</div>`;
+
+  res.send(`<!DOCTYPE html><html lang="fr"><head>
+    <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Fiche — ${nom}</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+      *{box-sizing:border-box;margin:0;padding:0}
+      body{background:#f5f0e8;font-family:'DM Sans',sans-serif;padding:32px 20px 80px;}
+      .top-bar{display:flex;gap:10px;align-items:center;margin-bottom:24px;flex-wrap:wrap;}
+      .btn{padding:9px 18px;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:0.82rem;font-weight:600;cursor:pointer;border:none;text-decoration:none;}
+      .btn-back{background:#fff;color:#1D3A28;border:1px solid #1D3A28;}
+      .btn-print{background:#1D3A28;color:#fff;}
+      .wrap{max-width:960px;margin:0 auto;display:flex;flex-direction:column;gap:20px;}
+      .card{background:#fff;border-radius:14px;padding:28px 32px;border:1px solid #e8e4de;}
+      .card h2{font-family:'Cormorant Garamond',serif;font-size:1.4rem;color:#1A1A16;margin-bottom:18px;padding-bottom:12px;border-bottom:1px solid #f0ece6;}
+      .info-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;}
+      .info-item label{display:block;font-size:0.7rem;text-transform:uppercase;letter-spacing:0.07em;color:#aaa;margin-bottom:4px;}
+      .info-item .val{font-size:0.9rem;color:#1A1A16;font-weight:500;}
+      .photos-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;}
+      .desc-box{background:#f9f7f4;border-radius:10px;padding:18px 22px;font-size:0.88rem;line-height:1.7;color:#444;white-space:pre-wrap;}
+      .docs-list{display:flex;flex-direction:column;gap:8px;}
+      .badge{display:inline-block;padding:3px 10px;border-radius:20px;font-size:0.72rem;font-weight:700;letter-spacing:0.05em;}
+      .badge-serenite{background:#e8f5e9;color:#2e7d32;}
+      .badge-autonome{background:#e3f2fd;color:#1565c0;}
+      @media print{.top-bar{display:none!important}body{background:#fff;padding:16px}@page{margin:12mm}}
+    </style>
+  </head><body>
+    <div class="top-bar">
+      <button class="btn btn-back" onclick="window.close()">← Fermer</button>
+      <button class="btn btn-print" onclick="window.print()">Imprimer / PDF</button>
+    </div>
+    <div class="wrap">
+
+      <!-- Infos vendeur -->
+      <div class="card">
+        <h2>👤 ${nom}</h2>
+        <div class="info-grid">
+          <div class="info-item"><label>Email</label><div class="val">${s.email}</div></div>
+          <div class="info-item"><label>Téléphone</label><div class="val">${s.phone||'—'}</div></div>
+          <div class="info-item"><label>Pack</label><span class="badge badge-${s.pack||'autonome'}">${s.pack==='serenite'?'Pack Sérénité':'Pack Autonome'}</span></div>
+          <div class="info-item"><label>Inscription</label><div class="val">${s.paid_at ? new Date(s.paid_at).toLocaleDateString('fr-FR') : '—'}</div></div>
+          <div class="info-item"><label>Contrat</label><div class="val">${s.contrat_signe ? '✓ Signé le '+new Date(s.contrat_signe_at||s.paid_at).toLocaleDateString('fr-FR') : '✗ Non signé'}</div></div>
+        </div>
+      </div>
+
+      ${p ? `
+      <!-- Fiche bien -->
+      <div class="card">
+        <h2>🏠 Fiche bien</h2>
+        <div class="info-grid">
+          <div class="info-item"><label>Type</label><div class="val">${p.type||'—'}</div></div>
+          <div class="info-item"><label>Adresse</label><div class="val">${p.address||'—'}</div></div>
+          <div class="info-item"><label>Ville</label><div class="val">${p.city||'—'} ${p.postal_code||''}</div></div>
+          <div class="info-item"><label>Prix</label><div class="val">${p.price ? p.price.toLocaleString('fr-FR')+' €' : '—'}</div></div>
+          <div class="info-item"><label>Surface</label><div class="val">${p.surface_habitable ? p.surface_habitable+' m²' : '—'}</div></div>
+          <div class="info-item"><label>Pièces</label><div class="val">${p.rooms||'—'}</div></div>
+          <div class="info-item"><label>DPE</label><div class="val">${p.dpe_class||'—'}</div></div>
+          <div class="info-item"><label>Année construction</label><div class="val">${p.year_built||'—'}</div></div>
+          <div class="info-item"><label>Statut</label><div class="val">${p.published ? '✓ Publié' : 'Non publié'}</div></div>
+        </div>
+      </div>
+
+      <!-- Description -->
+      ${p.description ? `<div class="card"><h2>📝 Description annonce</h2><div class="desc-box">${p.description}</div></div>` : ''}
+
+      <!-- Photos -->
+      <div class="card">
+        <h2>📷 Photos (${photos.length})</h2>
+        <div class="photos-grid">${photoHtml}</div>
+      </div>
+
+      <!-- Documents -->
+      <div class="card">
+        <h2>📁 Documents (${docs.length})</h2>
+        <div class="docs-list">${docHtml}</div>
+      </div>
+      ` : `<div class="card"><div style="text-align:center;padding:40px;color:#aaa;">Aucune fiche bien créée</div></div>`}
+
+    </div>
+  </body></html>`);
+});
+
 router.get('/api/crm/:id/offres', requireAdmin, (req, res) => {
   const property = db.prepare('SELECT id FROM properties WHERE seller_id=?').get(+req.params.id);
   if (!property) return res.json({ offers: [] });

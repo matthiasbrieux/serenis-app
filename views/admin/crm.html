@@ -1267,10 +1267,10 @@ function renderTable() {
       ? `<div style="display:flex;align-items:center;gap:4px"><div class="ic-${c.photographer_done_auto ? 'auto' : 'ok'}">${CHK}</div>${c.photographer_done_auto ? '<span class="auto-b">auto</span>' : ''}</div>`
       : `<div class="ic-no">${DSH}</div>`;
 
-    // Photos count (auto)
+    // Photos count — cliquable vers fiche complète
     const photosCell = c.photos_count > 0
-      ? `<span style="font-weight:700;color:${c.photos_count>=5?'#16a34a':'#d97706'}">${c.photos_count}</span>`
-      : `<span style="color:#D0CEC9">0</span>`;
+      ? `<a href="/admin/crm/${c.id}/fiche" target="_blank" onclick="event.stopPropagation()" style="font-weight:700;color:${c.photos_count>=5?'#16a34a':'#d97706'};text-decoration:underline;" title="Voir la fiche complète">${c.photos_count}</a>`
+      : `<a href="/admin/crm/${c.id}/fiche" target="_blank" onclick="event.stopPropagation()" style="color:#D0CEC9;text-decoration:underline;" title="Voir la fiche complète">0</a>`;
 
     // Report + virtual tour (manual)
     const reportCell = c.photo_report_url
