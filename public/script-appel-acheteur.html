@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Script d'appel acheteur — Vendu Par Moi</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: #f0f0ed;
+      padding: 32px 20px 60px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .no-print {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 8px;
+    }
+    .btn {
+      padding: 10px 22px;
+      border-radius: 8px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+    }
+    .btn-print { background: #1D3A28; color: #fff; }
+    .btn-back  { background: #fff; color: #1D3A28; border: 1px solid #1D3A28; }
+
+    .page {
+      width: 210mm;
+      min-height: 297mm;
+      background: #fff;
+      padding: 14mm 14mm 16mm;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.10);
+    }
+
+    /* ── Header ── */
+    .doc-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      padding-bottom: 14px;
+      border-bottom: 3px solid #0C1910;
+      margin-bottom: 20px;
+    }
+    .brand { font-family: 'Cormorant Garamond', serif; font-size: 1.3rem; color: #0C1910; font-weight: 600; }
+    .brand em { color: #C4603A; font-style: italic; }
+    .doc-title { text-align: right; }
+    .doc-title h1 { font-family: 'Cormorant Garamond', serif; font-size: 1.5rem; color: #1A1A16; }
+    .doc-title p  { font-size: 0.75rem; color: #888; margin-top: 3px; }
+
+    /* ── Intro ── */
+    .intro-box {
+      background: #0C1910;
+      color: #F5F0E8;
+      border-radius: 10px;
+      padding: 14px 18px;
+      font-size: 0.82rem;
+      line-height: 1.6;
+      margin-bottom: 20px;
+    }
+    .intro-box strong { color: #6BBF82; }
+
+    /* ── Règles d'or ── */
+    .regles {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-bottom: 22px;
+    }
+    .regle {
+      background: #f9f7f4;
+      border-radius: 8px;
+      padding: 12px 14px;
+      border-left: 3px solid #C4603A;
+      font-size: 0.78rem;
+      line-height: 1.5;
+      color: #333;
+    }
+    .regle strong { display: block; color: #C4603A; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 4px; }
+
+    /* ── Section titre ── */
+    .section-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.15rem;
+      color: #0C1910;
+      margin-bottom: 12px;
+      margin-top: 4px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .section-title::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: #e0dbd4;
+    }
+
+    /* ── Scénario ── */
+    .scenario {
+      margin-bottom: 16px;
+      border: 1px solid #e8e4de;
+      border-radius: 10px;
+      overflow: hidden;
+    }
+    .scenario-header {
+      background: #1D3A28;
+      color: #F5F0E8;
+      padding: 8px 14px;
+      font-size: 0.78rem;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .scenario-num {
+      background: #C4603A;
+      color: #fff;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.7rem;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+    .scenario-body { padding: 12px 14px; background: #fff; }
+
+    .trigger {
+      font-size: 0.75rem;
+      color: #888;
+      font-style: italic;
+      margin-bottom: 8px;
+    }
+    .trigger strong { color: #555; font-style: normal; }
+
+    .reply {
+      background: #F5F0E8;
+      border-left: 3px solid #1D3A28;
+      border-radius: 0 8px 8px 0;
+      padding: 10px 14px;
+      font-size: 0.82rem;
+      line-height: 1.65;
+      color: #1A1A16;
+      margin-bottom: 8px;
+      position: relative;
+    }
+    .reply::before {
+      content: '💬';
+      position: absolute;
+      top: 10px;
+      right: 12px;
+      font-size: 0.85rem;
+      opacity: 0.5;
+    }
+
+    .redirect {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.73rem;
+      color: #C4603A;
+      font-weight: 600;
+    }
+    .redirect::before { content: '→'; font-size: 1rem; }
+
+    /* ── Objections ── */
+    .objection-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 18px;
+    }
+    .objection {
+      border: 1px solid #e8e4de;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    .obj-question {
+      background: #f9f7f4;
+      padding: 8px 12px;
+      font-size: 0.75rem;
+      color: #555;
+      font-style: italic;
+      border-bottom: 1px solid #e8e4de;
+    }
+    .obj-answer {
+      padding: 8px 12px;
+      font-size: 0.78rem;
+      color: #1A1A16;
+      line-height: 1.55;
+    }
+
+    /* ── Boîte à outils ── */
+    .tools-box {
+      background: linear-gradient(135deg, #0C1910 0%, #1D3A28 100%);
+      border-radius: 10px;
+      padding: 16px 18px;
+      color: #F5F0E8;
+      margin-top: 6px;
+    }
+    .tools-box h3 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.05rem;
+      margin-bottom: 12px;
+      color: #6BBF82;
+    }
+    .tools-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+    }
+    .tool-item {
+      background: rgba(255,255,255,0.07);
+      border-radius: 6px;
+      padding: 8px 10px;
+      font-size: 0.72rem;
+      line-height: 1.4;
+    }
+    .tool-item strong { display: block; color: #6BBF82; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 2px; }
+
+    /* ── Footer ── */
+    .doc-footer {
+      margin-top: 18px;
+      padding-top: 10px;
+      border-top: 1px solid #e0dbd4;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.68rem;
+      color: #aaa;
+    }
+
+    /* ── Print ── */
+    @media print {
+      body { background: #fff; padding: 0; gap: 0; }
+      .no-print { display: none; }
+      .page { width: 210mm; min-height: 297mm; box-shadow: none; padding: 12mm 13mm 14mm; }
+      @page { margin: 0; size: A4 portrait; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="no-print">
+  <button class="btn btn-back" onclick="history.back()">← Retour</button>
+  <button class="btn btn-print" onclick="window.print()">Imprimer / Enregistrer PDF</button>
+</div>
+
+<div class="page">
+
+  <!-- Header -->
+  <div class="doc-header">
+    <div class="brand">Vendu Par <em>Moi</em></div>
+    <div class="doc-title">
+      <h1>Script d'appel acheteur</h1>
+      <p>Gérer les appels entrants — vendre sans se vendre</p>
+    </div>
+  </div>
+
+  <!-- Intro -->
+  <div class="intro-box">
+    <strong>Principe clé :</strong> votre rôle au téléphone n'est pas de convaincre, mais de <strong>qualifier et rediriger</strong>. Toutes les informations sont déjà sur la plateforme. Votre objectif : obtenir un rendez-vous ou renvoyer vers les outils VPM. Court, professionnel, efficace.
+  </div>
+
+  <!-- Règles d'or -->
+  <div class="regles">
+    <div class="regle"><strong>Règle 1 — Durée</strong>Ne restez jamais plus de 3 minutes. Si la conversation s'étire, proposez un rendez-vous et raccrochez poliment.</div>
+    <div class="regle"><strong>Règle 2 — Prix</strong>Ne négociez jamais par téléphone. "On en discutera lors de la visite" est la seule réponse acceptable.</div>
+    <div class="regle"><strong>Règle 3 — Redirection</strong>Tout ce qu'on vous demande par téléphone existe déjà en ligne. Renvoyez toujours vers le dossier ou l'agenda.</div>
+  </div>
+
+  <!-- Scénarios -->
+  <div class="section-title">Scénarios courants</div>
+
+  <div class="scenario">
+    <div class="scenario-header"><div class="scenario-num">1</div>Premier contact — demande d'infos générales</div>
+    <div class="scenario-body">
+      <div class="trigger"><strong>L'acheteur dit :</strong> "Bonjour, je vous appelle pour votre annonce, est-ce que vous pouvez me donner plus d'infos ?"</div>
+      <div class="reply">
+        "Bonjour ! Avec plaisir. J'ai mis à disposition un dossier complet en ligne — il contient les photos, les diagnostics, les détails du bien et les documents. Je vous envoie le lien par SMS dans la minute, vous aurez tout directement. Et si le bien vous intéresse après consultation, on peut fixer une visite depuis ce même lien."
+      </div>
+      <div class="redirect">Envoyer le lien dossier acheteur depuis votre espace VPM</div>
+    </div>
+  </div>
+
+  <div class="scenario">
+    <div class="scenario-header"><div class="scenario-num">2</div>Demande de visite</div>
+    <div class="scenario-body">
+      <div class="trigger"><strong>L'acheteur dit :</strong> "Est-ce que je peux venir visiter ?"</div>
+      <div class="reply">
+        "Tout à fait ! Pour réserver un créneau, j'utilise un agenda en ligne — comme ça vous choisissez directement l'horaire qui vous convient. Je vous envoie le lien de réservation par SMS. Vous recevrez une confirmation automatique avec tous les détails."
+      </div>
+      <div class="redirect">Envoyer le lien agenda / booking depuis votre espace VPM</div>
+    </div>
+  </div>
+
+  <div class="scenario">
+    <div class="scenario-header"><div class="scenario-num">3</div>Question sur les diagnostics / documents</div>
+    <div class="scenario-body">
+      <div class="trigger"><strong>L'acheteur dit :</strong> "Vous avez le DPE ? Les diagnostics sont bons ?"</div>
+      <div class="reply">
+        "Oui, tous les diagnostics sont disponibles dans le dossier en ligne — DPE, surface loi Carrez, état des risques… Tout y est, vous pouvez les consulter avant même la visite. Je vous envoie le lien."
+      </div>
+      <div class="redirect">Lien dossier acheteur — section diagnostics</div>
+    </div>
+  </div>
+
+  <div class="scenario">
+    <div class="scenario-header"><div class="scenario-num">4</div>Demande de négociation par téléphone</div>
+    <div class="scenario-body">
+      <div class="trigger"><strong>L'acheteur dit :</strong> "Le prix, y'a une marge de négociation ?"</div>
+      <div class="reply">
+        "C'est une question qu'on aborde après la visite — une fois que vous avez vu le bien en vrai. Pour l'instant je vous invite à venir visiter, ça vous permettra de vous faire une idée concrète. On peut convenir d'un créneau ?"
+      </div>
+      <div class="redirect">Rediriger vers la prise de rendez-vous — ne jamais répondre sur le prix au téléphone</div>
+    </div>
+  </div>
+
+  <!-- Objections -->
+  <div class="section-title">Objections fréquentes</div>
+
+  <div class="objection-grid">
+    <div class="objection">
+      <div class="obj-question">"Vous vendez sans agence, c'est sérieux ?"</div>
+      <div class="obj-answer">"Tout à fait — j'utilise une plateforme professionnelle avec dossier complet, agenda de visites et suivi. Vous verrez à la visite que tout est parfaitement organisé."</div>
+    </div>
+    <div class="objection">
+      <div class="obj-question">"Vous pouvez m'envoyer plus de photos ?"</div>
+      <div class="obj-answer">"Toutes les photos sont dans le dossier en ligne, en haute définition — il y en a [X]. Je vous envoie le lien maintenant."</div>
+    </div>
+    <div class="objection">
+      <div class="obj-question">"C'est dans quel quartier exactement ?"</div>
+      <div class="obj-answer">"L'adresse complète est indiquée dans le dossier avec une carte interactive. Je vous envoie le lien, vous aurez toutes les informations de localisation."</div>
+    </div>
+    <div class="objection">
+      <div class="obj-question">"Pourquoi vous vendez ?"</div>
+      <div class="obj-answer">"[Votre réponse personnelle, brève — mutation, projet familial, etc.] — mais je préfère qu'on en parle lors de la visite, c'est plus simple en face à face."</div>
+    </div>
+  </div>
+
+  <!-- Boîte à outils -->
+  <div class="tools-box">
+    <h3>Vos outils VPM à portée de main</h3>
+    <div class="tools-grid">
+      <div class="tool-item"><strong>Dossier acheteur</strong>Photos HD, diagnostics, plans, description complète — à envoyer dès le premier appel</div>
+      <div class="tool-item"><strong>Agenda en ligne</strong>Réservation de visite autonome par l'acheteur — vous choisissez vos créneaux à l'avance</div>
+      <div class="tool-item"><strong>Suivi des offres</strong>Toute offre reçue après visite est centralisée dans votre espace VPM</div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <div class="doc-footer">
+    <span>Script d'appel acheteur — Vendu Par Moi</span>
+    <span>contact@venduparmoi.fr · 06 95 44 36 54</span>
+  </div>
+
+</div>
+
+</body>
+</html>
