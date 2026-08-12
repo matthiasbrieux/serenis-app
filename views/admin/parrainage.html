@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Registre Parrainage — Vendu Par Moi Admin</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css?v=2">
+  <style>
+    body { background: #f0f0ed; font-family: 'DM Sans', sans-serif; }
+    .admin-layout { display: grid; grid-template-columns: 220px 1fr; min-height: 100vh; }
+    .admin-sidebar { background: #1A1A16; padding: 24px 0; position: sticky; top: 0; height: 100vh; overflow-y: auto; }
+    .admin-sidebar a { display: block; padding: 12px 24px; color: rgba(255,255,255,0.6); font-size: 0.88rem; text-decoration: none; }
+    .admin-sidebar a:hover, .admin-sidebar a.active { color: #fff; background: rgba(255,255,255,0.08); }
+    .admin-sidebar .logo { color: #FDFCF8; padding: 0 24px 24px; font-family: 'Cormorant Garamond', serif; font-size: 1.4rem; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 16px; }
+    .main { padding: 32px; max-width: 1400px; }
+
+    .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 16px; margin-bottom: 28px; }
+    .stat-card { background: #fff; border-radius: 12px; padding: 20px 24px; border: 1px solid #e8e4de; }
+    .stat-card .label { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.07em; color: #999; margin-bottom: 8px; }
+    .stat-card .value { font-family: 'Cormorant Garamond', serif; font-size: 2rem; color: #1A1A16; font-weight: 600; }
+    .stat-card.green .value { color: #1D3A28; }
+    .stat-card.terra .value { color: #C4603A; }
+
+    .card { background: #fff; border-radius: 12px; padding: 24px 28px; border: 1px solid #e8e4de; }
+    .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+    .card-header h2 { font-family: 'Cormorant Garamond', serif; font-size: 1.5rem; color: #1A1A16; }
+
+    table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+    th { text-align: left; padding: 10px 14px; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.06em; color: #999; border-bottom: 2px solid #f0f0ed; white-space: nowrap; }
+    td { padding: 12px 14px; border-bottom: 1px solid #f0f0ed; vertical-align: middle; }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: #fafaf8; }
+
+    .ref { font-family: monospace; font-size: 0.8rem; font-weight: 700; color: #1D3A28; background: rgba(29,58,40,0.07); padding: 3px 8px; border-radius: 4px; }
+    .name { font-weight: 500; color: #1A1A16; }
+    .muted { color: #aaa; font-size: 0.8rem; }
+
+    .badge { display: inline-block; padding: 3px 10px; border-radius: 20px; font-size: 0.72rem; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; white-space: nowrap; }
+    .badge-en_attente { background: #fff3e0; color: #e65100; }
+    .badge-valide { background: #e8f5e9; color: #2e7d32; }
+    .badge-verse { background: #e8f0fe; color: #1565c0; }
+    .badge-expire { background: #f5f5f5; color: #9e9e9e; }
+
+    .btn { display: inline-flex; align-items: center; gap: 6px; padding: 8px 16px; border-radius: 8px; font-family: 'DM Sans', sans-serif; font-size: 0.82rem; font-weight: 500; cursor: pointer; border: none; text-decoration: none; transition: all 0.15s; }
+    .btn-primary { background: #1D3A28; color: #fff; }
+    .btn-primary:hover { background: #0C1910; }
+    .btn-ghost { background: transparent; color: #666; border: 1px solid #e0e0e0; }
+    .btn-ghost:hover { background: #f5f5f5; }
+    .btn-danger { background: transparent; color: #C4603A; border: 1px solid #C4603A; }
+    .btn-danger:hover { background: #C4603A; color: #fff; }
+    .btn-sm { padding: 5px 10px; font-size: 0.75rem; }
+
+    .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 1000; display: flex; align-items: center; justify-content: center; opacity: 0; visibility: hidden; transition: opacity 0.2s; }
+    .modal-overlay.show { opacity: 1; visibility: visible; }
+    .modal { background: #fff; border-radius: 16px; padding: 32px; width: 520px; max-width: 95vw; max-height: 90vh; overflow-y: auto; }
+    .modal h3 { font-family: 'Cormorant Garamond', serif; font-size: 1.6rem; color: #1A1A16; margin-bottom: 24px; }
+    .form-group { margin-bottom: 16px; }
+    .form-group label { display: block; font-size: 0.78rem; font-weight: 600; color: #555; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.05em; }
+    .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 10px 14px; border: 1px solid #e0e0e0; border-radius: 8px; font-family: 'DM Sans', sans-serif; font-size: 0.9rem; outline: none; }
+    .form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: #1D3A28; }
+    .form-group textarea { height: 80px; resize: vertical; }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .modal-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 24px; }
+
+    .empty-state { text-align: center; padding: 60px 20px; color: #aaa; }
+    .empty-state p { font-size: 0.9rem; margin-top: 8px; }
+  </style>
+</head>
+<body>
+<div class="admin-layout">
+  <aside class="admin-sidebar">
+    <div class="logo">Vendu Par Moi Admin</div>
+    <a href="/admin">📊 Dashboard</a>
+    <a href="/admin/crm">🎯 CRM Vendeurs</a>
+    <a href="/admin/missions">📸 Photos pros</a>
+    <a href="/admin/emails">📧 Emails</a>
+    <a href="/admin#clients">👤 Clients</a>
+    <a href="/admin#contacts">📨 Contacts</a>
+    <a href="/admin/marketing">📣 Marketing & Docs IA</a>
+    <a href="/admin/finance">💰 Finance</a>
+    <a href="/admin/parcours">🗺️ Parcours client</a>
+    <a href="/admin/parrainage" class="active">🎁 Parrainage</a>
+    <a href="/admin/prospection">🎯 Prospection VRP</a>
+    <a href="/admin/logout">← Déconnexion</a>
+  </aside>
+
+  <main class="main">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:28px;">
+      <div>
+        <h1 style="font-family:'Cormorant Garamond',serif;color:#1A1A16;font-size:2rem;margin-bottom:4px;">Registre Parrainage</h1>
+        <p style="color:#888;font-size:0.85rem;">Chèques 100 € émis — suivi des versements</p>
+      </div>
+      <div style="display:flex;gap:10px;">
+        <a href="/cheques-parrainage" target="_blank" class="btn btn-ghost">Voir le chèque PDF</a>
+        <button onclick="openAddModal()" class="btn btn-primary">+ Enregistrer un chèque</button>
+      </div>
+    </div>
+
+    <!-- Stats -->
+    <div class="stats-grid" id="stats-grid">
+      <div class="stat-card"><div class="label">Total émis</div><div class="value" id="stat-total">—</div></div>
+      <div class="stat-card"><div class="label">En attente</div><div class="value" id="stat-attente" style="color:#e65100;">—</div></div>
+      <div class="stat-card green"><div class="label">Validés</div><div class="value" id="stat-valide">—</div></div>
+      <div class="stat-card"><div class="label">Versés</div><div class="value" id="stat-verse" style="color:#1565c0;">—</div></div>
+      <div class="stat-card terra"><div class="label">Montant versé</div><div class="value" id="stat-montant">—</div></div>
+    </div>
+
+    <!-- Table -->
+    <div class="card">
+      <div class="card-header">
+        <h2>Chèques enregistrés</h2>
+        <input type="text" id="search" placeholder="Rechercher..." oninput="filterTable()" style="padding:8px 14px;border:1px solid #e0e0e0;border-radius:8px;font-size:0.85rem;width:220px;outline:none;">
+      </div>
+      <div id="table-wrap">
+        <div class="empty-state">Chargement...</div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- Modal ajout -->
+<div class="modal-overlay" id="addModal">
+  <div class="modal">
+    <h3>Enregistrer un chèque parrainage</h3>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Bénéficiaire (parrain) *</label>
+        <input type="text" id="add-beneficiaire" placeholder="Nom Prénom">
+      </div>
+      <div class="form-group">
+        <label>Filleul recommandé *</label>
+        <input type="text" id="add-filleul" placeholder="Nom Prénom">
+      </div>
+    </div>
+    <div class="form-group">
+      <label>Bien concerné</label>
+      <input type="text" id="add-bien" placeholder="Ex : 12 rue des Lilas, Lyon">
+    </div>
+    <div class="form-group">
+      <label>Date d'émission</label>
+      <input type="date" id="add-date">
+    </div>
+    <div class="form-group">
+      <label>Notes</label>
+      <textarea id="add-notes" placeholder="Remarques internes…"></textarea>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal('addModal')">Annuler</button>
+      <button class="btn btn-primary" onclick="saveAdd()">Enregistrer</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal édition statut -->
+<div class="modal-overlay" id="editModal">
+  <div class="modal">
+    <h3 id="edit-title">Mettre à jour</h3>
+    <input type="hidden" id="edit-id">
+    <div class="form-group">
+      <label>Statut</label>
+      <select id="edit-statut">
+        <option value="en_attente">En attente</option>
+        <option value="valide">Validé (filleul signé)</option>
+        <option value="verse">Versé</option>
+        <option value="expire">Expiré</option>
+      </select>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Date signature filleul</label>
+        <input type="date" id="edit-signature">
+      </div>
+      <div class="form-group">
+        <label>Date de versement</label>
+        <input type="date" id="edit-versement">
+      </div>
+    </div>
+    <div class="form-group">
+      <label>Notes</label>
+      <textarea id="edit-notes"></textarea>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal('editModal')">Annuler</button>
+      <button class="btn btn-primary" onclick="saveEdit()">Enregistrer</button>
+    </div>
+  </div>
+</div>
+
+<script>
+let allCheques = [];
+
+async function loadData() {
+  const r = await fetch('/admin/api/parrainage');
+  const { cheques, stats } = await r.json();
+  allCheques = cheques;
+  renderStats(stats);
+  renderTable(cheques);
+}
+
+function renderStats(s) {
+  document.getElementById('stat-total').textContent = s.total || 0;
+  document.getElementById('stat-attente').textContent = s.en_attente || 0;
+  document.getElementById('stat-valide').textContent = s.valide || 0;
+  document.getElementById('stat-verse').textContent = s.verse || 0;
+  document.getElementById('stat-montant').textContent = (s.montant_verse || 0) + ' €';
+}
+
+function renderTable(cheques) {
+  const wrap = document.getElementById('table-wrap');
+  if (!cheques.length) {
+    wrap.innerHTML = `<div class="empty-state"><div style="font-size:2rem;">🎁</div><p>Aucun chèque enregistré pour l'instant.</p></div>`;
+    return;
+  }
+  const rows = cheques.map(c => `
+    <tr>
+      <td><span class="ref">${c.reference}</span></td>
+      <td><div class="name">${c.beneficiaire}</div></td>
+      <td><div class="name">${c.filleul}</div></td>
+      <td><div class="muted">${c.bien_concerne || '—'}</div></td>
+      <td><div class="muted">${c.date_emission ? fmt(c.date_emission) : '—'}</div></td>
+      <td><span class="badge badge-${c.statut}">${labelStatut(c.statut)}</span></td>
+      <td><div class="muted">${c.date_versement ? fmt(c.date_versement) : '—'}</div></td>
+      <td style="white-space:nowrap;">
+        <button class="btn btn-ghost btn-sm" onclick="openEdit(${c.id})">Modifier</button>
+        <button class="btn btn-danger btn-sm" onclick="deleteCheque(${c.id}, '${c.reference}')">Suppr.</button>
+      </td>
+    </tr>
+  `).join('');
+  wrap.innerHTML = `
+    <table>
+      <thead><tr>
+        <th>Référence</th><th>Bénéficiaire (parrain)</th><th>Filleul</th><th>Bien</th>
+        <th>Émis le</th><th>Statut</th><th>Versé le</th><th>Actions</th>
+      </tr></thead>
+      <tbody>${rows}</tbody>
+    </table>`;
+}
+
+function fmt(d) {
+  if (!d) return '—';
+  const p = d.split('-');
+  if (p.length === 3) return `${p[2]}/${p[1]}/${p[0]}`;
+  return d;
+}
+
+function labelStatut(s) {
+  return { en_attente: 'En attente', valide: 'Validé', verse: 'Versé', expire: 'Expiré' }[s] || s;
+}
+
+function filterTable() {
+  const q = document.getElementById('search').value.toLowerCase();
+  const filtered = allCheques.filter(c =>
+    c.beneficiaire.toLowerCase().includes(q) ||
+    c.filleul.toLowerCase().includes(q) ||
+    c.reference.toLowerCase().includes(q) ||
+    (c.bien_concerne || '').toLowerCase().includes(q)
+  );
+  renderTable(filtered);
+}
+
+function openAddModal() {
+  document.getElementById('add-beneficiaire').value = '';
+  document.getElementById('add-filleul').value = '';
+  document.getElementById('add-bien').value = '';
+  document.getElementById('add-date').value = new Date().toISOString().split('T')[0];
+  document.getElementById('add-notes').value = '';
+  document.getElementById('addModal').classList.add('show');
+}
+
+async function saveAdd() {
+  const beneficiaire = document.getElementById('add-beneficiaire').value.trim();
+  const filleul = document.getElementById('add-filleul').value.trim();
+  if (!beneficiaire || !filleul) { alert('Bénéficiaire et filleul obligatoires'); return; }
+  await fetch('/admin/api/parrainage', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      beneficiaire,
+      filleul,
+      bien_concerne: document.getElementById('add-bien').value.trim(),
+      date_emission: document.getElementById('add-date').value,
+      notes: document.getElementById('add-notes').value.trim()
+    })
+  });
+  closeModal('addModal');
+  loadData();
+}
+
+function openEdit(id) {
+  const c = allCheques.find(x => x.id === id);
+  if (!c) return;
+  document.getElementById('edit-id').value = id;
+  document.getElementById('edit-title').textContent = `${c.reference} — ${c.beneficiaire}`;
+  document.getElementById('edit-statut').value = c.statut;
+  document.getElementById('edit-signature').value = c.date_signature_filleul || '';
+  document.getElementById('edit-versement').value = c.date_versement || '';
+  document.getElementById('edit-notes').value = c.notes || '';
+  document.getElementById('editModal').classList.add('show');
+}
+
+async function saveEdit() {
+  const id = document.getElementById('edit-id').value;
+  await fetch(`/admin/api/parrainage/${id}`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      statut: document.getElementById('edit-statut').value,
+      date_signature_filleul: document.getElementById('edit-signature').value || null,
+      date_versement: document.getElementById('edit-versement').value || null,
+      notes: document.getElementById('edit-notes').value.trim()
+    })
+  });
+  closeModal('editModal');
+  loadData();
+}
+
+async function deleteCheque(id, ref) {
+  if (!confirm(`Supprimer le chèque ${ref} ?`)) return;
+  await fetch(`/admin/api/parrainage/${id}`, { method: 'DELETE' });
+  loadData();
+}
+
+function closeModal(id) {
+  document.getElementById(id).classList.remove('show');
+}
+
+document.querySelectorAll('.modal-overlay').forEach(m => {
+  m.addEventListener('click', e => { if (e.target === m) m.classList.remove('show'); });
+});
+
+loadData();
+</script>
+</body>
+</html>

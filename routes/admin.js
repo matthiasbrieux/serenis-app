@@ -220,7 +220,7 @@ router.post('/api/seed-demo', requireAdmin, (req, res) => {
   const demoHash = bcrypt.hashSync('demo1234', 10);
 
   // Supprime les démos existantes (transaction atomique — P3-5)
-  const existing = db.prepare("SELECT id FROM sellers WHERE email LIKE '%@demo.serenis'").all();
+  const existing = db.prepare("SELECT id FROM sellers WHERE email LIKE '%@demo.venduparmoi'").all();
   const deleteDemo = db.transaction((sellers) => {
     sellers.forEach(s => {
       const props = db.prepare('SELECT id FROM properties WHERE seller_id=?').all(s.id);
@@ -248,7 +248,7 @@ router.post('/api/seed-demo', requireAdmin, (req, res) => {
   const demos = [
     {
       first_name: 'Jean', last_name: 'Dupont', phone: '06 12 34 56 78',
-      email: 'jean.dupont@demo.serenis', pack: 'serenite', paid_at: ago(8),
+      email: 'jean.dupont@demo.venduparmoi', pack: 'serenite', paid_at: ago(8),
       twilio_number: null, contrat_signe: 0, rdv_photographe: 0,
       photographer_scheduled: 0, photographer_name: null, photographer_date: null,
       photographer_done: 0, photo_report_url: null, virtual_tour_done: 0,
@@ -257,7 +257,7 @@ router.post('/api/seed-demo', requireAdmin, (req, res) => {
     },
     {
       first_name: 'Marie', last_name: 'Martin', phone: '06 98 76 54 32',
-      email: 'marie.martin@demo.serenis', pack: 'serenite', paid_at: ago(15),
+      email: 'marie.martin@demo.venduparmoi', pack: 'serenite', paid_at: ago(15),
       twilio_number: '+33 9 87 65 43 21', contrat_signe: 1, rdv_photographe: 1,
       photographer_scheduled: 0, photographer_name: null, photographer_date: null,
       photographer_done: 0, photo_report_url: null, virtual_tour_done: 0,
@@ -266,7 +266,7 @@ router.post('/api/seed-demo', requireAdmin, (req, res) => {
     },
     {
       first_name: 'Pierre', last_name: 'Lefebvre', phone: '07 11 22 33 44',
-      email: 'pierre.lefebvre@demo.serenis', pack: 'serenite', paid_at: ago(22),
+      email: 'pierre.lefebvre@demo.venduparmoi', pack: 'serenite', paid_at: ago(22),
       twilio_number: '+33 9 12 34 56 78', contrat_signe: 1, rdv_photographe: 1,
       photographer_scheduled: 1, photographer_name: 'Studio Lumière - Julien', photographer_date: fromNow(3),
       photographer_done: 0, photo_report_url: null, virtual_tour_done: 0,
@@ -275,7 +275,7 @@ router.post('/api/seed-demo', requireAdmin, (req, res) => {
     },
     {
       first_name: 'Sophie', last_name: 'Bernard', phone: '06 55 44 33 22',
-      email: 'sophie.bernard@demo.serenis', pack: 'serenite', paid_at: ago(34),
+      email: 'sophie.bernard@demo.venduparmoi', pack: 'serenite', paid_at: ago(34),
       twilio_number: '+33 9 22 11 33 44', contrat_signe: 1, rdv_photographe: 1,
       photographer_scheduled: 1, photographer_name: 'Photographe Pro - Clara', photographer_date: ago(10).slice(0,10),
       photographer_done: 1, photo_report_url: 'https://drive.google.com/drive/folders/demo-sophie',
@@ -284,7 +284,7 @@ router.post('/api/seed-demo', requireAdmin, (req, res) => {
     },
     {
       first_name: 'Thomas', last_name: 'Moreau', phone: '06 77 88 99 00',
-      email: 'thomas.moreau@demo.serenis', pack: 'serenite', paid_at: ago(48),
+      email: 'thomas.moreau@demo.venduparmoi', pack: 'serenite', paid_at: ago(48),
       twilio_number: '+33 9 44 55 66 77', contrat_signe: 1, rdv_photographe: 1,
       photographer_scheduled: 1, photographer_name: 'Agence Pixel - Marc', photographer_date: ago(30).slice(0,10),
       photographer_done: 1, photo_report_url: 'https://drive.google.com/drive/folders/demo-thomas',
@@ -293,7 +293,7 @@ router.post('/api/seed-demo', requireAdmin, (req, res) => {
     },
     {
       first_name: 'Emma', last_name: 'Petit', phone: '07 33 22 11 00',
-      email: 'emma.petit@demo.serenis', pack: 'autonome', paid_at: ago(11),
+      email: 'emma.petit@demo.venduparmoi', pack: 'autonome', paid_at: ago(11),
       twilio_number: null, contrat_signe: 0, rdv_photographe: 0,
       photographer_scheduled: 0, photographer_name: null, photographer_date: null,
       photographer_done: 0, photo_report_url: null, virtual_tour_done: 0,
@@ -341,7 +341,7 @@ router.post('/api/seed-demo', requireAdmin, (req, res) => {
       insertPhoto.run(propertyId, `demo_cld_${sellerId}_${i}`, PHOTOS[i % PHOTOS.length], i);
     }
     for (let i = 0; i < (p.docsCount||0); i++) {
-      insertDoc.run(propertyId, DOC_TYPES[i] || `Document ${i+1}`, `https://demo.serenis/doc/${sellerId}/${i}`, 'document');
+      insertDoc.run(propertyId, DOC_TYPES[i] || `Document ${i+1}`, `https://demo.venduparmoi/doc/${sellerId}/${i}`, 'document');
     }
     for (let i = 0; i < (p.contactsCount||0); i++) {
       insertContact.run(propertyId, sellerId, `+336${String(i).padStart(8,'0')}`, `acheteur${i+1}@demo.fr`);
@@ -358,7 +358,7 @@ router.post('/api/seed-demo', requireAdmin, (req, res) => {
 });
 
 router.delete('/api/seed-demo', requireAdmin, (req, res) => {
-  const existing = db.prepare("SELECT id FROM sellers WHERE email LIKE '%@demo.serenis'").all();
+  const existing = db.prepare("SELECT id FROM sellers WHERE email LIKE '%@demo.venduparmoi'").all();
   existing.forEach(s => {
     const props = db.prepare('SELECT id FROM properties WHERE seller_id=?').all(s.id);
     props.forEach(p => {
@@ -864,7 +864,7 @@ router.get('/marketing/flyer', requireAdmin, (req, res) => {
         <div class="price">999 €</div>
         <div class="price-sub">ou 249€ × 4 sans frais · paiement unique · pas d'abonnement</div>
       </div>
-      <a class="cta">serenis-app.onrender.com</a>
+      <a class="cta">venduparmoi.fr</a>
       <div class="footer">
         <div class="footer-text">Vendu Par Moi — Vente immobilière entre particuliers</div>
         <div class="footer-text">📞 06 95 44 36 54 · Matthias répond en direct</div>
@@ -900,7 +900,7 @@ router.get('/marketing/parrainage', requireAdmin, (req, res) => {
       <div class="amount">100 €</div>
       <div class="title">Offerts pour chaque ami qui vend avec Vendu Par Moi</div>
       <div class="desc">Vous avez vendu votre bien avec Vendu Par Moi. Merci de nous faire confiance.<br>En signe de gratitude, voici votre chèque parrainage.</div>
-      <div class="conditions"><strong>Comment ça marche :</strong><br>1. Partagez votre code personnel à un proche qui souhaite vendre son bien<br>2. Il s'inscrit sur serenis-app.onrender.com et utilise votre code<br>3. Dès son paiement confirmé, vous recevez 100€ par virement sur votre compte<br><br><strong>Conditions :</strong> valable 12 mois · 1 parrainage = 1 virement · cumulable sans limite · votre filleul bénéficie de 50€ de réduction</div>
+      <div class="conditions"><strong>Comment ça marche :</strong><br>1. Partagez votre code personnel à un proche qui souhaite vendre son bien<br>2. Il s'inscrit sur venduparmoi.fr et utilise votre code<br>3. Dès son paiement confirmé, vous recevez 100€ par virement sur votre compte<br><br><strong>Conditions :</strong> valable 12 mois · 1 parrainage = 1 virement · cumulable sans limite · votre filleul bénéficie de 50€ de réduction</div>
       <div class="footer"><div><div style="font-size:0.72rem;color:#aaa;margin-bottom:6px;">Votre code personnel</div><div class="code">VPM-XXXX</div></div><div class="validity">Valable jusqu'au [DATE + 12 mois]<br>Matthias Brieux — 06 95 44 36 54</div></div>
     </div>
     <script>window.onload=()=>window.print()</script>
@@ -1224,6 +1224,52 @@ router.get('/api/offres', requireAdmin, (req, res) => {
     LIMIT 100
   `).all();
   res.json({ offres });
+});
+
+// ── Registre chèques parrainage ───────────────────────────────────────────────
+router.get('/parrainage', requireAdmin, (req, res) => {
+  res.sendFile('parrainage.html', { root: './views/admin' });
+});
+
+router.get('/api/parrainage', requireAdmin, (req, res) => {
+  const cheques = db.prepare(`SELECT * FROM cheques_parrainage ORDER BY created_at DESC`).all();
+  const stats = db.prepare(`
+    SELECT
+      COUNT(*) as total,
+      SUM(CASE WHEN statut='en_attente' THEN 1 ELSE 0 END) as en_attente,
+      SUM(CASE WHEN statut='valide' THEN 1 ELSE 0 END) as valide,
+      SUM(CASE WHEN statut='verse' THEN 1 ELSE 0 END) as verse,
+      SUM(CASE WHEN statut='verse' THEN 100 ELSE 0 END) as montant_verse,
+      SUM(CASE WHEN statut != 'expire' THEN 100 ELSE 0 END) as montant_engage
+    FROM cheques_parrainage
+  `).get();
+  res.json({ cheques, stats });
+});
+
+router.post('/api/parrainage', requireAdmin, express.json(), (req, res) => {
+  const { beneficiaire, filleul, bien_concerne, date_emission, notes } = req.body;
+  const count = db.prepare('SELECT COUNT(*) as n FROM cheques_parrainage').get().n;
+  const reference = `VPM-PARR-${String(count + 1).padStart(4, '0')}`;
+  const result = db.prepare(`
+    INSERT INTO cheques_parrainage (reference, beneficiaire, filleul, bien_concerne, date_emission, notes)
+    VALUES (?, ?, ?, ?, ?, ?)
+  `).run(reference, beneficiaire, filleul, bien_concerne || null, date_emission || null, notes || null);
+  res.json({ id: result.lastInsertRowid, reference });
+});
+
+router.put('/api/parrainage/:id', requireAdmin, express.json(), (req, res) => {
+  const { statut, date_signature_filleul, date_versement, notes } = req.body;
+  db.prepare(`
+    UPDATE cheques_parrainage
+    SET statut=?, date_signature_filleul=?, date_versement=?, notes=?
+    WHERE id=?
+  `).run(statut, date_signature_filleul || null, date_versement || null, notes || null, req.params.id);
+  res.json({ ok: true });
+});
+
+router.delete('/api/parrainage/:id', requireAdmin, (req, res) => {
+  db.prepare('DELETE FROM cheques_parrainage WHERE id=?').run(req.params.id);
+  res.json({ ok: true });
 });
 
 module.exports = router;

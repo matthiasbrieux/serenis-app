@@ -503,6 +503,23 @@ try { db.exec("ALTER TABLE properties ADD COLUMN constructeur TEXT"); } catch(e)
 try { db.exec("ALTER TABLE properties ADD COLUMN compromis_date DATE"); } catch(e) {}
 try { db.exec("ALTER TABLE properties ADD COLUMN compromis_conditions_delay INTEGER DEFAULT 45"); } catch(e) {}
 
+// ── Registre chèques parrainage ─────────────────────────────────
+db.exec(`
+  CREATE TABLE IF NOT EXISTS cheques_parrainage (
+    id          INTEGER PRIMARY KEY AUTOINCREMENT,
+    reference   TEXT NOT NULL,
+    beneficiaire TEXT NOT NULL,
+    filleul     TEXT NOT NULL,
+    bien_concerne TEXT,
+    date_emission TEXT,
+    date_signature_filleul TEXT,
+    statut      TEXT DEFAULT 'en_attente',
+    date_versement TEXT,
+    notes       TEXT,
+    created_at  TEXT DEFAULT (datetime('now'))
+  )
+`);
+
 // ── Nettoyage photos locales (avant Cloudinary) ─────────────────
 // Supprime les photos et documents dont l'URL commence par /uploads/
 // (stockage local éphémère Render — fichiers définitivement perdus)
