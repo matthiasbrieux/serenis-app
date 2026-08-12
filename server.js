@@ -86,6 +86,7 @@ app.get('/recu-paiement', (req, res) => { res.set('Cache-Control', 'no-store, no
 app.get('/planning-mise-en-vente', (req, res) => { res.set('Cache-Control', 'no-store, no-cache, must-revalidate'); res.sendFile(path.join(__dirname, 'public', 'planning-mise-en-vente.html')); });
 app.get('/planning-fin-de-vente', (req, res) => { res.set('Cache-Control', 'no-store, no-cache, must-revalidate'); res.sendFile(path.join(__dirname, 'public', 'planning-fin-de-vente.html')); });
 app.get('/notice-utilisation', (req, res) => { res.set('Cache-Control', 'no-store, no-cache, must-revalidate'); res.sendFile(path.join(__dirname, 'public', 'notice-utilisation.html')); });
+app.get('/cheques-parrainage', (req, res) => { res.set('Cache-Control', 'no-store, no-cache, must-revalidate'); res.sendFile(path.join(__dirname, 'public', 'cheques-parrainage.html')); });
 
 app.use(express.static(path.join(__dirname, 'public'), {
   maxAge: '7d',

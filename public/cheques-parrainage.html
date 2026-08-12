@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chèques Parrainage — Vendu Par Moi</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after {
+  margin: 0; padding: 0; box-sizing: border-box;
+  -webkit-print-color-adjust: exact !important;
+  print-color-adjust: exact !important;
+  color-adjust: exact !important;
+}
+body {
+  font-family: 'DM Sans', sans-serif; font-weight: 300;
+  background: #E8E4DC; min-height: 100vh;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  padding: 3rem 2rem; gap: 1.5rem;
+}
+.no-print {
+  background: #1D3A28; color: #fff; border: none;
+  padding: 11px 26px; border-radius: 8px;
+  font-family: 'DM Sans', sans-serif; font-size: .88rem; font-weight: 600;
+  cursor: pointer;
+}
+.no-print:hover { background: #3D5A47; }
+@media print {
+  body { background: #fff; padding: 0; gap: 0; justify-content: flex-start; }
+  .no-print, .page-label, .print-note { display: none; }
+  .page { box-shadow: none; width: 210mm; min-height: 297mm; }
+  @page { margin: 0; size: A4 portrait; }
+}
+
+.page-label { font-size: .7rem; letter-spacing: .14em; text-transform: uppercase; color: #999; text-align: center; }
+.print-note { font-size: .7rem; color: #AAA; text-align: center; font-style: italic; max-width: 600px; line-height: 1.7; }
+
+/* ── PAGE A4 ── */
+.page {
+  width: 794px;
+  background: #FAFAF8;
+  box-shadow: 0 20px 80px rgba(0,0,0,.2);
+  display: flex; flex-direction: column;
+  padding: 28px 36px;
+  gap: 0;
+}
+
+/* En-tête page */
+.page-header {
+  display: flex; justify-content: space-between; align-items: center;
+  margin-bottom: 20px;
+  padding-bottom: 14px;
+  border-bottom: 1.5px solid #E0D8CC;
+}
+.page-header-logo {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.1rem; font-weight: 700; color: #1D3A28;
+}
+.page-header-logo em { color: #C4603A; font-style: italic; }
+.page-header-title {
+  font-size: .65rem; font-weight: 600; letter-spacing: .2em;
+  text-transform: uppercase; color: #999;
+}
+.page-header-note {
+  font-size: .65rem; color: #BBB; text-align: right; line-height: 1.5;
+}
+
+/* Séparateur entre chèques */
+.separateur {
+  display: flex; align-items: center; gap: 12px;
+  margin: 12px 0;
+}
+.sep-line { flex: 1; border-top: 1.5px dashed #C8C0B8; }
+.sep-icon { font-size: .75rem; color: #C8C0B8; letter-spacing: .1em; }
+
+/* ── CHÈQUE ── */
+.cheque {
+  width: 100%;
+  background: #FAFAF8;
+  border: 1.5px solid #E0D8CC;
+  border-radius: 4px;
+  overflow: hidden;
+  position: relative;
+  display: flex;
+  height: 196px;
+}
+
+/* Bande gauche décorative */
+.cheque-band {
+  width: 10px;
+  background: linear-gradient(to bottom, #0C1910 0%, #1D3A28 50%, #C4603A 100%);
+  flex-shrink: 0;
+}
+
+/* PARTIE GAUCHE — valeur et marque */
+.cheque-left {
+  background: linear-gradient(135deg, #0C1910 0%, #1D3A28 60%, #2d5040 100%);
+  width: 220px; flex-shrink: 0;
+  padding: 20px 22px;
+  display: flex; flex-direction: column; justify-content: space-between;
+  position: relative; overflow: hidden;
+}
+
+/* Cercle déco */
+.cheque-deco {
+  position: absolute; width: 180px; height: 180px; border-radius: 50%;
+  background: radial-gradient(circle, rgba(196,96,58,.15) 0%, transparent 70%);
+  top: -60px; right: -60px; pointer-events: none;
+}
+
+.cheque-logo {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: .95rem; font-weight: 700; color: rgba(245,240,232,.45);
+  position: relative; z-index: 1;
+}
+.cheque-logo em { color: #C4603A; font-style: italic; }
+
+.cheque-valeur-wrap {
+  position: relative; z-index: 1;
+}
+.cheque-valeur-label {
+  font-size: .55rem; font-weight: 600; letter-spacing: .2em;
+  text-transform: uppercase; color: rgba(245,240,232,.3);
+  margin-bottom: 4px;
+}
+.cheque-valeur {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 3.8rem; font-weight: 700; color: #C4603A;
+  line-height: 1;
+}
+.cheque-valeur-sub {
+  font-size: .68rem; color: rgba(245,240,232,.45); line-height: 1.5;
+  margin-top: 4px;
+}
+
+.cheque-left-bottom {
+  position: relative; z-index: 1;
+}
+.cheque-parrainage-badge {
+  display: inline-block;
+  border: 1px solid rgba(196,96,58,.4);
+  padding: 3px 10px;
+  font-size: .55rem; font-weight: 700; letter-spacing: .18em;
+  text-transform: uppercase; color: #C4603A;
+}
+
+/* PARTIE DROITE — champs */
+.cheque-right {
+  flex: 1; padding: 18px 22px 16px;
+  display: flex; flex-direction: column; justify-content: space-between;
+}
+
+.cheque-titre {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.25rem; font-weight: 700; color: #1D3A28;
+  line-height: 1.1; margin-bottom: 2px;
+}
+.cheque-sous-titre {
+  font-size: .68rem; color: #999; line-height: 1.4;
+}
+
+.cheque-fields { display: flex; flex-direction: column; gap: 8px; }
+
+.field-row { display: flex; gap: 12px; }
+.field-block { flex: 1; }
+.field-block.small { flex: 0 0 130px; }
+.field-lbl {
+  font-size: .56rem; font-weight: 600; letter-spacing: .14em;
+  text-transform: uppercase; color: #BBB; margin-bottom: 3px; display: block;
+}
+.field-line {
+  border-bottom: 1px solid #C8C0B8; height: 1.3rem;
+  font-size: .78rem; color: #333;
+}
+
+.cheque-bottom {
+  display: flex; justify-content: space-between; align-items: flex-end;
+}
+.cheque-conditions {
+  font-size: .6rem; color: #BBB; line-height: 1.5; max-width: 300px;
+}
+.cheque-code-wrap { text-align: right; }
+.cheque-code-label {
+  font-size: .55rem; letter-spacing: .14em; text-transform: uppercase;
+  color: #CCC; margin-bottom: 2px;
+}
+.cheque-code-val {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: .9rem; font-weight: 700; color: #E0D8CC;
+  letter-spacing: .1em; border-bottom: 1px dashed #E0D8CC;
+  min-width: 120px; height: 1.3rem;
+}
+
+/* Fond en filigrane */
+.cheque-watermark {
+  position: absolute; bottom: -10px; right: 16px;
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 5rem; font-weight: 900;
+  color: rgba(29,58,40,.03);
+  pointer-events: none; user-select: none;
+  letter-spacing: .05em;
+}
+
+/* ── PIED DE PAGE ── */
+.page-footer {
+  margin-top: 18px; padding-top: 12px;
+  border-top: 1.5px solid #E0D8CC;
+  display: flex; justify-content: space-between; align-items: center;
+}
+.page-footer-txt { font-size: .62rem; color: #BBB; line-height: 1.6; }
+.page-footer-logo {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: .85rem; font-weight: 700; color: #3D5A47;
+}
+.page-footer-logo em { color: #C4603A; font-style: italic; }
+</style>
+</head>
+<body>
+
+<p class="page-label">Chèques Parrainage — Vendu Par Moi · 3 par page · À découper</p>
+<button class="no-print" onclick="window.print()">⬇ Télécharger en PDF</button>
+
+<div class="page">
+
+  <div class="page-header">
+    <div>
+      <div class="page-header-logo"><em>Vendu</em> Par Moi</div>
+      <div class="page-header-title">Chèques Parrainage — 100 €</div>
+    </div>
+    <div class="page-header-note">
+      Remettez ce chèque à vos proches souhaitant vendre<br>
+      Valeur déduite du montant de leur 1re séance
+    </div>
+  </div>
+
+  <!-- CHÈQUE 1 -->
+  <div class="cheque">
+    <div class="cheque-band"></div>
+    <div class="cheque-left">
+      <div class="cheque-deco"></div>
+      <div class="cheque-logo"><em>Vendu</em> Par Moi</div>
+      <div class="cheque-valeur-wrap">
+        <div class="cheque-valeur-label">Valeur</div>
+        <div class="cheque-valeur">100€</div>
+        <div class="cheque-valeur-sub">Cent euros offerts<br>sur votre 1re séance</div>
+      </div>
+      <div class="cheque-left-bottom">
+        <div class="cheque-parrainage-badge">Chèque parrainage</div>
+      </div>
+    </div>
+    <div class="cheque-right">
+      <div>
+        <div class="cheque-titre">Bénéficiez de 100 €<br>sur votre vente</div>
+        <div class="cheque-sous-titre">Offert par un client Vendu Par Moi · Déductible de la 1re séance</div>
+      </div>
+      <div class="cheque-fields">
+        <div class="field-row">
+          <div class="field-block">
+            <span class="field-lbl">Offert par (parrain)</span>
+            <div class="field-line"></div>
+          </div>
+          <div class="field-block">
+            <span class="field-lbl">Bénéficiaire</span>
+            <div class="field-line"></div>
+          </div>
+        </div>
+        <div class="field-row">
+          <div class="field-block">
+            <span class="field-lbl">Adresse du bien à vendre</span>
+            <div class="field-line"></div>
+          </div>
+          <div class="field-block small">
+            <span class="field-lbl">Valable jusqu'au</span>
+            <div class="field-line"></div>
+          </div>
+        </div>
+      </div>
+      <div class="cheque-bottom">
+        <div class="cheque-conditions">
+          1 chèque par client · Non cumulable · Valable 12 mois<br>
+          À présenter lors de la prise de contact · contact@venduparmoi.fr
+        </div>
+        <div class="cheque-code-wrap">
+          <div class="cheque-code-label">Code</div>
+          <div class="cheque-code-val">VPM-PARR-______</div>
+        </div>
+      </div>
+    </div>
+    <div class="cheque-watermark">VPM</div>
+  </div>
+
+  <div class="separateur">
+    <div class="sep-line"></div>
+    <div class="sep-icon">✂ &nbsp; Découpez ici</div>
+    <div class="sep-line"></div>
+  </div>
+
+  <!-- CHÈQUE 2 -->
+  <div class="cheque">
+    <div class="cheque-band"></div>
+    <div class="cheque-left">
+      <div class="cheque-deco"></div>
+      <div class="cheque-logo"><em>Vendu</em> Par Moi</div>
+      <div class="cheque-valeur-wrap">
+        <div class="cheque-valeur-label">Valeur</div>
+        <div class="cheque-valeur">100€</div>
+        <div class="cheque-valeur-sub">Cent euros offerts<br>sur votre 1re séance</div>
+      </div>
+      <div class="cheque-left-bottom">
+        <div class="cheque-parrainage-badge">Chèque parrainage</div>
+      </div>
+    </div>
+    <div class="cheque-right">
+      <div>
+        <div class="cheque-titre">Bénéficiez de 100 €<br>sur votre vente</div>
+        <div class="cheque-sous-titre">Offert par un client Vendu Par Moi · Déductible de la 1re séance</div>
+      </div>
+      <div class="cheque-fields">
+        <div class="field-row">
+          <div class="field-block">
+            <span class="field-lbl">Offert par (parrain)</span>
+            <div class="field-line"></div>
+          </div>
+          <div class="field-block">
+            <span class="field-lbl">Bénéficiaire</span>
+            <div class="field-line"></div>
+          </div>
+        </div>
+        <div class="field-row">
+          <div class="field-block">
+            <span class="field-lbl">Adresse du bien à vendre</span>
+            <div class="field-line"></div>
+          </div>
+          <div class="field-block small">
+            <span class="field-lbl">Valable jusqu'au</span>
+            <div class="field-line"></div>
+          </div>
+        </div>
+      </div>
+      <div class="cheque-bottom">
+        <div class="cheque-conditions">
+          1 chèque par client · Non cumulable · Valable 12 mois<br>
+          À présenter lors de la prise de contact · contact@venduparmoi.fr
+        </div>
+        <div class="cheque-code-wrap">
+          <div class="cheque-code-label">Code</div>
+          <div class="cheque-code-val">VPM-PARR-______</div>
+        </div>
+      </div>
+    </div>
+    <div class="cheque-watermark">VPM</div>
+  </div>
+
+  <div class="separateur">
+    <div class="sep-line"></div>
+    <div class="sep-icon">✂ &nbsp; Découpez ici</div>
+    <div class="sep-line"></div>
+  </div>
+
+  <!-- CHÈQUE 3 -->
+  <div class="cheque">
+    <div class="cheque-band"></div>
+    <div class="cheque-left">
+      <div class="cheque-deco"></div>
+      <div class="cheque-logo"><em>Vendu</em> Par Moi</div>
+      <div class="cheque-valeur-wrap">
+        <div class="cheque-valeur-label">Valeur</div>
+        <div class="cheque-valeur">100€</div>
+        <div class="cheque-valeur-sub">Cent euros offerts<br>sur votre 1re séance</div>
+      </div>
+      <div class="cheque-left-bottom">
+        <div class="cheque-parrainage-badge">Chèque parrainage</div>
+      </div>
+    </div>
+    <div class="cheque-right">
+      <div>
+        <div class="cheque-titre">Bénéficiez de 100 €<br>sur votre vente</div>
+        <div class="cheque-sous-titre">Offert par un client Vendu Par Moi · Déductible de la 1re séante</div>
+      </div>
+      <div class="cheque-fields">
+        <div class="field-row">
+          <div class="field-block">
+            <span class="field-lbl">Offert par (parrain)</span>
+            <div class="field-line"></div>
+          </div>
+          <div class="field-block">
+            <span class="field-lbl">Bénéficiaire</span>
+            <div class="field-line"></div>
+          </div>
+        </div>
+        <div class="field-row">
+          <div class="field-block">
+            <span class="field-lbl">Adresse du bien à vendre</span>
+            <div class="field-line"></div>
+          </div>
+          <div class="field-block small">
+            <span class="field-lbl">Valable jusqu'au</span>
+            <div class="field-line"></div>
+          </div>
+        </div>
+      </div>
+      <div class="cheque-bottom">
+        <div class="cheque-conditions">
+          1 chèque par client · Non cumulable · Valable 12 mois<br>
+          À présenter lors de la prise de contact · contact@venduparmoi.fr
+        </div>
+        <div class="cheque-code-wrap">
+          <div class="cheque-code-label">Code</div>
+          <div class="cheque-code-val">VPM-PARR-______</div>
+        </div>
+      </div>
+    </div>
+    <div class="cheque-watermark">VPM</div>
+  </div>
+
+  <div class="page-footer">
+    <div class="page-footer-txt">
+      06 95 44 36 54 · 06 84 34 06 11 · contact@venduparmoi.fr · venduparmoi.fr<br>
+      Le chèque parrainage est valable 12 mois à compter de sa date d'émission, pour toute première souscription à l'offre Vendu Par Moi.
+    </div>
+    <div class="page-footer-logo"><em>Vendu</em> Par Moi</div>
+  </div>
+
+</div>
+
+<p class="print-note">3 chèques par page · Imprimez autant de pages que nécessaire · Complétez avant remise</p>
+
+</body>
+</html>
