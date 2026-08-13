@@ -91,6 +91,7 @@ app.get('/script-appel-acheteur', (req, res) => { res.set('Cache-Control', 'no-s
 app.get('/presentation-commerciale', (req, res) => { res.set('Cache-Control', 'no-store, no-cache, must-revalidate'); res.sendFile(path.join(__dirname, 'public', 'presentation-commerciale.html')); });
 app.get('/fiche-visite', (req, res) => { res.set('Cache-Control', 'no-store, no-cache, must-revalidate'); res.sendFile(path.join(__dirname, 'public', 'fiche-visite.html')); });
 
+
 app.use(express.static(path.join(__dirname, 'public'), {
   maxAge: '7d',
   setHeaders: (res, filePath) => {
@@ -214,6 +215,7 @@ app.post('/api/callback-request', async (req, res) => {
   const db = require('./database');
   db.prepare('INSERT INTO contact_requests (name, phone, email, source, creneau, message) VALUES (?,?,?,?,?,?)')
     .run(name, phone || '', email || '', 'rappel', creneau || 'peu importe', `Demande de rappel — créneau : ${creneau || 'peu importe'}`);
+  db.prepare('INSERT INTO callback_requests (nom, telephone, moment) VALUES (?,?,?)').run(name || '', phone || '', creneau || '');
   try {
     const msg = `Créneau souhaité : ${creneau || 'peu importe'}`;
     await require('./services/email').sendContactNotification({ name, phone, email: email || 'non renseigné', offer: 'Demande de rappel', city: '', message: msg });

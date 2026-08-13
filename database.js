@@ -520,6 +520,21 @@ db.exec(`
   )
 `);
 
+// ── Demandes de rappel (landing page) ──────────────────────────────
+db.exec(`
+  CREATE TABLE IF NOT EXISTS callback_requests (
+    id          INTEGER PRIMARY KEY AUTOINCREMENT,
+    nom         TEXT,
+    prenom      TEXT,
+    telephone   TEXT NOT NULL,
+    moment      TEXT,
+    statut      TEXT DEFAULT 'a_rappeler',
+    notes       TEXT,
+    updated_at  TEXT,
+    created_at  TEXT DEFAULT (datetime('now'))
+  )
+`);
+
 // ── Nettoyage photos locales (avant Cloudinary) ─────────────────
 // Supprime les photos et documents dont l'URL commence par /uploads/
 // (stockage local éphémère Render — fichiers définitivement perdus)

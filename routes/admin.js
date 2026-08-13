@@ -1500,4 +1500,31 @@ router.delete('/api/parrainage/:id', requireAdmin, (req, res) => {
   res.json({ ok: true });
 });
 
+// ── Demandes de rappel ────────────────────────────────────────────
+router.get('/rappels', requireAdmin, (req, res) => {
+  res.sendFile('rappels.html', { root: './views/admin' });
+});
+
+router.get('/api/rappels', requireAdmin, (req, res) => {
+  const rows = db.prepare('SELECT * FROM callback_requests ORDER BY created_at DESC').all();
+  const stats = {
+    total: rows.length,
+    a_rappeler: rows.filter(r => r.statut === 'a_rappeler').length,
+    rappele: rows.filter(r => r.statut === 'rappele').length,
+    converti: rows.filter(r => r.statut === 'converti').length,
+  };
+  res.json({ rows, stats });
+});
+
+router.patch('/api/rappels/:id', requireAdmin, express.json(), (req, res) => {
+  const { statut, notes } = req.body;
+  db.prepare(`UPDATE callback_requests SET statut=?, notes=?, updated_at=datetime('now') WHERE id=?`).run(statut || 'a_rappeler', notes || null, req.params.id);
+  res.json({ ok: true });
+});
+
+router.delete('/api/rappels/:id', requireAdmin, (req, res) => {
+  db.prepare('DELETE FROM callback_requests WHERE id=?').run(req.params.id);
+  res.json({ ok: true });
+});
+
 module.exports = router;
