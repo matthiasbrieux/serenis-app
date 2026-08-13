@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fiche de visite — Vendu Par Moi</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'DM Sans', sans-serif; background: #f0f0ed; padding: 32px 20px 60px; display: flex; flex-direction: column; align-items: center; gap: 20px; }
+    .no-print { display: flex; gap: 10px; margin-bottom: 8px; }
+    .btn { padding: 10px 22px; border-radius: 8px; font-family: 'DM Sans', sans-serif; font-size: 0.85rem; font-weight: 600; cursor: pointer; border: none; }
+    .btn-print { background: #1D3A28; color: #fff; }
+    .btn-back { background: #fff; color: #1D3A28; border: 1px solid #1D3A28; }
+
+    .page { width: 210mm; height: 297mm; background: #fff; overflow: hidden; box-shadow: 0 4px 24px rgba(0,0,0,0.10); display: flex; flex-direction: column; }
+
+    /* Header */
+    .doc-header { background: linear-gradient(135deg, #0C1910, #1D3A28); padding: 18px 28px; display: flex; justify-content: space-between; align-items: center; flex-shrink: 0; }
+    .brand { font-family: 'Cormorant Garamond', serif; font-size: 1.2rem; color: #F5F0E8; }
+    .brand em { color: #C4603A; font-style: italic; }
+    .doc-title-block { text-align: right; }
+    .doc-title-block h1 { font-family: 'Cormorant Garamond', serif; font-size: 1.4rem; color: #F5F0E8; }
+    .doc-title-block p { font-size: 0.7rem; color: rgba(245,240,232,0.55); margin-top: 2px; }
+
+    /* Body */
+    .body { flex: 1; padding: 18px 28px 16px; display: flex; flex-direction: column; gap: 14px; overflow: hidden; }
+
+    /* Sections */
+    .section { border: 1px solid #e8e4de; border-radius: 10px; overflow: hidden; }
+    .section-head { background: #1D3A28; color: #F5F0E8; padding: 7px 14px; font-size: 0.72rem; font-weight: 700; letter-spacing: 0.07em; text-transform: uppercase; display: flex; align-items: center; gap: 8px; }
+    .section-head span { font-size: 0.9rem; }
+    .section-body { padding: 12px 14px; }
+
+    /* Grilles champs */
+    .fields { display: grid; gap: 8px; }
+    .fields-2 { grid-template-columns: 1fr 1fr; }
+    .fields-3 { grid-template-columns: 1fr 1fr 1fr; }
+    .field { display: flex; flex-direction: column; gap: 3px; }
+    .field label { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.07em; color: #aaa; font-weight: 600; }
+    .field .line { border-bottom: 1px solid #d0cbc4; min-height: 20px; padding-bottom: 2px; font-size: 0.82rem; color: #1A1A16; }
+
+    /* Financement */
+    .checks { display: flex; gap: 16px; flex-wrap: wrap; margin-top: 4px; }
+    .check-item { display: flex; align-items: center; gap: 6px; font-size: 0.78rem; color: #555; }
+    .box { width: 14px; height: 14px; border: 1.5px solid #aaa; border-radius: 3px; flex-shrink: 0; }
+
+    /* Compte-rendu */
+    .notes-area { border: 1px solid #e0dbd4; border-radius: 6px; min-height: 52px; padding: 8px 10px; font-size: 0.82rem; color: #1A1A16; }
+
+    /* Intérêt */
+    .stars { display: flex; gap: 8px; margin-top: 4px; }
+    .star-row { display: flex; align-items: center; gap: 6px; font-size: 0.78rem; color: #555; }
+    .star-box { width: 20px; height: 20px; border: 1.5px solid #d0cbc4; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; }
+
+    /* Tableau visites multiples */
+    .visits-table { width: 100%; border-collapse: collapse; font-size: 0.74rem; }
+    .visits-table th { background: #f9f7f4; color: #888; font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.06em; padding: 6px 10px; text-align: left; border-bottom: 1px solid #e8e4de; }
+    .visits-table td { padding: 8px 10px; border-bottom: 1px solid #f0ece6; vertical-align: top; }
+    .visits-table td .write-line { border-bottom: 1px solid #d0cbc4; min-height: 16px; }
+    .visits-table tr:last-child td { border-bottom: none; }
+
+    /* Footer */
+    .doc-footer { background: #0C1910; padding: 8px 28px; display: flex; justify-content: space-between; align-items: center; flex-shrink: 0; }
+    .doc-footer span { font-size: 0.65rem; color: rgba(245,240,232,0.4); }
+
+    /* Séparateur dossier */
+    .dossier-cta { background: #F5F0E8; border: 1px solid #e0dbd4; border-radius: 8px; padding: 10px 14px; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+    .dossier-cta p { font-size: 0.75rem; color: #555; line-height: 1.4; }
+    .dossier-cta strong { color: #1D3A28; }
+    .dossier-qr { width: 44px; height: 44px; background: #e8e4de; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 0.6rem; color: #aaa; text-align: center; flex-shrink: 0; }
+
+    @media print {
+      body { background: #fff; padding: 0; gap: 0; }
+      .no-print { display: none; }
+      .page { width: 210mm; height: 297mm; box-shadow: none; }
+      @page { margin: 0; size: A4 portrait; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="no-print">
+  <button class="btn btn-back" onclick="history.back()">← Retour</button>
+  <button class="btn btn-print" onclick="window.print()">Imprimer / Enregistrer PDF</button>
+</div>
+
+<div class="page">
+
+  <div class="doc-header">
+    <div class="brand">Vendu Par <em>Moi</em></div>
+    <div class="doc-title-block">
+      <h1>Fiche de visite</h1>
+      <p>À remplir pendant ou juste après chaque visite</p>
+    </div>
+  </div>
+
+  <div class="body">
+
+    <!-- Bien & date -->
+    <div class="section">
+      <div class="section-head"><span>🏠</span> Bien & visite</div>
+      <div class="section-body">
+        <div class="fields fields-3">
+          <div class="field"><label>Adresse du bien</label><div class="line"></div></div>
+          <div class="field"><label>Date de visite</label><div class="line"></div></div>
+          <div class="field"><label>Heure</label><div class="line"></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Acheteur -->
+    <div class="section">
+      <div class="section-head"><span>👤</span> Acheteur</div>
+      <div class="section-body">
+        <div class="fields fields-2" style="margin-bottom:8px;">
+          <div class="field"><label>Nom & Prénom</label><div class="line"></div></div>
+          <div class="field"><label>Téléphone</label><div class="line"></div></div>
+          <div class="field"><label>Email</label><div class="line"></div></div>
+          <div class="field"><label>Venu via</label>
+            <div class="checks" style="margin-top:6px;">
+              <div class="check-item"><div class="box"></div> LeBonCoin</div>
+              <div class="check-item"><div class="box"></div> SeLoger</div>
+              <div class="check-item"><div class="box"></div> PAP</div>
+              <div class="check-item"><div class="box"></div> Autre</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Profil acheteur -->
+    <div class="section">
+      <div class="section-head"><span>💰</span> Profil & financement</div>
+      <div class="section-body">
+        <div class="fields fields-3" style="margin-bottom:10px;">
+          <div class="field"><label>Situation</label>
+            <div class="checks" style="margin-top:6px;">
+              <div class="check-item"><div class="box"></div> Primo</div>
+              <div class="check-item"><div class="box"></div> Investisseur</div>
+              <div class="check-item"><div class="box"></div> Relogement</div>
+            </div>
+          </div>
+          <div class="field"><label>Financement</label>
+            <div class="checks" style="margin-top:6px;">
+              <div class="check-item"><div class="box"></div> Prêt bancaire</div>
+              <div class="check-item"><div class="box"></div> Comptant</div>
+            </div>
+          </div>
+          <div class="field"><label>Budget max déclaré</label><div class="line" style="margin-top:10px;"></div></div>
+        </div>
+        <div class="fields fields-2">
+          <div class="field"><label>Accord de principe bancaire ?</label>
+            <div class="checks" style="margin-top:6px;">
+              <div class="check-item"><div class="box"></div> Oui</div>
+              <div class="check-item"><div class="box"></div> Non</div>
+              <div class="check-item"><div class="box"></div> En cours</div>
+            </div>
+          </div>
+          <div class="field"><label>Bien à vendre avant d'acheter ?</label>
+            <div class="checks" style="margin-top:6px;">
+              <div class="check-item"><div class="box"></div> Oui</div>
+              <div class="check-item"><div class="box"></div> Non</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Ressenti -->
+    <div class="section">
+      <div class="section-head"><span>⭐</span> Ressenti & intérêt</div>
+      <div class="section-body">
+        <div class="fields fields-2" style="margin-bottom:10px;">
+          <div class="field">
+            <label>Niveau d'intérêt</label>
+            <div class="checks" style="margin-top:6px;">
+              <div class="check-item"><div class="box"></div> Très intéressé</div>
+              <div class="check-item"><div class="box"></div> Intéressé</div>
+              <div class="check-item"><div class="box"></div> Hésitant</div>
+              <div class="check-item"><div class="box"></div> Pas intéressé</div>
+            </div>
+          </div>
+          <div class="field">
+            <label>Points positifs mentionnés</label>
+            <div class="line" style="margin-top:6px;"></div>
+            <div class="line" style="margin-top:6px;"></div>
+          </div>
+        </div>
+        <div class="field">
+          <label>Objections / réserves</label>
+          <div class="line" style="margin-top:4px;"></div>
+          <div class="line" style="margin-top:6px;"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Suite -->
+    <div class="section">
+      <div class="section-head"><span>📋</span> Suite à donner</div>
+      <div class="section-body">
+        <div class="fields fields-2" style="margin-bottom:8px;">
+          <div class="field">
+            <label>Suite prévue</label>
+            <div class="checks" style="margin-top:6px;">
+              <div class="check-item"><div class="box"></div> 2e visite à prévoir</div>
+              <div class="check-item"><div class="box"></div> Offre attendue</div>
+              <div class="check-item"><div class="box"></div> Relance J+3</div>
+              <div class="check-item"><div class="box"></div> Sans suite</div>
+            </div>
+          </div>
+          <div class="field"><label>Date de relance prévue</label><div class="line" style="margin-top:10px;"></div></div>
+        </div>
+        <div class="field">
+          <label>Notes libres</label>
+          <div class="notes-area"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Dossier acheteur -->
+    <div class="dossier-cta">
+      <p><strong>Dossier acheteur VPM :</strong> envoyez le lien depuis votre espace vendeur pour que l'acheteur puisse consulter photos HD, diagnostics et documents avant de faire une offre.</p>
+      <div class="dossier-qr">Lien<br>dossier</div>
+    </div>
+
+  </div>
+
+  <div class="doc-footer">
+    <span>Fiche de visite — Vendu Par Moi</span>
+    <span>contact@venduparmoi.fr · 06 95 44 36 54</span>
+  </div>
+
+</div>
+
+</body>
+</html>
