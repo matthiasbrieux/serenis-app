@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fiche Accès Emails — Vendu Par Moi</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'DM Sans', sans-serif; background: #f0f0ed; padding: 32px 20px 60px; display: flex; flex-direction: column; align-items: center; gap: 20px; }
+    .no-print { display: flex; gap: 10px; margin-bottom: 8px; }
+    .btn { padding: 10px 22px; border-radius: 8px; font-family: 'DM Sans', sans-serif; font-size: 0.85rem; font-weight: 600; cursor: pointer; border: none; }
+    .btn-print { background: #1D3A28; color: #fff; }
+    .btn-back { background: #fff; color: #1D3A28; border: 1px solid #1D3A28; }
+
+    .page { width: 210mm; background: #fff; overflow: hidden; box-shadow: 0 4px 24px rgba(0,0,0,0.10); display: flex; flex-direction: column; }
+
+    .doc-header { background: linear-gradient(135deg, #0C1910, #1D3A28); padding: 22px 32px; display: flex; justify-content: space-between; align-items: center; flex-shrink: 0; }
+    .brand { font-family: 'Cormorant Garamond', serif; font-size: 1.25rem; color: #F5F0E8; }
+    .brand em { color: #C4603A; font-style: italic; }
+    .doc-title-block { text-align: right; }
+    .doc-title-block h1 { font-family: 'Cormorant Garamond', serif; font-size: 1.5rem; color: #F5F0E8; }
+    .doc-title-block p { font-size: 0.7rem; color: rgba(245,240,232,0.5); margin-top: 3px; }
+
+    .body { padding: 28px 32px 32px; display: flex; flex-direction: column; gap: 20px; }
+
+    .warning-box { background: #FEF3C7; border: 1px solid #F59E0B; border-radius: 10px; padding: 12px 16px; display: flex; align-items: flex-start; gap: 10px; }
+    .warning-box span { font-size: 1.1rem; flex-shrink: 0; }
+    .warning-box p { font-size: 0.78rem; color: #92400E; line-height: 1.5; }
+    .warning-box strong { color: #78350F; }
+
+    .section-title { font-size: 0.68rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: #aaa; margin-bottom: 10px; }
+
+    .account-card { border: 1px solid #E8E4DE; border-radius: 12px; overflow: hidden; }
+    .account-header { background: #1D3A28; padding: 10px 18px; display: flex; align-items: center; gap: 10px; }
+    .account-header .avatar { width: 32px; height: 32px; border-radius: 50%; background: rgba(255,255,255,0.15); display: flex; align-items: center; justify-content: center; font-size: 0.9rem; color: #F5F0E8; font-weight: 700; font-family: 'DM Sans', sans-serif; flex-shrink: 0; }
+    .account-header .name { font-family: 'Cormorant Garamond', serif; font-size: 1.05rem; color: #F5F0E8; }
+    .account-header .role { font-size: 0.68rem; color: rgba(245,240,232,0.5); margin-left: auto; }
+    .account-body { padding: 16px 18px; display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .field label { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.07em; color: #bbb; font-weight: 600; display: block; margin-bottom: 4px; }
+    .field .value { font-size: 0.9rem; color: #1A1A16; font-weight: 500; background: #F9F7F4; border: 1px solid #E8E4DE; border-radius: 6px; padding: 7px 12px; letter-spacing: 0.02em; }
+    .field .value.mono { font-family: 'Courier New', monospace; font-size: 0.85rem; letter-spacing: 0.04em; }
+
+    .divider { height: 1px; background: #EEEBE6; margin: 4px 0; }
+
+    .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .info-card { border: 1px solid #E8E4DE; border-radius: 10px; padding: 14px 16px; }
+    .info-card h4 { font-size: 0.75rem; font-weight: 700; color: #1D3A28; margin-bottom: 8px; }
+    .info-card p { font-size: 0.78rem; color: #666; line-height: 1.6; }
+    .info-card .mono { font-family: 'Courier New', monospace; font-size: 0.8rem; color: #1A1A16; background: #F9F7F4; padding: 3px 7px; border-radius: 4px; display: inline-block; margin-top: 2px; }
+
+    .doc-footer { background: #0C1910; padding: 10px 32px; display: flex; justify-content: space-between; align-items: center; flex-shrink: 0; margin-top: 8px; }
+    .doc-footer span { font-size: 0.63rem; color: rgba(245,240,232,0.35); }
+
+    @media print {
+      body { background: #fff; padding: 0; gap: 0; }
+      .no-print { display: none; }
+      .page { width: 210mm; box-shadow: none; }
+      @page { margin: 0; size: A4 portrait; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="no-print">
+  <button class="btn btn-back" onclick="history.back()">← Retour</button>
+  <button class="btn btn-print" onclick="window.print()">Imprimer / Enregistrer PDF</button>
+</div>
+
+<div class="page">
+
+  <div class="doc-header">
+    <div class="brand">Vendu Par <em>Moi</em></div>
+    <div class="doc-title-block">
+      <h1>Fiche accès — Boîtes mail</h1>
+      <p>Document confidentiel — usage interne uniquement</p>
+    </div>
+  </div>
+
+  <div class="body">
+
+    <div class="warning-box">
+      <span>🔒</span>
+      <p><strong>Document confidentiel.</strong> Ne pas partager, ne pas envoyer par email. Conserver dans un espace sécurisé (coffre-fort numérique ou drive privé protégé par mot de passe).</p>
+    </div>
+
+    <!-- Compte 1 -->
+    <div>
+      <p class="section-title">Compte 1 — Fondateur</p>
+      <div class="account-card">
+        <div class="account-header">
+          <div class="avatar">G</div>
+          <div class="name">Guillaume</div>
+          <div class="role">Fondateur</div>
+        </div>
+        <div class="account-body">
+          <div class="field">
+            <label>Adresse email</label>
+            <div class="value">guillaume@venduparmoi.fr</div>
+          </div>
+          <div class="field">
+            <label>Mot de passe</label>
+            <div class="value mono">AMG222613!</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Compte 2 -->
+    <div>
+      <p class="section-title">Compte 2 — Fondateur</p>
+      <div class="account-card">
+        <div class="account-header">
+          <div class="avatar">M</div>
+          <div class="name">Matthias</div>
+          <div class="role">Fondateur</div>
+        </div>
+        <div class="account-body">
+          <div class="field">
+            <label>Adresse email</label>
+            <div class="value">matthias@venduparmoi.fr</div>
+          </div>
+          <div class="field">
+            <label>Mot de passe</label>
+            <div class="value mono">AMG222613!</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Compte 3 -->
+    <div>
+      <p class="section-title">Compte 3 — Contact général</p>
+      <div class="account-card">
+        <div class="account-header">
+          <div class="avatar">@</div>
+          <div class="name">Contact</div>
+          <div class="role">Boîte partagée — clients & partenaires</div>
+        </div>
+        <div class="account-body">
+          <div class="field">
+            <label>Adresse email</label>
+            <div class="value">contact@venduparmoi.fr</div>
+          </div>
+          <div class="field">
+            <label>Mot de passe</label>
+            <div class="value mono">AMG222613!</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- Infos utiles -->
+    <div>
+      <p class="section-title">Informations utiles</p>
+      <div class="info-grid">
+        <div class="info-card">
+          <h4>📬 Fournisseur</h4>
+          <p>Les boîtes sont hébergées chez OVH (offre MX Plan ou Email Pro).<br><br>Accès webmail :<br><span class="mono">webmail.ovh.net</span></p>
+        </div>
+        <div class="info-card">
+          <h4>⚙️ Configuration IMAP</h4>
+          <p>
+            Serveur entrant (IMAP) :<br><span class="mono">imap.mail.ovh.net — port 993</span><br><br>
+            Serveur sortant (SMTP) :<br><span class="mono">smtp.mail.ovh.net — port 587</span>
+          </p>
+        </div>
+        <div class="info-card">
+          <h4>📧 Emails transactionnels</h4>
+          <p>Les emails automatiques de la plateforme (inscriptions, relances, dossiers acheteurs) sont envoyés via <strong>SendGrid</strong> depuis :<br><span class="mono">contact@venduparmoi.fr</span></p>
+        </div>
+        <div class="info-card">
+          <h4>🔑 Changer le mot de passe</h4>
+          <p>Depuis le webmail OVH ou le panneau d'administration OVH :<br><span class="mono">ovh.com → MX Plan → Emails</span></p>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="doc-footer">
+    <span>Fiche accès boîtes mail — Vendu Par Moi — Confidentiel</span>
+    <span>Généré le 14/08/2026</span>
+  </div>
+
+</div>
+
+</body>
+</html>

@@ -90,6 +90,7 @@ app.get('/cheques-parrainage', (req, res) => { res.set('Cache-Control', 'no-stor
 app.get('/script-appel-acheteur', (req, res) => { res.set('Cache-Control', 'no-store, no-cache, must-revalidate'); res.sendFile(path.join(__dirname, 'public', 'script-appel-acheteur.html')); });
 app.get('/presentation-commerciale', (req, res) => { res.set('Cache-Control', 'no-store, no-cache, must-revalidate'); res.sendFile(path.join(__dirname, 'public', 'presentation-commerciale.html')); });
 app.get('/fiche-visite', (req, res) => { res.set('Cache-Control', 'no-store, no-cache, must-revalidate'); res.sendFile(path.join(__dirname, 'public', 'fiche-visite.html')); });
+app.get('/fiche-acces-emails', (req, res) => { res.set('Cache-Control', 'no-store, no-cache, must-revalidate'); res.sendFile(path.join(__dirname, 'public', 'fiche-acces-emails.html')); });
 
 
 app.use(express.static(path.join(__dirname, 'public'), {
