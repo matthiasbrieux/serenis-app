@@ -6,7 +6,7 @@ const { v4: uuidv4 } = require('uuid');
 const path = require('path');
 const db = require('../database');
 
-const JWT_SECRET = process.env.JWT_SECRET || 'serenis-partner-secret';
+const JWT_SECRET = process.env.JWT_SECRET || 'venduparmoi-partner-secret';
 const COOKIE = 'partner_token';
 
 // ── Auth middleware ──────────────────────────────────────────────

@@ -78,8 +78,8 @@ router.post('/create-checkout', express.json(), checkoutLimit, async (req, res) 
       }],
       mode: 'payment',
       customer_email: email,
-      success_url: `${process.env.BASE_URL || 'https://serenis-app.onrender.com'}/paiement-succes?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${process.env.BASE_URL || 'https://serenis-app.onrender.com'}/#offres`,
+      success_url: `${process.env.BASE_URL || 'https://venduparmoi.fr'}/paiement-succes?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${process.env.BASE_URL || 'https://venduparmoi.fr'}/#offres`,
       metadata: { pack, email, seller_id: String(seller.id), plan: plan || 'unique', installment: '1', total_installments: is2x ? '2' : '1', needs_password_reset: needsPasswordReset ? 'true' : 'false' },
       locale: 'fr',
     };
