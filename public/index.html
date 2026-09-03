@@ -442,45 +442,65 @@
     .benefits .section-title { color: var(--charcoal); }
     .benefits .section-lead { color: #5A2812; }
     .benefits-grid {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
+      display: flex;
+      flex-wrap: wrap;
       gap: 20px;
+      justify-content: center;
     }
     .benefit-card {
-      background: #9E3A18;
+      flex: 0 0 calc(25% - 15px);
       border: none;
-      border-radius: 10px;
+      border-radius: 12px;
       padding: 28px 24px;
-      position: relative;
       transition: box-shadow 0.2s, transform 0.2s;
     }
+    .benefit-card.is-terra { background: #9E3A18; }
+    .benefit-card.is-creme { background: #F5F2ED; }
     .benefit-card:hover {
-      box-shadow: 0 8px 28px rgba(0,0,0,0.2);
+      box-shadow: 0 8px 28px rgba(0,0,0,0.18);
       transform: translateY(-2px);
     }
-    .benefit-num {
-      position: absolute;
-      top: 20px; right: 20px;
-      font-family: var(--font-serif);
-      font-size: 0.78rem;
+    .benefit-badge {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-sans);
+      font-size: 1rem;
       font-weight: 700;
-      color: rgba(245,242,237,0.35);
-      letter-spacing: 0.05em;
+      margin-bottom: 18px;
+      flex-shrink: 0;
     }
+    .is-terra .benefit-badge { background: #F5F2ED; color: #9E3A18; }
+    .is-creme .benefit-badge { background: #9E3A18; color: #F5F2ED; }
     .benefit-icon { display: none; }
+    .benefit-num  { display: none; }
     .benefit-title {
       font-family: var(--font-serif);
       font-size: 1.15rem;
       font-weight: 600;
-      color: #FFFFFF;
-      margin-bottom: 9px;
+      margin-bottom: 8px;
       line-height: 1.3;
     }
+    .is-terra .benefit-title { color: #FFFFFF; }
+    .is-creme .benefit-title { color: #2A1208; }
+    .benefit-sub {
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin: 0 0 8px;
+    }
+    .is-terra .benefit-sub { color: rgba(255,255,255,0.6); }
+    .is-creme .benefit-sub { color: #9E3A18; }
     .benefit-desc {
       font-size: 0.85rem;
       line-height: 1.7;
-      color: #FFFFFF;
     }
+    .is-terra .benefit-desc { color: rgba(255,255,255,0.88); }
+    .is-creme .benefit-desc { color: #5A2812; }
 
     /* ─── Comment ça marche ─── */
     .how {
@@ -940,7 +960,7 @@
 
     /* ─── Responsive ─── */
     @media (max-width: 1024px) {
-      .benefits-grid { grid-template-columns: repeat(2, 1fr); }
+      .benefit-card { flex: 0 0 calc(50% - 10px); }
     }
 
     @media (max-width: 768px) {
@@ -964,7 +984,7 @@
 
     @media (max-width: 480px) {
       .stats-inner { grid-template-columns: 1fr 1fr; }
-      .benefits-grid { grid-template-columns: 1fr; }
+      .benefit-card { flex: 0 0 100%; }
     }
 
     /* ─── Callback ─── */
@@ -1575,99 +1595,52 @@
 
       <div class="benefits-grid">
 
-        <div class="benefit-card reveal">
-          <div class="benefit-num" aria-hidden="true">01</div>
-          <div class="benefit-icon">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-              <circle cx="12" cy="12" r="10"/>
-              <path d="M12 6v6l4 2"/>
-            </svg>
-          </div>
+        <div class="benefit-card is-terra reveal">
+          <div class="benefit-badge" aria-hidden="true">1</div>
           <h3 class="benefit-title">Gardez chaque euro</h3>
-          <p style="font-size:0.78rem;font-weight:600;color:rgba(255,255,255,0.65);margin:4px 0 6px;text-transform:uppercase;letter-spacing:0.04em;">Un forfait fixe, pas de commission</p>
-          <p class="benefit-desc">Un forfait fixe, pas de commission. Plus le prix de votre bien est élevé, plus l'économie est importante face à un intermédiaire classique.</p>
+          <p class="benefit-desc">Un forfait fixe, payé une seule fois. Plus votre bien est cher, plus l'écart avec une commission classique est important.</p>
         </div>
 
-        <div class="benefit-card reveal">
-          <div class="benefit-num" aria-hidden="true">02</div>
-          <div class="benefit-icon">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-              <path d="M12 20h9M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/>
-            </svg>
-          </div>
+        <div class="benefit-card is-creme reveal">
+          <div class="benefit-badge" aria-hidden="true">2</div>
           <h3 class="benefit-title">Vendez au bon prix</h3>
-          <p style="font-size:0.78rem;font-weight:600;color:rgba(255,255,255,0.65);margin:4px 0 6px;text-transform:uppercase;letter-spacing:0.04em;">L'estimation en toute confiance</p>
-          <p class="benefit-desc">Grâce à notre méthode et à nos outils, définissez un prix cohérent pour attirer les bons acheteurs et maximiser la valeur de votre bien.</p>
+          <p class="benefit-sub">L'estimation en toute confiance</p>
+          <p class="benefit-desc">Grâce à notre méthode et nos outils, définissez un prix cohérent pour attirer les bons acheteurs et maximiser la valeur de votre bien.</p>
         </div>
 
-        <div class="benefit-card reveal">
-          <div class="benefit-num" aria-hidden="true">03</div>
-          <div class="benefit-icon">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-              <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/>
-              <circle cx="9" cy="7" r="4"/>
-              <path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/>
-            </svg>
-          </div>
+        <div class="benefit-card is-terra reveal">
+          <div class="benefit-badge" aria-hidden="true">3</div>
           <h3 class="benefit-title">Fini les acheteurs fantômes</h3>
-          <p style="font-size:0.78rem;font-weight:600;color:rgba(255,255,255,0.65);margin:4px 0 6px;text-transform:uppercase;letter-spacing:0.04em;">Des acquéreurs plus qualifiés</p>
+          <p class="benefit-sub">Des acquéreurs plus qualifiés</p>
           <p class="benefit-desc">Pré-qualification, vérification du financement et suivi des échanges : vous consacrez votre temps aux acheteurs réellement sérieux.</p>
         </div>
 
-        <div class="benefit-card reveal">
-          <div class="benefit-num" aria-hidden="true">04</div>
-          <div class="benefit-icon">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-              <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
-              <line x1="16" y1="2" x2="16" y2="6"/>
-              <line x1="8" y1="2" x2="8" y2="6"/>
-              <line x1="3" y1="10" x2="21" y2="10"/>
-            </svg>
-          </div>
+        <div class="benefit-card is-creme reveal">
+          <div class="benefit-badge" aria-hidden="true">4</div>
           <h3 class="benefit-title">Vendez plus vite</h3>
-          <p style="font-size:0.78rem;font-weight:600;color:rgba(255,255,255,0.65);margin:4px 0 6px;text-transform:uppercase;letter-spacing:0.04em;">Un suivi sans perte de temps</p>
+          <p class="benefit-sub">Un suivi sans perte de temps</p>
           <p class="benefit-desc">Visites, relances et rappels sont organisés pour maintenir l'intérêt des acquéreurs et favoriser une vente plus fluide.</p>
         </div>
 
-        <div class="benefit-card reveal">
-          <div class="benefit-num" aria-hidden="true">05</div>
-          <div class="benefit-icon">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-              <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/>
-            </svg>
-          </div>
+        <div class="benefit-card is-terra reveal">
+          <div class="benefit-badge" aria-hidden="true">5</div>
           <h3 class="benefit-title">Négociez avec assurance</h3>
-          <p style="font-size:0.78rem;font-weight:600;color:rgba(255,255,255,0.65);margin:4px 0 6px;text-transform:uppercase;letter-spacing:0.04em;">Les bons mots au bon moment</p>
+          <p class="benefit-sub">Les bons mots au bon moment</p>
           <p class="benefit-desc">Conseils, méthodes et stratégies pour répondre aux objections et défendre votre prix avec confiance.</p>
         </div>
 
-        <div class="benefit-card reveal">
-          <div class="benefit-num" aria-hidden="true">06</div>
-          <div class="benefit-icon">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-              <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/>
-              <polyline points="14 2 14 8 20 8"/>
-              <line x1="16" y1="13" x2="8" y2="13"/>
-              <line x1="16" y1="17" x2="8" y2="17"/>
-              <polyline points="10 9 9 9 8 9"/>
-            </svg>
-          </div>
+        <div class="benefit-card is-creme reveal">
+          <div class="benefit-badge" aria-hidden="true">6</div>
           <h3 class="benefit-title">Zéro stress administratif</h3>
-          <p style="font-size:0.78rem;font-weight:600;color:rgba(255,255,255,0.65);margin:4px 0 6px;text-transform:uppercase;letter-spacing:0.04em;">Tout est déjà prêt</p>
+          <p class="benefit-sub">Tout est déjà prêt</p>
           <p class="benefit-desc">Documents, modèles, check-lists et étapes clés : vous avancez sereinement jusqu'à la signature chez le notaire.</p>
         </div>
 
-        <div class="benefit-card reveal">
-          <div class="benefit-num" aria-hidden="true">07</div>
-          <div class="benefit-icon">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-              <rect x="3" y="3" width="18" height="18" rx="2"/>
-              <path d="M3 9h18M9 21V9"/>
-            </svg>
-          </div>
+        <div class="benefit-card is-terra reveal">
+          <div class="benefit-badge" aria-hidden="true">7</div>
           <h3 class="benefit-title">Des acheteurs déjà informés</h3>
-          <p style="font-size:0.78rem;font-weight:600;color:rgba(255,255,255,0.65);margin:4px 0 6px;text-transform:uppercase;letter-spacing:0.04em;">Moins de répétitions, plus d'efficacité</p>
-          <p class="benefit-desc">Partagez en un clic un dossier complet avec photos, caractéristiques et informations essentielles. Les visiteurs arrivent mieux préparés et les échanges sont plus fluides.</p>
+          <p class="benefit-sub">Moins de répétitions, plus d'efficacité</p>
+          <p class="benefit-desc">Partagez en un clic un dossier complet avec photos, caractéristiques et diagnostics. Les visiteurs arrivent préparés et les échanges sont plus fluides.</p>
         </div>
 
       </div>
