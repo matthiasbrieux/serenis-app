@@ -7,7 +7,7 @@
   <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16.png"/>
   <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"/>
   <link rel="manifest" href="/manifest.json"/>
-  <meta name="theme-color" content="#9E3A18"/>
+  <meta name="theme-color" content="var(--terracotta)"/>
   <meta name="apple-mobile-web-app-capable" content="yes"/>
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
   <meta name="apple-mobile-web-app-title" content="VPM"/>
@@ -32,41 +32,25 @@
     /* ─── Reset & tokens ─── */
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
-      /* ── PALETTE : 3 couleurs uniquement ────────────────────── */
-      --dark:   #9E3A18;   /* Rouille profonde — fonds sombres, texte sur clair */
-      --lin:    #E5DED3;   /* Lin / chanvre   — sections alternées, cartes */
-      --creme:  #F5F2ED;   /* Crème pure      — fonds clairs, texte sur sombre */
+      /* ── PALETTE : 4 couleurs, 4 variables, rien d'autre ─── */
+      --blanc:      #FFFFFF;   /* fond clair · texte sur terracotta */
+      --terracotta: #9E3A18;   /* fond terracotta · accents sur blanc */
+      --sable-dore: #E8C39E;   /* accent chaud, uniquement sur terracotta */
+      --noir:       #1C0804;   /* texte principal sur fond blanc */
 
-      /* ── Aliases CSS existants → redirigés ─────────────────── */
-      --green:        #9E3A18;
-      --green-dark:   #1C0804;
-      --green-deep:   #9E3A18;
-      --green-mid:    #B84520;
-      --green-accent: #9E3A18;
-      --terra:        #9E3A18;
-      --terra-dark:   #9E3A18;
-      --terra-deep:   #9E3A18;
-      --beige:        #E5DED3;
-      --beige-light:  #EDE8E1;
-      --cream:        #F5F2ED;
-      --sable-dore:   #E8C39E;   /* Sablé doré — accent chaud sur fonds terracotta */
-      --charcoal:     #1C0804;
-      --stone:        #6B3020;
-      --copper:       rgba(245,242,237,0.78); /* accent clair sur fonds sombres */
-      --ivory:        #F5F2ED;               /* texte principal sur fonds sombres */
-      --green-deep:   #6A2410;               /* bg cartes sombres (featured, vpm-col) */
-      --font-serif:   'Cormorant Garamond', Georgia, serif;
-      --font-sans:    'DM Sans', system-ui, sans-serif;
-      --max-w:        1100px;
-      --section-py:   clamp(72px, 10vw, 120px);
-      --section-px:   clamp(20px, 5vw, 48px);
+      /* ── Layout & typographie ─── */
+      --font-serif: 'Cormorant Garamond', Georgia, serif;
+      --font-sans:  'DM Sans', system-ui, sans-serif;
+      --max-w:      1100px;
+      --section-py: clamp(72px, 10vw, 120px);
+      --section-px: clamp(20px, 5vw, 48px);
     }
     html { scroll-behavior: smooth; }
     section[id] { scroll-margin-top: 72px; }
     body {
       font-family: var(--font-sans);
-      background: #9E3A18;
-      color: var(--cream);
+      background: var(--terracotta);
+      color: var(--blanc);
       line-height: 1.6;
       -webkit-font-smoothing: antialiased;
     }
@@ -93,7 +77,7 @@
       position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
       display: flex; align-items: center; justify-content: space-between;
       padding: 18px var(--section-px);
-      background: #9E3A18;
+      background: var(--terracotta);
       border-bottom: 1px solid rgba(255,255,255,0.08);
     }
     .nav-logo { display: flex; align-items: center; text-decoration: none; }
@@ -106,27 +90,27 @@
     .nav-links a {
       font-size: 0.82rem;
       font-weight: 500;
-      color: rgba(245,242,237,0.6);
+      color: rgba(255,255,255,0.6);
       letter-spacing: 0.02em;
       transition: color 0.2s;
     }
-    .nav-links a:hover { color: var(--cream); }
+    .nav-links a:hover { color: var(--blanc); }
 
     /* Login link — ghost style in nav */
     .nav-login {
       font-size: 0.82rem;
       font-weight: 500;
-      color: rgba(245,242,237,0.6);
+      color: rgba(255,255,255,0.6);
       letter-spacing: 0.02em;
       padding: 8px 16px;
-      border: 1px solid rgba(245,242,237,0.2);
+      border: 1px solid rgba(255,255,255,0.2);
       border-radius: 6px;
       transition: color 0.2s, border-color 0.2s, background 0.2s;
     }
     .nav-login:hover {
-      color: var(--cream);
-      border-color: rgba(245,242,237,0.45);
-      background: rgba(245,242,237,0.05);
+      color: var(--blanc);
+      border-color: rgba(255,255,255,0.45);
+      background: rgba(255,255,255,0.05);
     }
 
     .nav-right {
@@ -134,8 +118,8 @@
     }
 
     .nav-cta {
-      background: #F5F2ED;
-      color: #9E3A18;
+      background: var(--blanc);
+      color: var(--terracotta);
       border: none;
       padding: 10px 22px;
       border-radius: 6px;
@@ -144,7 +128,7 @@
       letter-spacing: 0.04em;
       transition: background 0.2s, transform 0.15s;
     }
-    .nav-cta:hover { background: var(--terra-dark); transform: translateY(-1px); }
+    .nav-cta:hover { background: var(--terracotta); transform: translateY(-1px); }
 
     /* hamburger */
     .nav-hamburger {
@@ -155,7 +139,7 @@
     }
     .nav-hamburger span {
       display: block; width: 24px; height: 2px;
-      background: var(--cream); border-radius: 2px;
+      background: var(--blanc); border-radius: 2px;
       transition: transform 0.25s, opacity 0.25s;
     }
     .nav-hamburger[aria-expanded="true"] span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
@@ -166,7 +150,7 @@
       display: none;
       position: fixed; top: 0; left: 0; right: 0; bottom: 0;
       z-index: 999;
-      background: rgba(158,58,24,0.98);
+      background: var(--terracotta);
       flex-direction: column; align-items: center; justify-content: center;
       gap: 32px;
     }
@@ -175,13 +159,13 @@
       font-family: var(--font-serif);
       font-size: 1.75rem;
       font-weight: 500;
-      color: var(--cream);
+      color: var(--blanc);
     }
     .nav-mobile .nav-mobile-login {
       font-family: var(--font-sans);
       font-size: 1rem;
-      color: rgba(245,242,237,0.65);
-      border: 1px solid rgba(245,242,237,0.25);
+      color: rgba(255,255,255,0.65);
+      border: 1px solid rgba(255,255,255,0.25);
       padding: 12px 36px;
       border-radius: 6px;
     }
@@ -193,9 +177,9 @@
       min-height: 100svh;
       display: flex; align-items: center;
       overflow: hidden;
-      background: linear-gradient(rgba(50,12,4,0.55), rgba(80,22,8,0.65)),
+      background: linear-gradient(rgba(28,8,4,0.55), rgba(28,8,4,0.65)),
                   url('/hero-bg.jpg') center/cover no-repeat;
-      background-color: #9E3A18;
+      background-color: var(--terracotta);
     }
     .hero-overlay {
       position: absolute; inset: 0; z-index: 1;
@@ -203,7 +187,7 @@
     }
     .hero-overlay-bottom {
       position: absolute; inset: 0; z-index: 1;
-      background: linear-gradient(to top, rgba(12,25,16,0.6) 0%, transparent 50%);
+      background: linear-gradient(to top, rgba(28,8,4,0.6) 0%, transparent 50%);
     }
     .hero-content {
       position: relative; z-index: 2;
@@ -216,7 +200,7 @@
       font-size: 0.7rem;
       letter-spacing: 0.35em;
       text-transform: uppercase;
-      color: rgba(245,242,237,0.65);
+      color: rgba(255,255,255,0.65);
       margin-bottom: 1.25rem;
     }
     .hero-title {
@@ -224,21 +208,21 @@
       font-size: clamp(2.8rem, 6.5vw, 5rem);
       font-weight: 600;
       line-height: 1.06;
-      color: #F5F2ED;
+      color: var(--blanc);
       margin-bottom: 1.25rem;
       max-width: 720px;
     }
     .hero-title em {
       font-style: italic;
       font-weight: 400;
-      color: #F5F2ED;
+      color: var(--blanc);
     }
     .hero-badge {
       display: inline-flex;
       align-items: center;
       gap: 10px;
-      background: #F5F2ED;
-      color: var(--green-deep);
+      background: var(--blanc);
+      color: var(--terracotta);
       border-radius: 8px;
       padding: 10px 18px;
       margin-bottom: 1.75rem;
@@ -247,13 +231,13 @@
       font-family: var(--font-serif);
       font-size: 1.5rem;
       font-weight: 700;
-      color: var(--green-dark);
+      color: var(--noir);
       line-height: 1;
     }
     .hero-badge-label {
       font-size: 0.78rem;
       font-weight: 500;
-      color: rgba(15,30,19,0.7);
+      color: rgba(28,8,4,0.7);
       line-height: 1.35;
     }
     .hero-title-card {
@@ -267,7 +251,7 @@
     .hero-subtitle {
       font-size: clamp(0.95rem, 1.6vw, 1.05rem);
       line-height: 1.8;
-      color: rgba(245,242,237,0.75);
+      color: rgba(255,255,255,0.75);
       max-width: 520px;
       margin-bottom: 2rem;
     }
@@ -275,12 +259,12 @@
       font-family: var(--font-serif);
       font-size: 1.1em;
       font-weight: 700;
-      color: #FFFFFF;
+      color: var(--blanc);
       text-shadow: 0 1px 4px rgba(0,0,0,0.4);
     }
     .hero-checklist-item {
       display: flex; align-items: flex-start; gap: 12px;
-      font-size: 0.92rem; color: rgba(245,242,237,0.9);
+      font-size: 0.92rem; color: rgba(255,255,255,0.9);
       line-height: 1.5;
     }
     .hero-checklist-icon {
@@ -295,8 +279,8 @@
     }
     .btn-primary {
       display: inline-flex; align-items: center;
-      background: #F5F2ED;
-      color: #9E3A18;
+      background: var(--blanc);
+      color: var(--terracotta);
       border: none;
       padding: 16px 32px;
       border-radius: 6px;
@@ -307,15 +291,15 @@
       min-height: 52px;
     }
     .btn-primary:hover {
-      background: var(--terra-dark);
+      background: var(--terracotta);
       transform: translateY(-2px);
       box-shadow: 0 8px 24px rgba(158,58,24,0.35);
     }
     .btn-secondary {
       display: inline-flex; align-items: center;
       background: transparent;
-      color: rgba(245,242,237,0.8);
-      border: 1px solid rgba(245,242,237,0.3);
+      color: rgba(255,255,255,0.8);
+      border: 1px solid rgba(255,255,255,0.3);
       padding: 16px 28px;
       border-radius: 6px;
       font-size: 0.88rem;
@@ -325,8 +309,8 @@
       min-height: 52px;
     }
     .btn-secondary:hover {
-      background: rgba(245,242,237,0.08);
-      border-color: rgba(245,242,237,0.55);
+      background: rgba(255,255,255,0.08);
+      border-color: rgba(255,255,255,0.55);
     }
     .hero-trust {
       display: grid;
@@ -338,7 +322,7 @@
     .hero-trust-item {
       display: flex; align-items: center; gap: 7px;
       font-size: 0.78rem;
-      color: rgba(229,222,211,0.65);
+      color: rgba(255,255,255,0.65);
     }
     .hero-trust-item:last-child {
       grid-column: 1 / -1;
@@ -347,8 +331,8 @@
 
     /* ─── Stats strip ─── */
     .stats {
-      background: #9E3A18;
-      color: #F5F2ED;
+      background: var(--terracotta);
+      color: var(--blanc);
       padding: clamp(48px, 8vw, 80px) var(--section-px);
     }
     .stats-inner {
@@ -372,12 +356,12 @@
       font-size: clamp(2.4rem, 5vw, 3.6rem);
       font-weight: 700;
       line-height: 1;
-      color: #E8C39E;
+      color: var(--sable-dore);
       margin-bottom: 8px;
     }
     .stat-label {
       font-size: 0.82rem;
-      color: rgba(245,242,237,0.75);
+      color: rgba(255,255,255,0.75);
       line-height: 1.5;
       letter-spacing: 0.01em;
     }
@@ -405,14 +389,14 @@
 
     /* ─── Bénéfices ─── */
     .benefits {
-      background: #FFFFFF;
-      color: var(--charcoal);
+      background: var(--blanc);
+      color: var(--noir);
       padding: var(--section-py) var(--section-px);
     }
     .benefits-inner { max-width: var(--max-w); margin: 0 auto; }
-    .benefits .section-eyebrow { color: var(--terra-dark); }
-    .benefits .section-title { color: var(--charcoal); }
-    .benefits .section-lead { color: #5A2812; }
+    .benefits .section-eyebrow { color: var(--terracotta); }
+    .benefits .section-title { color: var(--noir); }
+    .benefits .section-lead { color: var(--noir); }
     .benefits-grid {
       display: flex;
       flex-wrap: wrap;
@@ -428,8 +412,8 @@
       display: flex;
       flex-direction: column;
     }
-    .benefit-card.is-terra { background: #9E3A18; }
-    .benefit-card.is-creme { background: #F5F2ED; }
+    .benefit-card.is-terra { background: var(--terracotta); }
+    .benefit-card.is-creme { background: var(--blanc); }
     .benefit-card:hover {
       box-shadow: 0 8px 28px rgba(0,0,0,0.18);
       transform: translateY(-2px);
@@ -447,8 +431,8 @@
       margin: 0 auto 18px;
       flex-shrink: 0;
     }
-    .is-terra .benefit-badge { background: #F5F2ED; color: #9E3A18; }
-    .is-creme .benefit-badge { background: #9E3A18; color: #F5F2ED; }
+    .is-terra .benefit-badge { background: var(--blanc); color: var(--terracotta); }
+    .is-creme .benefit-badge { background: var(--terracotta); color: var(--blanc); }
     .benefit-icon { display: none; }
     .benefit-num  { display: none; }
     .benefit-title {
@@ -459,8 +443,8 @@
       line-height: 1.3;
       text-align: center;
     }
-    .is-terra .benefit-title { color: #FFFFFF; }
-    .is-creme .benefit-title { color: #2A1208; }
+    .is-terra .benefit-title { color: var(--blanc); }
+    .is-creme .benefit-title { color: var(--noir); }
     .benefit-sub {
       font-size: 0.75rem;
       font-weight: 600;
@@ -469,13 +453,13 @@
       margin: 0 0 8px;
     }
     .is-terra .benefit-sub { color: rgba(255,255,255,0.6); }
-    .is-creme .benefit-sub { color: #9E3A18; }
+    .is-creme .benefit-sub { color: var(--terracotta); }
     .benefit-desc {
       font-size: 0.85rem;
       line-height: 1.7;
     }
     .is-terra .benefit-desc { color: rgba(255,255,255,0.88); }
-    .is-creme .benefit-desc { color: #5A2812; }
+    .is-creme .benefit-desc { color: var(--noir); }
     .benefit-desc { flex-grow: 1; }
     .benefit-badge { display: none; }
     .benefit-icon-badge {
@@ -483,19 +467,19 @@
       display: flex; align-items: center; justify-content: center;
       margin: 0 auto 18px; flex-shrink: 0;
     }
-    .is-terra .benefit-icon-badge { background: #F5F2ED; color: #9E3A18; }
-    .is-creme .benefit-icon-badge { background: #9E3A18; color: #F5F2ED; }
+    .is-terra .benefit-icon-badge { background: var(--blanc); color: var(--terracotta); }
+    .is-creme .benefit-icon-badge { background: var(--terracotta); color: var(--blanc); }
 
     /* ─── Comment ça marche ─── */
     .how {
-      background: #FFFFFF;
-      color: var(--charcoal);
+      background: var(--blanc);
+      color: var(--noir);
       padding: var(--section-py) var(--section-px);
     }
     .how-inner { max-width: 820px; margin: 0 auto; }
-    .how .section-eyebrow { color: #9E3A18; }
-    .how .section-title { color: var(--charcoal); }
-    .how .section-title em { color: #9E3A18; font-style: italic; font-weight: 400; }
+    .how .section-eyebrow { color: var(--terracotta); }
+    .how .section-title { color: var(--noir); }
+    .how .section-title em { color: var(--terracotta); font-style: italic; font-weight: 400; }
     .how-steps {
       display: flex;
       flex-direction: column;
@@ -520,7 +504,7 @@
       font-family: var(--font-serif);
       font-size: 4.5rem;
       font-weight: 700;
-      color: #9E3A18;
+      color: var(--terracotta);
       line-height: 1;
       padding-top: 2px;
       text-align: center;
@@ -535,7 +519,7 @@
     .how-step-action {
       font-size: 0.65rem;
       font-weight: 700;
-      color: #9E3A18;
+      color: var(--terracotta);
       letter-spacing: 0.18em;
       text-transform: uppercase;
       margin-bottom: 10px;
@@ -544,21 +528,21 @@
       font-family: var(--font-serif);
       font-size: clamp(1.4rem, 2.5vw, 2rem);
       font-weight: 600;
-      color: var(--charcoal);
+      color: var(--noir);
       margin-bottom: 12px;
       line-height: 1.2;
     }
     .how-step-desc {
       font-size: 0.9rem;
       line-height: 1.85;
-      color: #2C2620;
+      color: var(--noir);
     }
     .how-step-result {
       display: inline-flex; align-items: center; gap: 6px;
       margin-top: 16px;
       font-size: 0.8rem;
       font-weight: 600;
-      color: #9E3A18;
+      color: var(--terracotta);
       opacity: 0.9;
     }
     .how-step-circle { display: none; }
@@ -566,15 +550,15 @@
 
     /* ─── Tarifs ─── */
     .pricing {
-      background: #FFFFFF;
-      color: var(--charcoal);
+      background: var(--blanc);
+      color: var(--noir);
       padding: var(--section-py) var(--section-px);
     }
     .pricing-inner { max-width: 860px; margin: 0 auto; }
-    .pricing .section-eyebrow { color: #9E3A18; text-align: center; }
+    .pricing .section-eyebrow { color: var(--terracotta); text-align: center; }
     .pricing .section-title { text-align: center; }
-    .pricing .section-title em { color: var(--terra-dark); font-style: italic; font-weight: 400; }
-    .pricing .section-lead { text-align: center; margin-left: auto; margin-right: auto; color: rgba(90,40,18,0.6); }
+    .pricing .section-title em { color: var(--terracotta); font-style: italic; font-weight: 400; }
+    .pricing .section-lead { text-align: center; margin-left: auto; margin-right: auto; color: rgba(28,8,4,0.6); }
     .pricing-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
@@ -587,19 +571,19 @@
       position: relative;
     }
     .pricing-card.featured {
-      background: #FFFFFF;
-      border: 2px solid #9E3A18;
+      background: var(--blanc);
+      border: 2px solid var(--terracotta);
       box-shadow: 0 8px 40px rgba(158,58,24,0.18);
     }
     .pricing-card.standard {
-      background: #FFFFFF;
+      background: var(--blanc);
       border: 1.5px solid rgba(158,58,24,0.35);
       box-shadow: 0 4px 24px rgba(0,0,0,0.06);
     }
     .pricing-badge {
       position: absolute; top: 16px; right: 16px;
-      background: #9E3A18;
-      color: #F5F2ED;
+      background: var(--terracotta);
+      color: var(--blanc);
       font-size: 0.58rem;
       font-weight: 700;
       letter-spacing: 0.1em;
@@ -611,25 +595,25 @@
       font-size: 0.62rem;
       letter-spacing: 0.25em;
       text-transform: uppercase;
-      color: #9E3A18;
+      color: var(--terracotta);
       margin-bottom: 20px;
     }
     .pricing-amount {
       font-family: var(--font-serif);
       font-size: 3rem;
       font-weight: 700;
-      color: #1C0804;
+      color: var(--noir);
       line-height: 1;
       margin-bottom: 4px;
     }
     .pricing-amount span {
       font-size: 1rem;
-      color: #9E3A18;
+      color: var(--terracotta);
       margin-left: 4px;
     }
     .pricing-detail {
       font-size: 0.78rem;
-      color: #6B3020;
+      color: var(--noir);
       margin-bottom: 8px;
     }
     .pricing-green-box {
@@ -639,7 +623,7 @@
       padding: 10px 14px;
       margin-bottom: 24px;
       font-size: 0.76rem;
-      color: #5A2812;
+      color: var(--noir);
       line-height: 1.6;
     }
     .pricing-features {
@@ -650,20 +634,20 @@
     .pricing-features li {
       display: flex; gap: 10px; align-items: flex-start;
       font-size: 0.8rem;
-      color: #5A2812;
+      color: var(--noir);
       line-height: 1.5;
     }
     .pricing-features li::before {
       content: "✔";
-      color: #9E3A18;
+      color: var(--terracotta);
       font-size: 0.72rem;
       flex-shrink: 0;
       margin-top: 2px;
     }
     .btn-buy-primary {
       width: 100%; padding: 14px;
-      background: #9E3A18;
-      color: #F5F2ED;
+      background: var(--terracotta);
+      color: var(--blanc);
       border: none;
       border-radius: 10px;
       font-size: 0.9rem;
@@ -672,21 +656,21 @@
       transition: background 0.2s, transform 0.15s;
       margin-bottom: 8px;
     }
-    .btn-buy-primary:hover { background: #7A2B12; transform: translateY(-1px); }
+    .btn-buy-primary:hover { background: var(--terracotta); transform: translateY(-1px); }
     .btn-buy-secondary {
       width: 100%; padding: 14px;
-      background: #9E3A18;
-      color: #F5F2ED;
+      background: var(--terracotta);
+      color: var(--blanc);
       border: none;
       border-radius: 10px;
       font-size: 0.88rem;
       font-weight: 600;
       transition: background 0.2s;
     }
-    .btn-buy-secondary:hover { background: #7A2B12; }
+    .btn-buy-secondary:hover { background: var(--terracotta); }
     .pricing-footnote {
       font-size: 0.68rem;
-      color: #9E3A18;
+      color: var(--terracotta);
       text-align: center;
       margin-top: 8px;
     }
@@ -697,21 +681,21 @@
     .pricing-trust-item {
       display: flex; align-items: center; gap: 8px;
       font-size: 0.76rem;
-      color: rgba(90,40,18,0.5);
+      color: rgba(28,8,4,0.5);
     }
 
     /* ─── FAQ ─── */
     .faq {
-      background: #9E3A18;
-      color: var(--cream);
+      background: var(--terracotta);
+      color: var(--blanc);
       padding: var(--section-py) var(--section-px);
     }
     .faq-inner { max-width: 760px; margin: 0 auto; }
-    .faq .section-eyebrow { color: rgba(245,242,237,0.65); }
+    .faq .section-eyebrow { color: rgba(255,255,255,0.65); }
     .faq .section-title { color: var(--sable-dore); }
     .faq-list { display: flex; flex-direction: column; }
     .faq-item {
-      border-bottom: 1px solid rgba(245,242,237,0.15);
+      border-bottom: 1px solid rgba(255,255,255,0.15);
     }
     .faq-question {
       width: 100%;
@@ -720,7 +704,7 @@
       padding: 22px 0;
       background: none; border: none;
       text-align: left;
-      color: var(--cream);
+      color: var(--blanc);
     }
     .faq-question p {
       font-family: var(--font-serif);
@@ -729,7 +713,7 @@
       line-height: 1.45;
     }
     .faq-icon {
-      color: rgba(245,242,237,0.8);
+      color: rgba(255,255,255,0.8);
       font-size: 1.4rem;
       line-height: 1;
       flex-shrink: 0;
@@ -744,19 +728,19 @@
     .faq-answer p {
       font-size: 0.88rem;
       line-height: 1.8;
-      color: rgba(245,242,237,0.85);
+      color: rgba(255,255,255,0.85);
     }
 
     /* ─── CTA bande ─── */
     .cta-band {
-      background: #9E3A18;
+      background: var(--terracotta);
       padding: clamp(60px, 9vw, 96px) var(--section-px);
       text-align: center;
     }
-    .cta-band .section-eyebrow { color: rgba(245,242,237,0.65); }
+    .cta-band .section-eyebrow { color: rgba(255,255,255,0.65); }
     .cta-band .section-title { color: var(--sable-dore); }
     .cta-band .section-lead {
-      color: rgba(245,242,237,0.65);
+      color: rgba(255,255,255,0.65);
       margin-left: auto; margin-right: auto;
     }
     .cta-btn-group {
@@ -764,8 +748,8 @@
       flex-wrap: wrap;
     }
     .cta-btn-white {
-      background: #F5F2ED;
-      color: #9E3A18;
+      background: var(--blanc);
+      color: var(--terracotta);
       border: none;
       padding: 16px 36px;
       border-radius: 6px;
@@ -775,11 +759,11 @@
       min-height: 52px;
       transition: background 0.2s, transform 0.15s;
     }
-    .cta-btn-white:hover { background: #F5F2ED; transform: translateY(-2px); }
+    .cta-btn-white:hover { background: var(--blanc); transform: translateY(-2px); }
     .cta-btn-outline {
       background: transparent;
-      color: rgba(245,242,237,0.75);
-      border: 1px solid rgba(245,242,237,0.3);
+      color: rgba(255,255,255,0.75);
+      border: 1px solid rgba(255,255,255,0.3);
       padding: 16px 28px;
       border-radius: 6px;
       font-size: 0.88rem;
@@ -787,12 +771,12 @@
       min-height: 52px;
       transition: background 0.2s, border-color 0.2s;
     }
-    .cta-btn-outline:hover { background: rgba(245,242,237,0.07); border-color: rgba(245,242,237,0.55); }
+    .cta-btn-outline:hover { background: rgba(255,255,255,0.07); border-color: rgba(255,255,255,0.55); }
 
     /* ─── Footer ─── */
     .footer {
-      background: #9E3A18;
-      color: rgba(245,242,237,0.42);
+      background: var(--terracotta);
+      color: rgba(255,255,255,0.42);
       padding: clamp(40px, 7vw, 64px) var(--section-px) clamp(28px, 5vw, 40px);
     }
     .footer-inner {
@@ -806,14 +790,14 @@
       gap: 40px;
       flex-wrap: wrap;
       padding-bottom: 32px;
-      border-bottom: 1px solid rgba(245,242,237,0.07);
+      border-bottom: 1px solid rgba(255,255,255,0.07);
       margin-bottom: 28px;
     }
     .footer-brand .footer-logo {
       font-family: var(--font-serif);
       font-size: 1.35rem;
       font-weight: 600;
-      color: var(--cream);
+      color: var(--blanc);
       margin-bottom: 8px;
     }
     .footer-brand p {
@@ -825,7 +809,7 @@
       font-size: 0.62rem;
       letter-spacing: 0.25em;
       text-transform: uppercase;
-      color: rgba(245,242,237,0.28);
+      color: rgba(255,255,255,0.28);
       margin-bottom: 14px;
     }
     .footer-nav-group ul {
@@ -834,10 +818,10 @@
     }
     .footer-nav-group a {
       font-size: 0.82rem;
-      color: rgba(245,242,237,0.48);
+      color: rgba(255,255,255,0.48);
       transition: color 0.2s;
     }
-    .footer-nav-group a:hover { color: var(--cream); }
+    .footer-nav-group a:hover { color: var(--blanc); }
     .footer-bottom {
       display: flex;
       flex-wrap: wrap;
@@ -849,10 +833,10 @@
     .footer-legal { display: flex; gap: 20px; }
     .footer-legal a {
       font-size: 0.75rem;
-      color: rgba(245,242,237,0.3);
+      color: rgba(255,255,255,0.3);
       transition: color 0.2s;
     }
-    .footer-legal a:hover { color: var(--cream); }
+    .footer-legal a:hover { color: var(--blanc); }
 
     /* ─── Scroll reveal ─── */
     .reveal {
@@ -898,7 +882,7 @@
       display: inline-flex; align-items: center; gap: 6px;
       margin-top: 10px;
       font-size: 0.85rem;
-      color: #9E3A18;
+      color: var(--terracotta);
       background: none; border: none;
       cursor: pointer;
       font-family: var(--font-sans);
@@ -906,31 +890,31 @@
       text-underline-offset: 3px;
       transition: color 0.2s;
     }
-    .callback-link:hover { color: rgba(245,242,237,0.9); }
+    .callback-link:hover { color: rgba(255,255,255,0.9); }
 
     .cta-band-sub {
       margin-top: 18px;
       font-size: 0.85rem;
-      color: rgba(245,242,237,0.45);
+      color: rgba(255,255,255,0.45);
     }
     .cta-band-sub button {
       background: none; border: none; cursor: pointer;
       font-family: var(--font-sans); font-size: 0.85rem;
-      color: rgba(245,242,237,0.55); text-decoration: underline;
+      color: rgba(255,255,255,0.55); text-decoration: underline;
       text-underline-offset: 3px;
     }
-    .cta-band-sub button:hover { color: rgba(245,242,237,0.9); }
+    .cta-band-sub button:hover { color: rgba(255,255,255,0.9); }
 
     /* ─── Simulateur d'économies ─── */
     .simulator {
-      background: #FFFFFF;
-      color: var(--charcoal);
+      background: var(--blanc);
+      color: var(--noir);
       padding: var(--section-py) var(--section-px);
       scroll-margin-top: 80px;
     }
     .simulator-inner { max-width: 820px; margin: 0 auto; text-align: center; }
-    .simulator .section-eyebrow { color: #9E3A18; }
-    .simulator .section-title { color: #9E3A18; }
+    .simulator .section-eyebrow { color: var(--terracotta); }
+    .simulator .section-title { color: var(--terracotta); }
     .sim-price-label {
       font-size: 0.75rem;
       font-weight: 600;
@@ -943,7 +927,7 @@
       font-family: var(--font-serif);
       font-size: clamp(2.6rem, 6vw, 4rem);
       font-weight: 700;
-      color: #9E3A18;
+      color: var(--terracotta);
       line-height: 1;
       margin-bottom: 20px;
     }
@@ -953,7 +937,7 @@
       width: 100%;
       height: 6px;
       border-radius: 3px;
-      background: linear-gradient(to right, #9E3A18 0%, #9E3A18 var(--pct, 22%), rgba(158,58,24,0.15) var(--pct, 22%), rgba(158,58,24,0.15) 100%);
+      background: linear-gradient(to right, var(--terracotta) 0%, var(--terracotta) var(--pct, 22%), rgba(158,58,24,0.15) var(--pct, 22%), rgba(158,58,24,0.15) 100%);
       outline: none;
       margin-bottom: 8px;
       cursor: pointer;
@@ -962,16 +946,16 @@
       -webkit-appearance: none;
       width: 24px; height: 24px;
       border-radius: 50%;
-      background: #9E3A18;
-      border: 3px solid #FFFFFF;
+      background: var(--terracotta);
+      border: 3px solid var(--blanc);
       box-shadow: 0 2px 10px rgba(158,58,24,0.25);
       cursor: pointer;
     }
     .sim-slider::-moz-range-thumb {
       width: 24px; height: 24px;
       border-radius: 50%;
-      background: #9E3A18;
-      border: 3px solid #FFFFFF;
+      background: var(--terracotta);
+      border: 3px solid var(--blanc);
       box-shadow: 0 2px 10px rgba(158,58,24,0.25);
       cursor: pointer;
     }
@@ -1003,7 +987,7 @@
       border-radius: 16px 0 0 0;
     }
     .sim-result-col.vpm-col {
-      background: #9E3A18;
+      background: var(--terracotta);
       border-radius: 0 16px 0 0;
     }
     .sim-result-col.vs-col {
@@ -1026,7 +1010,7 @@
       margin-bottom: 12px;
     }
     .sim-result-col.agency .sim-result-label { color: rgba(158,58,24,0.65); }
-    .sim-result-col.vpm-col .sim-result-label { color: rgba(245,242,237,0.75); }
+    .sim-result-col.vpm-col .sim-result-label { color: rgba(255,255,255,0.75); }
     .sim-result-amount {
       font-family: var(--font-serif);
       font-size: clamp(1.8rem, 4vw, 2.6rem);
@@ -1034,11 +1018,11 @@
       line-height: 1;
       margin-bottom: 6px;
     }
-    .sim-result-col.agency .sim-result-amount { color: #9E3A18; }
-    .sim-result-col.vpm-col .sim-result-amount { color: #FFFFFF; }
+    .sim-result-col.agency .sim-result-amount { color: var(--terracotta); }
+    .sim-result-col.vpm-col .sim-result-amount { color: var(--blanc); }
     .sim-result-sub { font-size: 0.74rem; }
     .sim-result-col.agency .sim-result-sub { color: rgba(158,58,24,0.6); }
-    .sim-result-col.vpm-col .sim-result-sub { color: rgba(245,242,237,0.7); }
+    .sim-result-col.vpm-col .sim-result-sub { color: rgba(255,255,255,0.7); }
     /* barre proportionnelle */
     .sim-bar-wrap {
       display: flex;
@@ -1048,7 +1032,7 @@
       margin-bottom: 20px;
     }
     .sim-bar-save {
-      background: #9E3A18;
+      background: var(--terracotta);
       transition: width 0.35s ease;
       position: relative;
     }
@@ -1065,9 +1049,9 @@
       letter-spacing: 0.1em;
       margin-bottom: 16px;
     }
-    .sim-bar-labels span:first-child { color: #9E3A18; font-weight: 700; }
+    .sim-bar-labels span:first-child { color: var(--terracotta); font-weight: 700; }
     .sim-savings-banner {
-      background: #9E3A18;
+      background: var(--terracotta);
       border-radius: 0 0 16px 16px;
       padding: 24px 28px;
       display: flex;
@@ -1081,19 +1065,19 @@
       font-size: 0.68rem;
       letter-spacing: 0.14em;
       text-transform: uppercase;
-      color: rgba(245,242,237,0.7);
+      color: rgba(255,255,255,0.7);
       margin-bottom: 4px;
     }
     .sim-savings-amount {
       font-family: var(--font-serif);
       font-size: clamp(2rem, 5vw, 2.8rem);
       font-weight: 700;
-      color: #FFFFFF;
+      color: var(--blanc);
       line-height: 1;
     }
     .sim-cta-btn {
-      background: #F5F2ED;
-      color: #9E3A18;
+      background: var(--blanc);
+      color: var(--terracotta);
       border: none;
       padding: 14px 26px;
       border-radius: 8px;
@@ -1105,23 +1089,23 @@
       font-family: var(--font-sans);
       transition: background 0.2s, transform 0.15s;
     }
-    .sim-cta-btn:hover { background: #FFFFFF; transform: translateY(-1px); }
+    .sim-cta-btn:hover { background: var(--blanc); transform: translateY(-1px); }
 
     /* ─── 3 peurs des vendeurs ─── */
     .fears {
-      background: #9E3A18;
-      color: var(--cream);
+      background: var(--terracotta);
+      color: var(--blanc);
       padding: var(--section-py) var(--section-px);
     }
     .fears-inner { max-width: var(--max-w); margin: 0 auto; }
-    .fears .section-eyebrow { color: rgba(245,242,237,0.65); }
+    .fears .section-eyebrow { color: rgba(255,255,255,0.65); }
     .fears-grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
       gap: 20px;
     }
     .fear-card {
-      background: #FFFFFF;
+      background: var(--blanc);
       border: 1px solid rgba(255,255,255,0.12);
       border-radius: 16px;
       padding: 32px 26px;
@@ -1136,7 +1120,7 @@
       font-family: var(--font-serif);
       font-size: 1.1rem;
       font-weight: 600;
-      color: var(--charcoal);
+      color: var(--noir);
       line-height: 1.4;
       padding-bottom: 14px;
       border-bottom: 1px solid rgba(158,58,24,0.12);
@@ -1145,13 +1129,13 @@
       font-size: 0.6rem;
       letter-spacing: 0.2em;
       text-transform: uppercase;
-      color: #9E3A18;
+      color: var(--terracotta);
       font-weight: 700;
     }
     .fear-answer {
       font-size: 0.86rem;
       line-height: 1.75;
-      color: #5A2812;
+      color: var(--noir);
       flex: 1;
     }
     .fear-badge {
@@ -1163,7 +1147,7 @@
       border-radius: 20px;
       padding: 5px 13px;
       font-size: 0.71rem;
-      color: #9E3A18;
+      color: var(--terracotta);
       font-weight: 600;
       align-self: flex-start;
     }
@@ -1181,12 +1165,12 @@
     /* ─── Comparatif table ─── */
     /* ─── Comparatif refondu ─── */
     .compare-table-section {
-      background: #9E3A18;
-      color: var(--cream);
+      background: var(--terracotta);
+      color: var(--blanc);
       padding: var(--section-py) var(--section-px);
     }
     .compare-table-section .cts-inner { max-width: 920px; margin: 0 auto; }
-    .compare-table-section .section-eyebrow { color: rgba(245,242,237,0.65); }
+    .compare-table-section .section-eyebrow { color: rgba(255,255,255,0.65); }
     .compare-table-section .section-title { color: var(--sable-dore); }
 
     .cmp2-wrap {
@@ -1203,18 +1187,18 @@
       padding: 18px 22px;
       font-weight: 600;
     }
-    .cmp2-th-blank { background: rgba(245,242,237,0.1); }
+    .cmp2-th-blank { background: rgba(255,255,255,0.1); }
     .cmp2-th-vpm {
-      background: #FFFFFF;
-      color: #9E3A18;
+      background: var(--blanc);
+      color: var(--terracotta);
       font-family: var(--font-serif);
       font-size: 1rem;
       text-align: center;
       display: flex; align-items: center; justify-content: center;
     }
     .cmp2-th-agence {
-      background: rgba(245,242,237,0.15);
-      color: rgba(245,242,237,0.65);
+      background: rgba(255,255,255,0.15);
+      color: rgba(255,255,255,0.65);
       font-size: 0.85rem;
       text-align: center;
       display: flex; align-items: center; justify-content: center;
@@ -1223,24 +1207,24 @@
       padding: 16px 22px;
       font-size: 0.87rem;
       font-weight: 600;
-      color: var(--cream);
-      background: rgba(245,242,237,0.1);
+      color: var(--blanc);
+      background: rgba(255,255,255,0.1);
       display: flex; align-items: center;
-      border-bottom: 1px solid rgba(245,242,237,0.1);
+      border-bottom: 1px solid rgba(255,255,255,0.1);
     }
     .cmp2-vpm {
-      background: #FFFFFF;
+      background: var(--blanc);
       padding: 16px 18px;
       display: flex; align-items: center; justify-content: center;
       text-align: center;
       border-bottom: 1px solid rgba(255,255,255,0.08);
     }
     .cmp2-age {
-      background: rgba(245,242,237,0.15);
+      background: rgba(255,255,255,0.15);
       padding: 16px 18px;
       display: flex; align-items: center; justify-content: center;
       text-align: center;
-      border-bottom: 1px solid rgba(245,242,237,0.1);
+      border-bottom: 1px solid rgba(255,255,255,0.1);
     }
     .cmp2-row:last-child .cmp2-label,
     .cmp2-row:last-child .cmp2-vpm,
@@ -1249,7 +1233,7 @@
     .cmp2-yes {
       display: inline-flex; align-items: flex-start; gap: 7px;
       font-size: 0.82rem; font-weight: 600;
-      color: #9E3A18; line-height: 1.45;
+      color: var(--terracotta); line-height: 1.45;
     }
     .cmp2-yes-chk {
       width: 18px; height: 18px; border-radius: 50%;
@@ -1259,18 +1243,18 @@
     }
     .cmp2-no {
       display: inline-flex; align-items: flex-start; gap: 7px;
-      font-size: 0.82rem; color: rgba(245,242,237,0.65); line-height: 1.45;
+      font-size: 0.82rem; color: rgba(255,255,255,0.65); line-height: 1.45;
     }
     .cmp2-no-x {
       width: 18px; height: 18px; border-radius: 50%;
-      background: rgba(245,242,237,0.12); color: rgba(245,242,237,0.55);
+      background: rgba(255,255,255,0.12); color: rgba(255,255,255,0.55);
       display: flex; align-items: center; justify-content: center;
       font-size: 0.65rem; flex-shrink: 0; margin-top: 1px;
     }
 
     .cmp2-pap {
-      background: rgba(245,242,237,0.12);
-      border-left: 3px solid rgba(245,242,237,0.4);
+      background: rgba(255,255,255,0.12);
+      border-left: 3px solid rgba(255,255,255,0.4);
       border-radius: 10px;
       padding: 20px 24px;
       margin-bottom: 28px;
@@ -1278,12 +1262,12 @@
     .cmp2-pap-title {
       font-family: var(--font-serif);
       font-size: 0.95rem; font-weight: 600;
-      color: var(--cream); margin-bottom: 6px;
+      color: var(--blanc); margin-bottom: 6px;
     }
-    .cmp2-pap-body { font-size: 0.84rem; line-height: 1.75; color: rgba(245,242,237,0.75); }
+    .cmp2-pap-body { font-size: 0.84rem; line-height: 1.75; color: rgba(255,255,255,0.75); }
 
     .cmp2-banner {
-      background: #FFFFFF;
+      background: var(--blanc);
       border-radius: 0;
       padding: 36px var(--section-px);
       margin-left: calc(-1 * var(--section-px));
@@ -1300,18 +1284,18 @@
     .cmp2-banner-amount {
       font-family: var(--font-serif);
       font-size: 3.6rem; font-weight: 700;
-      color: #9E3A18; line-height: 1;
+      color: var(--terracotta); line-height: 1;
     }
     .cmp2-banner-source { font-size: 0.68rem; color: rgba(158,58,24,0.5); margin-top: 5px; }
     .cmp2-banner-btn {
-      background: #9E3A18; color: #F5F2ED;
+      background: var(--terracotta); color: var(--blanc);
       border: none; padding: 15px 30px; border-radius: 10px;
       font-size: 0.9rem; font-weight: 700; cursor: pointer;
       font-family: var(--font-sans); white-space: nowrap;
       min-height: 44px; flex-shrink: 0;
       transition: background 0.15s;
     }
-    .cmp2-banner-btn:hover { background: #7A2E12; }
+    .cmp2-banner-btn:hover { background: var(--terracotta); }
 
     @media (max-width: 640px) {
       .cmp2-wrap {
@@ -1324,9 +1308,9 @@
         border-radius: 12px; overflow: hidden;
         box-shadow: 0 2px 8px rgba(0,0,0,0.08);
       }
-      .cmp2-label { border-bottom: 1px solid rgba(245,242,237,0.15); font-size: 0.9rem; }
+      .cmp2-label { border-bottom: 1px solid rgba(255,255,255,0.15); font-size: 0.9rem; }
       .cmp2-vpm, .cmp2-age { justify-content: flex-start; border-bottom: none; }
-      .cmp2-row:last-child .cmp2-label { border-bottom: 1px solid #EDE8E1; }
+      .cmp2-row:last-child .cmp2-label { border-bottom: 1px solid var(--blanc); }
       .cmp2-banner { padding: 28px var(--section-px); }
       .cmp2-banner-inner { flex-direction: column; text-align: center; }
       .cmp2-banner-amount { font-size: 2.8rem; }
@@ -1334,56 +1318,56 @@
 
     /* ─── Témoignages ─── */
     .testimonials {
-      background: #FFFFFF;
-      color: var(--charcoal);
+      background: var(--blanc);
+      color: var(--noir);
       padding: var(--section-py) var(--section-px);
     }
     .testimonials-inner { max-width: var(--max-w); margin: 0 auto; }
-    .testimonials .section-eyebrow { color: #9E3A18; }
-    .testimonials .section-title { color: var(--charcoal); }
+    .testimonials .section-eyebrow { color: var(--terracotta); }
+    .testimonials .section-title { color: var(--noir); }
     .testi-grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
       gap: 18px; margin-bottom: 28px;
     }
     .testi-card {
-      background: #FFFFFF; border: 1px solid rgba(158,58,24,0.12);
+      background: var(--blanc); border: 1px solid rgba(158,58,24,0.12);
       border-radius: 16px; padding: 26px 22px;
       display: flex; flex-direction: column; gap: 13px;
     }
-    .testi-card.testi-featured { background: #FFFFFF; border-color: rgba(158,58,24,0.22); }
+    .testi-card.testi-featured { background: var(--blanc); border-color: rgba(158,58,24,0.22); }
     .testi-qmark {
       font-family: var(--font-serif); font-size: 2.8rem;
-      color: var(--terra); line-height: 1; height: 26px; overflow: hidden;
+      color: var(--terracotta); line-height: 1; height: 26px; overflow: hidden;
     }
-    .testi-card.testi-featured .testi-qmark { color: var(--terra); }
+    .testi-card.testi-featured .testi-qmark { color: var(--terracotta); }
     .testi-stars { display: flex; gap: 2px; }
-    .testi-star { color: #9E3A18; font-size: 0.8rem; }
-    .testi-body { font-size: 0.86rem; line-height: 1.75; color: #2A1006; flex: 1; }
-    .testi-card.testi-featured .testi-body { color: #2A1006; }
+    .testi-star { color: var(--terracotta); font-size: 0.8rem; }
+    .testi-body { font-size: 0.86rem; line-height: 1.75; color: var(--noir); flex: 1; }
+    .testi-card.testi-featured .testi-body { color: var(--noir); }
     .testi-foot {
       display: flex; align-items: center; gap: 10px;
-      padding-top: 14px; border-top: 1px solid #EAE5DE;
+      padding-top: 14px; border-top: 1px solid var(--blanc);
     }
-    .testi-card.testi-featured .testi-foot { border-top-color: #EAE5DE; }
+    .testi-card.testi-featured .testi-foot { border-top-color: var(--blanc); }
     .testi-av {
       width: 38px; height: 38px; border-radius: 50%;
       display: flex; align-items: center; justify-content: center;
       font-family: var(--font-serif); font-size: 0.95rem; font-weight: 700; flex-shrink: 0;
     }
-    .testi-card:not(.testi-featured) .testi-av { background: #E5DED3; color: var(--charcoal); }
-    .testi-card.testi-featured .testi-av { background: #E5DED3; color: var(--charcoal); }
-    .testi-who-name { font-size: 0.82rem; font-weight: 600; color: var(--charcoal); }
-    .testi-card.testi-featured .testi-who-name { color: var(--charcoal); }
-    .testi-who-detail { font-size: 0.7rem; color: #999; margin-top: 1px; }
-    .testi-card.testi-featured .testi-who-detail { color: #999; }
+    .testi-card:not(.testi-featured) .testi-av { background: var(--blanc); color: var(--noir); }
+    .testi-card.testi-featured .testi-av { background: var(--blanc); color: var(--noir); }
+    .testi-who-name { font-size: 0.82rem; font-weight: 600; color: var(--noir); }
+    .testi-card.testi-featured .testi-who-name { color: var(--noir); }
+    .testi-who-detail { font-size: 0.7rem; color: rgba(28,8,4,0.35); margin-top: 1px; }
+    .testi-card.testi-featured .testi-who-detail { color: rgba(28,8,4,0.35); }
     .testi-eco { margin-left: auto; text-align: right; flex-shrink: 0; }
     .testi-eco-amt {
       font-family: var(--font-serif); font-size: 1.05rem;
-      font-weight: 700; color: #9E3A18;
+      font-weight: 700; color: var(--terracotta);
     }
-    .testi-card.testi-featured .testi-eco-amt { color: #9E3A18; }
-    .testi-eco-lbl { font-size: 0.6rem; color: #bbb; text-transform: uppercase; letter-spacing: 0.05em; }
+    .testi-card.testi-featured .testi-eco-amt { color: var(--terracotta); }
+    .testi-eco-lbl { font-size: 0.6rem; color: rgba(28,8,4,0.18); text-transform: uppercase; letter-spacing: 0.05em; }
     .testi-stats-bar {
       display: flex; justify-content: center; gap: 40px; flex-wrap: wrap;
       padding: 22px 28px;
@@ -1392,7 +1376,7 @@
     .testi-stat { text-align: center; }
     .testi-stat-n {
       font-family: var(--font-serif); font-size: 1.9rem;
-      font-weight: 700; color: #9E3A18; line-height: 1;
+      font-weight: 700; color: var(--terracotta); line-height: 1;
     }
     .testi-stat-l {
       font-size: 0.68rem; color: rgba(158,58,24,0.6);
@@ -1401,56 +1385,56 @@
 
     /* ─── Fondateurs ─── */
     .founders {
-      background: #9E3A18;
-      color: var(--cream);
+      background: var(--terracotta);
+      color: var(--blanc);
       padding: var(--section-py) var(--section-px);
     }
     .founders-inner { max-width: var(--max-w); margin: 0 auto; }
-    .founders .section-eyebrow { color: rgba(245,242,237,0.65); }
-    .founders .section-title { color: #FFFFFF; }
+    .founders .section-eyebrow { color: rgba(255,255,255,0.65); }
+    .founders .section-title { color: var(--blanc); }
     .founders-grid {
       display: grid; grid-template-columns: 1fr 1fr;
       gap: 22px; margin-bottom: 32px;
     }
     .founder-card {
-      background: #FFFFFF; border: 1px solid rgba(255,255,255,0.15);
+      background: var(--blanc); border: 1px solid rgba(255,255,255,0.15);
       border-radius: 16px; padding: 28px 24px;
       display: flex; flex-direction: column; gap: 14px;
     }
     .founder-top { display: flex; align-items: center; gap: 16px; }
     .founder-av {
       width: 62px; height: 62px; border-radius: 50%;
-      background: #FFFFFF;
+      background: var(--blanc);
       display: flex; align-items: center; justify-content: center;
       font-family: var(--font-serif); font-size: 1.65rem;
-      color: #9E3A18; font-weight: 700; flex-shrink: 0;
+      color: var(--terracotta); font-weight: 700; flex-shrink: 0;
       border: 2px solid rgba(255,255,255,0.3);
     }
     .founder-fn {
       font-family: var(--font-serif); font-size: 1.2rem;
-      color: var(--charcoal); font-weight: 600; line-height: 1.1;
+      color: var(--noir); font-weight: 600; line-height: 1.1;
     }
     .founder-role-lbl {
-      font-size: 0.67rem; color: #9E3A18; font-weight: 600;
+      font-size: 0.67rem; color: var(--terracotta); font-weight: 600;
       text-transform: uppercase; letter-spacing: 0.08em; margin-top: 4px;
     }
-    .founder-bio { font-size: 0.86rem; color: #5A2812; line-height: 1.75; }
+    .founder-bio { font-size: 0.86rem; color: var(--noir); line-height: 1.75; }
     .founder-stats {
       display: flex; gap: 20px;
       padding-top: 14px; border-top: 1px solid rgba(158,58,24,0.10);
     }
     .founder-stat-n {
       font-family: var(--font-serif); font-size: 1.3rem;
-      color: #9E3A18; font-weight: 700; line-height: 1;
+      color: var(--terracotta); font-weight: 700; line-height: 1;
     }
     .founder-stat-l {
-      font-size: 0.63rem; color: var(--stone);
+      font-size: 0.63rem; color: var(--noir);
       text-transform: uppercase; letter-spacing: 0.06em; margin-top: 2px;
     }
     .founders-quote {
       text-align: center; font-family: var(--font-serif);
       font-size: 1.1rem; font-style: italic;
-      color: rgba(245,242,237,0.85); max-width: 580px;
+      color: rgba(255,255,255,0.85); max-width: 580px;
       margin: 0 auto; line-height: 1.7;
     }
     .founder-photo-wrap {
@@ -1470,7 +1454,7 @@
     .founders-intro {
       text-align: center;
       font-size: 0.95rem;
-      color: rgba(245,242,237,0.75);
+      color: rgba(255,255,255,0.75);
       max-width: 620px;
       margin: 32px auto 44px;
       line-height: 1.75;
@@ -1543,8 +1527,8 @@
     <div class="hero-content">
       <div class="hero-title-card reveal">
         <h1 class="hero-title" style="margin-bottom:0">
-          <span style="color:#9E3A18;">Vendre</span> <span style="color:#F5F2ED;">seul…</span><br/>
-          <em><span style="color:#F5F2ED;">mais comme un</span> <span style="color:#9E3A18;">pro&nbsp;!</span></em>
+          <span style="color:var(--terracotta);">Vendre</span> <span style="color:var(--blanc);">seul…</span><br/>
+          <em><span style="color:var(--blanc);">mais comme un</span> <span style="color:var(--terracotta);">pro&nbsp;!</span></em>
         </h1>
       </div>
 
@@ -1554,23 +1538,23 @@
 
       <ul class="hero-checklist reveal" style="list-style:none;padding:0;margin:0 0 28px;display:flex;flex-direction:column;gap:12px;">
         <li class="hero-checklist-item">
-          <span class="hero-checklist-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 3L22 11H19V21H5V11H2L12 3Z" stroke="#9E3A18" stroke-width="1.8" stroke-linejoin="round" fill="rgba(158,58,24,0.12)"/><path d="M8.5 15.5l2.5 2.5 4.5-4.5" stroke="#9E3A18" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+          <span class="hero-checklist-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 3L22 11H19V21H5V11H2L12 3Z" stroke="var(--terracotta)" stroke-width="1.8" stroke-linejoin="round" fill="rgba(158,58,24,0.12)"/><path d="M8.5 15.5l2.5 2.5 4.5-4.5" stroke="var(--terracotta)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
           Le savoir-faire de professionnels de l'immobilier, mis à votre portée
         </li>
         <li class="hero-checklist-item">
-          <span class="hero-checklist-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 3L22 11H19V21H5V11H2L12 3Z" stroke="#9E3A18" stroke-width="1.8" stroke-linejoin="round" fill="rgba(158,58,24,0.12)"/><path d="M8.5 15.5l2.5 2.5 4.5-4.5" stroke="#9E3A18" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+          <span class="hero-checklist-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 3L22 11H19V21H5V11H2L12 3Z" stroke="var(--terracotta)" stroke-width="1.8" stroke-linejoin="round" fill="rgba(158,58,24,0.12)"/><path d="M8.5 15.5l2.5 2.5 4.5-4.5" stroke="var(--terracotta)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
           Tout votre bien réuni dans un seul dossier, partagé en un clic
         </li>
         <li class="hero-checklist-item">
-          <span class="hero-checklist-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 3L22 11H19V21H5V11H2L12 3Z" stroke="#9E3A18" stroke-width="1.8" stroke-linejoin="round" fill="rgba(158,58,24,0.12)"/><path d="M8.5 15.5l2.5 2.5 4.5-4.5" stroke="#9E3A18" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+          <span class="hero-checklist-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 3L22 11H19V21H5V11H2L12 3Z" stroke="var(--terracotta)" stroke-width="1.8" stroke-linejoin="round" fill="rgba(158,58,24,0.12)"/><path d="M8.5 15.5l2.5 2.5 4.5-4.5" stroke="var(--terracotta)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
           Vous restez en lien avec chaque acheteur, en toute clarté, sans y passer vos soirées
         </li>
         <li class="hero-checklist-item">
-          <span class="hero-checklist-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 3L22 11H19V21H5V11H2L12 3Z" stroke="#9E3A18" stroke-width="1.8" stroke-linejoin="round" fill="rgba(158,58,24,0.12)"/><path d="M8.5 15.5l2.5 2.5 4.5-4.5" stroke="#9E3A18" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+          <span class="hero-checklist-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 3L22 11H19V21H5V11H2L12 3Z" stroke="var(--terracotta)" stroke-width="1.8" stroke-linejoin="round" fill="rgba(158,58,24,0.12)"/><path d="M8.5 15.5l2.5 2.5 4.5-4.5" stroke="var(--terracotta)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
           Les visites se réservent en ligne, sans que vous gériez les rendez-vous
         </li>
         <li class="hero-checklist-item">
-          <span class="hero-checklist-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 3L22 11H19V21H5V11H2L12 3Z" stroke="#9E3A18" stroke-width="1.8" stroke-linejoin="round" fill="rgba(158,58,24,0.12)"/><path d="M8.5 15.5l2.5 2.5 4.5-4.5" stroke="#9E3A18" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+          <span class="hero-checklist-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 3L22 11H19V21H5V11H2L12 3Z" stroke="var(--terracotta)" stroke-width="1.8" stroke-linejoin="round" fill="rgba(158,58,24,0.12)"/><path d="M8.5 15.5l2.5 2.5 4.5-4.5" stroke="var(--terracotta)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
           Un tarif fixe, payé une fois, sans mauvaise surprise
         </li>
       </ul>
@@ -1585,7 +1569,7 @@
       </div>
       <div class="reveal" style="margin-top:-10px;margin-bottom:18px;">
         <button class="callback-link" onclick="openCallback()">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#9E3A18" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 10.8 19.79 19.79 0 01.12 2.18 2 2 0 012.11 0h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.09 7.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 14.92z"/></svg>
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--terracotta)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 10.8 19.79 19.79 0 01.12 2.18 2 2 0 012.11 0h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.09 7.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 14.92z"/></svg>
           Vous avez des questions ? Demandez à être rappelé gratuitement
         </button>
       </div>
@@ -1593,19 +1577,19 @@
       <div class="hero-trust reveal">
         <span class="hero-trust-item">
           <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
-            <path d="M2 7L5.5 10.5L12 3.5" stroke="#9E3A18" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M2 7L5.5 10.5L12 3.5" stroke="var(--terracotta)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
           </svg>
           Paiement sécurisé
         </span>
         <span class="hero-trust-item">
           <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
-            <path d="M2 7L5.5 10.5L12 3.5" stroke="#9E3A18" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M2 7L5.5 10.5L12 3.5" stroke="var(--terracotta)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
           </svg>
           Annulation sous 48h
         </span>
         <span class="hero-trust-item">
           <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
-            <path d="M2 7L5.5 10.5L12 3.5" stroke="#9E3A18" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M2 7L5.5 10.5L12 3.5" stroke="var(--terracotta)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
           </svg>
           Zéro commission sur la vente
         </span>
@@ -1620,7 +1604,7 @@
       <p class="section-eyebrow reveal">Pourquoi Vendu Par Moi ?</p>
       <h2 class="section-title reveal">
         Vendez en toute confiance,<br/>
-        <em style="color:var(--terra-dark);font-style:italic;font-weight:400">gardez la main du début à la fin.</em>
+        <em style="color:var(--terracotta);font-style:italic;font-weight:400">gardez la main du début à la fin.</em>
       </h2>
 
       <div class="benefits-grid">
@@ -1670,7 +1654,7 @@
       </div>
 
       <div style="text-align:center;margin-top:48px;" class="reveal">
-        <button style="background:#F5F2ED;color:#9E3A18;border:none;border-radius:8px;padding:14px 36px;font-size:0.95rem;font-weight:600;font-family:'DM Sans',sans-serif;cursor:pointer;letter-spacing:0.03em;transition:background .2s;" onmouseover="this.style.opacity='0.85'" onmouseout="this.style.opacity='1'" onclick="document.getElementById('comment-ca-marche').scrollIntoView({behavior:'smooth'})">Voir comment ça marche →</button>
+        <button style="background:var(--blanc);color:var(--terracotta);border:none;border-radius:8px;padding:14px 36px;font-size:0.95rem;font-weight:600;font-family:'DM Sans',sans-serif;cursor:pointer;letter-spacing:0.03em;transition:background .2s;" onmouseover="this.style.opacity='0.85'" onmouseout="this.style.opacity='1'" onclick="document.getElementById('comment-ca-marche').scrollIntoView({behavior:'smooth'})">Voir comment ça marche →</button>
       </div>
     </div>
   </section>
@@ -1703,7 +1687,7 @@
       <h2 class="section-title reveal">
         5 étapes, un objectif&nbsp;: <em>la vente de votre bien.</em>
       </h2>
-      <p class="section-lead reveal" style="color:#2C2620;">
+      <p class="section-lead reveal" style="color:var(--noir);">
         À chaque étape, une méthode, des outils et un accompagnement pour avancer sereinement jusqu'à la signature.
       </p>
 
@@ -1772,7 +1756,7 @@
       </div>
 
       <div style="text-align:center;margin-top:48px;" class="reveal">
-        <button style="background:#F5F2ED;color:#9E3A18;border:none;border-radius:8px;padding:14px 36px;font-size:0.95rem;font-weight:600;font-family:'DM Sans',sans-serif;cursor:pointer;letter-spacing:0.03em;transition:background .2s;" onmouseover="this.style.opacity='0.85'" onmouseout="this.style.opacity='1'" onclick="document.getElementById('economie').scrollIntoView({behavior:'smooth'})">Calculer mon économie →</button>
+        <button style="background:var(--blanc);color:var(--terracotta);border:none;border-radius:8px;padding:14px 36px;font-size:0.95rem;font-weight:600;font-family:'DM Sans',sans-serif;cursor:pointer;letter-spacing:0.03em;transition:background .2s;" onmouseover="this.style.opacity='0.85'" onmouseout="this.style.opacity='1'" onclick="document.getElementById('economie').scrollIntoView({behavior:'smooth'})">Calculer mon économie →</button>
       </div>
     </div>
   </section>
@@ -1781,8 +1765,8 @@
   <section class="compare-table-section" aria-label="Comparatif Vendu Par Moi vs agence">
     <div class="cts-inner">
       <p class="section-eyebrow reveal">Pourquoi choisir Vendu Par Moi</p>
-      <h2 class="section-title reveal"><span style="color:rgba(255,255,255,0.55);">Ce que vous perdez avec une agence.</span><br/><em style="color:#E8C39E;font-style:italic;font-weight:400">Ce que vous gardez avec nous.</em></h2>
-      <p style="font-size:0.95rem;color:rgba(245,242,237,0.75);max-width:520px;margin:0 0 36px;line-height:1.75;" class="reveal">
+      <h2 class="section-title reveal"><span style="color:rgba(255,255,255,0.55);">Ce que vous perdez avec une agence.</span><br/><em style="color:var(--sable-dore);font-style:italic;font-weight:400">Ce que vous gardez avec nous.</em></h2>
+      <p style="font-size:0.95rem;color:rgba(255,255,255,0.75);max-width:520px;margin:0 0 36px;line-height:1.75;" class="reveal">
         Une agence prend 4 à 6&nbsp;% de votre vente — peu importe le travail fourni. Comparez.
       </p>
 
@@ -1859,7 +1843,7 @@
   <section class="simulator" id="economie" aria-label="Simulateur d'économies">
     <div class="simulator-inner">
       <p class="section-eyebrow reveal">Calculez votre économie</p>
-      <h2 class="section-title reveal"><span style="color:#1C0804;">Combien économisez-vous</span><br/>avec Vendu Par Moi&nbsp;?</h2>
+      <h2 class="section-title reveal"><span style="color:var(--noir);">Combien économisez-vous</span><br/>avec Vendu Par Moi&nbsp;?</h2>
       <p style="font-size:0.95rem;color:rgba(158,58,24,0.65);margin:0 auto 36px;max-width:520px;line-height:1.75;" class="reveal">
         Faites glisser le curseur sur le prix estimé de votre bien et voyez ce que vous gardez.
       </p>
@@ -1918,10 +1902,10 @@
   <section class="fears" aria-label="Vos questions">
     <div class="fears-inner">
       <p class="section-eyebrow reveal">Ce que vous vous demandez</p>
-      <h2 class="section-title reveal" style="color:#FFFFFF;">
-        On a les réponses à <span style="color:#E8C39E;">vos questions</span>.
+      <h2 class="section-title reveal" style="color:var(--blanc);">
+        On a les réponses à <span style="color:var(--sable-dore);">vos questions</span>.
       </h2>
-      <p style="font-size:0.95rem;color:rgba(245,242,237,0.75);max-width:540px;margin:0 0 3rem;line-height:1.75;" class="reveal">
+      <p style="font-size:0.95rem;color:rgba(255,255,255,0.75);max-width:540px;margin:0 0 3rem;line-height:1.75;" class="reveal">
         Voici ce que se disent la plupart des vendeurs avant de se lancer. Et pourquoi avec VPM, ces blocages n'existent plus.
       </p>
 
@@ -1929,7 +1913,7 @@
 
         <div class="fear-card reveal">
           <div class="fear-icon">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#9E3A18" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--terracotta)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
               <path d="M14 9a2 2 0 0 1-2 2H6l-4 4V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2z"/>
               <path d="M18 9h2a2 2 0 0 1 2 2v11l-4-4h-6a2 2 0 0 1-2-2v-1"/>
             </svg>
@@ -1944,7 +1928,7 @@
 
         <div class="fear-card reveal">
           <div class="fear-icon">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#9E3A18" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--terracotta)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
               <path d="M21 7.5V6a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h3.5"/>
               <path d="M16 2v4"/><path d="M8 2v4"/><path d="M3 10h5"/>
               <circle cx="17" cy="17" r="4"/>
@@ -1961,7 +1945,7 @@
 
         <div class="fear-card reveal">
           <div class="fear-icon">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#9E3A18" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--terracotta)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
               <rect width="8" height="4" x="8" y="2" rx="1" ry="1"/>
               <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/>
               <path d="m9 14 2 2 4-4"/>
@@ -1983,7 +1967,7 @@
   <section class="testimonials" id="temoignages" aria-label="Témoignages clients">
     <div class="testimonials-inner">
       <p class="section-eyebrow reveal">Ils ont vendu sans agence</p>
-      <h2 class="section-title reveal">Ils ont vendu par <span style="color:#9E3A18;">eux-mêmes</span></h2>
+      <h2 class="section-title reveal">Ils ont vendu par <span style="color:var(--terracotta);">eux-mêmes</span></h2>
       <p style="font-size:0.95rem;color:rgba(158,58,24,0.65);max-width:460px;margin:0 0 40px;line-height:1.75;" class="reveal">
         Des particuliers comme vous, qui ont gardé leur commission.
       </p>
@@ -2073,7 +2057,7 @@
     <div class="founders-inner">
       <p class="section-eyebrow reveal">Les fondateurs</p>
       <h2 class="section-title reveal">
-        <span style="color:#FFFFFF;">Deux agents immobiliers qui ont décidé de </span><span style="color:#E8C39E;">changer les règles.</span>
+        <span style="color:var(--blanc);">Deux agents immobiliers qui ont décidé de </span><span style="color:var(--sable-dore);">changer les règles.</span>
       </h2>
 
       <div class="founder-photo-wrap reveal">
@@ -2178,7 +2162,7 @@
       </div>
 
       <div style="text-align:center;margin:0 0 24px;">
-        <button onclick="openCallback()" style="background:none;border:1.5px solid rgba(158,58,24,0.3);border-radius:10px;color:rgba(158,58,24,0.7);padding:11px 28px;font-size:.88rem;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;transition:.2s;" onmouseover="this.style.borderColor='#9E3A18';this.style.color='#9E3A18'" onmouseout="this.style.borderColor='rgba(158,58,24,0.3)';this.style.color='rgba(158,58,24,0.7)'">
+        <button onclick="openCallback()" style="background:none;border:1.5px solid rgba(158,58,24,0.3);border-radius:10px;color:rgba(158,58,24,0.7);padding:11px 28px;font-size:.88rem;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;transition:.2s;" onmouseover="this.style.borderColor='var(--terracotta)';this.style.color='var(--terracotta)'" onmouseout="this.style.borderColor='rgba(158,58,24,0.3)';this.style.color='rgba(158,58,24,0.7)'">
           Une question ? On vous rappelle
         </button>
       </div>
@@ -2213,8 +2197,8 @@
   <!-- ─── FAQ ─── -->
   <section class="faq" id="faq" aria-label="Questions fréquentes">
     <div class="faq-inner">
-      <p class="section-eyebrow reveal" style="color:#9E3A18">Questions fréquentes</p>
-      <h2 class="section-title reveal">Tout ce que vous voulez <span style="color:#FFFFFF;">savoir</span>.</h2>
+      <p class="section-eyebrow reveal" style="color:var(--terracotta)">Questions fréquentes</p>
+      <h2 class="section-title reveal">Tout ce que vous voulez <span style="color:var(--blanc);">savoir</span>.</h2>
 
       <div class="faq-list">
 
@@ -2281,7 +2265,7 @@
       </div>
 
       <div style="text-align:center;margin-top:48px;" class="reveal">
-        <button style="background:#F5F2ED;color:#9E3A18;border:none;border-radius:8px;padding:14px 36px;font-size:0.95rem;font-weight:600;font-family:'DM Sans',sans-serif;cursor:pointer;letter-spacing:0.03em;transition:background .2s;" onmouseover="this.style.background='#FFFFFF'" onmouseout="this.style.background='#F5F2ED'" onclick="document.getElementById('tarifs').scrollIntoView({behavior:'smooth'})">Choisir mon pack →</button>
+        <button style="background:var(--blanc);color:var(--terracotta);border:none;border-radius:8px;padding:14px 36px;font-size:0.95rem;font-weight:600;font-family:'DM Sans',sans-serif;cursor:pointer;letter-spacing:0.03em;transition:background .2s;" onmouseover="this.style.background='var(--blanc)'" onmouseout="this.style.background='var(--blanc)'" onclick="document.getElementById('tarifs').scrollIntoView({behavior:'smooth'})">Choisir mon pack →</button>
       </div>
     </div>
   </section
@@ -2445,32 +2429,32 @@
 
 <!-- Modal rappel -->
 <div id="callbackModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:9999;align-items:center;justify-content:center;padding:16px;">
-  <div style="background:#F5F2ED;border-radius:20px;padding:36px 32px;max-width:420px;width:100%;position:relative;box-shadow:0 20px 60px rgba(0,0,0,.3);">
-    <button onclick="closeCallback()" style="position:absolute;top:16px;right:16px;background:none;border:none;font-size:1.4rem;color:#888;cursor:pointer;">×</button>
+  <div style="background:var(--blanc);border-radius:20px;padding:36px 32px;max-width:420px;width:100%;position:relative;box-shadow:0 20px 60px rgba(0,0,0,.3);">
+    <button onclick="closeCallback()" style="position:absolute;top:16px;right:16px;background:none;border:none;font-size:1.4rem;color:rgba(28,8,4,0.45);cursor:pointer;">×</button>
     <div id="cbForm">
-      <h2 style="font-family:'Cormorant Garamond',serif;font-size:1.6rem;color:#9E3A18;margin:0 0 4px;">Être rappelé</h2>
-      <p style="font-size:.85rem;color:#888;margin:0 0 22px;">Un membre de notre équipe vous contacte sous 24h.</p>
-      <label style="display:block;font-size:.82rem;font-weight:600;color:#9E3A18;margin-bottom:6px;">Votre nom *</label>
-      <input id="cbName" type="text" placeholder="Jean Dupont" style="width:100%;padding:11px 13px;border:1.5px solid #ddd;border-radius:8px;font-size:.92rem;box-sizing:border-box;font-family:'DM Sans',sans-serif;margin-bottom:12px;">
-      <label style="display:block;font-size:.82rem;font-weight:600;color:#9E3A18;margin-bottom:6px;">Votre téléphone *</label>
-      <input id="cbPhone" type="tel" placeholder="06 12 34 56 78" style="width:100%;padding:11px 13px;border:1.5px solid #ddd;border-radius:8px;font-size:.92rem;box-sizing:border-box;font-family:'DM Sans',sans-serif;margin-bottom:12px;">
-      <label style="display:block;font-size:.82rem;font-weight:600;color:#9E3A18;margin-bottom:6px;">Email (optionnel)</label>
-      <input id="cbEmail" type="email" placeholder="jean@exemple.fr" style="width:100%;padding:11px 13px;border:1.5px solid #ddd;border-radius:8px;font-size:.92rem;box-sizing:border-box;font-family:'DM Sans',sans-serif;margin-bottom:12px;">
-      <label style="display:block;font-size:.82rem;font-weight:600;color:#9E3A18;margin-bottom:8px;">Créneau préféré</label>
+      <h2 style="font-family:'Cormorant Garamond',serif;font-size:1.6rem;color:var(--terracotta);margin:0 0 4px;">Être rappelé</h2>
+      <p style="font-size:.85rem;color:rgba(28,8,4,0.45);margin:0 0 22px;">Un membre de notre équipe vous contacte sous 24h.</p>
+      <label style="display:block;font-size:.82rem;font-weight:600;color:var(--terracotta);margin-bottom:6px;">Votre nom *</label>
+      <input id="cbName" type="text" placeholder="Jean Dupont" style="width:100%;padding:11px 13px;border:1.5px solid rgba(28,8,4,0.1);border-radius:8px;font-size:.92rem;box-sizing:border-box;font-family:'DM Sans',sans-serif;margin-bottom:12px;">
+      <label style="display:block;font-size:.82rem;font-weight:600;color:var(--terracotta);margin-bottom:6px;">Votre téléphone *</label>
+      <input id="cbPhone" type="tel" placeholder="06 12 34 56 78" style="width:100%;padding:11px 13px;border:1.5px solid rgba(28,8,4,0.1);border-radius:8px;font-size:.92rem;box-sizing:border-box;font-family:'DM Sans',sans-serif;margin-bottom:12px;">
+      <label style="display:block;font-size:.82rem;font-weight:600;color:var(--terracotta);margin-bottom:6px;">Email (optionnel)</label>
+      <input id="cbEmail" type="email" placeholder="jean@exemple.fr" style="width:100%;padding:11px 13px;border:1.5px solid rgba(28,8,4,0.1);border-radius:8px;font-size:.92rem;box-sizing:border-box;font-family:'DM Sans',sans-serif;margin-bottom:12px;">
+      <label style="display:block;font-size:.82rem;font-weight:600;color:var(--terracotta);margin-bottom:8px;">Créneau préféré</label>
       <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:16px;">
-        <div class="cb-slot active" onclick="selectSlot(this,'matin')" style="padding:10px 6px;border:1.5px solid #9E3A18;border-radius:8px;text-align:center;font-size:.82rem;font-weight:500;color:#9E3A18;cursor:pointer;background:#F5F2ED;">🌅 Matin</div>
-        <div class="cb-slot" onclick="selectSlot(this,'après-midi')" style="padding:10px 6px;border:1.5px solid #E5DED3;border-radius:8px;text-align:center;font-size:.82rem;font-weight:500;color:#555;cursor:pointer;background:#F5F2ED;">☀️ Après-midi</div>
-        <div class="cb-slot" onclick="selectSlot(this,'peu importe')" style="padding:10px 6px;border:1.5px solid #E5DED3;border-radius:8px;text-align:center;font-size:.82rem;font-weight:500;color:#555;cursor:pointer;background:#F5F2ED;">🕐 Peu importe</div>
+        <div class="cb-slot active" onclick="selectSlot(this,'matin')" style="padding:10px 6px;border:1.5px solid var(--terracotta);border-radius:8px;text-align:center;font-size:.82rem;font-weight:500;color:var(--terracotta);cursor:pointer;background:var(--blanc);">🌅 Matin</div>
+        <div class="cb-slot" onclick="selectSlot(this,'après-midi')" style="padding:10px 6px;border:1.5px solid var(--blanc);border-radius:8px;text-align:center;font-size:.82rem;font-weight:500;color:rgba(28,8,4,0.55);cursor:pointer;background:var(--blanc);">☀️ Après-midi</div>
+        <div class="cb-slot" onclick="selectSlot(this,'peu importe')" style="padding:10px 6px;border:1.5px solid var(--blanc);border-radius:8px;text-align:center;font-size:.82rem;font-weight:500;color:rgba(28,8,4,0.55);cursor:pointer;background:var(--blanc);">🕐 Peu importe</div>
       </div>
-      <div id="cbError" style="display:none;color:#9E3A18;font-size:.83rem;margin-bottom:12px;padding:9px 12px;background:#F5F2ED;border-radius:6px;"></div>
-      <button onclick="submitCallback()" id="cbBtn" style="width:100%;padding:13px;background:#9E3A18;color:#F5F2ED;border:none;border-radius:10px;font-weight:700;font-size:.95rem;cursor:pointer;font-family:'DM Sans',sans-serif;">Demander à être rappelé →</button>
-      <p style="text-align:center;font-size:.73rem;color:#bbb;margin:10px 0 0;">Aucun engagement · Rappel gratuit</p>
+      <div id="cbError" style="display:none;color:var(--terracotta);font-size:.83rem;margin-bottom:12px;padding:9px 12px;background:var(--blanc);border-radius:6px;"></div>
+      <button onclick="submitCallback()" id="cbBtn" style="width:100%;padding:13px;background:var(--terracotta);color:var(--blanc);border:none;border-radius:10px;font-weight:700;font-size:.95rem;cursor:pointer;font-family:'DM Sans',sans-serif;">Demander à être rappelé →</button>
+      <p style="text-align:center;font-size:.73rem;color:rgba(28,8,4,0.18);margin:10px 0 0;">Aucun engagement · Rappel gratuit</p>
     </div>
     <div id="cbConfirm" style="display:none;text-align:center;padding:16px 0;">
       <div style="font-size:2.5rem;margin-bottom:16px;">✅</div>
-      <h2 style="font-family:'Cormorant Garamond',serif;font-size:1.5rem;color:#9E3A18;margin:0 0 10px;">Demande enregistrée</h2>
-      <p style="font-size:.88rem;color:#666;line-height:1.7;margin:0 0 24px;">Merci ! Un membre de notre équipe vous recontacte sous 24h.</p>
-      <button onclick="closeCallback()" style="padding:11px 28px;background:#9E3A18;color:#F5F2ED;border:none;border-radius:8px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;">Fermer</button>
+      <h2 style="font-family:'Cormorant Garamond',serif;font-size:1.5rem;color:var(--terracotta);margin:0 0 10px;">Demande enregistrée</h2>
+      <p style="font-size:.88rem;color:rgba(28,8,4,0.5);line-height:1.7;margin:0 0 24px;">Merci ! Un membre de notre équipe vous recontacte sous 24h.</p>
+      <button onclick="closeCallback()" style="padding:11px 28px;background:var(--terracotta);color:var(--blanc);border:none;border-radius:8px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;">Fermer</button>
     </div>
   </div>
 </div>
@@ -2486,9 +2470,9 @@
     document.getElementById('cbBtn').textContent = 'Demander à être rappelé →';
     document.getElementById('cbBtn').disabled = false;
     document.querySelectorAll('.cb-slot').forEach((s,i) => {
-      s.style.borderColor = i===0 ? '#9E3A18' : '#E5DED3';
-      s.style.color = i===0 ? '#9E3A18' : '#555';
-      s.style.background = i===0 ? '#F5F2ED' : '#F5F2ED';
+      s.style.borderColor = i===0 ? 'var(--terracotta)' : 'var(--blanc)';
+      s.style.color = i===0 ? 'var(--terracotta)' : 'rgba(28,8,4,0.55)';
+      s.style.background = i===0 ? 'var(--blanc)' : 'var(--blanc)';
     });
     _cbSlot = 'matin';
     const m = document.getElementById('callbackModal');
@@ -2501,9 +2485,9 @@
   }
   function selectSlot(el, val) {
     document.querySelectorAll('.cb-slot').forEach(s => {
-      s.style.borderColor = '#E5DED3'; s.style.color = '#555'; s.style.background = '#F5F2ED';
+      s.style.borderColor = 'var(--blanc)'; s.style.color = 'rgba(28,8,4,0.55)'; s.style.background = 'var(--blanc)';
     });
-    el.style.borderColor = '#9E3A18'; el.style.color = '#9E3A18'; el.style.background = '#F5F2ED';
+    el.style.borderColor = 'var(--terracotta)'; el.style.color = 'var(--terracotta)'; el.style.background = 'var(--blanc)';
     _cbSlot = val;
   }
   document.getElementById('callbackModal').addEventListener('click', function(e) {
