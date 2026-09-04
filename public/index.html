@@ -1002,6 +1002,7 @@
       background: #F5F2ED;
       color: #9E3A18;
       padding: var(--section-py) var(--section-px);
+      scroll-margin-top: 80px;
     }
     .simulator-inner { max-width: 820px; margin: 0 auto; text-align: center; }
     .simulator .section-eyebrow { color: var(--terra-dark); }
@@ -1018,7 +1019,7 @@
       font-family: var(--font-serif);
       font-size: clamp(2.6rem, 6vw, 4rem);
       font-weight: 700;
-      color: var(--green-dark);
+      color: #9E3A18;
       line-height: 1;
       margin-bottom: 20px;
     }
@@ -1028,7 +1029,7 @@
       width: 100%;
       height: 6px;
       border-radius: 3px;
-      background: linear-gradient(to right, var(--green-dark) 0%, var(--green-dark) var(--pct, 22%), #E5DED3 var(--pct, 22%), #E5DED3 100%);
+      background: linear-gradient(to right, #9E3A18 0%, #9E3A18 var(--pct, 22%), #E5DED3 var(--pct, 22%), #E5DED3 100%);
       outline: none;
       margin-bottom: 8px;
       cursor: pointer;
@@ -1037,17 +1038,17 @@
       -webkit-appearance: none;
       width: 24px; height: 24px;
       border-radius: 50%;
-      background: var(--green-dark);
+      background: #9E3A18;
       border: 3px solid #F5F2ED;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.18);
+      box-shadow: 0 2px 10px rgba(158,58,24,0.3);
       cursor: pointer;
     }
     .sim-slider::-moz-range-thumb {
       width: 24px; height: 24px;
       border-radius: 50%;
-      background: var(--green-dark);
+      background: #9E3A18;
       border: 3px solid #F5F2ED;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.18);
+      box-shadow: 0 2px 10px rgba(158,58,24,0.3);
       cursor: pointer;
     }
     .sim-range-labels {
@@ -1055,31 +1056,31 @@
       justify-content: space-between;
       font-size: 0.7rem;
       color: var(--stone);
-      margin-bottom: 32px;
+      margin-bottom: 28px;
     }
     .sim-results {
       display: grid;
       grid-template-columns: 1fr auto 1fr;
       gap: 0;
       align-items: stretch;
-      margin-bottom: 20px;
-      border-radius: 16px;
+      margin-bottom: 0;
+      border-radius: 16px 16px 0 0;
       overflow: hidden;
-      box-shadow: 0 4px 24px rgba(0,0,0,0.07);
     }
     .sim-result-col {
       padding: 28px 20px;
       text-align: center;
     }
     .sim-result-col.agency {
-      background: rgba(158,58,24,0.05);
-      border: 1px solid rgba(158,58,24,0.15);
+      background: rgba(158,58,24,0.06);
+      border: 1px solid rgba(158,58,24,0.14);
       border-right: none;
-      border-radius: 16px 0 0 16px;
+      border-bottom: none;
+      border-radius: 16px 0 0 0;
     }
     .sim-result-col.vpm-col {
-      background: var(--green-deep);
-      border-radius: 0 16px 16px 0;
+      background: #9E3A18;
+      border-radius: 0 16px 0 0;
     }
     .sim-result-col.vs-col {
       display: flex;
@@ -1090,9 +1091,8 @@
       font-weight: 600;
       color: var(--stone);
       padding: 0 10px;
-      background: #E5DED3;
-      border-top: 1px solid #E5DED3;
-      border-bottom: 1px solid #E5DED3;
+      background: #EAE5DE;
+      border-top: 1px solid #EAE5DE;
     }
     .sim-result-label {
       font-size: 0.62rem;
@@ -1101,8 +1101,8 @@
       font-weight: 700;
       margin-bottom: 12px;
     }
-    .sim-result-col.agency .sim-result-label { color: #4A2010; }
-    .sim-result-col.vpm-col .sim-result-label { color: rgba(245,242,237,0.65); }
+    .sim-result-col.agency .sim-result-label { color: rgba(158,58,24,0.7); }
+    .sim-result-col.vpm-col .sim-result-label { color: rgba(245,242,237,0.75); }
     .sim-result-amount {
       font-family: var(--font-serif);
       font-size: clamp(1.8rem, 4vw, 2.6rem);
@@ -1111,14 +1111,41 @@
       margin-bottom: 6px;
     }
     .sim-result-col.agency .sim-result-amount { color: #9E3A18; }
-    .sim-result-col.vpm-col .sim-result-amount { color: var(--cream); }
+    .sim-result-col.vpm-col .sim-result-amount { color: #F5F2ED; }
     .sim-result-sub { font-size: 0.74rem; }
     .sim-result-col.agency .sim-result-sub { color: var(--stone); }
-    .sim-result-col.vpm-col .sim-result-sub { color: rgba(245,242,237,0.42); }
+    .sim-result-col.vpm-col .sim-result-sub { color: rgba(245,242,237,0.55); }
+    /* barre proportionnelle */
+    .sim-bar-wrap {
+      display: flex;
+      height: 12px;
+      border-radius: 0;
+      overflow: hidden;
+      margin-bottom: 20px;
+    }
+    .sim-bar-save {
+      background: #9E3A18;
+      transition: width 0.35s ease;
+      position: relative;
+    }
+    .sim-bar-cost {
+      background: #E5DED3;
+      flex: 1;
+    }
+    .sim-bar-labels {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.62rem;
+      color: var(--stone);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 16px;
+    }
+    .sim-bar-labels span:first-child { color: #9E3A18; font-weight: 700; }
     .sim-savings-banner {
-      background: linear-gradient(135deg, var(--green-dark), #9E3A18);
-      border-radius: 14px;
-      padding: 22px 28px;
+      background: #9E3A18;
+      border-radius: 0 0 16px 16px;
+      padding: 24px 28px;
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -1130,14 +1157,14 @@
       font-size: 0.68rem;
       letter-spacing: 0.14em;
       text-transform: uppercase;
-      color: rgba(245,242,237,0.45);
+      color: rgba(245,242,237,0.75);
       margin-bottom: 4px;
     }
     .sim-savings-amount {
       font-family: var(--font-serif);
       font-size: clamp(2rem, 5vw, 2.8rem);
       font-weight: 700;
-      color: var(--cream);
+      color: #F5F2ED;
       line-height: 1;
     }
     .sim-cta-btn {
@@ -1154,7 +1181,7 @@
       font-family: var(--font-sans);
       transition: background 0.2s, transform 0.15s;
     }
-    .sim-cta-btn:hover { background: var(--terra-dark); transform: translateY(-1px); }
+    .sim-cta-btn:hover { background: #EAE5DE; transform: translateY(-1px); }
 
     /* ─── 3 peurs des vendeurs ─── */
     .fears {
@@ -1975,15 +2002,24 @@
         <div class="sim-result-col vs-col">vs</div>
         <div class="sim-result-col vpm-col">
           <p class="sim-result-label">Vendu Par Moi</p>
-          <p class="sim-result-amount">1&nbsp;548&nbsp;€</p>
+          <p class="sim-result-amount">999&nbsp;€ TTC</p>
           <p class="sim-result-sub">forfait fixe tout compris</p>
         </div>
+      </div>
+
+      <div class="sim-bar-wrap reveal">
+        <div class="sim-bar-save" id="simBarSave" style="width:92%"></div>
+        <div class="sim-bar-cost"></div>
+      </div>
+      <div class="sim-bar-labels reveal">
+        <span>← Vous économisez</span>
+        <span>Forfait VPM →</span>
       </div>
 
       <div class="sim-savings-banner reveal">
         <div class="sim-savings-text">
           <p class="sim-savings-label">Vous gardez dans votre poche</p>
-          <p class="sim-savings-amount" id="simSavings">12&nbsp;001&nbsp;€</p>
+          <p class="sim-savings-amount" id="simSavings">11&nbsp;500&nbsp;€</p>
         </div>
         <button class="sim-cta-btn" onclick="document.getElementById('offres').scrollIntoView({behavior:'smooth'})">
           Commencer ma vente &rarr;
@@ -2514,7 +2550,7 @@
   // ─── Simulateur d'économies ───
   (function () {
     function fmt(n) {
-      return new Intl.NumberFormat('fr-FR').format(Math.round(n)) + ' €';
+      return new Intl.NumberFormat('fr-FR').format(Math.round(n / 100) * 100) + ' €';
     }
     window.updateSim = function (val) {
       val = parseInt(val, 10);
@@ -2524,9 +2560,11 @@
       slider.style.setProperty('--pct', pct + '%');
       document.getElementById('simPriceDisplay').textContent = fmt(val);
       var agency = val * 0.05;
-      var savings = Math.max(0, agency - 499);
+      var savings = Math.max(0, agency - 999);
       document.getElementById('simAgency').textContent = fmt(agency);
       document.getElementById('simSavings').textContent = fmt(savings);
+      var barPct = agency > 0 ? Math.round((savings / agency) * 100) : 92;
+      document.getElementById('simBarSave').style.width = barPct + '%';
     };
     window.updateSim(250000);
   })();
