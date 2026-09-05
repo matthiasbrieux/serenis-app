@@ -9,13 +9,15 @@
   <title>Soumettre une offre d'achat — Vendu Par Moi</title>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
   <style>
+    :root {
+      --terracotta: #9E3A18; --terracotta-dark: #7A2B12; --noir: #1C0804;
+      --blanc: #FDFCF8; --sable-dore: #E8C39E;
+    }
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     body { background: #F5F0E8; font-family: 'DM Sans', sans-serif; color: #1A1A16; min-height: 100vh; }
 
     /* Header */
-    .site-header { background: #3D5A47; padding: 18px 24px; display: flex; align-items: center; gap: 14px; }
-    .site-logo { font-family: 'Cormorant Garamond', serif; font-size: 1.4rem; color: #fff; text-decoration: none; display: flex; align-items: center; gap: 10px; }
-    .site-logo-icon { width: 36px; height: 36px; border-radius: 10px; background: rgba(212,228,216,0.15); border: 1.5px solid rgba(212,228,216,0.22); display: flex; align-items: center; justify-content: center; }
+    .site-header { background: var(--noir); padding: 18px 24px; display: flex; align-items: center; gap: 14px; }
     .header-badge { margin-left: auto; background: rgba(196,120,90,0.2); border: 1px solid rgba(196,120,90,0.4); color: #f5c8b5; font-size: 0.72rem; font-weight: 600; padding: 5px 12px; border-radius: 20px; letter-spacing: 0.04em; text-transform: uppercase; }
 
     /* Container */
@@ -23,7 +25,7 @@
 
     /* Property info card */
     .prop-info { background: #fff; border-radius: 16px; padding: 20px 24px; margin-bottom: 24px; display: flex; align-items: center; gap: 16px; box-shadow: 0 2px 12px rgba(0,0,0,0.06); border: 1.5px solid #e8e3db; }
-    .prop-icon { width: 48px; height: 48px; border-radius: 12px; background: #3D5A47; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .prop-icon { width: 48px; height: 48px; border-radius: 12px; background: var(--terracotta); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
     .prop-name { font-family: 'Cormorant Garamond', serif; font-size: 1.15rem; font-weight: 600; color: #1a1a1a; margin-bottom: 3px; }
     .prop-sub { font-size: 0.78rem; color: #888; }
 
@@ -46,22 +48,22 @@
       font-family: 'DM Sans', sans-serif; font-size: 0.9rem; color: #1a1a1a; background: #fff;
       transition: border-color 0.15s; outline: none;
     }
-    .form-field input:focus, .form-field select:focus, .form-field textarea:focus { border-color: #3D5A47; }
+    .form-field input:focus, .form-field select:focus, .form-field textarea:focus { border-color: var(--terracotta); }
     .form-field textarea { min-height: 90px; resize: vertical; }
 
     /* Amount field — star */
     .amount-wrap { position: relative; }
-    .amount-wrap input { padding-left: 36px; font-size: 1.1rem; font-weight: 700; color: #3D5A47; }
-    .amount-symbol { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); font-size: 1rem; color: #3D5A47; font-weight: 700; pointer-events: none; }
+    .amount-wrap input { padding-left: 36px; font-size: 1.1rem; font-weight: 700; color: var(--terracotta); }
+    .amount-symbol { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); font-size: 1rem; color: var(--terracotta); font-weight: 700; pointer-events: none; }
 
     /* Conditions checkboxes */
     .cond-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
     @media (max-width: 480px) { .cond-grid { grid-template-columns: 1fr; } }
     .cond-item { display: flex; align-items: center; gap: 9px; padding: 10px 12px; border: 1.5px solid #e0d8cc; border-radius: 10px; cursor: pointer; transition: all 0.15s; user-select: none; }
-    .cond-item:hover { border-color: #3D5A47; background: #f0f7f2; }
-    .cond-item input[type="checkbox"] { width: 16px; height: 16px; accent-color: #3D5A47; flex-shrink: 0; cursor: pointer; }
+    .cond-item:hover { border-color: var(--terracotta); background: rgba(158,58,24,0.04); }
+    .cond-item input[type="checkbox"] { width: 16px; height: 16px; accent-color: var(--terracotta); flex-shrink: 0; cursor: pointer; }
     .cond-item label { font-size: 0.82rem; color: #444; cursor: pointer; line-height: 1.35; }
-    .cond-item.checked { border-color: #3D5A47; background: #f0f7f2; }
+    .cond-item.checked { border-color: var(--terracotta); background: rgba(158,58,24,0.04); }
 
     /* Validity row */
     .validity-row { display: flex; align-items: center; gap: 10px; }
@@ -73,13 +75,13 @@
     .legal-note strong { color: #C4785A; }
 
     /* Submit */
-    .btn-submit { width: 100%; padding: 16px; background: #3D5A47; color: #fff; border: none; border-radius: 12px; font-family: 'DM Sans', sans-serif; font-size: 1rem; font-weight: 700; cursor: pointer; transition: all 0.2s; margin-top: 20px; display: flex; align-items: center; justify-content: center; gap: 8px; min-height: 54px; }
-    .btn-submit:hover { background: #2e4435; transform: translateY(-1px); }
+    .btn-submit { width: 100%; padding: 16px; background: var(--terracotta); color: #fff; border: none; border-radius: 12px; font-family: 'DM Sans', sans-serif; font-size: 1rem; font-weight: 700; cursor: pointer; transition: all 0.2s; margin-top: 20px; display: flex; align-items: center; justify-content: center; gap: 8px; min-height: 54px; }
+    .btn-submit:hover { background: var(--terracotta-dark); transform: translateY(-1px); }
     .btn-submit:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
 
     /* Success screen */
     .success-screen { display: none; text-align: center; padding: 60px 20px; }
-    .success-icon { width: 80px; height: 80px; border-radius: 50%; background: #3D5A47; display: flex; align-items: center; justify-content: center; margin: 0 auto 24px; }
+    .success-icon { width: 80px; height: 80px; border-radius: 50%; background: var(--terracotta); display: flex; align-items: center; justify-content: center; margin: 0 auto 24px; }
     .success-title { font-family: 'Cormorant Garamond', serif; font-size: 2rem; font-weight: 600; color: #1a1a1a; margin-bottom: 12px; }
     .success-sub { font-size: 0.9rem; color: #666; line-height: 1.7; max-width: 420px; margin: 0 auto 28px; }
     .success-recap { background: #fff; border-radius: 14px; padding: 20px 24px; text-align: left; border: 1.5px solid #e8e3db; max-width: 400px; margin: 0 auto; }
@@ -87,7 +89,7 @@
     .success-recap-row:last-child { border-bottom: none; }
     .success-recap-row .label { color: #888; }
     .success-recap-row .value { font-weight: 600; color: #1a1a1a; }
-    .amount-big { font-family: 'Cormorant Garamond', serif; font-size: 1.8rem; font-weight: 600; color: #3D5A47; }
+    .amount-big { font-family: 'Cormorant Garamond', serif; font-size: 1.8rem; font-weight: 600; color: var(--terracotta); }
 
     /* Error state */
     .error-screen { display: none; text-align: center; padding: 60px 20px; }
@@ -101,11 +103,8 @@
 <body>
 
 <header class="site-header">
-  <a href="/" class="site-logo">
-    <div class="site-logo-icon">
-      <svg width="18" height="18" viewBox="0 0 32 32"><path d="M16 2L3 13v17h8v-8h10v8h8V13L16 2z" fill="#D4E4D8"/></svg>
-    </div>
-    Vendu Par Moi
+  <a href="/">
+    <img src="/images/vendu-par-moi.svg" alt="Vendu Par Moi" style="height:38px;width:auto;display:block;">
   </a>
   <span class="header-badge">Offre d'achat</span>
 </header>
