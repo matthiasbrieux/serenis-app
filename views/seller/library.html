@@ -17,6 +17,17 @@
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,400&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/css/style.css?v=3">
   <style>
+    /* ——— Design tokens (alignés dashboard) ——— */
+    :root {
+      --sp-1:4px; --sp-2:8px; --sp-3:16px; --sp-4:24px;
+      --sp-5:32px; --sp-6:48px; --sp-7:64px;
+      --text-xs:0.70rem; --text-sm:0.80rem; --text-base:0.88rem; --text-md:1rem;
+      --text-lg:1.20rem; --text-xl:1.50rem; --text-2xl:2rem; --text-3xl:2.5rem;
+      --radius-sm:6px; --radius-md:10px; --radius-lg:16px; --radius-xl:24px; --radius-full:9999px;
+      --shadow-sm:0 1px 8px rgba(0,0,0,0.07);
+      --shadow-md:0 4px 20px rgba(0,0,0,0.09);
+      --shadow-terracotta:0 4px 16px rgba(158,58,24,0.15);
+    }
     /* ── Hero wrap (bandeau sombre) ── */
     .f-hero-wrap {
       background: linear-gradient(160deg, var(--terracotta) 0%, var(--terracotta-dark) 100%);
@@ -246,8 +257,8 @@
     }
     .mod-tab:hover { border-color: var(--terracotta); color: var(--terracotta); }
     .mod-tab.active { background: var(--terracotta); color: #fff; border-color: var(--terracotta); }
-    .mod-phase-apres .mod-tab:hover { border-color: #9b6b0a; color: #9b6b0a; }
-    .mod-phase-apres .mod-tab.active { background: #9b6b0a; color: #fff; border-color: #9b6b0a; }
+    .mod-phase-apres .mod-tab:hover { border-color: var(--terracotta); color: var(--terracotta); }
+    .mod-phase-apres .mod-tab.active { background: var(--terracotta); color: #fff; border-color: var(--terracotta); }
 
     /* ── Module content ── */
     .mod-content { display: none; }
@@ -296,7 +307,7 @@
     .step-body { display: none; padding: 0 20px 24px; border-top: 1px solid #F0ECE6; margin-top: 0; }
     .step-card.open .step-body { display: block; }
     .sst { margin-top: 0; }
-    .sst-title { font-size: 1rem; font-weight: 800; color: #1a2e1f; margin-bottom: 20px; }
+    .sst-title { font-size: 1rem; font-weight: 800; color: #1a1a1a; margin-bottom: 20px; }
     .sst-text { font-size: 0.88rem; color: #333; line-height: 1.7; }
 
     /* Tables */
@@ -450,7 +461,7 @@
     }
     .fiche-link:hover { background: rgba(158,58,24,0.06); text-decoration-style: solid; }
     .fiche-link::after { content: ' ⓘ'; font-size: 0.72em; opacity: 0.5; vertical-align: super; cursor: help; }
-    .fiche-link:hover::after { opacity: 1; color: #1B6B35; }
+    .fiche-link:hover::after { opacity: 1; color: var(--terracotta); }
 
     /* ── Tooltip fiche-link ── */
     #ft { position:fixed; z-index:9000; background:#1a1a1a; color:#fff; border-radius:9px; padding:10px 13px; max-width:230px; font-size:0.78rem; line-height:1.5; pointer-events:none; opacity:0; transition:opacity 0.13s; box-shadow:0 4px 20px rgba(0,0,0,0.24); }
@@ -804,8 +815,8 @@
     }
     .mod-phase-label::after { display: none; }
     .mod-phase-label svg { color: var(--terracotta); flex-shrink: 0; width: 15px; height: 15px; }
-    .mod-phase-apres .mod-phase-label { color: #6b4800; background: linear-gradient(135deg, #fdf8ec 0%, #faf3e2 100%); border-left-color: #9b6b0a; }
-    .mod-phase-apres .mod-phase-label svg { color: #9b6b0a; }
+    .mod-phase-apres .mod-phase-label { color: var(--terracotta-dark); background: #F5F0E8; border-left-color: var(--terracotta); }
+    .mod-phase-apres .mod-phase-label svg { color: var(--terracotta); }
     .mod-phase-desc { font-size: 0.76rem; color: #777; line-height: 1.55; margin-bottom: 14px; padding-left: 4px; }
 
     /* Module tabs — cards numérotées */
@@ -832,9 +843,9 @@
     .mod-tab:hover .mod-tab-num { background: var(--terracotta); color: #fff; }
     .mod-tab.active { background: var(--terracotta); color: #fff; border-color: var(--terracotta); box-shadow: 0 4px 14px rgba(158,58,24,0.28); }
     .mod-tab.active .mod-tab-num { background: rgba(255,255,255,0.18); color: #fff; }
-    .mod-phase-apres .mod-tab:hover { border-color: #9b6b0a; color: #9b6b0a; }
-    .mod-phase-apres .mod-tab:hover .mod-tab-num { background: #9b6b0a; color: #fff; }
-    .mod-phase-apres .mod-tab.active { background: #9b6b0a; border-color: #9b6b0a; box-shadow: 0 4px 14px rgba(155,107,10,0.25); }
+    .mod-phase-apres .mod-tab:hover { border-color: var(--terracotta); color: var(--terracotta); }
+    .mod-phase-apres .mod-tab:hover .mod-tab-num { background: var(--terracotta); color: #fff; }
+    .mod-phase-apres .mod-tab.active { background: var(--terracotta); border-color: var(--terracotta); box-shadow: 0 4px 14px rgba(158,58,24,0.25); }
     .mod-phase-apres .mod-tab.active .mod-tab-num { background: rgba(255,255,255,0.18); color: #fff; }
 
     /* Module header — plus aéré */
@@ -1057,7 +1068,7 @@
     .mod-tab.active .mod-tab-prog { background:rgba(255,255,255,0.22); }
     .mod-tab-prog-fill { height:100%; border-radius:2px; background:var(--terracotta); transition:width 0.4s cubic-bezier(0.16,1,0.3,1); }
     .mod-tab.active .mod-tab-prog-fill { background:rgba(255,255,255,0.85); }
-    .mod-phase-apres .mod-tab .mod-tab-prog-fill { background:#9b6b0a; }
+    .mod-phase-apres .mod-tab .mod-tab-prog-fill { background:var(--terracotta); }
     .mod-phase-apres .mod-tab.active .mod-tab-prog-fill { background:rgba(255,255,255,0.85); }
 
     /* ── sst-title — style Notion ── */
@@ -1081,7 +1092,7 @@
     @keyframes checkPop { 0%{transform:scale(0) rotate(-20deg)} 65%{transform:scale(1.18) rotate(4deg)} 100%{transform:scale(1) rotate(0deg)} }
     .celebrate-overlay.show .celebrate-check { animation:checkPop 0.55s cubic-bezier(0.16,1,0.3,1) 0.12s both; }
     .celebrate-tag { display:inline-block; padding:3px 11px; border-radius:100px; background:rgba(158,58,24,0.06); color:var(--terracotta); font-size:0.67rem; font-weight:700; letter-spacing:0.08em; text-transform:uppercase; margin-bottom:12px; }
-    .celebrate-title { font-family:'Cormorant Garamond',serif; font-size:1.75rem; font-weight:600; color:#1a2e1f; margin:0 0 8px; line-height:1.2; }
+    .celebrate-title { font-family:'Cormorant Garamond',serif; font-size:1.75rem; font-weight:600; color:#1a1a1a; margin:0 0 8px; line-height:1.2; }
     .celebrate-sub { font-size:0.84rem; color:#7a7065; margin:0 0 28px; line-height:1.55; }
     .celebrate-btn { display:inline-flex; align-items:center; gap:8px; padding:12px 26px; background:var(--terracotta); color:#fff; border:none; border-radius:10px; font-size:0.88rem; font-weight:600; cursor:pointer; transition:background 0.2s, box-shadow 0.2s; font-family:inherit; }
     .celebrate-btn:hover { background:var(--terracotta-dark); box-shadow:0 6px 18px rgba(158,58,24,0.28); }
@@ -1138,14 +1149,14 @@
       border-left-color: rgba(255,255,255,0.5) !important;
     }
     .mod-phase-apres .mod-tab.mod-status-done {
-      border-left-color: #9b6b0a !important;
+      border-left-color: var(--terracotta) !important;
       background: #FDFAF2 !important;
     }
     .mod-phase-apres .mod-tab.mod-status-done .mod-tab-num {
-      background: #9b6b0a !important; color: #fff !important;
+      background: var(--terracotta) !important; color: #fff !important;
     }
     .mod-phase-apres .mod-tab.active.mod-status-done {
-      background: #9b6b0a !important;
+      background: var(--terracotta) !important;
       border-left-color: rgba(255,255,255,0.5) !important;
     }
 
@@ -1596,15 +1607,15 @@ const MODULES = [
           { title:'Trois possibilités s\'offrent à vous',
             body:`<div style="display:flex;flex-direction:column;gap:12px;">
 <div style="background:rgba(158,58,24,0.06);border:1.5px solid rgba(158,58,24,0.12);border-radius:12px;padding:16px 18px;">
-  <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;"><span style="background:var(--terracotta);color:#fff;font-size:0.75rem;font-weight:700;border-radius:50%;width:24px;height:24px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">1</span><strong style="font-size:0.9rem;color:#1C2E22;">Vendre plus rapidement</strong></div>
+  <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;"><span style="background:var(--terracotta);color:#fff;font-size:0.75rem;font-weight:700;border-radius:50%;width:24px;height:24px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">1</span><strong style="font-size:0.9rem;color:#1a1a1a;">Vendre plus rapidement</strong></div>
   <p style="margin:0;font-size:0.88rem;color:var(--terracotta);line-height:1.6;">Vous pouvez choisir de proposer un prix plus attractif afin de vous démarquer des autres biens similaires. Un bien affiché à un prix compétitif attire davantage de contacts et de visites, ce qui augmente les chances de vendre plus rapidement.</p>
 </div>
 <div style="background:rgba(158,58,24,0.06);border:1.5px solid rgba(158,58,24,0.12);border-radius:12px;padding:16px 18px;">
-  <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;"><span style="background:var(--terracotta);color:#fff;font-size:0.75rem;font-weight:700;border-radius:50%;width:24px;height:24px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">2</span><strong style="font-size:0.9rem;color:#1C2E22;">Augmenter votre net vendeur</strong></div>
+  <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;"><span style="background:var(--terracotta);color:#fff;font-size:0.75rem;font-weight:700;border-radius:50%;width:24px;height:24px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">2</span><strong style="font-size:0.9rem;color:#1a1a1a;">Augmenter votre net vendeur</strong></div>
   <p style="margin:0;font-size:0.88rem;color:var(--terracotta);line-height:1.6;">Vous pouvez décider de conserver cet avantage pour vous-même. Ce qui aurait été consacré aux frais de commercialisation vient directement augmenter le montant que vous percevrez lors de la vente.</p>
 </div>
 <div style="background:rgba(158,58,24,0.06);border:1.5px solid rgba(158,58,24,0.12);border-radius:12px;padding:16px 18px;">
-  <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;"><span style="background:var(--terracotta);color:#fff;font-size:0.75rem;font-weight:700;border-radius:50%;width:24px;height:24px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">3</span><strong style="font-size:0.9rem;color:#1C2E22;">Vous laisser une marge de négociation</strong></div>
+  <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;"><span style="background:var(--terracotta);color:#fff;font-size:0.75rem;font-weight:700;border-radius:50%;width:24px;height:24px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">3</span><strong style="font-size:0.9rem;color:#1a1a1a;">Vous laisser une marge de négociation</strong></div>
   <p style="margin:0;font-size:0.88rem;color:var(--terracotta);line-height:1.6;">La plupart des ventes immobilières donnent lieu à une négociation. Grâce à la méthode Vendu par moi, vous disposez d'une marge supplémentaire qui vous permet de discuter plus sereinement avec les acheteurs, tout en protégeant votre objectif de prix.</p>
 </div>
 </div>` },
@@ -1756,7 +1767,7 @@ const MODULES = [
             body:`<p style="margin:0 0 12px;font-size:0.88rem;line-height:1.6;">Après avoir préparé votre dossier, vient l'étape des visites, puis des négociations, de la signature du compromis et enfin de la vente définitive. Et là encore, notre objectif est le même : <strong>vous faire gagner du temps et vous simplifier la vie.</strong></p>
 <p style="margin:0 0 16px;font-size:0.88rem;line-height:1.6;">C'est pourquoi nous avons intégré directement dans vos fiches de renseignements un <strong>agenda de visites simple à utiliser</strong>.</p>
 <div style="background:rgba(158,58,24,0.06);border:1.5px solid rgba(158,58,24,0.12);border-radius:12px;padding:16px 18px;">
-  <div style="font-weight:700;font-size:0.9rem;color:#1C2E22;margin-bottom:10px;">Comment ça fonctionne ?</div>
+  <div style="font-weight:700;font-size:0.9rem;color:#1a1a1a;margin-bottom:10px;">Comment ça fonctionne ?</div>
   <div style="display:flex;flex-direction:column;gap:8px;">
     <div style="display:flex;align-items:flex-start;gap:10px;font-size:0.88rem;line-height:1.5;"><span style="color:var(--terracotta);font-weight:700;flex-shrink:0;">1.</span><span>Vous renseignez vos disponibilités dans votre espace vendeur</span></div>
     <div style="display:flex;align-items:flex-start;gap:10px;font-size:0.88rem;line-height:1.5;"><span style="color:var(--terracotta);font-weight:700;flex-shrink:0;">2.</span><span>Vos prospects voient immédiatement les créneaux disponibles</span></div>
@@ -1776,7 +1787,7 @@ const MODULES = [
             body:`<p style="margin:0 0 12px;font-size:0.88rem;line-height:1.6;">Depuis le début de cette formation, notre objectif n'a jamais été de vous faire vendre seul, mais de vous permettre de <strong>vendre avec méthode et avec les bons outils</strong>.</p>
 <p style="margin:0 0 16px;font-size:0.88rem;line-height:1.6;">La première partie vous a permis de préparer votre vente dans les meilleures conditions. Nous allons maintenant entrer dans la seconde phase : recevoir les acheteurs, organiser les visites, gérer les négociations, signer le compromis et vous accompagner jusqu'à la vente définitive.</p>
 <div style="background:rgba(158,58,24,0.06);border:1.5px solid rgba(158,58,24,0.12);border-radius:12px;padding:16px 18px;text-align:center;">
-  <div style="font-size:0.9rem;font-weight:700;color:#1C2E22;margin-bottom:6px;">Et comme depuis le premier jour, notre mission reste la même :</div>
+  <div style="font-size:0.9rem;font-weight:700;color:#1a1a1a;margin-bottom:6px;">Et comme depuis le premier jour, notre mission reste la même :</div>
   <div style="font-size:0.85rem;color:var(--terracotta);line-height:1.7;">vous faire gagner du temps, vous simplifier chaque étape et vous permettre de <strong>vendre votre bien dans les meilleures conditions possibles.</strong></div>
 </div>` },
         ],
@@ -1785,7 +1796,7 @@ const MODULES = [
       },
       { title:'◆ Qualifier l\'acheteur avant la visite', meta:'4 min · Organisation', tag:'Bénéficiez d\'alertes et d\'outils de qualification pour mieux préparer vos visites et gagner du temps.',
         speakText:`Un acheteur non finançable peut vous faire perdre trois à six mois. Avant d'ouvrir votre porte, posez deux questions simples : quel est votre budget, et avez-vous rencontré votre banque ? L'adresse exacte, vous la donnez uniquement après avoir qualifié.`,
-        explication:`Dès qu\'un acheteur réserve un créneau depuis vos disponibilités en ligne, <strong>Vendu par moi vous envoie instantanément une notification.</strong> En quelques secondes, depuis votre agenda, vous disposez de tout ce qu\'il faut pour le qualifier avant même de lui ouvrir votre porte.<br><br><div style="background:rgba(158,58,24,0.06);border:1.5px solid rgba(158,58,24,0.12);border-radius:12px;padding:16px 18px;margin-bottom:16px;"><div style="font-weight:700;font-size:0.9rem;color:#1C2E22;margin-bottom:12px;">Depuis votre agenda Vendu par moi, vous pouvez :</div><div style="display:flex;flex-direction:column;gap:10px;"><div style="display:flex;align-items:flex-start;gap:10px;font-size:0.88rem;line-height:1.5;"><span style="background:var(--terracotta);color:#fff;border-radius:50%;width:22px;height:22px;display:flex;align-items:center;justify-content:center;font-size:0.72rem;font-weight:700;flex-shrink:0;margin-top:1px;">1</span><span><strong>Envoyer un rappel SMS personnalisé</strong> — avec le prénom de l\'acheteur, la date et l\'heure de la visite, depuis un message pré-rédigé à son nom</span></div><div style="display:flex;align-items:flex-start;gap:10px;font-size:0.88rem;line-height:1.5;"><span style="background:var(--terracotta);color:#fff;border-radius:50%;width:22px;height:22px;display:flex;align-items:center;justify-content:center;font-size:0.72rem;font-weight:700;flex-shrink:0;margin-top:1px;">2</span><span><strong>L\'appeler directement</strong> en un clic pour vous présenter et poser vos premières questions de qualification</span></div><div style="display:flex;align-items:flex-start;gap:10px;font-size:0.88rem;line-height:1.5;"><span style="background:var(--terracotta);color:#fff;border-radius:50%;width:22px;height:22px;display:flex;align-items:center;justify-content:center;font-size:0.72rem;font-weight:700;flex-shrink:0;margin-top:1px;">3</span><span><strong>Envoyer un message de qualification pré-enregistré</strong> — il lui demande discrètement où il en est dans son projet et son financement, avant même la visite</span></div></div></div><div style="background:var(--terracotta-dark);border-radius:14px;padding:18px 16px;margin-bottom:16px;"><div style="font-size:0.68rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:rgba(255,255,255,0.5);margin-bottom:14px;">Message de qualification — pré-enregistré dans votre agenda</div><div style="display:flex;justify-content:flex-end;"><div style="max-width:88%;"><div style="background:var(--terracotta);color:#fff;border-radius:16px 16px 3px 16px;padding:12px 15px;font-size:0.82rem;line-height:1.7;font-family:\'DM Sans\',sans-serif;">Bonjour <span style="background:rgba(255,255,255,0.18);border-radius:4px;padding:1px 7px;font-size:0.75rem;font-style:italic;">Prénom acheteur</span>,<br><br>Je vous confirme avec plaisir notre rendez-vous du <span style="background:rgba(255,255,255,0.18);border-radius:4px;padding:1px 7px;font-size:0.75rem;font-style:italic;">date</span> à <span style="background:rgba(255,255,255,0.18);border-radius:4px;padding:1px 7px;font-size:0.75rem;font-style:italic;">heure</span>.<br><br>Pour que je puisse préparer au mieux la visite, pourriez-vous me dire où vous en êtes dans votre projet d\'achat ? Et, si vous le souhaitez, me préciser si vous avez déjà avancé sur la partie financement avec votre banque ou un courtier.<br><br>Cela nous permettra d\'échanger plus efficacement lors de notre rencontre.<br><br>À bientôt,<br><span style="background:rgba(255,255,255,0.18);border-radius:4px;padding:1px 7px;font-size:0.75rem;font-style:italic;">Votre prénom</span></div><div style="font-size:0.65rem;color:rgba(255,255,255,0.4);text-align:right;margin-top:5px;padding-right:2px;">Envoyé ✓✓</div></div></div><a href="/mon-agenda" style="display:flex;align-items:center;justify-content:space-between;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.12);border-radius:9px;padding:11px 14px;margin-top:14px;text-decoration:none;" onmouseover="this.style.background=\'rgba(255,255,255,0.12)\'" onmouseout="this.style.background=\'rgba(255,255,255,0.07)\'"><div style="font-size:0.82rem;font-weight:600;color:rgba(158,58,24,0.12);">→ Retrouver ce message dans mon agenda</div><div style="font-size:0.75rem;color:rgba(255,255,255,0.45);">Mes visites</div></a></div>Un acheteur non finançable vous fait perdre 3 à 6 mois et vous oblige à tout recommencer. <strong>Qualifiez discrètement avant d\'ouvrir votre porte.</strong>`,
+        explication:`Dès qu\'un acheteur réserve un créneau depuis vos disponibilités en ligne, <strong>Vendu par moi vous envoie instantanément une notification.</strong> En quelques secondes, depuis votre agenda, vous disposez de tout ce qu\'il faut pour le qualifier avant même de lui ouvrir votre porte.<br><br><div style="background:rgba(158,58,24,0.06);border:1.5px solid rgba(158,58,24,0.12);border-radius:12px;padding:16px 18px;margin-bottom:16px;"><div style="font-weight:700;font-size:0.9rem;color:#1a1a1a;margin-bottom:12px;">Depuis votre agenda Vendu par moi, vous pouvez :</div><div style="display:flex;flex-direction:column;gap:10px;"><div style="display:flex;align-items:flex-start;gap:10px;font-size:0.88rem;line-height:1.5;"><span style="background:var(--terracotta);color:#fff;border-radius:50%;width:22px;height:22px;display:flex;align-items:center;justify-content:center;font-size:0.72rem;font-weight:700;flex-shrink:0;margin-top:1px;">1</span><span><strong>Envoyer un rappel SMS personnalisé</strong> — avec le prénom de l\'acheteur, la date et l\'heure de la visite, depuis un message pré-rédigé à son nom</span></div><div style="display:flex;align-items:flex-start;gap:10px;font-size:0.88rem;line-height:1.5;"><span style="background:var(--terracotta);color:#fff;border-radius:50%;width:22px;height:22px;display:flex;align-items:center;justify-content:center;font-size:0.72rem;font-weight:700;flex-shrink:0;margin-top:1px;">2</span><span><strong>L\'appeler directement</strong> en un clic pour vous présenter et poser vos premières questions de qualification</span></div><div style="display:flex;align-items:flex-start;gap:10px;font-size:0.88rem;line-height:1.5;"><span style="background:var(--terracotta);color:#fff;border-radius:50%;width:22px;height:22px;display:flex;align-items:center;justify-content:center;font-size:0.72rem;font-weight:700;flex-shrink:0;margin-top:1px;">3</span><span><strong>Envoyer un message de qualification pré-enregistré</strong> — il lui demande discrètement où il en est dans son projet et son financement, avant même la visite</span></div></div></div><div style="background:var(--terracotta-dark);border-radius:14px;padding:18px 16px;margin-bottom:16px;"><div style="font-size:0.68rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:rgba(255,255,255,0.5);margin-bottom:14px;">Message de qualification — pré-enregistré dans votre agenda</div><div style="display:flex;justify-content:flex-end;"><div style="max-width:88%;"><div style="background:var(--terracotta);color:#fff;border-radius:16px 16px 3px 16px;padding:12px 15px;font-size:0.82rem;line-height:1.7;font-family:\'DM Sans\',sans-serif;">Bonjour <span style="background:rgba(255,255,255,0.18);border-radius:4px;padding:1px 7px;font-size:0.75rem;font-style:italic;">Prénom acheteur</span>,<br><br>Je vous confirme avec plaisir notre rendez-vous du <span style="background:rgba(255,255,255,0.18);border-radius:4px;padding:1px 7px;font-size:0.75rem;font-style:italic;">date</span> à <span style="background:rgba(255,255,255,0.18);border-radius:4px;padding:1px 7px;font-size:0.75rem;font-style:italic;">heure</span>.<br><br>Pour que je puisse préparer au mieux la visite, pourriez-vous me dire où vous en êtes dans votre projet d\'achat ? Et, si vous le souhaitez, me préciser si vous avez déjà avancé sur la partie financement avec votre banque ou un courtier.<br><br>Cela nous permettra d\'échanger plus efficacement lors de notre rencontre.<br><br>À bientôt,<br><span style="background:rgba(255,255,255,0.18);border-radius:4px;padding:1px 7px;font-size:0.75rem;font-style:italic;">Votre prénom</span></div><div style="font-size:0.65rem;color:rgba(255,255,255,0.4);text-align:right;margin-top:5px;padding-right:2px;">Envoyé ✓✓</div></div></div><a href="/mon-agenda" style="display:flex;align-items:center;justify-content:space-between;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.12);border-radius:9px;padding:11px 14px;margin-top:14px;text-decoration:none;" onmouseover="this.style.background=\'rgba(255,255,255,0.12)\'" onmouseout="this.style.background=\'rgba(255,255,255,0.07)\'"><div style="font-size:0.82rem;font-weight:600;color:rgba(158,58,24,0.12);">→ Retrouver ce message dans mon agenda</div><div style="font-size:0.75rem;color:rgba(255,255,255,0.45);">Mes visites</div></a></div>Un acheteur non finançable vous fait perdre 3 à 6 mois et vous oblige à tout recommencer. <strong>Qualifiez discrètement avant d\'ouvrir votre porte.</strong>`,
         tableau:{ headers:['Profil acheteur','Ce qu\'il doit vous fournir'], rows:[['Achat comptant','Attestation de fonds ou relevé bancaire'],['Achat avec crédit','Étude de faisabilité banque/courtier + montant apport + accord de principe'],['Propriétaire vendeur','Vérifiez que son bien est en vente ou déjà vendu']] },
         script:[{speaker:'vendeur',line:'Avant de fixer un rendez-vous, puis-je vous poser quelques questions rapides ?'},{speaker:'acheteur',line:'Bien sûr.'},{speaker:'vendeur',line:'Quel est votre budget global ? Avez-vous déjà rencontré votre banque ou un courtier ?'},{speaker:'vendeur',line:'Dans quel délai souhaitez-vous idéalement emménager ?'}],
         tips:['Créneaux de 45 min minimum','Horaires idéaux : semaine après 18h, ou samedi matin','Confirmez par SMS la veille avec l\'adresse exacte'],
