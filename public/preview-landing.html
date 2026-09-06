@@ -1,0 +1,735 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Prévisualisation — Nouvelles sections landing</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'DM Sans', sans-serif; background: #f0f0ed; }
+
+    .preview-label {
+      background: #1D3A28;
+      color: #fff;
+      text-align: center;
+      padding: 12px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    /* ─────────────────────────────────────────────
+       SECTION 1 — COMPARATIF VPM vs AGENCE
+    ───────────────────────────────────────────── */
+    .section-compare {
+      background: #F9F7F4;
+      padding: 80px 24px;
+    }
+    .section-compare .inner { max-width: 900px; margin: 0 auto; }
+    .section-compare .eyebrow {
+      font-size: 0.7rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: #C4603A;
+      margin-bottom: 10px;
+      text-align: center;
+    }
+    .section-compare h2 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(1.8rem, 4vw, 2.6rem);
+      color: #1A1A16;
+      text-align: center;
+      font-weight: 700;
+      line-height: 1.2;
+      margin-bottom: 12px;
+    }
+    .section-compare .subtitle {
+      text-align: center;
+      color: #666;
+      font-size: 0.95rem;
+      margin-bottom: 48px;
+      max-width: 520px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .compare-table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 4px 32px rgba(0,0,0,0.08);
+    }
+    .compare-table thead th {
+      padding: 18px 24px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      text-align: center;
+    }
+    .compare-table thead .col-critere {
+      background: #fff;
+      text-align: left;
+      color: #999;
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      width: 36%;
+    }
+    .compare-table thead .col-vpm {
+      background: #1D3A28;
+      color: #F5F0E8;
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.1rem;
+      font-weight: 600;
+      position: relative;
+    }
+    .compare-table thead .col-agence {
+      background: #F0EDE8;
+      color: #888;
+      font-size: 0.9rem;
+    }
+
+    .compare-table tbody tr:nth-child(odd) td { background: #fff; }
+    .compare-table tbody tr:nth-child(even) td { background: #FAFAF8; }
+
+    .compare-table tbody td {
+      padding: 16px 24px;
+      font-size: 0.88rem;
+      border-bottom: 1px solid #F0EDE8;
+      vertical-align: middle;
+    }
+    .compare-table tbody td.critere {
+      color: #444;
+      font-weight: 500;
+    }
+    .compare-table tbody td.vpm-col {
+      text-align: center;
+      font-weight: 600;
+      color: #1D3A28;
+    }
+    .compare-table tbody td.agence-col {
+      text-align: center;
+      color: #999;
+    }
+
+    .badge-yes {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      background: #E8F5EE;
+      color: #1D6340;
+      font-size: 0.8rem;
+      font-weight: 600;
+      padding: 4px 10px;
+      border-radius: 20px;
+    }
+    .badge-no {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      background: #FEE2E2;
+      color: #9B1C1C;
+      font-size: 0.8rem;
+      font-weight: 600;
+      padding: 4px 10px;
+      border-radius: 20px;
+    }
+    .badge-neutral {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      background: #F3F4F6;
+      color: #6B7280;
+      font-size: 0.8rem;
+      font-weight: 600;
+      padding: 4px 10px;
+      border-radius: 20px;
+    }
+    .price-highlight {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: #1D3A28;
+    }
+    .price-bad {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: #C4603A;
+    }
+
+    .compare-table tfoot td {
+      padding: 20px 24px;
+      background: #1D3A28;
+      text-align: center;
+    }
+    .compare-table tfoot td.col-critere-foot {
+      background: #fff;
+      border-top: 2px solid #F0EDE8;
+    }
+    .compare-table tfoot .cta-btn {
+      display: inline-block;
+      background: #C4603A;
+      color: #fff;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.85rem;
+      font-weight: 700;
+      padding: 11px 24px;
+      border-radius: 8px;
+      text-decoration: none;
+      letter-spacing: 0.02em;
+    }
+    .compare-table tfoot .agence-foot {
+      background: #F0EDE8;
+      color: #aaa;
+      font-size: 0.78rem;
+    }
+
+
+    /* ─────────────────────────────────────────────
+       SECTION 2 — FONDATEURS
+    ───────────────────────────────────────────── */
+    .section-founders {
+      background: linear-gradient(160deg, #0C1910 0%, #1D3A28 100%);
+      padding: 80px 24px;
+    }
+    .section-founders .inner { max-width: 900px; margin: 0 auto; }
+    .section-founders .eyebrow {
+      font-size: 0.7rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: #6BBF82;
+      margin-bottom: 10px;
+      text-align: center;
+    }
+    .section-founders h2 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(1.8rem, 4vw, 2.6rem);
+      color: #F5F0E8;
+      text-align: center;
+      font-weight: 700;
+      line-height: 1.2;
+      margin-bottom: 12px;
+    }
+    .section-founders .subtitle {
+      text-align: center;
+      color: rgba(245,240,232,0.55);
+      font-size: 0.95rem;
+      margin-bottom: 52px;
+      max-width: 520px;
+      margin-left: auto;
+      margin-right: auto;
+      line-height: 1.6;
+    }
+
+    .founders-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+    }
+    @media (max-width: 620px) { .founders-grid { grid-template-columns: 1fr; } }
+
+    .founder-card {
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 16px;
+      padding: 32px 28px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    .founder-top {
+      display: flex;
+      align-items: center;
+      gap: 18px;
+    }
+    .founder-avatar {
+      width: 68px;
+      height: 68px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #3D5A47, #6BBF82);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.8rem;
+      color: #F5F0E8;
+      font-weight: 700;
+      flex-shrink: 0;
+      border: 2px solid rgba(107,191,130,0.3);
+    }
+    .founder-meta {}
+    .founder-name {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.35rem;
+      color: #F5F0E8;
+      font-weight: 600;
+      line-height: 1.1;
+    }
+    .founder-role {
+      font-size: 0.72rem;
+      color: #6BBF82;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-top: 4px;
+    }
+    .founder-bio {
+      font-size: 0.88rem;
+      color: rgba(245,240,232,0.7);
+      line-height: 1.7;
+    }
+    .founder-stats {
+      display: flex;
+      gap: 20px;
+      padding-top: 14px;
+      border-top: 1px solid rgba(255,255,255,0.08);
+    }
+    .founder-stat {}
+    .founder-stat .num {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.4rem;
+      color: #F5F0E8;
+      font-weight: 700;
+      line-height: 1;
+    }
+    .founder-stat .lbl {
+      font-size: 0.68rem;
+      color: rgba(245,240,232,0.4);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-top: 2px;
+    }
+
+    .founders-tagline {
+      margin-top: 36px;
+      text-align: center;
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.2rem;
+      font-style: italic;
+      color: rgba(245,240,232,0.5);
+      max-width: 600px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+
+    /* ─────────────────────────────────────────────
+       SECTION 3 — TÉMOIGNAGES
+    ───────────────────────────────────────────── */
+    .section-testimonials {
+      background: #fff;
+      padding: 80px 24px;
+    }
+    .section-testimonials .inner { max-width: 960px; margin: 0 auto; }
+    .section-testimonials .eyebrow {
+      font-size: 0.7rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: #C4603A;
+      margin-bottom: 10px;
+      text-align: center;
+    }
+    .section-testimonials h2 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(1.8rem, 4vw, 2.6rem);
+      color: #1A1A16;
+      text-align: center;
+      font-weight: 700;
+      line-height: 1.2;
+      margin-bottom: 12px;
+    }
+    .section-testimonials .subtitle {
+      text-align: center;
+      color: #666;
+      font-size: 0.95rem;
+      margin-bottom: 52px;
+      max-width: 480px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .testimonials-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+    }
+    @media (max-width: 700px) { .testimonials-grid { grid-template-columns: 1fr; } }
+
+    .testi-card {
+      background: #F9F7F4;
+      border: 1px solid #EAE7E2;
+      border-radius: 16px;
+      padding: 28px 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      position: relative;
+    }
+    .testi-card.featured {
+      background: #1D3A28;
+      border-color: #1D3A28;
+    }
+    .quote-mark {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 3rem;
+      color: #C4603A;
+      line-height: 1;
+      height: 28px;
+      overflow: hidden;
+    }
+    .testi-card.featured .quote-mark { color: rgba(196,96,58,0.7); }
+
+    .stars { display: flex; gap: 2px; margin-bottom: 4px; }
+    .star { color: #F59E0B; font-size: 0.85rem; }
+
+    .testi-text {
+      font-size: 0.9rem;
+      color: #444;
+      line-height: 1.7;
+      flex: 1;
+    }
+    .testi-card.featured .testi-text { color: rgba(245,240,232,0.85); }
+
+    .testi-footer {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding-top: 16px;
+      border-top: 1px solid #EAE7E2;
+    }
+    .testi-card.featured .testi-footer { border-top-color: rgba(255,255,255,0.1); }
+
+    .testi-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1rem;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+    .testi-card:not(.featured) .testi-avatar {
+      background: #E8F0EA;
+      color: #1D3A28;
+    }
+    .testi-card.featured .testi-avatar {
+      background: rgba(255,255,255,0.12);
+      color: #F5F0E8;
+    }
+
+    .testi-info {}
+    .testi-name {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: #1A1A16;
+    }
+    .testi-card.featured .testi-name { color: #F5F0E8; }
+    .testi-detail {
+      font-size: 0.72rem;
+      color: #999;
+      margin-top: 1px;
+    }
+    .testi-card.featured .testi-detail { color: rgba(245,240,232,0.4); }
+
+    .testi-savings {
+      margin-left: auto;
+      text-align: right;
+    }
+    .testi-savings .amount {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #1D3A28;
+    }
+    .testi-card.featured .testi-savings .amount { color: #6BBF82; }
+    .testi-savings .label {
+      font-size: 0.62rem;
+      color: #aaa;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .testi-summary {
+      margin-top: 48px;
+      display: flex;
+      justify-content: center;
+      gap: 48px;
+      padding: 28px 32px;
+      background: #F9F7F4;
+      border-radius: 14px;
+      border: 1px solid #EAE7E2;
+    }
+    .testi-stat { text-align: center; }
+    .testi-stat .big {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 2.2rem;
+      font-weight: 700;
+      color: #1D3A28;
+      line-height: 1;
+    }
+    .testi-stat .small {
+      font-size: 0.72rem;
+      color: #999;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-top: 4px;
+    }
+  </style>
+</head>
+<body>
+
+<div class="preview-label">APERÇU 1 — COMPARATIF VPM vs AGENCE CLASSIQUE</div>
+
+<!-- SECTION 1 : COMPARATIF -->
+<section class="section-compare">
+  <div class="inner">
+    <p class="eyebrow">Pourquoi choisir Vendu Par Moi</p>
+    <h2>Ce que vous gardez en vendant <em style="font-style:italic;color:#C4603A">sans</em> agence</h2>
+    <p class="subtitle">Une agence prend 4 à 6 % de votre vente. Vendu Par Moi vous donne les mêmes outils pour une fraction du prix.</p>
+
+    <table class="compare-table">
+      <thead>
+        <tr>
+          <th class="col-critere">Critère</th>
+          <th class="col-vpm">Vendu Par Moi</th>
+          <th class="col-agence">Agence classique</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="critere">💶 Coût pour le vendeur</td>
+          <td class="vpm-col"><span class="price-highlight">999 € à 1 548 €</span><br><span style="font-size:0.72rem;color:#6BBF82;font-weight:500">forfait fixe, tout compris</span></td>
+          <td class="agence-col"><span class="price-bad">4 % à 6 % du prix de vente</span><br><span style="font-size:0.72rem;color:#ccc">ex : 12 000 € sur un bien à 250 000 €</span></td>
+        </tr>
+        <tr>
+          <td class="critere">🎯 Diffusion annonce</td>
+          <td class="vpm-col"><span class="badge-yes">✓ SeLoger, Leboncoin, PAP</span></td>
+          <td class="agence-col"><span class="badge-yes" style="background:#F0EDE8;color:#888;">✓ Inclus</span></td>
+        </tr>
+        <tr>
+          <td class="critere">📅 Gestion des visites</td>
+          <td class="vpm-col"><span class="badge-yes">✓ Agenda intelligent inclus</span></td>
+          <td class="agence-col"><span class="badge-yes" style="background:#F0EDE8;color:#888;">✓ Pris en charge</span></td>
+        </tr>
+        <tr>
+          <td class="critere">🤖 Coach IA disponible 24h/24</td>
+          <td class="vpm-col"><span class="badge-yes">✓ Inclus</span></td>
+          <td class="agence-col"><span class="badge-no">✗ Non disponible</span></td>
+        </tr>
+        <tr>
+          <td class="critere">📂 Dossier acheteur digital</td>
+          <td class="vpm-col"><span class="badge-yes">✓ Photos, diagnostics, docs</span></td>
+          <td class="agence-col"><span class="badge-no">✗ Pas de dossier structuré</span></td>
+        </tr>
+        <tr>
+          <td class="critere">📘 Formation complète incluse</td>
+          <td class="vpm-col"><span class="badge-yes">✓ De la prépa au notaire</span></td>
+          <td class="agence-col"><span class="badge-no">✗ Vous restez dépendant</span></td>
+        </tr>
+        <tr>
+          <td class="critere">💪 Vous restez maître de la vente</td>
+          <td class="vpm-col"><span class="badge-yes">✓ Toujours vous qui décidez</span></td>
+          <td class="agence-col"><span class="badge-no">✗ L'agent décide pour vous</span></td>
+        </tr>
+        <tr>
+          <td class="critere">🔄 Sans engagement de résultat</td>
+          <td class="vpm-col"><span class="badge-yes">✓ Forfait fixe garanti</span></td>
+          <td class="agence-col"><span class="badge-neutral">Variable selon mandat</span></td>
+        </tr>
+      </tbody>
+      <tfoot>
+        <tr>
+          <td class="col-critere-foot" style="font-size:0.78rem;color:#999;padding:20px 24px;">Économie moyenne sur un bien à 250 000 €</td>
+          <td style="background:#1D3A28;text-align:center;padding:20px 24px;">
+            <div style="font-family:'Cormorant Garamond',serif;font-size:1.8rem;font-weight:700;color:#F5F0E8;line-height:1;">≈ 11 000 €</div>
+            <div style="font-size:0.72rem;color:rgba(245,240,232,0.5);margin-top:4px;">économisés en commission</div>
+            <a href="#" class="cta-btn" style="margin-top:12px;display:inline-block;">Commencer ma vente →</a>
+          </td>
+          <td class="agence-foot" style="background:#F0EDE8;text-align:center;padding:20px 24px;">
+            <div style="font-family:'Cormorant Garamond',serif;font-size:1.8rem;font-weight:700;color:#C4603A;line-height:1;">12 500 €</div>
+            <div style="font-size:0.72rem;color:#bbb;margin-top:4px;">de commission à payer</div>
+          </td>
+        </tr>
+      </tfoot>
+    </table>
+  </div>
+</section>
+
+
+<div class="preview-label">APERÇU 2 — SECTION FONDATEURS</div>
+
+<!-- SECTION 2 : FONDATEURS -->
+<section class="section-founders">
+  <div class="inner">
+    <p class="eyebrow">Les fondateurs</p>
+    <h2>Créé par des professionnels de l'immobilier,<br>pour les particuliers</h2>
+    <p class="subtitle">Nous avons négocié, vendu et accompagné des centaines de transactions. Vendu Par Moi, c'est notre méthode — rendue accessible à tous.</p>
+
+    <div class="founders-grid">
+      <div class="founder-card">
+        <div class="founder-top">
+          <div class="founder-avatar">G</div>
+          <div class="founder-meta">
+            <div class="founder-name">Guillaume Girod</div>
+            <div class="founder-role">Co-fondateur — Expert immobilier</div>
+          </div>
+        </div>
+        <p class="founder-bio">
+          Agent immobilier depuis plus de 10 ans, Guillaume a accompagné plusieurs centaines de vendeurs dans leurs projets. Il connaît chaque étape — des diagnostics à la signature — et a voulu rendre cette expertise accessible sans frais d'agence.
+        </p>
+        <div class="founder-stats">
+          <div class="founder-stat">
+            <div class="num">10+</div>
+            <div class="lbl">ans d'expérience</div>
+          </div>
+          <div class="founder-stat">
+            <div class="num">300+</div>
+            <div class="lbl">ventes accompagnées</div>
+          </div>
+          <div class="founder-stat">
+            <div class="num">Nord</div>
+            <div class="lbl">Hauts-de-France</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="founder-card">
+        <div class="founder-top">
+          <div class="founder-avatar">M</div>
+          <div class="founder-meta">
+            <div class="founder-name">Matthias Brieux</div>
+            <div class="founder-role">Co-fondateur — Technologie & Stratégie</div>
+          </div>
+        </div>
+        <p class="founder-bio">
+          Issu du monde de l'immobilier et du digital, Matthias a construit la plateforme pour que chaque vendeur ait accès aux mêmes outils qu'un professionnel — agenda, dossier acheteur, coach IA, suivi des offres — sans intermédiaire.
+        </p>
+        <div class="founder-stats">
+          <div class="founder-stat">
+            <div class="num">8+</div>
+            <div class="lbl">ans d'expérience</div>
+          </div>
+          <div class="founder-stat">
+            <div class="num">100%</div>
+            <div class="lbl">digital first</div>
+          </div>
+          <div class="founder-stat">
+            <div class="num">VPM</div>
+            <div class="lbl">Fondateur</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <p class="founders-tagline">"On a passé nos carrières à vendre pour les autres. On a créé Vendu Par Moi pour que vous vendiez pour vous."</p>
+  </div>
+</section>
+
+
+<div class="preview-label">APERÇU 3 — TÉMOIGNAGES CLIENTS</div>
+
+<!-- SECTION 3 : TÉMOIGNAGES -->
+<section class="section-testimonials">
+  <div class="inner">
+    <p class="eyebrow">Ils ont vendu sans agence</p>
+    <h2>Ce que disent nos premiers vendeurs</h2>
+    <p class="subtitle">Des particuliers comme vous, qui ont gardé leur commission.</p>
+
+    <div class="testimonials-grid">
+      <div class="testi-card">
+        <div class="quote-mark">"</div>
+        <div class="stars">
+          <span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span>
+        </div>
+        <p class="testi-text">
+          J'avais peur de ne pas savoir gérer les visites et les négociations. Avec la formation et le coach IA, j'ai eu réponse à chaque question en temps réel. Vendu en 6 semaines, au prix demandé.
+        </p>
+        <div class="testi-footer">
+          <div class="testi-avatar">S</div>
+          <div class="testi-info">
+            <div class="testi-name">Sophie M.</div>
+            <div class="testi-detail">Appartement — Lille, 59</div>
+          </div>
+          <div class="testi-savings">
+            <div class="amount">9 200 €</div>
+            <div class="label">économisés</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="testi-card featured">
+        <div class="quote-mark">"</div>
+        <div class="stars">
+          <span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span>
+        </div>
+        <p class="testi-text">
+          Mon agence m'avait proposé un mandat à 5,5 %. J'ai décidé d'essayer Vendu Par Moi. Le dossier acheteur a vraiment fait la différence — les acheteurs arrivaient déjà convaincus. Plus de 11 000 € économisés.
+        </p>
+        <div class="testi-footer">
+          <div class="testi-avatar">P</div>
+          <div class="testi-info">
+            <div class="testi-name">Pierre & Claire D.</div>
+            <div class="testi-detail">Maison — Valenciennes, 59</div>
+          </div>
+          <div class="testi-savings">
+            <div class="amount">11 400 €</div>
+            <div class="label">économisés</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="testi-card">
+        <div class="quote-mark">"</div>
+        <div class="stars">
+          <span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span>
+        </div>
+        <p class="testi-text">
+          L'agenda de réservation des visites est bluffant. Les acheteurs réservaient eux-mêmes leurs créneaux, je recevais une notif. Aucun stress de coordination. Je recommande à 100 %.
+        </p>
+        <div class="testi-footer">
+          <div class="testi-avatar">N</div>
+          <div class="testi-info">
+            <div class="testi-name">Nadia B.</div>
+            <div class="testi-detail">Appartement — Douai, 59</div>
+          </div>
+          <div class="testi-savings">
+            <div class="amount">7 800 €</div>
+            <div class="label">économisés</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="testi-summary">
+      <div class="testi-stat">
+        <div class="big">4.9/5</div>
+        <div class="small">Note moyenne</div>
+      </div>
+      <div class="testi-stat">
+        <div class="big">100%</div>
+        <div class="small">Recommandent VPM</div>
+      </div>
+      <div class="testi-stat">
+        <div class="big">9 800 €</div>
+        <div class="small">Économie moyenne</div>
+      </div>
+      <div class="testi-stat">
+        <div class="big">6 sem.</div>
+        <div class="small">Délai moyen de vente</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+</body>
+</html>

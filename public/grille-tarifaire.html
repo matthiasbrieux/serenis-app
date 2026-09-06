@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Grille tarifaire — Vendu Par Moi</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: #f8f5f0; font-family: 'DM Sans', sans-serif; color: #333; }
+
+    .header { background: #fff; border-bottom: 1px solid #e8e0d6; padding: 16px 24px; }
+    .header-inner { max-width: 820px; margin: 0 auto; display: flex; align-items: center; gap: 12px; }
+    .header-inner a { display: flex; align-items: center; gap: 8px; text-decoration: none; }
+    .logo-text { font-family: 'Cormorant Garamond', serif; font-size: 1.1rem; color: #2a4030; }
+    .breadcrumb { font-size: 0.82rem; color: #888; }
+
+    .wrap { max-width: 820px; margin: 0 auto; padding: 60px 24px 100px; }
+
+    .doc-title { font-family: 'Cormorant Garamond', serif; font-size: 2.2rem; color: #2a4030; margin-bottom: 6px; }
+    .doc-date { font-size: 0.82rem; color: #999; margin-bottom: 48px; }
+
+    .pack-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 48px; }
+
+    .pack-card { background: #fff; border: 1px solid #e8e0d6; border-radius: 8px; padding: 32px 28px; }
+    .pack-card.serenite { border-color: #3D5A47; border-width: 2px; }
+
+    .pack-badge { font-size: 0.68rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.12em; color: #3D5A47; margin-bottom: 10px; }
+    .pack-badge.serenite { color: #C4603A; }
+    .pack-name { font-family: 'Cormorant Garamond', serif; font-size: 1.8rem; color: #2a4030; margin-bottom: 4px; }
+    .pack-price { font-size: 2.2rem; font-weight: 700; color: #1C1C1A; margin: 16px 0 4px; }
+    .pack-price span { font-size: 1rem; font-weight: 400; color: #888; }
+    .pack-option { font-size: 0.82rem; color: #888; margin-bottom: 24px; }
+
+    .pack-features { list-style: none; padding: 0; border-top: 1px solid #e8e0d6; padding-top: 20px; }
+    .pack-features li { font-size: 0.88rem; color: #444; line-height: 1.7; margin-bottom: 8px; padding-left: 18px; position: relative; }
+    .pack-features li::before { content: '✓'; position: absolute; left: 0; color: #3D5A47; font-weight: 700; }
+    .pack-features li.extra::before { color: #C4603A; content: '+'; }
+
+    .section-title { font-family: 'DM Sans', sans-serif; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: #3D5A47; margin-bottom: 16px; padding-bottom: 10px; border-bottom: 1px solid #e8e0d6; }
+
+    .info-table { width: 100%; border-collapse: collapse; margin-bottom: 40px; }
+    .info-table th { background: #3D5A47; color: #fff; padding: 10px 16px; text-align: left; font-size: 0.82rem; font-weight: 600; }
+    .info-table td { padding: 10px 16px; font-size: 0.88rem; color: #444; border-bottom: 1px solid #e8e0d6; line-height: 1.6; }
+    .info-table tr:nth-child(even) td { background: #fafaf8; }
+
+    .note-box { background: #F0F5F1; border-left: 3px solid #3D5A47; border-radius: 0 8px 8px 0; padding: 14px 18px; font-size: 0.88rem; color: #2D4D38; line-height: 1.65; margin-bottom: 32px; }
+
+    .footer-actions { margin-top: 48px; border-top: 1px solid #e0d8cc; padding-top: 32px; display: flex; gap: 16px; flex-wrap: wrap; align-items: center; }
+
+    @media print {
+      .header, .footer-actions { display: none; }
+      body { background: #fff; }
+      .wrap { padding: 20px; }
+      .pack-grid { grid-template-columns: 1fr 1fr; }
+    }
+
+    @media (max-width: 600px) {
+      .pack-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-inner">
+    <a href="/">
+      <svg width="20" height="20" viewBox="0 0 32 32"><path d="M16 2L3 13v17h8v-8h10v8h8V13L16 2z" fill="#3D5A47"/></svg>
+      <span class="logo-text">Vendu Par Moi</span>
+    </a>
+    <span class="breadcrumb" style="color:#ccc;">›</span>
+    <span class="breadcrumb">Grille tarifaire</span>
+  </div>
+</div>
+
+<div class="wrap">
+
+  <h1 class="doc-title">Grille tarifaire</h1>
+  <p class="doc-date">En vigueur depuis août 2026 — Tous prix TTC</p>
+
+  <div class="pack-grid">
+
+    <div class="pack-card">
+      <p class="pack-badge">Pack</p>
+      <p class="pack-name">Autonome</p>
+      <p class="pack-price">999 € <span>TTC</span></p>
+      <p class="pack-option">Paiement unique — sans abonnement</p>
+      <ul class="pack-features">
+        <li>Espace vendeur numérique complet</li>
+        <li>Formation pas à pas (9 étapes)</li>
+        <li>Coach IA intégré</li>
+        <li>Agenda connecté (visites en ligne)</li>
+        <li>Dossier acheteur numérique partageable</li>
+        <li>Bibliothèque de modèles (emails, SMS, scripts)</li>
+        <li>Générateur d'annonce par IA</li>
+        <li>Suivi des offres centralisé</li>
+        <li>Accès 6 mois renouvelable</li>
+      </ul>
+    </div>
+
+    <div class="pack-card serenite">
+      <p class="pack-badge serenite">Pack — Le plus complet</p>
+      <p class="pack-name">Sérénité</p>
+      <p class="pack-price">1 548 € <span>TTC</span></p>
+      <p class="pack-option">Ou 2 × 774 € sans frais ni intérêts</p>
+      <ul class="pack-features">
+        <li>Tout le Pack Autonome inclus</li>
+        <li class="extra">Photos professionnelles du bien</li>
+        <li class="extra">Visite virtuelle 360°</li>
+        <li class="extra">Rédaction de l'annonce par nos soins</li>
+        <li class="extra">Accompagnement personnalisé</li>
+        <li class="extra">Constitution complète du dossier acheteur</li>
+        <li class="extra">Numéro intelligent dédié (VPM Connect)</li>
+        <li class="extra">Relances automatiques des visiteurs</li>
+        <li>Accès 6 mois renouvelable</li>
+      </ul>
+    </div>
+
+  </div>
+
+  <p class="section-title">Options de paiement</p>
+  <table class="info-table">
+    <tr><th>Pack</th><th>Paiement intégral</th><th>Paiement en 2× (sans frais)</th></tr>
+    <tr><td><strong>Autonome</strong></td><td>999 € TTC</td><td>Non disponible</td></tr>
+    <tr><td><strong>Sérénité</strong></td><td>1 548 € TTC</td><td>774 € × 2 = 1 548 € TTC</td></tr>
+  </table>
+
+  <p class="section-title">Renouvellement et durée</p>
+  <table class="info-table">
+    <tr><th>Élément</th><th>Détail</th></tr>
+    <tr><td>Durée initiale</td><td>6 mois à compter de la souscription</td></tr>
+    <tr><td>Renouvellement</td><td>Possible aux tarifs en vigueur à la date de renouvellement</td></tr>
+    <tr><td>Sans renouvellement</td><td>Accès suspendu — données conservées 30 jours</td></tr>
+    <tr><td>Garantie annulation</td><td>Remboursement intégral sous 48h, sans justification</td></tr>
+  </table>
+
+  <div class="note-box">
+    Paiements sécurisés par <strong>Stripe</strong> (certifié PCI-DSS). Aucune donnée bancaire conservée par Vendu Par Moi. Accès à la plateforme activé immédiatement après confirmation du paiement.
+  </div>
+
+  <p class="section-title">Contact commercial</p>
+  <p style="font-size:0.9rem;color:#444;line-height:1.75;">
+    <strong>Matthias Brieux</strong> — 06 95 44 36 54<br>
+    <strong>Guillaume Girod</strong><br>
+    Email : contact@venduparmoi.fr<br>
+    Site : venduparmoi.fr
+  </p>
+
+  <div class="footer-actions">
+    <a href="/" style="display:inline-flex;align-items:center;gap:6px;font-size:0.88rem;color:#3D5A47;font-weight:600;text-decoration:none;">← Retour à l'accueil</a>
+    <button onclick="window.print()" style="display:inline-flex;align-items:center;gap:6px;font-size:0.88rem;color:#fff;background:#3D5A47;border:none;border-radius:8px;padding:9px 18px;cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:600;">⬇ Télécharger en PDF</button>
+  </div>
+
+</div>
+</body>
+</html>
