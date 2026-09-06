@@ -55,7 +55,7 @@
       z-index: 300;
       width: 44px;
       height: 44px;
-      background: #3D5A47;
+      background: var(--terracotta-dark);
       border: none;
       border-radius: 10px;
       cursor: pointer;
