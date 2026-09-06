@@ -559,7 +559,7 @@ router.post('/api/property/export-pdf', requireAuth, express.json({ limit: '2mb'
   </style>
   </head><body>${html}</body></html>`;
 
-  const options = { format: 'A4', margin: { top: '10mm', bottom: '10mm', left: '10mm', right: '10mm' } };
+  const options = { format: 'A4', margin: { top: '10mm', bottom: '10mm', left: '10mm', right: '10mm' }, args: ['--no-sandbox', '--disable-setuid-sandbox'] };
   try {
     const file = { content: fullHtml };
     const pdfBuffer = await htmlPdf.generatePdf(file, options);
