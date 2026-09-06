@@ -5,7 +5,6 @@ const { v4: uuidv4 } = require('uuid');
 const db = require('../database');
 const { requireAuth } = require('../middleware/auth');
 const { uploadPhoto, uploadDocument } = require('../services/upload');
-const { assignTwilioNumber } = require('../services/twilio');
 const { sendSoldCongrats, sendPropertySoldToBuyer, sendVisitConfirmation } = require('../services/email');
 
 // Désactiver le cache navigateur pour toutes les pages vendeur
@@ -405,21 +404,6 @@ router.get('/api/visits', requireAuth, (req, res) => {
   res.json({ visits });
 });
 
-// Checklist
-router.post('/api/checklist', requireAuth, express.json(), (req, res) => {
-  const { checklist_type, item_index, checked } = req.body;
-  db.prepare(`INSERT OR REPLACE INTO checklist_progress (seller_id, checklist_type, item_index, checked, updated_at)
-    VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP)`)
-    .run(req.seller.id, checklist_type, item_index, checked ? 1 : 0);
-  res.json({ success: true });
-});
-
-router.get('/api/checklist/:type', requireAuth, (req, res) => {
-  const items = db.prepare('SELECT item_index, checked FROM checklist_progress WHERE seller_id=? AND checklist_type=?')
-    .all(req.seller.id, req.params.type);
-  res.json({ items });
-});
-
 // Status update
 // Compromis de vente — jalons calendrier
 router.get('/api/compromis', requireAuth, (req, res) => {
@@ -556,27 +540,6 @@ Style : direct, chaleureux, expert. Pas de jargon inutile. Réponses courtes (3-
     res.json({ reply: response.content[0].text });
   } catch (err) {
     res.json({ error: 'Coach indisponible, réessayez.' });
-  }
-});
-
-// ── Alex vocal — résumé de step ──────────────────────────────────
-router.post('/api/formation/speak', requireAuth, express.json(), async (req, res) => {
-  const { moduleTitle, stepTitle, keyPoints = [] } = req.body;
-  if (!process.env.ANTHROPIC_API_KEY) {
-    return res.json({ text: `${stepTitle}. ${keyPoints[0] || 'Voici ce que vous allez apprendre dans cette étape.'}` });
-  }
-  const Anthropic = require('@anthropic-ai/sdk');
-  const client = new Anthropic.default({ apiKey: process.env.ANTHROPIC_API_KEY });
-  try {
-    const response = await client.messages.create({
-      model: 'claude-haiku-4-5-20251001',
-      max_tokens: 100,
-      system: `Tu es Alex, coach immobilier vocal. En 2 phrases courtes et naturelles (style parlé, pas écrit), tu annonces ce que le vendeur va apprendre dans cette étape. Sois motivant et direct. Pas de liste, pas de titre, pas de ponctuation excessive. Maximum 35 mots.`,
-      messages: [{ role: 'user', content: `Module : ${moduleTitle}\nÉtape : ${stepTitle}\nPoints clés du module : ${keyPoints.slice(0, 2).join(' / ')}` }],
-    });
-    res.json({ text: response.content[0].text });
-  } catch (e) {
-    res.json({ text: `${stepTitle}. Regardez bien cette étape, elle est essentielle pour votre vente.` });
   }
 });
 
@@ -1314,17 +1277,6 @@ router.delete('/api/offers/:id', requireAuth, (req, res) => {
   res.json({ success: true });
 });
 
-router.put('/api/offres/:id/repondre', requireAuth, express.json(), (req, res) => {
-  const { status, seller_response } = req.body;
-  if (!['accepted', 'refused', 'counter'].includes(status)) return res.json({ error: 'Statut invalide' });
-  const offer = db.prepare(`
-    SELECT o.* FROM offers o JOIN properties p ON p.id = o.property_id WHERE o.id = ? AND p.seller_id = ?
-  `).get(req.params.id, req.seller.id);
-  if (!offer) return res.status(403).json({ error: 'Offre introuvable' });
-  db.prepare('UPDATE offers SET status=?, seller_response=?, responded_at=CURRENT_TIMESTAMP WHERE id=?')
-    .run(status, seller_response || null, offer.id);
-  res.json({ success: true });
-});
 
 // ── Pipeline acheteurs ────────────────────────────────────────
 router.get('/mes-acheteurs', requireAuth, (req, res) => res.redirect('/mon-agenda'));
@@ -1365,31 +1317,6 @@ router.delete('/api/guide-photos/:cloudinary_id', requireAuth, async (req, res) 
     await cloudinary.uploader.destroy(req.params.cloudinary_id).catch(() => {});
   }
   res.json({ success: true });
-});
-
-// ── Export CSV contacts acheteurs ────────────────────────────
-router.get('/api/connect/contacts/export.csv', requireAuth, (req, res) => {
-  const property = db.prepare('SELECT id FROM properties WHERE seller_id=?').get(req.seller.id);
-  if (!property) return res.status(404).end();
-  const contacts = db.prepare('SELECT buyer_name, buyer_phone, buyer_email, source, status, notes, created_at FROM buyer_contacts WHERE seller_id=? ORDER BY created_at DESC').all(req.seller.id);
-  const visits = db.prepare("SELECT buyer_name, buyer_email, visit_date, visit_time, status FROM visits WHERE seller_id=? AND status != 'cancelled' ORDER BY visit_date").all(req.seller.id);
-  const visitMap = {};
-  for (const v of visits) {
-    const key = v.buyer_email || v.buyer_name;
-    if (!visitMap[key]) visitMap[key] = [];
-    visitMap[key].push(`${v.visit_date} ${v.visit_time}`);
-  }
-  const header = 'Nom,Téléphone,Email,Source,Statut,Visites,Notes,Date contact';
-  const rows = contacts.map(c => {
-    const key = c.buyer_email || c.buyer_name;
-    const vDates = (visitMap[key] || []).join(' | ');
-    const esc = s => `"${(s||'').replace(/"/g, '""')}"`;
-    return [esc(c.buyer_name), esc(c.buyer_phone), esc(c.buyer_email), esc(c.source), esc(c.status), esc(vDates), esc(c.notes), esc((c.created_at||'').slice(0,10))].join(',');
-  });
-  const csv = '﻿' + [header, ...rows].join('\r\n');
-  res.setHeader('Content-Type', 'text/csv; charset=utf-8');
-  res.setHeader('Content-Disposition', `attachment; filename="contacts-acheteurs-${new Date().toISOString().slice(0,10)}.csv"`);
-  res.send(csv);
 });
 
 // ── RGPD ─────────────────────────────────────────────────────

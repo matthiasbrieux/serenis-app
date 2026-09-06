@@ -6,7 +6,7 @@ const path = require('path');
 const db = require('../database');
 
 const publicFormLimit = rateLimit({ windowMs: 15 * 60 * 1000, max: 8, standardHeaders: true, legacyHeaders: false, handler: (req, res) => res.status(429).json({ error: 'Trop de tentatives. Réessayez dans 15 minutes.' }) });
-const { sendDossierEmail, sendVisitConfirmation, sendVisitRequestReceived, sendNewVisitRequest } = require('../services/email');
+const { sendDossierEmail, sendVisitConfirmation, sendNewVisitRequest } = require('../services/email');
 const { v4: uuidv4 } = require('uuid');
 const { sendSmsNotification } = require('../services/twilio');
 
