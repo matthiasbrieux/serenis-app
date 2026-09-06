@@ -104,8 +104,8 @@ app.use(express.static(path.join(__dirname, 'public'), {
 app.post('/webhook/stripe', express.raw({ type: 'application/json' }), require('./routes/payment').stripeWebhook);
 
 // ── Twilio webhooks : urlencoded ──
-app.post('/webhook/sms', smsLimit, express.urlencoded({ extended: false }), require('./routes/buyer').smsWebhook);
-app.post('/webhook/voice', smsLimit, express.urlencoded({ extended: false }), require('./routes/buyer').voiceWebhook);
+app.post('/webhook/sms', express.urlencoded({ extended: false }), smsLimit, require('./routes/buyer').smsWebhook);
+app.post('/webhook/voice', express.urlencoded({ extended: false }), smsLimit, require('./routes/buyer').voiceWebhook);
 
 // ── Middleware corps JSON/form pour le reste ──
 app.use(express.json({ limit: '10mb' }));
