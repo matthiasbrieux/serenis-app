@@ -210,7 +210,7 @@ async function smsWebhook(req, res) {
     const property = db.prepare('SELECT * FROM properties WHERE id = ?').get(seller.property_id);
     const photos = db.prepare('SELECT url FROM property_photos WHERE property_id = ? ORDER BY order_index LIMIT 5').all(seller.property_id);
     try {
-      await sendDossierEmail(buyerEmail, property, photos);
+      await sendDossierEmail({ to: buyerEmail, buyerName: null, dossierUrl, propertyCity: property.city, propertyType: property.type });
       if (seller.phone) await sendSmsNotification(seller.phone, `Nouveau contact sur votre bien.\nDossier envoyé à ${buyerEmail} (${From}).`);
     } catch (e) { console.error('Dossier email error:', e.message); }
 

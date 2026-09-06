@@ -32,7 +32,7 @@ app.use(helmet({
       styleSrc: ["'self'", "'unsafe-inline'", "fonts.googleapis.com", "fonts.gstatic.com"],
       fontSrc: ["'self'", "fonts.gstatic.com"],
       imgSrc: ["'self'", "data:", "*.cloudinary.com", "res.cloudinary.com", "images.unsplash.com", "api.qrserver.com"],
-      connectSrc: ["'self'", "api.stripe.com"],
+      connectSrc: ["'self'", "api.stripe.com", "https://nominatim.openstreetmap.org", "https://overpass-api.de"],
       frameSrc: ["'self'", "js.stripe.com"],
       mediaSrc: ["'self'"],
     }

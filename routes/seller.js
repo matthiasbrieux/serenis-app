@@ -1427,8 +1427,13 @@ router.delete('/api/seller/rgpd/account', requireAuth, async (req, res) => {
       db.prepare('DELETE FROM property_documents WHERE property_id=?').run(property.id);
       db.prepare('DELETE FROM buyer_contacts WHERE property_id=?').run(property.id);
       db.prepare('DELETE FROM visits WHERE property_id=?').run(property.id);
+      db.prepare('DELETE FROM offers WHERE property_id=?').run(property.id);
       db.prepare('DELETE FROM properties WHERE id=?').run(property.id);
     }
+    db.prepare('DELETE FROM checklist_progress WHERE seller_id=?').run(sid);
+    db.prepare('DELETE FROM property_publications WHERE seller_id=?').run(sid);
+    db.prepare('DELETE FROM property_performances WHERE seller_id=?').run(sid);
+    db.prepare('DELETE FROM offers WHERE seller_id=?').run(sid);
     db.prepare('DELETE FROM agenda_slots WHERE seller_id=?').run(sid);
     db.prepare('DELETE FROM notifications WHERE seller_id=?').run(sid);
     db.prepare('DELETE FROM sellers WHERE id=?').run(sid);

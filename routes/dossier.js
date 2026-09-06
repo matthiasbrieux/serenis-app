@@ -208,7 +208,7 @@ router.post('/api/dossier/notaire/send-email', requireAuth, async (req, res) => 
     const sellerName = [prop.first_name, prop.last_name].filter(Boolean).join(' ') || 'Votre client';
 
     const { sendDossierToNotaire } = require('../services/email');
-    await sendDossierToNotaire({ notaireEmail: notaire_email, notaireName: notaire_name || '', sellerName, property: prop, dossierUrl });
+    await sendDossierToNotaire({ to: notaire_email, notaireName: notaire_name || '', dossierUrl, propertyAddress: prop.address || '', sellerName });
 
     res.json({ success: true, url: dossierUrl });
   } catch(e) {
