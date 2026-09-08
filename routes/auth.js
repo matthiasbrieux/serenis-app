@@ -43,24 +43,31 @@ router.get('/admin/login', (req, res) => {
   res.sendFile('admin-login.html', { root: './public' });
 });
 
-router.post('/admin/login', express.json(), (req, res) => {
+router.post('/admin/login', express.json(), async (req, res) => {
   const { email, password } = req.body;
-  if (!process.env.ADMIN_PASSWORD || !process.env.JWT_SECRET) {
-    return res.json({ error: 'Configuration serveur incomplète. Contactez le support.' });
-  }
-  if (email !== process.env.ADMIN_EMAIL || password !== process.env.ADMIN_PASSWORD) {
-    return res.json({ error: 'Accès refusé' });
-  }
+  if (!process.env.JWT_SECRET) return res.json({ error: 'Configuration serveur incomplète.' });
+
   try {
-    const token = jwt.sign({ role: 'admin', email }, process.env.JWT_SECRET, { expiresIn: '8h' });
-    res.cookie('admin_token', token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      maxAge: 8 * 3600 * 1000
-    });
-    res.json({ success: true, redirect: '/admin' });
+    // Vérification dans la table admins
+    const admin = db.prepare('SELECT * FROM admins WHERE email = ?').get((email || '').toLowerCase().trim());
+    if (admin) {
+      const valid = await bcrypt.compare(password, admin.password);
+      if (!valid) return res.json({ error: 'Accès refusé' });
+      const token = jwt.sign({ role: 'admin', email: admin.email, name: admin.name }, process.env.JWT_SECRET, { expiresIn: '8h' });
+      res.cookie('admin_token', token, { httpOnly: true, secure: process.env.NODE_ENV === 'production', maxAge: 8 * 3600 * 1000 });
+      return res.json({ success: true, redirect: '/admin' });
+    }
+    // Fallback env vars (ancien système)
+    if (process.env.ADMIN_EMAIL && process.env.ADMIN_PASSWORD) {
+      if (email === process.env.ADMIN_EMAIL && password === process.env.ADMIN_PASSWORD) {
+        const token = jwt.sign({ role: 'admin', email }, process.env.JWT_SECRET, { expiresIn: '8h' });
+        res.cookie('admin_token', token, { httpOnly: true, secure: process.env.NODE_ENV === 'production', maxAge: 8 * 3600 * 1000 });
+        return res.json({ success: true, redirect: '/admin' });
+      }
+    }
+    return res.json({ error: 'Accès refusé' });
   } catch (e) {
-    res.json({ error: 'Erreur serveur. Contactez le support.' });
+    res.json({ error: 'Erreur serveur.' });
   }
 });
 

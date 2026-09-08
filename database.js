@@ -535,6 +535,33 @@ db.exec(`
   )
 `);
 
+// ── Table admins ─────────────────────────────────────────────────
+db.exec(`
+  CREATE TABLE IF NOT EXISTS admins (
+    id         INTEGER PRIMARY KEY AUTOINCREMENT,
+    email      TEXT NOT NULL UNIQUE,
+    name       TEXT NOT NULL,
+    password   TEXT NOT NULL,
+    created_at TEXT DEFAULT (datetime('now'))
+  )
+`);
+
+// Seed initial si la table est vide
+const adminCount = db.prepare('SELECT COUNT(*) as n FROM admins').get().n;
+if (adminCount === 0) {
+  const bcrypt = require('bcryptjs');
+  const seed = [
+    { email: 'matthias@venduparmoi.fr', name: 'Matthias',    password: 'VPM-Matthias2026'  },
+    { email: 'guillaume@venduparmoi.fr', name: 'Guillaume',   password: 'VPM-Guillaume2026' },
+    { email: 'contact@venduparmoi.fr',  name: 'Secrétariat', password: 'VPM-Contact2026'   },
+  ];
+  for (const acc of seed) {
+    const hash = bcrypt.hashSync(acc.password, 10);
+    db.prepare('INSERT OR IGNORE INTO admins (email, name, password) VALUES (?,?,?)').run(acc.email, acc.name, hash);
+  }
+  console.log('[ADMINS] 3 comptes admin créés (mots de passe temporaires)');
+}
+
 // ── Nettoyage photos locales (avant Cloudinary) ─────────────────
 // Supprime les photos et documents dont l'URL commence par /uploads/
 // (stockage local éphémère Render — fichiers définitivement perdus)
