@@ -21,6 +21,10 @@
     .form-group label { display: block; font-size: 0.85rem; font-weight: 600; color: #444; margin-bottom: 6px; }
     .form-group input { width: 100%; padding: 10px 14px; border: 1px solid #ddd; border-radius: 8px; font-size: 0.95rem; box-sizing: border-box; }
     .form-group input:focus { outline: none; border-color: #C4603A; }
+    .input-wrap { position: relative; }
+    .input-wrap input { padding-right: 44px; }
+    .eye-btn { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; color: #aaa; padding: 4px; line-height: 1; }
+    .eye-btn:hover { color: #555; }
     .btn-save { background: #C4603A; color: #fff; border: none; padding: 12px 28px; border-radius: 8px; font-size: 0.95rem; font-weight: 600; cursor: pointer; }
     .btn-save:hover { background: #a84f2e; }
     .msg { padding: 12px 16px; border-radius: 8px; margin-bottom: 20px; font-size: 0.9rem; display: none; }
@@ -68,15 +72,24 @@
       <form id="pwd-form">
         <div class="form-group">
           <label>Mot de passe actuel</label>
-          <input type="password" id="current" required autocomplete="current-password">
+          <div class="input-wrap">
+            <input type="password" id="current" required autocomplete="current-password">
+            <button type="button" class="eye-btn" onclick="togglePwd('current', this)">👁</button>
+          </div>
         </div>
         <div class="form-group">
           <label>Nouveau mot de passe</label>
-          <input type="password" id="newpwd" required minlength="8" autocomplete="new-password">
+          <div class="input-wrap">
+            <input type="password" id="newpwd" required minlength="8" autocomplete="new-password">
+            <button type="button" class="eye-btn" onclick="togglePwd('newpwd', this)">👁</button>
+          </div>
         </div>
         <div class="form-group">
           <label>Confirmer le nouveau mot de passe</label>
-          <input type="password" id="confirm" required autocomplete="new-password">
+          <div class="input-wrap">
+            <input type="password" id="confirm" required autocomplete="new-password">
+            <button type="button" class="eye-btn" onclick="togglePwd('confirm', this)">👁</button>
+          </div>
         </div>
         <button type="submit" class="btn-save">Changer le mot de passe</button>
       </form>
@@ -85,6 +98,13 @@
 </div>
 
 <script>
+function togglePwd(id, btn) {
+  const input = document.getElementById(id);
+  const show = input.type === 'password';
+  input.type = show ? 'text' : 'password';
+  btn.textContent = show ? '🙈' : '👁';
+}
+
 // Affiche le nom/email depuis le token (décodé côté serveur via la page)
 fetch('/admin/api/me').then(r => r.json()).then(d => {
   if (d.name) document.getElementById('admin-name').textContent = d.name;
