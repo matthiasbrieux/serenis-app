@@ -29,9 +29,6 @@ router.get('/finance', requireAdmin, (req, res) => {
   res.sendFile('finance.html', { root: './views/admin' });
 });
 
-router.get('/parcours', requireAdmin, (req, res) => {
-  res.sendFile('parcours.html', { root: './views/admin' });
-});
 
 router.get('/documents/mot-premier-rdv', requireAdmin, (req, res) => {
   res.sendFile('mot-premier-rdv.html', { root: './views/admin' });
@@ -93,19 +90,6 @@ router.get('/guide', requireAdmin, (req, res) => {
 </html>`);
 });
 
-router.get('/api/parcours/tokens', requireAdmin, (req, res) => {
-  // Préfère un bien publié avec photos, sinon prend le premier disponible
-  const prop = db.prepare(`
-    SELECT p.acheteur_token, p.notaire_token, p.slug, p.address, p.city,
-      s.first_name, s.last_name,
-      (SELECT COUNT(*) FROM property_photos pp WHERE pp.property_id = p.id) as photo_count
-    FROM properties p JOIN sellers s ON s.id = p.seller_id
-    WHERE p.acheteur_token IS NOT NULL
-    ORDER BY p.published DESC, photo_count DESC
-    LIMIT 1
-  `).get();
-  res.json({ prop: prop || null });
-});
 
 // ── Vue contrat signé d'un vendeur (admin) ────────────────────
 router.get('/crm/:id/contrat', requireAdmin, (req, res) => {
