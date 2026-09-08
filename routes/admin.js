@@ -1552,4 +1552,41 @@ router.delete('/api/rappels/:id', requireAdmin, (req, res) => {
   res.json({ ok: true });
 });
 
+// ── Route de diagnostic email ─────────────────────────────────
+router.get('/api/test-email', requireAdmin, async (req, res) => {
+  const to = req.query.to;
+  if (!to) return res.status(400).json({ error: 'Paramètre ?to=adresse@email.fr requis' });
+
+  const sgMail = require('@sendgrid/mail');
+  const apiKey = process.env.SENDGRID_API_KEY;
+  const fromEmail = process.env.SENDGRID_FROM_EMAIL || 'contact@venduparmoi.fr';
+  const baseUrl = process.env.BASE_URL || 'https://www.venduparmoi.fr';
+
+  const diag = {
+    SENDGRID_API_KEY: apiKey ? `présente (${apiKey.substring(0, 10)}...)` : '❌ MANQUANTE',
+    SENDGRID_FROM_EMAIL: fromEmail,
+    BASE_URL: baseUrl,
+    NODE_ENV: process.env.NODE_ENV,
+  };
+
+  if (!apiKey) return res.json({ diag, sent: false, error: 'SENDGRID_API_KEY manquante' });
+
+  sgMail.setApiKey(apiKey);
+  try {
+    await sgMail.send({
+      to,
+      from: { email: fromEmail, name: 'Vendu Par Moi' },
+      subject: '[TEST] Email de diagnostic Vendu Par Moi',
+      html: `<p>Cet email confirme que SendGrid fonctionne correctement depuis <strong>${baseUrl}</strong>.</p><p>Expéditeur : ${fromEmail}</p><p>Heure : ${new Date().toISOString()}</p>`,
+    });
+    console.log(`[TEST EMAIL] ✓ Envoyé → ${to}`);
+    res.json({ diag, sent: true });
+  } catch (e) {
+    const errDetail = e?.response?.body?.errors?.[0]?.message || e.message;
+    const errCode = e?.code || e?.response?.status;
+    console.error(`[TEST EMAIL] ✗ Erreur ${errCode} → ${errDetail}`);
+    res.json({ diag, sent: false, error: errDetail, code: errCode });
+  }
+});
+
 module.exports = router;
