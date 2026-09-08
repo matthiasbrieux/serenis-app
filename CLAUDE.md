@@ -2,7 +2,7 @@
 
 ## Identité du projet
 
-- **Produit** : Vendu Par Moi (venduparmo.fr)
+- **Produit** : Vendu Par Moi (venduparmoi.fr)
 - **Dépôt local** : `/Users/brieuxmatthias/serenis-app` (ancien nom "serenis", ne pas renommer)
 - **Dépôt GitHub** : `matthiasbrieux/serenis-app`
 - **Déploiement** : Render (auto-deploy sur push `main`, ~3 min)
