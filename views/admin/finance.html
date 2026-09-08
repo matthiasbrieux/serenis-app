@@ -13,50 +13,45 @@
   <meta name="apple-mobile-web-app-title" content="VPM"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Finance — Vendu Par Moi Admin</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css?v=3">
+  <link rel="stylesheet" href="/css/admin.css">
   <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { background: #0f0f0e; color: #FDFCF8; font-family: 'Segoe UI', Arial, sans-serif; font-size: 14px; }
-    .topbar { background: #1a1a18; border-bottom: 1px solid #2a2a28; padding: 14px 28px; display: flex; align-items: center; gap: 20px; }
-    .topbar a { color: #C4603A; text-decoration: none; font-weight: 600; font-size: .85rem; }
-    .topbar h1 { color: #FDFCF8; font-size: 1.1rem; }
-    .page { max-width: 1200px; margin: 0 auto; padding: 28px 24px; }
-    .kpi-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; margin-bottom: 28px; }
-    .kpi { background: #1a1a18; border: 1px solid #2a2a28; border-radius: 12px; padding: 20px; }
-    .kpi-val { font-size: 2rem; font-weight: 700; margin-bottom: 4px; }
-    .kpi-lbl { font-size: .78rem; color: #9a9a8e; text-transform: uppercase; letter-spacing: .05em; }
-    .card { background: #1a1a18; border: 1px solid #2a2a28; border-radius: 12px; padding: 20px; margin-bottom: 20px; }
-    .card h2 { font-size: .95rem; font-weight: 600; color: #FDFCF8; margin-bottom: 16px; }
+    .kpi-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 16px; margin-bottom: 28px; }
+    .kpi { background: #fff; border-radius: 12px; padding: 20px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); }
+    .kpi-val { font-size: 2rem; font-weight: 700; margin-bottom: 4px; color: #1A1A16; }
+    .kpi-lbl { font-size: .78rem; color: #9a9087; text-transform: uppercase; letter-spacing: .05em; }
+    .card { background: #fff; border-radius: 12px; padding: 20px; margin-bottom: 20px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); }
+    .card h2 { font-size: .95rem; font-weight: 600; color: #1A1A16; margin-bottom: 16px; }
     .bar-chart { display: flex; align-items: flex-end; gap: 6px; height: 120px; padding-bottom: 4px; }
     .bar-wrap { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; }
     .bar { width: 100%; background: #C4603A; border-radius: 4px 4px 0 0; transition: opacity .2s; min-height: 4px; }
     .bar:hover { opacity: .8; }
-    .bar-lbl { font-size: .65rem; color: #666; }
-    .bar-val { font-size: .72rem; color: #9a9a8e; }
+    .bar-lbl { font-size: .65rem; color: #9a9087; }
+    .bar-val { font-size: .72rem; color: #9a9087; }
     table { width: 100%; border-collapse: collapse; }
-    th { text-align: left; font-size: .72rem; color: #666; text-transform: uppercase; letter-spacing: .05em; padding: 8px; border-bottom: 1px solid #2a2a28; }
-    td { padding: 10px 8px; border-bottom: 1px solid #1e1e1c; font-size: .85rem; color: #FDFCF8; }
-    tr:hover td { background: rgba(255,255,255,.02); }
+    th { text-align: left; font-size: .72rem; color: #9a9087; text-transform: uppercase; letter-spacing: .05em; padding: 8px; border-bottom: 1px solid #e8e0d6; }
+    td { padding: 10px 8px; border-bottom: 1px solid #f5f0e8; font-size: .85rem; color: #1A1A16; }
+    tr:hover td { background: rgba(196,96,58,.03); }
     .badge { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: .72rem; font-weight: 600; }
-    .badge-serenite { background: rgba(196,96,58,.15); color: #C4603A; }
-    .badge-autonome { background: rgba(154,154,142,.15); color: #9a9a8e; }
+    .badge-serenite { background: rgba(196,96,58,.12); color: #C4603A; }
+    .badge-autonome { background: rgba(26,26,22,.08); color: #666; }
     .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
     .donut-wrap { display: flex; align-items: center; gap: 24px; }
-    .legend-item { display: flex; align-items: center; gap: 8px; font-size: .85rem; margin-bottom: 8px; }
+    .legend-item { display: flex; align-items: center; gap: 8px; font-size: .85rem; margin-bottom: 8px; color: #444; }
     .legend-dot { width: 12px; height: 12px; border-radius: 50%; }
-    .views-stat { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #1e1e1c; font-size: .85rem; }
+    .views-stat { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #f0ede8; font-size: .85rem; color: #444; }
     .views-stat a { color: #C4603A; text-decoration: none; }
     @media (max-width: 700px) { .two-col { grid-template-columns: 1fr; } }
   </style>
 </head>
-<body>
-
-<div class="topbar">
-  <a href="/admin">← Admin</a>
-  <h1>💰 Vue financière</h1>
-  <span style="margin-left:auto;font-size:.78rem;color:#666;" id="lastUpdate"></span>
-</div>
-
-<div class="page">
+<body class="admin-body">
+<div class="admin-layout">
+  <div id="admin-sidebar-slot"></div>
+  <main class="admin-main">
+  <h1 class="adm-page-title">Finance</h1>
+  <span style="font-size:.78rem;color:#9a9087;display:block;margin-top:-20px;margin-bottom:24px;" id="lastUpdate"></span>
+<div>
   <div class="kpi-row" id="kpiRow">
     <div class="kpi"><div class="kpi-val" style="color:#059669;" id="kCA">—</div><div class="kpi-lbl">CA total estimé</div></div>
     <div class="kpi"><div class="kpi-val" id="kClients">—</div><div class="kpi-lbl">Clients payants</div></div>
@@ -175,5 +170,7 @@ async function load() {
 
 load();
 </script>
+<script src="/js/admin-sidebar.js"></script>
+</main></div>
 </body>
 </html>

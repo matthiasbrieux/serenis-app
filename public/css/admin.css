@@ -1,0 +1,207 @@
+/* ── Admin layout ─────────────────────────────────────────────── */
+:root {
+  --adm-sidebar-w: 232px;
+  --adm-sidebar-bg: #161614;
+  --adm-sidebar-text: rgba(253,252,248,0.55);
+  --adm-sidebar-hover: rgba(253,252,248,0.05);
+  --adm-active-bg: rgba(196,96,58,0.13);
+  --adm-active-text: #C4603A;
+  --adm-active-border: #C4603A;
+  --adm-main-bg: #F5F0E8;
+  --adm-main-text: #1A1A16;
+  --adm-card-bg: #fff;
+  --adm-border: rgba(253,252,248,0.08);
+  --adm-transition: 0.22s ease;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+
+body.admin-body {
+  margin: 0;
+  background: var(--adm-main-bg);
+  color: var(--adm-main-text);
+  font-family: 'DM Sans', 'Helvetica Neue', Arial, sans-serif;
+  font-size: 14px;
+}
+
+.admin-layout {
+  display: flex;
+  min-height: 100vh;
+}
+
+/* ── Sidebar ─────────────────────────────────────────────────── */
+.admin-sidebar {
+  width: var(--adm-sidebar-w);
+  min-width: var(--adm-sidebar-w);
+  background: var(--adm-sidebar-bg);
+  display: flex;
+  flex-direction: column;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow: hidden;
+  transition: width var(--adm-transition), min-width var(--adm-transition);
+  z-index: 100;
+}
+.admin-sidebar.collapsed {
+  width: 60px;
+  min-width: 60px;
+}
+
+.adm-logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 22px 20px 20px;
+  border-bottom: 1px solid var(--adm-border);
+  color: #FDFCF8;
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: 1.05rem;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+}
+.adm-logo svg { flex-shrink: 0; }
+.adm-logo-text { transition: opacity var(--adm-transition); }
+.admin-sidebar.collapsed .adm-logo-text { opacity: 0; pointer-events: none; }
+
+.adm-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding: 10px 14px 6px;
+}
+.adm-toggle-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--adm-sidebar-text);
+  padding: 6px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  transition: color 0.15s, background 0.15s;
+}
+.adm-toggle-btn:hover { color: #FDFCF8; background: var(--adm-sidebar-hover); }
+.adm-toggle-btn svg { transition: transform var(--adm-transition); }
+.admin-sidebar.collapsed .adm-toggle-btn svg { transform: rotate(180deg); }
+
+.adm-nav {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 8px 0;
+  scrollbar-width: none;
+}
+.adm-nav::-webkit-scrollbar { display: none; }
+
+.adm-nav a {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  padding: 10px 20px;
+  color: var(--adm-sidebar-text);
+  text-decoration: none;
+  font-size: 0.85rem;
+  font-weight: 400;
+  white-space: nowrap;
+  overflow: hidden;
+  border-left: 3px solid transparent;
+  transition: color 0.15s, background 0.15s, border-color 0.15s;
+  position: relative;
+}
+.adm-nav a:hover {
+  color: #FDFCF8;
+  background: var(--adm-sidebar-hover);
+}
+.adm-nav a.active {
+  color: var(--adm-active-text);
+  background: var(--adm-active-bg);
+  border-left-color: var(--adm-active-border);
+  font-weight: 500;
+}
+.adm-nav a svg { flex-shrink: 0; }
+.adm-nav a .adm-label { transition: opacity var(--adm-transition); }
+.admin-sidebar.collapsed .adm-nav a .adm-label { opacity: 0; pointer-events: none; }
+.admin-sidebar.collapsed .adm-nav a { justify-content: center; padding: 10px; border-left: none; }
+.admin-sidebar.collapsed .adm-nav a.active { background: var(--adm-active-bg); border-radius: 8px; margin: 0 6px; }
+
+/* Tooltip quand collapsed */
+.admin-sidebar.collapsed .adm-nav a::after {
+  content: attr(data-label);
+  position: absolute;
+  left: 64px;
+  background: #2a2a28;
+  color: #FDFCF8;
+  font-size: 0.8rem;
+  padding: 5px 10px;
+  border-radius: 6px;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.15s;
+  z-index: 200;
+}
+.admin-sidebar.collapsed .adm-nav a:hover::after { opacity: 1; }
+
+.adm-sep {
+  height: 1px;
+  background: var(--adm-border);
+  margin: 8px 20px;
+}
+.admin-sidebar.collapsed .adm-sep { margin: 8px 10px; }
+
+.adm-footer {
+  border-top: 1px solid var(--adm-border);
+  padding: 8px 0;
+}
+
+/* ── Main ────────────────────────────────────────────────────── */
+.admin-main {
+  flex: 1;
+  min-width: 0;
+  padding: 32px;
+  background: var(--adm-main-bg);
+  overflow-y: auto;
+}
+
+.adm-page-title {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: 2rem;
+  font-weight: 600;
+  color: var(--adm-main-text);
+  margin: 0 0 28px;
+}
+
+/* ── Cards ───────────────────────────────────────────────────── */
+.adm-card {
+  background: var(--adm-card-bg);
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+  margin-bottom: 20px;
+}
+.adm-card h2 {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--adm-main-text);
+  margin: 0 0 16px;
+}
+
+/* ── Boutons ─────────────────────────────────────────────────── */
+.adm-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  text-decoration: none;
+  transition: opacity 0.15s;
+}
+.adm-btn:hover { opacity: 0.85; }
+.adm-btn-primary { background: #C4603A; color: #FDFCF8; }
+.adm-btn-ghost { background: transparent; color: var(--adm-main-text); border: 1px solid #ddd; }

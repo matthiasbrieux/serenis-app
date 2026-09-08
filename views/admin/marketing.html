@@ -15,15 +15,16 @@
   <title>Marketing & Lancement — Vendu Par Moi Admin</title>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/css/style.css?v=3">
+  <link rel="stylesheet" href="/css/admin.css">
   <style>
     :root { --bg:#0f0f0e; --bg2:#161614; --bg3:#1e1e1c; --border:#2a2a28; --text:#e8e4de; --muted:#888; --accent:#C4603A; --green:#4ade80; --gold:#C9A84C; }
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body { background: #f0f0ed; font-family: 'DM Sans', sans-serif; }
-    .admin-layout { display: grid; grid-template-columns: 220px 1fr; min-height: 100vh; }
-    .admin-sidebar { background: #1A1A16; padding: 24px 0; position: sticky; top: 0; height: 100vh; overflow-y: auto; }
-    .admin-sidebar a { display: block; padding: 12px 24px; color: rgba(255,255,255,0.6); font-size: 0.88rem; text-decoration: none; }
-    .admin-sidebar a:hover, .admin-sidebar a.active { color: #fff; background: rgba(255,255,255,0.08); }
-    .admin-sidebar .logo { color: #FDFCF8; padding: 0 24px 24px; font-family: 'Cormorant Garamond', serif; font-size: 1.4rem; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 16px; }
+    
+    
+    
+    
+    
     .main { padding: 32px; max-width: 1400px; }
 
     /* TABS */
@@ -174,22 +175,9 @@
     .alert-box { background: rgba(196,96,58,0.08); border: 1px solid rgba(196,96,58,0.25); border-radius: 8px; padding: 14px 18px; font-size: 0.84rem; color: #C4603A; margin-bottom: 20px; }
   </style>
 </head>
-<body>
+<body class="admin-body">
 <div class="admin-layout">
-  <aside class="admin-sidebar">
-    <div class="logo">Vendu Par Moi Admin</div>
-    <a href="/admin">📊 Dashboard</a>
-    <a href="/admin/crm">🎯 CRM Vendeurs</a>
-    <a href="/admin/missions">📸 Photos pros</a>
-    <a href="/admin/emails">📧 Emails</a>
-    <a href="/admin/marketing" class="active">🚀 Marketing</a>
-    <a href="/admin/parrainage">🎁 Parrainage</a>
-    <a href="/admin/rappels">📞 Rappels</a>
-    <a href="/admin/prospection">🎯 Prospection VRP</a>
-    <a href="/admin/mon-compte">🔑 Mon compte</a>
-    <a href="/admin/logout">← Déconnexion</a>
-  </aside>
-
+  <div id="admin-sidebar-slot"></div>
   <main class="main">
     <div style="margin-bottom:28px;">
       <h1 style="font-family:'Cormorant Garamond',serif;color:#1A1A16;font-size:2rem;margin-bottom:6px;">Marketing & Lancement</h1>
@@ -1309,9 +1297,10 @@ function printFlyer() {
       @page { size: A5; margin: 0; }
       body { margin: 0; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
       ${document.querySelector('style').textContent}
-    </style></head><body>
+    </style></head><body class="admin-body">
     ${document.getElementById('flyer-content').outerHTML}
-    <script>window.onload=()=>window.print()<\/script></body></html>`);
+    <script>window.onload=()=>window.print()<\/script><script src="/js/admin-sidebar.js"></script>
+</body></html>`);
   w.document.close();
 }
 
@@ -1323,9 +1312,10 @@ function printCheque() {
       @page { size: A5 landscape; margin: 20mm; }
       body { margin: 0; -webkit-print-color-adjust: exact; print-color-adjust: exact; font-family: 'DM Sans', sans-serif; }
       ${document.querySelector('style').textContent}
-    </style></head><body>
+    </style></head><body class="admin-body">
     ${document.getElementById('cheque-content').outerHTML}
-    <script>window.onload=()=>window.print()<\/script></body></html>`);
+    <script>window.onload=()=>window.print()<\/script><script src="/js/admin-sidebar.js"></script>
+</body></html>`);
   w.document.close();
 }
 
@@ -1337,9 +1327,10 @@ function printPlaquette() {
       @page { size: A5; margin: 0; }
       body { margin: 0; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
       ${document.querySelector('style').textContent}
-    </style></head><body>
+    </style></head><body class="admin-body">
     ${document.getElementById('plaquette-content').outerHTML}
-    <script>window.onload=()=>window.print()<\/script></body></html>`);
+    <script>window.onload=()=>window.print()<\/script><script src="/js/admin-sidebar.js"></script>
+</body></html>`);
   w.document.close();
 }
 
@@ -1352,9 +1343,10 @@ function printPresentation() {
       body { margin: 0; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
       .slide { page-break-after: always; min-height: 100vh; }
       ${document.querySelector('style').textContent}
-    </style></head><body>
+    </style></head><body class="admin-body">
     ${document.getElementById('pres-content').outerHTML}
-    <script>window.onload=()=>window.print()<\/script></body></html>`);
+    <script>window.onload=()=>window.print()<\/script><script src="/js/admin-sidebar.js"></script>
+</body></html>`);
   w.document.close();
 }
 
@@ -1485,5 +1477,6 @@ document.querySelectorAll('input[type=checkbox]').forEach(cb => {
   cb.addEventListener('change', () => localStorage.setItem(key, cb.checked));
 });
 </script>
+<script src="/js/admin-sidebar.js"></script>
 </body>
 </html>
