@@ -6,7 +6,7 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { v4: uuidv4 } = require('uuid');
 const db = require('../database');
-const { sendWelcomeImproved, sendInvoiceEmail, sendFirstMeetingEmail } = require('../services/email');
+const { sendWelcomeImproved, sendInvoiceEmail, sendFirstMeetingEmail, sendNewClientAdminNotif } = require('../services/email');
 const crypto = require('crypto');
 
 const checkoutLimit = rateLimit({
@@ -261,6 +261,19 @@ async function activateSeller(session) {
   try {
     await sendFirstMeetingEmail({ email: seller.email, firstName: seller.first_name });
   } catch(e) { console.error('First meeting email error:', e.message); }
+
+  // Todos admin + notif admin
+  try {
+    const activePack = pack || seller.pack;
+    const todoData = JSON.stringify({ name: `${seller.first_name || ''} ${seller.last_name || ''}`.trim() || seller.email, pack: activePack, email: seller.email, phone: seller.phone });
+    db.prepare('INSERT INTO admin_todos (type, seller_id, data) VALUES (?,?,?)').run('new_signup', seller.id, todoData);
+    if (activePack === 'autonome') {
+      db.prepare('INSERT INTO admin_todos (type, seller_id, data) VALUES (?,?,?)').run('autonome_call', seller.id, todoData);
+    } else {
+      db.prepare('INSERT INTO admin_todos (type, seller_id, data) VALUES (?,?,?)').run('formation_rdv', seller.id, todoData);
+    }
+    await sendNewClientAdminNotif({ firstName: seller.first_name, lastName: seller.last_name, email: seller.email, pack: activePack, phone: seller.phone });
+  } catch(e) { console.error('Admin todo/notif error:', e.message); }
 
   // Facture automatique
   try {

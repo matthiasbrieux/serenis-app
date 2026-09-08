@@ -751,6 +751,33 @@ async function sendAdminDirectEmail({ to, subject, html: customHtml, text }) {
 }
 
 // ─────────────────────────────────────────────────────────────
+// 17. NOTIF ADMIN — NOUVEAU CLIENT
+// ─────────────────────────────────────────────────────────────
+
+async function sendNewClientAdminNotif({ firstName, lastName, email, pack, phone }) {
+  const packLabel = pack === 'serenite' ? 'Pack Sérénité' : 'Pack Autonome';
+  const packColor = pack === 'serenite' ? '#C4603A' : '#6b6965';
+  const urgency = pack === 'autonome'
+    ? `<p style="background:#fff8f0;border-left:3px solid #C4603A;padding:10px 14px;border-radius:0 6px 6px 0;font-size:13px;color:#8a4020;margin:16px 0 0;">⚡ Pack Autonome — appeler sous 48h pour expliquer le fonctionnement</p>`
+    : `<p style="background:#fff8f0;border-left:3px solid #C4603A;padding:10px 14px;border-radius:0 6px 6px 0;font-size:13px;color:#8a4020;margin:16px 0 0;">📅 Pack Sérénité — contacter pour planifier la formation (dans les 48h)</p>`;
+  const html = `
+    <p style="font-size:15px;color:#3a3530;margin:0 0 20px;">Un nouveau client vient de souscrire sur <strong>Vendu Par Moi</strong>.</p>
+    <table style="width:100%;border-collapse:collapse;font-size:14px;color:#3a3530;" cellpadding="0" cellspacing="0">
+      <tr><td style="padding:8px 0;color:#9a9087;width:130px;">Prénom / Nom</td><td style="padding:8px 0;font-weight:600;">${firstName || '—'} ${lastName || ''}</td></tr>
+      <tr><td style="padding:8px 0;color:#9a9087;">Email</td><td style="padding:8px 0;"><a href="mailto:${email}" style="color:#C4603A;">${email}</a></td></tr>
+      ${phone ? `<tr><td style="padding:8px 0;color:#9a9087;">Téléphone</td><td style="padding:8px 0;">${phone}</td></tr>` : ''}
+      <tr><td style="padding:8px 0;color:#9a9087;">Pack</td><td style="padding:8px 0;"><span style="background:${packColor};color:#fff;padding:2px 10px;border-radius:10px;font-size:12px;font-weight:600;">${packLabel}</span></td></tr>
+    </table>
+    ${urgency}
+    <p style="margin:24px 0 0;"><a href="${BASE_URL}/admin" style="display:inline-block;background:#C4603A;color:#fff;padding:10px 20px;border-radius:6px;font-size:13px;font-weight:600;text-decoration:none;">Voir dans l'admin →</a></p>
+  `;
+  const ADMIN_EMAILS = ['matthias@venduparmoi.fr', 'guillaume@venduparmoi.fr'];
+  await Promise.all(ADMIN_EMAILS.map(to =>
+    send(to, `🆕 Nouveau client VPM — ${firstName || email} (${packLabel})`, layout(`<div style="font-size:15px;color:#3a3530;line-height:1.7;">${html}</div>`))
+  ));
+}
+
+// ─────────────────────────────────────────────────────────────
 // 14. PRÉVISUALISATION (admin marketing)
 // ─────────────────────────────────────────────────────────────
 
@@ -926,5 +953,6 @@ module.exports = {
   // Admin
   sendAdminDirectEmail,
   sendWeeklyAdminReport,
+  sendNewClientAdminNotif,
   previewEmail,
 };

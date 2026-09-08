@@ -20,6 +20,22 @@
     .revenue-card { background: linear-gradient(135deg, #C4603A, #a84f2e); color: #fff; border-radius: 12px; padding: 28px; }
     .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 1000; display: flex; align-items: center; justify-content: center; opacity: 0; visibility: hidden; pointer-events: none; transition: opacity 0.2s; }
     .modal-overlay.show { opacity: 1; visibility: visible; pointer-events: all; }
+
+    /* Zone À traiter */
+    .todo-zone { background:#fff;border-radius:12px;padding:20px 24px;margin-bottom:28px;box-shadow:0 2px 8px rgba(0,0,0,0.06);border-left:4px solid #C4603A; }
+    .todo-zone-header { display:flex;align-items:center;gap:10px;margin-bottom:16px; }
+    .todo-zone-title { font-family:'Cormorant Garamond',serif;font-size:1.15rem;color:#1A1A16;font-weight:600; }
+    .todo-badge { background:#C4603A;color:#fff;border-radius:10px;font-size:.7rem;font-weight:700;padding:2px 8px; }
+    .todo-list { display:flex;flex-direction:column;gap:10px; }
+    .todo-card { display:flex;align-items:center;gap:14px;background:#fdf9f6;border-radius:8px;padding:12px 16px;border:1px solid #f0e8df; }
+    .todo-icon { font-size:1.4rem;flex-shrink:0; }
+    .todo-body { flex:1;min-width:0; }
+    .todo-label { font-weight:600;font-size:.88rem;color:#1A1A16; }
+    .todo-sub { font-size:.78rem;color:#9a9087;margin-top:2px; }
+    .todo-time { font-size:.72rem;color:#bbb;margin-top:3px; }
+    .todo-btn { flex-shrink:0;padding:6px 14px;background:#fff;border:1.5px solid #C4603A;color:#C4603A;border-radius:6px;font-size:.78rem;font-weight:600;cursor:pointer;transition:all .15s;white-space:nowrap; }
+    .todo-btn:hover { background:#C4603A;color:#fff; }
+    .todo-empty { color:#9a9087;font-size:.88rem;font-style:italic;text-align:center;padding:12px 0; }
   </style>
 </head>
 <body class="admin-body">
@@ -31,6 +47,20 @@
       <h1 style="font-family:'Cormorant Garamond',serif;color:#1A1A16;font-size:2rem;">Dashboard Admin</h1>
       <button onclick="document.getElementById('addClientModal').classList.add('show')" class="btn-primary">+ Ajouter un client</button>
     </div>
+
+    <!-- À TRAITER MAINTENANT -->
+    <section id="todo-section" style="display:none;margin-bottom:28px;">
+      <div class="todo-zone">
+        <div class="todo-zone-header">
+          <span style="font-size:1.3rem;">🔔</span>
+          <span class="todo-zone-title">À traiter maintenant</span>
+          <span class="todo-badge" id="todoBadge">0</span>
+        </div>
+        <div class="todo-list" id="todoList">
+          <div class="todo-empty">Chargement…</div>
+        </div>
+      </div>
+    </section>
 
     <!-- Alerts -->
     <section id="alerts-section" style="margin-bottom:32px;">
@@ -188,6 +218,65 @@
 <script>
 let currentResetId = null;
 let allClients = [];
+
+// ── TODOS ──────────────────────────────────────────────────────
+const TODO_CONFIG = {
+  new_signup:    { icon: '🆕', label: 'Nouveau client',          action: 'Accueilli ✓',   color: '#059669' },
+  autonome_call: { icon: '📞', label: 'À appeler (Pack Autonome)', action: 'Appelé ✓',     color: '#C4603A' },
+  formation_rdv: { icon: '📅', label: 'Planifier la formation',   action: 'RDV planifié ✓', color: '#C4603A' },
+};
+
+function fmtRelative(dateStr) {
+  const diff = Date.now() - new Date(dateStr).getTime();
+  const m = Math.floor(diff / 60000);
+  if (m < 60) return `il y a ${m} min`;
+  const h = Math.floor(m / 60);
+  if (h < 24) return `il y a ${h}h`;
+  return `il y a ${Math.floor(h / 24)}j`;
+}
+
+async function loadTodos() {
+  const { todos } = await fetch('/admin/api/todos').then(r => r.json());
+  const section = document.getElementById('todo-section');
+  const list = document.getElementById('todoList');
+  const badge = document.getElementById('todoBadge');
+
+  badge.textContent = todos.length;
+  section.style.display = todos.length ? 'block' : 'none';
+
+  if (!todos.length) { list.innerHTML = ''; return; }
+
+  list.innerHTML = todos.map(t => {
+    const cfg = TODO_CONFIG[t.type] || { icon: '❓', label: t.type, action: 'Traité ✓', color: '#888' };
+    let data = {};
+    try { data = JSON.parse(t.data || '{}'); } catch(e) {}
+    const name = t.first_name ? `${t.first_name} ${t.last_name || ''}`.trim() : (data.name || t.seller_email || '—');
+    const phone = t.seller_phone || data.phone || '';
+    const email = t.seller_email || data.email || '';
+    const packLabel = (t.seller_pack || data.pack) === 'serenite' ? 'Sérénité' : 'Autonome';
+    const sub = [name, packLabel, phone].filter(Boolean).join(' · ');
+    return `<div class="todo-card" id="todo-${t.id}">
+      <div class="todo-icon">${cfg.icon}</div>
+      <div class="todo-body">
+        <div class="todo-label">${cfg.label}</div>
+        <div class="todo-sub">${sub}</div>
+        ${email ? `<div class="todo-sub"><a href="mailto:${email}" style="color:#C4603A;">${email}</a></div>` : ''}
+        <div class="todo-time">${fmtRelative(t.created_at)}</div>
+      </div>
+      <button class="todo-btn" onclick="dismissTodo(${t.id})" style="border-color:${cfg.color};color:${cfg.color};">${cfg.action}</button>
+    </div>`;
+  }).join('');
+}
+
+async function dismissTodo(id) {
+  const btn = document.querySelector(`#todo-${id} .todo-btn`);
+  if (btn) { btn.disabled = true; btn.textContent = '…'; }
+  await fetch(`/admin/api/todos/${id}/dismiss`, { method: 'POST' });
+  await loadTodos();
+}
+
+loadTodos();
+setInterval(loadTodos, 30000);
 
 async function loadStats() {
   const res = await fetch('/admin/api/stats');

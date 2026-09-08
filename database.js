@@ -535,6 +535,19 @@ db.exec(`
   )
 `);
 
+// ── Todos admin (alertes dismissables) ───────────────────────────
+db.exec(`
+  CREATE TABLE IF NOT EXISTS admin_todos (
+    id           INTEGER PRIMARY KEY AUTOINCREMENT,
+    type         TEXT NOT NULL,
+    seller_id    INTEGER REFERENCES sellers(id) ON DELETE CASCADE,
+    data         TEXT DEFAULT '{}',
+    dismissed_at TEXT,
+    dismissed_by TEXT,
+    created_at   TEXT DEFAULT (datetime('now'))
+  )
+`);
+
 // ── Table admins ─────────────────────────────────────────────────
 db.exec(`
   CREATE TABLE IF NOT EXISTS admins (

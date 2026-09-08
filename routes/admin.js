@@ -6,7 +6,7 @@ const path = require('path');
 const fs = require('fs');
 const db = require('../database');
 const { requireAdmin } = require('../middleware/auth');
-const { sendWelcomeEmail, sendPhotographerAvailabilityRequest, sendPostFirstVisitFeedbackSeller, sendCheckInNoOffer, sendNoPhotosNudge, sendMissingDocNudge, sendNotPublishedNudge, sendProspectNudge, sendContractRenewal, sendReviewRequest, sendAdminDirectEmail, sendFirstMeetingEmail } = require('../services/email');
+const { sendWelcomeEmail, sendPhotographerAvailabilityRequest, sendPostFirstVisitFeedbackSeller, sendCheckInNoOffer, sendNoPhotosNudge, sendMissingDocNudge, sendNotPublishedNudge, sendProspectNudge, sendContractRenewal, sendReviewRequest, sendAdminDirectEmail, sendFirstMeetingEmail, sendNewClientAdminNotif } = require('../services/email');
 
 router.get('/', requireAdmin, (req, res) => {
   res.sendFile('dashboard.html', { root: './views/admin' });
@@ -584,7 +584,18 @@ router.post('/api/clients', requireAdmin, express.json(), async (req, res) => {
   const uuid = uuidv4();
   db.prepare('INSERT INTO sellers (uuid, email, password, pack, first_name, last_name, phone, paid_at) VALUES (?,?,?,?,?,?,?,CURRENT_TIMESTAMP)')
     .run(uuid, email.toLowerCase(), hashed, pack, first_name || '', last_name || '', phone || '');
+  const seller = db.prepare('SELECT id FROM sellers WHERE email=?').get(email.toLowerCase());
   try { await sendWelcomeEmail({ email, firstName: first_name || '', pack }); } catch(e) {}
+  try {
+    const todoData = JSON.stringify({ name: `${first_name || ''} ${last_name || ''}`.trim() || email, pack, email, phone: phone || '' });
+    db.prepare('INSERT INTO admin_todos (type, seller_id, data) VALUES (?,?,?)').run('new_signup', seller.id, todoData);
+    if (pack === 'autonome') {
+      db.prepare('INSERT INTO admin_todos (type, seller_id, data) VALUES (?,?,?)').run('autonome_call', seller.id, todoData);
+    } else {
+      db.prepare('INSERT INTO admin_todos (type, seller_id, data) VALUES (?,?,?)').run('formation_rdv', seller.id, todoData);
+    }
+    await sendNewClientAdminNotif({ firstName: first_name, lastName: last_name, email, pack, phone });
+  } catch(e) { console.error('[ADMIN_TODOS manual]', e.message); }
   res.json({ success: true, temp_password: tempPassword });
 });
 
@@ -732,6 +743,26 @@ router.post('/api/crm/:id/assign-number', requireAdmin, async (req, res) => {
 });
 
 // ── ALERTS ENDPOINT ──────────────────────────────────────
+// ── TODOS ADMIN (alertes dismissables) ──────────────────────────
+
+router.get('/api/todos', requireAdmin, (req, res) => {
+  const todos = db.prepare(`
+    SELECT t.*, s.first_name, s.last_name, s.email as seller_email, s.phone as seller_phone, s.pack as seller_pack
+    FROM admin_todos t
+    LEFT JOIN sellers s ON s.id = t.seller_id
+    WHERE t.dismissed_at IS NULL
+    ORDER BY t.created_at DESC
+  `).all();
+  res.json({ todos });
+});
+
+router.post('/api/todos/:id/dismiss', requireAdmin, (req, res) => {
+  const admin = req.admin;
+  db.prepare(`UPDATE admin_todos SET dismissed_at=datetime('now'), dismissed_by=? WHERE id=?`)
+    .run(admin?.email || 'admin', req.params.id);
+  res.json({ success: true });
+});
+
 router.get('/api/alerts', requireAdmin, (req, res) => {
   // Paid but no property > 24h
   const paidNoProperty = db.prepare(`
