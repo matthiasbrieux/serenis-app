@@ -612,21 +612,30 @@ router.post('/api/clients/:id/reset-password', requireAdmin, express.json(), asy
 });
 
 router.delete('/api/clients/:id', requireAdmin, (req, res) => {
-  const id = +req.params.id;
-  const prop = db.prepare('SELECT id FROM properties WHERE seller_id=?').get(id);
-  if (prop) {
-    db.prepare('DELETE FROM offers WHERE property_id=?').run(prop.id);
-    db.prepare('DELETE FROM buyer_contacts WHERE property_id=?').run(prop.id);
-    db.prepare('DELETE FROM visits WHERE property_id=?').run(prop.id);
-    db.prepare('DELETE FROM property_publications WHERE property_id=?').run(prop.id);
-    db.prepare('DELETE FROM properties WHERE id=?').run(prop.id);
+  try {
+    const id = +req.params.id;
+    const prop = db.prepare('SELECT id FROM properties WHERE seller_id=?').get(id);
+    if (prop) {
+      db.prepare('DELETE FROM property_page_views WHERE property_id=?').run(prop.id);
+      db.prepare('DELETE FROM property_price_history WHERE property_id=?').run(prop.id);
+      db.prepare('DELETE FROM offers WHERE property_id=?').run(prop.id);
+      db.prepare('DELETE FROM buyer_contacts WHERE property_id=?').run(prop.id);
+      db.prepare('DELETE FROM visits WHERE property_id=?').run(prop.id);
+      db.prepare('DELETE FROM properties WHERE id=?').run(prop.id);
+    }
+    db.prepare('DELETE FROM agenda_slots WHERE seller_id=?').run(id);
+    db.prepare('DELETE FROM checklist_progress WHERE seller_id=?').run(id);
+    db.prepare('DELETE FROM property_publications WHERE seller_id=?').run(id);
+    db.prepare('DELETE FROM property_performances WHERE seller_id=?').run(id);
+    db.prepare('DELETE FROM offers WHERE seller_id=?').run(id);
+    db.prepare('DELETE FROM notifications WHERE seller_id=?').run(id);
+    db.prepare('DELETE FROM admin_activity_log WHERE seller_id=?').run(id);
+    db.prepare('DELETE FROM sellers WHERE id=?').run(id);
+    res.json({ success: true });
+  } catch(e) {
+    console.error('[DELETE SELLER]', e.message);
+    res.status(500).json({ error: e.message });
   }
-  db.prepare('DELETE FROM checklist_progress WHERE seller_id=?').run(id);
-  db.prepare('DELETE FROM property_performances WHERE seller_id=?').run(id);
-  db.prepare('DELETE FROM offers WHERE seller_id=?').run(id);
-  db.prepare('DELETE FROM email_log WHERE seller_id=?').run(id);
-  db.prepare('DELETE FROM sellers WHERE id=?').run(id);
-  res.json({ success: true });
 });
 
 router.get('/api/contacts', requireAdmin, (req, res) => {
