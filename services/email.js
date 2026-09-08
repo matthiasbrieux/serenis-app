@@ -59,7 +59,11 @@ ${preheader ? `<div style="display:none;max-height:0;overflow:hidden;color:#F5F0
 
       <!-- Logo -->
       <tr><td align="center" style="padding-bottom:24px;">
-        <span style="font-size:20px;font-weight:700;color:#3D5A47;letter-spacing:-0.5px;">Vendu Par Moi</span>
+        <table cellpadding="0" cellspacing="0" border="0"><tr>
+          <td width="56" height="56" align="center" valign="middle" style="background:#C4603A;border-radius:28px;width:56px;height:56px;">
+            <span style="font-family:Arial,Helvetica,sans-serif;font-size:13px;font-weight:700;color:#F5F0E8;letter-spacing:2px;">VPM</span>
+          </td>
+        </tr></table>
       </td></tr>
 
       <!-- Card -->
