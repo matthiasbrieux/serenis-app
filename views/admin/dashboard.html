@@ -394,9 +394,23 @@ async function loadContacts() {
 }
 
 async function setContactStatut(id, statut, btn) {
-  const card = document.getElementById('cc-' + id);
   await fetch(`/admin/api/contacts/${id}`, { method:'PATCH', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ statut }) });
-  await loadContacts();
+
+  // Mise à jour en place — pas de retri, pas de confusion visuelle
+  const card = document.getElementById('cc-' + id);
+  if (!card) { await loadContacts(); return; }
+
+  card.classList.toggle('traite', statut === 'traite');
+
+  card.querySelectorAll('.statut-btn').forEach(b => {
+    const m = b.getAttribute('onclick').match(/'([a-z_]+)',this\)/);
+    if (!m) return;
+    b.className = 'statut-btn' + (m[1] === statut ? ' active-' + statut : '');
+  });
+
+  const pending = document.querySelectorAll('.contact-card:not(.traite)').length;
+  const countEl = document.getElementById('contactsCount');
+  if (countEl) countEl.textContent = pending > 0 ? `${pending} à traiter` : 'Tout traité ✓';
 }
 
 let _noteTimers = {};
