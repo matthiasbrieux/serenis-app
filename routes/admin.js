@@ -1592,4 +1592,43 @@ router.get('/api/test-email', requireAdmin, async (req, res) => {
   }
 });
 
+router.get('/api/test-all-emails', requireAdmin, async (req, res) => {
+  const to = req.query.to;
+  if (!to) return res.status(400).json({ error: 'Paramètre ?to=adresse@email.fr requis' });
+  if (!process.env.RESEND_API_KEY) return res.status(500).json({ error: 'RESEND_API_KEY manquante' });
+
+  const { previewEmail } = require('../services/email');
+  const { Resend } = require('resend');
+  const resend = new Resend(process.env.RESEND_API_KEY);
+  const fromEmail = process.env.SENDGRID_FROM_EMAIL || 'contact@venduparmoi.fr';
+
+  const templates = [
+    'welcome', 'welcome_v2', 'password_reset', 'invoice', 'published',
+    'visit_confirmation', 'new_visit_request', 'visit_reminder_seller',
+    'dossier', 'prospect_nudge', 'no_property', 'no_photos', 'not_published',
+    'missing_doc', 'photographer_request', 'post_first_visit', 'check_in_no_offer',
+    'contract_renewal', 'post_visit_dossier', 'post_visit_j3', 'post_visit_buyer',
+    'price_drop', 'weekly_seller', 'weekly_admin', 'first_meeting', 'review_request',
+    'sold_congrats',
+  ];
+
+  const results = {};
+  for (const tpl of templates) {
+    try {
+      const html = await previewEmail(tpl);
+      const { error } = await resend.emails.send({
+        from: `Vendu Par Moi <${fromEmail}>`,
+        to,
+        subject: `[TEST] ${tpl}`,
+        html,
+      });
+      results[tpl] = error ? `erreur: ${JSON.stringify(error)}` : 'envoyé';
+    } catch (e) {
+      results[tpl] = `exception: ${e.message}`;
+    }
+  }
+
+  res.json({ total: templates.length, results });
+});
+
 module.exports = router;
