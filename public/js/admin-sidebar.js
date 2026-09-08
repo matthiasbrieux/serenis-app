@@ -64,8 +64,8 @@
     return ''
       + '<aside class="admin-sidebar" id="admin-sidebar">'
       + '  <div class="adm-logo">'
-      + '    ' + ICONS.house
-      + '    <span class="adm-logo-text">VPM Admin</span>'
+      + '    <img src="/images/vendu-par-moi.svg" alt="Vendu Par Moi" class="adm-logo-img">'
+      + '    <span class="adm-logo-sub">Espace admin</span>'
       + '  </div>'
       + '  <div class="adm-toggle">'
       + '    <button class="adm-toggle-btn" id="adm-toggle-btn" title="Réduire la sidebar">' + ICONS.chevron + '</button>'
