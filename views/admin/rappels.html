@@ -2,105 +2,64 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
+  <link rel="icon" href="/favicon.ico" sizes="any"/>
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png"/>
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Demandes de rappel — Vendu Par Moi Admin</title>
+  <title>Rappels — Vendu Par Moi Admin</title>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css?v=3">
+  <link rel="stylesheet" href="/css/admin.css">
   <style>
-    :root {
-      --bg: #F5F4F1; --surface: #fff; --border: #E9E7E3;
-      --dark: #1A1A16; --text2: #68665E; --text3: #A09C95;
-      --green: #16a34a; --green-bg: #dcfce7;
-      --amber: #d97706; --amber-bg: #fef3c7;
-      --red: #dc2626; --red-bg: #fee2e2;
-      --blue: #2563eb; --blue-bg: #dbeafe;
-      --purple: #7c3aed; --purple-bg: #ede9fe;
-    }
-    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-    body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--dark);font-size:13.5px;overflow:hidden;height:100vh}
-    a{text-decoration:none;color:inherit}
+    .stats-row { display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:24px; }
+    .stat-box { background:#fff;border-radius:12px;padding:16px 20px;box-shadow:0 1px 4px rgba(0,0,0,.06); }
+    .stat-box .lbl { font-size:.72rem;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:#9a9087;margin-bottom:6px; }
+    .stat-box .val { font-size:1.8rem;font-weight:700;font-family:'Cormorant Garamond',serif; }
+    .val-orange { color:#d97706; }
+    .val-green  { color:#059669; }
+    .val-blue   { color:#2563eb; }
 
-    .layout{display:flex;height:100vh;overflow:hidden}
+    .table-card { background:#fff;border-radius:12px;box-shadow:0 1px 4px rgba(0,0,0,.06);overflow:hidden; }
+    .table-header { padding:14px 20px;border-bottom:1px solid #eee;display:flex;align-items:center;justify-content:space-between;gap:12px; }
+    .table-header h2 { font-family:'Cormorant Garamond',serif;font-size:1.2rem;font-weight:600;color:#1A1A16; }
+    .search-input { border:1px solid #e8e0d6;border-radius:7px;padding:6px 12px;font-size:.82rem;font-family:'DM Sans',sans-serif;width:220px;outline:none; }
+    .search-input:focus { border-color:#C4603A; }
 
-    .sidebar{width:220px;flex-shrink:0;background:#1A1A16;display:flex;flex-direction:column;overflow-y:auto}
-    .logo{padding:24px 22px 20px;font-family:'Cormorant Garamond',serif;font-size:1.35rem;color:#FDFCF8;border-bottom:1px solid rgba(255,255,255,.08)}
-    .nav{flex:1;padding:12px 0}
-    .nav a{display:flex;align-items:center;gap:9px;padding:10px 22px;color:rgba(255,255,255,.5);font-size:0.82rem;transition:all .12s}
-    .nav a:hover{color:#fff;background:rgba(255,255,255,.06)}
-    .nav a.active{color:#fff;background:rgba(255,255,255,.1);border-right:2px solid #C4785A}
-    .sep{height:1px;background:rgba(255,255,255,.06);margin:10px 16px}
-    .nav-out{padding:16px 22px;border-top:1px solid rgba(255,255,255,.06)}
-    .nav-out a{display:block;color:rgba(255,255,255,.3);font-size:0.78rem;margin-bottom:6px}
-    .nav-out a:hover{color:rgba(255,255,255,.6)}
+    table { width:100%;border-collapse:collapse;font-size:.82rem; }
+    thead th { background:#F9F8F5;padding:9px 14px;text-align:left;font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#9a9087;border-bottom:1px solid #eee;white-space:nowrap; }
+    tbody td { padding:11px 14px;border-bottom:1px solid #f5f0e8;vertical-align:middle; }
+    tbody tr:last-child td { border-bottom:none; }
+    tbody tr:hover td { background:#fdf9f6; }
 
-    .main{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0}
+    .badge { display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:20px;font-size:.72rem;font-weight:700; }
+    .badge-orange { background:#fef3c7;color:#d97706; }
+    .badge-green  { background:#ecfdf5;color:#059669; }
+    .badge-blue   { background:#dbeafe;color:#2563eb; }
+    .badge-gray   { background:#f0ede9;color:#9a9087; }
 
-    .topbar{flex-shrink:0;padding:14px 28px;background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
-    .topbar-left h1{font-family:'Cormorant Garamond',serif;font-size:1.6rem;font-weight:600;line-height:1}
-    .topbar-left .sub{font-size:0.73rem;color:var(--text3);margin-top:2px}
-    .topbar-right{display:flex;align-items:center;gap:8px}
-    .live-dot{display:inline-flex;align-items:center;gap:5px;font-size:0.72rem;font-weight:600;color:var(--green);background:var(--green-bg);padding:4px 10px;border-radius:20px}
-    .live-dot::before{content:'';width:6px;height:6px;background:var(--green);border-radius:50%;animation:pulse 2s infinite}
-    @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(.8)}}
+    .tel-link { color:#C4603A;font-weight:600;text-decoration:none; }
+    .tel-link:hover { text-decoration:underline; }
 
-    .content{flex:1;overflow-y:auto;padding:24px 28px;display:flex;flex-direction:column;gap:20px}
+    .action-btn { border:1px solid #e8e0d6;background:#fff;padding:4px 10px;border-radius:6px;font-size:.75rem;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;color:#555;transition:all .12s; }
+    .action-btn:hover { border-color:#C4603A;color:#C4603A; }
+    .action-btn.danger:hover { border-color:#dc2626;color:#dc2626; }
 
-    /* Stats */
-    .stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
-    .stat-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px 20px}
-    .stat-card .label{font-size:0.72rem;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--text3);margin-bottom:6px}
-    .stat-card .value{font-size:1.8rem;font-weight:700;line-height:1;font-family:'Cormorant Garamond',serif}
-    .stat-card.orange .value{color:var(--amber)}
-    .stat-card.green .value{color:var(--green)}
-    .stat-card.blue .value{color:var(--blue)}
-
-    /* Table */
-    .table-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden}
-    .table-header{padding:14px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:12px}
-    .table-header h2{font-family:'Cormorant Garamond',serif;font-size:1.2rem;font-weight:600}
-    .search-input{border:1px solid var(--border);border-radius:7px;padding:6px 12px;font-size:0.82rem;font-family:'DM Sans',sans-serif;width:220px;outline:none}
-    .search-input:focus{border-color:#C4603A}
-
-    table{width:100%;border-collapse:collapse;font-size:0.82rem}
-    thead th{background:#F9F8F5;padding:9px 14px;text-align:left;font-size:0.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text3);border-bottom:1px solid var(--border);white-space:nowrap}
-    tbody td{padding:11px 14px;border-bottom:1px solid #F0EDE9;vertical-align:middle}
-    tbody tr:last-child td{border-bottom:none}
-    tbody tr:hover{background:#FAFAF8}
-
-    .badge{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:20px;font-size:0.72rem;font-weight:700}
-    .badge.orange{background:var(--amber-bg);color:var(--amber)}
-    .badge.green{background:var(--green-bg);color:var(--green)}
-    .badge.blue{background:var(--blue-bg);color:var(--blue)}
-    .badge.gray{background:#F0EDE9;color:var(--text3)}
-
-    .tel-link{color:#C4603A;font-weight:600;text-decoration:none}
-    .tel-link:hover{text-decoration:underline}
-
-    .date-small{font-size:0.75rem;color:var(--text3)}
-
-    .action-btn{border:1px solid var(--border);background:var(--surface);padding:4px 10px;border-radius:6px;font-size:0.75rem;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;color:var(--text2);transition:all .12s}
-    .action-btn:hover{border-color:#C4603A;color:#C4603A}
-    .action-btn.danger:hover{border-color:var(--red);color:var(--red)}
-
-    .empty{padding:40px;text-align:center;color:var(--text3);font-size:0.88rem}
+    .empty { padding:40px;text-align:center;color:#9a9087;font-size:.88rem; }
 
     /* Modal */
-    .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:1000;align-items:center;justify-content:center}
-    .modal-overlay.open{display:flex}
-    .modal{background:#fff;border-radius:14px;padding:28px;width:460px;max-width:95vw;box-shadow:0 8px 40px rgba(0,0,0,.18)}
-    .modal h3{font-family:'Cormorant Garamond',serif;font-size:1.4rem;margin-bottom:6px}
-    .modal .contact-info{font-size:0.9rem;color:var(--text2);margin-bottom:20px;padding:12px 14px;background:#F9F8F5;border-radius:8px;border-left:3px solid #C4603A}
-    .modal .contact-info strong{color:var(--dark)}
-    .modal label{display:block;font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text3);margin-bottom:5px;margin-top:14px}
-    .modal select,.modal textarea{width:100%;border:1px solid var(--border);border-radius:7px;padding:8px 12px;font-size:0.85rem;font-family:'DM Sans',sans-serif;outline:none;background:#fff}
-    .modal select:focus,.modal textarea:focus{border-color:#C4603A}
-    .modal textarea{resize:vertical;min-height:70px}
-    .modal-actions{display:flex;gap:10px;margin-top:20px}
-    .btn-save{flex:1;background:#C4603A;color:#fff;border:none;padding:10px;border-radius:8px;font-size:0.85rem;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif}
-    .btn-save:hover{background:#0F2019}
-    .btn-cancel{flex:1;background:#F5F4F1;color:var(--dark);border:1px solid var(--border);padding:10px;border-radius:8px;font-size:0.85rem;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif}
-    .btn-cancel:hover{background:#ece9e4}
-
-    .notif-badge{background:#ef4444;color:#fff;border-radius:10px;font-size:0.68rem;font-weight:700;padding:1px 6px;margin-left:4px}
+    .modal-overlay { display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:1000;align-items:center;justify-content:center; }
+    .modal-overlay.open { display:flex; }
+    .modal { background:#fff;border-radius:14px;padding:28px;width:460px;max-width:95vw;box-shadow:0 8px 40px rgba(0,0,0,.18); }
+    .modal h3 { font-family:'Cormorant Garamond',serif;font-size:1.4rem;margin-bottom:6px;color:#1A1A16; }
+    .modal .contact-info { font-size:.9rem;color:#555;margin-bottom:20px;padding:12px 14px;background:#fdf9f6;border-radius:8px;border-left:3px solid #C4603A; }
+    .modal label { display:block;font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#9a9087;margin-bottom:5px;margin-top:14px; }
+    .modal select, .modal textarea { width:100%;border:1px solid #e8e0d6;border-radius:7px;padding:8px 12px;font-size:.85rem;font-family:'DM Sans',sans-serif;outline:none;background:#fff; }
+    .modal select:focus, .modal textarea:focus { border-color:#C4603A; }
+    .modal textarea { resize:vertical;min-height:70px; }
+    .modal-actions { display:flex;gap:10px;margin-top:20px; }
+    .btn-save { flex:1;background:#C4603A;color:#fff;border:none;padding:10px;border-radius:8px;font-size:.85rem;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif; }
+    .btn-save:hover { background:#a84f2e; }
+    .btn-cancel { flex:1;background:#F5F0E8;color:#1A1A16;border:1px solid #e8e0d6;padding:10px;border-radius:8px;font-size:.85rem;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif; }
   </style>
 </head>
 <body class="admin-body">
@@ -108,49 +67,28 @@
   <div id="admin-sidebar-slot"></div>
 
   <main class="admin-main">
-    <div class="topbar">
-      <div class="topbar-left">
-        <h1>Demandes de rappel</h1>
-        <div class="sub">Visiteurs du site souhaitant être contactés</div>
-      </div>
-      <div class="topbar-right">
-        <span class="live-dot" id="live-count">Chargement…</span>
-      </div>
+    <div style="display:flex;align-items:baseline;gap:16px;margin-bottom:28px;">
+      <h1 class="adm-page-title" style="margin:0;">Demandes de rappel</h1>
+      <span id="live-count" style="font-size:.8rem;color:#9a9087;"></span>
     </div>
 
-    <div class="content">
-
-      <div class="stats-row">
-        <div class="stat-card orange">
-          <div class="label">À rappeler</div>
-          <div class="value" id="stat-a">—</div>
-        </div>
-        <div class="stat-card green">
-          <div class="label">Rappelés</div>
-          <div class="value" id="stat-r">—</div>
-        </div>
-        <div class="stat-card blue">
-          <div class="label">Convertis</div>
-          <div class="value" id="stat-c">—</div>
-        </div>
-        <div class="stat-card">
-          <div class="label">Total</div>
-          <div class="value" id="stat-t">—</div>
-        </div>
-      </div>
-
-      <div class="table-card">
-        <div class="table-header">
-          <h2>Toutes les demandes</h2>
-          <input class="search-input" type="search" placeholder="Rechercher…" id="search-input" oninput="filterTable()">
-        </div>
-        <div id="table-wrap">
-          <div class="empty">Chargement…</div>
-        </div>
-      </div>
-
+    <div class="stats-row">
+      <div class="stat-box"><div class="lbl">À rappeler</div><div class="val val-orange" id="stat-a">—</div></div>
+      <div class="stat-box"><div class="lbl">Rappelés</div><div class="val val-green" id="stat-r">—</div></div>
+      <div class="stat-box"><div class="lbl">Convertis</div><div class="val val-blue" id="stat-c">—</div></div>
+      <div class="stat-box"><div class="lbl">Total</div><div class="val" id="stat-t">—</div></div>
     </div>
-  </div>
+
+    <div class="table-card">
+      <div class="table-header">
+        <h2>Toutes les demandes</h2>
+        <input class="search-input" type="search" placeholder="Rechercher…" id="search-input" oninput="filterTable()">
+      </div>
+      <div id="table-wrap">
+        <div class="empty">Chargement…</div>
+      </div>
+    </div>
+  </main>
 </div>
 
 <!-- Modal édition -->
@@ -158,7 +96,6 @@
   <div class="modal">
     <h3>Mettre à jour le statut</h3>
     <div class="contact-info" id="modal-contact"></div>
-
     <label>Statut</label>
     <select id="modal-statut">
       <option value="a_rappeler">📞 À rappeler</option>
@@ -166,10 +103,8 @@
       <option value="converti">🎉 Converti (a souscrit)</option>
       <option value="sans_suite">❌ Sans suite</option>
     </select>
-
     <label>Notes internes</label>
     <textarea id="modal-notes" placeholder="Observations, heure de rappel, résultat de l'appel…"></textarea>
-
     <div class="modal-actions">
       <button class="btn-cancel" onclick="closeModal()">Annuler</button>
       <button class="btn-save" onclick="saveModal()">Enregistrer</button>
@@ -182,25 +117,13 @@
   let editingId = null;
 
   async function load() {
-    const r = await fetch('/admin/api/rappels');
-    const data = await r.json();
+    const data = await fetch('/admin/api/rappels').then(r => r.json());
     allRows = data.rows;
-
     document.getElementById('stat-a').textContent = data.stats.a_rappeler;
     document.getElementById('stat-r').textContent = data.stats.rappele;
     document.getElementById('stat-c').textContent = data.stats.converti;
     document.getElementById('stat-t').textContent = data.stats.total;
-
-    const badge = document.getElementById('sidebar-badge');
-    if (data.stats.a_rappeler > 0) {
-      badge.textContent = data.stats.a_rappeler;
-      badge.style.display = 'inline';
-    } else {
-      badge.style.display = 'none';
-    }
-
-    document.getElementById('live-count').textContent = `${data.stats.a_rappeler} à rappeler`;
-
+    document.getElementById('live-count').textContent = data.stats.a_rappeler > 0 ? `${data.stats.a_rappeler} à rappeler` : 'Tout traité ✓';
     renderTable(allRows);
   }
 
@@ -212,46 +135,36 @@
     }
     wrap.innerHTML = `<table>
       <thead><tr>
-        <th>Date</th>
-        <th>Nom</th>
-        <th>Téléphone</th>
-        <th>Moment souhaité</th>
-        <th>Statut</th>
-        <th>Notes</th>
-        <th>Actions</th>
+        <th>Date</th><th>Nom</th><th>Téléphone</th><th>Moment souhaité</th><th>Statut</th><th>Notes</th><th>Actions</th>
       </tr></thead>
       <tbody>${rows.map(row => `
-        <tr data-id="${row.id}">
-          <td><span class="date-small">${fmtDate(row.created_at)}</span></td>
+        <tr>
+          <td style="font-size:.75rem;color:#9a9087;">${fmtDate(row.created_at)}</td>
           <td><strong>${esc(row.prenom)} ${esc(row.nom)}</strong></td>
           <td><a class="tel-link" href="tel:${esc(row.telephone)}">${esc(row.telephone)}</a></td>
           <td>${row.moment ? esc(row.moment) : '<span style="color:#ccc">—</span>'}</td>
-          <td>${badge(row.statut)}</td>
-          <td style="max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--text2)">${row.notes ? esc(row.notes) : '<span style="color:#ccc">—</span>'}</td>
-          <td style="display:flex;gap:6px;white-space:nowrap">
-            <button class="action-btn" onclick="openModal(${row.id})">Modifier</button>
-            <button class="action-btn danger" onclick="del(${row.id})">Suppr.</button>
+          <td>${mkBadge(row.statut)}</td>
+          <td style="max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#555">${row.notes ? esc(row.notes) : '<span style="color:#ccc">—</span>'}</td>
+          <td>
+            <div style="display:flex;gap:6px;">
+              <button class="action-btn" onclick="openModal(${row.id})">Modifier</button>
+              <button class="action-btn danger" onclick="del(${row.id})">Suppr.</button>
+            </div>
           </td>
         </tr>`).join('')}
       </tbody>
     </table>`;
   }
 
-  function badge(s) {
-    const map = {
-      a_rappeler: ['orange','📞 À rappeler'],
-      rappele: ['green','✅ Rappelé'],
-      converti: ['blue','🎉 Converti'],
-      sans_suite: ['gray','❌ Sans suite'],
-    };
-    const [cls, label] = map[s] || ['gray', s];
-    return `<span class="badge ${cls}">${label}</span>`;
+  function mkBadge(s) {
+    const map = { a_rappeler:['badge-orange','📞 À rappeler'], rappele:['badge-green','✅ Rappelé'], converti:['badge-blue','🎉 Converti'], sans_suite:['badge-gray','❌ Sans suite'] };
+    const [cls, lbl] = map[s] || ['badge-gray', s];
+    return `<span class="badge ${cls}">${lbl}</span>`;
   }
 
   function fmtDate(s) {
     if (!s) return '—';
-    const d = new Date(s.replace(' ','T') + 'Z');
-    return d.toLocaleDateString('fr-FR', { day:'2-digit', month:'2-digit', year:'2-digit', hour:'2-digit', minute:'2-digit' });
+    return new Date(s).toLocaleDateString('fr-FR', { day:'2-digit', month:'2-digit', year:'2-digit', hour:'2-digit', minute:'2-digit' });
   }
 
   function esc(s) {
@@ -261,13 +174,9 @@
 
   function filterTable() {
     const q = document.getElementById('search-input').value.toLowerCase();
-    const filtered = allRows.filter(r =>
-      (r.nom||'').toLowerCase().includes(q) ||
-      (r.prenom||'').toLowerCase().includes(q) ||
-      (r.telephone||'').toLowerCase().includes(q) ||
-      (r.moment||'').toLowerCase().includes(q)
-    );
-    renderTable(filtered);
+    renderTable(allRows.filter(r =>
+      (r.nom||'').toLowerCase().includes(q) || (r.prenom||'').toLowerCase().includes(q) || (r.telephone||'').toLowerCase().includes(q)
+    ));
   }
 
   function openModal(id) {
@@ -277,7 +186,7 @@
     document.getElementById('modal-contact').innerHTML =
       `<strong>${esc(row.prenom)} ${esc(row.nom)}</strong><br>
        📞 <a class="tel-link" href="tel:${esc(row.telephone)}">${esc(row.telephone)}</a>
-       ${row.moment ? ` · Souhaite être rappelé : <strong>${esc(row.moment)}</strong>` : ''}`;
+       ${row.moment ? ` · Rappeler : <strong>${esc(row.moment)}</strong>` : ''}`;
     document.getElementById('modal-statut').value = row.statut || 'a_rappeler';
     document.getElementById('modal-notes').value = row.notes || '';
     document.getElementById('modal').classList.add('open');
@@ -291,12 +200,8 @@
   async function saveModal() {
     if (!editingId) return;
     await fetch(`/admin/api/rappels/${editingId}`, {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        statut: document.getElementById('modal-statut').value,
-        notes: document.getElementById('modal-notes').value,
-      }),
+      method:'PATCH', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ statut: document.getElementById('modal-statut').value, notes: document.getElementById('modal-notes').value })
     });
     closeModal();
     await load();
@@ -304,13 +209,11 @@
 
   async function del(id) {
     if (!confirm('Supprimer cette demande ?')) return;
-    await fetch(`/admin/api/rappels/${id}`, { method: 'DELETE' });
+    await fetch(`/admin/api/rappels/${id}`, { method:'DELETE' });
     await load();
   }
 
-  document.getElementById('modal').addEventListener('click', e => {
-    if (e.target === document.getElementById('modal')) closeModal();
-  });
+  document.getElementById('modal').addEventListener('click', e => { if (e.target === document.getElementById('modal')) closeModal(); });
 
   load();
   setInterval(load, 30000);
