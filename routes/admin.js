@@ -539,6 +539,7 @@ router.get('/create-seller', requireAdmin, async (req, res) => {
   const propUuid = uuidv4();
   db.prepare('INSERT INTO properties (uuid, seller_id, slug, acheteur_token, notaire_token, status) VALUES (?,?,?,?,?,?)')
     .run(propUuid, sellerId, `bien-${sellerId}`, uuidv4(), uuidv4(), 'preparation');
+  try { await sendWelcomeEmail({ email, firstName: '', pack: pack || 'serenite' }); } catch(e) {}
   res.send(`✓ Compte créé — email: ${email} — dossier acheteur activé`);
 });
 
@@ -599,7 +600,7 @@ router.post('/api/clients', requireAdmin, express.json(), async (req, res) => {
   const uuid = uuidv4();
   db.prepare('INSERT INTO sellers (uuid, email, password, pack, first_name, last_name, phone, paid_at) VALUES (?,?,?,?,?,?,?,CURRENT_TIMESTAMP)')
     .run(uuid, email.toLowerCase(), hashed, pack, first_name || '', last_name || '', phone || '');
-  try { await sendWelcomeEmail(email, tempPassword, pack); } catch(e) {}
+  try { await sendWelcomeEmail({ email, firstName: first_name || '', pack }); } catch(e) {}
   res.json({ success: true, temp_password: tempPassword });
 });
 
