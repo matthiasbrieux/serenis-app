@@ -73,7 +73,7 @@ ${preheader ? `<div style="display:none;max-height:0;overflow:hidden;color:#F5F0
 
       <!-- Footer -->
       <tr><td align="center" style="padding:28px 0 0;font-size:12px;color:#9a9087;line-height:1.7;">
-        <a href="${BASE_URL}" style="color:#3D5A47;text-decoration:none;font-weight:600;">venduparmoi.fr</a> &nbsp;·&nbsp;
+        <a href="${BASE_URL}" style="color:#C4603A;text-decoration:none;font-weight:600;">venduparmoi.fr</a> &nbsp;·&nbsp;
         <a href="mailto:contact@venduparmoi.fr" style="color:#9a9087;text-decoration:none;">contact@venduparmoi.fr</a><br/>
         Vous recevez cet email car vous utilisez la plateforme Vendu Par Moi.
       </td></tr>
@@ -87,10 +87,10 @@ ${preheader ? `<div style="display:none;max-height:0;overflow:hidden;color:#F5F0
 
 // ── Composants réutilisables ──────────────────────────────────
 function h1(text) {
-  return `<h1 style="font-size:24px;font-weight:700;color:#3D5A47;margin:0 0 8px;">${text}</h1>`;
+  return `<h1 style="font-size:24px;font-weight:700;color:#C4603A;margin:0 0 8px;">${text}</h1>`;
 }
 function h2(text) {
-  return `<h2 style="font-size:18px;font-weight:600;color:#3D5A47;margin:24px 0 8px;">${text}</h2>`;
+  return `<h2 style="font-size:18px;font-weight:600;color:#C4603A;margin:24px 0 8px;">${text}</h2>`;
 }
 function p(text) {
   return `<p style="font-size:15px;color:#4a4540;line-height:1.65;margin:0 0 16px;">${text}</p>`;
@@ -98,7 +98,7 @@ function p(text) {
 function muted(text) {
   return `<p style="font-size:13px;color:#9a9087;line-height:1.6;margin:0 0 12px;">${text}</p>`;
 }
-function btn(label, url, color = '#3D5A47') {
+function btn(label, url, color = '#C4603A') {
   return `<div style="text-align:center;margin:28px 0;">
     <a href="${url}" style="display:inline-block;background:${color};color:#fff;font-size:15px;font-weight:600;padding:14px 32px;border-radius:10px;text-decoration:none;">${label}</a>
   </div>`;
@@ -117,7 +117,7 @@ function infoTable(rows) {
     ${rows}
   </table>`;
 }
-function badge(text, color = '#3D5A47') {
+function badge(text, color = '#C4603A') {
   return `<span style="display:inline-block;background:${color}20;color:${color};font-size:12px;font-weight:600;padding:3px 10px;border-radius:20px;margin-bottom:16px;">${text}</span>`;
 }
 
@@ -186,7 +186,7 @@ async function sendVisitConfirmation(buyerEmail, buyerName, property, visitDate,
   const formattedDate = new Date(visitDate).toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
 
   const html = layout(`
-    ${badge(isReminder ? '⏰ Rappel visite' : '✅ Visite confirmée', '#3D5A47')}
+    ${badge(isReminder ? '⏰ Rappel visite' : '✅ Visite confirmée', '#C4603A')}
     ${h1(isReminder ? `Rappel : votre visite est demain` : `Votre visite est confirmée, ${buyerName || ''} !`)}
     ${p(isReminder
       ? `Nous vous rappelons que vous avez une visite prévue <strong>demain</strong>. Voici les détails ci-dessous.`
@@ -243,7 +243,7 @@ async function sendDossierEmail({ to, buyerName, dossierUrl, propertyCity, prope
     ${h1(`Voici le dossier du bien à ${propertyCity || ''}`)}
     ${p(`Bonjour${buyerName ? ` ${buyerName}` : ''},`)}
     ${p(`Le propriétaire vous fait parvenir le dossier complet de son ${typeLabel.toLowerCase()}. Vous y trouverez toutes les informations utiles : description du bien, photos, diagnostics et disponibilités pour une visite.`)}
-    ${btn('Accéder au dossier', dossierUrl, '#3D5A47')}
+    ${btn('Accéder au dossier', dossierUrl, '#C4603A')}
     ${divider()}
     ${muted('Ce dossier a été préparé par le propriétaire du bien via la plateforme <strong>Vendu Par Moi</strong>. Vente entre particuliers.')}
   `, { preheader: `Le dossier du bien à ${propertyCity} vous a été envoyé.` });
@@ -257,7 +257,7 @@ async function sendDossierToNotaire({ to, notaireName, dossierUrl, propertyAddre
     ${p(`Bonjour${notaireName ? ` ${notaireName}` : ''},`)}
     ${p(`Vous avez été invité à consulter le dossier complet du bien situé au <strong>${propertyAddress || 'adresse communiquée par le propriétaire'}</strong>, dans le cadre d'une vente entre particuliers accompagnée par Vendu Par Moi.`)}
     ${p(`Ce dossier contient l'ensemble des documents (diagnostics, plans, pièces administratives) et les offres d'achat reçues.`)}
-    ${btn('Accéder au dossier notaire', dossierUrl, '#3D5A47')}
+    ${btn('Accéder au dossier notaire', dossierUrl, '#C4603A')}
     ${divider()}
     ${muted(`Bien présenté par ${sellerName || 'le propriétaire'} via la plateforme Vendu Par Moi.`)}
   `, { preheader: `Dossier notaire — ${propertyAddress}` });
@@ -271,7 +271,7 @@ async function sendDossierToNotaire({ to, notaireName, dossierUrl, propertyAddre
 async function sendPublishedConfirmation({ email, propertySlug }) {
   const publicUrl = `${BASE_URL}/bien/${propertySlug}`;
   const html = layout(`
-    ${badge('🚀 Bien publié', '#3D5A47')}
+    ${badge('🚀 Bien publié', '#C4603A')}
     ${h1('Votre bien est en ligne !')}
     ${p('Félicitations ! Votre annonce est maintenant publiée et accessible aux acheteurs. Votre numéro dédié est activé : les acheteurs qui vous contactent recevront automatiquement votre dossier.')}
     ${btn('Voir mon annonce', publicUrl)}
@@ -327,7 +327,7 @@ async function sendInvoiceEmail({ email, firstName, amount, pack, invoiceNumber,
   const packLabel = pack === 'serenite' ? 'Pack Sérénité' : 'Pack Autonome';
   const dateStr   = new Date(date).toLocaleDateString('fr-FR');
   const html = layout(`
-    ${badge('🧾 Facture', '#3D5A47')}
+    ${badge('🧾 Facture', '#C4603A')}
     ${h1(`Facture — ${packLabel}`)}
     ${p(`Bonjour ${firstName || ''},`)}
     ${p('Veuillez trouver ci-dessous le détail de votre facture Vendu Par Moi.')}
@@ -341,7 +341,7 @@ async function sendInvoiceEmail({ email, firstName, amount, pack, invoiceNumber,
     `)}
     ${p('Cette facture fait foi pour votre comptabilité. Conservez-la précieusement.')}
     ${divider()}
-    ${muted('Pour toute question, contactez-nous à <a href="mailto:contact@venduparmoi.fr" style="color:#3D5A47;">contact@venduparmoi.fr</a>')}
+    ${muted('Pour toute question, contactez-nous à <a href="mailto:contact@venduparmoi.fr" style="color:#C4603A;">contact@venduparmoi.fr</a>')}
   `, { preheader: `Votre facture Vendu Par Moi — ${amountTTC} € TTC` });
   return send(email, `🧾 Facture Vendu Par Moi — ${amountTTC} € TTC`, html);
 }
@@ -360,7 +360,7 @@ async function sendContractRenewal({ email, firstName, expiryDate, daysLeft }) {
     ${btn('Renouveler mon accès', `${BASE_URL}/tarifs`, '#C4785A')}
     ${p('Si votre vente est finalisée, félicitations ! Vous pouvez nous le signaler depuis votre espace vendeur.')}
     ${divider()}
-    ${muted('Une question ? Contactez-nous à <a href="mailto:contact@venduparmoi.fr" style="color:#3D5A47;">contact@venduparmoi.fr</a>')}
+    ${muted('Une question ? Contactez-nous à <a href="mailto:contact@venduparmoi.fr" style="color:#C4603A;">contact@venduparmoi.fr</a>')}
   `, { preheader: `Votre accès Vendu Par Moi expire dans ${daysLeft} jours.` });
   return send(email, `⚠️ Votre accès expire dans ${daysLeft} jours`, html);
 }
@@ -389,7 +389,7 @@ async function sendReviewRequest({ email, firstName, daysSold, propertyCity }) {
 
 async function sendMissionAssigned(photographer, mission) {
   const html = layout(`
-    ${badge('📸 Nouvelle mission', '#3D5A47')}
+    ${badge('📸 Nouvelle mission', '#C4603A')}
     ${h1(`Bonjour ${photographer.first_name}, une mission vous est proposée`)}
     ${p('Une nouvelle mission photo vient de vous être assignée. Acceptez ou refusez depuis votre espace partenaire.')}
     ${infoTable(`
@@ -412,7 +412,7 @@ async function sendMissionConfirmed(clientEmail, clientName, mission, photograph
     ? new Date(mission.scheduled_date).toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' })
     : '—';
   const html = layout(`
-    ${badge('✅ Séance confirmée', '#3D5A47')}
+    ${badge('✅ Séance confirmée', '#C4603A')}
     ${h1(`Votre séance photo est confirmée !`)}
     ${p(`Bonjour ${clientName || ''},`)}
     ${p('Votre séance photo professionnelle est confirmée. Voici les détails :')}
@@ -442,7 +442,7 @@ async function sendMissionReminderJ1(clientEmail, clientName, mission, photograp
     `)}
     ${p('Conseils de dernière minute : ouvrez les volets, allumez les lumières, rangez les objets personnels dans les pièces.')}
     ${divider()}
-    ${muted('En cas d\'imprévu, contactez-nous à <a href="mailto:contact@venduparmoi.fr" style="color:#3D5A47;">contact@venduparmoi.fr</a>')}
+    ${muted('En cas d\'imprévu, contactez-nous à <a href="mailto:contact@venduparmoi.fr" style="color:#C4603A;">contact@venduparmoi.fr</a>')}
   `, { preheader: 'Rappel — votre photographe arrive demain.' });
   return send(clientEmail, '⏰ Rappel — Votre séance photo est demain', html);
 }
@@ -489,7 +489,7 @@ async function sendProspectNudge({ name, email }) {
 
 async function sendNoPropertyNudge({ email }) {
   const html = layout(`
-    ${badge('🏠 Étape 1', '#3D5A47')}
+    ${badge('🏠 Étape 1', '#C4603A')}
     ${h1('Créez votre fiche bien pour commencer')}
     ${p('Votre compte est activé mais votre fiche bien n\'est pas encore créée. C\'est la première étape pour que votre dossier acheteur soit prêt à être envoyé.')}
     ${p('Cela prend environ 10 minutes. Notre formulaire vous guide étape par étape.')}
@@ -512,7 +512,7 @@ async function sendNoPhotosNudge({ email }) {
 
 async function sendNotPublishedNudge({ email, score }) {
   const html = layout(`
-    ${badge(`✨ Dossier prêt à ${score}%`, '#3D5A47')}
+    ${badge(`✨ Dossier prêt à ${score}%`, '#C4603A')}
     ${h1('Votre bien est prêt — publiez-le !')}
     ${p('Votre dossier est bien avancé. Il ne vous reste qu\'une chose à faire : publier votre annonce pour qu\'elle soit visible par les acheteurs et que votre numéro dédié soit activé.')}
     ${btn('Publier mon annonce', `${BASE_URL}/mon-bien`)}
@@ -536,7 +536,7 @@ async function sendMissingDocNudge({ email, missingDocs }) {
 
 async function sendPhotographerAvailabilityRequest({ email, firstName }) {
   const html = layout(`
-    ${badge('📸 Photos professionnelles', '#3D5A47')}
+    ${badge('📸 Photos professionnelles', '#C4603A')}
     ${h1(`${firstName || ''}, avez-vous pensé aux photos pro ?`)}
     ${p('Les annonces avec des photos professionnelles se vendent en moyenne 2× plus vite. Vendu Par Moi vous propose des photographes partenaires locaux à partir de quelques centaines d\'euros.')}
     ${p('Le photographe se déplace chez vous, prend en charge toute la session et livre vos photos en 5 jours ouvrés.')}
@@ -549,7 +549,7 @@ async function sendPhotographerAvailabilityRequest({ email, firstName }) {
 
 async function sendPostFirstVisitFeedbackSeller({ email, firstName }) {
   const html = layout(`
-    ${badge('🏡 Après la visite', '#3D5A47')}
+    ${badge('🏡 Après la visite', '#C4603A')}
     ${h1(`Comment s'est passée votre première visite ?`)}
     ${p(`Bonjour ${firstName || ''},`)}
     ${p('Vous avez réalisé votre première visite ! C\'est une étape importante. Voici quelques conseils pour les prochaines visites :')}
@@ -613,7 +613,7 @@ async function sendWeeklyAdminReport({ to, stats }) {
   const { newClients = 0, newOffers = 0, newVisits = 0, publishedProps = 0, totalRevenue = 0, totalActive = 0 } = stats;
   const revenueFormatted = new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 }).format(totalRevenue);
   const html = layout(`
-    ${badge('📊 Rapport hebdomadaire', '#3D5A47')}
+    ${badge('📊 Rapport hebdomadaire', '#C4603A')}
     ${h1('Rapport Vendu Par Moi — semaine écoulée')}
     ${infoTable(`
       ${infoRow('Nouveaux clients', newClients)}
@@ -659,15 +659,15 @@ async function sendWeeklySellerReport({ email, firstName, stats }) {
   }
 
   const html = layout(`
-    ${badge('📊 Bilan de la semaine', '#3D5A47')}
+    ${badge('📊 Bilan de la semaine', '#C4603A')}
     ${h1(`Bonjour ${firstName || ''}, voici votre bilan`)}
     ${p(`Votre bien est en ligne depuis <strong>${daysOnline} jour${daysOnline > 1 ? 's' : ''}</strong>.`)}
     ${infoTable(`
       ${infoRow('Vues cette semaine', views > 0
-        ? `<strong style="color:#3D5A47;">${views}</strong>${viewsTrend ? `<span style="font-size:0.75em;color:#888;margin-left:6px;">${viewsTrend}</span>` : ''}`
+        ? `<strong style="color:#C4603A;">${views}</strong>${viewsTrend ? `<span style="font-size:0.75em;color:#888;margin-left:6px;">${viewsTrend}</span>` : ''}`
         : `${views}`)}
       ${infoRow('Nouveaux contacts', contacts > 0 ? `<strong style="color:#C4785A;">${contacts}</strong>` : `${contacts}`)}
-      ${infoRow('Visites réalisées', visits > 0 ? `<strong style="color:#3D5A47;">${visits}</strong>` : `${visits}`)}
+      ${infoRow('Visites réalisées', visits > 0 ? `<strong style="color:#C4603A;">${visits}</strong>` : `${visits}`)}
       ${upcoming > 0 ? infoRow('Visites à venir', `<strong style="color:#1565c0;">${upcoming} cette semaine</strong>`) : ''}
       ${infoRow('Offres reçues', offers > 0 ? `<strong style="color:#C4785A;">${offers}</strong>` : `${offers}`)}
       ${infoRow('Total contacts', contactsAll)}
@@ -712,7 +712,7 @@ async function sendPostVisitJ3Nudge({ buyerEmail, buyerName, propertyCity, prope
     ${p(`Vous avez visité ${typeLabel} à <strong>${propertyCity || ''}</strong> il y a quelques jours.`)}
     ${p(`${sellerFirstName || 'Le propriétaire'} reste disponible pour répondre à vos questions ou vous fournir des informations supplémentaires.`)}
     ${p('Si ce bien vous intéresse, vous pouvez soumettre une offre directement en ligne ou relire le dossier complet :')}
-    ${btn('Revoir le dossier et faire une offre', dossierUrl, '#3D5A47')}
+    ${btn('Revoir le dossier et faire une offre', dossierUrl, '#C4603A')}
     ${divider()}
     ${muted('Vente entre particuliers accompagnée par <strong>Vendu Par Moi</strong>.')}
   `, { preheader: `${firstName ? firstName + ', vous avez visité' : 'Vous avez visité'} ${typeLabel} à ${propertyCity} — des questions ?` });
@@ -815,9 +815,9 @@ async function previewEmail(templateName) {
 
 async function sendFirstMeetingEmail({ email, firstName }) {
   const html = layout(`
-    <div style="background:#0F1E13;border-radius:10px;padding:24px 28px;margin-bottom:28px;">
-      <div style="font-size:10px;font-weight:700;color:#6BBF82;letter-spacing:0.15em;text-transform:uppercase;margin-bottom:8px;">Vendu Par Moi</div>
-      <div style="font-size:21px;font-weight:700;color:#F5F0E8;line-height:1.35;margin-bottom:8px;">Préparons votre dossier,<br><span style="font-style:italic;color:#6BBF82;">ensemble.</span></div>
+    <div style="background:#3D1208;border-radius:10px;padding:24px 28px;margin-bottom:28px;">
+      <div style="font-size:10px;font-weight:700;color:#F0A882;letter-spacing:0.15em;text-transform:uppercase;margin-bottom:8px;">Vendu Par Moi</div>
+      <div style="font-size:21px;font-weight:700;color:#F5F0E8;line-height:1.35;margin-bottom:8px;">Préparons votre dossier,<br><span style="font-style:italic;color:#F0A882;">ensemble.</span></div>
       <div style="font-size:13px;color:rgba(212,228,216,0.60);">Quelques éléments utiles avant notre premier rendez-vous</div>
     </div>
 
@@ -842,12 +842,12 @@ async function sendFirstMeetingEmail({ email, firstName }) {
     ${p('Nous travaillons habituellement avec un diagnostiqueur de confiance :')}
     <div style="background:#F4F1EC;border-radius:10px;padding:16px 20px;margin:0 0 12px;">
       <div style="font-size:15px;font-weight:700;color:#1a1a1a;margin-bottom:4px;">PL Diagnostic — M. Leroy</div>
-      <div style="font-size:14px;color:#3D5A47;font-weight:600;">06 07 99 25 10</div>
+      <div style="font-size:14px;color:#C4603A;font-weight:600;">06 07 99 25 10</div>
     </div>
     ${muted('<em>Vous n\'avez bien sûr aucune obligation de passer par lui : c\'est une recommandation, pas une condition.</em>')}
 
     ${divider()}
-    <div style="background:#0F1E13;border-radius:10px;padding:16px 24px;text-align:center;">
+    <div style="background:#3D1208;border-radius:10px;padding:16px 24px;text-align:center;">
       <div style="font-size:13px;font-weight:700;color:#F5F0E8;margin-bottom:4px;">Vendu Par Moi</div>
       <div style="font-size:12px;color:rgba(212,228,216,0.55);font-style:italic;">À très bientôt — nous préparons la suite ensemble.</div>
     </div>
