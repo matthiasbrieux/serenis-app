@@ -637,9 +637,20 @@ router.delete('/api/clients/:id', requireAdmin, (req, res) => {
 
 router.get('/api/contacts', requireAdmin, (req, res) => {
   const contacts = db.prepare(`
-    SELECT * FROM contact_requests ORDER BY created_at DESC LIMIT 100
+    SELECT * FROM contact_requests
+    ORDER BY
+      CASE WHEN statut = 'traite' THEN 1 ELSE 0 END ASC,
+      created_at DESC
+    LIMIT 200
   `).all();
   res.json({ contacts });
+});
+
+router.patch('/api/contacts/:id', requireAdmin, express.json(), (req, res) => {
+  const { statut, notes } = req.body;
+  db.prepare(`UPDATE contact_requests SET statut=?, notes=?, updated_at=datetime('now') WHERE id=?`)
+    .run(statut || 'a_traiter', notes !== undefined ? notes : null, req.params.id);
+  res.json({ ok: true });
 });
 
 // ── GESTION DES NUMÉROS IA ────────────────────────────────

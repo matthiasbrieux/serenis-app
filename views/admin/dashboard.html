@@ -21,6 +21,27 @@
     .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 1000; display: flex; align-items: center; justify-content: center; opacity: 0; visibility: hidden; pointer-events: none; transition: opacity 0.2s; }
     .modal-overlay.show { opacity: 1; visibility: visible; pointer-events: all; }
 
+    /* Cards demandes de contact */
+    .contact-card { border:1px solid #ede8e0;border-radius:10px;padding:14px 16px;background:#fdf9f6;transition:opacity .2s; }
+    .contact-card.traite { opacity:.45;background:#f8f6f2; }
+    .contact-card-header { display:flex;align-items:flex-start;gap:12px;margin-bottom:10px; }
+    .contact-name { font-weight:600;font-size:.9rem;color:#1A1A16;flex:1; }
+    .contact-meta { display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px; }
+    .contact-link { display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:6px;font-size:.78rem;font-weight:500;text-decoration:none;border:1.5px solid #e8e0d6;color:#1A1A16;transition:all .15s; }
+    .contact-link:hover { border-color:#C4603A;color:#C4603A;background:#fff8f5; }
+    .contact-link svg { opacity:.6; }
+    .contact-badge { font-size:.72rem;padding:2px 8px;border-radius:8px;font-weight:600; }
+    .badge-serenite { background:rgba(196,96,58,.12);color:#C4603A; }
+    .badge-autonome { background:rgba(26,26,22,.08);color:#666; }
+    .contact-statut-row { display:flex;align-items:center;gap:6px;margin-bottom:8px; }
+    .statut-btn { font-size:.72rem;padding:3px 10px;border-radius:6px;border:1.5px solid #ddd;background:#fff;cursor:pointer;font-weight:600;color:#666;transition:all .15s; }
+    .statut-btn.active-a_traiter { border-color:#f59e0b;background:#fffbeb;color:#b45309; }
+    .statut-btn.active-rappele { border-color:#3b82f6;background:#eff6ff;color:#1d4ed8; }
+    .statut-btn.active-traite { border-color:#059669;background:#ecfdf5;color:#065f46; }
+    .contact-notes { width:100%;border:1.5px solid #ede8e0;border-radius:6px;padding:7px 10px;font-family:inherit;font-size:.8rem;color:#444;resize:vertical;min-height:40px;box-sizing:border-box;background:#fff; }
+    .contact-notes:focus { outline:none;border-color:#C4603A; }
+    .contact-date { font-size:.7rem;color:#bbb;margin-left:auto;align-self:flex-start; }
+
     /* Zone À traiter */
     .todo-zone { background:#fff;border-radius:12px;padding:20px 24px;margin-bottom:28px;box-shadow:0 2px 8px rgba(0,0,0,0.06);border-left:4px solid #C4603A; }
     .todo-zone-header { display:flex;align-items:center;gap:10px;margin-bottom:16px; }
@@ -111,18 +132,12 @@
 
     <!-- Contacts -->
     <div style="background:#fff;border-radius:12px;box-shadow:0 2px 8px rgba(0,0,0,0.06);overflow:hidden;" id="contacts">
-      <div style="padding:20px 24px;border-bottom:1px solid #eee;">
+      <div style="padding:20px 24px;border-bottom:1px solid #eee;display:flex;align-items:center;justify-content:space-between;">
         <h2 style="font-size:1.1rem;font-family:'Cormorant Garamond',serif;">Demandes de contact (site)</h2>
+        <span id="contactsCount" style="font-size:.78rem;color:#9a9087;"></span>
       </div>
-      <div style="overflow-x:auto;">
-        <table class="admin-table">
-          <thead>
-            <tr><th>Nom</th><th>Téléphone</th><th>Email</th><th>Offre</th><th>Ville</th><th>Date</th></tr>
-          </thead>
-          <tbody id="contactsTable">
-            <tr><td colspan="6" style="text-align:center;color:#aaa;padding:40px;">Chargement...</td></tr>
-          </tbody>
-        </table>
+      <div id="contactsList" style="padding:16px 24px;display:flex;flex-direction:column;gap:12px;">
+        <div style="color:#aaa;font-size:.85rem;">Chargement…</div>
       </div>
     </div>
     <!-- Documents légaux -->
@@ -326,24 +341,70 @@ function renderClients(clients) {
   }).join('');
 }
 
+// ── CONTACTS ──────────────────────────────────────────────────────
+const STATUTS_CONTACT = [
+  { key: 'a_traiter', label: '⏳ À traiter' },
+  { key: 'rappele',   label: '📞 Rappelé'   },
+  { key: 'traite',    label: '✅ Traité'     },
+];
+
+function renderContactCard(c) {
+  const dateStr = new Date(c.created_at).toLocaleDateString('fr-FR', { day:'2-digit', month:'short' });
+  const offerBadge = c.offer ? `<span class="contact-badge badge-${c.offer}">${c.offer === 'serenite' ? 'Sérénité' : c.offer === 'autonome' ? 'Autonome' : c.offer}</span>` : '';
+  const cityBadge  = c.city  ? `<span style="font-size:.72rem;color:#888;">${c.city}</span>` : '';
+  const msg        = c.message ? `<div style="font-size:.78rem;color:#666;margin-bottom:8px;font-style:italic;">"${c.message}"</div>` : '';
+  const statut     = c.statut || 'a_traiter';
+  const statutBtns = STATUTS_CONTACT.map(s =>
+    `<button class="statut-btn ${statut === s.key ? 'active-' + s.key : ''}" onclick="setContactStatut(${c.id},'${s.key}',this)">${s.label}</button>`
+  ).join('');
+  return `<div class="contact-card ${statut === 'traite' ? 'traite' : ''}" id="cc-${c.id}">
+    <div class="contact-card-header">
+      <div>
+        <div class="contact-name">${c.name || '—'}</div>
+        <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:4px;">${offerBadge}${cityBadge}</div>
+      </div>
+      <div class="contact-date">${dateStr}</div>
+    </div>
+    <div class="contact-meta">
+      ${c.phone ? `<a class="contact-link" href="tel:${c.phone.replace(/\s/g,'')}">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6A19.79 19.79 0 012.12 4.18 2 2 0 014.11 2h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg>
+        ${c.phone}</a>` : ''}
+      ${c.email ? `<a class="contact-link" href="mailto:${c.email}">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+        ${c.email}</a>` : ''}
+    </div>
+    ${msg}
+    <div class="contact-statut-row">${statutBtns}</div>
+    <textarea class="contact-notes" placeholder="Note (rappelé le …, à recontacter…)" onblur="saveContactNote(${c.id},this.value)">${c.notes || ''}</textarea>
+  </div>`;
+}
+
 async function loadContacts() {
-  const res = await fetch('/admin/api/contacts');
-  const data = await res.json();
-  const tbody = document.getElementById('contactsTable');
+  const data = await fetch('/admin/api/contacts').then(r => r.json());
+  const list = document.getElementById('contactsList');
+  const count = document.getElementById('contactsCount');
   if (!data.contacts?.length) {
-    tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:#aaa;padding:20px;">Aucune demande</td></tr>';
+    list.innerHTML = '<div style="color:#aaa;font-size:.85rem;text-align:center;padding:20px 0;">Aucune demande</div>';
+    if (count) count.textContent = '';
     return;
   }
-  tbody.innerHTML = data.contacts.map(c => `
-    <tr>
-      <td>${c.name}</td>
-      <td>${c.phone}</td>
-      <td>${c.email}</td>
-      <td>${c.offer || '—'}</td>
-      <td>${c.city || '—'}</td>
-      <td style="font-size:0.78rem;color:#888;">${new Date(c.created_at).toLocaleDateString('fr-FR')}</td>
-    </tr>
-  `).join('');
+  const pending = data.contacts.filter(c => (c.statut || 'a_traiter') !== 'traite').length;
+  if (count) count.textContent = pending > 0 ? `${pending} à traiter` : 'Tout traité ✓';
+  list.innerHTML = data.contacts.map(renderContactCard).join('');
+}
+
+async function setContactStatut(id, statut, btn) {
+  const card = document.getElementById('cc-' + id);
+  await fetch(`/admin/api/contacts/${id}`, { method:'PATCH', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ statut }) });
+  await loadContacts();
+}
+
+let _noteTimers = {};
+function saveContactNote(id, notes) {
+  clearTimeout(_noteTimers[id]);
+  _noteTimers[id] = setTimeout(() => {
+    fetch(`/admin/api/contacts/${id}`, { method:'PATCH', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ notes }) });
+  }, 600);
 }
 
 document.getElementById('searchClients').addEventListener('input', (e) => {

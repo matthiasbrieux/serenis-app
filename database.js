@@ -332,6 +332,9 @@ const newCols = [
   "ALTER TABLE properties ADD COLUMN notaire_token TEXT",
   "ALTER TABLE contact_requests ADD COLUMN source TEXT DEFAULT 'contact'",
   "ALTER TABLE contact_requests ADD COLUMN creneau TEXT",
+  "ALTER TABLE contact_requests ADD COLUMN statut TEXT DEFAULT 'a_traiter'",
+  "ALTER TABLE contact_requests ADD COLUMN notes TEXT",
+  "ALTER TABLE contact_requests ADD COLUMN updated_at TEXT",
 ];
 newCols.forEach(sql => { try { db.exec(sql); } catch(e) {} });
 
