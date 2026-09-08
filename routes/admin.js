@@ -1553,6 +1553,27 @@ router.delete('/api/rappels/:id', requireAdmin, (req, res) => {
 });
 
 // ── Route de diagnostic email ─────────────────────────────────
+router.get('/mon-compte', requireAdmin, (req, res) => {
+  res.sendFile('mon-compte.html', { root: './views/admin' });
+});
+
+router.get('/api/me', requireAdmin, (req, res) => {
+  res.json({ email: req.admin.email || '', name: req.admin.name || '' });
+});
+
+router.post('/api/change-password', requireAdmin, express.json(), async (req, res) => {
+  const { current, newpwd } = req.body;
+  if (!current || !newpwd || newpwd.length < 8) return res.json({ error: 'Données invalides.' });
+  const bcrypt = require('bcryptjs');
+  const admin = db.prepare('SELECT * FROM admins WHERE email = ?').get(req.admin.email);
+  if (!admin) return res.json({ error: 'Compte introuvable.' });
+  const valid = await bcrypt.compare(current, admin.password);
+  if (!valid) return res.json({ error: 'Mot de passe actuel incorrect.' });
+  const hash = await bcrypt.hash(newpwd, 10);
+  db.prepare('UPDATE admins SET password = ? WHERE email = ?').run(hash, req.admin.email);
+  res.json({ success: true });
+});
+
 router.get('/api/test-email', requireAdmin, async (req, res) => {
   const to = req.query.to;
   if (!to) return res.status(400).json({ error: 'Paramètre ?to=adresse@email.fr requis' });
