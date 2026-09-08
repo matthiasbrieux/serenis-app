@@ -18,14 +18,14 @@
   };
 
   var NAV_ITEMS = [
-    { label: 'Dashboard',        href: '/admin',              icon: 'dashboard', exact: true  },
-    { label: 'CRM Vendeurs',     href: '/admin/crm',          icon: 'crm'    },
+    { label: 'Tableau de bord',   href: '/admin',              icon: 'dashboard', exact: true  },
+    { label: 'Suivi vendeurs',   href: '/admin/crm',          icon: 'crm'    },
     { label: 'Photos pros',      href: '/admin/missions',     icon: 'camera' },
     { label: 'Emails',           href: '/admin/emails',       icon: 'mail'   },
     { label: 'Clients',          href: '/admin#clients',      icon: 'user'   },
     { label: 'Contacts',         href: '/admin#contacts',     icon: 'message'},
     { sep: true },
-    { label: 'Marketing',        href: '/admin/marketing',    icon: 'marketing' },
+    { label: 'Pub et contenus',  href: '/admin/marketing',    icon: 'marketing' },
     { label: 'Finance',          href: '/admin/finance',      icon: 'finance'   },
     { label: 'Parrainage',       href: '/admin/parrainage',   icon: 'gift'      },
     { label: 'Rappels',          href: '/admin/rappels',      icon: 'phone'     },
