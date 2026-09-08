@@ -57,13 +57,13 @@ ${preheader ? `<div style="display:none;max-height:0;overflow:hidden;color:#F5F0
   <tr><td align="center">
     <table width="600" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%;">
 
-      <!-- Logo -->
-      <tr><td align="center" style="padding-bottom:24px;">
-        <img src="${BASE_URL}/images/email-logo.png" alt="Vendu Par Moi" width="200" height="35" style="display:block;border:0;outline:none;text-decoration:none;" />
+      <!-- Logo header -->
+      <tr><td style="padding-bottom:0;">
+        <img src="${BASE_URL}/images/email-logo.png" alt="Vendu Par Moi" width="600" height="175" style="display:block;border:0;outline:none;text-decoration:none;border-radius:16px 16px 0 0;max-width:100%;" />
       </td></tr>
 
       <!-- Card -->
-      <tr><td style="background:#ffffff;border-radius:16px;padding:40px 40px 32px;box-shadow:0 2px 12px rgba(0,0,0,0.06);">
+      <tr><td style="background:#ffffff;border-radius:0 0 16px 16px;padding:40px 40px 32px;box-shadow:0 2px 12px rgba(0,0,0,0.06);">
         ${content}
       </td></tr>
 
