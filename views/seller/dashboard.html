@@ -1618,10 +1618,14 @@ async function confirmDeleteAccount() {
   if (!ok) return;
   const ok2 = confirm('Dernière confirmation : voulez-vous vraiment supprimer votre compte ?');
   if (!ok2) return;
-  const r = await fetch('/api/seller/rgpd/account', { method: 'DELETE' });
-  const data = await r.json();
-  if (data.success) { alert('Votre compte a été supprimé.'); window.location.href = '/'; }
-  else alert('Erreur lors de la suppression.');
+  try {
+    const r = await fetch('/api/seller/rgpd/account', { method: 'DELETE' });
+    const data = await r.json();
+    if (data.success) { alert('Votre compte a été supprimé.'); window.location.href = '/'; }
+    else alert('Erreur lors de la suppression : ' + (data.error || 'erreur inconnue'));
+  } catch(e) {
+    alert('Erreur de connexion au serveur. Réessayez ou contactez le support.');
+  }
 }
 
 </script>

@@ -616,6 +616,8 @@ router.delete('/api/clients/:id', requireAdmin, (req, res) => {
     const id = +req.params.id;
     const prop = db.prepare('SELECT id FROM properties WHERE seller_id=?').get(id);
     if (prop) {
+      db.prepare('DELETE FROM property_photos WHERE property_id=?').run(prop.id);
+      db.prepare('DELETE FROM property_documents WHERE property_id=?').run(prop.id);
       db.prepare('DELETE FROM property_page_views WHERE property_id=?').run(prop.id);
       db.prepare('DELETE FROM property_price_history WHERE property_id=?').run(prop.id);
       db.prepare('DELETE FROM offers WHERE property_id=?').run(prop.id);

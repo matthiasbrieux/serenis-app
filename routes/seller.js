@@ -1352,6 +1352,8 @@ router.delete('/api/seller/rgpd/account', requireAuth, async (req, res) => {
     if (property) {
       db.prepare('DELETE FROM property_photos WHERE property_id=?').run(property.id);
       db.prepare('DELETE FROM property_documents WHERE property_id=?').run(property.id);
+      db.prepare('DELETE FROM property_page_views WHERE property_id=?').run(property.id);
+      db.prepare('DELETE FROM property_price_history WHERE property_id=?').run(property.id);
       db.prepare('DELETE FROM buyer_contacts WHERE property_id=?').run(property.id);
       db.prepare('DELETE FROM visits WHERE property_id=?').run(property.id);
       db.prepare('DELETE FROM offers WHERE property_id=?').run(property.id);
@@ -1365,7 +1367,12 @@ router.delete('/api/seller/rgpd/account', requireAuth, async (req, res) => {
     db.prepare('DELETE FROM notifications WHERE seller_id=?').run(sid);
     db.prepare('DELETE FROM sellers WHERE id=?').run(sid);
   });
-  deleteAccount();
+  try {
+    deleteAccount();
+  } catch (e) {
+    console.error('[RGPD DELETE]', e.message);
+    return res.status(500).json({ success: false, error: 'Erreur lors de la suppression : ' + e.message });
+  }
   res.clearCookie('token');
   res.json({ success: true });
 });
