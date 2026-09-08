@@ -38,10 +38,11 @@
   ];
 
   function isActive(href) {
+    // Les liens avec ancre (#) ne sont jamais "actifs" sur une autre page
+    if (href.includes('#')) return false;
     var path = window.location.pathname;
-    var hrefPath = href.split('#')[0];
-    if (hrefPath === '/admin') return path === '/admin';
-    return path === hrefPath || path.startsWith(hrefPath + '/');
+    if (href === '/admin') return path === '/admin';
+    return path === href || path.startsWith(href + '/');
   }
 
   function navLink(item) {
