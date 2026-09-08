@@ -1,25 +1,43 @@
-const sgMail = require('@sendgrid/mail');
+const { Resend } = require('resend');
 
 const FROM_EMAIL = process.env.SENDGRID_FROM_EMAIL || 'contact@venduparmoi.fr';
 const FROM_NAME  = 'Vendu Par Moi';
-const BASE_URL   = process.env.BASE_URL || 'https://venduparmoi.fr';
+const BASE_URL   = process.env.BASE_URL || 'https://www.venduparmoi.fr';
 
-if (process.env.SENDGRID_API_KEY) {
-  sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+function getResend() {
+  const key = process.env.RESEND_API_KEY;
+  if (!key) return null;
+  return new Resend(key);
 }
 
-// ── Helper : envoyer un email via SendGrid ────────────────────
+let _previewCapture = null;
+
+// ── Helper : envoyer un email via Resend ─────────────────────
 async function send(to, subject, html) {
-  if (!process.env.SENDGRID_API_KEY) {
-    console.warn(`[EMAIL] SENDGRID_API_KEY manquant — email non envoyé à ${to} : ${subject}`);
+  if (_previewCapture !== null) {
+    _previewCapture = html;
+    return true;
+  }
+  const resend = getResend();
+  if (!resend) {
+    console.warn(`[EMAIL] RESEND_API_KEY manquant — email non envoyé à ${to} : ${subject}`);
     return false;
   }
   try {
-    await sgMail.send({ to, from: { email: FROM_EMAIL, name: FROM_NAME }, subject, html });
+    const { error } = await resend.emails.send({
+      from: `${FROM_NAME} <${FROM_EMAIL}>`,
+      to,
+      subject,
+      html,
+    });
+    if (error) {
+      console.error(`[EMAIL] ✗ Erreur → ${to} : ${JSON.stringify(error)}`);
+      return false;
+    }
     console.log(`[EMAIL] ✓ Envoyé → ${to} : ${subject}`);
     return true;
   } catch (e) {
-    console.error(`[EMAIL] ✗ Erreur → ${to} : ${e?.response?.body?.errors?.[0]?.message || e.message}`);
+    console.error(`[EMAIL] ✗ Exception → ${to} : ${e.message}`);
     return false;
   }
 }
@@ -726,26 +744,10 @@ async function sendPriceDropNudge({ email, firstName, daysPublished, currentPric
 // ─────────────────────────────────────────────────────────────
 
 async function sendAdminDirectEmail({ to, subject, html: customHtml, text }) {
-  if (!process.env.SENDGRID_API_KEY) {
-    console.warn(`[EMAIL] SENDGRID_API_KEY manquant — email admin non envoyé à ${to}`);
-    return false;
-  }
-  try {
-    const wrappedHtml = customHtml
-      ? layout(`<div style="font-size:15px;color:#3a3530;line-height:1.7;">${customHtml}</div>`)
-      : layout(p(text || ''));
-    await sgMail.send({
-      to,
-      from: { email: FROM_EMAIL, name: FROM_NAME },
-      subject: subject || 'Message de Vendu Par Moi',
-      html: wrappedHtml,
-    });
-    console.log(`[EMAIL] ✓ Admin direct → ${to} : ${subject}`);
-    return true;
-  } catch (e) {
-    console.error(`[EMAIL] ✗ Admin direct error → ${to} : ${e?.response?.body?.errors?.[0]?.message || e.message}`);
-    return false;
-  }
+  const wrappedHtml = customHtml
+    ? layout(`<div style="font-size:15px;color:#3a3530;line-height:1.7;">${customHtml}</div>`)
+    : layout(p(text || ''));
+  return send(to, subject || 'Message de Vendu Par Moi', wrappedHtml);
 }
 
 // ─────────────────────────────────────────────────────────────
@@ -788,28 +790,17 @@ async function previewEmail(templateName) {
     sold_congrats:         () => sendSoldCongrats({ email: fakeSellerEmail, firstName: 'Sophie', property: fakeProp }),
   };
 
-  // Intercepte sgMail.send pour capturer le HTML sans envoyer
-  // Force aussi le passage du check SENDGRID_API_KEY en injectant une clé factice si absente
-  const originalSend = sgMail.send.bind(sgMail);
-  const hadKey = !!process.env.SENDGRID_API_KEY;
-  if (!hadKey) {
-    process.env.SENDGRID_API_KEY = 'preview-mode';
-    sgMail.setApiKey('preview-mode');
-  }
-  let capturedHtml = null;
-  sgMail.send = async (msg) => { capturedHtml = msg.html; };
-
   const fn = fns[templateName];
   if (!fn) return `<p style="font-family:sans-serif;padding:20px;color:#c00;">Template inconnu : <strong>${templateName}</strong></p>`;
 
+  _previewCapture = '';
   try {
     await fn();
   } finally {
-    sgMail.send = originalSend;
-    if (!hadKey) {
-      delete process.env.SENDGRID_API_KEY;
-    }
+    // nothing to restore
   }
+  const capturedHtml = _previewCapture;
+  _previewCapture = null;
 
   return capturedHtml || `<p style="font-family:sans-serif;padding:20px;color:#c00;">Rendu indisponible pour ce template.</p>`;
 }

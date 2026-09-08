@@ -1446,7 +1446,7 @@ router.post('/api/emails/send', requireAdmin, async (req, res) => {
       db.prepare(`INSERT INTO email_log (trigger_type, recipient_email) VALUES (?,?) ON CONFLICT DO NOTHING`).run(`${email_type}:manual`, seller.email);
       res.json({ success: true });
     } else {
-      res.status(500).json({ error: 'Envoi échoué (vérifiez SENDGRID_API_KEY)' });
+      res.status(500).json({ error: 'Envoi échoué (vérifiez RESEND_API_KEY)' });
     }
   } catch(e) {
     console.error('[ADMIN EMAIL SEND]', e.message);
@@ -1557,35 +1557,38 @@ router.get('/api/test-email', requireAdmin, async (req, res) => {
   const to = req.query.to;
   if (!to) return res.status(400).json({ error: 'Paramètre ?to=adresse@email.fr requis' });
 
-  const sgMail = require('@sendgrid/mail');
-  const apiKey = process.env.SENDGRID_API_KEY;
+  const { Resend } = require('resend');
+  const apiKey = process.env.RESEND_API_KEY;
   const fromEmail = process.env.SENDGRID_FROM_EMAIL || 'contact@venduparmoi.fr';
   const baseUrl = process.env.BASE_URL || 'https://www.venduparmoi.fr';
 
   const diag = {
-    SENDGRID_API_KEY: apiKey ? `présente (${apiKey.substring(0, 10)}...)` : '❌ MANQUANTE',
-    SENDGRID_FROM_EMAIL: fromEmail,
+    RESEND_API_KEY: apiKey ? `présente (${apiKey.substring(0, 10)}...)` : '❌ MANQUANTE',
+    FROM_EMAIL: fromEmail,
     BASE_URL: baseUrl,
     NODE_ENV: process.env.NODE_ENV,
   };
 
-  if (!apiKey) return res.json({ diag, sent: false, error: 'SENDGRID_API_KEY manquante' });
+  if (!apiKey) return res.json({ diag, sent: false, error: 'RESEND_API_KEY manquante' });
 
-  sgMail.setApiKey(apiKey);
+  const resend = new Resend(apiKey);
   try {
-    await sgMail.send({
+    const { error } = await resend.emails.send({
+      from: `Vendu Par Moi <${fromEmail}>`,
       to,
-      from: { email: fromEmail, name: 'Vendu Par Moi' },
       subject: '[TEST] Email de diagnostic Vendu Par Moi',
-      html: `<p>Cet email confirme que SendGrid fonctionne correctement depuis <strong>${baseUrl}</strong>.</p><p>Expéditeur : ${fromEmail}</p><p>Heure : ${new Date().toISOString()}</p>`,
+      html: `<p>Cet email confirme que Resend fonctionne correctement depuis <strong>${baseUrl}</strong>.</p><p>Expéditeur : ${fromEmail}</p><p>Heure : ${new Date().toISOString()}</p>`,
     });
-    console.log(`[TEST EMAIL] ✓ Envoyé → ${to}`);
-    res.json({ diag, sent: true });
+    if (error) {
+      console.error(`[TEST EMAIL] ✗ Erreur → ${JSON.stringify(error)}`);
+      res.json({ diag, sent: false, error: JSON.stringify(error) });
+    } else {
+      console.log(`[TEST EMAIL] ✓ Envoyé → ${to}`);
+      res.json({ diag, sent: true });
+    }
   } catch (e) {
-    const errDetail = e?.response?.body?.errors?.[0]?.message || e.message;
-    const errCode = e?.code || e?.response?.status;
-    console.error(`[TEST EMAIL] ✗ Erreur ${errCode} → ${errDetail}`);
-    res.json({ diag, sent: false, error: errDetail, code: errCode });
+    console.error(`[TEST EMAIL] ✗ Exception → ${e.message}`);
+    res.json({ diag, sent: false, error: e.message });
   }
 });
 
