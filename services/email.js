@@ -12,8 +12,17 @@ function getResend() {
 
 let _previewCapture = null;
 
+function _logEmailSend(to, subject, success, resendId, source = 'auto') {
+  try {
+    const db = require('../database');
+    const seller = db.prepare('SELECT id FROM sellers WHERE email=?').get(to);
+    db.prepare('INSERT INTO email_sends (to_email, subject, seller_id, resend_id, success, source) VALUES (?,?,?,?,?,?)')
+      .run(to, subject, seller?.id || null, resendId || null, success ? 1 : 0, source);
+  } catch(e) {}
+}
+
 // ── Helper : envoyer un email via Resend ─────────────────────
-async function send(to, subject, html) {
+async function send(to, subject, html, source = 'auto') {
   if (_previewCapture !== null) {
     _previewCapture = html;
     return true;
@@ -24,7 +33,7 @@ async function send(to, subject, html) {
     return false;
   }
   try {
-    const { error } = await resend.emails.send({
+    const { data, error } = await resend.emails.send({
       from: `${FROM_NAME} <${FROM_EMAIL}>`,
       to,
       subject,
@@ -32,12 +41,15 @@ async function send(to, subject, html) {
     });
     if (error) {
       console.error(`[EMAIL] ✗ Erreur → ${to} : ${JSON.stringify(error)}`);
+      _logEmailSend(to, subject, false, null, source);
       return false;
     }
     console.log(`[EMAIL] ✓ Envoyé → ${to} : ${subject}`);
+    _logEmailSend(to, subject, true, data?.id, source);
     return true;
   } catch (e) {
     console.error(`[EMAIL] ✗ Exception → ${to} : ${e.message}`);
+    _logEmailSend(to, subject, false, null, source);
     return false;
   }
 }
@@ -747,7 +759,7 @@ async function sendAdminDirectEmail({ to, subject, html: customHtml, text }) {
   const wrappedHtml = customHtml
     ? layout(`<div style="font-size:15px;color:#3a3530;line-height:1.7;">${customHtml}</div>`)
     : layout(p(text || ''));
-  return send(to, subject || 'Message de Vendu Par Moi', wrappedHtml);
+  return send(to, subject || 'Message de Vendu Par Moi', wrappedHtml, 'manual');
 }
 
 // ─────────────────────────────────────────────────────────────

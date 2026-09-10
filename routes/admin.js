@@ -889,6 +889,15 @@ router.get('/api/crm/:id/activity', requireAdmin, (req, res) => {
   res.json({ activity, autoEmails });
 });
 
+// ── Historique emails vendeur ─────────────────────────────────
+router.get('/api/crm/:id/emails', requireAdmin, (req, res) => {
+  let emails = [];
+  try {
+    emails = db.prepare('SELECT id, to_email, subject, success, resend_id, source, sent_at FROM email_sends WHERE seller_id=? ORDER BY sent_at DESC LIMIT 100').all(+req.params.id);
+  } catch(e) {}
+  res.json({ emails });
+});
+
 // ── Performance annonce vendeur ───────────────────────────────
 router.get('/api/crm/:id/performance', requireAdmin, (req, res) => {
   const property = db.prepare('SELECT id, slug, price, city, type, published, published_at, surface_habitable, rooms FROM properties WHERE seller_id=?').get(+req.params.id);

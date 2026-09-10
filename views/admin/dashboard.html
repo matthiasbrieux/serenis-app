@@ -57,6 +57,24 @@
     .todo-btn { flex-shrink:0;padding:6px 14px;background:#fff;border:1.5px solid #C4603A;color:#C4603A;border-radius:6px;font-size:.78rem;font-weight:600;cursor:pointer;transition:all .15s;white-space:nowrap; }
     .todo-btn:hover { background:#C4603A;color:#fff; }
     .todo-empty { color:#9a9087;font-size:.88rem;font-style:italic;text-align:center;padding:12px 0; }
+
+    /* Email history drawer */
+    .email-drawer { position:fixed;top:0;right:0;height:100vh;width:440px;max-width:95vw;background:#fff;box-shadow:-4px 0 24px rgba(0,0,0,.14);z-index:2000;transform:translateX(100%);transition:transform .25s ease;display:flex;flex-direction:column; }
+    .email-drawer.open { transform:translateX(0); }
+    .email-drawer-overlay { display:none;position:fixed;inset:0;background:rgba(0,0,0,.3);z-index:1999; }
+    .email-drawer-overlay.open { display:block; }
+    .email-drawer-head { padding:20px 24px;border-bottom:1px solid #eee;display:flex;align-items:center;justify-content:space-between;flex-shrink:0; }
+    .email-drawer-head h3 { font-family:'Cormorant Garamond',serif;font-size:1.25rem;color:#1A1A16;margin:0; }
+    .email-drawer-close { border:none;background:none;cursor:pointer;color:#9a9087;font-size:1.2rem;line-height:1;padding:4px; }
+    .email-drawer-close:hover { color:#1A1A16; }
+    .email-drawer-body { flex:1;overflow-y:auto;padding:16px 24px; }
+    .email-item { padding:12px 0;border-bottom:1px solid #f0ebe4; }
+    .email-item:last-child { border-bottom:none; }
+    .email-item-subject { font-size:.85rem;font-weight:600;color:#1A1A16;margin-bottom:4px;line-height:1.3; }
+    .email-item-meta { display:flex;align-items:center;gap:8px;font-size:.72rem;color:#9a9087; }
+    .email-badge-ok { display:inline-block;background:#ecfdf5;color:#059669;font-size:.68rem;font-weight:700;padding:2px 7px;border-radius:10px; }
+    .email-badge-fail { display:inline-block;background:#fef2f2;color:#dc2626;font-size:.68rem;font-weight:700;padding:2px 7px;border-radius:10px; }
+    .email-empty { padding:40px 0;text-align:center;color:#9a9087;font-size:.88rem; }
   </style>
 </head>
 <body class="admin-body">
@@ -191,6 +209,21 @@
     </div>
 
   </main>
+</div>
+
+<!-- Email history drawer -->
+<div class="email-drawer-overlay" id="emailDrawerOverlay" onclick="closeEmailHistory()"></div>
+<div class="email-drawer" id="emailDrawer">
+  <div class="email-drawer-head">
+    <div>
+      <h3>Historique emails</h3>
+      <div id="emailDrawerClient" style="font-size:.8rem;color:#9a9087;margin-top:2px;"></div>
+    </div>
+    <button class="email-drawer-close" onclick="closeEmailHistory()">✕</button>
+  </div>
+  <div class="email-drawer-body" id="emailDrawerBody">
+    <div class="email-empty">Chargement…</div>
+  </div>
 </div>
 
 <!-- Add client modal -->
@@ -331,14 +364,49 @@ function renderClients(clients) {
       <td>${c.status ? `<span class="status-badge ${statusClass}">${statusLabels[c.status]||c.status}</span>` : '<span style="color:#ddd">—</span>'}</td>
       <td style="font-size:0.82rem;color:#888;">${c.paid_at ? new Date(c.paid_at).toLocaleDateString('fr-FR') : 'Manuel'}</td>
       <td>
-        <div style="display:flex;gap:6px;">
+        <div style="display:flex;gap:6px;align-items:center;">
           ${c.slug ? `<a href="/bien/${c.slug}" target="_blank" style="font-size:0.78rem;color:#C4603A;">Voir →</a>` : ''}
+          <button onclick="openEmailHistory(${c.id})" style="font-size:0.78rem;color:#2563eb;cursor:pointer;border:1px solid #bfdbfe;background:#eff6ff;border-radius:4px;padding:2px 7px;">Emails</button>
           <button onclick="openReset(${c.id},'${c.email}')" style="font-size:0.78rem;color:#C4785A;cursor:pointer;">MDP</button>
           <button onclick="deleteClient(${c.id},'${c.email}')" style="font-size:0.78rem;color:#d9534f;cursor:pointer;">Suppr</button>
         </div>
       </td>
     </tr>`;
   }).join('');
+}
+
+// ── HISTORIQUE EMAILS ─────────────────────────────────────────────
+async function openEmailHistory(clientId) {
+  const client = allClients.find(c => c.id === clientId);
+  const name = client ? `${client.first_name||''} ${client.last_name||''}`.trim() : '';
+  document.getElementById('emailDrawerClient').textContent = client?.email || '';
+  document.getElementById('emailDrawerBody').innerHTML = '<div class="email-empty">Chargement…</div>';
+  document.getElementById('emailDrawer').classList.add('open');
+  document.getElementById('emailDrawerOverlay').classList.add('open');
+
+  const { emails } = await fetch(`/admin/api/crm/${clientId}/emails`).then(r => r.json());
+
+  const body = document.getElementById('emailDrawerBody');
+  const drawerTitle = document.querySelector('#emailDrawer .email-drawer-head h3');
+  drawerTitle.textContent = `Emails — ${name || 'Client'}`;
+
+  if (!emails.length) {
+    body.innerHTML = '<div class="email-empty">Aucun email enregistré pour ce client.</div>';
+    return;
+  }
+  body.innerHTML = emails.map(e => {
+    const date = new Date(e.sent_at).toLocaleDateString('fr-FR', { day:'2-digit', month:'short', year:'2-digit', hour:'2-digit', minute:'2-digit' });
+    const badge = e.success ? '<span class="email-badge-ok">Envoyé</span>' : '<span class="email-badge-fail">Échec</span>';
+    return `<div class="email-item">
+      <div class="email-item-subject">${e.subject || '(sans sujet)'}</div>
+      <div class="email-item-meta">${badge}<span>${date}</span>${e.source === 'manual' ? '<span style="color:#C4603A;font-weight:600;">Manuel</span>' : '<span>Auto</span>'}</div>
+    </div>`;
+  }).join('');
+}
+
+function closeEmailHistory() {
+  document.getElementById('emailDrawer').classList.remove('open');
+  document.getElementById('emailDrawerOverlay').classList.remove('open');
 }
 
 // ── CONTACTS ──────────────────────────────────────────────────────

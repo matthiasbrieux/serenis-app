@@ -275,6 +275,20 @@ db.exec(`
   );
 `);
 
+// ── Table email_sends (historique complet des emails envoyés) ─
+db.exec(`
+  CREATE TABLE IF NOT EXISTS email_sends (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    to_email TEXT NOT NULL,
+    subject TEXT,
+    seller_id INTEGER,
+    resend_id TEXT,
+    success BOOLEAN DEFAULT 1,
+    source TEXT DEFAULT 'auto',
+    sent_at DATETIME DEFAULT CURRENT_TIMESTAMP
+  );
+`);
+
 // Migrations: add columns not in original CREATE TABLE
 const newCols = [
   "ALTER TABLE property_documents ADD COLUMN folder TEXT DEFAULT 'diagnostics'",
