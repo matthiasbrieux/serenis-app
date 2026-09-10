@@ -1577,7 +1577,7 @@ router.get('/api/leads', requireAdmin, (req, res) => {
   try { contacts = db.prepare('SELECT * FROM contact_requests ORDER BY created_at DESC').all(); } catch(e) {}
   try { callbacks = db.prepare('SELECT * FROM callback_requests ORDER BY created_at DESC').all(); } catch(e) {}
 
-  const STATUT_MAP = { converti: 'traite', a_rappeler: 'a_rappeler' };
+  const STATUT_MAP = { converti: 'traite', rappele: 'a_traiter' };
   const normalize = (r, type) => {
     const rawStatut = r.statut || (type === 'contact' ? 'a_traiter' : 'a_rappeler');
     return {
