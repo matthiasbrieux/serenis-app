@@ -1,13 +1,14 @@
-const { Resend } = require('resend');
+const sgMail = require('@sendgrid/mail');
 
 const FROM_EMAIL = process.env.SENDGRID_FROM_EMAIL || 'contact@venduparmoi.fr';
 const FROM_NAME  = 'Vendu Par Moi';
 const BASE_URL   = process.env.BASE_URL || 'https://www.venduparmoi.fr';
 
-function getResend() {
-  const key = process.env.RESEND_API_KEY;
+function getSendGrid() {
+  const key = process.env.SENDGRID_API_KEY;
   if (!key) return null;
-  return new Resend(key);
+  sgMail.setApiKey(key);
+  return sgMail;
 }
 
 let _previewCapture = null;
@@ -21,35 +22,38 @@ function _logEmailSend(to, subject, success, resendId, source = 'auto') {
   } catch(e) {}
 }
 
-// ── Helper : envoyer un email via Resend ─────────────────────
+// ── Helper : envoyer un email via SendGrid ───────────────────
 async function send(to, subject, html, source = 'auto') {
   if (_previewCapture !== null) {
     _previewCapture = html;
     return true;
   }
-  const resend = getResend();
-  if (!resend) {
-    console.warn(`[EMAIL] RESEND_API_KEY manquant — email non envoyé à ${to} : ${subject}`);
+  const sg = getSendGrid();
+  if (!sg) {
+    console.warn(`[EMAIL] SENDGRID_API_KEY manquant — email non envoyé à ${to} : ${subject}`);
     _logEmailSend(to, subject, false, null, source);
     return false;
   }
   try {
-    const { data, error } = await resend.emails.send({
-      from: `${FROM_NAME} <${FROM_EMAIL}>`,
+    const [response] = await sg.send({
+      from: { name: FROM_NAME, email: FROM_EMAIL },
       to,
       subject,
       html,
     });
-    if (error) {
-      console.error(`[EMAIL] ✗ Erreur → ${to} : ${JSON.stringify(error)}`);
+    const ok = response.statusCode >= 200 && response.statusCode < 300;
+    if (!ok) {
+      console.error(`[EMAIL] ✗ SendGrid status ${response.statusCode} → ${to} : ${subject}`);
       _logEmailSend(to, subject, false, null, source);
       return false;
     }
-    console.log(`[EMAIL] ✓ Envoyé → ${to} : ${subject}`);
-    _logEmailSend(to, subject, true, data?.id, source);
+    const msgId = response.headers?.['x-message-id'] || null;
+    console.log(`[EMAIL] ✓ Envoyé (${response.statusCode}) → ${to} : ${subject}`);
+    _logEmailSend(to, subject, true, msgId, source);
     return true;
   } catch (e) {
-    console.error(`[EMAIL] ✗ Exception → ${to} : ${e.message}`);
+    const detail = e.response?.body ? JSON.stringify(e.response.body) : e.message;
+    console.error(`[EMAIL] ✗ Exception → ${to} : ${detail}`);
     _logEmailSend(to, subject, false, null, source);
     return false;
   }
