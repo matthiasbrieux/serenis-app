@@ -11,83 +11,90 @@
   <link rel="stylesheet" href="/css/style.css?v=3">
   <link rel="stylesheet" href="/css/admin.css">
   <style>
-    /* Stats row */
-    .stats-row { display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:24px; }
-    .stat-box { background:#fff;border-radius:12px;padding:16px 20px;box-shadow:0 1px 4px rgba(0,0,0,.06); }
-    .stat-box .lbl { font-size:.72rem;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:#9a9087;margin-bottom:6px; }
-    .stat-box .val { font-size:1.8rem;font-weight:700;font-family:'Cormorant Garamond',serif; }
-    .val-orange { color:#d97706; }
-    .val-red    { color:#dc2626; }
-    .val-green  { color:#059669; }
-    .val-muted  { color:#9a9087; }
+    /* ── Stats ─────────────────────────────────────────────── */
+    .stats-row { display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px; }
+    .stat-box { background:#fff;border-radius:10px;padding:14px 18px;box-shadow:0 1px 4px rgba(0,0,0,.06); }
+    .stat-box .lbl { font-size:.68rem;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:#9a9087;margin-bottom:4px; }
+    .stat-box .val { font-size:1.7rem;font-weight:700;font-family:'Cormorant Garamond',serif; }
 
-    /* Alertes today */
-    .alert-today { background:linear-gradient(135deg,#fef3c7,#fde68a);border:1px solid #f59e0b;border-radius:12px;padding:16px 20px;margin-bottom:22px;display:flex;align-items:center;gap:14px; }
-    .alert-today .icon { font-size:1.5rem;flex-shrink:0; }
-    .alert-today .txt { flex:1;font-size:.88rem;color:#92400e;font-weight:600; }
-    .alert-today .btn-link { font-size:.82rem;font-weight:700;color:#92400e;border:1.5px solid #f59e0b;background:#fff;border-radius:6px;padding:5px 12px;cursor:pointer;white-space:nowrap; }
-    .alert-today .btn-link:hover { background:#f59e0b;color:#fff; }
-    .alert-retard { background:linear-gradient(135deg,#fef2f2,#fee2e2);border:1px solid #f87171;border-radius:12px;padding:14px 20px;margin-bottom:14px;display:flex;align-items:center;gap:12px; }
-    .alert-retard .txt { font-size:.85rem;color:#7f1d1d;font-weight:600; }
+    /* ── Alertes ────────────────────────────────────────────── */
+    .alert-banner { border-radius:10px;padding:12px 18px;margin-bottom:10px;display:flex;align-items:center;gap:12px; }
+    .alert-banner .icon { font-size:1.1rem;flex-shrink:0; }
+    .alert-banner .txt { flex:1;font-size:.85rem;font-weight:600; }
+    .alert-overdue { background:#fef2f2;border:1px solid #f87171;color:#7f1d1d; }
+    .alert-today   { background:#fffbeb;border:1px solid #f59e0b;color:#92400e; }
+    .alert-rdv     { background:#faf5ff;border:1px solid #a78bfa;color:#5b21b6; }
+    .alert-banner a { color:inherit;font-weight:700;text-decoration:underline;cursor:pointer; }
 
-    /* Table */
+    /* ── Table card ─────────────────────────────────────────── */
     .table-card { background:#fff;border-radius:12px;box-shadow:0 1px 4px rgba(0,0,0,.06);overflow:hidden; }
-    .table-header { padding:14px 20px;border-bottom:1px solid #eee;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap; }
-    .table-header h2 { font-family:'Cormorant Garamond',serif;font-size:1.2rem;font-weight:600;color:#1A1A16; }
-    .search-input { border:1px solid #e8e0d6;border-radius:7px;padding:6px 12px;font-size:.82rem;font-family:'DM Sans',sans-serif;width:200px;outline:none; }
-    .search-input:focus { border-color:#C4603A; }
-    .filter-btns { display:flex;gap:6px; }
-    .filter-btn { font-size:.75rem;font-weight:600;padding:5px 12px;border-radius:20px;border:1.5px solid #e8e0d6;background:#fff;cursor:pointer;font-family:'DM Sans',sans-serif;color:#555;transition:all .12s; }
-    .filter-btn.active { border-color:#C4603A;background:#C4603A;color:#fff; }
-    .filter-btn:hover:not(.active) { border-color:#C4603A;color:#C4603A; }
+    .table-head { padding:14px 20px;border-bottom:1px solid #eee;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap; }
+    .table-head h2 { font-family:'Cormorant Garamond',serif;font-size:1.15rem;font-weight:600;color:#1A1A16;margin:0; }
+    .filter-row { display:flex;flex-wrap:wrap;gap:6px;align-items:center; }
+    .fb { font-size:.73rem;font-weight:600;padding:4px 11px;border-radius:20px;border:1.5px solid #e8e0d6;background:#fff;cursor:pointer;font-family:'DM Sans',sans-serif;color:#555;transition:all .12s;white-space:nowrap; }
+    .fb:hover:not(.fb-active) { border-color:#C4603A;color:#C4603A; }
+    .fb.fb-active { background:#C4603A;border-color:#C4603A;color:#fff; }
+    .search-inp { border:1px solid #e8e0d6;border-radius:7px;padding:5px 11px;font-size:.8rem;font-family:'DM Sans',sans-serif;width:180px;outline:none; }
+    .search-inp:focus { border-color:#C4603A; }
 
-    /* Main table */
+    /* ── Table ──────────────────────────────────────────────── */
     table { width:100%;border-collapse:collapse;font-size:.82rem; }
-    thead th { background:#F9F8F5;padding:9px 14px;text-align:left;font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#9a9087;border-bottom:1px solid #eee;white-space:nowrap; }
-    tbody td { padding:10px 14px;border-bottom:1px solid #f5f0e8;vertical-align:middle; }
+    thead th { background:#F9F8F5;padding:9px 12px;text-align:left;font-size:.66rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#9a9087;border-bottom:1px solid #eee;white-space:nowrap; }
+    tbody td { padding:9px 12px;border-bottom:1px solid #f5f0e8;vertical-align:middle; }
     tbody tr:last-child td { border-bottom:none; }
-    tbody tr:hover td { background:#fdf9f6; }
-    tbody tr.today-due td { background:#fffbeb; }
-    tbody tr.today-due:hover td { background:#fef3c7; }
-    tbody tr.retard td { background:#fff7f7; }
-    tbody tr.retard:hover td { background:#fee2e2; }
 
-    .nom-cell strong { font-size:.85rem;color:#1A1A16; }
-    .nom-cell .type-tag { display:inline-block;font-size:.65rem;font-weight:700;padding:1px 6px;border-radius:8px;margin-left:6px;vertical-align:middle; }
+    /* Row states */
+    tr.row-overdue td { background:#fef2f2; }
+    tr.row-today   td { background:#fffbeb; }
+    tr.row-rdv     td { background:#faf5ff; }
+    tr.row-overdue:hover td { background:#fee2e2; }
+    tr.row-today:hover   td { background:#fef3c7; }
+    tr.row-rdv:hover     td { background:#f3e8ff; }
+    tbody tr:not(.row-overdue):not(.row-today):not(.row-rdv):hover td { background:#fdf9f6; }
+
+    /* Type tags */
+    .type-tag { display:inline-block;font-size:.63rem;font-weight:700;padding:1px 6px;border-radius:8px;margin-left:5px;vertical-align:middle; }
     .tag-contact { background:#dbeafe;color:#1d4ed8; }
-    .tag-rappel  { background:#f3e8ff;color:#6d28d9; }
-    .tel-link { color:#C4603A;font-weight:600;text-decoration:none;white-space:nowrap; }
-    .tel-link:hover { text-decoration:underline; }
-    .mail-link { color:#555;font-size:.75rem;text-decoration:none; }
-    .mail-link:hover { color:#C4603A; }
-    .message-cell { max-width:160px;color:#555;font-style:italic;font-size:.78rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap; }
+    .tag-rappel  { background:#ede9fe;color:#6d28d9; }
 
-    /* Date de rappel */
-    .date-input { border:1px solid #e8e0d6;border-radius:6px;padding:4px 8px;font-size:.78rem;font-family:'DM Sans',sans-serif;outline:none;background:#fff;width:120px;cursor:pointer; }
-    .date-input:focus { border-color:#C4603A; }
-    .date-input.has-date { border-color:#d97706;color:#92400e;background:#fffbeb; }
-    .date-input.overdue { border-color:#dc2626;color:#7f1d1d;background:#fef2f2; }
+    /* Contact links */
+    .tel-link { color:#C4603A;font-weight:600;text-decoration:none;white-space:nowrap;font-size:.82rem; }
+    .tel-link:hover { text-decoration:underline; }
+    .mail-link { color:#7a7065;font-size:.73rem;text-decoration:none; }
+    .mail-link:hover { color:#C4603A; }
+
+    /* Message cell */
+    .msg-cell { max-width:140px;color:#6b6965;font-style:italic;font-size:.76rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap; }
+
+    /* Date cell */
+    .date-lbl { font-size:.63rem;font-weight:700;text-transform:uppercase;letter-spacing:.04em;display:block;margin-bottom:3px; }
+    .lbl-rappel { color:#d97706; }
+    .lbl-rdv    { color:#7c3aed; }
+    .date-inp { border:1px solid #e8e0d6;border-radius:6px;padding:4px 7px;font-size:.76rem;font-family:'DM Sans',sans-serif;outline:none;background:#fff;width:122px;cursor:pointer; }
+    .date-inp:focus { border-color:#C4603A; }
+    .date-inp.di-overdue { border-color:#dc2626;color:#7f1d1d;background:#fef2f2; }
+    .date-inp.di-today   { border-color:#d97706;color:#92400e;background:#fffbeb; }
+    .date-inp.di-future  { border-color:#d97706;color:#92400e; }
+    .date-inp.di-rdv-soon { border-color:#7c3aed;color:#5b21b6;background:#faf5ff; }
+    .date-inp.di-rdv-future { border-color:#a78bfa;color:#5b21b6; }
 
     /* Notes */
-    .notes-input { border:1px solid #e8e0d6;border-radius:6px;padding:4px 8px;font-size:.78rem;font-family:'DM Sans',sans-serif;outline:none;background:#fff;width:100%;min-width:120px;resize:none;height:36px; }
-    .notes-input:focus { border-color:#C4603A; }
+    .notes-ta { border:1px solid #e8e0d6;border-radius:6px;padding:4px 8px;font-size:.76rem;font-family:'DM Sans',sans-serif;outline:none;background:#fff;width:100%;min-width:100px;resize:none;height:34px;box-sizing:border-box; }
+    .notes-ta:focus { border-color:#C4603A; }
 
-    /* Statut */
-    .statut-select { border:1px solid #e8e0d6;border-radius:6px;padding:4px 8px;font-size:.75rem;font-family:'DM Sans',sans-serif;outline:none;background:#fff;cursor:pointer;font-weight:600; }
-    .statut-select:focus { border-color:#C4603A; }
-    .statut-select.s-a_traiter,
-    .statut-select.s-a_rappeler { border-color:#f59e0b;color:#92400e;background:#fffbeb; }
-    .statut-select.s-rappele   { border-color:#3b82f6;color:#1d4ed8;background:#eff6ff; }
-    .statut-select.s-traite,
-    .statut-select.s-converti  { border-color:#059669;color:#065f46;background:#ecfdf5; }
-    .statut-select.s-sans_suite { border-color:#9ca3af;color:#6b7280;background:#f9fafb; }
+    /* Statut select */
+    .stat-sel { border-radius:7px;padding:4px 8px;font-size:.76rem;font-family:'DM Sans',sans-serif;outline:none;cursor:pointer;font-weight:600;border-width:1.5px;border-style:solid;transition:background .1s; }
+    .stat-sel:focus { outline:none; }
+    .s-a_traiter  { background:#fff8f0;color:#C4603A;  border-color:#e8c4b0; }
+    .s-a_rappeler { background:#fffbeb;color:#d97706;  border-color:#f59e0b; }
+    .s-rappele    { background:#eff6ff;color:#1d4ed8;  border-color:#93c5fd; }
+    .s-rdv_prevu  { background:#faf5ff;color:#7c3aed;  border-color:#a78bfa; }
+    .s-traite     { background:#ecfdf5;color:#065f46;  border-color:#6ee7b7; }
+    .s-sans_suite { background:#f9fafb;color:#6b7280;  border-color:#d1d5db; }
 
-    /* Actions */
-    .del-btn { border:1px solid #e8e0d6;background:#fff;padding:4px 10px;border-radius:6px;font-size:.75rem;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;color:#dc2626;transition:all .12s; }
-    .del-btn:hover { border-color:#dc2626;background:#fef2f2; }
-
-    .save-icon { display:none;width:18px;height:18px;color:#059669;margin-left:6px;vertical-align:middle;animation:fadeOut 2s forwards; }
-    @keyframes fadeOut { 0%{opacity:1} 70%{opacity:1} 100%{opacity:0} }
+    /* Delete btn */
+    .del-btn { border:1px solid #e8e0d6;background:#fff;padding:5px 8px;border-radius:6px;cursor:pointer;color:#9a9087;line-height:1;transition:all .12s;display:flex;align-items:center; }
+    .del-btn:hover { border-color:#dc2626;background:#fef2f2;color:#dc2626; }
 
     .empty { padding:40px;text-align:center;color:#9a9087;font-size:.88rem; }
   </style>
@@ -97,45 +104,53 @@
   <div id="admin-sidebar-slot"></div>
 
   <main class="admin-main">
-    <div style="display:flex;align-items:baseline;gap:16px;margin-bottom:24px;">
+    <div style="display:flex;align-items:baseline;gap:14px;margin-bottom:20px;">
       <h1 class="adm-page-title" style="margin:0;">Rappels</h1>
-      <span id="live-count" style="font-size:.8rem;color:#9a9087;"></span>
+      <span id="live-lbl" style="font-size:.8rem;color:#9a9087;"></span>
     </div>
 
-    <!-- Alertes -->
-    <div id="alert-today" style="display:none;" class="alert-today">
-      <div class="icon">🔔</div>
-      <div class="txt" id="alert-today-txt"></div>
-      <button class="btn-link" onclick="setFilter('today')">Voir →</button>
+    <!-- Alertes urgentes -->
+    <div id="alert-overdue" style="display:none;" class="alert-banner alert-overdue">
+      <span class="icon">🔴</span>
+      <span class="txt" id="txt-overdue"></span>
+      <a onclick="setFilter('a_rappeler')">Voir →</a>
     </div>
-    <div id="alert-retard" style="display:none;" class="alert-retard">
-      <div class="txt" id="alert-retard-txt"></div>
+    <div id="alert-today" style="display:none;" class="alert-banner alert-today">
+      <span class="icon">🔔</span>
+      <span class="txt" id="txt-today"></span>
+      <a onclick="setFilter('a_rappeler')">Voir →</a>
+    </div>
+    <div id="alert-rdv" style="display:none;" class="alert-banner alert-rdv">
+      <span class="icon">📅</span>
+      <span class="txt" id="txt-rdv"></span>
+      <a onclick="setFilter('rdv_prevu')">Voir →</a>
     </div>
 
     <!-- Stats -->
     <div class="stats-row">
-      <div class="stat-box"><div class="lbl">À traiter</div><div class="val val-orange" id="stat-pending">—</div></div>
-      <div class="stat-box"><div class="lbl">Rappel aujourd'hui</div><div class="val val-red" id="stat-today">—</div></div>
-      <div class="stat-box"><div class="lbl">Traités</div><div class="val val-green" id="stat-done">—</div></div>
-      <div class="stat-box"><div class="lbl">Total</div><div class="val val-muted" id="stat-total">—</div></div>
+      <div class="stat-box"><div class="lbl">À traiter</div><div class="val" style="color:#C4603A;" id="s-a_traiter">—</div></div>
+      <div class="stat-box"><div class="lbl">À rappeler</div><div class="val" style="color:#d97706;" id="s-a_rappeler">—</div></div>
+      <div class="stat-box"><div class="lbl">RDV prévus</div><div class="val" style="color:#7c3aed;" id="s-rdv_prevu">—</div></div>
+      <div class="stat-box"><div class="lbl">Traités</div><div class="val" style="color:#059669;" id="s-traite">—</div></div>
     </div>
 
     <!-- Table -->
     <div class="table-card">
-      <div class="table-header">
+      <div class="table-head">
         <h2>Toutes les demandes</h2>
-        <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
-          <div class="filter-btns">
-            <button class="filter-btn active" data-filter="all" onclick="setFilter('all')">Tous</button>
-            <button class="filter-btn" data-filter="pending" onclick="setFilter('pending')">À traiter</button>
-            <button class="filter-btn" data-filter="today" onclick="setFilter('today')">Aujourd'hui</button>
-            <button class="filter-btn" data-filter="done" onclick="setFilter('done')">Traités</button>
-          </div>
-          <input class="search-input" type="search" placeholder="Nom, téléphone…" id="search-input" oninput="render()">
+        <div class="filter-row">
+          <button class="fb fb-active" data-f="all"        onclick="setFilter('all')">Tous</button>
+          <button class="fb"           data-f="a_traiter"  onclick="setFilter('a_traiter')">À traiter</button>
+          <button class="fb"           data-f="a_rappeler" onclick="setFilter('a_rappeler')">À rappeler</button>
+          <button class="fb"           data-f="rappele"    onclick="setFilter('rappele')">Rappelé</button>
+          <button class="fb"           data-f="rdv_prevu"  onclick="setFilter('rdv_prevu')">RDV prévu</button>
+          <button class="fb"           data-f="traite"     onclick="setFilter('traite')">Traité</button>
+          <button class="fb"           data-f="sans_suite" onclick="setFilter('sans_suite')">Sans suite</button>
+          <input class="search-inp" type="search" placeholder="Nom, téléphone…" id="srch" oninput="render()">
         </div>
       </div>
       <div style="overflow-x:auto;">
-        <div id="table-wrap"><div class="empty">Chargement…</div></div>
+        <div id="tbl-wrap"><div class="empty">Chargement…</div></div>
       </div>
     </div>
   </main>
@@ -144,84 +159,132 @@
 <script>
   let allLeads = [];
   let activeFilter = 'all';
-  const today = new Date().toISOString().slice(0, 10);
+  const today    = new Date().toISOString().slice(0, 10);
+  const tomorrow = new Date(Date.now() + 86400000).toISOString().slice(0, 10);
+
+  const STATUTS = [
+    { v: 'a_traiter',  l: 'À traiter',  cls: 's-a_traiter'  },
+    { v: 'a_rappeler', l: 'À rappeler', cls: 's-a_rappeler' },
+    { v: 'rappele',    l: 'Rappelé',    cls: 's-rappele'    },
+    { v: 'rdv_prevu',  l: 'RDV prévu',  cls: 's-rdv_prevu'  },
+    { v: 'traite',     l: 'Traité',     cls: 's-traite'     },
+    { v: 'sans_suite', l: 'Sans suite', cls: 's-sans_suite' },
+  ];
+
+  function isDone(r) { return r.statut === 'traite' || r.statut === 'sans_suite'; }
+
+  function rowPriority(r) {
+    if (r.statut === 'a_rappeler') {
+      if (r.rappel_prevu_le && r.rappel_prevu_le < today)  return 1; // en retard
+      if (r.rappel_prevu_le && r.rappel_prevu_le === today) return 2; // aujourd'hui
+      if (r.rappel_prevu_le) return 4; // futur
+      return 5;
+    }
+    if (r.statut === 'rdv_prevu') {
+      if (r.rdv_prevu_le && r.rdv_prevu_le <= tomorrow) return 3; // RDV proche
+      if (r.rdv_prevu_le) return 6;
+      return 7;
+    }
+    if (r.statut === 'a_traiter') return 8;
+    if (r.statut === 'rappele')   return 9;
+    return 10; // traite, sans_suite
+  }
+
+  function rowClass(r) {
+    if (r.statut === 'a_rappeler') {
+      if (r.rappel_prevu_le && r.rappel_prevu_le < today)  return 'row-overdue';
+      if (r.rappel_prevu_le && r.rappel_prevu_le === today) return 'row-today';
+    }
+    if (r.statut === 'rdv_prevu' && r.rdv_prevu_le && r.rdv_prevu_le <= tomorrow) return 'row-rdv';
+    return '';
+  }
 
   async function load() {
     const data = await fetch('/admin/api/leads').then(r => r.json());
     allLeads = data.leads || [];
-
-    // Stats
-    const pending = allLeads.filter(r => !isDone(r)).length;
-    const todayDue = allLeads.filter(r => !isDone(r) && r.rappel_prevu_le && r.rappel_prevu_le <= today).length;
-    const retard   = allLeads.filter(r => !isDone(r) && r.rappel_prevu_le && r.rappel_prevu_le < today).length;
-    const done     = allLeads.filter(r => isDone(r)).length;
-
-    document.getElementById('stat-pending').textContent = pending;
-    document.getElementById('stat-today').textContent   = todayDue;
-    document.getElementById('stat-done').textContent    = done;
-    document.getElementById('stat-total').textContent   = allLeads.length;
-    document.getElementById('live-count').textContent   = pending > 0 ? `${pending} à traiter` : 'Tout traité ✓';
-
-    // Alertes
-    const alertToday = document.getElementById('alert-today');
-    const alertRetard = document.getElementById('alert-retard');
-    if (todayDue > 0) {
-      alertToday.style.display = 'flex';
-      document.getElementById('alert-today-txt').textContent = `${todayDue} rappel${todayDue > 1 ? 's' : ''} prévu${todayDue > 1 ? 's' : ''} aujourd'hui`;
-    } else {
-      alertToday.style.display = 'none';
-    }
-    if (retard > 0) {
-      alertRetard.style.display = 'flex';
-      document.getElementById('alert-retard-txt').textContent = `⚠️ ${retard} rappel${retard > 1 ? 's' : ''} en retard`;
-    } else {
-      alertRetard.style.display = 'none';
-    }
-
+    refreshAlerts(data);
+    refreshStats();
     render();
   }
 
-  function isDone(r) {
-    return ['traite', 'sans_suite', 'converti'].includes(r.statut);
+  function refreshStats() {
+    ['a_traiter','a_rappeler','rdv_prevu','traite'].forEach(s => {
+      const el = document.getElementById('s-' + s);
+      if (el) el.textContent = allLeads.filter(r => r.statut === s).length;
+    });
+    const actif = allLeads.filter(r => !isDone(r)).length;
+    document.getElementById('live-lbl').textContent = actif > 0 ? `${actif} actif${actif>1?'s':''}` : 'Tout traité ✓';
+  }
+
+  function refreshAlerts(data) {
+    const { retard_rappel = 0, today_rappel = 0, rdv_soon = 0 } = data || {};
+    // On recalcule en live depuis allLeads au cas où load() est appelé sans data
+    const ret = data ? retard_rappel : allLeads.filter(r => r.statut==='a_rappeler' && r.rappel_prevu_le && r.rappel_prevu_le < today).length;
+    const tdy = data ? today_rappel  : allLeads.filter(r => r.statut==='a_rappeler' && r.rappel_prevu_le === today).length;
+    const rdv = data ? rdv_soon      : allLeads.filter(r => r.statut==='rdv_prevu'  && r.rdv_prevu_le   && r.rdv_prevu_le <= tomorrow).length;
+
+    setAlert('alert-overdue','txt-overdue', ret, `${ret} rappel${ret>1?'s':''} en retard`);
+    setAlert('alert-today',  'txt-today',   tdy, `${tdy} rappel${tdy>1?'s':''} prévu${tdy>1?'s':''} aujourd'hui`);
+    setAlert('alert-rdv',    'txt-rdv',     rdv, `${rdv} RDV prévu${rdv>1?'s':''} dans les 48h`);
+  }
+
+  function setAlert(wrapperId, txtId, count, msg) {
+    const el = document.getElementById(wrapperId);
+    if (!el) return;
+    el.style.display = count > 0 ? 'flex' : 'none';
+    if (count > 0) document.getElementById(txtId).textContent = msg;
   }
 
   function setFilter(f) {
     activeFilter = f;
-    document.querySelectorAll('.filter-btn').forEach(b => {
-      b.classList.toggle('active', b.dataset.filter === f);
-    });
+    document.querySelectorAll('.fb').forEach(b => b.classList.toggle('fb-active', b.dataset.f === f));
     render();
   }
 
   function getVisible() {
-    const q = (document.getElementById('search-input')?.value || '').toLowerCase();
-    let rows = allLeads;
-
-    if (activeFilter === 'pending') rows = rows.filter(r => !isDone(r));
-    else if (activeFilter === 'today') rows = rows.filter(r => !isDone(r) && r.rappel_prevu_le && r.rappel_prevu_le <= today);
-    else if (activeFilter === 'done') rows = rows.filter(r => isDone(r));
-
+    const q = (document.getElementById('srch')?.value || '').toLowerCase();
+    let rows = activeFilter === 'all'
+      ? allLeads
+      : allLeads.filter(r => r.statut === activeFilter);
     if (q) rows = rows.filter(r =>
-      (r.nom || '').toLowerCase().includes(q) ||
-      (r.telephone || '').toLowerCase().includes(q) ||
-      (r.email || '').toLowerCase().includes(q)
+      (r.nom||'').toLowerCase().includes(q) ||
+      (r.telephone||'').toLowerCase().includes(q) ||
+      (r.email||'').toLowerCase().includes(q)
     );
+    return [...rows].sort((a, b) => rowPriority(a) - rowPriority(b) || new Date(b.created_at) - new Date(a.created_at));
+  }
 
-    // Tri : retard → today → pending sans date → done
-    return rows.sort((a, b) => {
-      const rank = r => {
-        if (isDone(r)) return 4;
-        if (r.rappel_prevu_le && r.rappel_prevu_le < today) return 1;
-        if (r.rappel_prevu_le && r.rappel_prevu_le === today) return 2;
-        return 3;
-      };
-      return rank(a) - rank(b) || new Date(b.created_at) - new Date(a.created_at);
-    });
+  function renderDateCell(row) {
+    if (row.statut === 'a_rappeler') {
+      const isOvd  = row.rappel_prevu_le && row.rappel_prevu_le < today;
+      const isTdy  = row.rappel_prevu_le === today;
+      const cls    = 'date-inp' + (isOvd ? ' di-overdue' : isTdy ? ' di-today' : row.rappel_prevu_le ? ' di-future' : '');
+      return `<span class="date-lbl lbl-rappel">📞 Rappel le</span>
+        <input type="date" class="${cls}" value="${row.rappel_prevu_le||''}"
+          onchange="patchField('${row.source_type}',${row.id},{rappel_prevu_le:this.value})">`;
+    }
+    if (row.statut === 'rdv_prevu') {
+      const isSoon = row.rdv_prevu_le && row.rdv_prevu_le <= tomorrow;
+      const cls    = 'date-inp' + (isSoon ? ' di-rdv-soon' : row.rdv_prevu_le ? ' di-rdv-future' : '');
+      return `<span class="date-lbl lbl-rdv">📅 RDV le</span>
+        <input type="date" class="${cls}" value="${row.rdv_prevu_le||''}"
+          onchange="patchField('${row.source_type}',${row.id},{rdv_prevu_le:this.value})">`;
+    }
+    return '<span style="color:#ddd;font-size:.76rem;">—</span>';
+  }
+
+  function renderStatutSelect(row) {
+    const opts = STATUTS.map(s =>
+      `<option value="${s.v}" ${row.statut===s.v?'selected':''}>${s.l}</option>`
+    ).join('');
+    const cls  = STATUTS.find(s => s.v === row.statut)?.cls || 's-a_traiter';
+    return `<select class="stat-sel ${cls}"
+      onchange="patchStatus('${row.source_type}',${row.id},this.value,this)">${opts}</select>`;
   }
 
   function render() {
     const rows = getVisible();
-    const wrap = document.getElementById('table-wrap');
+    const wrap = document.getElementById('tbl-wrap');
     if (!rows.length) {
       wrap.innerHTML = '<div class="empty">Aucune demande pour ce filtre.</div>';
       return;
@@ -231,51 +294,38 @@
         <th>Nom</th>
         <th>Contact</th>
         <th>Message</th>
-        <th>Date de rappel</th>
+        <th>Date</th>
         <th>Commentaire</th>
         <th>Statut</th>
-        <th style="width:60px;"></th>
+        <th></th>
       </tr></thead>
       <tbody>${rows.map(row => {
-        const isToday   = !isDone(row) && row.rappel_prevu_le === today;
-        const isRetard  = !isDone(row) && row.rappel_prevu_le && row.rappel_prevu_le < today;
-        const rowClass  = isRetard ? 'retard' : isToday ? 'today-due' : '';
-        const dateClass = row.rappel_prevu_le
-          ? (isRetard ? 'date-input overdue' : isToday ? 'date-input has-date' : 'date-input has-date')
-          : 'date-input';
         const tag = row.source_type === 'contact'
           ? '<span class="type-tag tag-contact">Contact</span>'
           : '<span class="type-tag tag-rappel">Rappel</span>';
-        const statuts = row.source_type === 'contact'
-          ? [['a_traiter','⏳ À traiter'],['rappele','📞 Rappelé'],['traite','✅ Traité'],['sans_suite','— Sans suite']]
-          : [['a_rappeler','⏳ À rappeler'],['rappele','📞 Rappelé'],['converti','✅ Converti'],['sans_suite','— Sans suite']];
-        const opts = statuts.map(([v,l]) => `<option value="${v}" ${row.statut===v?'selected':''}>${l}</option>`).join('');
-        return `<tr class="${rowClass}" id="row-${row.source_type}-${row.id}">
-          <td class="nom-cell"><strong>${esc(row.nom) || '—'}</strong>${tag}</td>
+        const dateStr = new Date(row.created_at).toLocaleDateString('fr-FR',{day:'2-digit',month:'short'});
+        return `<tr class="${rowClass(row)}" id="r-${row.source_type}-${row.id}">
           <td>
-            ${row.telephone ? `<div><a class="tel-link" href="tel:${esc(row.telephone)}">${esc(row.telephone)}</a></div>` : ''}
-            ${row.email ? `<div><a class="mail-link" href="mailto:${esc(row.email)}">${esc(row.email)}</a></div>` : ''}
-          </td>
-          <td class="message-cell" title="${esc(row.message)}">${esc(row.message) || '<span style="color:#ccc">—</span>'}</td>
-          <td>
-            <input type="date" class="${dateClass}" value="${row.rappel_prevu_le || ''}"
-              onchange="patch('${row.source_type}',${row.id},{rappel_prevu_le:this.value})"
-            >
+            <div style="font-weight:600;font-size:.84rem;color:#1A1A16;">${esc(row.nom)||'—'}${tag}</div>
+            <div style="font-size:.7rem;color:#aaa;margin-top:2px;">${dateStr}</div>
           </td>
           <td>
-            <textarea class="notes-input" placeholder="Note libre…"
-              onblur="patch('${row.source_type}',${row.id},{notes:this.value})"
+            ${row.telephone?`<div><a class="tel-link" href="tel:${esc(row.telephone)}">${esc(row.telephone)}</a></div>`:''}
+            ${row.email?`<div style="margin-top:2px;"><a class="mail-link" href="mailto:${esc(row.email)}">${esc(row.email)}</a></div>`:''}
+          </td>
+          <td class="msg-cell" title="${esc(row.message)}">${esc(row.message)||'<span style="color:#ddd">—</span>'}</td>
+          <td style="min-width:140px;">${renderDateCell(row)}</td>
+          <td style="min-width:130px;">
+            <textarea class="notes-ta" placeholder="Note libre…"
+              onblur="patchField('${row.source_type}',${row.id},{notes:this.value})"
             >${esc(row.notes)}</textarea>
           </td>
+          <td style="min-width:130px;">${renderStatutSelect(row)}</td>
           <td>
-            <select class="statut-select s-${row.statut}"
-              onchange="patch('${row.source_type}',${row.id},{statut:this.value});this.className='statut-select s-'+this.value;updateRow('${row.source_type}',${row.id})">
-              ${opts}
-            </select>
-          </td>
-          <td>
-            <button class="del-btn" onclick="del('${row.source_type}',${row.id})">
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg>
+            <button class="del-btn" onclick="del('${row.source_type}',${row.id})" title="Supprimer">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/>
+              </svg>
             </button>
           </td>
         </tr>`;
@@ -284,73 +334,67 @@
     </table>`;
   }
 
-  async function patch(type, id, fields) {
+  async function patchStatus(type, id, newStatut, sel) {
+    const lead = allLeads.find(r => r.source_type === type && r.id === id);
+    if (!lead) return;
+    lead.statut = newStatut;
+    // Update select class immediately
+    const statDef = STATUTS.find(s => s.v === newStatut);
+    if (sel && statDef) sel.className = `stat-sel ${statDef.cls}`;
+    await fetch(`/admin/api/leads/${type}/${id}`, {
+      method:'PATCH', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ statut: newStatut }),
+    });
+    // Re-render to update date cell and row color
+    render();
+    refreshStats();
+    refreshAlerts(null);
+  }
+
+  async function patchField(type, id, fields) {
     const lead = allLeads.find(r => r.source_type === type && r.id === id);
     if (!lead) return;
     Object.assign(lead, fields);
     await fetch(`/admin/api/leads/${type}/${id}`, {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
+      method:'PATCH', headers:{'Content-Type':'application/json'},
       body: JSON.stringify(fields),
     });
-    // Re-render stats + alertes sans casser le focus clavier
-    updateStats();
+    // Update row class without full re-render (keeps focus)
+    const row = document.getElementById(`r-${type}-${id}`);
+    if (row) row.className = rowClass(lead);
+    // Update date input class if needed
+    const dateInp = row?.querySelector('.date-inp');
+    if (dateInp) {
+      const isRappel = lead.statut === 'a_rappeler';
+      const isRdv    = lead.statut === 'rdv_prevu';
+      const val      = isRappel ? lead.rappel_prevu_le : lead.rdv_prevu_le;
+      dateInp.className = 'date-inp' + (
+        isRappel && val && val < today  ? ' di-overdue' :
+        isRappel && val === today       ? ' di-today'   :
+        isRappel && val                 ? ' di-future'  :
+        isRdv    && val && val <= tomorrow ? ' di-rdv-soon' :
+        isRdv    && val                 ? ' di-rdv-future' : ''
+      );
+    }
+    refreshStats();
+    refreshAlerts(null);
   }
 
   async function del(type, id) {
-    if (!confirm('Supprimer cette demande ?')) return;
-    const row = document.getElementById(`row-${type}-${id}`);
-    if (row) { row.style.opacity = '.4'; row.style.pointerEvents = 'none'; }
-    await fetch(`/admin/api/leads/${type}/${id}`, { method: 'DELETE' });
-    allLeads = allLeads.filter(r => !(r.source_type === type && r.id === id));
+    if (!confirm('Supprimer cette demande définitivement ?')) return;
+    const row = document.getElementById(`r-${type}-${id}`);
+    if (row) { row.style.opacity='.35';row.style.pointerEvents='none'; }
+    const res = await fetch(`/admin/api/leads/${type}/${id}`, { method:'DELETE' });
+    if (!res.ok) { if(row){row.style.opacity='1';row.style.pointerEvents='';} alert('Erreur lors de la suppression.'); return; }
+    allLeads = allLeads.filter(r => !(r.source_type===type && r.id===id));
     render();
-    updateStats();
-  }
-
-  function updateRow(type, id) {
-    setTimeout(() => {
-      const lead = allLeads.find(r => r.source_type === type && r.id === id);
-      if (!lead) return;
-      const row = document.getElementById(`row-${type}-${id}`);
-      if (!row) return;
-      const done = isDone(lead);
-      const isToday  = !done && lead.rappel_prevu_le === today;
-      const isRetard = !done && lead.rappel_prevu_le && lead.rappel_prevu_le < today;
-      row.className = isRetard ? 'retard' : isToday ? 'today-due' : '';
-    }, 50);
-  }
-
-  function updateStats() {
-    const pending = allLeads.filter(r => !isDone(r)).length;
-    const todayDue = allLeads.filter(r => !isDone(r) && r.rappel_prevu_le && r.rappel_prevu_le <= today).length;
-    const retard   = allLeads.filter(r => !isDone(r) && r.rappel_prevu_le && r.rappel_prevu_le < today).length;
-    const done     = allLeads.filter(r => isDone(r)).length;
-    document.getElementById('stat-pending').textContent = pending;
-    document.getElementById('stat-today').textContent   = todayDue;
-    document.getElementById('stat-done').textContent    = done;
-    document.getElementById('stat-total').textContent   = allLeads.length;
-    document.getElementById('live-count').textContent   = pending > 0 ? `${pending} à traiter` : 'Tout traité ✓';
-
-    const alertToday  = document.getElementById('alert-today');
-    const alertRetard = document.getElementById('alert-retard');
-    if (todayDue > 0) {
-      alertToday.style.display = 'flex';
-      document.getElementById('alert-today-txt').textContent = `${todayDue} rappel${todayDue > 1 ? 's' : ''} prévu${todayDue > 1 ? 's' : ''} aujourd'hui`;
-    } else { alertToday.style.display = 'none'; }
-    if (retard > 0) {
-      alertRetard.style.display = 'flex';
-      document.getElementById('alert-retard-txt').textContent = `⚠️ ${retard} rappel${retard > 1 ? 's' : ''} en retard`;
-    } else { alertRetard.style.display = 'none'; }
+    refreshStats();
+    refreshAlerts(null);
   }
 
   function esc(s) {
     if (!s) return '';
     return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-  }
-
-  function fmtDate(s) {
-    if (!s) return '—';
-    return new Date(s).toLocaleDateString('fr-FR', { day:'2-digit', month:'2-digit', year:'2-digit', hour:'2-digit', minute:'2-digit' });
   }
 
   load();

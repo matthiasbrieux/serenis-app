@@ -1577,42 +1577,53 @@ router.get('/api/leads', requireAdmin, (req, res) => {
   try { contacts = db.prepare('SELECT * FROM contact_requests ORDER BY created_at DESC').all(); } catch(e) {}
   try { callbacks = db.prepare('SELECT * FROM callback_requests ORDER BY created_at DESC').all(); } catch(e) {}
 
-  const normalize = (r, type) => ({
-    id: r.id,
-    source_type: type,
-    nom: type === 'contact' ? (r.name || '') : `${r.prenom || ''} ${r.nom || ''}`.trim(),
-    telephone: r.telephone || r.phone || '',
-    email: r.email || '',
-    message: type === 'contact' ? (r.message || r.creneau || '') : (r.moment || ''),
-    rappel_prevu_le: r.rappel_prevu_le || '',
-    statut: r.statut || (type === 'contact' ? 'a_traiter' : 'a_rappeler'),
-    notes: r.notes || '',
-    created_at: r.created_at,
-  });
+  const STATUT_MAP = { converti: 'traite', a_rappeler: 'a_rappeler' };
+  const normalize = (r, type) => {
+    const rawStatut = r.statut || (type === 'contact' ? 'a_traiter' : 'a_rappeler');
+    return {
+      id: r.id,
+      source_type: type,
+      nom: type === 'contact' ? (r.name || '') : `${r.prenom || ''} ${r.nom || ''}`.trim(),
+      telephone: r.telephone || r.phone || '',
+      email: r.email || '',
+      message: type === 'contact' ? (r.message || r.creneau || '') : (r.moment || ''),
+      rappel_prevu_le: r.rappel_prevu_le || '',
+      rdv_prevu_le: r.rdv_prevu_le || '',
+      statut: STATUT_MAP[rawStatut] || rawStatut,
+      notes: r.notes || '',
+      created_at: r.created_at,
+    };
+  };
 
   const all = [
     ...contacts.map(r => normalize(r, 'contact')),
     ...callbacks.map(r => normalize(r, 'rappel')),
   ].sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
 
-  const actifs = all.filter(r => !['traite','sans_suite','converti'].includes(r.statut));
-  const today_due = actifs.filter(r => r.rappel_prevu_le && r.rappel_prevu_le <= today).length;
-  const retard   = actifs.filter(r => r.rappel_prevu_le && r.rappel_prevu_le < today).length;
+  const tomorrow = new Date(Date.now() + 86400000).toISOString().slice(0, 10);
+  const isDone = r => ['traite', 'sans_suite'].includes(r.statut);
+  const actifs = all.filter(r => !isDone(r));
+  const retard_rappel = actifs.filter(r => r.statut === 'a_rappeler' && r.rappel_prevu_le && r.rappel_prevu_le < today).length;
+  const today_rappel  = actifs.filter(r => r.statut === 'a_rappeler' && r.rappel_prevu_le === today).length;
+  const rdv_soon      = actifs.filter(r => r.statut === 'rdv_prevu'  && r.rdv_prevu_le   && r.rdv_prevu_le <= tomorrow).length;
 
-  res.json({ leads: all, today_due, retard });
+  res.json({ leads: all, retard_rappel, today_rappel, rdv_soon });
 });
 
 router.patch('/api/leads/:type/:id', requireAdmin, express.json(), (req, res) => {
-  const { statut, notes, rappel_prevu_le } = req.body;
+  const { statut, notes, rappel_prevu_le, rdv_prevu_le } = req.body;
   const { type, id } = req.params;
   try {
-    if (type === 'contact') {
-      db.prepare(`UPDATE contact_requests SET statut=?, notes=?, rappel_prevu_le=?, updated_at=datetime('now') WHERE id=?`)
-        .run(statut || 'a_traiter', notes !== undefined ? notes : null, rappel_prevu_le || null, id);
-    } else {
-      db.prepare(`UPDATE callback_requests SET statut=?, notes=?, rappel_prevu_le=?, updated_at=datetime('now') WHERE id=?`)
-        .run(statut || 'a_rappeler', notes !== undefined ? notes : null, rappel_prevu_le || null, id);
-    }
+    const fields = [];
+    const vals = [];
+    if (statut !== undefined)        { fields.push('statut=?');          vals.push(statut); }
+    if (notes !== undefined)         { fields.push('notes=?');           vals.push(notes || null); }
+    if (rappel_prevu_le !== undefined){ fields.push('rappel_prevu_le=?'); vals.push(rappel_prevu_le || null); }
+    if (rdv_prevu_le !== undefined)   { fields.push('rdv_prevu_le=?');    vals.push(rdv_prevu_le || null); }
+    if (!fields.length) return res.json({ ok: true });
+    fields.push("updated_at=datetime('now')");
+    const table = type === 'contact' ? 'contact_requests' : 'callback_requests';
+    db.prepare(`UPDATE ${table} SET ${fields.join(',')} WHERE id=?`).run(...vals, id);
     res.json({ ok: true });
   } catch(e) { res.status(500).json({ error: e.message }); }
 });
