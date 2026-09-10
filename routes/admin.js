@@ -1015,7 +1015,7 @@ router.get('/crm/:id/fiche', requireAdmin, (req, res) => {
     </style>
   </head><body>
     <div class="top-bar">
-      <button class="btn btn-back" onclick="history.back()">← Admin</button>
+      <button class="btn btn-back" onclick="window.location.href='/admin'">← Admin</button>
       <button class="btn btn-print" onclick="window.print()">Imprimer / PDF</button>
     </div>
     <div class="wrap">
@@ -1132,12 +1132,17 @@ router.get('/crm/:id/fiche', requireAdmin, (req, res) => {
         suivi_rdv_date: document.getElementById('sv-rdv-date').value || null,
         suivi_notes:    document.getElementById('sv-notes').value,
       };
-      await fetch('/admin/api/crm/'+SELLER_ID+'/suivi', {
-        method:'PATCH', headers:{'Content-Type':'application/json'}, body: JSON.stringify(body)
-      });
-      const ok = document.getElementById('save-ok');
-      ok.style.display = 'inline';
-      setTimeout(() => ok.style.display = 'none', 2500);
+      try {
+        const r = await fetch('/admin/api/crm/'+SELLER_ID+'/suivi', {
+          method:'PATCH', headers:{'Content-Type':'application/json'}, body: JSON.stringify(body)
+        });
+        if (!r.ok) throw new Error('HTTP ' + r.status);
+        const ok = document.getElementById('save-ok');
+        ok.style.display = 'inline';
+        setTimeout(() => ok.style.display = 'none', 2500);
+      } catch(e) {
+        alert('Erreur lors de l\'enregistrement : ' + e.message);
+      }
     }
   </script>
   </body></html>`);

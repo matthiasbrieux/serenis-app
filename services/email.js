@@ -30,6 +30,7 @@ async function send(to, subject, html, source = 'auto') {
   const resend = getResend();
   if (!resend) {
     console.warn(`[EMAIL] RESEND_API_KEY manquant — email non envoyé à ${to} : ${subject}`);
+    _logEmailSend(to, subject, false, null, source);
     return false;
   }
   try {
