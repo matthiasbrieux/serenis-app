@@ -11,55 +11,85 @@
   <link rel="stylesheet" href="/css/style.css?v=3">
   <link rel="stylesheet" href="/css/admin.css">
   <style>
+    /* Stats row */
     .stats-row { display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:24px; }
     .stat-box { background:#fff;border-radius:12px;padding:16px 20px;box-shadow:0 1px 4px rgba(0,0,0,.06); }
     .stat-box .lbl { font-size:.72rem;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:#9a9087;margin-bottom:6px; }
     .stat-box .val { font-size:1.8rem;font-weight:700;font-family:'Cormorant Garamond',serif; }
     .val-orange { color:#d97706; }
+    .val-red    { color:#dc2626; }
     .val-green  { color:#059669; }
-    .val-blue   { color:#2563eb; }
+    .val-muted  { color:#9a9087; }
 
+    /* Alertes today */
+    .alert-today { background:linear-gradient(135deg,#fef3c7,#fde68a);border:1px solid #f59e0b;border-radius:12px;padding:16px 20px;margin-bottom:22px;display:flex;align-items:center;gap:14px; }
+    .alert-today .icon { font-size:1.5rem;flex-shrink:0; }
+    .alert-today .txt { flex:1;font-size:.88rem;color:#92400e;font-weight:600; }
+    .alert-today .btn-link { font-size:.82rem;font-weight:700;color:#92400e;border:1.5px solid #f59e0b;background:#fff;border-radius:6px;padding:5px 12px;cursor:pointer;white-space:nowrap; }
+    .alert-today .btn-link:hover { background:#f59e0b;color:#fff; }
+    .alert-retard { background:linear-gradient(135deg,#fef2f2,#fee2e2);border:1px solid #f87171;border-radius:12px;padding:14px 20px;margin-bottom:14px;display:flex;align-items:center;gap:12px; }
+    .alert-retard .txt { font-size:.85rem;color:#7f1d1d;font-weight:600; }
+
+    /* Table */
     .table-card { background:#fff;border-radius:12px;box-shadow:0 1px 4px rgba(0,0,0,.06);overflow:hidden; }
-    .table-header { padding:14px 20px;border-bottom:1px solid #eee;display:flex;align-items:center;justify-content:space-between;gap:12px; }
+    .table-header { padding:14px 20px;border-bottom:1px solid #eee;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap; }
     .table-header h2 { font-family:'Cormorant Garamond',serif;font-size:1.2rem;font-weight:600;color:#1A1A16; }
-    .search-input { border:1px solid #e8e0d6;border-radius:7px;padding:6px 12px;font-size:.82rem;font-family:'DM Sans',sans-serif;width:220px;outline:none; }
+    .search-input { border:1px solid #e8e0d6;border-radius:7px;padding:6px 12px;font-size:.82rem;font-family:'DM Sans',sans-serif;width:200px;outline:none; }
     .search-input:focus { border-color:#C4603A; }
+    .filter-btns { display:flex;gap:6px; }
+    .filter-btn { font-size:.75rem;font-weight:600;padding:5px 12px;border-radius:20px;border:1.5px solid #e8e0d6;background:#fff;cursor:pointer;font-family:'DM Sans',sans-serif;color:#555;transition:all .12s; }
+    .filter-btn.active { border-color:#C4603A;background:#C4603A;color:#fff; }
+    .filter-btn:hover:not(.active) { border-color:#C4603A;color:#C4603A; }
 
+    /* Main table */
     table { width:100%;border-collapse:collapse;font-size:.82rem; }
     thead th { background:#F9F8F5;padding:9px 14px;text-align:left;font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#9a9087;border-bottom:1px solid #eee;white-space:nowrap; }
-    tbody td { padding:11px 14px;border-bottom:1px solid #f5f0e8;vertical-align:middle; }
+    tbody td { padding:10px 14px;border-bottom:1px solid #f5f0e8;vertical-align:middle; }
     tbody tr:last-child td { border-bottom:none; }
     tbody tr:hover td { background:#fdf9f6; }
+    tbody tr.today-due td { background:#fffbeb; }
+    tbody tr.today-due:hover td { background:#fef3c7; }
+    tbody tr.retard td { background:#fff7f7; }
+    tbody tr.retard:hover td { background:#fee2e2; }
 
-    .badge { display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:20px;font-size:.72rem;font-weight:700; }
-    .badge-orange { background:#fef3c7;color:#d97706; }
-    .badge-green  { background:#ecfdf5;color:#059669; }
-    .badge-blue   { background:#dbeafe;color:#2563eb; }
-    .badge-gray   { background:#f0ede9;color:#9a9087; }
-
-    .tel-link { color:#C4603A;font-weight:600;text-decoration:none; }
+    .nom-cell strong { font-size:.85rem;color:#1A1A16; }
+    .nom-cell .type-tag { display:inline-block;font-size:.65rem;font-weight:700;padding:1px 6px;border-radius:8px;margin-left:6px;vertical-align:middle; }
+    .tag-contact { background:#dbeafe;color:#1d4ed8; }
+    .tag-rappel  { background:#f3e8ff;color:#6d28d9; }
+    .tel-link { color:#C4603A;font-weight:600;text-decoration:none;white-space:nowrap; }
     .tel-link:hover { text-decoration:underline; }
+    .mail-link { color:#555;font-size:.75rem;text-decoration:none; }
+    .mail-link:hover { color:#C4603A; }
+    .message-cell { max-width:160px;color:#555;font-style:italic;font-size:.78rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap; }
 
-    .action-btn { border:1px solid #e8e0d6;background:#fff;padding:4px 10px;border-radius:6px;font-size:.75rem;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;color:#555;transition:all .12s; }
-    .action-btn:hover { border-color:#C4603A;color:#C4603A; }
-    .action-btn.danger:hover { border-color:#dc2626;color:#dc2626; }
+    /* Date de rappel */
+    .date-input { border:1px solid #e8e0d6;border-radius:6px;padding:4px 8px;font-size:.78rem;font-family:'DM Sans',sans-serif;outline:none;background:#fff;width:120px;cursor:pointer; }
+    .date-input:focus { border-color:#C4603A; }
+    .date-input.has-date { border-color:#d97706;color:#92400e;background:#fffbeb; }
+    .date-input.overdue { border-color:#dc2626;color:#7f1d1d;background:#fef2f2; }
+
+    /* Notes */
+    .notes-input { border:1px solid #e8e0d6;border-radius:6px;padding:4px 8px;font-size:.78rem;font-family:'DM Sans',sans-serif;outline:none;background:#fff;width:100%;min-width:120px;resize:none;height:36px; }
+    .notes-input:focus { border-color:#C4603A; }
+
+    /* Statut */
+    .statut-select { border:1px solid #e8e0d6;border-radius:6px;padding:4px 8px;font-size:.75rem;font-family:'DM Sans',sans-serif;outline:none;background:#fff;cursor:pointer;font-weight:600; }
+    .statut-select:focus { border-color:#C4603A; }
+    .statut-select.s-a_traiter,
+    .statut-select.s-a_rappeler { border-color:#f59e0b;color:#92400e;background:#fffbeb; }
+    .statut-select.s-rappele   { border-color:#3b82f6;color:#1d4ed8;background:#eff6ff; }
+    .statut-select.s-traite,
+    .statut-select.s-converti  { border-color:#059669;color:#065f46;background:#ecfdf5; }
+    .statut-select.s-sans_suite { border-color:#9ca3af;color:#6b7280;background:#f9fafb; }
+
+    /* Actions */
+    .del-btn { border:1px solid #e8e0d6;background:#fff;padding:4px 10px;border-radius:6px;font-size:.75rem;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;color:#dc2626;transition:all .12s; }
+    .del-btn:hover { border-color:#dc2626;background:#fef2f2; }
+
+    .save-icon { display:none;width:18px;height:18px;color:#059669;margin-left:6px;vertical-align:middle;animation:fadeOut 2s forwards; }
+    @keyframes fadeOut { 0%{opacity:1} 70%{opacity:1} 100%{opacity:0} }
 
     .empty { padding:40px;text-align:center;color:#9a9087;font-size:.88rem; }
-
-    /* Modal */
-    .modal-overlay { display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:1000;align-items:center;justify-content:center; }
-    .modal-overlay.open { display:flex; }
-    .modal { background:#fff;border-radius:14px;padding:28px;width:460px;max-width:95vw;box-shadow:0 8px 40px rgba(0,0,0,.18); }
-    .modal h3 { font-family:'Cormorant Garamond',serif;font-size:1.4rem;margin-bottom:6px;color:#1A1A16; }
-    .modal .contact-info { font-size:.9rem;color:#555;margin-bottom:20px;padding:12px 14px;background:#fdf9f6;border-radius:8px;border-left:3px solid #C4603A; }
-    .modal label { display:block;font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#9a9087;margin-bottom:5px;margin-top:14px; }
-    .modal select, .modal textarea { width:100%;border:1px solid #e8e0d6;border-radius:7px;padding:8px 12px;font-size:.85rem;font-family:'DM Sans',sans-serif;outline:none;background:#fff; }
-    .modal select:focus, .modal textarea:focus { border-color:#C4603A; }
-    .modal textarea { resize:vertical;min-height:70px; }
-    .modal-actions { display:flex;gap:10px;margin-top:20px; }
-    .btn-save { flex:1;background:#C4603A;color:#fff;border:none;padding:10px;border-radius:8px;font-size:.85rem;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif; }
-    .btn-save:hover { background:#a84f2e; }
-    .btn-cancel { flex:1;background:#F5F0E8;color:#1A1A16;border:1px solid #e8e0d6;padding:10px;border-radius:8px;font-size:.85rem;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif; }
   </style>
 </head>
 <body class="admin-body">
@@ -67,99 +97,255 @@
   <div id="admin-sidebar-slot"></div>
 
   <main class="admin-main">
-    <div style="display:flex;align-items:baseline;gap:16px;margin-bottom:28px;">
+    <div style="display:flex;align-items:baseline;gap:16px;margin-bottom:24px;">
       <h1 class="adm-page-title" style="margin:0;">Rappels</h1>
       <span id="live-count" style="font-size:.8rem;color:#9a9087;"></span>
     </div>
 
-    <div class="stats-row">
-      <div class="stat-box"><div class="lbl">À rappeler</div><div class="val val-orange" id="stat-a">—</div></div>
-      <div class="stat-box"><div class="lbl">Rappelés</div><div class="val val-green" id="stat-r">—</div></div>
-      <div class="stat-box"><div class="lbl">Convertis</div><div class="val val-blue" id="stat-c">—</div></div>
-      <div class="stat-box"><div class="lbl">Total</div><div class="val" id="stat-t">—</div></div>
+    <!-- Alertes -->
+    <div id="alert-today" style="display:none;" class="alert-today">
+      <div class="icon">🔔</div>
+      <div class="txt" id="alert-today-txt"></div>
+      <button class="btn-link" onclick="setFilter('today')">Voir →</button>
+    </div>
+    <div id="alert-retard" style="display:none;" class="alert-retard">
+      <div class="txt" id="alert-retard-txt"></div>
     </div>
 
+    <!-- Stats -->
+    <div class="stats-row">
+      <div class="stat-box"><div class="lbl">À traiter</div><div class="val val-orange" id="stat-pending">—</div></div>
+      <div class="stat-box"><div class="lbl">Rappel aujourd'hui</div><div class="val val-red" id="stat-today">—</div></div>
+      <div class="stat-box"><div class="lbl">Traités</div><div class="val val-green" id="stat-done">—</div></div>
+      <div class="stat-box"><div class="lbl">Total</div><div class="val val-muted" id="stat-total">—</div></div>
+    </div>
+
+    <!-- Table -->
     <div class="table-card">
       <div class="table-header">
         <h2>Toutes les demandes</h2>
-        <input class="search-input" type="search" placeholder="Rechercher…" id="search-input" oninput="filterTable()">
+        <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
+          <div class="filter-btns">
+            <button class="filter-btn active" data-filter="all" onclick="setFilter('all')">Tous</button>
+            <button class="filter-btn" data-filter="pending" onclick="setFilter('pending')">À traiter</button>
+            <button class="filter-btn" data-filter="today" onclick="setFilter('today')">Aujourd'hui</button>
+            <button class="filter-btn" data-filter="done" onclick="setFilter('done')">Traités</button>
+          </div>
+          <input class="search-input" type="search" placeholder="Nom, téléphone…" id="search-input" oninput="render()">
+        </div>
       </div>
-      <div id="table-wrap">
-        <div class="empty">Chargement…</div>
+      <div style="overflow-x:auto;">
+        <div id="table-wrap"><div class="empty">Chargement…</div></div>
       </div>
     </div>
   </main>
 </div>
 
-<!-- Modal édition -->
-<div class="modal-overlay" id="modal">
-  <div class="modal">
-    <h3>Mettre à jour le statut</h3>
-    <div class="contact-info" id="modal-contact"></div>
-    <label>Statut</label>
-    <select id="modal-statut">
-      <option value="a_rappeler">📞 À rappeler</option>
-      <option value="rappele">✅ Rappelé</option>
-      <option value="converti">🎉 Converti (a souscrit)</option>
-      <option value="sans_suite">❌ Sans suite</option>
-    </select>
-    <label>Notes internes</label>
-    <textarea id="modal-notes" placeholder="Observations, heure de rappel, résultat de l'appel…"></textarea>
-    <div class="modal-actions">
-      <button class="btn-cancel" onclick="closeModal()">Annuler</button>
-      <button class="btn-save" onclick="saveModal()">Enregistrer</button>
-    </div>
-  </div>
-</div>
-
 <script>
-  let allRows = [];
-  let editingId = null;
+  let allLeads = [];
+  let activeFilter = 'all';
+  const today = new Date().toISOString().slice(0, 10);
 
   async function load() {
-    const data = await fetch('/admin/api/rappels').then(r => r.json());
-    allRows = data.rows;
-    document.getElementById('stat-a').textContent = data.stats.a_rappeler;
-    document.getElementById('stat-r').textContent = data.stats.rappele;
-    document.getElementById('stat-c').textContent = data.stats.converti;
-    document.getElementById('stat-t').textContent = data.stats.total;
-    document.getElementById('live-count').textContent = data.stats.a_rappeler > 0 ? `${data.stats.a_rappeler} à rappeler` : 'Tout traité ✓';
-    renderTable(allRows);
+    const data = await fetch('/admin/api/leads').then(r => r.json());
+    allLeads = data.leads || [];
+
+    // Stats
+    const pending = allLeads.filter(r => !isDone(r)).length;
+    const todayDue = allLeads.filter(r => !isDone(r) && r.rappel_prevu_le && r.rappel_prevu_le <= today).length;
+    const retard   = allLeads.filter(r => !isDone(r) && r.rappel_prevu_le && r.rappel_prevu_le < today).length;
+    const done     = allLeads.filter(r => isDone(r)).length;
+
+    document.getElementById('stat-pending').textContent = pending;
+    document.getElementById('stat-today').textContent   = todayDue;
+    document.getElementById('stat-done').textContent    = done;
+    document.getElementById('stat-total').textContent   = allLeads.length;
+    document.getElementById('live-count').textContent   = pending > 0 ? `${pending} à traiter` : 'Tout traité ✓';
+
+    // Alertes
+    const alertToday = document.getElementById('alert-today');
+    const alertRetard = document.getElementById('alert-retard');
+    if (todayDue > 0) {
+      alertToday.style.display = 'flex';
+      document.getElementById('alert-today-txt').textContent = `${todayDue} rappel${todayDue > 1 ? 's' : ''} prévu${todayDue > 1 ? 's' : ''} aujourd'hui`;
+    } else {
+      alertToday.style.display = 'none';
+    }
+    if (retard > 0) {
+      alertRetard.style.display = 'flex';
+      document.getElementById('alert-retard-txt').textContent = `⚠️ ${retard} rappel${retard > 1 ? 's' : ''} en retard`;
+    } else {
+      alertRetard.style.display = 'none';
+    }
+
+    render();
   }
 
-  function renderTable(rows) {
+  function isDone(r) {
+    return ['traite', 'sans_suite', 'converti'].includes(r.statut);
+  }
+
+  function setFilter(f) {
+    activeFilter = f;
+    document.querySelectorAll('.filter-btn').forEach(b => {
+      b.classList.toggle('active', b.dataset.filter === f);
+    });
+    render();
+  }
+
+  function getVisible() {
+    const q = (document.getElementById('search-input')?.value || '').toLowerCase();
+    let rows = allLeads;
+
+    if (activeFilter === 'pending') rows = rows.filter(r => !isDone(r));
+    else if (activeFilter === 'today') rows = rows.filter(r => !isDone(r) && r.rappel_prevu_le && r.rappel_prevu_le <= today);
+    else if (activeFilter === 'done') rows = rows.filter(r => isDone(r));
+
+    if (q) rows = rows.filter(r =>
+      (r.nom || '').toLowerCase().includes(q) ||
+      (r.telephone || '').toLowerCase().includes(q) ||
+      (r.email || '').toLowerCase().includes(q)
+    );
+
+    // Tri : retard → today → pending sans date → done
+    return rows.sort((a, b) => {
+      const rank = r => {
+        if (isDone(r)) return 4;
+        if (r.rappel_prevu_le && r.rappel_prevu_le < today) return 1;
+        if (r.rappel_prevu_le && r.rappel_prevu_le === today) return 2;
+        return 3;
+      };
+      return rank(a) - rank(b) || new Date(b.created_at) - new Date(a.created_at);
+    });
+  }
+
+  function render() {
+    const rows = getVisible();
     const wrap = document.getElementById('table-wrap');
     if (!rows.length) {
-      wrap.innerHTML = '<div class="empty">Aucune demande de rappel pour l\'instant.</div>';
+      wrap.innerHTML = '<div class="empty">Aucune demande pour ce filtre.</div>';
       return;
     }
     wrap.innerHTML = `<table>
       <thead><tr>
-        <th>Date</th><th>Nom</th><th>Téléphone</th><th>Moment souhaité</th><th>Statut</th><th>Notes</th><th>Actions</th>
+        <th>Nom</th>
+        <th>Contact</th>
+        <th>Message</th>
+        <th>Date de rappel</th>
+        <th>Commentaire</th>
+        <th>Statut</th>
+        <th style="width:60px;"></th>
       </tr></thead>
-      <tbody>${rows.map(row => `
-        <tr>
-          <td style="font-size:.75rem;color:#9a9087;">${fmtDate(row.created_at)}</td>
-          <td><strong>${esc(row.prenom)} ${esc(row.nom)}</strong></td>
-          <td><a class="tel-link" href="tel:${esc(row.telephone)}">${esc(row.telephone)}</a></td>
-          <td>${row.moment ? esc(row.moment) : '<span style="color:#ccc">—</span>'}</td>
-          <td>${mkBadge(row.statut)}</td>
-          <td style="max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#555">${row.notes ? esc(row.notes) : '<span style="color:#ccc">—</span>'}</td>
+      <tbody>${rows.map(row => {
+        const isToday   = !isDone(row) && row.rappel_prevu_le === today;
+        const isRetard  = !isDone(row) && row.rappel_prevu_le && row.rappel_prevu_le < today;
+        const rowClass  = isRetard ? 'retard' : isToday ? 'today-due' : '';
+        const dateClass = row.rappel_prevu_le
+          ? (isRetard ? 'date-input overdue' : isToday ? 'date-input has-date' : 'date-input has-date')
+          : 'date-input';
+        const tag = row.source_type === 'contact'
+          ? '<span class="type-tag tag-contact">Contact</span>'
+          : '<span class="type-tag tag-rappel">Rappel</span>';
+        const statuts = row.source_type === 'contact'
+          ? [['a_traiter','⏳ À traiter'],['rappele','📞 Rappelé'],['traite','✅ Traité'],['sans_suite','— Sans suite']]
+          : [['a_rappeler','⏳ À rappeler'],['rappele','📞 Rappelé'],['converti','✅ Converti'],['sans_suite','— Sans suite']];
+        const opts = statuts.map(([v,l]) => `<option value="${v}" ${row.statut===v?'selected':''}>${l}</option>`).join('');
+        return `<tr class="${rowClass}" id="row-${row.source_type}-${row.id}">
+          <td class="nom-cell"><strong>${esc(row.nom) || '—'}</strong>${tag}</td>
           <td>
-            <div style="display:flex;gap:6px;">
-              <button class="action-btn" onclick="openModal(${row.id})">Modifier</button>
-              <button class="action-btn danger" onclick="del(${row.id})">Suppr.</button>
-            </div>
+            ${row.telephone ? `<div><a class="tel-link" href="tel:${esc(row.telephone)}">${esc(row.telephone)}</a></div>` : ''}
+            ${row.email ? `<div><a class="mail-link" href="mailto:${esc(row.email)}">${esc(row.email)}</a></div>` : ''}
           </td>
-        </tr>`).join('')}
+          <td class="message-cell" title="${esc(row.message)}">${esc(row.message) || '<span style="color:#ccc">—</span>'}</td>
+          <td>
+            <input type="date" class="${dateClass}" value="${row.rappel_prevu_le || ''}"
+              onchange="patch('${row.source_type}',${row.id},{rappel_prevu_le:this.value})"
+            >
+          </td>
+          <td>
+            <textarea class="notes-input" placeholder="Note libre…"
+              onblur="patch('${row.source_type}',${row.id},{notes:this.value})"
+            >${esc(row.notes)}</textarea>
+          </td>
+          <td>
+            <select class="statut-select s-${row.statut}"
+              onchange="patch('${row.source_type}',${row.id},{statut:this.value});this.className='statut-select s-'+this.value;updateRow('${row.source_type}',${row.id})">
+              ${opts}
+            </select>
+          </td>
+          <td>
+            <button class="del-btn" onclick="del('${row.source_type}',${row.id})">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg>
+            </button>
+          </td>
+        </tr>`;
+      }).join('')}
       </tbody>
     </table>`;
   }
 
-  function mkBadge(s) {
-    const map = { a_rappeler:['badge-orange','📞 À rappeler'], rappele:['badge-green','✅ Rappelé'], converti:['badge-blue','🎉 Converti'], sans_suite:['badge-gray','❌ Sans suite'] };
-    const [cls, lbl] = map[s] || ['badge-gray', s];
-    return `<span class="badge ${cls}">${lbl}</span>`;
+  async function patch(type, id, fields) {
+    const lead = allLeads.find(r => r.source_type === type && r.id === id);
+    if (!lead) return;
+    Object.assign(lead, fields);
+    await fetch(`/admin/api/leads/${type}/${id}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(fields),
+    });
+    // Re-render stats + alertes sans casser le focus clavier
+    updateStats();
+  }
+
+  async function del(type, id) {
+    if (!confirm('Supprimer cette demande ?')) return;
+    const row = document.getElementById(`row-${type}-${id}`);
+    if (row) { row.style.opacity = '.4'; row.style.pointerEvents = 'none'; }
+    await fetch(`/admin/api/leads/${type}/${id}`, { method: 'DELETE' });
+    allLeads = allLeads.filter(r => !(r.source_type === type && r.id === id));
+    render();
+    updateStats();
+  }
+
+  function updateRow(type, id) {
+    setTimeout(() => {
+      const lead = allLeads.find(r => r.source_type === type && r.id === id);
+      if (!lead) return;
+      const row = document.getElementById(`row-${type}-${id}`);
+      if (!row) return;
+      const done = isDone(lead);
+      const isToday  = !done && lead.rappel_prevu_le === today;
+      const isRetard = !done && lead.rappel_prevu_le && lead.rappel_prevu_le < today;
+      row.className = isRetard ? 'retard' : isToday ? 'today-due' : '';
+    }, 50);
+  }
+
+  function updateStats() {
+    const pending = allLeads.filter(r => !isDone(r)).length;
+    const todayDue = allLeads.filter(r => !isDone(r) && r.rappel_prevu_le && r.rappel_prevu_le <= today).length;
+    const retard   = allLeads.filter(r => !isDone(r) && r.rappel_prevu_le && r.rappel_prevu_le < today).length;
+    const done     = allLeads.filter(r => isDone(r)).length;
+    document.getElementById('stat-pending').textContent = pending;
+    document.getElementById('stat-today').textContent   = todayDue;
+    document.getElementById('stat-done').textContent    = done;
+    document.getElementById('stat-total').textContent   = allLeads.length;
+    document.getElementById('live-count').textContent   = pending > 0 ? `${pending} à traiter` : 'Tout traité ✓';
+
+    const alertToday  = document.getElementById('alert-today');
+    const alertRetard = document.getElementById('alert-retard');
+    if (todayDue > 0) {
+      alertToday.style.display = 'flex';
+      document.getElementById('alert-today-txt').textContent = `${todayDue} rappel${todayDue > 1 ? 's' : ''} prévu${todayDue > 1 ? 's' : ''} aujourd'hui`;
+    } else { alertToday.style.display = 'none'; }
+    if (retard > 0) {
+      alertRetard.style.display = 'flex';
+      document.getElementById('alert-retard-txt').textContent = `⚠️ ${retard} rappel${retard > 1 ? 's' : ''} en retard`;
+    } else { alertRetard.style.display = 'none'; }
+  }
+
+  function esc(s) {
+    if (!s) return '';
+    return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
   }
 
   function fmtDate(s) {
@@ -167,56 +353,8 @@
     return new Date(s).toLocaleDateString('fr-FR', { day:'2-digit', month:'2-digit', year:'2-digit', hour:'2-digit', minute:'2-digit' });
   }
 
-  function esc(s) {
-    if (!s) return '';
-    return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-  }
-
-  function filterTable() {
-    const q = document.getElementById('search-input').value.toLowerCase();
-    renderTable(allRows.filter(r =>
-      (r.nom||'').toLowerCase().includes(q) || (r.prenom||'').toLowerCase().includes(q) || (r.telephone||'').toLowerCase().includes(q)
-    ));
-  }
-
-  function openModal(id) {
-    const row = allRows.find(r => r.id === id);
-    if (!row) return;
-    editingId = id;
-    document.getElementById('modal-contact').innerHTML =
-      `<strong>${esc(row.prenom)} ${esc(row.nom)}</strong><br>
-       📞 <a class="tel-link" href="tel:${esc(row.telephone)}">${esc(row.telephone)}</a>
-       ${row.moment ? ` · Rappeler : <strong>${esc(row.moment)}</strong>` : ''}`;
-    document.getElementById('modal-statut').value = row.statut || 'a_rappeler';
-    document.getElementById('modal-notes').value = row.notes || '';
-    document.getElementById('modal').classList.add('open');
-  }
-
-  function closeModal() {
-    document.getElementById('modal').classList.remove('open');
-    editingId = null;
-  }
-
-  async function saveModal() {
-    if (!editingId) return;
-    await fetch(`/admin/api/rappels/${editingId}`, {
-      method:'PATCH', headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({ statut: document.getElementById('modal-statut').value, notes: document.getElementById('modal-notes').value })
-    });
-    closeModal();
-    await load();
-  }
-
-  async function del(id) {
-    if (!confirm('Supprimer cette demande ?')) return;
-    await fetch(`/admin/api/rappels/${id}`, { method:'DELETE' });
-    await load();
-  }
-
-  document.getElementById('modal').addEventListener('click', e => { if (e.target === document.getElementById('modal')) closeModal(); });
-
   load();
-  setInterval(load, 30000);
+  setInterval(load, 60000);
 </script>
 <script src="/js/admin-sidebar.js"></script>
 </body>

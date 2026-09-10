@@ -653,6 +653,11 @@ router.patch('/api/contacts/:id', requireAdmin, express.json(), (req, res) => {
   res.json({ ok: true });
 });
 
+router.delete('/api/contacts/:id', requireAdmin, (req, res) => {
+  db.prepare('DELETE FROM contact_requests WHERE id=?').run(req.params.id);
+  res.json({ ok: true });
+});
+
 // ── GESTION DES NUMÉROS IA ────────────────────────────────
 router.get('/api/numbers', requireAdmin, (req, res) => {
   const numbers = db.prepare(`
@@ -1565,6 +1570,66 @@ router.get('/rappels', requireAdmin, (req, res) => {
   res.sendFile('rappels.html', { root: './views/admin' });
 });
 
+// API unifiée : retourne contact_requests + callback_requests fusionnés
+router.get('/api/leads', requireAdmin, (req, res) => {
+  const today = new Date().toISOString().slice(0, 10);
+  let contacts = [], callbacks = [];
+  try { contacts = db.prepare('SELECT * FROM contact_requests ORDER BY created_at DESC').all(); } catch(e) {}
+  try { callbacks = db.prepare('SELECT * FROM callback_requests ORDER BY created_at DESC').all(); } catch(e) {}
+
+  const normalize = (r, type) => ({
+    id: r.id,
+    source_type: type,
+    nom: type === 'contact' ? (r.name || '') : `${r.prenom || ''} ${r.nom || ''}`.trim(),
+    telephone: r.telephone || r.phone || '',
+    email: r.email || '',
+    message: type === 'contact' ? (r.message || r.creneau || '') : (r.moment || ''),
+    rappel_prevu_le: r.rappel_prevu_le || '',
+    statut: r.statut || (type === 'contact' ? 'a_traiter' : 'a_rappeler'),
+    notes: r.notes || '',
+    created_at: r.created_at,
+  });
+
+  const all = [
+    ...contacts.map(r => normalize(r, 'contact')),
+    ...callbacks.map(r => normalize(r, 'rappel')),
+  ].sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+
+  const actifs = all.filter(r => !['traite','sans_suite','converti'].includes(r.statut));
+  const today_due = actifs.filter(r => r.rappel_prevu_le && r.rappel_prevu_le <= today).length;
+  const retard   = actifs.filter(r => r.rappel_prevu_le && r.rappel_prevu_le < today).length;
+
+  res.json({ leads: all, today_due, retard });
+});
+
+router.patch('/api/leads/:type/:id', requireAdmin, express.json(), (req, res) => {
+  const { statut, notes, rappel_prevu_le } = req.body;
+  const { type, id } = req.params;
+  try {
+    if (type === 'contact') {
+      db.prepare(`UPDATE contact_requests SET statut=?, notes=?, rappel_prevu_le=?, updated_at=datetime('now') WHERE id=?`)
+        .run(statut || 'a_traiter', notes !== undefined ? notes : null, rappel_prevu_le || null, id);
+    } else {
+      db.prepare(`UPDATE callback_requests SET statut=?, notes=?, rappel_prevu_le=?, updated_at=datetime('now') WHERE id=?`)
+        .run(statut || 'a_rappeler', notes !== undefined ? notes : null, rappel_prevu_le || null, id);
+    }
+    res.json({ ok: true });
+  } catch(e) { res.status(500).json({ error: e.message }); }
+});
+
+router.delete('/api/leads/:type/:id', requireAdmin, (req, res) => {
+  const { type, id } = req.params;
+  try {
+    if (type === 'contact') {
+      db.prepare('DELETE FROM contact_requests WHERE id=?').run(id);
+    } else {
+      db.prepare('DELETE FROM callback_requests WHERE id=?').run(id);
+    }
+    res.json({ ok: true });
+  } catch(e) { res.status(500).json({ error: e.message }); }
+});
+
+// Anciennes routes conservées pour compatibilité
 router.get('/api/rappels', requireAdmin, (req, res) => {
   const rows = db.prepare('SELECT * FROM callback_requests ORDER BY created_at DESC').all();
   const stats = {

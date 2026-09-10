@@ -148,15 +148,19 @@
       </div>
     </div>
 
-    <!-- Contacts -->
-    <div style="background:#fff;border-radius:12px;box-shadow:0 2px 8px rgba(0,0,0,0.06);overflow:hidden;" id="contacts">
-      <div style="padding:20px 24px;border-bottom:1px solid #eee;display:flex;align-items:center;justify-content:space-between;">
-        <h2 style="font-size:1.1rem;font-family:'Cormorant Garamond',serif;">Demandes de contact (site)</h2>
-        <span id="contactsCount" style="font-size:.78rem;color:#9a9087;"></span>
+    <!-- Contacts / Rappels — aperçu compact -->
+    <div style="background:#fff;border-radius:12px;box-shadow:0 2px 8px rgba(0,0,0,0.06);overflow:hidden;margin-bottom:28px;" id="contacts">
+      <div style="padding:16px 24px;display:flex;align-items:center;justify-content:space-between;gap:16px;">
+        <div style="display:flex;align-items:center;gap:14px;">
+          <span style="font-size:1.3rem;">📋</span>
+          <div>
+            <div style="font-family:'Cormorant Garamond',serif;font-size:1.05rem;font-weight:600;color:#1A1A16;">Demandes &amp; Rappels</div>
+            <div id="contactsCount" style="font-size:.8rem;color:#9a9087;margin-top:2px;">Chargement…</div>
+          </div>
+        </div>
+        <a href="/admin/rappels" style="flex-shrink:0;padding:7px 16px;background:#C4603A;color:#fff;border-radius:7px;font-size:.82rem;font-weight:600;text-decoration:none;white-space:nowrap;">Gérer tout →</a>
       </div>
-      <div id="contactsList" style="padding:16px 24px;display:flex;flex-direction:column;gap:12px;">
-        <div style="color:#aaa;font-size:.85rem;">Chargement…</div>
-      </div>
+      <div id="contactsList" style="display:none;"></div>
     </div>
     <!-- Documents légaux -->
     <div style="background:#fff;border-radius:12px;box-shadow:0 2px 8px rgba(0,0,0,0.06);overflow:hidden;margin-bottom:32px;" id="documents">
@@ -409,84 +413,19 @@ function closeEmailHistory() {
   document.getElementById('emailDrawerOverlay').classList.remove('open');
 }
 
-// ── CONTACTS ──────────────────────────────────────────────────────
-const STATUTS_CONTACT = [
-  { key: 'a_traiter', label: '⏳ À traiter' },
-  { key: 'rappele',   label: '📞 Rappelé'   },
-  { key: 'traite',    label: '✅ Traité'     },
-];
-
-function renderContactCard(c) {
-  const dateStr = new Date(c.created_at).toLocaleDateString('fr-FR', { day:'2-digit', month:'short' });
-  const offerBadge = c.offer ? `<span class="contact-badge badge-${c.offer}">${c.offer === 'serenite' ? 'Sérénité' : c.offer === 'autonome' ? 'Autonome' : c.offer}</span>` : '';
-  const cityBadge  = c.city  ? `<span style="font-size:.72rem;color:#888;">${c.city}</span>` : '';
-  const msg        = c.message ? `<div style="font-size:.78rem;color:#666;margin-bottom:8px;font-style:italic;">"${c.message}"</div>` : '';
-  const statut     = c.statut || 'a_traiter';
-  const statutBtns = STATUTS_CONTACT.map(s =>
-    `<button class="statut-btn ${statut === s.key ? 'active-' + s.key : ''}" onclick="setContactStatut(${c.id},'${s.key}',this)">${s.label}</button>`
-  ).join('');
-  return `<div class="contact-card ${statut === 'traite' ? 'traite' : ''}" id="cc-${c.id}">
-    <div class="contact-card-header">
-      <div>
-        <div class="contact-name">${c.name || '—'}</div>
-        <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:4px;">${offerBadge}${cityBadge}</div>
-      </div>
-      <div class="contact-date">${dateStr}</div>
-    </div>
-    <div class="contact-meta">
-      ${c.phone ? `<a class="contact-link" href="tel:${c.phone.replace(/\s/g,'')}">
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6A19.79 19.79 0 012.12 4.18 2 2 0 014.11 2h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg>
-        ${c.phone}</a>` : ''}
-      ${c.email ? `<a class="contact-link" href="mailto:${c.email}">
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
-        ${c.email}</a>` : ''}
-    </div>
-    ${msg}
-    <div class="contact-statut-row">${statutBtns}</div>
-    <textarea class="contact-notes" placeholder="Note (rappelé le …, à recontacter…)" onblur="saveContactNote(${c.id},this.value)">${c.notes || ''}</textarea>
-  </div>`;
-}
-
+// ── CONTACTS — aperçu compact (gestion complète dans /admin/rappels) ──
 async function loadContacts() {
-  const data = await fetch('/admin/api/contacts').then(r => r.json());
-  const list = document.getElementById('contactsList');
-  const count = document.getElementById('contactsCount');
-  if (!data.contacts?.length) {
-    list.innerHTML = '<div style="color:#aaa;font-size:.85rem;text-align:center;padding:20px 0;">Aucune demande</div>';
-    if (count) count.textContent = '';
-    return;
-  }
-  const pending = data.contacts.filter(c => (c.statut || 'a_traiter') !== 'traite').length;
-  if (count) count.textContent = pending > 0 ? `${pending} à traiter` : 'Tout traité ✓';
-  list.innerHTML = data.contacts.map(renderContactCard).join('');
-}
-
-async function setContactStatut(id, statut, btn) {
-  await fetch(`/admin/api/contacts/${id}`, { method:'PATCH', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ statut }) });
-
-  // Mise à jour en place — pas de retri, pas de confusion visuelle
-  const card = document.getElementById('cc-' + id);
-  if (!card) { await loadContacts(); return; }
-
-  card.classList.toggle('traite', statut === 'traite');
-
-  card.querySelectorAll('.statut-btn').forEach(b => {
-    const m = b.getAttribute('onclick').match(/'([a-z_]+)',this\)/);
-    if (!m) return;
-    b.className = 'statut-btn' + (m[1] === statut ? ' active-' + statut : '');
-  });
-
-  const pending = document.querySelectorAll('.contact-card:not(.traite)').length;
-  const countEl = document.getElementById('contactsCount');
-  if (countEl) countEl.textContent = pending > 0 ? `${pending} à traiter` : 'Tout traité ✓';
-}
-
-let _noteTimers = {};
-function saveContactNote(id, notes) {
-  clearTimeout(_noteTimers[id]);
-  _noteTimers[id] = setTimeout(() => {
-    fetch(`/admin/api/contacts/${id}`, { method:'PATCH', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ notes }) });
-  }, 600);
+  try {
+    const data = await fetch('/admin/api/leads').then(r => r.json());
+    const count = document.getElementById('contactsCount');
+    const today = new Date().toISOString().slice(0, 10);
+    const leads = data.leads || [];
+    const pending = leads.filter(r => !['traite','sans_suite','converti'].includes(r.statut)).length;
+    const todayDue = leads.filter(r => !['traite','sans_suite','converti'].includes(r.statut) && r.rappel_prevu_le && r.rappel_prevu_le <= today).length;
+    let txt = pending > 0 ? `${pending} à traiter` : 'Tout traité ✓';
+    if (todayDue > 0) txt += ` · 🔔 ${todayDue} rappel${todayDue > 1 ? 's' : ''} aujourd'hui`;
+    if (count) count.textContent = txt;
+  } catch(e) {}
 }
 
 document.getElementById('searchClients').addEventListener('input', (e) => {
