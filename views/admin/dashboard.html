@@ -137,6 +137,7 @@
               <th>Pack</th>
               <th>Bien</th>
               <th>Statut</th>
+              <th>Pris par</th>
               <th>Inscrit le</th>
               <th>Actions</th>
             </tr>
@@ -366,10 +367,15 @@ function renderClients(clients) {
       <td><span class="status-badge ${c.pack === 'serenite' ? 'status-compromis' : 'status-preparation'}">${c.pack === 'serenite' ? 'Sérénité' : 'Autonome'}</span></td>
       <td>${c.city ? `<strong>${c.city}</strong><br><span style="font-size:0.78rem;color:#888;">${c.price ? Number(c.price).toLocaleString('fr-FR')+'€' : '—'}</span>` : '<span style="color:#ddd">—</span>'}</td>
       <td>${c.status ? `<span class="status-badge ${statusClass}">${statusLabels[c.status]||c.status}</span>` : '<span style="color:#ddd">—</span>'}</td>
+      <td style="font-size:0.8rem;">
+        ${c.assigned_to
+          ? `<span style="color:#059669;font-weight:600;">✓ ${c.assigned_to}</span>`
+          : `<button onclick="quickAssign(${c.id},this)" style="font-size:0.73rem;color:#d97706;cursor:pointer;border:1px solid #f59e0b;background:#fffbeb;border-radius:4px;padding:2px 8px;font-weight:600;">Je m'en occupe</button>`}
+      </td>
       <td style="font-size:0.82rem;color:#888;">${c.paid_at ? new Date(c.paid_at).toLocaleDateString('fr-FR') : 'Manuel'}</td>
       <td>
         <div style="display:flex;gap:6px;align-items:center;">
-          ${c.slug ? `<a href="/bien/${c.slug}" target="_blank" style="font-size:0.78rem;color:#C4603A;">Voir →</a>` : ''}
+          <a href="/admin/crm/${c.id}/fiche" target="_blank" style="font-size:0.78rem;color:#C4603A;font-weight:600;">Fiche →</a>
           <button onclick="openEmailHistory(${c.id})" style="font-size:0.78rem;color:#2563eb;cursor:pointer;border:1px solid #bfdbfe;background:#eff6ff;border-radius:4px;padding:2px 7px;">Emails</button>
           <button onclick="openReset(${c.id},'${c.email}')" style="font-size:0.78rem;color:#C4785A;cursor:pointer;">MDP</button>
           <button onclick="deleteClient(${c.id},'${c.email}')" style="font-size:0.78rem;color:#d9534f;cursor:pointer;">Suppr</button>
@@ -377,6 +383,24 @@ function renderClients(clients) {
       </td>
     </tr>`;
   }).join('');
+}
+
+// ── ATTRIBUTION RAPIDE ───────────────────────────────────────────
+async function quickAssign(clientId, btn) {
+  btn.disabled = true;
+  btn.textContent = '…';
+  const r = await fetch(`/admin/api/crm/${clientId}/assign`, { method: 'POST' });
+  const d = await r.json();
+  if (d.ok) {
+    const cell = btn.parentElement;
+    cell.innerHTML = `<span style="color:#059669;font-weight:600;">✓ ${d.assigned_to}</span>`;
+    // Mettre à jour dans allClients
+    const c = allClients.find(x => x.id === clientId);
+    if (c) c.assigned_to = d.assigned_to;
+  } else {
+    btn.disabled = false;
+    btn.textContent = 'Je m\'en occupe';
+  }
 }
 
 // ── HISTORIQUE EMAILS ─────────────────────────────────────────────

@@ -353,6 +353,11 @@ const newCols = [
   "ALTER TABLE contact_requests ADD COLUMN rdv_prevu_le TEXT",
   "ALTER TABLE callback_requests ADD COLUMN rappel_prevu_le TEXT",
   "ALTER TABLE callback_requests ADD COLUMN rdv_prevu_le TEXT",
+  "ALTER TABLE sellers ADD COLUMN assigned_to TEXT",
+  "ALTER TABLE sellers ADD COLUMN assigned_at TEXT",
+  "ALTER TABLE sellers ADD COLUMN suivi_statut TEXT DEFAULT 'a_appeler'",
+  "ALTER TABLE sellers ADD COLUMN suivi_rdv_date TEXT",
+  "ALTER TABLE sellers ADD COLUMN suivi_notes TEXT",
 ];
 newCols.forEach(sql => { try { db.exec(sql); } catch(e) {} });
 

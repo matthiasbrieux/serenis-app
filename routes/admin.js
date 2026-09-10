@@ -566,12 +566,41 @@ router.get('/api/clients', requireAdmin, (req, res) => {
   const clients = db.prepare(`
     SELECT s.id, s.uuid, s.email, s.first_name, s.last_name, s.phone, s.pack,
            s.paid_at, s.created_at, s.twilio_number,
+           s.assigned_to, s.assigned_at,
+           s.suivi_statut, s.suivi_rdv_date, s.suivi_notes,
            p.slug, p.status, p.published, p.city, p.price
     FROM sellers s
     LEFT JOIN properties p ON p.seller_id = s.id
     ORDER BY s.created_at DESC
   `).all();
   res.json({ clients });
+});
+
+// ── Attribution client (anti-doublon d'appel) ─────────────────
+router.post('/api/crm/:id/assign', requireAdmin, (req, res) => {
+  const name = req.admin.name || req.admin.email.split('@')[0];
+  const displayName = name.charAt(0).toUpperCase() + name.slice(1);
+  db.prepare(`UPDATE sellers SET assigned_to=?, assigned_at=datetime('now') WHERE id=?`).run(displayName, +req.params.id);
+  res.json({ ok: true, assigned_to: displayName });
+});
+
+router.post('/api/crm/:id/unassign', requireAdmin, (req, res) => {
+  db.prepare(`UPDATE sellers SET assigned_to=NULL, assigned_at=NULL WHERE id=?`).run(+req.params.id);
+  res.json({ ok: true });
+});
+
+// ── Suivi RDV présentiel ──────────────────────────────────────
+router.patch('/api/crm/:id/suivi', requireAdmin, express.json(), (req, res) => {
+  const { suivi_statut, suivi_rdv_date, suivi_notes } = req.body;
+  try {
+    const fields = [], vals = [];
+    if (suivi_statut  !== undefined) { fields.push('suivi_statut=?');   vals.push(suivi_statut || 'a_appeler'); }
+    if (suivi_rdv_date !== undefined){ fields.push('suivi_rdv_date=?'); vals.push(suivi_rdv_date || null); }
+    if (suivi_notes   !== undefined) { fields.push('suivi_notes=?');    vals.push(suivi_notes || null); }
+    if (!fields.length) return res.json({ ok: true });
+    db.prepare(`UPDATE sellers SET ${fields.join(',')} WHERE id=?`).run(...vals, +req.params.id);
+    res.json({ ok: true });
+  } catch(e) { res.status(500).json({ error: e.message }); }
 });
 
 router.post('/api/clients', requireAdmin, express.json(), async (req, res) => {
@@ -594,7 +623,7 @@ router.post('/api/clients', requireAdmin, express.json(), async (req, res) => {
     } else {
       db.prepare('INSERT INTO admin_todos (type, seller_id, data) VALUES (?,?,?)').run('formation_rdv', seller.id, todoData);
     }
-    await sendNewClientAdminNotif({ firstName: first_name, lastName: last_name, email, pack, phone });
+    await sendNewClientAdminNotif({ firstName: first_name, lastName: last_name, email, pack, phone, sellerId: seller.id });
   } catch(e) { console.error('[ADMIN_TODOS manual]', e.message); }
   res.json({ success: true, temp_password: tempPassword });
 });
@@ -920,7 +949,8 @@ router.get('/api/crm/:id/performance', requireAdmin, (req, res) => {
 
 // ── Fiche complète vendeur (admin) ───────────────────────────
 router.get('/crm/:id/fiche', requireAdmin, (req, res) => {
-  const s = db.prepare(`SELECT id, first_name, last_name, email, phone, pack, paid_at, contrat_signe, contrat_signe_at FROM sellers WHERE id=?`).get(+req.params.id);
+  const s = db.prepare(`SELECT id, first_name, last_name, email, phone, pack, paid_at, contrat_signe, contrat_signe_at,
+    assigned_to, assigned_at, suivi_statut, suivi_rdv_date, suivi_notes FROM sellers WHERE id=?`).get(+req.params.id);
   if (!s) return res.status(404).send('Vendeur introuvable');
   const p = db.prepare(`SELECT * FROM properties WHERE seller_id=?`).get(+req.params.id);
   const photos = p ? db.prepare(`SELECT * FROM property_photos WHERE property_id=? ORDER BY \`order\` ASC, id ASC`).all(p.id) : [];
@@ -959,13 +989,80 @@ router.get('/crm/:id/fiche', requireAdmin, (req, res) => {
       .badge-serenite{background:#e8f5e9;color:#2e7d32;}
       .badge-autonome{background:#e3f2fd;color:#1565c0;}
       @media print{.top-bar{display:none!important}body{background:#fff;padding:16px}@page{margin:12mm}}
+      /* Attribution */
+      .assign-card{background:#fff;border-radius:14px;padding:22px 28px;border:2px solid #e8c4b0;display:flex;align-items:center;gap:18px;flex-wrap:wrap;}
+      .assign-card.claimed{border-color:#6ee7b7;background:#f0fdf4;}
+      .assign-dot{width:12px;height:12px;border-radius:50%;flex-shrink:0;}
+      .dot-free{background:#f59e0b;}
+      .dot-claimed{background:#059669;}
+      .assign-txt{flex:1;font-size:.9rem;}
+      .assign-name{font-weight:700;color:#1A1A16;font-size:1rem;}
+      .assign-since{font-size:.75rem;color:#888;margin-top:2px;}
+      .btn-assign{background:#C4603A;color:#fff;border:none;padding:10px 22px;border-radius:8px;font-size:.85rem;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;white-space:nowrap;}
+      .btn-assign:hover{background:#a84f2e;}
+      .btn-release{background:#fff;color:#888;border:1px solid #ddd;padding:8px 16px;border-radius:8px;font-size:.8rem;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;}
+      .btn-release:hover{border-color:#dc2626;color:#dc2626;}
+      /* Suivi */
+      .suivi-row{display:flex;gap:12px;flex-wrap:wrap;align-items:flex-end;}
+      .suivi-group{display:flex;flex-direction:column;gap:5px;}
+      .suivi-label{font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#aaa;}
+      .suivi-sel,.suivi-date,.suivi-ta{border:1px solid #e8e0d6;border-radius:7px;padding:7px 11px;font-size:.84rem;font-family:'DM Sans',sans-serif;outline:none;background:#fff;}
+      .suivi-sel:focus,.suivi-date:focus,.suivi-ta:focus{border-color:#C4603A;}
+      .suivi-ta{resize:vertical;min-height:36px;flex:1;min-width:200px;}
+      .btn-save-suivi{background:#C4603A;color:#fff;border:none;padding:8px 18px;border-radius:7px;font-size:.82rem;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;white-space:nowrap;}
+      .btn-save-suivi:hover{background:#a84f2e;}
+      .save-ok{display:none;font-size:.8rem;color:#059669;font-weight:600;margin-left:8px;}
     </style>
   </head><body>
     <div class="top-bar">
-      <button class="btn btn-back" onclick="window.close()">← Fermer</button>
+      <button class="btn btn-back" onclick="history.back()">← Admin</button>
       <button class="btn btn-print" onclick="window.print()">Imprimer / PDF</button>
     </div>
     <div class="wrap">
+
+      <!-- ATTRIBUTION (anti-doublon) -->
+      <div id="assign-card" class="assign-card${s.assigned_to ? ' claimed' : ''}">
+        <div class="assign-dot ${s.assigned_to ? 'dot-claimed' : 'dot-free'}"></div>
+        <div class="assign-txt">
+          ${s.assigned_to
+            ? `<div class="assign-name">Pris en charge par ${s.assigned_to}</div>
+               <div class="assign-since">depuis le ${s.assigned_at ? new Date(s.assigned_at).toLocaleDateString('fr-FR',{day:'2-digit',month:'long',hour:'2-digit',minute:'2-digit'}) : '—'}</div>`
+            : `<div class="assign-name" style="color:#d97706;">Personne n'a encore pris en charge ce client</div>
+               <div class="assign-since">Cliquez pour éviter un double appel</div>`}
+        </div>
+        ${s.assigned_to
+          ? `<button class="btn-release" onclick="unassign()">Libérer</button>`
+          : `<button class="btn-assign" onclick="assign()">✋ Je m'en occupe</button>`}
+      </div>
+
+      <!-- SUIVI RDV PRÉSENTIEL -->
+      <div class="card" style="border-color:#e8e0d6;">
+        <h2>📞 Suivi contact &amp; RDV</h2>
+        <div class="suivi-row">
+          <div class="suivi-group">
+            <span class="suivi-label">Statut</span>
+            <select id="sv-statut" class="suivi-sel" onchange="showRdvDate()">
+              <option value="a_appeler"  ${(s.suivi_statut||'a_appeler')==='a_appeler' ?'selected':''}>📞 À appeler</option>
+              <option value="a_rappeler" ${s.suivi_statut==='a_rappeler'?'selected':''}>🔔 À rappeler</option>
+              <option value="rdv_prevu"  ${s.suivi_statut==='rdv_prevu' ?'selected':''}>📅 RDV prévu</option>
+              <option value="appele"     ${s.suivi_statut==='appele'    ?'selected':''}>✅ Appelé</option>
+            </select>
+          </div>
+          <div class="suivi-group" id="rdv-date-wrap" style="${s.suivi_statut==='rdv_prevu'?'':'display:none;'}">
+            <span class="suivi-label">Date du RDV</span>
+            <input type="date" id="sv-rdv-date" class="suivi-date" value="${s.suivi_rdv_date||''}">
+          </div>
+          <div class="suivi-group" style="flex:1;">
+            <span class="suivi-label">Commentaire</span>
+            <textarea id="sv-notes" class="suivi-ta" placeholder="Rappelé le…, RDV confirmé…, pas de réponse…">${s.suivi_notes||''}</textarea>
+          </div>
+          <div class="suivi-group">
+            <span class="suivi-label">&nbsp;</span>
+            <button class="btn-save-suivi" onclick="saveSuivi()">Enregistrer</button>
+          </div>
+        </div>
+        <span class="save-ok" id="save-ok">✓ Enregistré</span>
+      </div>
 
       <!-- Infos vendeur -->
       <div class="card">
@@ -1013,6 +1110,36 @@ router.get('/crm/:id/fiche', requireAdmin, (req, res) => {
       ` : `<div class="card"><div style="text-align:center;padding:40px;color:#aaa;">Aucune fiche bien créée</div></div>`}
 
     </div>
+  <script>
+    const SELLER_ID = ${s.id};
+    function showRdvDate() {
+      const v = document.getElementById('sv-statut').value;
+      document.getElementById('rdv-date-wrap').style.display = v === 'rdv_prevu' ? '' : 'none';
+    }
+    async function assign() {
+      const r = await fetch('/admin/api/crm/'+SELLER_ID+'/assign', { method:'POST' });
+      const d = await r.json();
+      if (d.ok) location.reload();
+    }
+    async function unassign() {
+      if (!confirm('Libérer ce client (le remettre disponible pour l\'autre) ?')) return;
+      await fetch('/admin/api/crm/'+SELLER_ID+'/unassign', { method:'POST' });
+      location.reload();
+    }
+    async function saveSuivi() {
+      const body = {
+        suivi_statut:   document.getElementById('sv-statut').value,
+        suivi_rdv_date: document.getElementById('sv-rdv-date').value || null,
+        suivi_notes:    document.getElementById('sv-notes').value,
+      };
+      await fetch('/admin/api/crm/'+SELLER_ID+'/suivi', {
+        method:'PATCH', headers:{'Content-Type':'application/json'}, body: JSON.stringify(body)
+      });
+      const ok = document.getElementById('save-ok');
+      ok.style.display = 'inline';
+      setTimeout(() => ok.style.display = 'none', 2500);
+    }
+  </script>
   </body></html>`);
 });
 

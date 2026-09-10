@@ -272,7 +272,7 @@ async function activateSeller(session) {
     } else {
       db.prepare('INSERT INTO admin_todos (type, seller_id, data) VALUES (?,?,?)').run('formation_rdv', seller.id, todoData);
     }
-    await sendNewClientAdminNotif({ firstName: seller.first_name, lastName: seller.last_name, email: seller.email, pack: activePack, phone: seller.phone });
+    await sendNewClientAdminNotif({ firstName: seller.first_name, lastName: seller.last_name, email: seller.email, pack: activePack, phone: seller.phone, sellerId: seller.id });
   } catch(e) { console.error('Admin todo/notif error:', e.message); }
 
   // Facture automatique
