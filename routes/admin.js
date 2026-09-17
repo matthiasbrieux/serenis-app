@@ -1349,6 +1349,79 @@ router.get('/missions', requireAdmin, (req, res) => {
   res.sendFile('missions.html', { root: './views/admin' });
 });
 
+// ── VRP ──────────────────────────────────────────────────────────────────────
+router.get('/vrp', requireAdmin, (req, res) => {
+  res.sendFile('vrp.html', { root: './views/admin' });
+});
+
+router.get('/api/vrp', requireAdmin, (req, res) => {
+  const vrps = db.prepare(`
+    SELECT v.*,
+      COUNT(s.id) AS sales_count,
+      COALESCE(SUM(s.commission_amount_ht), 0) AS commissions_total_ht,
+      COALESCE(SUM(CASE WHEN s.commission_paid=1 THEN s.commission_amount_ht ELSE 0 END), 0) AS commissions_paid_ht
+    FROM vrps v
+    LEFT JOIN vrp_sales s ON s.vrp_id = v.id
+    GROUP BY v.id
+    ORDER BY v.created_at DESC
+  `).all();
+  res.json({ vrps });
+});
+
+router.post('/api/vrp', requireAdmin, express.json(), (req, res) => {
+  const { first_name, last_name, email, phone, zone, notes, commission_rate } = req.body;
+  if (!first_name || !last_name || !email) return res.status(400).json({ error: 'Champs requis manquants' });
+  const { v4: uuidv4 } = require('uuid');
+  try {
+    db.prepare(`INSERT INTO vrps (uuid, first_name, last_name, email, phone, zone, notes, commission_rate)
+      VALUES (?,?,?,?,?,?,?,?)`)
+      .run(uuidv4(), first_name.trim(), last_name.trim(), email.toLowerCase().trim(), phone||'', zone||'', notes||'', commission_rate||null);
+    res.json({ success: true });
+  } catch(e) {
+    res.status(400).json({ error: e.message.includes('UNIQUE') ? 'Email déjà utilisé' : e.message });
+  }
+});
+
+router.patch('/api/vrp/:id', requireAdmin, express.json(), (req, res) => {
+  const { first_name, last_name, email, phone, zone, notes, status, commission_rate } = req.body;
+  const allowed = { first_name, last_name, email, phone, zone, notes, status, commission_rate };
+  const fields = Object.entries(allowed).filter(([,v]) => v !== undefined).map(([k]) => `${k}=?`);
+  const vals = Object.entries(allowed).filter(([,v]) => v !== undefined).map(([,v]) => v);
+  if (!fields.length) return res.status(400).json({ error: 'Rien à mettre à jour' });
+  db.prepare(`UPDATE vrps SET ${fields.join(',')} WHERE id=?`).run(...vals, +req.params.id);
+  res.json({ success: true });
+});
+
+router.delete('/api/vrp/:id', requireAdmin, (req, res) => {
+  db.prepare('DELETE FROM vrps WHERE id=?').run(+req.params.id);
+  res.json({ success: true });
+});
+
+router.get('/api/vrp/:id/sales', requireAdmin, (req, res) => {
+  const sales = db.prepare(`
+    SELECT vs.*, s.first_name || ' ' || s.last_name AS seller_name, s.email AS seller_email
+    FROM vrp_sales vs
+    LEFT JOIN sellers s ON s.id = vs.seller_id
+    WHERE vs.vrp_id = ?
+    ORDER BY vs.sale_date DESC
+  `).all(+req.params.id);
+  res.json({ sales });
+});
+
+router.post('/api/vrp/:id/sales', requireAdmin, express.json(), (req, res) => {
+  const { seller_id, pack, pack_amount_ht, commission_amount_ht, notes } = req.body;
+  if (!pack || !pack_amount_ht) return res.status(400).json({ error: 'Pack et montant requis' });
+  db.prepare(`INSERT INTO vrp_sales (vrp_id, seller_id, pack, pack_amount_ht, commission_amount_ht, notes)
+    VALUES (?,?,?,?,?,?)`)
+    .run(+req.params.id, seller_id||null, pack, +pack_amount_ht, commission_amount_ht||null, notes||'');
+  res.json({ success: true });
+});
+
+router.patch('/api/vrp/sales/:id/paid', requireAdmin, (req, res) => {
+  db.prepare(`UPDATE vrp_sales SET commission_paid=1, commission_paid_at=CURRENT_TIMESTAMP WHERE id=?`).run(+req.params.id);
+  res.json({ success: true });
+});
+
 // ── API photographes (admin) ──────────────────────────────────────────────────
 router.get('/api/photographers', requireAdmin, (req, res) => {
   const photographers = db.prepare(`

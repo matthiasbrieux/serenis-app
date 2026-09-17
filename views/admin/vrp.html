@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Réseau VRP — Admin Vendu Par Moi</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css?v=3">
+  <link rel="stylesheet" href="/css/admin.css">
+  <style>
+    /* ── Onglets ── */
+    .vrp-tabs { display:flex; gap:4px; border-bottom:2px solid #f0ebe4; margin-bottom:28px; }
+    .vrp-tab { padding:10px 20px; font-size:.88rem; font-weight:600; color:#9a9087; background:none; border:none; cursor:pointer; border-bottom:2px solid transparent; margin-bottom:-2px; transition:color .15s,border-color .15s; }
+    .vrp-tab.active { color:#C4603A; border-bottom-color:#C4603A; }
+    .vrp-panel { display:none; }
+    .vrp-panel.active { display:block; }
+
+    /* ── Stats cards ── */
+    .vrp-stats { display:grid; grid-template-columns:repeat(4,1fr); gap:16px; margin-bottom:28px; }
+    .vrp-stat { background:#fff; border-radius:10px; padding:18px 20px; box-shadow:0 1px 4px rgba(0,0,0,.06); }
+    .vrp-stat-label { font-size:.72rem; color:#aaa; text-transform:uppercase; letter-spacing:.05em; margin-bottom:6px; }
+    .vrp-stat-val { font-family:'Cormorant Garamond',serif; font-size:2rem; font-weight:600; color:#1A1A16; line-height:1; }
+    .vrp-stat-sub { font-size:.75rem; color:#9a9087; margin-top:4px; }
+
+    /* ── Table VRP ── */
+    .vrp-table-wrap { background:#fff; border-radius:12px; box-shadow:0 2px 8px rgba(0,0,0,.06); overflow:hidden; }
+    .vrp-table-head { padding:18px 24px; border-bottom:1px solid #f0ebe4; display:flex; align-items:center; justify-content:space-between; }
+    .vrp-table-head h2 { font-family:'Cormorant Garamond',serif; font-size:1.1rem; color:#1A1A16; }
+    .vrp-table { width:100%; border-collapse:collapse; font-size:.85rem; }
+    .vrp-table th { background:#faf7f4; padding:10px 16px; text-align:left; font-size:.72rem; font-weight:600; text-transform:uppercase; letter-spacing:.05em; color:#9a9087; border-bottom:1px solid #f0ebe4; }
+    .vrp-table td { padding:13px 16px; border-bottom:1px solid #f8f4f0; color:#1A1A16; vertical-align:middle; }
+    .vrp-table tr:last-child td { border-bottom:none; }
+    .vrp-table tr:hover td { background:#fdf9f6; }
+    .badge-actif { background:#ecfdf5; color:#059669; font-size:.7rem; font-weight:700; padding:3px 9px; border-radius:20px; }
+    .badge-inactif { background:#f3f4f6; color:#9a9087; font-size:.7rem; font-weight:700; padding:3px 9px; border-radius:20px; }
+    .vrp-empty { text-align:center; padding:48px 24px; color:#9a9087; font-size:.9rem; }
+
+    /* ── Modal ── */
+    .modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,.5); z-index:1000; display:flex; align-items:center; justify-content:center; opacity:0; visibility:hidden; pointer-events:none; transition:opacity .2s; }
+    .modal-overlay.show { opacity:1; visibility:visible; pointer-events:all; }
+    .modal { background:#fff; border-radius:14px; width:480px; max-width:95vw; max-height:90vh; overflow-y:auto; box-shadow:0 20px 60px rgba(0,0,0,.2); }
+    .modal-head { padding:20px 24px; border-bottom:1px solid #f0ebe4; display:flex; align-items:center; justify-content:space-between; }
+    .modal-head h3 { font-family:'Cormorant Garamond',serif; font-size:1.2rem; color:#1A1A16; }
+    .modal-close { border:none; background:none; cursor:pointer; color:#9a9087; font-size:1.3rem; line-height:1; }
+    .modal-body { padding:24px; }
+    .form-row { margin-bottom:16px; }
+    .form-row label { display:block; font-size:.78rem; font-weight:600; color:#666; margin-bottom:5px; }
+    .form-row input, .form-row textarea, .form-row select { width:100%; border:1.5px solid #e8e0d6; border-radius:8px; padding:9px 12px; font-family:inherit; font-size:.88rem; color:#1A1A16; background:#fff; transition:border-color .15s; }
+    .form-row input:focus, .form-row textarea:focus, .form-row select:focus { outline:none; border-color:#C4603A; }
+    .form-grid2 { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+    .modal-footer { padding:16px 24px; border-top:1px solid #f0ebe4; display:flex; justify-content:flex-end; gap:10px; }
+    .btn-primary { background:#C4603A; color:#fff; border:none; border-radius:8px; padding:10px 20px; font-family:inherit; font-size:.88rem; font-weight:600; cursor:pointer; transition:background .15s; }
+    .btn-primary:hover { background:#a84f2e; }
+    .btn-secondary { background:#fff; color:#666; border:1.5px solid #ddd; border-radius:8px; padding:10px 20px; font-family:inherit; font-size:.88rem; font-weight:600; cursor:pointer; }
+    .btn-danger { background:#fef2f2; color:#dc2626; border:1.5px solid #fecaca; border-radius:8px; padding:6px 14px; font-family:inherit; font-size:.8rem; font-weight:600; cursor:pointer; }
+
+    /* ── Guide auto-entrepreneur ── */
+    .guide-wrap { max-width:760px; }
+    .guide-section { margin-bottom:36px; }
+    .guide-h2 { font-family:'Cormorant Garamond',serif; font-size:1.35rem; color:#C4603A; font-weight:600; margin-bottom:10px; border-bottom:1px solid #f0ebe4; padding-bottom:8px; }
+    .guide-lead { font-size:.9rem; color:#555; line-height:1.75; margin-bottom:16px; background:#fdf9f6; border-left:3px solid #C4603A; padding:12px 16px; border-radius:0 8px 8px 0; }
+    .guide-table { width:100%; border-collapse:collapse; font-size:.85rem; margin-bottom:16px; }
+    .guide-table th { background:#C4603A; color:#fff; padding:9px 14px; text-align:left; font-size:.78rem; font-weight:600; letter-spacing:.03em; }
+    .guide-table th:first-child { border-radius:8px 0 0 0; }
+    .guide-table th:last-child { border-radius:0 8px 0 0; }
+    .guide-table td { padding:10px 14px; border-bottom:1px solid #f0ebe4; }
+    .guide-table tr:nth-child(even) td { background:#fdf9f6; }
+    .guide-table .td-terra { color:#C4603A; font-weight:700; }
+    .guide-table .td-total { font-weight:700; background:#fff8f5 !important; border-top:2px solid #f0d5c8; }
+    .guide-alert { background:#fffbeb; border:1.5px solid #fde68a; border-radius:8px; padding:14px 18px; font-size:.85rem; color:#78350f; margin-bottom:14px; display:flex; gap:10px; }
+    .guide-alert-icon { flex-shrink:0; font-size:1.1rem; }
+    .guide-info { background:#f0fdf4; border:1.5px solid #bbf7d0; border-radius:8px; padding:14px 18px; font-size:.85rem; color:#14532d; margin-bottom:14px; display:flex; gap:10px; }
+    .guide-note { background:#f8f4f0; border-radius:8px; padding:14px 18px; font-size:.82rem; color:#555; font-style:italic; margin-top:10px; border-left:3px solid #d4b896; }
+    .guide-todo { display:flex; flex-direction:column; gap:12px; }
+    .guide-todo-item { display:flex; gap:14px; background:#fff; border:1.5px solid #f0ebe4; border-radius:10px; padding:14px 18px; }
+    .guide-todo-num { width:28px; height:28px; background:#C4603A; color:#fff; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:.85rem; font-weight:700; flex-shrink:0; }
+    .guide-todo-body h4 { font-size:.9rem; font-weight:600; color:#1A1A16; margin-bottom:4px; }
+    .guide-todo-body p { font-size:.82rem; color:#666; line-height:1.65; margin:0; }
+    .guide-todo-body a { color:#C4603A; }
+    .tbd { display:inline-block; background:#f3f4f6; color:#9a9087; font-size:.78rem; font-weight:600; padding:2px 8px; border-radius:4px; letter-spacing:.04em; }
+  </style>
+</head>
+<body class="admin-body">
+<div class="admin-layout">
+  <div id="admin-sidebar-slot"></div>
+
+  <main class="admin-main">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;">
+      <h1 style="font-family:'Cormorant Garamond',serif;color:#1A1A16;font-size:2rem;">Réseau VRP</h1>
+      <button class="btn-primary" onclick="openModal()">+ Ajouter un VRP</button>
+    </div>
+
+    <!-- Onglets -->
+    <div class="vrp-tabs">
+      <button class="vrp-tab active" onclick="switchTab('dashboard')">Tableau de bord</button>
+      <button class="vrp-tab" onclick="switchTab('guide')">Guide auto-entrepreneur</button>
+    </div>
+
+    <!-- ═══ PANEL DASHBOARD ═══ -->
+    <div class="vrp-panel active" id="panel-dashboard">
+
+      <!-- Stats -->
+      <div class="vrp-stats">
+        <div class="vrp-stat">
+          <div class="vrp-stat-label">VRP actifs</div>
+          <div class="vrp-stat-val" id="statVrpActifs">—</div>
+        </div>
+        <div class="vrp-stat">
+          <div class="vrp-stat-label">Packs vendus</div>
+          <div class="vrp-stat-val" id="statVrpVentes">—</div>
+        </div>
+        <div class="vrp-stat">
+          <div class="vrp-stat-label">Commissions dues</div>
+          <div class="vrp-stat-val" id="statVrpDues">—</div>
+          <div class="vrp-stat-sub">HT, non encore payées</div>
+        </div>
+        <div class="vrp-stat">
+          <div class="vrp-stat-label">Commissions payées</div>
+          <div class="vrp-stat-val" id="statVrpPayees">—</div>
+          <div class="vrp-stat-sub">HT, total cumulé</div>
+        </div>
+      </div>
+
+      <!-- Table VRPs -->
+      <div class="vrp-table-wrap">
+        <div class="vrp-table-head">
+          <h2>Mes VRP</h2>
+          <input type="text" id="searchVrp" placeholder="Rechercher…" oninput="filterVrps()"
+            style="border:1.5px solid #e8e0d6;border-radius:8px;padding:7px 12px;font-size:.85rem;width:200px;">
+        </div>
+        <div style="overflow-x:auto;">
+          <table class="vrp-table">
+            <thead>
+              <tr>
+                <th>VRP</th>
+                <th>Zone</th>
+                <th>Packs vendus</th>
+                <th>Comm. due (HT)</th>
+                <th>Comm. payée (HT)</th>
+                <th>Rétrocession</th>
+                <th>Statut</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="vrpTableBody">
+              <tr><td colspan="8" class="vrp-empty">Chargement…</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div><!-- /panel-dashboard -->
+
+
+    <!-- ═══ PANEL GUIDE AUTO-ENTREPRENEUR ═══ -->
+    <div class="vrp-panel" id="panel-guide">
+      <div class="guide-wrap">
+
+        <div style="margin-bottom:24px;padding:16px 20px;background:#fff;border-radius:10px;border-left:4px solid #C4603A;box-shadow:0 1px 4px rgba(0,0,0,.05);">
+          <div style="font-size:.78rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#9a9087;margin-bottom:4px;">À titre informatif</div>
+          <div style="font-size:.85rem;color:#555;line-height:1.7;">Cette fiche est fournie à titre indicatif. Elle ne remplace pas l'avis d'un expert-comptable : les taux et seuils peuvent évoluer, et la situation personnelle de chaque VRP (option fiscale, foyer, autres activités) peut changer le résultat.</div>
+        </div>
+
+        <!-- Section 1 — En une phrase -->
+        <div class="guide-section">
+          <div class="guide-h2">En une phrase</div>
+          <div class="guide-lead">
+            La gestion d'une micro-entreprise est la plus simple qui soit — mais comme dans toute activité, il ne faut jamais confondre chiffre d'affaires et revenu réel : sur une commission encaissée, une partie significative appartient à l'État (TVA) et aux organismes sociaux (URSSAF). Ce guide vous montre exactement ce qui reste.
+          </div>
+        </div>
+
+        <!-- Section 2 — Décomposer un encaissement -->
+        <div class="guide-section">
+          <div class="guide-h2">Décomposer un encaissement</div>
+          <p style="font-size:.88rem;color:#555;margin-bottom:14px;line-height:1.7;">
+            Tout part de la commission que vous percevez sur chaque pack vendu. L'exemple ci-dessous utilise une commission de <strong class="tbd">X € HT</strong> — montant à renseigner une fois la rétrocession définie. Il suffit de remplacer X par votre commission réelle pour retrouver vos propres chiffres.
+          </p>
+
+          <table class="guide-table">
+            <thead>
+              <tr><th>Élément</th><th>Montant</th><th>Nature</th></tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Commission HT</td>
+                <td class="tbd-cell"><span class="tbd">X € HT</span></td>
+                <td>Votre commission sur le pack vendu</td>
+              </tr>
+              <tr>
+                <td>+ TVA collectée (20 %)</td>
+                <td class="tbd-cell"><span class="tbd">X × 20 %</span></td>
+                <td>Argent de l'État, qui ne fait que transiter</td>
+              </tr>
+              <tr class="td-total">
+                <td><strong>Total encaissé (TTC)</strong></td>
+                <td class="tbd-cell"><span class="tbd">X × 1,20</span></td>
+                <td>Ce qui arrive sur votre compte pro</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div class="guide-alert">
+            <div class="guide-alert-icon">⚠️</div>
+            <div>La TVA collectée n'est jamais un revenu. Elle doit être isolée dès l'encaissement — idéalement virée sur un sous-compte — car elle sera réclamée par l'État à échéance fixe.</div>
+          </div>
+        </div>
+
+        <!-- Section 3 — Ce qu'il faut mettre de côté -->
+        <div class="guide-section">
+          <div class="guide-h2">Ce qu'il faut garder de côté — provisions obligatoires</div>
+          <p style="font-size:.88rem;color:#555;margin-bottom:14px;line-height:1.7;">Ces sommes seront réclamées, à échéance fixe, par l'État et l'URSSAF. Ne jamais y toucher.</p>
+
+          <table class="guide-table">
+            <thead>
+              <tr><th>Charge</th><th>Taux</th><th>Base de calcul</th><th>Montant (sur X € HT)</th></tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>TVA à reverser</td>
+                <td>20 %</td>
+                <td>du HT</td>
+                <td class="td-terra"><span class="tbd">X × 0,20</span></td>
+              </tr>
+              <tr>
+                <td>Cotisations sociales</td>
+                <td>26 %</td>
+                <td>du HT</td>
+                <td class="td-terra"><span class="tbd">X × 0,26</span></td>
+              </tr>
+              <tr>
+                <td>CFP (formation pro)</td>
+                <td>0,3 %</td>
+                <td>du HT</td>
+                <td class="td-terra"><span class="tbd">X × 0,003</span></td>
+              </tr>
+              <tr class="td-total">
+                <td colspan="2"><strong>Total à conserver</strong></td>
+                <td><strong>≈ 46,3 %</strong></td>
+                <td class="td-terra"><strong><span class="tbd">X × 0,463</span></strong></td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div class="guide-note">
+            Si vous optez pour le <strong>versement libératoire de l'IR</strong> (1,7 % du HT pour les BIC services, sous conditions de revenu), ajoutez environ 1,7 % supplémentaire → total à conserver ≈ 48 %. Sans cette option, l'IR sera calculé en fin d'année sur votre revenu global avec un abattement forfaitaire de 50 % : prévoir une réserve supplémentaire de 5 à 15 % du HT selon votre tranche.
+          </div>
+        </div>
+
+        <!-- Section 4 — Ce qui est réellement disponible -->
+        <div class="guide-section">
+          <div class="guide-h2">Ce qui peut être viré sur votre compte courant</div>
+
+          <table class="guide-table">
+            <thead>
+              <tr><th>Situation</th><th>Calcul</th><th>Disponible</th></tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Avec versement libératoire IR</td>
+                <td>TTC − 48 %</td>
+                <td class="td-terra"><strong>≈ 72 % du TTC</strong></td>
+              </tr>
+              <tr>
+                <td>Sans versement libératoire (réserve IR ~10 %)</td>
+                <td>TTC − 46,3 % − ~10 %</td>
+                <td class="td-terra"><strong>≈ 63 % du TTC</strong></td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div class="guide-info">
+            <div class="guide-alert-icon">💡</div>
+            <div>En pratique : sur 1 000 € HT de commission encaissés (1 200 € TTC), comptez entre <strong>760 € et 864 €</strong> réellement disponibles pour vous — selon votre option fiscale.</div>
+          </div>
+        </div>
+
+        <!-- Section 5 — Quand l'argent rentre -->
+        <div class="guide-section">
+          <div class="guide-h2">Quand votre commission vous est versée</div>
+          <div class="guide-lead">
+            Chez Vendu Par Moi, le paiement du client intervient au moment de l'inscription — pas à la signature notaire comme en transaction immobilière classique. Votre commission vous est reversée dans les <strong>5 à 15 jours</strong> suivant la confirmation du paiement client et la validation de la vente.
+          </div>
+          <div class="guide-note">
+            C'est un avantage clé par rapport au circuit classique de l'immobilier, où il s'écoule souvent 4 à 5 mois entre la signature du compromis et la perception effective de la commission.
+          </div>
+        </div>
+
+        <!-- Section 6 — Seuils -->
+        <div class="guide-section">
+          <div class="guide-h2">Seuil à surveiller (micro-BIC services)</div>
+          <p style="font-size:.88rem;color:#555;margin-bottom:14px;line-height:1.7;">
+            En tant qu'auto-entrepreneur exerçant une activité de services (prestation commerciale), vous êtes soumis au plafond du régime micro-BIC. Suivez votre chiffre d'affaires HT en cumul sur l'année civile.
+          </p>
+          <table class="guide-table">
+            <thead>
+              <tr><th>Seuil</th><th>Conséquence</th></tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>~77 700 € HT / an</strong></td>
+                <td>Plafond micro-BIC services (à confirmer avec votre expert-comptable — peut évoluer)</td>
+              </tr>
+              <tr>
+                <td>Dépassement 2 années consécutives</td>
+                <td>Sortie du régime micro-entreprise → passage au régime réel</td>
+              </tr>
+            </tbody>
+          </table>
+          <div class="guide-alert">
+            <div class="guide-alert-icon">⚠️</div>
+            <div>Faites confirmer le seuil applicable à votre situation auprès de votre expert-comptable ou de l'URSSAF. Les plafonds peuvent être révisés chaque année.</div>
+          </div>
+        </div>
+
+        <!-- Section 7 — Points de vigilance -->
+        <div class="guide-section">
+          <div class="guide-h2">Points de vigilance pratiques</div>
+          <ul style="font-size:.88rem;color:#444;line-height:2;padding-left:18px;">
+            <li><strong>Ne jamais raisonner sur le TTC.</strong> La TVA collectée n'est pas votre revenu.</li>
+            <li><strong>La TVA est récupérable sur vos achats professionnels.</strong> Ordinateur, téléphone, abonnements pro : la TVA payée vient en déduction de la TVA à reverser. Conservez toutes vos factures d'achat.</li>
+            <li><strong>Les cotisations sociales se calculent sur le CA HT encaissé</strong>, avec une déclaration mensuelle ou trimestrielle à l'URSSAF selon votre option.</li>
+            <li><strong>Ouvrez un compte bancaire professionnel dédié</strong> — il n'est pas obligatoire la première année, mais il clarifie la séparation pro/perso et facilite vos déclarations.</li>
+            <li><strong>Utilisez un logiciel de facturation agréé</strong> pour émettre vos factures (ex. : Indy, Freebe, Henrri). Votre espace VPM ne remplace pas cette obligation légale.</li>
+          </ul>
+        </div>
+
+        <!-- Section 8 — Deux obligations -->
+        <div class="guide-section">
+          <div class="guide-h2">Deux obligations dès le démarrage</div>
+          <div class="guide-todo">
+            <div class="guide-todo-item">
+              <div class="guide-todo-num">1</div>
+              <div class="guide-todo-body">
+                <h4>Un logiciel de facturation électronique agréé par l'État</h4>
+                <p>Vous devez émettre des factures conformes pour chaque commission perçue. Exemples de logiciels : <a href="https://www.indy.fr" target="_blank">indy.fr</a>, Freebe, Henrri — formules à partir de 0 €. Votre espace VPM s'occupe de la gestion de votre activité chez nous, mais n'est pas agréé pour la facturation officielle.</p>
+              </div>
+            </div>
+            <div class="guide-todo-item">
+              <div class="guide-todo-num">2</div>
+              <div class="guide-todo-body">
+                <h4>Un compte bancaire professionnel dédié</h4>
+                <p>Il n'est pas obligatoire la première année, mais vivement recommandé dès le début. Il sépare nettement le pro du privé — et c'est sur ce compte que seront prélevées la TVA et les charges sociales, ce qui laisse votre compte personnel serein.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div><!-- /panel-guide -->
+
+  </main>
+</div>
+
+<!-- Modal ajout / édition VRP -->
+<div class="modal-overlay" id="vrpModal">
+  <div class="modal">
+    <div class="modal-head">
+      <h3 id="modalTitle">Nouveau VRP</h3>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="vrpId">
+      <div class="form-grid2">
+        <div class="form-row">
+          <label>Prénom *</label>
+          <input type="text" id="vrpFirstName" placeholder="Prénom">
+        </div>
+        <div class="form-row">
+          <label>Nom *</label>
+          <input type="text" id="vrpLastName" placeholder="Nom">
+        </div>
+      </div>
+      <div class="form-row">
+        <label>Email *</label>
+        <input type="email" id="vrpEmail" placeholder="email@exemple.fr">
+      </div>
+      <div class="form-grid2">
+        <div class="form-row">
+          <label>Téléphone</label>
+          <input type="text" id="vrpPhone" placeholder="06 xx xx xx xx">
+        </div>
+        <div class="form-row">
+          <label>Zone géographique</label>
+          <input type="text" id="vrpZone" placeholder="ex. Lyon, Bordeaux…">
+        </div>
+      </div>
+      <div class="form-row">
+        <label>Rétrocession (€ HT par pack vendu) — <em>optionnel, à compléter ultérieurement</em></label>
+        <input type="number" id="vrpCommission" placeholder="ex. 150" min="0">
+      </div>
+      <div class="form-row">
+        <label>Statut</label>
+        <select id="vrpStatus">
+          <option value="actif">Actif</option>
+          <option value="inactif">Inactif</option>
+        </select>
+      </div>
+      <div class="form-row">
+        <label>Notes internes</label>
+        <textarea id="vrpNotes" rows="2" placeholder="Notes libres…"></textarea>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-secondary" onclick="closeModal()">Annuler</button>
+      <button class="btn-primary" onclick="saveVrp()">Enregistrer</button>
+    </div>
+  </div>
+</div>
+
+<script src="/js/admin-sidebar.js"></script>
+<script>
+// ── Onglets ──────────────────────────────────────────────────────
+function switchTab(tab) {
+  document.querySelectorAll('.vrp-tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.vrp-panel').forEach(p => p.classList.remove('active'));
+  document.querySelector(`[onclick="switchTab('${tab}')"]`).classList.add('active');
+  document.getElementById('panel-' + tab).classList.add('active');
+}
+
+// ── Données ──────────────────────────────────────────────────────
+let allVrps = [];
+
+async function loadVrps() {
+  const r = await fetch('/admin/api/vrp');
+  const data = await r.json();
+  allVrps = data.vrps || [];
+  renderStats();
+  renderTable(allVrps);
+}
+
+function renderStats() {
+  const actifs = allVrps.filter(v => v.status === 'actif').length;
+  const ventes = allVrps.reduce((s, v) => s + (v.sales_count || 0), 0);
+  const dues = allVrps.reduce((s, v) => s + (v.commissions_total_ht - v.commissions_paid_ht), 0);
+  const payees = allVrps.reduce((s, v) => s + (v.commissions_paid_ht || 0), 0);
+  document.getElementById('statVrpActifs').textContent = actifs;
+  document.getElementById('statVrpVentes').textContent = ventes;
+  document.getElementById('statVrpDues').textContent = dues > 0 ? fmtEur(dues) : '—';
+  document.getElementById('statVrpPayees').textContent = payees > 0 ? fmtEur(payees) : '—';
+}
+
+function fmtEur(ht) {
+  return new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 }).format(ht);
+}
+
+function renderTable(vrps) {
+  const tbody = document.getElementById('vrpTableBody');
+  if (!vrps.length) {
+    tbody.innerHTML = '<tr><td colspan="8" class="vrp-empty">Aucun VRP pour l\'instant. Ajoutez votre premier VRP avec le bouton ci-dessus.</td></tr>';
+    return;
+  }
+  tbody.innerHTML = vrps.map(v => {
+    const due = (v.commissions_total_ht || 0) - (v.commissions_paid_ht || 0);
+    const comm = v.commission_rate ? v.commission_rate + ' € HT / pack' : '<span style="color:#bbb;font-size:.78rem;">À définir</span>';
+    return `<tr>
+      <td>
+        <div style="font-weight:600;">${v.first_name} ${v.last_name}</div>
+        <div style="font-size:.78rem;color:#9a9087;">${v.email}</div>
+        ${v.phone ? `<div style="font-size:.78rem;color:#9a9087;">${v.phone}</div>` : ''}
+      </td>
+      <td>${v.zone || '<span style="color:#ccc;">—</span>'}</td>
+      <td style="font-weight:600;">${v.sales_count || 0}</td>
+      <td style="color:${due > 0 ? '#dc2626' : '#9a9087'};font-weight:${due > 0 ? '700' : '400'};">${due > 0 ? fmtEur(due) : '—'}</td>
+      <td style="color:#059669;">${v.commissions_paid_ht > 0 ? fmtEur(v.commissions_paid_ht) : '—'}</td>
+      <td>${comm}</td>
+      <td><span class="badge-${v.status}">${v.status === 'actif' ? 'Actif' : 'Inactif'}</span></td>
+      <td>
+        <div style="display:flex;gap:6px;">
+          <button class="btn-primary" style="padding:5px 12px;font-size:.78rem;" onclick="editVrp(${v.id})">Modifier</button>
+          <button class="btn-danger" onclick="deleteVrp(${v.id}, '${v.first_name} ${v.last_name}')">Suppr.</button>
+        </div>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+function filterVrps() {
+  const q = document.getElementById('searchVrp').value.toLowerCase();
+  renderTable(q ? allVrps.filter(v =>
+    (v.first_name + ' ' + v.last_name + ' ' + v.email + ' ' + (v.zone||'')).toLowerCase().includes(q)
+  ) : allVrps);
+}
+
+// ── Modal ─────────────────────────────────────────────────────────
+function openModal() {
+  document.getElementById('modalTitle').textContent = 'Nouveau VRP';
+  document.getElementById('vrpId').value = '';
+  ['vrpFirstName','vrpLastName','vrpEmail','vrpPhone','vrpZone','vrpNotes','vrpCommission'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('vrpStatus').value = 'actif';
+  document.getElementById('vrpModal').classList.add('show');
+}
+
+function editVrp(id) {
+  const v = allVrps.find(x => x.id === id);
+  if (!v) return;
+  document.getElementById('modalTitle').textContent = 'Modifier ' + v.first_name + ' ' + v.last_name;
+  document.getElementById('vrpId').value = v.id;
+  document.getElementById('vrpFirstName').value = v.first_name;
+  document.getElementById('vrpLastName').value = v.last_name;
+  document.getElementById('vrpEmail').value = v.email;
+  document.getElementById('vrpPhone').value = v.phone || '';
+  document.getElementById('vrpZone').value = v.zone || '';
+  document.getElementById('vrpNotes').value = v.notes || '';
+  document.getElementById('vrpCommission').value = v.commission_rate || '';
+  document.getElementById('vrpStatus').value = v.status || 'actif';
+  document.getElementById('vrpModal').classList.add('show');
+}
+
+function closeModal() { document.getElementById('vrpModal').classList.remove('show'); }
+
+async function saveVrp() {
+  const id = document.getElementById('vrpId').value;
+  const body = {
+    first_name:      document.getElementById('vrpFirstName').value.trim(),
+    last_name:       document.getElementById('vrpLastName').value.trim(),
+    email:           document.getElementById('vrpEmail').value.trim(),
+    phone:           document.getElementById('vrpPhone').value.trim(),
+    zone:            document.getElementById('vrpZone').value.trim(),
+    notes:           document.getElementById('vrpNotes').value.trim(),
+    status:          document.getElementById('vrpStatus').value,
+    commission_rate: document.getElementById('vrpCommission').value ? +document.getElementById('vrpCommission').value : null,
+  };
+  if (!body.first_name || !body.last_name || !body.email) return alert('Prénom, nom et email sont requis.');
+  const url  = id ? `/admin/api/vrp/${id}` : '/admin/api/vrp';
+  const meth = id ? 'PATCH' : 'POST';
+  const r = await fetch(url, { method: meth, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+  const data = await r.json();
+  if (data.error) return alert('Erreur : ' + data.error);
+  closeModal();
+  loadVrps();
+}
+
+async function deleteVrp(id, name) {
+  if (!confirm(`Supprimer ${name} ? Cette action supprime aussi toutes ses ventes enregistrées.`)) return;
+  await fetch(`/admin/api/vrp/${id}`, { method: 'DELETE' });
+  loadVrps();
+}
+
+// ── Init ─────────────────────────────────────────────────────────
+loadVrps();
+</script>
+</body>
+</html>

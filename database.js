@@ -601,6 +601,39 @@ if (adminCount === 0) {
   console.log('[ADMINS] 3 comptes admin créés (mots de passe temporaires)');
 }
 
+// ── Tables VRP ──────────────────────────────────────────────────
+try {
+  db.exec(`
+    CREATE TABLE IF NOT EXISTS vrps (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      uuid TEXT UNIQUE NOT NULL,
+      first_name TEXT NOT NULL,
+      last_name TEXT NOT NULL,
+      email TEXT UNIQUE NOT NULL,
+      phone TEXT,
+      zone TEXT,
+      status TEXT DEFAULT 'actif',
+      notes TEXT,
+      commission_rate INTEGER,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    )
+  `);
+  db.exec(`
+    CREATE TABLE IF NOT EXISTS vrp_sales (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      vrp_id INTEGER NOT NULL REFERENCES vrps(id) ON DELETE CASCADE,
+      seller_id INTEGER REFERENCES sellers(id),
+      pack TEXT NOT NULL,
+      pack_amount_ht INTEGER NOT NULL,
+      commission_amount_ht INTEGER,
+      commission_paid INTEGER DEFAULT 0,
+      commission_paid_at DATETIME,
+      sale_date DATETIME DEFAULT CURRENT_TIMESTAMP,
+      notes TEXT
+    )
+  `);
+} catch(e) { console.error('[DB] VRP tables error:', e.message); }
+
 // ── Nettoyage photos locales (avant Cloudinary) ─────────────────
 // Supprime les photos et documents dont l'URL commence par /uploads/
 // (stockage local éphémère Render — fichiers définitivement perdus)
