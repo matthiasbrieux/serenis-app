@@ -177,9 +177,28 @@
       min-height: 100svh;
       display: flex; align-items: center;
       overflow: hidden;
-      background: linear-gradient(rgba(28,8,4,0.55), rgba(28,8,4,0.65)),
-                  url('/hero-bg.jpg') center/cover no-repeat;
-      background-color: var(--terracotta);
+      background-color: #1C0804;
+    }
+    .hero-bg-img {
+      position: absolute; inset: 0;
+      width: 100%; height: 100%;
+      object-fit: cover;
+      object-position: 58% 22%;
+      z-index: 0;
+    }
+    .hero-overlay-dark {
+      position: absolute; inset: 0; z-index: 1;
+      background: linear-gradient(
+        to right,
+        rgba(28,8,4,0.80) 0%,
+        rgba(28,8,4,0.62) 40%,
+        rgba(28,8,4,0.28) 65%,
+        rgba(28,8,4,0.08) 100%
+      );
+    }
+    @media (max-width: 768px) {
+      .hero-bg-img { object-position: 58% 25%; }
+      .hero-overlay-dark { background: rgba(28,8,4,0.72); }
     }
     .hero-overlay {
       position: absolute; inset: 0; z-index: 1;
@@ -1474,6 +1493,42 @@
     @media (max-width: 480px) {
       .testi-stats-bar { gap: 14px; }
     }
+
+    /* ─── Photo couple (avant témoignages) ─── */
+    .happy-moment {
+      background: var(--blanc);
+      padding: clamp(48px, 8vw, 80px) var(--section-px) 0;
+    }
+    .happy-moment-inner {
+      max-width: var(--max-w);
+      margin: 0 auto;
+    }
+    .happy-moment-eyebrow {
+      font-size: 0.7rem;
+      letter-spacing: 0.35em;
+      text-transform: uppercase;
+      color: var(--terracotta);
+      margin-bottom: 1rem;
+    }
+    .happy-moment-img-wrap {
+      border-radius: 16px;
+      overflow: hidden;
+      line-height: 0;
+      box-shadow: 0 8px 40px rgba(28,8,4,0.10);
+    }
+    .happy-moment-img {
+      width: 100%;
+      height: clamp(280px, 36vw, 500px);
+      object-fit: cover;
+      object-position: center 28%;
+      display: block;
+    }
+    @media (max-width: 768px) {
+      .happy-moment-img {
+        height: clamp(220px, 56vw, 340px);
+        object-position: center 22%;
+      }
+    }
   </style>
 </head>
 <body>
@@ -1521,6 +1576,18 @@
 
   <!-- ─── HERO ─── -->
   <section class="hero" aria-label="Page d'accueil Vendu Par Moi">
+    <img
+      class="hero-bg-img"
+      src="/images/hero-cles.jpg"
+      alt=""
+      aria-hidden="true"
+      fetchpriority="high"
+      loading="eager"
+      decoding="sync"
+      width="1135"
+      height="1440"
+    >
+    <div class="hero-overlay-dark" aria-hidden="true"></div>
     <div class="hero-overlay" aria-hidden="true"></div>
     <div class="hero-overlay-bottom" aria-hidden="true"></div>
 
@@ -1959,6 +2026,24 @@
           <span class="fear-badge">✓ Guidé de A à Z</span>
         </div>
 
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── PHOTO COUPLE — vendeurs satisfaits ─── -->
+  <section class="happy-moment" aria-label="Vendeurs satisfaits">
+    <div class="happy-moment-inner">
+      <p class="happy-moment-eyebrow reveal">Ils ont vendu, ils profitent</p>
+      <div class="happy-moment-img-wrap reveal">
+        <img
+          src="/images/couple-cles.jpg"
+          alt="Un couple heureux tenant les clés de leur bien après une vente réussie sans agence"
+          class="happy-moment-img"
+          loading="lazy"
+          decoding="async"
+          width="1920"
+          height="1280"
+        >
       </div>
     </div>
   </section>
