@@ -1323,19 +1323,67 @@
     .cmp2-banner-btn:hover { background: var(--terracotta); }
 
     @media (max-width: 640px) {
+      /* Wrapper */
       .cmp2-wrap {
-        border-radius: 0; overflow: visible; box-shadow: none;
-        display: flex; flex-direction: column; gap: 12px;
+        overflow: visible; box-shadow: none;
+        display: flex; flex-direction: column; gap: 10px;
       }
       .cmp2-hdr-row { display: none; }
+
+      /* Chaque ligne devient une carte */
       .cmp2-row {
         display: flex; flex-direction: column;
-        border-radius: 12px; overflow: hidden;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        border-radius: 14px; overflow: hidden;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.12);
       }
-      .cmp2-label { border-bottom: 1px solid rgba(255,255,255,0.15); font-size: 0.9rem; }
-      .cmp2-vpm, .cmp2-age { justify-content: flex-start; border-bottom: none; }
-      .cmp2-row:last-child .cmp2-label { border-bottom: 1px solid var(--blanc); }
+
+      /* Intitulé du critère */
+      .cmp2-label {
+        padding: 15px 18px;
+        font-size: 0.92rem; font-weight: 700;
+        border-bottom: 1px solid rgba(255,255,255,0.15);
+      }
+
+      /* Cellule VPM */
+      .cmp2-vpm {
+        display: flex; flex-direction: column;
+        align-items: flex-start; justify-content: flex-start;
+        text-align: left;
+        padding: 12px 18px 14px;
+        gap: 5px;
+        border-bottom: 1px solid rgba(158,58,24,0.10);
+      }
+      .cmp2-vpm::before {
+        content: "Vendu Par Moi";
+        font-size: 0.58rem; font-weight: 700;
+        letter-spacing: 0.14em; text-transform: uppercase;
+        color: var(--terracotta);
+      }
+
+      /* Cellule Agence */
+      .cmp2-age {
+        display: flex; flex-direction: column;
+        align-items: flex-start; justify-content: flex-start;
+        text-align: left;
+        padding: 12px 18px 14px;
+        gap: 5px;
+        border-bottom: none;
+      }
+      .cmp2-age::before {
+        content: "Avec une agence";
+        font-size: 0.58rem; font-weight: 700;
+        letter-spacing: 0.14em; text-transform: uppercase;
+        color: rgba(255,255,255,0.48);
+      }
+
+      /* Texte des valeurs aligné à gauche */
+      .cmp2-yes, .cmp2-no { display: flex; align-items: flex-start; text-align: left; }
+
+      /* Dernière ligne : pas de bordure double */
+      .cmp2-row:last-child .cmp2-label { border-bottom: 1px solid rgba(255,255,255,0.15); }
+      .cmp2-row:last-child .cmp2-age   { border-bottom: none; }
+
+      /* Bannière bas */
       .cmp2-banner { padding: 28px var(--section-px); }
       .cmp2-banner-inner { flex-direction: column; text-align: center; }
       .cmp2-banner-amount { font-size: 2.8rem; }
