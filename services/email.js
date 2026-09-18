@@ -836,6 +836,9 @@ async function previewEmail(templateName) {
     first_meeting:         () => sendFirstMeetingEmail({ email: fakeSellerEmail, firstName: 'Sophie' }),
     review_request:        () => sendReviewRequest({ email: fakeSellerEmail, firstName: 'Sophie' }),
     sold_congrats:         () => sendSoldCongrats({ email: fakeSellerEmail, firstName: 'Sophie', property: fakeProp }),
+    offer_notification:    () => sendNewOfferEmail({ sellerEmail: fakeSellerEmail, sellerFirstName: 'Sophie', buyerName: 'Thomas Durand', amount: 285000, city: 'Lyon', offersUrl: `${BASE_URL}/mes-offres` }),
+    buyer_contacted:       () => sendNewVisitRequest({ sellerEmail: fakeSellerEmail, buyerName: 'Thomas Durand', visitDate: '20 septembre 2026 à 14:00', notes: '📞 06 12 34 56 78' }),
+    contact_notification:  () => sendContactNotification({ name: 'Thomas Durand', phone: '06 12 34 56 78', email: fakeBuyerEmail, offer: 'Pack Sérénité', city: 'Lyon', message: 'Je suis intéressé par votre offre.' }),
   };
 
   const fn = fns[templateName];
