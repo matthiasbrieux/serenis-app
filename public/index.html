@@ -1503,55 +1503,64 @@
     /* ─── Photo couple (avant témoignages) ─── */
     .happy-moment {
       background: var(--blanc);
-      padding: clamp(48px, 8vw, 80px) var(--section-px) 0;
+      color: var(--noir);
+      padding: var(--section-py) var(--section-px);
     }
     .happy-moment-inner {
       max-width: var(--max-w);
       margin: 0 auto;
-    }
-    .happy-moment-img-wrap {
-      position: relative;
-      border-radius: 16px 16px 0 0;
-      overflow: hidden;
-      line-height: 0;
-    }
-    .happy-moment-img-wrap::after {
-      content: '';
-      position: absolute;
-      bottom: 0; left: 0; right: 0;
-      height: 52%;
-      background: linear-gradient(to bottom, transparent 0%, rgba(255,255,255,0.88) 60%, #fff 100%);
-      pointer-events: none;
-      z-index: 1;
-    }
-    .happy-moment-caption {
-      position: absolute;
-      bottom: clamp(22px, 3.5vw, 40px);
-      left: 0; right: 0;
-      z-index: 2;
-      text-align: center;
-      padding: 0 var(--section-px);
+      display: grid;
+      grid-template-columns: 1fr 1.5fr;
+      gap: clamp(32px, 4vw, 56px);
+      align-items: center;
     }
     .happy-moment-eyebrow {
-      display: block;
       font-size: 0.7rem;
       letter-spacing: 0.35em;
       text-transform: uppercase;
       color: var(--terracotta);
+      margin-bottom: 1.25rem;
+    }
+    .happy-moment-title {
+      font-family: var(--font-serif);
+      font-size: clamp(1.9rem, 3.4vw, 2.9rem);
+      font-weight: 600;
+      color: var(--noir);
+      line-height: 1.12;
+      margin-bottom: 1.25rem;
+    }
+    .happy-moment-title em {
+      font-style: italic;
+      font-weight: 400;
+      color: var(--terracotta);
+    }
+    .happy-moment-desc {
+      font-size: 0.95rem;
+      line-height: 1.8;
+      color: rgba(28,8,4,0.55);
+    }
+    .happy-moment-img-wrap {
+      border-radius: 16px;
+      overflow: hidden;
+      line-height: 0;
+      box-shadow: 0 6px 32px rgba(28,8,4,0.09);
     }
     .happy-moment-img {
       width: 100%;
-      height: clamp(300px, 42vw, 560px);
+      height: clamp(300px, 36vw, 480px);
       object-fit: cover;
-      object-position: center 22%;
+      object-position: center 42%;
       display: block;
     }
     @media (max-width: 768px) {
-      .happy-moment-img {
-        height: clamp(240px, 58vw, 360px);
-        object-position: center 18%;
+      .happy-moment-inner {
+        grid-template-columns: 1fr;
+        gap: 28px;
       }
-      .happy-moment-img-wrap::after { height: 45%; }
+      .happy-moment-img {
+        height: clamp(260px, 60vw, 380px);
+        object-position: center 38%;
+      }
     }
   </style>
 </head>
@@ -2057,19 +2066,21 @@
   <!-- ─── PHOTO COUPLE — vendeurs satisfaits ─── -->
   <section class="happy-moment" aria-label="Vendeurs satisfaits">
     <div class="happy-moment-inner">
+      <div class="reveal">
+        <p class="happy-moment-eyebrow">Ils ont vendu, ils profitent</p>
+        <h2 class="happy-moment-title">Une vente réussie,<br><em>des propriétaires heureux.</em></h2>
+        <p class="happy-moment-desc">Découvrez les témoignages de celles et ceux qui ont vendu leur bien avec Vendu Par Moi.</p>
+      </div>
       <div class="happy-moment-img-wrap reveal">
         <img
           src="/images/couple-cles.jpg"
-          alt="Un couple heureux tenant les clés de leur bien après une vente réussie sans agence"
+          alt="Un couple heureux avec leurs clés et des cartons de déménagement, après une vente réussie sans agence"
           class="happy-moment-img"
           loading="lazy"
           decoding="async"
           width="1920"
           height="1280"
         >
-        <div class="happy-moment-caption">
-          <span class="happy-moment-eyebrow">Ils ont vendu, ils profitent</span>
-        </div>
       </div>
     </div>
   </section>
