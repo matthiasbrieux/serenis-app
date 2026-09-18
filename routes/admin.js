@@ -166,7 +166,7 @@ router.get('/crm/:id/contrat', requireAdmin, (req, res) => {
       <div class="cgv">
         <h2>1. Objet du contrat</h2>
         <p>Le présent contrat a pour objet de définir les conditions dans lesquelles Vendu Par Moi (ci-après « la Plateforme ») met à disposition du vendeur (ci-après « le Client ») un ensemble de services destinés à faciliter la vente immobilière entre particuliers.</p>
-        <h2>2. Services inclus dans le Pack Sérénité</h2>
+        <h2>2. Services inclus dans le Pack Coaching Plus</h2>
         <ul>
           <li>Séance photo professionnelle au domicile du Client</li>
           <li>Visite virtuelle 360° du bien immobilier</li>
@@ -176,7 +176,7 @@ router.get('/crm/:id/contrat', requireAdmin, (req, res) => {
         </ul>
         <h2>3. Mandat simple</h2>
         <p>Le Client confie à Vendu Par Moi un mandat <strong>simple et non exclusif</strong> de mise en valeur et de diffusion de son bien immobilier. Le Client reste libre de vendre son bien par ses propres moyens ou via d'autres canaux.</p>
-        <p>Vendu Par Moi ne perçoit <strong>aucune commission</strong> sur la vente. Le prix du Pack Sérénité est forfaitaire et dû dès la souscription, indépendamment de la réalisation de la vente.</p>
+        <p>Vendu Par Moi ne perçoit <strong>aucune commission</strong> sur la vente. Le prix du Pack Coaching Plus est forfaitaire et dû dès la souscription, indépendamment de la réalisation de la vente.</p>
         <h2>4. Obligations du Client</h2>
         <ul>
           <li>Fournir des informations exactes et complètes sur le bien à vendre</li>
@@ -194,7 +194,7 @@ router.get('/crm/:id/contrat', requireAdmin, (req, res) => {
         <p>Le contrat est conclu pour une durée de <strong>12 mois</strong> à compter de la date de signature. En cas de vente du bien avant l'échéance, le contrat prend fin de plein droit sans remboursement du forfait.</p>
         <p>Le Client peut résilier dans un délai de <strong>14 jours</strong> suivant la souscription (délai légal de rétractation), sauf si la prestation photo a déjà été réalisée, conformément à l'article L221-28 du Code de la consommation.</p>
         <h2>7. Tarification</h2>
-        <p>Le Pack Sérénité est proposé au tarif de <strong>999 € TTC</strong> (paiement unique) ou <strong>4 × 249 € TTC</strong> (paiement échelonné, sans frais). Ce tarif est définitif et ne comprend aucun frais caché.</p>
+        <p>Le Pack Coaching Plus est proposé au tarif de <strong>999 € TTC</strong> (paiement unique) ou <strong>4 × 250 € TTC</strong> (paiement échelonné, sans frais). Ce tarif est définitif et ne comprend aucun frais caché.</p>
         <h2>8. Données personnelles</h2>
         <p>Les données collectées sont traitées conformément au RGPD, utilisées exclusivement pour la fourniture des services Vendu Par Moi et ne sont pas revendues à des tiers.</p>
         <h2>9. Responsabilité</h2>
@@ -1070,7 +1070,7 @@ router.get('/crm/:id/fiche', requireAdmin, (req, res) => {
         <div class="info-grid">
           <div class="info-item"><label>Email</label><div class="val">${s.email}</div></div>
           <div class="info-item"><label>Téléphone</label><div class="val">${s.phone||'—'}</div></div>
-          <div class="info-item"><label>Pack</label><span class="badge badge-${s.pack||'autonome'}">${s.pack==='serenite'?'Pack Sérénité':'Pack Autonome'}</span></div>
+          <div class="info-item"><label>Pack</label><span class="badge badge-${s.pack||'autonome'}">${s.pack==='serenite'?'Pack Coaching Plus':'Pack Autonome'}</span></div>
           <div class="info-item"><label>Inscription</label><div class="val">${s.paid_at ? new Date(s.paid_at).toLocaleDateString('fr-FR') : '—'}</div></div>
           <div class="info-item"><label>Contrat</label><div class="val">${s.contrat_signe ? '✓ Signé le '+new Date(s.contrat_signe_at||s.paid_at).toLocaleDateString('fr-FR') : '✗ Non signé'}</div></div>
         </div>

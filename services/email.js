@@ -139,7 +139,7 @@ function badge(text, color = '#C4603A') {
 // ─────────────────────────────────────────────────────────────
 
 async function sendWelcomeEmail({ email, firstName, pack }) {
-  const packLabel = pack === 'serenite' ? 'Pack Sérénité' : 'Pack Autonome';
+  const packLabel = pack === 'serenite' ? 'Pack Coaching Plus' : 'Pack Autonome';
   const html = layout(`
     ${badge(packLabel)}
     ${h1(`Bienvenue, ${firstName || 'cher vendeur'} !`)}
@@ -153,7 +153,7 @@ async function sendWelcomeEmail({ email, firstName, pack }) {
 }
 
 async function sendWelcomeImproved({ email, firstName, pack, loginUrl }) {
-  const packLabel = pack === 'serenite' ? 'Pack Sérénité' : 'Pack Autonome';
+  const packLabel = pack === 'serenite' ? 'Pack Coaching Plus' : 'Pack Autonome';
   const nextSteps = pack === 'serenite'
     ? '<li>Réservez votre séance photo professionnelle</li><li>Créez votre fiche bien</li><li>Préparez vos documents</li>'
     : '<li>Créez votre fiche bien</li><li>Ajoutez vos photos</li><li>Préparez vos documents</li>';
@@ -337,7 +337,7 @@ async function sendInvoiceEmail({ email, firstName, amount, pack, invoiceNumber,
   const amountTTC = (amount / 100).toFixed(2).replace('.', ',');
   const amountHT  = ((amount / 100) / 1.2).toFixed(2).replace('.', ',');
   const tva       = ((amount / 100) - (amount / 100) / 1.2).toFixed(2).replace('.', ',');
-  const packLabel = pack === 'serenite' ? 'Pack Sérénité' : 'Pack Autonome';
+  const packLabel = pack === 'serenite' ? 'Pack Coaching Plus' : 'Pack Autonome';
   const dateStr   = new Date(date).toLocaleDateString('fr-FR');
   const html = layout(`
     ${badge('🧾 Facture', '#C4603A')}
@@ -772,12 +772,12 @@ async function sendAdminDirectEmail({ to, subject, html: customHtml, text }) {
 // ─────────────────────────────────────────────────────────────
 
 async function sendNewClientAdminNotif({ firstName, lastName, email, pack, phone, sellerId }) {
-  const packLabel = pack === 'serenite' ? 'Pack Sérénité' : 'Pack Autonome';
+  const packLabel = pack === 'serenite' ? 'Pack Coaching Plus' : 'Pack Autonome';
   const packColor = pack === 'serenite' ? '#C4603A' : '#6b6965';
   const ficheUrl  = sellerId ? `${BASE_URL}/admin/crm/${sellerId}/fiche` : `${BASE_URL}/admin`;
   const urgency = pack === 'autonome'
     ? `<p style="background:#fff8f0;border-left:3px solid #C4603A;padding:10px 14px;border-radius:0 6px 6px 0;font-size:13px;color:#8a4020;margin:16px 0 0;">⚡ Pack Autonome — appeler sous 48h</p>`
-    : `<p style="background:#fff8f0;border-left:3px solid #C4603A;padding:10px 14px;border-radius:0 6px 6px 0;font-size:13px;color:#8a4020;margin:16px 0 0;">📅 Pack Sérénité — planifier la formation (dans les 48h)</p>`;
+    : `<p style="background:#fff8f0;border-left:3px solid #C4603A;padding:10px 14px;border-radius:0 6px 6px 0;font-size:13px;color:#8a4020;margin:16px 0 0;">📅 Pack Coaching Plus — planifier la formation (dans les 48h)</p>`;
   const html = `
     <p style="font-size:15px;color:#3a3530;margin:0 0 20px;">Un nouveau client vient de souscrire sur <strong>Vendu Par Moi</strong>.</p>
     <table style="width:100%;border-collapse:collapse;font-size:14px;color:#3a3530;" cellpadding="0" cellspacing="0">
@@ -838,7 +838,7 @@ async function previewEmail(templateName) {
     sold_congrats:         () => sendSoldCongrats({ email: fakeSellerEmail, firstName: 'Sophie', property: fakeProp }),
     offer_notification:    () => sendNewOfferEmail({ sellerEmail: fakeSellerEmail, sellerFirstName: 'Sophie', buyerName: 'Thomas Durand', amount: 285000, city: 'Lyon', offersUrl: `${BASE_URL}/mes-offres` }),
     buyer_contacted:       () => sendNewVisitRequest({ sellerEmail: fakeSellerEmail, buyerName: 'Thomas Durand', visitDate: '20 septembre 2026 à 14:00', notes: '📞 06 12 34 56 78' }),
-    contact_notification:  () => sendContactNotification({ name: 'Thomas Durand', phone: '06 12 34 56 78', email: fakeBuyerEmail, offer: 'Pack Sérénité', city: 'Lyon', message: 'Je suis intéressé par votre offre.' }),
+    contact_notification:  () => sendContactNotification({ name: 'Thomas Durand', phone: '06 12 34 56 78', email: fakeBuyerEmail, offer: 'Pack Coaching Plus', city: 'Lyon', message: 'Je suis intéressé par votre offre.' }),
   };
 
   const fn = fns[templateName];

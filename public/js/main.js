@@ -171,7 +171,7 @@ document.querySelectorAll('[data-pack]').forEach(btn => {
     e.preventDefault();
     selectedPack = btn.dataset.pack;
     const labels = {
-      serenite: 'Pack Sérénité — 999 € TTC',
+      serenite: 'Pack Coaching Plus — 999 € TTC',
       autonome: 'Pack Autonome — 499 € TTC',
     };
     const descs = {

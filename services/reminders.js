@@ -374,13 +374,13 @@ async function chargeInstallments() {
     const installmentNum = seller.installments_paid + 1;
     try {
       const pi = await stripe.paymentIntents.create({
-        amount: 77400, // 774 € — 2e versement Sérénité 2x
+        amount: 25000, // 250 € — versement Pack Coaching Plus 4x
         currency: 'eur',
         customer: seller.stripe_customer_id,
         payment_method: seller.stripe_payment_method_id,
         confirm: true,
         off_session: true,
-        description: `Pack Sérénité Vendu Par Moi — versement ${installmentNum}/${seller.installments_total}`,
+        description: `Pack Coaching Plus Vendu Par Moi — versement ${installmentNum}/${seller.installments_total}`,
         metadata: { seller_id: String(seller.id), installment: String(installmentNum) },
       });
 
@@ -391,14 +391,13 @@ async function chargeInstallments() {
           : null;
         db.prepare('UPDATE sellers SET installments_paid=?, next_installment_date=? WHERE id=?')
           .run(newPaid, nextDate, seller.id);
-        const invoiceNumber = `SER-${new Date().getFullYear()}-${String(seller.id).padStart(5, '0')}-V${installmentNum}`;
-        await sendInvoiceEmail({ email: seller.email, firstName: seller.first_name, amount: 77400, pack: 'serenite', invoiceNumber, date: new Date() }).catch(() => {});
-        console.log(`✓ 2x versement ${installmentNum}/${seller.installments_total} encaissé — seller ${seller.id} (${seller.email})`);
+        const invoiceNumber = `VPM-${new Date().getFullYear()}-${String(seller.id).padStart(5, '0')}-V${installmentNum}`;
+        await sendInvoiceEmail({ email: seller.email, firstName: seller.first_name, amount: 25000, pack: 'serenite', invoiceNumber, date: new Date() }).catch(() => {});
+        console.log(`✓ Versement ${installmentNum}/${seller.installments_total} encaissé (250€) — seller ${seller.id} (${seller.email})`);
       }
     } catch(e) {
-      console.error(`2x charge error seller ${seller.id}:`, e.message);
-      // Alerte admin si carte refusée (log serveur — seller_id=0 invalide en base)
-      console.error(`⚠️  Échec mensualité 2x — ${seller.email} (id=${seller.id}) versement ${installmentNum}/${seller.installments_total} : ${e.message}`);
+      console.error(`Installment charge error seller ${seller.id}:`, e.message);
+      console.error(`⚠️  Échec versement — ${seller.email} (id=${seller.id}) versement ${installmentNum}/${seller.installments_total} : ${e.message}`);
     }
   }
 }

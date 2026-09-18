@@ -247,8 +247,8 @@
       <div class="form-group">
         <label>Pack *</label>
         <select name="pack" required>
-          <option value="autonome">Pack Autonome — 99 €</option>
-          <option value="serenite">Pack Sérénité — 999 €</option>
+          <option value="autonome">Pack Autonome — 499 €</option>
+          <option value="serenite">Pack Coaching Plus — 999 €</option>
         </select>
       </div>
       <button type="submit" class="btn-primary btn-full">Créer le compte</button>
@@ -306,7 +306,7 @@ async function loadTodos() {
     const name = t.first_name ? `${t.first_name} ${t.last_name || ''}`.trim() : (data.name || t.seller_email || '—');
     const phone = t.seller_phone || data.phone || '';
     const email = t.seller_email || data.email || '';
-    const packLabel = (t.seller_pack || data.pack) === 'serenite' ? 'Sérénité' : 'Autonome';
+    const packLabel = (t.seller_pack || data.pack) === 'serenite' ? 'Coaching Plus' : 'Autonome';
     const sub = [name, packLabel, phone].filter(Boolean).join(' · ');
     return `<div class="todo-card" id="todo-${t.id}">
       <div class="todo-icon">${cfg.icon}</div>
@@ -335,7 +335,7 @@ async function loadStats() {
   const res = await fetch('/admin/api/stats');
   const data = await res.json();
   document.getElementById('statRevenue').textContent = Number(data.revenue.total).toLocaleString('fr-FR') + ' €';
-  document.getElementById('revDetail').textContent = `Autonome: ${data.revenue.autonome.count} × 99€ — Sérénité: ${data.revenue.serenite.count} × 999€`;
+  document.getElementById('revDetail').textContent = `Autonome: ${data.revenue.autonome.count} × 499€ — Coaching Plus: ${data.revenue.serenite.count} × 999€`;
   document.getElementById('statClients').textContent = data.sellers;
   document.getElementById('statProps').textContent = data.properties_active;
   document.getElementById('statContacts').textContent = data.contacts;
@@ -364,7 +364,7 @@ function renderClients(clients) {
         <div style="font-size:0.78rem;color:#888;">${c.email}</div>
         ${c.phone ? `<div style="font-size:0.78rem;color:#aaa;">${c.phone}</div>` : ''}
       </td>
-      <td><span class="status-badge ${c.pack === 'serenite' ? 'status-compromis' : 'status-preparation'}">${c.pack === 'serenite' ? 'Sérénité' : 'Autonome'}</span></td>
+      <td><span class="status-badge ${c.pack === 'serenite' ? 'status-compromis' : 'status-preparation'}">${c.pack === 'serenite' ? 'Coaching Plus' : 'Autonome'}</span></td>
       <td>${c.city ? `<strong>${c.city}</strong><br><span style="font-size:0.78rem;color:#888;">${c.price ? Number(c.price).toLocaleString('fr-FR')+'€' : '—'}</span>` : '<span style="color:#ddd">—</span>'}</td>
       <td>${c.status ? `<span class="status-badge ${statusClass}">${statusLabels[c.status]||c.status}</span>` : '<span style="color:#ddd">—</span>'}</td>
       <td style="font-size:0.8rem;">

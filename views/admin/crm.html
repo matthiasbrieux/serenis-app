@@ -371,7 +371,7 @@
       <span class="filter-lbl">Pack</span>
       <select class="fsel" id="fPack" onchange="applyFilters()">
         <option value="">Tous</option>
-        <option value="serenite">Sérénité</option>
+        <option value="serenite">Coaching Plus</option>
         <option value="autonome">Autonome</option>
       </select>
       <span class="filter-lbl">Photos</span>
@@ -410,7 +410,7 @@
     <div id="crm-filters">
       <button class="crm-filter active" data-filter="all">Tous</button>
       <button class="crm-filter" data-filter="pack-autonome">Pack Autonome</button>
-      <button class="crm-filter" data-filter="pack-serenite">Pack Sérénité</button>
+      <button class="crm-filter" data-filter="pack-serenite">Pack Coaching Plus</button>
       <button class="crm-filter" data-filter="no-photos">Sans photos</button>
       <button class="crm-filter" data-filter="missing-docs">Sans diagnostics</button>
       <button class="crm-filter" data-filter="not-published">Non publiés</button>
@@ -966,7 +966,7 @@ function renderKanban() {
       const prog = calcProgression(c);
       const progClr = prog >= 80 ? '#16a34a' : prog >= 40 ? '#d97706' : '#dc2626';
       const packBadge = c.pack === 'serenite'
-        ? `<span class="k-tag" style="background:#fef3c7;color:#92400e">Sérénité</span>`
+        ? `<span class="k-tag" style="background:#fef3c7;color:#92400e">Coaching Plus</span>`
         : `<span class="k-tag" style="background:#f1f5f9;color:#475569">Autonome</span>`;
       const days = c.days_since_signup || 0;
       const alerts = getAlerts(c, score);
@@ -1313,7 +1313,7 @@ function renderTable() {
       const eLabel = daysLeft > 0 ? `${daysLeft}j restants` : `Expiré (${Math.abs(daysLeft)}j)`;
       echeanceHtml = `<div style="font-size:0.62rem;color:${eColor};font-weight:600;margin-top:2px">📋 ${eLabel}</div>`;
     }
-    const packCell = `<span class="badge ${c.pack||'autonome'}">${c.pack==='serenite'?'Sérénité':'Autonome'}</span>
+    const packCell = `<span class="badge ${c.pack||'autonome'}">${c.pack==='serenite'?'Coaching Plus':'Autonome'}</span>
       <div style="font-size:0.66rem;color:#aaa;margin-top:2px">${fd(c.paid_at||c.created_at)||'—'}</div>
       <div style="font-size:0.64rem;color:#bbb">J+${c.days_since_signup||0}</div>
       ${echeanceHtml}`;
@@ -1464,7 +1464,7 @@ function renderPanel(c) {
       <div class="p-grid">
         <div class="p-field"><label>Email</label><div class="p-val">${c.email}</div></div>
         <div class="p-field"><label>Téléphone</label><div class="p-val ${c.phone?'':'muted'}">${c.phone||'Non renseigné'}</div></div>
-        <div class="p-field"><label>Pack</label><span class="badge ${c.pack||'autonome'}">${c.pack==='serenite'?'Pack Sérénité':'Pack Autonome'}</span></div>
+        <div class="p-field"><label>Pack</label><span class="badge ${c.pack||'autonome'}">${c.pack==='serenite'?'Pack Coaching Plus':'Pack Autonome'}</span></div>
         <div class="p-field"><label>Inscription</label><div class="p-val">${fdl(c.paid_at||c.created_at)||'—'} <span style="color:#aaa;font-size:0.72rem">(J+${c.days_since_signup||0})</span></div></div>
         ${(()=>{
           const sat = c.contrat_signe_at || c.paid_at;
