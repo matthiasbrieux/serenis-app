@@ -5,6 +5,7 @@ const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
 const db = require('../database');
 const { sendPasswordResetEmail } = require('../services/email');
+const { isPasswordPwned } = require('../services/passwordCheck');
 
 // Limite dédiée sur les tentatives de connexion (la limite globale de
 // server.js est partagée par toutes les routes et bien trop large pour
@@ -133,6 +134,9 @@ router.get('/reset-password', (req, res) => {
 router.post('/api/reset-password', express.json(), async (req, res) => {
   const { token, password } = req.body;
   if (!token || !password || password.length < 8) return res.json({ error: 'Données invalides.' });
+  if (await isPasswordPwned(password)) {
+    return res.json({ error: 'Ce mot de passe est apparu dans des fuites de données connues. Choisissez-en un autre.' });
+  }
 
   const row = db.prepare("SELECT * FROM password_reset_tokens WHERE token=? AND used_at IS NULL AND expires_at > datetime('now')").get(token);
   if (!row) return res.json({ error: 'Lien expiré ou invalide. Demandez un nouveau lien.' });

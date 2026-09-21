@@ -6,6 +6,7 @@ const db = require('../database');
 const { requireAuth } = require('../middleware/auth');
 const { uploadPhoto, uploadDocument } = require('../services/upload');
 const { sendSoldCongrats, sendPropertySoldToBuyer, sendVisitConfirmation } = require('../services/email');
+const { isPasswordPwned } = require('../services/passwordCheck');
 
 // Désactiver le cache navigateur pour toutes les pages vendeur
 router.use((req, res, next) => {
@@ -130,7 +131,11 @@ router.post('/api/profile', requireAuth, express.json(), async (req, res) => {
   const { first_name, last_name, phone, password } = req.body;
   const updates = { first_name, last_name, phone };
 
-  if (password && password.length >= 8) {
+  if (password) {
+    if (password.length < 8) return res.json({ error: 'Le mot de passe doit faire au moins 8 caractères.' });
+    if (await isPasswordPwned(password)) {
+      return res.json({ error: 'Ce mot de passe est apparu dans des fuites de données connues. Choisissez-en un autre.' });
+    }
     updates.password = await bcrypt.hash(password, 12);
   }
 

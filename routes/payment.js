@@ -7,6 +7,7 @@ const jwt = require('jsonwebtoken');
 const { v4: uuidv4 } = require('uuid');
 const db = require('../database');
 const { sendWelcomeImproved, sendInvoiceEmail, sendFirstMeetingEmail, sendNewClientAdminNotif } = require('../services/email');
+const { isPasswordPwned } = require('../services/passwordCheck');
 const crypto = require('crypto');
 
 const checkoutLimit = rateLimit({
@@ -33,6 +34,8 @@ router.post('/create-checkout', express.json(), checkoutLimit, async (req, res) 
     } else {
       return res.json({ error: 'Mot de passe trop court (8 caractères minimum).' });
     }
+  } else if (await isPasswordPwned(password)) {
+    return res.json({ error: 'Ce mot de passe est apparu dans des fuites de données connues. Choisissez-en un autre.' });
   }
 
   if (!process.env.STRIPE_SECRET_KEY) {
