@@ -903,7 +903,7 @@ router.post('/api/crm/:id/email', requireAdmin, express.json(), async (req, res)
     try { db.prepare('INSERT INTO email_log (recipient_email, trigger_type) VALUES (?,?)').run(seller.email, 'admin_direct'); } catch(e) {}
     res.json({ success: true });
   } else {
-    res.status(500).json({ error: 'Erreur envoi email (vérifier SendGrid)' });
+    res.status(500).json({ error: 'Erreur envoi email (vérifier Resend)' });
   }
 });
 
