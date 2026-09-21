@@ -27,7 +27,7 @@
   <meta name="twitter:title" content="Tarifs Vendu Par Moi — Vendez votre bien sans commission">
   <meta name="twitter:description" content="Pack Autonome 499€ ou Pack Coaching Plus 999€. Zéro commission sur la vente.">
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/css/style.css?v=2">
+  <link rel="stylesheet" href="/css/style.css?v=3">
   <style>
     body { background:#F5F0E8;font-family:'DM Sans',sans-serif;margin:0; }
     nav { position:fixed;top:0;left:0;right:0;background:rgba(26,26,22,.92);backdrop-filter:blur(12px);z-index:100;padding:14px 32px;display:flex;justify-content:space-between;align-items:center; }
@@ -162,10 +162,16 @@
       <form id="checkoutForm" onsubmit="submitCheckout(event)">
         <input type="email" id="checkoutEmail" placeholder="Votre email" required
           style="width:100%;padding:12px 14px;border:1.5px solid #ddd;border-radius:8px;font-size:.95rem;margin-bottom:12px;box-sizing:border-box;font-family:'DM Sans',sans-serif;">
-        <input type="password" id="checkoutPassword" placeholder="Mot de passe (8 caractères min.)" required minlength="8"
-          style="width:100%;padding:12px 14px;border:1.5px solid #ddd;border-radius:8px;font-size:.95rem;margin-bottom:12px;box-sizing:border-box;font-family:'DM Sans',sans-serif;">
-        <input type="password" id="checkoutPassword2" placeholder="Confirmer le mot de passe" required minlength="8"
-          style="width:100%;padding:12px 14px;border:1.5px solid #ddd;border-radius:8px;font-size:.95rem;margin-bottom:16px;box-sizing:border-box;font-family:'DM Sans',sans-serif;">
+        <div class="pwd-wrap" style="margin-bottom:12px;">
+          <input type="password" id="checkoutPassword" placeholder="Mot de passe (8 caractères min.)" required minlength="8"
+            style="width:100%;padding:12px 44px 12px 14px;border:1.5px solid #ddd;border-radius:8px;font-size:.95rem;box-sizing:border-box;font-family:'DM Sans',sans-serif;">
+          <button type="button" class="pwd-eye-btn" onclick="togglePwd('checkoutPassword', this)">👁</button>
+        </div>
+        <div class="pwd-wrap" style="margin-bottom:16px;">
+          <input type="password" id="checkoutPassword2" placeholder="Confirmer le mot de passe" required minlength="8"
+            style="width:100%;padding:12px 44px 12px 14px;border:1.5px solid #ddd;border-radius:8px;font-size:.95rem;box-sizing:border-box;font-family:'DM Sans',sans-serif;">
+          <button type="button" class="pwd-eye-btn" onclick="togglePwd('checkoutPassword2', this)">👁</button>
+        </div>
         <label style="display:flex;gap:10px;align-items:flex-start;font-size:.82rem;color:#555;margin-bottom:20px;cursor:pointer;">
           <input type="checkbox" id="checkoutCgv" required style="margin-top:2px;flex-shrink:0;">
           J'accepte les <a href="/cgv" target="_blank" style="color:#C4785A;">CGV</a> et le contrat de prestation Vendu Par Moi.
@@ -179,6 +185,7 @@
       </form>
     </div>
   </div>
+  <script src="/js/toggle-password.js"></script>
   <script>
     let _checkoutPack = null;
     let _checkout4x = false;

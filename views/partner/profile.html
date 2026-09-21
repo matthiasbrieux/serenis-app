@@ -56,6 +56,10 @@
     .profile-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; flex-wrap: wrap; gap: 12px; }
     .profile-name { font-family: 'Cormorant Garamond', serif; font-size: 1.4rem; font-weight: 600; }
     .form-actions { display: flex; align-items: center; }
+    .pwd-wrap { position: relative; }
+    .pwd-wrap input { padding-right: 44px; }
+    .pwd-eye-btn { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; color: #aaa; padding: 6px; line-height: 1; font-size: 1.05rem; }
+    .pwd-eye-btn:hover { color: #555; }
   </style>
 </head>
 <body>
@@ -160,9 +164,15 @@
         <div class="card-header"><h2>Changer le mot de passe</h2></div>
         <div class="card-body">
           <label>Mot de passe actuel</label>
-          <input type="password" id="current_password" placeholder="••••••••">
+          <div class="pwd-wrap">
+            <input type="password" id="current_password" placeholder="••••••••">
+            <button type="button" class="pwd-eye-btn" onclick="togglePwd('current_password', this)">👁</button>
+          </div>
           <label>Nouveau mot de passe</label>
-          <input type="password" id="new_password" placeholder="8 caractères minimum" minlength="8">
+          <div class="pwd-wrap">
+            <input type="password" id="new_password" placeholder="8 caractères minimum" minlength="8">
+            <button type="button" class="pwd-eye-btn" onclick="togglePwd('new_password', this)">👁</button>
+          </div>
           <div class="form-actions">
             <button class="btn btn-primary" id="pwd-save-btn">Changer le mot de passe</button>
             <span class="success-msg" id="pwd-success">Mot de passe modifié ✓</span>
@@ -173,6 +183,7 @@
     </main>
   </div>
 
+  <script src="/js/toggle-password.js"></script>
   <script>
     let photographer = null;
 

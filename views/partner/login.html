@@ -75,6 +75,10 @@
     .error { background: #fee; border: 1px solid #fcc; border-radius: 6px; padding: 12px 14px; font-size: 0.88rem; color: #c33; margin-bottom: 16px; display: none; }
     .footer-link { text-align: center; margin-top: 20px; font-size: 0.85rem; color: #8C8880; }
     .footer-link a { color: #C4603A; text-decoration: none; }
+    .pwd-wrap { position: relative; }
+    .pwd-wrap input { padding-right: 44px; }
+    .pwd-eye-btn { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; color: #aaa; padding: 6px; line-height: 1; font-size: 1.05rem; }
+    .pwd-eye-btn:hover { color: #555; }
   </style>
 </head>
 <body>
@@ -87,13 +91,17 @@
       <label>Adresse email</label>
       <input type="email" id="email" required autocomplete="email" placeholder="vous@exemple.fr">
       <label>Mot de passe</label>
-      <input type="password" id="password" required autocomplete="current-password" placeholder="••••••••">
+      <div class="pwd-wrap">
+        <input type="password" id="password" required autocomplete="current-password" placeholder="••••••••">
+        <button type="button" class="pwd-eye-btn" onclick="togglePwd('password', this)">👁</button>
+      </div>
       <button type="submit" class="btn" id="btn">Se connecter</button>
     </form>
     <div class="footer-link">
       Pas encore partenaire ? <a href="/partner/register">Rejoindre le réseau</a>
     </div>
   </div>
+  <script src="/js/toggle-password.js"></script>
   <script>
     document.getElementById('form').addEventListener('submit', async (e) => {
       e.preventDefault();
