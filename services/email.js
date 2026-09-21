@@ -189,6 +189,20 @@ async function sendPasswordResetEmail(email, resetUrl) {
   return send(email, 'Réinitialisation de votre mot de passe', html);
 }
 
+async function sendLoginCode(email, code) {
+  const codeBlock = `<div style="text-align:center;margin:28px 0;">
+    <span style="display:inline-block;background:#F5F0E8;border:1.5px solid #ede7de;border-radius:12px;padding:18px 28px;font-size:32px;font-weight:700;letter-spacing:10px;color:#C4603A;font-family:'Courier New',monospace;">${code}</span>
+  </div>`;
+  const html = layout(`
+    ${h1('Votre code de connexion')}
+    ${p('Voici le code à saisir pour finaliser votre connexion à Vendu Par Moi.')}
+    ${codeBlock}
+    ${divider()}
+    ${muted('Ce code est valable <strong>10 minutes</strong> et à usage unique. Si vous n\'êtes pas à l\'origine de cette tentative de connexion, ignorez cet email et envisagez de changer votre mot de passe.')}
+  `, { preheader: `Votre code de connexion : ${code}` });
+  return send(email, 'Votre code de connexion — Vendu Par Moi', html);
+}
+
 // ─────────────────────────────────────────────────────────────
 // 3. VISITES
 // ─────────────────────────────────────────────────────────────
@@ -812,6 +826,7 @@ async function previewEmail(templateName) {
     welcome:               () => sendWelcomeEmail({ email: fakeSellerEmail, firstName: 'Sophie' }),
     welcome_v2:            () => sendWelcomeImproved({ email: fakeSellerEmail, firstName: 'Sophie' }),
     password_reset:        () => sendPasswordResetEmail({ email: fakeSellerEmail, firstName: 'Sophie', resetUrl: `${BASE_URL}/reset-password?token=preview` }),
+    login_code:            () => sendLoginCode(fakeSellerEmail, '482913'),
     invoice:               () => sendInvoiceEmail({ email: fakeSellerEmail, firstName: 'Sophie', amount: 49900, pack: 'serenite', invoiceNumber: 'SER-2026-00042-V1', date: new Date() }),
     published:             () => sendPublishedConfirmation({ email: fakeSellerEmail, firstName: 'Sophie', property: fakeProp }),
     visit_confirmation:    () => sendVisitConfirmation(fakeBuyerEmail, 'Thomas Durand', fakeProp, '2026-06-20', '14:00', false),
@@ -929,6 +944,7 @@ async function sendContactNotification({ name, phone, email, offer, city, messag
 module.exports = {
   // Auth
   sendPasswordResetEmail,
+  sendLoginCode,
   // Contact
   sendContactNotification,
   // Bienvenue / Paiement

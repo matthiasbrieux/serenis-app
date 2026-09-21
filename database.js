@@ -428,6 +428,20 @@ db.exec(`
     used_at DATETIME,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP
   );
+
+  -- Codes de vérification 2FA envoyés par email à la connexion (vendeur ou
+  -- admin — account_type distingue les deux, account_id référence sellers.id
+  -- ou admins.id selon le cas).
+  CREATE TABLE IF NOT EXISTS login_2fa_codes (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    account_type TEXT NOT NULL,
+    account_id INTEGER NOT NULL,
+    code TEXT NOT NULL,
+    attempts INTEGER DEFAULT 0,
+    expires_at DATETIME NOT NULL,
+    used_at DATETIME,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+  );
 `);
 
 // ── Offres d'achat ────────────────────────────────────────────
