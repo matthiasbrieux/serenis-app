@@ -6035,9 +6035,23 @@ async function fetchNearbyPOIs() {
   panel.style.display = 'none';
   panel.innerHTML = '';
 
+  // fetch() n'a pas de délai d'expiration par défaut : si le service ne
+  // répond pas du tout (au lieu de répondre par une erreur), la requête
+  // reste en attente indéfiniment et le bouton reste bloqué sur
+  // "Recherche en cours…". On force un abandon après timeoutMs.
+  async function fetchWithTimeout(url, opts, timeoutMs) {
+    const controller = new AbortController();
+    const t = setTimeout(() => controller.abort(), timeoutMs);
+    try {
+      return await fetch(url, Object.assign({}, opts, { signal: controller.signal }));
+    } finally {
+      clearTimeout(t);
+    }
+  }
+
   try {
     const q = [address.trim(), city.trim(), 'France'].filter(Boolean).join(', ');
-    const geoRes = await fetch('https://nominatim.openstreetmap.org/search?q=' + encodeURIComponent(q) + '&format=json&limit=1', { headers: { 'Accept-Language': 'fr' } });
+    const geoRes = await fetchWithTimeout('https://nominatim.openstreetmap.org/search?q=' + encodeURIComponent(q) + '&format=json&limit=1', { headers: { 'Accept-Language': 'fr' } }, 10000);
     if (!geoRes.ok) throw new Error('Nominatim HTTP ' + geoRes.status);
     const geoData = await geoRes.json();
     if (!geoData.length) {
@@ -6073,7 +6087,7 @@ async function fetchNearbyPOIs() {
     let ovData = null, ovErr = null;
     for (const mirror of OVERPASS_MIRRORS) {
       try {
-        const ovRes = await fetch(mirror, { method: 'POST', body: oq });
+        const ovRes = await fetchWithTimeout(mirror, { method: 'POST', body: oq }, 10000);
         if (!ovRes.ok) { ovErr = new Error(mirror + ' → HTTP ' + ovRes.status); continue; }
         ovData = await ovRes.json();
         ovErr = null;
