@@ -19,6 +19,11 @@ const loginLimit = require('express-rate-limit')({ windowMs: 15 * 60 * 1000, max
 // pour avoir mal tapé son mot de passe une fois avant de réussir.
 const verify2faLimit = require('express-rate-limit')({ windowMs: 15 * 60 * 1000, max: 20, keyGenerator: (req) => req.ip });
 
+// Le 2FA par email n'est demandé qu'en réaction à plusieurs mots de passe
+// erronés d'affilée sur le compte (signe d'une tentative d'intrusion) — pas
+// à chaque connexion normale, qui reste directe comme avant.
+const FAILED_ATTEMPTS_2FA_THRESHOLD = 3;
+
 function maskEmail(email) {
   const [user, domain] = email.split('@');
   const visible = user.slice(0, 2);
@@ -41,14 +46,30 @@ router.post('/login', loginLimit, express.json(), async (req, res) => {
   if (!seller) return res.json({ error: 'Identifiants incorrects' });
 
   const valid = await bcrypt.compare(password, seller.password);
-  if (!valid) return res.json({ error: 'Identifiants incorrects' });
+  if (!valid) {
+    db.prepare('UPDATE sellers SET failed_login_attempts = failed_login_attempts + 1 WHERE id=?').run(seller.id);
+    return res.json({ error: 'Identifiants incorrects' });
+  }
 
-  await issue2FACode('seller', seller.id, seller.email);
-  res.json({
-    requires2fa: true,
-    pendingToken: issuePendingToken('seller', seller.id),
-    maskedEmail: maskEmail(seller.email),
-  });
+  // Mot de passe correct mais plusieurs échecs récents sur ce compte →
+  // vérification par email avant de laisser passer.
+  if (seller.failed_login_attempts >= FAILED_ATTEMPTS_2FA_THRESHOLD) {
+    await issue2FACode('seller', seller.id, seller.email);
+    return res.json({
+      requires2fa: true,
+      pendingToken: issuePendingToken('seller', seller.id),
+      maskedEmail: maskEmail(seller.email),
+    });
+  }
+
+  db.prepare('UPDATE sellers SET failed_login_attempts = 0 WHERE id=?').run(seller.id);
+  const token = jwt.sign(
+    { id: seller.id, uuid: seller.uuid, email: seller.email, pack: seller.pack },
+    process.env.JWT_SECRET,
+    { expiresIn: '30d' }
+  );
+  res.cookie('token', token, { httpOnly: true, secure: process.env.NODE_ENV === 'production', maxAge: 30 * 24 * 3600 * 1000 });
+  res.json({ success: true, redirect: '/dashboard' });
 });
 
 // Deuxième étape : vérification du code reçu par email, pour un compte
@@ -67,6 +88,7 @@ router.post('/api/login/verify-2fa', verify2faLimit, express.json(), async (req,
   if (payload.accountType === 'seller') {
     const seller = db.prepare('SELECT * FROM sellers WHERE id = ?').get(payload.accountId);
     if (!seller) return res.json({ error: 'Compte introuvable.' });
+    db.prepare('UPDATE sellers SET failed_login_attempts = 0 WHERE id=?').run(seller.id);
     const token = jwt.sign(
       { id: seller.id, uuid: seller.uuid, email: seller.email, pack: seller.pack },
       process.env.JWT_SECRET,
@@ -79,6 +101,7 @@ router.post('/api/login/verify-2fa', verify2faLimit, express.json(), async (req,
   if (payload.accountType === 'admin') {
     const admin = db.prepare('SELECT * FROM admins WHERE id = ?').get(payload.accountId);
     if (!admin) return res.json({ error: 'Compte introuvable.' });
+    db.prepare('UPDATE admins SET failed_login_attempts = 0 WHERE id=?').run(admin.id);
     const token = jwt.sign({ role: 'admin', email: admin.email, name: admin.name }, process.env.JWT_SECRET, { expiresIn: '8h' });
     res.cookie('admin_token', token, { httpOnly: true, secure: process.env.NODE_ENV === 'production', maxAge: 8 * 3600 * 1000 });
     return res.json({ success: true, redirect: '/admin' });
@@ -105,13 +128,24 @@ router.post('/admin/login', loginLimit, express.json(), async (req, res) => {
     const admin = db.prepare('SELECT * FROM admins WHERE email = ?').get((email || '').toLowerCase().trim());
     if (admin) {
       const valid = await bcrypt.compare(password, admin.password);
-      if (!valid) return res.json({ error: 'Accès refusé' });
-      await issue2FACode('admin', admin.id, admin.email);
-      return res.json({
-        requires2fa: true,
-        pendingToken: issuePendingToken('admin', admin.id),
-        maskedEmail: maskEmail(admin.email),
-      });
+      if (!valid) {
+        db.prepare('UPDATE admins SET failed_login_attempts = failed_login_attempts + 1 WHERE id=?').run(admin.id);
+        return res.json({ error: 'Accès refusé' });
+      }
+
+      if (admin.failed_login_attempts >= FAILED_ATTEMPTS_2FA_THRESHOLD) {
+        await issue2FACode('admin', admin.id, admin.email);
+        return res.json({
+          requires2fa: true,
+          pendingToken: issuePendingToken('admin', admin.id),
+          maskedEmail: maskEmail(admin.email),
+        });
+      }
+
+      db.prepare('UPDATE admins SET failed_login_attempts = 0 WHERE id=?').run(admin.id);
+      const token = jwt.sign({ role: 'admin', email: admin.email, name: admin.name }, process.env.JWT_SECRET, { expiresIn: '8h' });
+      res.cookie('admin_token', token, { httpOnly: true, secure: process.env.NODE_ENV === 'production', maxAge: 8 * 3600 * 1000 });
+      return res.json({ success: true, redirect: '/admin' });
     }
     // Fallback env vars (ancien système, pas de compte en base donc pas de
     // 2FA possible ici — ce chemin ne sert plus depuis que les admins sont
