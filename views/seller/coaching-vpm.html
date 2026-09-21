@@ -484,6 +484,7 @@
 
   </main>
 
+  <script src="/js/progress-sync.js"></script>
   <script>
   const VPM_MODULES = [
     {
@@ -960,8 +961,10 @@
     VPM_MODULES.forEach((m,mi) => m.steps.forEach((_,si) => { if(doneSteps[mi+'-'+si]) done++; }));
     const pct = total ? Math.round(done/total*100) : 0;
     document.getElementById('progLabel').textContent = `${done} étape${done>1?'s':''} complétée${done>1?'s':''} sur ${total} · ${pct}%`;
-    document.getElementById('progFill').style.width = pct + '%';
-    document.getElementById('progFillLabel').textContent = pct === 100 ? '🎉 Programme complet — Félicitations !' : pct === 0 ? 'Commencez par le Module 01 — Analyse DVF' : `${pct}% du programme complété`;
+    const progFill = document.getElementById('progFill');
+    if (progFill) progFill.style.width = pct + '%';
+    const progFillLabel = document.getElementById('progFillLabel');
+    if (progFillLabel) progFillLabel.textContent = pct === 100 ? '🎉 Programme complet — Félicitations !' : pct === 0 ? 'Commencez par le Module 01 — Analyse DVF' : `${pct}% du programme complété`;
   }
 
   function toggleCl(el) {
@@ -1065,6 +1068,7 @@
     const key = mi+'-'+si;
     doneSteps[key] = !doneSteps[key];
     localStorage.setItem('vpm_done_steps', JSON.stringify(doneSteps));
+    syncProgress('vpm_done_steps', JSON.stringify(doneSteps));
     const el = document.getElementById('step-'+mi+'-'+si);
     el.classList.toggle('done', !!doneSteps[key]);
     const allDone = VPM_MODULES[mi].steps.every((_,s) => doneSteps[mi+'-'+s]);
@@ -1080,6 +1084,7 @@
       document.getElementById('step-'+mi+'-'+si)?.classList.toggle('done', !allDone);
     });
     localStorage.setItem('vpm_done_steps', JSON.stringify(doneSteps));
+    syncProgress('vpm_done_steps', JSON.stringify(doneSteps));
     document.getElementById('mod-'+mi).classList.toggle('done', !allDone);
     updateProgress();
   }
@@ -1087,6 +1092,22 @@
   renderModules();
   updateProgress();
   if (window.speechSynthesis) window.speechSynthesis.getVoices();
+
+  // Rattrape la progression enregistrée côté serveur (autre appareil, cache
+  // vidé). Pas de re-render complet ici : renderModules() fait des
+  // appendChild sans vider le container, on met juste à jour les classes
+  // .done des éléments déjà à l'écran.
+  hydrateProgress(() => {
+    Object.assign(doneSteps, JSON.parse(localStorage.getItem('vpm_done_steps') || '{}'));
+    VPM_MODULES.forEach((mod, mi) => {
+      mod.steps.forEach((_, si) => {
+        document.getElementById('step-'+mi+'-'+si)?.classList.toggle('done', !!doneSteps[mi+'-'+si]);
+      });
+      const allDone = mod.steps.every((_, si) => doneSteps[mi+'-'+si]);
+      document.getElementById('mod-'+mi)?.classList.toggle('done', allDone);
+    });
+    updateProgress();
+  });
   </script>
 <script src="/js/seller-nav.js"></script>
 </body>

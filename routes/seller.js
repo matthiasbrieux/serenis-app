@@ -503,6 +503,26 @@ Retourne UNIQUEMENT un objet JSON valide, sans texte avant ni après, avec exact
   }
 });
 
+// ── Progression formation/coaching (persistance serveur) ────────
+router.get('/api/progress', requireAuth, (req, res) => {
+  const rows = db.prepare('SELECT key, value FROM seller_progress WHERE seller_id = ?').all(req.seller.id);
+  const progress = {};
+  rows.forEach(r => { progress[r.key] = r.value; });
+  res.json(progress);
+});
+
+router.post('/api/progress', requireAuth, express.json(), (req, res) => {
+  const { key, value } = req.body;
+  if (!key || typeof key !== 'string' || typeof value !== 'string') {
+    return res.status(400).json({ error: 'key et value (string) requis' });
+  }
+  db.prepare(`
+    INSERT INTO seller_progress (seller_id, key, value, updated_at) VALUES (?, ?, ?, datetime('now'))
+    ON CONFLICT(seller_id, key) DO UPDATE SET value = excluded.value, updated_at = excluded.updated_at
+  `).run(req.seller.id, key, value);
+  res.json({ ok: true });
+});
+
 // ── Coach IA formation ─────────────��──────────────────────────
 router.post('/api/formation/chat', requireAuth, aiRateLimit, express.json(), async (req, res) => {
   if (!process.env.ANTHROPIC_API_KEY) return res.status(503).json({ error: 'Coach formation non configuré — ajoutez ANTHROPIC_API_KEY.' });

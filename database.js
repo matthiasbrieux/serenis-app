@@ -133,6 +133,17 @@ db.exec(`
     UNIQUE(seller_id, checklist_type, item_index)
   );
 
+  -- Progression formation/coaching (miroir serveur des clés localStorage
+  -- vpm_done_steps, vpm_celebrated, ck_<type>, aic_<champ>...) pour survivre
+  -- à un vidage de cache ou un changement d'appareil.
+  CREATE TABLE IF NOT EXISTS seller_progress (
+    seller_id  INTEGER NOT NULL REFERENCES sellers(id),
+    key        TEXT NOT NULL,
+    value      TEXT NOT NULL,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (seller_id, key)
+  );
+
   CREATE TABLE IF NOT EXISTS contact_requests (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     name TEXT,
