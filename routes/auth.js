@@ -6,11 +6,16 @@ const crypto = require('crypto');
 const db = require('../database');
 const { sendPasswordResetEmail } = require('../services/email');
 
+// Limite dédiée sur les tentatives de connexion (la limite globale de
+// server.js est partagée par toutes les routes et bien trop large pour
+// contenir du brute-force ciblé sur un compte).
+const loginLimit = require('express-rate-limit')({ windowMs: 15 * 60 * 1000, max: 10, keyGenerator: (req) => req.ip });
+
 router.get('/login', (req, res) => {
   res.sendFile('login.html', { root: './public' });
 });
 
-router.post('/login', express.json(), async (req, res) => {
+router.post('/login', loginLimit, express.json(), async (req, res) => {
   const { email, password } = req.body;
   if (!email || !password) return res.json({ error: 'Champs requis' });
 
@@ -43,7 +48,7 @@ router.get('/admin/login', (req, res) => {
   res.sendFile('admin-login.html', { root: './public' });
 });
 
-router.post('/admin/login', express.json(), async (req, res) => {
+router.post('/admin/login', loginLimit, express.json(), async (req, res) => {
   const { email, password } = req.body;
   if (!process.env.JWT_SECRET) return res.json({ error: 'Configuration serveur incomplète.' });
 
