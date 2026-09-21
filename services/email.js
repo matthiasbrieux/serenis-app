@@ -1,8 +1,22 @@
 const { Resend } = require('resend');
+const fs = require('fs');
+const path = require('path');
 
 const FROM_EMAIL = process.env.SENDGRID_FROM_EMAIL || 'contact@venduparmoi.fr';
 const FROM_NAME  = 'Vendu Par Moi';
 const BASE_URL   = process.env.BASE_URL || 'https://www.venduparmoi.fr';
+
+// Le logo est encodé en base64 et intégré directement dans le HTML plutôt que
+// chargé depuis une URL distante : beaucoup de clients mail (Gmail, Apple
+// Mail…) bloquent les images distantes par défaut, ce qui affichait un
+// rectangle vide avec le texte alternatif à la place du logo.
+let LOGO_DATA_URI = '';
+try {
+  const logoBuffer = fs.readFileSync(path.join(__dirname, '../public/images/email-logo.png'));
+  LOGO_DATA_URI = `data:image/png;base64,${logoBuffer.toString('base64')}`;
+} catch (e) {
+  console.error('[EMAIL] Logo introuvable pour l\'embarquer dans les emails:', e.message);
+}
 
 function getResend() {
   const key = process.env.RESEND_API_KEY;
@@ -72,7 +86,7 @@ ${preheader ? `<div style="display:none;max-height:0;overflow:hidden;color:#F5F0
 
       <!-- Logo header -->
       <tr><td style="padding-bottom:0;">
-        <img src="${BASE_URL}/images/email-logo.png" alt="Vendu Par Moi" width="600" height="175" style="display:block;border:0;outline:none;text-decoration:none;border-radius:16px 16px 0 0;max-width:100%;" />
+        <img src="${LOGO_DATA_URI}" alt="Vendu Par Moi" width="600" height="175" style="display:block;border:0;outline:none;text-decoration:none;border-radius:16px 16px 0 0;max-width:100%;" />
       </td></tr>
 
       <!-- Card -->
