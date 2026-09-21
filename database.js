@@ -626,6 +626,12 @@ if (adminCount === 0) {
   console.log('[ADMINS] 3 comptes admin créés (mots de passe temporaires)');
 }
 
+// ── Anti-bruteforce par compte : compte les échecs de mot de passe
+// pour déclencher une vérification par email seulement après plusieurs
+// tentatives ratées, plutôt qu'à chaque connexion (voir routes/auth.js).
+try { db.exec("ALTER TABLE sellers ADD COLUMN failed_login_attempts INTEGER DEFAULT 0"); } catch(e) {}
+try { db.exec("ALTER TABLE admins ADD COLUMN failed_login_attempts INTEGER DEFAULT 0"); } catch(e) {}
+
 // ── Tables VRP ──────────────────────────────────────────────────
 try {
   db.exec(`
