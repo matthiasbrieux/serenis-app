@@ -5,6 +5,7 @@ const { v4: uuidv4 } = require('uuid');
 const path = require('path');
 const fs = require('fs');
 const db = require('../database');
+const { isPasswordPwned } = require('../services/passwordCheck');
 const { requireAdmin } = require('../middleware/auth');
 const { sendWelcomeEmail, sendPhotographerAvailabilityRequest, sendPostFirstVisitFeedbackSeller, sendCheckInNoOffer, sendNoPhotosNudge, sendMissingDocNudge, sendNotPublishedNudge, sendProspectNudge, sendContractRenewal, sendReviewRequest, sendAdminDirectEmail, sendFirstMeetingEmail, sendNewClientAdminNotif } = require('../services/email');
 
@@ -1883,6 +1884,9 @@ router.get('/api/me', requireAdmin, (req, res) => {
 router.post('/api/change-password', requireAdmin, express.json(), async (req, res) => {
   const { current, newpwd } = req.body;
   if (!current || !newpwd || newpwd.length < 8) return res.json({ error: 'Données invalides.' });
+  if (await isPasswordPwned(newpwd)) {
+    return res.json({ error: 'Ce mot de passe est apparu dans des fuites de données connues. Choisissez-en un autre.' });
+  }
   const bcrypt = require('bcryptjs');
   const admin = db.prepare('SELECT * FROM admins WHERE email = ?').get(req.admin.email);
   if (!admin) return res.json({ error: 'Compte introuvable.' });

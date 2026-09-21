@@ -5,6 +5,7 @@ const jwt = require('jsonwebtoken');
 const { v4: uuidv4 } = require('uuid');
 const path = require('path');
 const db = require('../database');
+const { isPasswordPwned } = require('../services/passwordCheck');
 
 const JWT_SECRET = process.env.JWT_SECRET || 'venduparmoi-partner-secret';
 const COOKIE = 'partner_token';
@@ -37,6 +38,9 @@ router.post('/partner/register', async (req, res) => {
   const { email, password, first_name, last_name, phone, base_city, base_postal_code, intervention_radius } = req.body;
   if (!email || !password || !first_name || !last_name) return res.json({ error: 'Champs requis manquants' });
   if (password.length < 8) return res.json({ error: 'Le mot de passe doit faire au moins 8 caractères.' });
+  if (await isPasswordPwned(password)) {
+    return res.json({ error: 'Ce mot de passe est apparu dans des fuites de données connues. Choisissez-en un autre.' });
+  }
   const existing = db.prepare('SELECT id FROM photographers WHERE email = ?').get(email.toLowerCase());
   if (existing) return res.json({ error: 'Email déjà utilisé' });
   const hashed = await bcrypt.hash(password, 12);
@@ -202,6 +206,9 @@ router.post('/api/partner/profile', requirePartner, async (req, res) => {
 router.post('/api/partner/change-password', requirePartner, async (req, res) => {
   const { current_password, new_password } = req.body;
   if (!current_password || !new_password || new_password.length < 8) return res.json({ error: 'Données invalides.' });
+  if (await isPasswordPwned(new_password)) {
+    return res.json({ error: 'Ce mot de passe est apparu dans des fuites de données connues. Choisissez-en un autre.' });
+  }
   const p = db.prepare('SELECT * FROM photographers WHERE id=?').get(req.partner.id);
   if (!await bcrypt.compare(current_password, p.password)) return res.json({ error: 'Mot de passe actuel incorrect' });
   const hashed = await bcrypt.hash(new_password, 12);
