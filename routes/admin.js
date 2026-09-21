@@ -1613,16 +1613,19 @@ router.get('/api/emails/log', requireAdmin, (req, res) => {
   try {
     const page = parseInt(req.query.page) || 0;
     const limit = 50;
-    let logs = [], total = 0;
-    try {
-      logs = db.prepare(`
-        SELECT el.*, s.first_name, s.last_name
-        FROM email_log el
-        LEFT JOIN sellers s ON s.email = el.recipient_email
-        ORDER BY el.sent_at DESC LIMIT ? OFFSET ?
-      `).all(limit, page * limit);
-      total = db.prepare(`SELECT COUNT(*) as c FROM email_log`).get()?.c || 0;
-    } catch(e) { /* email_log might not exist yet */ }
+    // email_sends est le journal réel de chaque tentative d'envoi (succès/échec),
+    // écrit par services/email.js pour tous les emails — automatiques ou non
+    // (accueil, reset mot de passe, offres...). email_log ne sert qu'à la
+    // déduplication des relances automatiques et ne trace ni les échecs ni
+    // les envois transactionnels (ex: reset mot de passe) : ne pas l'utiliser ici.
+    const logs = db.prepare(`
+      SELECT es.id, es.sent_at, es.subject AS trigger_type, es.to_email AS recipient_email,
+             es.success, s.first_name, s.last_name
+      FROM email_sends es
+      LEFT JOIN sellers s ON s.id = es.seller_id
+      ORDER BY es.sent_at DESC LIMIT ? OFFSET ?
+    `).all(limit, page * limit);
+    const total = db.prepare(`SELECT COUNT(*) as c FROM email_sends`).get()?.c || 0;
     res.json({ logs, total, page });
   } catch(e) { res.status(500).json({ error: e.message }); }
 });
