@@ -6037,7 +6037,8 @@ async function fetchNearbyPOIs() {
 
   try {
     const q = [address.trim(), city.trim(), 'France'].filter(Boolean).join(', ');
-    const geoRes  = await fetch('https://nominatim.openstreetmap.org/search?q=' + encodeURIComponent(q) + '&format=json&limit=1', { headers: { 'Accept-Language': 'fr' } });
+    const geoRes = await fetch('https://nominatim.openstreetmap.org/search?q=' + encodeURIComponent(q) + '&format=json&limit=1', { headers: { 'Accept-Language': 'fr' } });
+    if (!geoRes.ok) throw new Error('Nominatim HTTP ' + geoRes.status);
     const geoData = await geoRes.json();
     if (!geoData.length) {
       panel.innerHTML = '<div class="poi-err">Adresse introuvable — vérifiez l\'adresse saisie.</div>';
@@ -6066,8 +6067,20 @@ async function fetchNearbyPOIs() {
       node(around:2000,${lat},${lon})[railway=halt];
     );out center;`;
 
-    const ovRes  = await fetch('https://overpass-api.de/api/interpreter', { method: 'POST', body: oq });
-    const ovData = await ovRes.json();
+    // overpass-api.de (le miroir public le plus utilisé) sature régulièrement
+    // (429/504) : on retente sur un second miroir avant d'abandonner.
+    const OVERPASS_MIRRORS = ['https://overpass-api.de/api/interpreter', 'https://overpass.kumi.systems/api/interpreter'];
+    let ovData = null, ovErr = null;
+    for (const mirror of OVERPASS_MIRRORS) {
+      try {
+        const ovRes = await fetch(mirror, { method: 'POST', body: oq });
+        if (!ovRes.ok) { ovErr = new Error(mirror + ' → HTTP ' + ovRes.status); continue; }
+        ovData = await ovRes.json();
+        ovErr = null;
+        break;
+      } catch (e) { ovErr = e; }
+    }
+    if (ovErr) throw ovErr;
 
     function mDist(lat2, lon2) {
       var R = 6371000, d1 = (lat2-lat)*Math.PI/180, d2 = (lon2-lon)*Math.PI/180;
@@ -6126,7 +6139,8 @@ async function fetchNearbyPOIs() {
     panel.innerHTML = html || '<div class="poi-empty">Aucun résultat trouvé dans un rayon de 2 km.</div>';
     panel.style.display = 'block';
   } catch(e) {
-    panel.innerHTML = '<div class="poi-err">Erreur de recherche. Vérifiez votre connexion et réessayez.</div>';
+    console.error('[fetchNearbyPOIs]', e);
+    panel.innerHTML = '<div class="poi-err">Erreur de recherche (service de géolocalisation indisponible). Réessayez dans quelques instants.</div>';
     panel.style.display = 'block';
   } finally {
     btn.disabled = false;
