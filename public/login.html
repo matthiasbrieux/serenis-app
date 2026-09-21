@@ -20,7 +20,7 @@
   <div class="auth-logo-top">
     <a href="/"><img src="/images/vendu-par-moi.svg" alt="Vendu Par Moi" style="width:240px;height:auto;display:block;margin:0 auto;"></a>
   </div>
-  <div class="auth-box">
+  <div class="auth-box" id="stepCreds">
     <h1>Espace vendeur</h1>
     <p class="auth-sub">Connectez-vous pour accéder à vos outils</p>
     <form id="loginForm">
@@ -44,8 +44,26 @@
       <p style="margin-top:8px;">Une question ? <strong>06 95 44 36 54</strong></p>
     </div>
   </div>
+
+  <div class="auth-box" id="step2fa" style="display:none;">
+    <h1>Vérification</h1>
+    <p class="auth-sub">Code envoyé à <strong id="maskedEmail"></strong></p>
+    <form id="twoFaForm">
+      <div class="form-group">
+        <label>Code à 6 chiffres</label>
+        <input type="text" id="twoFaCode" required inputmode="numeric" pattern="[0-9]{6}" maxlength="6" placeholder="123456" autocomplete="one-time-code" style="letter-spacing:6px;font-size:1.3rem;text-align:center;">
+      </div>
+      <button type="submit" class="btn-primary btn-full" id="twoFaBtn">Vérifier</button>
+      <div id="twoFaError" class="form-error hidden"></div>
+    </form>
+    <div class="auth-footer">
+      <p><a href="#" id="backToCreds">← Retour</a></p>
+    </div>
+  </div>
   <script src="/js/toggle-password.js"></script>
   <script>
+    let pendingToken = null;
+
     document.getElementById('loginForm').addEventListener('submit', async (e) => {
       e.preventDefault();
       const btn = document.getElementById('loginBtn');
@@ -62,10 +80,46 @@
           })
         });
         const data = await res.json();
+        if (data.success) {
+          window.location.href = data.redirect;
+        } else if (data.requires2fa) {
+          pendingToken = data.pendingToken;
+          document.getElementById('maskedEmail').textContent = data.maskedEmail;
+          document.getElementById('stepCreds').style.display = 'none';
+          document.getElementById('step2fa').style.display = 'block';
+          document.getElementById('twoFaCode').focus();
+        } else {
+          err.textContent = data.error; err.classList.remove('hidden');
+        }
+      } catch { err.textContent = 'Erreur réseau.'; err.classList.remove('hidden'); }
+      btn.textContent = 'Me connecter'; btn.disabled = false;
+    });
+
+    document.getElementById('twoFaForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const btn = document.getElementById('twoFaBtn');
+      const err = document.getElementById('twoFaError');
+      btn.textContent = 'Vérification...'; btn.disabled = true;
+      err.classList.add('hidden');
+      try {
+        const res = await fetch('/api/login/verify-2fa', {
+          method: 'POST',
+          headers: {'Content-Type':'application/json'},
+          body: JSON.stringify({ pendingToken, code: document.getElementById('twoFaCode').value })
+        });
+        const data = await res.json();
         if (data.success) { window.location.href = data.redirect; }
         else { err.textContent = data.error; err.classList.remove('hidden'); }
       } catch { err.textContent = 'Erreur réseau.'; err.classList.remove('hidden'); }
-      btn.textContent = 'Me connecter'; btn.disabled = false;
+      btn.textContent = 'Vérifier'; btn.disabled = false;
+    });
+
+    document.getElementById('backToCreds').addEventListener('click', (e) => {
+      e.preventDefault();
+      pendingToken = null;
+      document.getElementById('step2fa').style.display = 'none';
+      document.getElementById('stepCreds').style.display = 'block';
+      document.getElementById('twoFaCode').value = '';
     });
   </script>
   <script>if('serviceWorker' in navigator) navigator.serviceWorker.register('/sw.js');</script>

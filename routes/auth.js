@@ -6,11 +6,28 @@ const crypto = require('crypto');
 const db = require('../database');
 const { sendPasswordResetEmail } = require('../services/email');
 const { isPasswordPwned } = require('../services/passwordCheck');
+const { issue2FACode, verify2FACode } = require('../services/twoFactor');
 
 // Limite dédiée sur les tentatives de connexion (la limite globale de
 // server.js est partagée par toutes les routes et bien trop large pour
 // contenir du brute-force ciblé sur un compte).
 const loginLimit = require('express-rate-limit')({ windowMs: 15 * 60 * 1000, max: 10, keyGenerator: (req) => req.ip });
+// Limite séparée pour la vérification du code 2FA : le blocage par code
+// (5 essais, voir services/twoFactor.js) protège déjà du brute-force sur le
+// code lui-même, donc ce compteur peut être plus large — il ne doit pas
+// pénaliser un utilisateur qui a déjà consommé son quota sur /login juste
+// pour avoir mal tapé son mot de passe une fois avant de réussir.
+const verify2faLimit = require('express-rate-limit')({ windowMs: 15 * 60 * 1000, max: 20, keyGenerator: (req) => req.ip });
+
+function maskEmail(email) {
+  const [user, domain] = email.split('@');
+  const visible = user.slice(0, 2);
+  return `${visible}${'*'.repeat(Math.max(user.length - 2, 2))}@${domain}`;
+}
+
+function issuePendingToken(accountType, accountId) {
+  return jwt.sign({ pending2fa: true, accountType, accountId }, process.env.JWT_SECRET, { expiresIn: '10m' });
+}
 
 router.get('/login', (req, res) => {
   res.sendFile('login.html', { root: './public' });
@@ -26,18 +43,48 @@ router.post('/login', loginLimit, express.json(), async (req, res) => {
   const valid = await bcrypt.compare(password, seller.password);
   if (!valid) return res.json({ error: 'Identifiants incorrects' });
 
-  const token = jwt.sign(
-    { id: seller.id, uuid: seller.uuid, email: seller.email, pack: seller.pack },
-    process.env.JWT_SECRET,
-    { expiresIn: '30d' }
-  );
-
-  res.cookie('token', token, {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-    maxAge: 30 * 24 * 3600 * 1000
+  await issue2FACode('seller', seller.id, seller.email);
+  res.json({
+    requires2fa: true,
+    pendingToken: issuePendingToken('seller', seller.id),
+    maskedEmail: maskEmail(seller.email),
   });
-  res.json({ success: true, redirect: '/dashboard' });
+});
+
+// Deuxième étape : vérification du code reçu par email, pour un compte
+// vendeur ou admin (accountType porté par le pendingToken émis à l'étape 1).
+router.post('/api/login/verify-2fa', verify2faLimit, express.json(), async (req, res) => {
+  const { pendingToken, code } = req.body;
+  if (!pendingToken || !code) return res.json({ error: 'Données invalides.' });
+
+  let payload;
+  try { payload = jwt.verify(pendingToken, process.env.JWT_SECRET); } catch { return res.json({ error: 'Session expirée — reconnectez-vous.' }); }
+  if (!payload.pending2fa) return res.json({ error: 'Session invalide.' });
+
+  const result = verify2FACode(payload.accountType, payload.accountId, String(code).trim());
+  if (!result.ok) return res.json({ error: result.error });
+
+  if (payload.accountType === 'seller') {
+    const seller = db.prepare('SELECT * FROM sellers WHERE id = ?').get(payload.accountId);
+    if (!seller) return res.json({ error: 'Compte introuvable.' });
+    const token = jwt.sign(
+      { id: seller.id, uuid: seller.uuid, email: seller.email, pack: seller.pack },
+      process.env.JWT_SECRET,
+      { expiresIn: '30d' }
+    );
+    res.cookie('token', token, { httpOnly: true, secure: process.env.NODE_ENV === 'production', maxAge: 30 * 24 * 3600 * 1000 });
+    return res.json({ success: true, redirect: '/dashboard' });
+  }
+
+  if (payload.accountType === 'admin') {
+    const admin = db.prepare('SELECT * FROM admins WHERE id = ?').get(payload.accountId);
+    if (!admin) return res.json({ error: 'Compte introuvable.' });
+    const token = jwt.sign({ role: 'admin', email: admin.email, name: admin.name }, process.env.JWT_SECRET, { expiresIn: '8h' });
+    res.cookie('admin_token', token, { httpOnly: true, secure: process.env.NODE_ENV === 'production', maxAge: 8 * 3600 * 1000 });
+    return res.json({ success: true, redirect: '/admin' });
+  }
+
+  res.json({ error: 'Type de compte invalide.' });
 });
 
 router.post('/logout', (req, res) => {
@@ -59,11 +106,16 @@ router.post('/admin/login', loginLimit, express.json(), async (req, res) => {
     if (admin) {
       const valid = await bcrypt.compare(password, admin.password);
       if (!valid) return res.json({ error: 'Accès refusé' });
-      const token = jwt.sign({ role: 'admin', email: admin.email, name: admin.name }, process.env.JWT_SECRET, { expiresIn: '8h' });
-      res.cookie('admin_token', token, { httpOnly: true, secure: process.env.NODE_ENV === 'production', maxAge: 8 * 3600 * 1000 });
-      return res.json({ success: true, redirect: '/admin' });
+      await issue2FACode('admin', admin.id, admin.email);
+      return res.json({
+        requires2fa: true,
+        pendingToken: issuePendingToken('admin', admin.id),
+        maskedEmail: maskEmail(admin.email),
+      });
     }
-    // Fallback env vars (ancien système)
+    // Fallback env vars (ancien système, pas de compte en base donc pas de
+    // 2FA possible ici — ce chemin ne sert plus depuis que les admins sont
+    // en base, laissé pour compatibilité)
     if (process.env.ADMIN_EMAIL && process.env.ADMIN_PASSWORD) {
       if (email === process.env.ADMIN_EMAIL && password === process.env.ADMIN_PASSWORD) {
         const token = jwt.sign({ role: 'admin', email }, process.env.JWT_SECRET, { expiresIn: '8h' });
