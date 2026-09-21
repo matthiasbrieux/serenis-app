@@ -1542,6 +1542,7 @@
 <audio id="agentAudioEl" preload="auto" src="/audio/agent-intro.mp3" style="display:none;"></audio>
 
 <script src="/js/transitions.js"></script>
+<script src="/js/progress-sync.js"></script>
 <script>
 // ── Déblocage audio navigateur (Firefox / autoplay policy) ──
 (function() {
@@ -2768,6 +2769,7 @@ function renderChecklist(type, title, containerId) {
       const isDone = row.classList.toggle('ck-done');
       saved[i] = isDone;
       localStorage.setItem(`ck_${type}`, JSON.stringify(saved));
+      syncProgress(`ck_${type}`, JSON.stringify(saved));
       updateProgress();
     });
   });
@@ -2858,6 +2860,7 @@ function handleInteractionEvent(e) {
     const mi = +chk.dataset.mi, si = +chk.dataset.si, key = `${mi}_${si}`;
     doneSteps[key] = !doneSteps[key];
     localStorage.setItem('vpm_done_steps', JSON.stringify(doneSteps));
+    syncProgress('vpm_done_steps', JSON.stringify(doneSteps));
     document.getElementById(`step-${mi}-${si}`)?.classList.toggle('done', !!doneSteps[key]);
     updateProgress();
     const fill = document.getElementById(`mod-tab-prog-${mi}`);
@@ -2936,6 +2939,7 @@ function showCelebration(mi) {
   if (!mod) return;
   celebratedModules.add(mi);
   localStorage.setItem('vpm_celebrated', JSON.stringify([...celebratedModules]));
+  syncProgress('vpm_celebrated', JSON.stringify([...celebratedModules]));
   const stepCount = mod.steps.length;
   const nextMi = mi + 1 < MODULES.length ? mi + 1 : null;
   document.getElementById('celebrateTag').textContent = `Module ${mod.num} terminé`;
@@ -3148,7 +3152,9 @@ function stopAgentIntro() {
 // ── Annonce Info Checklist ──
 function toggleAnnonceInfo(el) {
   el.classList.toggle('ai-checked');
-  localStorage.setItem(el.dataset.key, el.classList.contains('ai-checked') ? '1' : '0');
+  const aiVal = el.classList.contains('ai-checked') ? '1' : '0';
+  localStorage.setItem(el.dataset.key, aiVal);
+  syncProgress(el.dataset.key, aiVal);
   updateAnnonceInfoCounters();
 }
 function updateAnnonceInfoCounters() {
@@ -3420,6 +3426,20 @@ updateKeyPoints();
 updateModuleVideo();
 showWelcomeSlide();
 setTimeout(() => triggerAiModuleMsg(0), 2000);
+
+// Rattrape la progression enregistrée côté serveur (autre appareil, cache
+// vidé) : le premier rendu ci-dessus reste immédiat via localStorage, on
+// re-rend seulement si le serveur avait des données plus récentes.
+hydrateProgress(() => {
+  Object.assign(doneSteps, JSON.parse(localStorage.getItem('vpm_done_steps') || '{}'));
+  celebratedModules.clear();
+  JSON.parse(localStorage.getItem('vpm_celebrated') || '[]').forEach(mi => celebratedModules.add(mi));
+  renderModules();
+  renderMails();
+  renderChecklists();
+  updateKeyPoints();
+  updateModuleVideo();
+});
 
 // ── Init carousel ──
 (function initCarousel() {
