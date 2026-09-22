@@ -175,7 +175,7 @@ async function sendAutomatedNudges() {
     for (const s of sellers) {
       if (alreadySent(s.email, 'missing_doc_nudge', 168)) continue;
       const missingDocs = [];
-      if (!s.dpe_class) missingDocs.push('Diagnostic de Performance Energétique (DPE) — classe énergie');
+      if (!s.dpe_class) missingDocs.push('Diagnostics techniques complets — un doute sur lesquels réaliser ? Votre espace formation vous guide');
       if (!s.taxe_fonciere) missingDocs.push('Montant de la taxe foncière annuelle');
       const ok = await sendMissingDocNudge({ email: s.email, missingDocs });
       if (ok) { logEmail(s.email, 'missing_doc_nudge'); console.log('[NUDGE] missing_doc_nudge sent:', s.email); }
