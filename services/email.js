@@ -297,7 +297,7 @@ async function sendPublishedConfirmation({ email, propertySlug }) {
   const html = layout(`
     ${badge('🚀 Bien publié', '#C4603A')}
     ${h1('Votre bien est en ligne !')}
-    ${p('Félicitations ! Votre annonce est maintenant publiée et accessible aux acheteurs. Votre numéro dédié est activé : les acheteurs qui vous contactent recevront automatiquement votre dossier.')}
+    ${p('Félicitations ! Vous avez suivi toutes les étapes de préparation de commercialisation, votre dossier est prêt. Votre annonce n\'attend plus que vous pour être visible par les acheteurs.')}
     ${btn('Voir mon annonce', publicUrl)}
     ${h2('Et maintenant ?')}
     <ul style="font-size:14px;color:#4a4540;line-height:2;padding-left:20px;margin:0 0 16px;">
