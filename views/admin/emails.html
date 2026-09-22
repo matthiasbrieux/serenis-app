@@ -39,6 +39,8 @@
     .badge-acheteur { background: #fce4ec; color: #c62828; }
     .badge-prospect { background: #f3e5f5; color: #6a1b9a; }
     .badge-prestataire { background: #e0f2f1; color: #00695c; }
+    .badge-admin { background: #fff3e0; color: #e65100; }
+    .catalog-section-row td { background: #F5F0E8; font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #9E3A18; padding: 8px 12px; }
     .badge-success { background: #e8f4ec; color: #2e7d32; }
     .badge-fail { background: #fdecea; color: #c62828; }
     .btn-send { background: #C4785A; color: #fff; border: none; padding: 7px 16px; border-radius: 6px; font-size: 0.82rem; cursor: pointer; font-weight: 600; white-space: nowrap; display: inline-flex; align-items: center; gap: 5px; }
@@ -304,9 +306,10 @@ const EMAIL_DESCRIPTIONS = {
   prospect_nudge: 'Relance un prospect inscrit mais non encore passé à l\'achat.',
   info_needed: 'Demande des informations manquantes au vendeur pour compléter son dossier.',
   buyer_contacted: 'Informe le vendeur qu\'un acheteur vient de remplir le formulaire de contact de son annonce.',
-  visit_feedback_buyer: 'Demande à l\'acheteur son retour après une visite confirmée (J+1).',
-  sold_congrats: 'Félicite le vendeur après acceptation d\'une offre — son bien est vendu !',
+  post_visit_buyer: 'Relance l\'acheteur qui a visité sans faire d\'offre, une semaine après la visite.',
+  sold_congrats: 'Félicite le vendeur dès qu\'il passe le statut de son bien à "vendu".',
   welcome_v2: 'Email de bienvenue amélioré envoyé à la création de compte.',
+  contact_notification: 'Prévient l\'admin qu\'un prospect a rempli le formulaire de contact ou de rappel du site.',
   custom: 'Message libre rédigé manuellement par l\'administrateur.',
 };
 
@@ -364,10 +367,16 @@ async function loadSellers() {
 function renderCatalog(list) {
   const tbody = document.getElementById('catalogBody');
   if (!list.length) { tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:#aaa;padding:32px;">Aucun résultat</td></tr>'; return; }
+  let lastCategory = null;
   tbody.innerHTML = list.map(e => {
-    const recBadge = e.recipient === 'Vendeur' ? 'badge-seller' : e.recipient === 'Acheteur' ? 'badge-acheteur' : e.recipient === 'Prospect' ? 'badge-prospect' : 'badge-prestataire';
+    const recBadge = e.recipient === 'Vendeur' ? 'badge-seller' : e.recipient === 'Acheteur' ? 'badge-acheteur' : e.recipient === 'Prospect' ? 'badge-prospect' : e.recipient === 'Admin' ? 'badge-admin' : 'badge-prestataire';
     const lastSent = e.last_sent ? new Date(e.last_sent).toLocaleDateString('fr-FR', { day:'2-digit', month:'short', year:'numeric' }) : '<span style="color:#ccc">Jamais</span>';
-    return `<tr>
+    let sectionRow = '';
+    if (e.category && e.category !== lastCategory) {
+      sectionRow = `<tr class="catalog-section-row"><td colspan="6">${e.category}</td></tr>`;
+      lastCategory = e.category;
+    }
+    return `${sectionRow}<tr>
       <td>
         <div style="font-weight:600;color:#1A1A16;">${e.label}</div>
         <div style="font-size:0.78rem;color:#999;margin-top:2px;">${EMAIL_DESCRIPTIONS[e.id] || ''}</div>

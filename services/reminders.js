@@ -181,11 +181,6 @@ async function sendAutomatedNudges() {
       if (ok) { logEmail(s.email, 'missing_doc_nudge'); console.log('[NUDGE] missing_doc_nudge sent:', s.email); }
     }
   } catch (e) { console.error('[NUDGE] Trigger 7 error:', e.message); }
-
-  // Trigger 10: check-in for sellers published 14+ days with no offer
-  try {
-    await sendCheckInNoOfferNudges();
-  } catch (e) { console.error('[NUDGE] Trigger 10 (check_in_no_offer) error:', e.message); }
 }
 
 // ── Relances contrats J-14 ────────────────────────────────────
