@@ -399,8 +399,9 @@ async function sendReviewRequest({ email, firstName, daysSold, propertyCity }) {
     ${h1(`Comment s'est passée votre vente ?`)}
     ${p(`Bonjour ${firstName || ''},`)}
     ${p(`Vous avez vendu votre bien à <strong>${propertyCity || ''}</strong>${daysSold ? ` en ${daysSold} jours` : ''} grâce à Vendu Par Moi. Nous espérons que l'expérience a été à la hauteur de vos attentes.`)}
-    ${p('Votre retour d\'expérience est précieux pour nous améliorer et aider les futurs vendeurs à se décider. Cela ne prend que 2 minutes !')}
+    ${p('Votre retour est précieux pour nous améliorer et aider les futurs vendeurs — cela ne prend que 2 minutes.')}
     ${btn('Laisser mon avis', 'https://g.page/r/venduparmo/review', '#C4785A')}
+    ${p('Vous êtes dans notre secteur ? Nous serions ravis de venir trinquer avec vous pour célébrer votre vente — répondez simplement à cet email avec vos disponibilités.')}
     ${divider()}
     ${muted('Merci d\'avoir choisi Vendu Par Moi pour votre vente.')}
   `, { preheader: 'Votre avis sur Vendu Par Moi nous tient à cœur.' });
