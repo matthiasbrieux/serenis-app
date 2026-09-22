@@ -199,17 +199,7 @@
     <div class="separator">CHOISISSEZ VOTRE FORMULE</div>
 
     <div class="plan-grid">
-      <button class="plan-btn primary" id="btn2x" onclick="submit2x()">
-        <div>
-          <div class="plan-label">Paiement en 4 fois</div>
-          <div class="plan-detail">Sans frais — prélevé automatiquement</div>
-        </div>
-        <div class="plan-price">
-          250&nbsp;€
-          <small>× 4 versements</small>
-        </div>
-      </button>
-      <button class="plan-btn secondary" id="btnUnique" onclick="submitUnique()">
+      <button class="plan-btn primary" id="btnUnique" onclick="submitUnique()">
         <div>
           <div class="plan-label">Paiement en une fois</div>
           <div class="plan-detail">999&nbsp;€ TTC tout compris</div>
@@ -259,24 +249,20 @@
       const btn = document.getElementById(btnId);
       if (loading) {
         btn.disabled = true;
-        document.getElementById('btn2x').disabled = true;
-        document.getElementById('btnUnique').disabled = true;
         const orig = btn.innerHTML;
         btn.dataset.orig = orig;
         btn.innerHTML = '<span class="spinner"></span>Redirection vers le paiement…';
       } else {
-        document.getElementById('btn2x').disabled = false;
-        document.getElementById('btnUnique').disabled = false;
+        btn.disabled = false;
         btn.innerHTML = btn.dataset.orig || btn.innerHTML;
       }
     }
 
-    async function checkout(plan) {
+    async function submitUnique() {
       const data = getFormData();
       if (!data) return;
 
-      const btnId = plan === '2x' ? 'btn2x' : 'btnUnique';
-      setLoading(btnId, true);
+      setLoading('btnUnique', true);
 
       try {
         const res = await fetch('/create-checkout', {
@@ -284,7 +270,7 @@
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             pack: 'serenite',
-            plan,
+            plan: 'unique',
             email: data.email,
             first_name: data.firstName,
             last_name: data.lastName,
@@ -296,16 +282,13 @@
           window.location.href = json.url;
         } else {
           showError(json.error || 'Une erreur est survenue. Réessayez ou appelez le 06 95 44 36 54.');
-          setLoading(btnId, false);
+          setLoading('btnUnique', false);
         }
       } catch {
         showError('Erreur réseau. Vérifiez votre connexion et réessayez.');
-        setLoading(btnId, false);
+        setLoading('btnUnique', false);
       }
     }
-
-    function submit2x()     { checkout('2x'); }
-    function submitUnique() { checkout('unique'); }
   </script>
 </body>
 </html>

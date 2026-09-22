@@ -21,7 +21,7 @@ const checkoutLimit = rateLimit({
 
 // Checkout session creation
 router.post('/create-checkout', express.json(), checkoutLimit, async (req, res) => {
-  const { pack, email, plan, first_name, last_name, phone } = req.body;
+  const { pack, email, first_name, last_name, phone } = req.body;
   let { password } = req.body;
   if (!['serenite', 'autonome'].includes(pack)) return res.json({ error: 'Pack invalide' });
   if (!email) return res.json({ error: 'Email requis' });
@@ -43,15 +43,12 @@ router.post('/create-checkout', express.json(), checkoutLimit, async (req, res) 
   }
 
   const isSerenite = pack === 'serenite';
-  const is4x = plan === '2x' && isSerenite; // paiement 4x pour Pack Coaching Plus (plan '2x' = code installment)
 
   let amount, productName, productDesc;
   if (isSerenite) {
-    amount = is4x ? 25000 : 99900; // 250€ × 4 ou 999€ unique
-    productName = is4x ? 'Vendu Par Moi — 1er versement sur 4' : 'Vendu Par Moi — Pack Coaching Plus';
-    productDesc = is4x
-      ? '1er versement sur 4 · 250€ × 4 = 1 000€ TTC · sans frais ni intérêts'
-      : 'Pack Coaching Plus · Fiche descriptive · Agenda intelligent · SMS automatiques · Formation complète · Coach IA';
+    amount = 99900; // 999€ unique
+    productName = 'Vendu Par Moi — Pack Coaching Plus';
+    productDesc = 'Pack Coaching Plus · Fiche descriptive · Agenda intelligent · SMS automatiques · Formation complète · Coach IA';
   } else {
     amount = 49900; // 499€ — Pack Autonome
     productName = 'Vendu Par Moi — Pack Autonome';
@@ -83,13 +80,9 @@ router.post('/create-checkout', express.json(), checkoutLimit, async (req, res) 
       customer_email: email,
       success_url: `${process.env.BASE_URL || 'https://venduparmoi.fr'}/paiement-succes?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${process.env.BASE_URL || 'https://venduparmoi.fr'}/#offres`,
-      metadata: { pack, email, seller_id: String(seller.id), plan: plan || 'unique', installment: '1', total_installments: is4x ? '4' : '1', needs_password_reset: needsPasswordReset ? 'true' : 'false' },
+      metadata: { pack, email, seller_id: String(seller.id), needs_password_reset: needsPasswordReset ? 'true' : 'false' },
       locale: 'fr',
     };
-    // Pour le 4x : sauvegarder la carte pour les versements suivants
-    if (is4x) {
-      sessionParams.payment_intent_data = { setup_future_usage: 'off_session' };
-    }
     const session = await stripe.checkout.sessions.create(sessionParams);
     res.json({ url: session.url });
   } catch (err) {
@@ -225,26 +218,6 @@ async function activateSeller(session) {
     if (!assigned) {
       console.warn(`⚠️  Aucun numéro Twilio disponible pour ${seller.email} (id=${seller.id}). Ajoutez un numéro dans l'admin.`);
     }
-  }
-
-  // Gestion plan installments — sauvegarder la carte + initialiser le suivi des versements
-  const totalInstallments = parseInt(session.metadata?.total_installments || '1', 10);
-  const isInstallmentPlan = totalInstallments > 1;
-  if (isInstallmentPlan) {
-    try {
-      const customerId = session.customer || seller.stripe_customer_id;
-      if (customerId) {
-        const pms = await stripe.paymentMethods.list({ customer: customerId, type: 'card', limit: 1 });
-        const pmId = pms.data[0]?.id;
-        if (pmId) {
-          const _nd = new Date(Date.now() + 30 * 24 * 3600 * 1000);
-          const nextDate = `${_nd.getFullYear()}-${String(_nd.getMonth()+1).padStart(2,'0')}-${String(_nd.getDate()).padStart(2,'0')}`;
-          db.prepare('UPDATE sellers SET stripe_payment_method_id=?, installments_paid=1, installments_total=?, next_installment_date=? WHERE id=?')
-            .run(pmId, totalInstallments, nextDate, seller.id);
-          console.log(`✓ Carte sauvegardée pour paiement ${totalInstallments}x — seller ${seller.id}`);
-        }
-      }
-    } catch(e) { console.error('installment setup error:', e.message); }
   }
 
   // Email de bienvenue — avec lien reset si mot de passe auto-généré
