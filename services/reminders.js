@@ -299,41 +299,6 @@ async function sendCheckInNoOfferNudges() {
   }
 }
 
-// ── Envoi dossier acheteur sérieux J+1 après visite ──────────
-async function sendPostVisitDossierNudges() {
-  const { sendPostVisitDossierNudge } = require('./email');
-  const base = process.env.BASE_URL || 'https://venduparmoi.fr';
-
-  const yesterday = new Date();
-  yesterday.setDate(yesterday.getDate() - 1);
-  const yesterdayStr = yesterday.toISOString().split('T')[0];
-
-  const visits = db.prepare(`
-    SELECT v.buyer_email, v.buyer_name, v.id,
-           p.acheteur_token, p.city, p.type,
-           s.first_name as seller_first_name
-    FROM visits v
-    JOIN properties p ON p.id = v.property_id
-    JOIN sellers s ON s.id = v.seller_id
-    WHERE v.visit_date = ? AND v.status = 'confirmed'
-      AND p.acheteur_docs_visible = 1
-  `).all(yesterdayStr);
-
-  for (const v of visits) {
-    try {
-      const triggerKey = `post_visit_dossier:${v.id}`;
-      const already = db.prepare(`SELECT id FROM email_log WHERE trigger_type=? AND recipient_email=?`).get(triggerKey, v.buyer_email);
-      if (already) continue;
-      const dossierUrl = `${base}/dossier/acheteur/${v.acheteur_token}`;
-      const ok = await sendPostVisitDossierNudge({ buyerEmail: v.buyer_email, buyerName: v.buyer_name, propertyCity: v.city, propertyType: v.type, dossierUrl, sellerFirstName: v.seller_first_name });
-      if (ok) {
-        db.prepare(`INSERT INTO email_log (trigger_type, recipient_email) VALUES (?,?)`).run(triggerKey, v.buyer_email);
-        console.log(`[NUDGE] post_visit_dossier → ${v.buyer_email}`);
-      }
-    } catch(e) { console.error('[NUDGE] post_visit_dossier error:', e.message); }
-  }
-}
-
 // ── Relance acheteurs post-visite J+3 ────────────────────────
 async function sendPostVisitJ3Nudges() {
   const { sendPostVisitJ3Nudge } = require('./email');
@@ -404,4 +369,4 @@ async function sendPriceDropNudges() {
   }
 }
 
-module.exports = { sendVisitReminders, sendMissionReminders, sendAutomatedNudges, sendContractExpiryReminders, sendPostVisitBuyerNudges, sendPostVisitDossierNudges, sendPostVisitJ3Nudges, sendPostFirstVisitFeedbackNudges, sendCheckInNoOfferNudges, sendPriceDropNudges };
+module.exports = { sendVisitReminders, sendMissionReminders, sendAutomatedNudges, sendContractExpiryReminders, sendPostVisitBuyerNudges, sendPostVisitJ3Nudges, sendPostFirstVisitFeedbackNudges, sendCheckInNoOfferNudges, sendPriceDropNudges };

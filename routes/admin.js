@@ -1582,7 +1582,6 @@ const EMAIL_CATALOG = [
   { id: 'visit_feedback_buyer',  label: 'Retour visite (acheteur)',           trigger: 'J+1 après visite confirmée',       recipient: 'Acheteur', auto: false },
   { id: 'sold_congrats',         label: 'Félicitations — bien vendu !',       trigger: 'Offre acceptée',                   recipient: 'Vendeur',  auto: false },
   { id: 'welcome_v2',            label: 'Bienvenue (version améliorée)',      trigger: 'Création compte',                  recipient: 'Vendeur',  auto: true },
-  { id: 'post_visit_dossier',    label: 'Dossier sérieux J+1',               trigger: 'J+1 après visite (si docs actifs)', recipient: 'Acheteur', auto: true },
   { id: 'post_visit_j3',         label: 'Relance J+3 post-visite',           trigger: 'J+3 si pas d\'offre',              recipient: 'Acheteur', auto: true },
   { id: 'price_drop',            label: 'Conseil baisse de prix',            trigger: 'J+45 publié sans offre',           recipient: 'Vendeur',  auto: true },
   { id: 'invoice',               label: 'Facture paiement',                  trigger: 'Après paiement / mensualité',      recipient: 'Vendeur',  auto: true },
@@ -1944,7 +1943,7 @@ router.get('/api/test-all-emails', requireAdmin, async (req, res) => {
     'visit_confirmation', 'new_visit_request', 'visit_reminder_seller',
     'dossier', 'prospect_nudge', 'no_property', 'no_photos', 'not_published',
     'missing_doc', 'post_first_visit', 'check_in_no_offer',
-    'contract_renewal', 'post_visit_dossier', 'post_visit_j3', 'post_visit_buyer',
+    'contract_renewal', 'post_visit_j3', 'post_visit_buyer',
     'price_drop', 'first_meeting', 'review_request',
     'sold_congrats',
   ];
