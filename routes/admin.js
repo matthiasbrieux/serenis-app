@@ -232,9 +232,9 @@ router.get('/api/contrats', requireAdmin, (req, res) => {
       s.vente_realisee, s.vente_date, s.avis_demande_at, s.avis_recu,
       s.relance_extension_at,
       -- Calcul date d'échéance
-      date(s.contrat_signe_at, '+12 months') as contrat_echeance,
+      date(s.contrat_signe_at, '+6 months') as contrat_echeance,
       -- Jours restants avant échéance
-      CAST((julianday(date(s.contrat_signe_at, '+12 months')) - julianday('now')) AS INTEGER) as jours_restants,
+      CAST((julianday(date(s.contrat_signe_at, '+6 months')) - julianday('now')) AS INTEGER) as jours_restants,
       -- Jours pour vendre (de paid_at à vente_date)
       CASE WHEN s.vente_realisee=1 AND s.vente_date IS NOT NULL AND s.paid_at IS NOT NULL
            THEN CAST((julianday(s.vente_date) - julianday(s.paid_at)) AS INTEGER)
@@ -265,7 +265,7 @@ router.post('/api/contrats/:id/relance-extension', requireAdmin, async (req, res
   const seller = db.prepare('SELECT * FROM sellers WHERE id=?').get(req.params.id);
   if (!seller) return res.status(404).json({ error: 'Vendeur introuvable' });
   const expiryDate = seller.contrat_signe_at
-    ? new Date(new Date(seller.contrat_signe_at).setFullYear(new Date(seller.contrat_signe_at).getFullYear() + 1))
+    ? new Date(new Date(seller.contrat_signe_at).setMonth(new Date(seller.contrat_signe_at).getMonth() + 6))
     : new Date(Date.now() + 30 * 24 * 3600 * 1000);
   const daysLeft = Math.max(1, Math.round((expiryDate - new Date()) / (1000 * 3600 * 24)));
   const ok = await sendContractRenewal({ email: seller.email, firstName: seller.first_name, expiryDate: expiryDate.toISOString(), daysLeft });

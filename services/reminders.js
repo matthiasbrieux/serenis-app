@@ -208,14 +208,14 @@ async function sendContractExpiryReminders() {
     FROM sellers s
     WHERE s.contrat_signe_at IS NOT NULL
       AND s.vente_realisee = 0
-      AND date(s.contrat_signe_at, '+12 months') BETWEEN date('now', '+13 days') AND date('now', '+15 days')
+      AND date(s.contrat_signe_at, '+6 months') BETWEEN date('now', '+13 days') AND date('now', '+15 days')
       AND (s.relance_extension_at IS NULL OR s.relance_extension_at < date('now', '-30 days'))
   `).all();
 
   for (const s of sellers) {
     try {
       const expiryDate = new Date(s.contrat_signe_at);
-      expiryDate.setFullYear(expiryDate.getFullYear() + 1);
+      expiryDate.setMonth(expiryDate.getMonth() + 6);
       const daysLeft = Math.round((expiryDate - new Date()) / (1000 * 3600 * 24));
       const ok = await sendContractRenewal({ email: s.email, firstName: s.first_name, expiryDate: expiryDate.toISOString(), daysLeft });
       if (ok) {
