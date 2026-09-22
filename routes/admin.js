@@ -7,7 +7,7 @@ const fs = require('fs');
 const db = require('../database');
 const { isPasswordPwned } = require('../services/passwordCheck');
 const { requireAdmin } = require('../middleware/auth');
-const { sendWelcomeEmail, sendPhotographerAvailabilityRequest, sendPostFirstVisitFeedbackSeller, sendCheckInNoOffer, sendNoPhotosNudge, sendMissingDocNudge, sendNotPublishedNudge, sendProspectNudge, sendContractRenewal, sendReviewRequest, sendAdminDirectEmail, sendFirstMeetingEmail, sendNewClientAdminNotif } = require('../services/email');
+const { sendWelcomeImproved, sendPhotographerAvailabilityRequest, sendPostFirstVisitFeedbackSeller, sendCheckInNoOffer, sendNoPhotosNudge, sendMissingDocNudge, sendNotPublishedNudge, sendProspectNudge, sendContractRenewal, sendReviewRequest, sendAdminDirectEmail, sendFirstMeetingEmail, sendNewClientAdminNotif } = require('../services/email');
 
 router.get('/', requireAdmin, (req, res) => {
   res.sendFile('dashboard.html', { root: './views/admin' });
@@ -524,7 +524,7 @@ router.get('/create-seller', requireAdmin, async (req, res) => {
   const propUuid = uuidv4();
   db.prepare('INSERT INTO properties (uuid, seller_id, slug, acheteur_token, notaire_token, status) VALUES (?,?,?,?,?,?)')
     .run(propUuid, sellerId, `bien-${sellerId}`, uuidv4(), uuidv4(), 'preparation');
-  try { await sendWelcomeEmail({ email, firstName: '', pack: pack || 'serenite' }); } catch(e) {}
+  try { await sendWelcomeImproved({ email, firstName: '', pack: pack || 'serenite' }); } catch(e) {}
   res.send(`✓ Compte créé — email: ${email} — dossier acheteur activé`);
 });
 
@@ -615,7 +615,7 @@ router.post('/api/clients', requireAdmin, express.json(), async (req, res) => {
   db.prepare('INSERT INTO sellers (uuid, email, password, pack, first_name, last_name, phone, paid_at) VALUES (?,?,?,?,?,?,?,CURRENT_TIMESTAMP)')
     .run(uuid, email.toLowerCase(), hashed, pack, first_name || '', last_name || '', phone || '');
   const seller = db.prepare('SELECT id FROM sellers WHERE email=?').get(email.toLowerCase());
-  try { await sendWelcomeEmail({ email, firstName: first_name || '', pack }); } catch(e) {}
+  try { await sendWelcomeImproved({ email, firstName: first_name || '', pack }); } catch(e) {}
   try {
     const todoData = JSON.stringify({ name: `${first_name || ''} ${last_name || ''}`.trim() || email, pack, email, phone: phone || '' });
     db.prepare('INSERT INTO admin_todos (type, seller_id, data) VALUES (?,?,?)').run('new_signup', seller.id, todoData);
@@ -1562,7 +1562,6 @@ router.get('/emails', requireAdmin, (req, res) => {
 });
 
 const EMAIL_CATALOG = [
-  { id: 'welcome',               label: 'Bienvenue + accès espace',         trigger: 'Création de compte',               recipient: 'Vendeur',  auto: true },
   { id: 'first_meeting',        label: 'Préparation 1er rendez-vous',       trigger: 'Après paiement',                   recipient: 'Vendeur',  auto: true },
   { id: 'no_property',           label: 'Pas encore de bien créé',           trigger: 'J+3 sans fiche',                   recipient: 'Vendeur',  auto: true },
   { id: 'no_photos',             label: 'Photos manquantes',                 trigger: 'J+3 payé sans photos',             recipient: 'Vendeur',  auto: true },
@@ -1947,7 +1946,7 @@ router.get('/api/test-all-emails', requireAdmin, async (req, res) => {
   const fromEmail = process.env.SENDGRID_FROM_EMAIL || 'contact@venduparmoi.fr';
 
   const templates = [
-    'welcome', 'welcome_v2', 'password_reset', 'invoice', 'published',
+    'welcome_v2', 'password_reset', 'invoice', 'published',
     'visit_confirmation', 'new_visit_request', 'visit_reminder_seller',
     'dossier', 'prospect_nudge', 'no_property', 'no_photos', 'not_published',
     'missing_doc', 'photographer_request', 'post_first_visit', 'check_in_no_offer',
