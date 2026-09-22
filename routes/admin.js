@@ -7,7 +7,7 @@ const fs = require('fs');
 const db = require('../database');
 const { isPasswordPwned } = require('../services/passwordCheck');
 const { requireAdmin } = require('../middleware/auth');
-const { sendWelcomeImproved, sendPhotographerAvailabilityRequest, sendPostFirstVisitFeedbackSeller, sendCheckInNoOffer, sendNoPhotosNudge, sendMissingDocNudge, sendNotPublishedNudge, sendProspectNudge, sendContractRenewal, sendReviewRequest, sendAdminDirectEmail, sendFirstMeetingEmail, sendNewClientAdminNotif } = require('../services/email');
+const { sendWelcomeImproved, sendPostFirstVisitFeedbackSeller, sendCheckInNoOffer, sendNoPhotosNudge, sendMissingDocNudge, sendNotPublishedNudge, sendProspectNudge, sendContractRenewal, sendReviewRequest, sendAdminDirectEmail, sendFirstMeetingEmail, sendNewClientAdminNotif } = require('../services/email');
 
 router.get('/', requireAdmin, (req, res) => {
   res.sendFile('dashboard.html', { root: './views/admin' });
@@ -1565,7 +1565,6 @@ const EMAIL_CATALOG = [
   { id: 'first_meeting',        label: 'Préparation 1er rendez-vous',       trigger: 'Après paiement',                   recipient: 'Vendeur',  auto: true },
   { id: 'no_property',           label: 'Pas encore de bien créé',           trigger: 'J+3 sans fiche',                   recipient: 'Vendeur',  auto: true },
   { id: 'no_photos',             label: 'Photos manquantes',                 trigger: 'J+3 payé sans photos',             recipient: 'Vendeur',  auto: true },
-  { id: 'photographer_request',  label: 'Demande de dispos photographe',     trigger: 'J+3 payé sans photos (manuel)',    recipient: 'Vendeur',  auto: false },
   { id: 'missing_doc',           label: 'Documents manquants',               trigger: 'J+5 payé sans diagnostics',        recipient: 'Vendeur',  auto: true },
   { id: 'not_published',         label: 'Fiche non publiée',                 trigger: 'J+7 non publié',                   recipient: 'Vendeur',  auto: true },
   { id: 'post_first_visit',      label: 'Retour 1ère session de visites',    trigger: 'J+2 après 1ère visite',            recipient: 'Vendeur',  auto: false },
@@ -1658,8 +1657,6 @@ router.post('/api/emails/send', requireAdmin, async (req, res) => {
       ok = await sendFirstMeetingEmail({ email: seller.email, firstName: seller.first_name });
     } else if (email_type === 'no_photos') {
       ok = await sendNoPhotosNudge({ email: seller.email, firstName: seller.first_name });
-    } else if (email_type === 'photographer_request') {
-      ok = await sendPhotographerAvailabilityRequest({ email: seller.email, firstName: seller.first_name });
     } else if (email_type === 'missing_doc') {
       ok = await sendMissingDocNudge({ email: seller.email, missingDocs: [] });
     } else if (email_type === 'not_published') {
@@ -1947,7 +1944,7 @@ router.get('/api/test-all-emails', requireAdmin, async (req, res) => {
     'welcome_v2', 'password_reset', 'invoice', 'published',
     'visit_confirmation', 'new_visit_request', 'visit_reminder_seller',
     'dossier', 'prospect_nudge', 'no_property', 'no_photos', 'not_published',
-    'missing_doc', 'photographer_request', 'post_first_visit', 'check_in_no_offer',
+    'missing_doc', 'post_first_visit', 'check_in_no_offer',
     'contract_renewal', 'post_visit_dossier', 'post_visit_j3', 'post_visit_buyer',
     'price_drop', 'first_meeting', 'review_request',
     'sold_congrats',

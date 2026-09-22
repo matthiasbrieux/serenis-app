@@ -1,5 +1,5 @@
 const db = require('../database');
-const { sendVisitConfirmation, sendMissionReminderJ1, sendPhotographerAvailabilityRequest, sendPostFirstVisitFeedbackSeller, sendCheckInNoOffer } = require('./email');
+const { sendVisitConfirmation, sendMissionReminderJ1, sendPostFirstVisitFeedbackSeller, sendCheckInNoOffer } = require('./email');
 const { sendSmsNotification } = require('./twilio');
 
 async function sendVisitReminders() {
@@ -182,11 +182,6 @@ async function sendAutomatedNudges() {
     }
   } catch (e) { console.error('[NUDGE] Trigger 7 error:', e.message); }
 
-  // Trigger 8: photographer availability nudge (paid 3+ days, no photos yet)
-  try {
-    await sendPhotographerAvailabilityNudges();
-  } catch (e) { console.error('[NUDGE] Trigger 8 (photographer_availability) error:', e.message); }
-
   // Trigger 9: post-first-visit seller feedback (J+2 after first visit)
   try {
     await sendPostFirstVisitFeedbackNudges();
@@ -254,30 +249,6 @@ async function sendPostVisitBuyerNudges() {
         console.log(`[NUDGE] post_visit sent → ${v.buyer_email} (${v.slug})`);
       }
     } catch(e) { console.error('[NUDGE] post_visit error:', e.message); }
-  }
-}
-
-async function sendPhotographerAvailabilityNudges() {
-  // Sellers paid but no photos yet, sent 3+ days after payment
-  const sellers = db.prepare(`
-    SELECT s.email, s.first_name, s.id
-    FROM sellers s
-    LEFT JOIN properties p ON p.seller_id = s.id
-    LEFT JOIN (SELECT pr.seller_id, COUNT(*) as cnt FROM property_photos ph2 JOIN properties pr ON pr.id = ph2.property_id GROUP BY pr.seller_id) ph ON ph.seller_id = s.id
-    WHERE s.paid_at IS NOT NULL
-      AND (s.archived IS NULL OR s.archived = 0)
-      AND (ph.cnt IS NULL OR ph.cnt = 0)
-      AND s.paid_at <= date('now', '-3 days')
-    LIMIT 20
-  `).all();
-  for (const s of sellers) {
-    const key = `photographer_request:${s.id}`;
-    const already = db.prepare(`SELECT id FROM email_log WHERE trigger_type=? AND recipient_email=?`).get(key, s.email);
-    if (already) continue;
-    try {
-      await sendPhotographerAvailabilityRequest({ email: s.email, firstName: s.first_name });
-      db.prepare(`INSERT INTO email_log (trigger_type, recipient_email) VALUES (?,?)`).run(key, s.email);
-    } catch(e) { console.error('[NUDGE] photographer_request error:', e.message); }
   }
 }
 
@@ -438,4 +409,4 @@ async function sendPriceDropNudges() {
   }
 }
 
-module.exports = { sendVisitReminders, sendMissionReminders, sendAutomatedNudges, sendContractExpiryReminders, sendPostVisitBuyerNudges, sendPostVisitDossierNudges, sendPostVisitJ3Nudges, sendPhotographerAvailabilityNudges, sendPostFirstVisitFeedbackNudges, sendCheckInNoOfferNudges, sendPriceDropNudges };
+module.exports = { sendVisitReminders, sendMissionReminders, sendAutomatedNudges, sendContractExpiryReminders, sendPostVisitBuyerNudges, sendPostVisitDossierNudges, sendPostVisitJ3Nudges, sendPostFirstVisitFeedbackNudges, sendCheckInNoOfferNudges, sendPriceDropNudges };
