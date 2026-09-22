@@ -412,26 +412,6 @@ async function sendReviewRequest({ email, firstName, daysSold, propertyCity }) {
 // 9. MISSIONS PHOTOGRAPHES
 // ─────────────────────────────────────────────────────────────
 
-async function sendMissionAssigned(photographer, mission) {
-  const html = layout(`
-    ${badge('📸 Nouvelle mission', '#C4603A')}
-    ${h1(`Bonjour ${photographer.first_name}, une mission vous est proposée`)}
-    ${p('Une nouvelle mission photo vient de vous être assignée. Acceptez ou refusez depuis votre espace partenaire.')}
-    ${infoTable(`
-      ${infoRow('Client', mission.client_name || '—')}
-      ${infoRow('Adresse', mission.address + ', ' + mission.city)}
-      ${infoRow('Type', mission.property_type || '—')}
-      ${infoRow('Surface', mission.surface ? `${mission.surface} m²` : '—')}
-      ${mission.scheduled_date ? infoRow('Date prévue', mission.scheduled_date) : ''}
-      ${mission.scheduled_time ? infoRow('Heure', mission.scheduled_time) : ''}
-    `)}
-    ${btn('Accepter ou refuser', `${BASE_URL}/partner/dashboard`)}
-    ${divider()}
-    ${muted('Vendu Par Moi — Réseau de photographes partenaires.')}
-  `, { preheader: `Nouvelle mission photo — ${mission.city}` });
-  return send(photographer.email, '📸 Nouvelle mission photo — Vendu Par Moi', html);
-}
-
 async function sendMissionConfirmed(clientEmail, clientName, mission, photographer) {
   const dateStr = mission.scheduled_date
     ? new Date(mission.scheduled_date).toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' })
@@ -868,7 +848,6 @@ module.exports = {
   // Avis
   sendReviewRequest,
   // Missions photographes
-  sendMissionAssigned,
   sendMissionConfirmed,
   sendMissionReminderJ1,
   // Nudges vendeurs
