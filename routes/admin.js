@@ -1561,31 +1561,51 @@ router.get('/emails', requireAdmin, (req, res) => {
   res.sendFile('emails.html', { root: './views/admin' });
 });
 
+// Classé dans l'ordre chronologique du parcours vendeur : prospection →
+// inscription/paiement → préparation du dossier → publication → visites →
+// suivi sans offre → offre/vente → après-vente. Les notifications internes
+// (destinataire ≠ vendeur/acheteur/prospect) sont regroupées à part.
 const EMAIL_CATALOG = [
-  { id: 'first_meeting',        label: 'Préparation 1er rendez-vous',       trigger: 'Après paiement',                   recipient: 'Vendeur',  auto: true },
-  { id: 'no_property',           label: 'Pas encore de bien créé',           trigger: 'J+3 sans fiche',                   recipient: 'Vendeur',  auto: true },
-  { id: 'no_photos',             label: 'Photos manquantes',                 trigger: 'J+3 payé sans photos',             recipient: 'Vendeur',  auto: true },
-  { id: 'missing_doc',           label: 'Documents manquants',               trigger: 'J+5 payé sans diagnostics',        recipient: 'Vendeur',  auto: true },
-  { id: 'not_published',         label: 'Fiche non publiée',                 trigger: 'J+7 non publié',                   recipient: 'Vendeur',  auto: true },
-  { id: 'post_first_visit',      label: 'Retour 1ère session de visites',    trigger: 'J+2 après 1ère visite',            recipient: 'Vendeur',  auto: true },
-  { id: 'check_in_no_offer',     label: 'Check-in sans offre',               trigger: 'J+14 publié sans offre',           recipient: 'Vendeur',  auto: false },
-  { id: 'contract_renewal',      label: 'Renouvellement contrat',            trigger: '30j avant expiration',             recipient: 'Vendeur',  auto: true },
-  { id: 'review_request',        label: 'Demande d\'avis',                   trigger: 'Après offre acceptée',             recipient: 'Vendeur',  auto: false },
-  { id: 'visit_confirmation',    label: 'Confirmation de visite',            trigger: 'Réservation validée',              recipient: 'Acheteur', auto: true },
-  { id: 'visit_reminder_seller', label: 'Rappel visite (vendeur)',           trigger: 'Veille de la visite',              recipient: 'Vendeur',  auto: true },
-  { id: 'new_visit_request',     label: 'Nouvelle demande de visite',        trigger: 'Demande soumise',                  recipient: 'Vendeur',  auto: true },
-  { id: 'contact_notification',  label: 'Notification contact acheteur',     trigger: 'SMS dossier acheteur reçu',        recipient: 'Vendeur',  auto: true },
-  { id: 'offer_notification',    label: 'Notification offre reçue',          trigger: 'Offre soumise par acheteur',       recipient: 'Vendeur',  auto: true },
-  { id: 'prospect_nudge',        label: 'Relance prospect',                  trigger: 'J+7 inscrit non payé',             recipient: 'Prospect', auto: true },
-  { id: 'info_needed',           label: 'Renseignements manquants sur la fiche', trigger: 'Manuel admin',                  recipient: 'Vendeur',  auto: false },
-  { id: 'buyer_contacted',       label: 'Un acheteur vous a contacté',       trigger: 'Formulaire contact annonce',       recipient: 'Vendeur',  auto: true },
-  { id: 'visit_feedback_buyer',  label: 'Retour visite (acheteur)',           trigger: 'J+1 après visite confirmée',       recipient: 'Acheteur', auto: false },
-  { id: 'sold_congrats',         label: 'Félicitations — bien vendu !',       trigger: 'Offre acceptée',                   recipient: 'Vendeur',  auto: false },
-  { id: 'welcome_v2',            label: 'Bienvenue (version améliorée)',      trigger: 'Création compte',                  recipient: 'Vendeur',  auto: true },
-  { id: 'price_drop',            label: 'Conseil baisse de prix',            trigger: 'J+30 publié sans offre',           recipient: 'Vendeur',  auto: true },
-  { id: 'invoice',               label: 'Facture paiement',                  trigger: 'Après paiement / mensualité',      recipient: 'Vendeur',  auto: true },
-  { id: 'published',             label: 'Bien publié — confirmation',        trigger: 'Publication de l\'annonce',        recipient: 'Vendeur',  auto: true },
-  { id: 'review_request',        label: 'Demande d\'avis Google',            trigger: 'Après vente réalisée',             recipient: 'Vendeur',  auto: false },
+  // ── Prospection ──────────────────────────────────────────────
+  { category: 'Prospection', id: 'prospect_nudge', label: 'Relance prospect', trigger: 'J+7 inscrit non payé', recipient: 'Prospect', auto: true },
+
+  // ── Inscription & paiement ───────────────────────────────────
+  { category: 'Inscription & paiement', id: 'welcome_v2', label: 'Bienvenue (version améliorée)', trigger: 'Création de compte', recipient: 'Vendeur', auto: true },
+  { category: 'Inscription & paiement', id: 'invoice', label: 'Facture paiement', trigger: 'Après paiement / mensualité', recipient: 'Vendeur', auto: true },
+  { category: 'Inscription & paiement', id: 'first_meeting', label: 'Préparation 1er rendez-vous', trigger: 'Après paiement', recipient: 'Vendeur', auto: true },
+
+  // ── Préparation du dossier ───────────────────────────────────
+  { category: 'Préparation du dossier', id: 'no_property', label: 'Pas encore de bien créé', trigger: 'J+3 sans fiche', recipient: 'Vendeur', auto: true },
+  { category: 'Préparation du dossier', id: 'no_photos', label: 'Photos manquantes', trigger: 'J+3 payé sans photos', recipient: 'Vendeur', auto: true },
+  { category: 'Préparation du dossier', id: 'missing_doc', label: 'Documents manquants', trigger: 'J+5 payé sans diagnostics', recipient: 'Vendeur', auto: true },
+  { category: 'Préparation du dossier', id: 'not_published', label: 'Fiche non publiée', trigger: 'J+7 non publié', recipient: 'Vendeur', auto: true },
+  { category: 'Préparation du dossier', id: 'info_needed', label: 'Renseignements manquants sur la fiche', trigger: 'Manuel admin', recipient: 'Vendeur', auto: false },
+
+  // ── Publication ───────────────────────────────────────────────
+  { category: 'Publication', id: 'published', label: 'Bien publié — confirmation', trigger: 'Publication de l\'annonce', recipient: 'Vendeur', auto: true },
+
+  // ── Visites ───────────────────────────────────────────────────
+  { category: 'Visites', id: 'new_visit_request', label: 'Nouvelle demande de visite', trigger: 'Demande soumise', recipient: 'Vendeur', auto: true },
+  { category: 'Visites', id: 'visit_confirmation', label: 'Confirmation de visite', trigger: 'Réservation validée', recipient: 'Acheteur', auto: true },
+  { category: 'Visites', id: 'visit_reminder_seller', label: 'Rappel visite (vendeur)', trigger: 'Veille de la visite', recipient: 'Vendeur', auto: true },
+  { category: 'Visites', id: 'buyer_contacted', label: 'Un acheteur vous a contacté', trigger: 'Formulaire contact annonce', recipient: 'Vendeur', auto: true },
+  { category: 'Visites', id: 'post_first_visit', label: 'Retour 1ère session de visites', trigger: 'J+2 après 1ère visite', recipient: 'Vendeur', auto: true },
+
+  // ── Suivi sans offre ──────────────────────────────────────────
+  { category: 'Suivi sans offre', id: 'check_in_no_offer', label: 'Check-in sans offre', trigger: 'J+14 publié sans offre', recipient: 'Vendeur', auto: true },
+  { category: 'Suivi sans offre', id: 'price_drop', label: 'Conseil baisse de prix', trigger: 'J+30 publié sans offre', recipient: 'Vendeur', auto: true },
+  { category: 'Suivi sans offre', id: 'post_visit_buyer', label: 'Relance acheteur post-visite', trigger: 'J+7 après visite sans offre', recipient: 'Acheteur', auto: true },
+
+  // ── Offre & vente ─────────────────────────────────────────────
+  { category: 'Offre & vente', id: 'offer_notification', label: 'Notification offre reçue', trigger: 'Offre soumise par acheteur', recipient: 'Vendeur', auto: true },
+  { category: 'Offre & vente', id: 'sold_congrats', label: 'Félicitations — bien vendu !', trigger: 'Statut passé à "vendu"', recipient: 'Vendeur', auto: true },
+
+  // ── Après-vente ───────────────────────────────────────────────
+  { category: 'Après-vente', id: 'review_request', label: 'Demande d\'avis Google', trigger: 'Après vente réalisée (manuel)', recipient: 'Vendeur', auto: false },
+  { category: 'Après-vente', id: 'contract_renewal', label: 'Renouvellement contrat', trigger: '30j avant expiration (contrat 6 mois)', recipient: 'Vendeur', auto: true },
+
+  // ── Notifications internes ───────────────────────────────────
+  { category: 'Notifications internes', id: 'contact_notification', label: 'Nouveau contact site', trigger: 'Formulaire de contact / rappel soumis', recipient: 'Admin', auto: true },
 ];
 
 router.get('/api/emails/catalog', requireAdmin, (req, res) => {
