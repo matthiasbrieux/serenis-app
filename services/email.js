@@ -747,7 +747,7 @@ async function previewEmail(templateName) {
     welcome_v2:            () => sendWelcomeImproved({ email: fakeSellerEmail, firstName: 'Sophie' }),
     password_reset:        () => sendPasswordResetEmail({ email: fakeSellerEmail, firstName: 'Sophie', resetUrl: `${BASE_URL}/reset-password?token=preview` }),
     login_code:            () => sendLoginCode(fakeSellerEmail, '482913'),
-    invoice:               () => sendInvoiceEmail({ email: fakeSellerEmail, firstName: 'Sophie', amount: 49900, pack: 'serenite', invoiceNumber: 'SER-2026-00042-V1', date: new Date() }),
+    invoice:               () => sendInvoiceEmail({ email: fakeSellerEmail, firstName: 'Sophie', amount: 99900, pack: 'serenite', invoiceNumber: 'SER-2026-00042-V1', date: new Date() }),
     published:             () => sendPublishedConfirmation({ email: fakeSellerEmail, firstName: 'Sophie', property: fakeProp }),
     visit_confirmation:    () => sendVisitConfirmation(fakeBuyerEmail, 'Thomas Durand', fakeProp, '2026-06-20', '14:00', false),
     new_visit_request:     () => sendNewVisitRequest({ sellerEmail: fakeSellerEmail, buyerName: 'Thomas Durand', visitDate: '20 juin 2026 à 14:00', notes: '📞 06 12 34 56 78' }),

@@ -333,54 +333,6 @@ async function sendCheckInNoOfferNudges() {
   }
 }
 
-async function chargeInstallments() {
-  if (!process.env.STRIPE_SECRET_KEY) return;
-  const today = new Date().toISOString().split('T')[0];
-  const due = db.prepare(`
-    SELECT * FROM sellers
-    WHERE installments_total > 1
-      AND installments_paid < installments_total
-      AND next_installment_date <= ?
-      AND stripe_customer_id IS NOT NULL
-      AND stripe_payment_method_id IS NOT NULL
-  `).all(today);
-
-  if (!due.length) return;
-  const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
-  const { sendInvoiceEmail } = require('./email');
-
-  for (const seller of due) {
-    const installmentNum = seller.installments_paid + 1;
-    try {
-      const pi = await stripe.paymentIntents.create({
-        amount: 25000, // 250 € — versement Pack Coaching Plus 4x
-        currency: 'eur',
-        customer: seller.stripe_customer_id,
-        payment_method: seller.stripe_payment_method_id,
-        confirm: true,
-        off_session: true,
-        description: `Pack Coaching Plus Vendu Par Moi — versement ${installmentNum}/${seller.installments_total}`,
-        metadata: { seller_id: String(seller.id), installment: String(installmentNum) },
-      });
-
-      if (pi.status === 'succeeded') {
-        const newPaid = seller.installments_paid + 1;
-        const nextDate = newPaid < seller.installments_total
-          ? new Date(Date.now() + 30 * 24 * 3600 * 1000).toISOString().split('T')[0]
-          : null;
-        db.prepare('UPDATE sellers SET installments_paid=?, next_installment_date=? WHERE id=?')
-          .run(newPaid, nextDate, seller.id);
-        const invoiceNumber = `VPM-${new Date().getFullYear()}-${String(seller.id).padStart(5, '0')}-V${installmentNum}`;
-        await sendInvoiceEmail({ email: seller.email, firstName: seller.first_name, amount: 25000, pack: 'serenite', invoiceNumber, date: new Date() }).catch(() => {});
-        console.log(`✓ Versement ${installmentNum}/${seller.installments_total} encaissé (250€) — seller ${seller.id} (${seller.email})`);
-      }
-    } catch(e) {
-      console.error(`Installment charge error seller ${seller.id}:`, e.message);
-      console.error(`⚠️  Échec versement — ${seller.email} (id=${seller.id}) versement ${installmentNum}/${seller.installments_total} : ${e.message}`);
-    }
-  }
-}
-
 // ── Envoi dossier acheteur sérieux J+1 après visite ──────────
 async function sendPostVisitDossierNudges() {
   const { sendPostVisitDossierNudge } = require('./email');
@@ -486,4 +438,4 @@ async function sendPriceDropNudges() {
   }
 }
 
-module.exports = { sendVisitReminders, sendMissionReminders, sendAutomatedNudges, sendContractExpiryReminders, sendPostVisitBuyerNudges, sendPostVisitDossierNudges, sendPostVisitJ3Nudges, sendPhotographerAvailabilityNudges, sendPostFirstVisitFeedbackNudges, sendCheckInNoOfferNudges, chargeInstallments, sendPriceDropNudges };
+module.exports = { sendVisitReminders, sendMissionReminders, sendAutomatedNudges, sendContractExpiryReminders, sendPostVisitBuyerNudges, sendPostVisitDossierNudges, sendPostVisitJ3Nudges, sendPhotographerAvailabilityNudges, sendPostFirstVisitFeedbackNudges, sendCheckInNoOfferNudges, sendPriceDropNudges };
