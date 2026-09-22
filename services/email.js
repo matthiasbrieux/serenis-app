@@ -148,20 +148,6 @@ function badge(text, color = '#C4603A') {
 // 1. BIENVENUE
 // ─────────────────────────────────────────────────────────────
 
-async function sendWelcomeEmail({ email, firstName, pack }) {
-  const packLabel = pack === 'serenite' ? 'Pack Coaching Plus' : 'Pack Autonome';
-  const html = layout(`
-    ${badge(packLabel)}
-    ${h1(`Bienvenue, ${firstName || 'cher vendeur'} !`)}
-    ${p('Votre espace vendeur Vendu Par Moi est prêt. Vous pouvez dès maintenant créer votre fiche bien, ajouter vos photos et préparer votre dossier acheteur.')}
-    ${p('Notre objectif : vous faire gagner un maximum de temps et vous permettre de vendre votre bien dans les meilleures conditions, sans intermédiaire.')}
-    ${btn('Accéder à mon espace', `${BASE_URL}/dashboard`)}
-    ${divider()}
-    ${muted('Si vous avez la moindre question, répondez simplement à cet email — nous vous répondons en moins de 24h.')}
-  `, { preheader: `Bienvenue sur Vendu Par Moi — votre espace vendeur est prêt.` });
-  return send(email, 'Bienvenue sur Vendu Par Moi 🏡', html);
-}
-
 async function sendWelcomeImproved({ email, firstName, pack, loginUrl }) {
   const packLabel = pack === 'serenite' ? 'Pack Coaching Plus' : 'Pack Autonome';
   const nextSteps = pack === 'serenite'
@@ -171,6 +157,7 @@ async function sendWelcomeImproved({ email, firstName, pack, loginUrl }) {
     ${badge(packLabel)}
     ${h1(`C'est parti, ${firstName || 'cher vendeur'} !`)}
     ${p('Votre paiement a bien été reçu. Votre compte est activé et votre espace vendeur est accessible immédiatement.')}
+    ${p('Bienvenue dans votre espace Vendu Par Moi — tous les outils pour préparer, présenter et vendre votre bien dans les meilleures conditions.')}
     ${h2('Vos premières étapes')}
     <ol style="font-size:15px;color:#4a4540;line-height:2;padding-left:20px;margin:0 0 20px;">
       ${nextSteps}
@@ -833,7 +820,6 @@ async function previewEmail(templateName) {
   const fakeDossierUrl = `${BASE_URL}/dossier/acheteur/preview-token`;
 
   const fns = {
-    welcome:               () => sendWelcomeEmail({ email: fakeSellerEmail, firstName: 'Sophie' }),
     welcome_v2:            () => sendWelcomeImproved({ email: fakeSellerEmail, firstName: 'Sophie' }),
     password_reset:        () => sendPasswordResetEmail({ email: fakeSellerEmail, firstName: 'Sophie', resetUrl: `${BASE_URL}/reset-password?token=preview` }),
     login_code:            () => sendLoginCode(fakeSellerEmail, '482913'),
@@ -958,7 +944,6 @@ module.exports = {
   // Contact
   sendContactNotification,
   // Bienvenue / Paiement
-  sendWelcomeEmail,
   sendWelcomeImproved,
   sendInvoiceEmail,
   // Bien
