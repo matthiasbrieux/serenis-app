@@ -1575,7 +1575,6 @@ const EMAIL_CATALOG = [
   { id: 'visit_reminder_seller', label: 'Rappel visite (vendeur)',           trigger: 'Veille de la visite',              recipient: 'Vendeur',  auto: true },
   { id: 'new_visit_request',     label: 'Nouvelle demande de visite',        trigger: 'Demande soumise',                  recipient: 'Vendeur',  auto: true },
   { id: 'contact_notification',  label: 'Notification contact acheteur',     trigger: 'SMS dossier acheteur reçu',        recipient: 'Vendeur',  auto: true },
-  { id: 'mission_assigned',      label: 'Mission assignée',                  trigger: 'Attribution photographe/coach',    recipient: 'Prestataire', auto: true },
   { id: 'offer_notification',    label: 'Notification offre reçue',          trigger: 'Offre soumise par acheteur',       recipient: 'Vendeur',  auto: true },
   { id: 'prospect_nudge',        label: 'Relance prospect',                  trigger: 'J+7 inscrit non payé',             recipient: 'Prospect', auto: true },
   { id: 'info_needed',           label: 'Renseignements manquants sur la fiche', trigger: 'Manuel admin',                  recipient: 'Vendeur',  auto: false },
