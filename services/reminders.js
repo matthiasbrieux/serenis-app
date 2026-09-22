@@ -182,11 +182,6 @@ async function sendAutomatedNudges() {
     }
   } catch (e) { console.error('[NUDGE] Trigger 7 error:', e.message); }
 
-  // Trigger 9: post-first-visit seller feedback (J+2 after first visit)
-  try {
-    await sendPostFirstVisitFeedbackNudges();
-  } catch (e) { console.error('[NUDGE] Trigger 9 (post_first_visit_feedback) error:', e.message); }
-
   // Trigger 10: check-in for sellers published 14+ days with no offer
   try {
     await sendCheckInNoOfferNudges();
