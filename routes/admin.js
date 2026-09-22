@@ -1567,7 +1567,7 @@ const EMAIL_CATALOG = [
   { id: 'no_photos',             label: 'Photos manquantes',                 trigger: 'J+3 payé sans photos',             recipient: 'Vendeur',  auto: true },
   { id: 'missing_doc',           label: 'Documents manquants',               trigger: 'J+5 payé sans diagnostics',        recipient: 'Vendeur',  auto: true },
   { id: 'not_published',         label: 'Fiche non publiée',                 trigger: 'J+7 non publié',                   recipient: 'Vendeur',  auto: true },
-  { id: 'post_first_visit',      label: 'Retour 1ère session de visites',    trigger: 'J+2 après 1ère visite',            recipient: 'Vendeur',  auto: false },
+  { id: 'post_first_visit',      label: 'Retour 1ère session de visites',    trigger: 'J+2 après 1ère visite',            recipient: 'Vendeur',  auto: true },
   { id: 'check_in_no_offer',     label: 'Check-in sans offre',               trigger: 'J+14 publié sans offre',           recipient: 'Vendeur',  auto: false },
   { id: 'contract_renewal',      label: 'Renouvellement contrat',            trigger: '30j avant expiration',             recipient: 'Vendeur',  auto: true },
   { id: 'review_request',        label: 'Demande d\'avis',                   trigger: 'Après offre acceptée',             recipient: 'Vendeur',  auto: false },
