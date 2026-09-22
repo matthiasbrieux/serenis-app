@@ -897,12 +897,8 @@ async function sendFirstMeetingEmail({ email, firstName }) {
 
     ${divider()}
     ${h2('Pour vos diagnostics')}
-    ${p('Nous travaillons habituellement avec un diagnostiqueur de confiance :')}
-    <div style="background:#F4F1EC;border-radius:10px;padding:16px 20px;margin:0 0 12px;">
-      <div style="font-size:15px;font-weight:700;color:#1a1a1a;margin-bottom:4px;">PL Diagnostic — M. Leroy</div>
-      <div style="font-size:14px;color:#C4603A;font-weight:600;">06 07 99 25 10</div>
-    </div>
-    ${muted('<em>Vous n\'avez bien sûr aucune obligation de passer par lui : c\'est une recommandation, pas une condition.</em>')}
+    ${p('Si vous n\'avez pas encore réalisé vos diagnostics techniques, nous pouvons vous conseiller des organismes de confiance pour vous accompagner.')}
+    ${muted('<em>N\'hésitez pas à nous en parler lors de notre échange.</em>')}
 
     ${divider()}
     <div style="background:#3D1208;border-radius:10px;padding:16px 24px;text-align:center;">
