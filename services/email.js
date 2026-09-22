@@ -527,9 +527,10 @@ async function sendNoPropertyNudge({ email }) {
 async function sendNoPhotosNudge({ email }) {
   const html = layout(`
     ${badge('📷 Photos manquantes', '#C4785A')}
-    ${h1('Ajoutez vos photos pour attirer les acheteurs')}
-    ${p('Pensez à ajouter vos photos dès maintenant — elles seront intégrées automatiquement à votre dossier acheteur, prêt à être envoyé dès le premier contact.')}
+    ${h1('Photos manquantes')}
+    ${p('Pensez à ajouter vos photos dès maintenant — elles seront intégrées automatiquement dans votre dossier acheteur, prêt à être envoyé en 1 clic dès le premier contact. La qualité de vos photos compte : c\'est la première impression que les acheteurs auront de votre bien. Besoin d\'aide ? L\'espace formation vous guide pas à pas et notre guide photo vous aide à réussir vos clichés.')}
     ${btn('Ajouter mes photos', `${BASE_URL}/mon-bien`)}
+    ${muted('Vous souhaitez des photos encore plus qualitatives ? Nous pouvons vous mettre en relation avec un photographe professionnel qui sublimera votre bien.')}
   `, { preheader: 'Vos photos sont manquantes — ajoutez-les pour attirer plus d\'acheteurs.' });
   return send(email, '📷 Ajoutez vos photos pour attirer plus d\'acheteurs', html);
 }
