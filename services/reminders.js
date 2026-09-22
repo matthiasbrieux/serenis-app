@@ -299,7 +299,7 @@ async function sendCheckInNoOfferNudges() {
   }
 }
 
-// ── Nudge baisse de prix J+45 sans offre ─────────────────────
+// ── Nudge baisse de prix J+30 sans offre ─────────────────────
 async function sendPriceDropNudges() {
   const { sendPriceDropNudge } = require('./email');
 
@@ -314,7 +314,7 @@ async function sendPriceDropNudges() {
       AND p.published = 1
       AND (s.archived IS NULL OR s.archived = 0)
       AND o.id IS NULL
-      AND p.published_at <= date('now', '-45 days')
+      AND p.published_at <= date('now', '-30 days')
     LIMIT 20
   `).all();
 

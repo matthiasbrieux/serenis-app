@@ -604,17 +604,27 @@ async function sendPostVisitBuyerNudge({ buyerEmail, buyerName, propertyCity, pr
 
 async function sendPriceDropNudge({ email, firstName, daysPublished, currentPrice, propertyCity }) {
   const priceFormatted = currentPrice ? new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 }).format(currentPrice) : '';
+  const signalCard = (title, desc) => `
+    <div style="background:#1A1A16;border-radius:10px;padding:16px 18px;margin:0 0 10px;">
+      <div style="font-size:14px;font-weight:700;color:#E8C39E;margin-bottom:4px;">${title}</div>
+      <div style="font-size:13px;color:rgba(245,240,232,0.75);line-height:1.5;">${desc}</div>
+    </div>`;
   const html = layout(`
     ${badge('💡 Conseil stratégique', '#C4785A')}
     ${h1(`${firstName ? firstName + ', ' : ''}une piste à envisager`)}
     ${p(`Votre bien${propertyCity ? ` à <strong>${propertyCity}</strong>` : ''} est en ligne depuis <strong>${daysPublished} jours</strong>${priceFormatted ? ` affiché à ${priceFormatted}` : ''} et n'a pas encore reçu d'offre.`)}
     ${p('Dans cette situation, une légère baisse de prix peut relancer l\'intérêt des acheteurs et générer de nouvelles visites. Même une réduction de 2 à 5 % peut faire passer votre bien au-dessus d\'un seuil psychologique important.')}
+    ${p('Le prix est le levier le plus efficace que vous maîtrisez directement. À titre de repère, une agence recommanderait souvent une baisse d\'au moins 10 000 € sur le net vendeur, tout en conservant ses honoraires à 5 %. En vendant par vous-même, c\'est vous qui décidez de l\'ajustement, sans cette contrainte supplémentaire.')}
     ${h2('Quelques pistes à explorer')}
     <ul style="font-size:15px;color:#4a4540;line-height:2;padding-left:20px;margin:0 0 20px;">
       <li>Vérifiez le prix au m² des biens vendus dans votre secteur (DVF)</li>
       <li>Actualisez vos photos ou votre description si possible</li>
-      <li>Consultez votre coach IA pour une analyse personnalisée</li>
     </ul>
+    ${h2('Le vrai test, c\'est le marché lui-même')}
+    ${p('Une estimation reste une hypothèse tant qu\'elle n\'a pas été confrontée à la demande réelle. Observez ces 3 signaux :')}
+    ${signalCard('Peu ou pas de demandes de visite', 'Le prix est probablement trop haut, ou l\'annonce manque de visibilité.')}
+    ${signalCard('Beaucoup de visites, aucune offre', 'Le prix est le problème, pas la visibilité : ajustez sans attendre.')}
+    ${signalCard('Offres rapides autour du prix affiché', 'Le prix est juste : ne perdez pas de temps à hésiter, tranchez vite.')}
     ${btn('Accéder à mon espace', `${BASE_URL}/dashboard`)}
     ${divider()}
     ${muted('Ce message est envoyé automatiquement dans le cadre du suivi de votre vente. Si vous avez déjà ajusté votre prix, ignorez ce message.')}

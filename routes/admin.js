@@ -1582,7 +1582,7 @@ const EMAIL_CATALOG = [
   { id: 'visit_feedback_buyer',  label: 'Retour visite (acheteur)',           trigger: 'J+1 après visite confirmée',       recipient: 'Acheteur', auto: false },
   { id: 'sold_congrats',         label: 'Félicitations — bien vendu !',       trigger: 'Offre acceptée',                   recipient: 'Vendeur',  auto: false },
   { id: 'welcome_v2',            label: 'Bienvenue (version améliorée)',      trigger: 'Création compte',                  recipient: 'Vendeur',  auto: true },
-  { id: 'price_drop',            label: 'Conseil baisse de prix',            trigger: 'J+45 publié sans offre',           recipient: 'Vendeur',  auto: true },
+  { id: 'price_drop',            label: 'Conseil baisse de prix',            trigger: 'J+30 publié sans offre',           recipient: 'Vendeur',  auto: true },
   { id: 'invoice',               label: 'Facture paiement',                  trigger: 'Après paiement / mensualité',      recipient: 'Vendeur',  auto: true },
   { id: 'published',             label: 'Bien publié — confirmation',        trigger: 'Publication de l\'annonce',        recipient: 'Vendeur',  auto: true },
   { id: 'review_request',        label: 'Demande d\'avis Google',            trigger: 'Après vente réalisée',             recipient: 'Vendeur',  auto: false },
