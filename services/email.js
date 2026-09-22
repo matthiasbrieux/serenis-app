@@ -599,25 +599,6 @@ async function sendPostVisitBuyerNudge({ buyerEmail, buyerName, propertyCity, pr
 }
 
 // ─────────────────────────────────────────────────────────────
-// 15. RELANCE POST-VISITE J+3 VERS ACHETEUR
-// ─────────────────────────────────────────────────────────────
-
-async function sendPostVisitJ3Nudge({ buyerEmail, buyerName, propertyCity, propertyType, dossierUrl, sellerFirstName }) {
-  const typeLabel = propertyType === 'appartement' ? 'l\'appartement' : propertyType === 'maison' ? 'la maison' : 'le bien';
-  const firstName = buyerName ? buyerName.split(' ')[0] : '';
-  const html = layout(`
-    ${h1(`${firstName ? firstName + ', ' : ''}avez-vous eu le temps de réfléchir ?`)}
-    ${p(`Vous avez visité ${typeLabel} à <strong>${propertyCity || ''}</strong> il y a quelques jours.`)}
-    ${p(`${sellerFirstName || 'Le propriétaire'} reste disponible pour répondre à vos questions ou vous fournir des informations supplémentaires.`)}
-    ${p('Si ce bien vous intéresse, vous pouvez soumettre une offre directement en ligne ou relire le dossier complet :')}
-    ${btn('Revoir le dossier et faire une offre', dossierUrl, '#C4603A')}
-    ${divider()}
-    ${muted('Vente entre particuliers accompagnée par <strong>Vendu Par Moi</strong>.')}
-  `, { preheader: `${firstName ? firstName + ', vous avez visité' : 'Vous avez visité'} ${typeLabel} à ${propertyCity} — des questions ?` });
-  return send(buyerEmail, `Avez-vous eu le temps de réfléchir ? — ${typeLabel} à ${propertyCity || ''}`, html);
-}
-
-// ─────────────────────────────────────────────────────────────
 // 16. NUDGE BAISSE DE PRIX (J+45 sans offre)
 // ─────────────────────────────────────────────────────────────
 
@@ -711,7 +692,6 @@ async function previewEmail(templateName) {
     post_first_visit:      () => sendPostFirstVisitFeedbackSeller({ email: fakeSellerEmail, firstName: 'Sophie' }),
     check_in_no_offer:     () => sendCheckInNoOffer({ email: fakeSellerEmail, firstName: 'Sophie', daysPublished: 18 }),
     contract_renewal:      () => sendContractRenewal({ email: fakeSellerEmail, firstName: 'Sophie', expiryDate: new Date(Date.now() + 14 * 86400000).toISOString(), daysLeft: 14 }),
-    post_visit_j3:         () => sendPostVisitJ3Nudge({ buyerEmail: fakeBuyerEmail, buyerName: 'Thomas Durand', propertyCity: 'Lyon', propertyType: 'maison', dossierUrl: fakeDossierUrl, sellerFirstName: 'Sophie' }),
     post_visit_buyer:      () => sendPostVisitBuyerNudge({ buyerEmail: fakeBuyerEmail, buyerName: 'Thomas Durand', propertyCity: 'Lyon', propertyType: 'maison', propertySlug: 'maison-lyon-preview', price: 320000 }),
     price_drop:            () => sendPriceDropNudge({ email: fakeSellerEmail, firstName: 'Sophie', daysPublished: 47, currentPrice: 320000, propertyCity: 'Lyon' }),
     first_meeting:         () => sendFirstMeetingEmail({ email: fakeSellerEmail, firstName: 'Sophie' }),
@@ -841,7 +821,6 @@ module.exports = {
   sendCheckInNoOffer,
   // Nudges acheteurs
   sendPostVisitBuyerNudge,
-  sendPostVisitJ3Nudge,
   // Nudge prix
   sendPriceDropNudge,
   // Avant premier RDV
