@@ -306,7 +306,7 @@ app.listen(PORT, () => {
   backupDatabase(); // premier backup au démarrage
   setInterval(() => backupDatabase(), 24 * 60 * 60 * 1000); // backup quotidien
 
-  const { sendVisitReminders, sendMissionReminders, sendAutomatedNudges, sendContractExpiryReminders, sendPostVisitBuyerNudges, sendPostVisitDossierNudges, sendPostVisitJ3Nudges, sendWeeklyAdminReportEmail, sendWeeklySellerReportEmail, sendPhotographerAvailabilityNudges, sendPostFirstVisitFeedbackNudges, sendCheckInNoOfferNudges, chargeInstallments, sendPriceDropNudges } = require('./services/reminders');
+  const { sendVisitReminders, sendMissionReminders, sendAutomatedNudges, sendContractExpiryReminders, sendPostVisitBuyerNudges, sendPostVisitDossierNudges, sendPostVisitJ3Nudges, sendPhotographerAvailabilityNudges, sendPostFirstVisitFeedbackNudges, sendCheckInNoOfferNudges, chargeInstallments, sendPriceDropNudges } = require('./services/reminders');
 
   function runDailyJobs() {
     sendVisitReminders().catch(e => console.error('Reminder job error:', e.message));
@@ -340,26 +340,5 @@ app.listen(PORT, () => {
     }, msUntil18h);
   }
   scheduleReminders();
-
-  // Rapport hebdomadaire admin — chaque lundi à 8h00
-  function scheduleWeeklyReport() {
-    const now = new Date();
-    const next = new Date();
-    const dayOfWeek = now.getDay(); // 0=Sun, 1=Mon
-    const daysUntilMonday = dayOfWeek === 1 ? (now.getHours() >= 8 ? 7 : 0) : (8 - dayOfWeek) % 7 || 7;
-    next.setDate(now.getDate() + daysUntilMonday);
-    next.setHours(8, 0, 0, 0);
-    const ms = next - now;
-    setTimeout(() => {
-      sendWeeklyAdminReportEmail().catch(e => console.error('Weekly report error:', e.message));
-      sendWeeklySellerReportEmail().catch(e => console.error('Weekly seller report error:', e.message));
-      setInterval(() => {
-        sendWeeklyAdminReportEmail().catch(e => console.error('Weekly report error:', e.message));
-        sendWeeklySellerReportEmail().catch(e => console.error('Weekly seller report error:', e.message));
-      }, 7 * 24 * 60 * 60 * 1000);
-    }, ms);
-    console.log(`✓ Rapport hebdo planifié dans ${Math.round(ms / 3600000)}h`);
-  }
-  scheduleWeeklyReport();
 });
 }).catch(e => { console.error('Erreur démarrage:', e.message); process.exit(1); });

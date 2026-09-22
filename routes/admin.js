@@ -1587,8 +1587,6 @@ const EMAIL_CATALOG = [
   { id: 'post_visit_dossier',    label: 'Dossier sérieux J+1',               trigger: 'J+1 après visite (si docs actifs)', recipient: 'Acheteur', auto: true },
   { id: 'post_visit_j3',         label: 'Relance J+3 post-visite',           trigger: 'J+3 si pas d\'offre',              recipient: 'Acheteur', auto: true },
   { id: 'price_drop',            label: 'Conseil baisse de prix',            trigger: 'J+45 publié sans offre',           recipient: 'Vendeur',  auto: true },
-  { id: 'weekly_seller',         label: 'Rapport hebdo vendeur',             trigger: 'Chaque lundi 8h00',                recipient: 'Vendeur',  auto: true },
-  { id: 'weekly_admin',          label: 'Rapport hebdo admin',               trigger: 'Chaque lundi 8h00',                recipient: 'Admin',    auto: true },
   { id: 'invoice',               label: 'Facture paiement',                  trigger: 'Après paiement / mensualité',      recipient: 'Vendeur',  auto: true },
   { id: 'published',             label: 'Bien publié — confirmation',        trigger: 'Publication de l\'annonce',        recipient: 'Vendeur',  auto: true },
   { id: 'review_request',        label: 'Demande d\'avis Google',            trigger: 'Après vente réalisée',             recipient: 'Vendeur',  auto: false },
@@ -1951,7 +1949,7 @@ router.get('/api/test-all-emails', requireAdmin, async (req, res) => {
     'dossier', 'prospect_nudge', 'no_property', 'no_photos', 'not_published',
     'missing_doc', 'photographer_request', 'post_first_visit', 'check_in_no_offer',
     'contract_renewal', 'post_visit_dossier', 'post_visit_j3', 'post_visit_buyer',
-    'price_drop', 'weekly_seller', 'weekly_admin', 'first_meeting', 'review_request',
+    'price_drop', 'first_meeting', 'review_request',
     'sold_congrats',
   ];
 

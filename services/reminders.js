@@ -257,27 +257,6 @@ async function sendPostVisitBuyerNudges() {
   }
 }
 
-async function sendWeeklyAdminReportEmail() {
-  const { sendWeeklyAdminReport } = require('./email');
-  const adminEmail = process.env.ADMIN_EMAIL || process.env.SENDGRID_FROM_EMAIL || 'contact@venduparmoi.fr';
-
-  try {
-    const newClients = db.prepare(`SELECT COUNT(*) as c FROM sellers WHERE paid_at >= date('now', '-7 days')`).get()?.c || 0;
-    const newOffers  = db.prepare(`SELECT COUNT(*) as c FROM offers WHERE created_at >= date('now', '-7 days')`).get()?.c || 0;
-    const newVisits  = db.prepare(`SELECT COUNT(*) as c FROM visits WHERE created_at >= date('now', '-7 days')`).get()?.c || 0;
-    const publishedProps = db.prepare(`SELECT COUNT(*) as c FROM properties WHERE published_at >= date('now', '-7 days')`).get()?.c || 0;
-    const totalActive = db.prepare(`SELECT COUNT(*) as c FROM sellers WHERE paid_at IS NOT NULL AND (archived IS NULL OR archived=0)`).get()?.c || 0;
-    const revenueRow = db.prepare(`SELECT SUM(CASE WHEN pack='serenite' THEN 999 ELSE 499 END) as t FROM sellers WHERE paid_at >= date('now', '-7 days')`).get();
-    const totalRevenue = revenueRow?.t || 0;
-
-    await sendWeeklyAdminReport({
-      to: adminEmail,
-      stats: { newClients, newOffers, newVisits, publishedProps, totalRevenue, totalActive },
-    });
-    console.log('[WEEKLY] Rapport hebdo envoyé à', adminEmail);
-  } catch(e) { console.error('[WEEKLY] Erreur rapport hebdo:', e.message); }
-}
-
 async function sendPhotographerAvailabilityNudges() {
   // Sellers paid but no photos yet, sent 3+ days after payment
   const sellers = db.prepare(`
@@ -474,39 +453,6 @@ async function sendPostVisitJ3Nudges() {
   }
 }
 
-// ── Rapport hebdomadaire vendeurs (lundi 8h) ─────────────────
-async function sendWeeklySellerReportEmail() {
-  const { sendWeeklySellerReport } = require('./email');
-  const base = process.env.BASE_URL || 'https://venduparmoi.fr';
-
-  const sellers = db.prepare(`
-    SELECT s.id, s.email, s.first_name, p.id as prop_id, p.published_at, p.acheteur_token
-    FROM sellers s
-    JOIN properties p ON p.seller_id = s.id
-    WHERE p.published = 1
-      AND p.published_at IS NOT NULL
-      AND (s.archived IS NULL OR s.archived = 0)
-  `).all();
-
-  for (const s of sellers) {
-    try {
-      const views       = db.prepare(`SELECT COUNT(*) as c FROM property_page_views WHERE property_id=? AND viewed_at >= date('now','-7 days')`).get(s.prop_id)?.c || 0;
-      const viewsPrev   = db.prepare(`SELECT COUNT(*) as c FROM property_page_views WHERE property_id=? AND viewed_at >= date('now','-14 days') AND viewed_at < date('now','-7 days')`).get(s.prop_id)?.c || 0;
-      const contacts    = db.prepare(`SELECT COUNT(*) as c FROM buyer_contacts WHERE seller_id=? AND created_at >= date('now','-7 days')`).get(s.id)?.c || 0;
-      const contactsAll = db.prepare(`SELECT COUNT(*) as c FROM buyer_contacts WHERE seller_id=?`).get(s.id)?.c || 0;
-      const visits      = db.prepare(`SELECT COUNT(*) as c FROM visits WHERE seller_id=? AND visit_date >= date('now','-7 days') AND visit_date < date('now') AND status='confirmed'`).get(s.id)?.c || 0;
-      const visitsAll   = db.prepare(`SELECT COUNT(*) as c FROM visits WHERE seller_id=? AND status='confirmed'`).get(s.id)?.c || 0;
-      const upcoming    = db.prepare(`SELECT COUNT(*) as c FROM visits WHERE seller_id=? AND visit_date >= date('now') AND visit_date <= date('now','+7 days') AND status='confirmed'`).get(s.id)?.c || 0;
-      const offers      = db.prepare(`SELECT COUNT(*) as c FROM offers WHERE seller_id=? AND created_at >= date('now','-7 days')`).get(s.id)?.c || 0;
-      const offersAll   = db.prepare(`SELECT COUNT(*) as c FROM offers WHERE seller_id=?`).get(s.id)?.c || 0;
-      const daysOnline  = s.published_at ? Math.round((Date.now() - new Date(s.published_at)) / 86400000) : 0;
-
-      await sendWeeklySellerReport({ email: s.email, firstName: s.first_name, stats: { views, viewsPrev, contacts, contactsAll, visits, visitsAll, upcoming, offers, offersAll, daysOnline } });
-      console.log(`[WEEKLY] Rapport vendeur → ${s.email}`);
-    } catch(e) { console.error(`[WEEKLY] Seller report error ${s.email}:`, e.message); }
-  }
-}
-
 // ── Nudge baisse de prix J+45 sans offre ─────────────────────
 async function sendPriceDropNudges() {
   const { sendPriceDropNudge } = require('./email');
@@ -540,4 +486,4 @@ async function sendPriceDropNudges() {
   }
 }
 
-module.exports = { sendVisitReminders, sendMissionReminders, sendAutomatedNudges, sendContractExpiryReminders, sendPostVisitBuyerNudges, sendPostVisitDossierNudges, sendPostVisitJ3Nudges, sendWeeklyAdminReportEmail, sendWeeklySellerReportEmail, sendPhotographerAvailabilityNudges, sendPostFirstVisitFeedbackNudges, sendCheckInNoOfferNudges, chargeInstallments, sendPriceDropNudges };
+module.exports = { sendVisitReminders, sendMissionReminders, sendAutomatedNudges, sendContractExpiryReminders, sendPostVisitBuyerNudges, sendPostVisitDossierNudges, sendPostVisitJ3Nudges, sendPhotographerAvailabilityNudges, sendPostFirstVisitFeedbackNudges, sendCheckInNoOfferNudges, chargeInstallments, sendPriceDropNudges };
