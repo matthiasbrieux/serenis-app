@@ -599,24 +599,6 @@ async function sendPostVisitBuyerNudge({ buyerEmail, buyerName, propertyCity, pr
 }
 
 // ─────────────────────────────────────────────────────────────
-// 14. NUDGE POST-VISITE J+1 VERS ACHETEUR (dossier sérieux)
-// ─────────────────────────────────────────────────────────────
-
-async function sendPostVisitDossierNudge({ buyerEmail, buyerName, propertyCity, propertyType, dossierUrl, sellerFirstName }) {
-  const typeLabel = propertyType === 'appartement' ? 'l\'appartement' : propertyType === 'maison' ? 'la maison' : 'le bien';
-  const html = layout(`
-    ${h1(`Suite à votre visite — ${buyerName ? buyerName.split(' ')[0] : ''}`)}
-    ${p(`Merci d'avoir visité ${typeLabel} à <strong>${propertyCity || ''}</strong>.`)}
-    ${p(`${sellerFirstName || 'Le propriétaire'} souhaite vous donner accès à des informations complémentaires réservées aux acheteurs sérieux : diagnostics complets, documents techniques et informations de voisinage.`)}
-    ${btn('Accéder au dossier complémentaire', dossierUrl, '#C4785A')}
-    ${p('Si vous souhaitez soumettre une offre d\'achat, vous pouvez le faire directement depuis ce dossier.')}
-    ${divider()}
-    ${muted('Vente entre particuliers accompagnée par <strong>Vendu Par Moi</strong>.')}
-  `, { preheader: `Suite à votre visite — documents complémentaires disponibles` });
-  return send(buyerEmail, `Documents complémentaires — ${typeLabel} à ${propertyCity || ''}`, html);
-}
-
-// ─────────────────────────────────────────────────────────────
 // 15. RELANCE POST-VISITE J+3 VERS ACHETEUR
 // ─────────────────────────────────────────────────────────────
 
@@ -729,7 +711,6 @@ async function previewEmail(templateName) {
     post_first_visit:      () => sendPostFirstVisitFeedbackSeller({ email: fakeSellerEmail, firstName: 'Sophie' }),
     check_in_no_offer:     () => sendCheckInNoOffer({ email: fakeSellerEmail, firstName: 'Sophie', daysPublished: 18 }),
     contract_renewal:      () => sendContractRenewal({ email: fakeSellerEmail, firstName: 'Sophie', expiryDate: new Date(Date.now() + 14 * 86400000).toISOString(), daysLeft: 14 }),
-    post_visit_dossier:    () => sendPostVisitDossierNudge({ buyerEmail: fakeBuyerEmail, buyerName: 'Thomas Durand', propertyCity: 'Lyon', propertyType: 'maison', dossierUrl: fakeDossierUrl, sellerFirstName: 'Sophie' }),
     post_visit_j3:         () => sendPostVisitJ3Nudge({ buyerEmail: fakeBuyerEmail, buyerName: 'Thomas Durand', propertyCity: 'Lyon', propertyType: 'maison', dossierUrl: fakeDossierUrl, sellerFirstName: 'Sophie' }),
     post_visit_buyer:      () => sendPostVisitBuyerNudge({ buyerEmail: fakeBuyerEmail, buyerName: 'Thomas Durand', propertyCity: 'Lyon', propertyType: 'maison', propertySlug: 'maison-lyon-preview', price: 320000 }),
     price_drop:            () => sendPriceDropNudge({ email: fakeSellerEmail, firstName: 'Sophie', daysPublished: 47, currentPrice: 320000, propertyCity: 'Lyon' }),
@@ -860,7 +841,6 @@ module.exports = {
   sendCheckInNoOffer,
   // Nudges acheteurs
   sendPostVisitBuyerNudge,
-  sendPostVisitDossierNudge,
   sendPostVisitJ3Nudge,
   // Nudge prix
   sendPriceDropNudge,
