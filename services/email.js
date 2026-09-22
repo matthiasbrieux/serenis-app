@@ -559,19 +559,6 @@ async function sendMissingDocNudge({ email, missingDocs }) {
   return send(email, '📋 Documents manquants dans votre dossier', html);
 }
 
-async function sendPhotographerAvailabilityRequest({ email, firstName }) {
-  const html = layout(`
-    ${badge('📸 Photos professionnelles', '#C4603A')}
-    ${h1(`${firstName || ''}, avez-vous pensé aux photos pro ?`)}
-    ${p('Les annonces avec des photos professionnelles se vendent en moyenne 2× plus vite. Vendu Par Moi vous propose des photographes partenaires locaux à partir de quelques centaines d\'euros.')}
-    ${p('Le photographe se déplace chez vous, prend en charge toute la session et livre vos photos en 5 jours ouvrés.')}
-    ${btn('Réserver une séance photo', `${BASE_URL}/booking`)}
-    ${divider()}
-    ${muted('Cette séance est facultative — vos propres photos sont tout à fait acceptées.')}
-  `, { preheader: 'Valorisez votre bien avec des photos professionnelles.' });
-  return send(email, '📸 Valorisez votre bien avec des photos professionnelles', html);
-}
-
 async function sendPostFirstVisitFeedbackSeller({ email, firstName }) {
   const html = layout(`
     ${badge('🏡 Après la visite', '#C4603A')}
@@ -758,7 +745,6 @@ async function previewEmail(templateName) {
     no_photos:             () => sendNoPhotosNudge({ email: fakeSellerEmail }),
     not_published:         () => sendNotPublishedNudge({ email: fakeSellerEmail, score: 82 }),
     missing_doc:           () => sendMissingDocNudge({ email: fakeSellerEmail, missingDocs: ['DPE', 'Taxe foncière'] }),
-    photographer_request:  () => sendPhotographerAvailabilityRequest({ email: fakeSellerEmail, firstName: 'Sophie' }),
     post_first_visit:      () => sendPostFirstVisitFeedbackSeller({ email: fakeSellerEmail, firstName: 'Sophie' }),
     check_in_no_offer:     () => sendCheckInNoOffer({ email: fakeSellerEmail, firstName: 'Sophie', daysPublished: 18 }),
     contract_renewal:      () => sendContractRenewal({ email: fakeSellerEmail, firstName: 'Sophie', expiryDate: new Date(Date.now() + 14 * 86400000).toISOString(), daysLeft: 14 }),
@@ -890,7 +876,6 @@ module.exports = {
   sendNoPhotosNudge,
   sendNotPublishedNudge,
   sendMissingDocNudge,
-  sendPhotographerAvailabilityRequest,
   sendPostFirstVisitFeedbackSeller,
   sendCheckInNoOffer,
   // Nudges acheteurs
