@@ -522,17 +522,28 @@ router.post('/api/property/diagnostics-summary/generate', requireAuth, aiRateLim
   `).all(property.id);
   if (!diagDocs.length) return res.status(400).json({ error: 'Ajoutez au moins un diagnostic avant de générer le résumé.' });
 
+  // doc.name est un libellé humain ("Diagnostics complets"), jamais un nom de fichier —
+  // l'extension réelle ne vit que dans l'URL stockée (Cloudinary ou /uploads/documents/<uuid>.ext).
   const SUPPORTED_EXT = new Set(['pdf', 'jpg', 'jpeg', 'png', 'webp']);
-  const usable = diagDocs.filter(d => SUPPORTED_EXT.has((d.name || '').split('.').pop().toLowerCase())).slice(0, 6);
+  function docFileExt(doc) {
+    const urlExt = (doc.url || '').split('?')[0].split('.').pop().toLowerCase();
+    if (SUPPORTED_EXT.has(urlExt)) return urlExt;
+    if ((doc.url || '').includes('/raw/upload/')) return 'pdf'; // Cloudinary raw (PDF) sans extension dans l'URL
+    const nameExt = (doc.name || '').split('.').pop().toLowerCase();
+    return SUPPORTED_EXT.has(nameExt) ? nameExt : null;
+  }
+  const usable = diagDocs
+    .map(d => ({ doc: d, ext: docFileExt(d) }))
+    .filter(d => d.ext)
+    .slice(0, 6);
   if (!usable.length) return res.status(400).json({ error: 'Formats non pris en charge pour l\'analyse (PDF, JPG ou PNG requis — pas de ZIP).' });
 
   let fileBlocks;
   try {
-    fileBlocks = await Promise.all(usable.map(async (doc) => {
+    fileBlocks = await Promise.all(usable.map(async ({ doc, ext }) => {
       const response = await fetch(doc.url);
       if (!response.ok) throw new Error(`Téléchargement impossible : ${doc.name}`);
       const buf = Buffer.from(await response.arrayBuffer());
-      const ext = (doc.name || '').split('.').pop().toLowerCase();
       if (ext === 'pdf') {
         return { type: 'document', source: { type: 'base64', media_type: 'application/pdf', data: buf.toString('base64') } };
       }
