@@ -29,6 +29,11 @@ let _previewCapture = null;
 // contenu/sujet du template d'origine) — utilisé pour tester un modèle
 // d'email avec des données de démo sans l'envoyer au vrai destinataire.
 let _sendOverrideTo = null;
+// Quand renseigné, envoie sous cette identité au lieu de FROM_NAME/FROM_EMAIL
+// — utilisé pour les envois manuels depuis l'admin, afin que le client voie
+// l'adresse du compte admin qui lui écrit (Matthias, Guillaume, Secrétariat)
+// plutôt qu'une adresse générique.
+let _sendOverrideFrom = null;
 
 function _logEmailSend(to, subject, success, resendId, source = 'auto') {
   try {
@@ -54,8 +59,10 @@ async function send(to, subject, html, source = 'auto') {
     return false;
   }
   try {
+    const fromName = _sendOverrideFrom?.name || FROM_NAME;
+    const fromEmail = _sendOverrideFrom?.email || FROM_EMAIL;
     const { data, error } = await resend.emails.send({
-      from: `${FROM_NAME} <${FROM_EMAIL}>`,
+      from: `${fromName} <${fromEmail}>`,
       to: actualTo,
       subject,
       html,
@@ -759,6 +766,17 @@ function listTestableTemplates() {
   return Object.keys(_templateFns());
 }
 
+// Exécute fn() avec les emails envoyés sous l'identité {email, name} donnée
+// au lieu de FROM_EMAIL/FROM_NAME — pour les envois manuels depuis l'admin.
+async function withFromOverride(fromEmail, fromName, fn) {
+  _sendOverrideFrom = fromEmail ? { email: fromEmail, name: fromName } : null;
+  try {
+    return await fn();
+  } finally {
+    _sendOverrideFrom = null;
+  }
+}
+
 // ─────────────────────────────────────────────────────────────
 // 17. AVANT PREMIER RENDEZ-VOUS
 // ─────────────────────────────────────────────────────────────
@@ -873,4 +891,5 @@ module.exports = {
   previewEmail,
   sendTestEmail,
   listTestableTemplates,
+  withFromOverride,
 };

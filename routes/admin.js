@@ -1730,10 +1730,14 @@ router.post('/api/emails/send-test', requireAdmin, async (req, res) => {
   const { template_id, to, custom_message } = req.body;
   if (!template_id || !to) return res.status(400).json({ error: 'template_id et to requis' });
   try {
-    const { sendTestEmail, sendAdminDirectEmail } = require('../services/email');
-    const ok = template_id === 'custom'
-      ? await sendAdminDirectEmail({ to, subject: 'Message de Vendu Par Moi', text: custom_message || '' })
-      : await sendTestEmail(template_id, to);
+    const { sendTestEmail, sendAdminDirectEmail, withFromOverride } = require('../services/email');
+    // Envoyé sous l'identité de l'admin connecté (Matthias, Guillaume,
+    // Secrétariat) plutôt que l'adresse générique — le client sait qui lui écrit.
+    const ok = await withFromOverride(req.admin.email, req.admin.name, () =>
+      template_id === 'custom'
+        ? sendAdminDirectEmail({ to, subject: 'Message de Vendu Par Moi', text: custom_message || '' })
+        : sendTestEmail(template_id, to)
+    );
     if (ok) return res.json({ success: true });
     return res.status(500).json({ error: 'Envoi échoué (vérifiez RESEND_API_KEY sur Render)' });
   } catch(e) {
