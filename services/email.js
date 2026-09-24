@@ -494,10 +494,11 @@ async function sendProspectNudge({ name, email }) {
     ${p(`Bonjour ${name || ''},`)}
     ${p('Vous avez demandé des informations sur Vendu Par Moi. Voici en quelques mots ce que nous vous proposons :')}
     <ul style="font-size:15px;color:#4a4540;line-height:2;padding-left:20px;margin:0 0 20px;">
-      <li>Un dossier acheteur automatiquement envoyé à chaque contact</li>
-      <li>Un agenda en ligne pour les réservations de visites</li>
-      <li>Un numéro de téléphone dédié à votre bien</li>
-      <li>Un coach IA disponible 7j/7</li>
+      <li>Diffusez votre annonce sur LeBonCoin, SeLoger, PAP... guidé pas à pas depuis votre espace</li>
+      <li>Partagez le lien de votre dossier acheteur, généré automatiquement, pour transmettre toutes les informations à vos contacts en un clic</li>
+      <li>Votre agenda est ouvert — les acheteurs réservent leurs visites en ligne</li>
+      <li>Vous recevez une notification à chaque nouvelle réservation</li>
+      <li>Vous êtes guidé pas à pas dans tout le processus de vente — un guide continu accessible depuis votre espace</li>
     </ul>
     ${p('Des milliers de particuliers ont déjà vendu leur bien sans payer de commission d\'agence. Vous pouvez le faire aussi.')}
     ${btn('Découvrir nos offres', `${BASE_URL}/tarifs`)}
