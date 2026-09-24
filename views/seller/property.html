@@ -5489,6 +5489,13 @@ function buildFicheHtml() {
         </a>
       </div>`:''}
 
+      <!-- RÉSUMÉ IA DIAGNOSTICS — seulement si le vendeur l'a validé -->
+      ${(p.diagnostics_ai_summary && Number(p.diagnostics_ai_summary_validated) === 1)?`
+      <div class="fv2-card">
+        <div class="fv2-card-hd" style="color:var(--terracotta);">Ce que disent les diagnostics, en clair</div>
+        <div style="font-size:0.8rem;color:#444;line-height:1.7;white-space:pre-line;">${String(p.diagnostics_ai_summary).replace(/[&<>"']/g, function(c){ return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c]; })}</div>
+      </div>`:''}
+
       <!-- DOCUMENTS -->
       ${publicDocs.length>0?`
       <div class="fv2-card">
