@@ -1727,13 +1727,15 @@ router.get('/api/emails/testable', requireAdmin, (req, res) => {
 });
 
 router.post('/api/emails/send-test', requireAdmin, async (req, res) => {
-  const { template_id, to } = req.body;
+  const { template_id, to, custom_message } = req.body;
   if (!template_id || !to) return res.status(400).json({ error: 'template_id et to requis' });
   try {
-    const { sendTestEmail } = require('../services/email');
-    const ok = await sendTestEmail(template_id, to);
+    const { sendTestEmail, sendAdminDirectEmail } = require('../services/email');
+    const ok = template_id === 'custom'
+      ? await sendAdminDirectEmail({ to, subject: 'Message de Vendu Par Moi', text: custom_message || '' })
+      : await sendTestEmail(template_id, to);
     if (ok) return res.json({ success: true });
-    return res.status(500).json({ error: 'Envoi échoué (vérifiez RESEND_API_KEY)' });
+    return res.status(500).json({ error: 'Envoi échoué (vérifiez RESEND_API_KEY sur Render)' });
   } catch(e) {
     res.status(500).json({ error: e.message });
   }
