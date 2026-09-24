@@ -121,7 +121,16 @@ router.get('/api/bien/:slug', (req, res) => {
     return property.plan_docs_visible !== 0;
   });
   const seller = db.prepare('SELECT twilio_number FROM sellers WHERE id = ?').get(property.seller_id);
-  res.json({ property: { ...property, photos, documents }, contact_number: seller?.twilio_number || null });
+  // Le résumé IA des diagnostics n'est visible que si le vendeur l'a relu et validé,
+  // et seulement si les diagnostics eux-mêmes sont inclus dans la fiche publique.
+  const diagnosticsAiSummary = (property.diagnostics_ai_summary_validated === 1 && property.diagnostics_in_dossier !== 0)
+    ? property.diagnostics_ai_summary
+    : null;
+  const { diagnostics_ai_summary, diagnostics_ai_summary_validated, ...safeProperty } = property;
+  res.json({
+    property: { ...safeProperty, diagnostics_ai_summary: diagnosticsAiSummary, photos, documents },
+    contact_number: seller?.twilio_number || null,
+  });
 });
 
 // ── Réservation visite ──
