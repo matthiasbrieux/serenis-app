@@ -508,6 +508,92 @@ Retourne UNIQUEMENT un objet JSON valide, sans texte avant ni après, avec exact
   }
 });
 
+// ── Résumé IA des diagnostics — vulgarisation pour l'acheteur ────
+// Reste en brouillon (validated=0) tant que le vendeur ne l'a pas relu et validé :
+// il n'est exposé au dossier acheteur qu'après validation manuelle (voir routes/dossier.js).
+router.post('/api/property/diagnostics-summary/generate', requireAuth, aiRateLimit, async (req, res) => {
+  if (!process.env.ANTHROPIC_API_KEY) return res.status(503).json({ error: 'Service IA non configuré — ajoutez ANTHROPIC_API_KEY dans les variables d\'environnement.' });
+
+  const property = db.prepare('SELECT * FROM properties WHERE seller_id = ?').get(req.seller.id);
+  if (!property) return res.status(404).json({ error: 'Créez d\'abord votre fiche bien.' });
+
+  const diagDocs = db.prepare(`
+    SELECT * FROM property_documents WHERE property_id = ? AND folder = 'diagnostics' ORDER BY created_at
+  `).all(property.id);
+  if (!diagDocs.length) return res.status(400).json({ error: 'Ajoutez au moins un diagnostic avant de générer le résumé.' });
+
+  const SUPPORTED_EXT = new Set(['pdf', 'jpg', 'jpeg', 'png', 'webp']);
+  const usable = diagDocs.filter(d => SUPPORTED_EXT.has((d.name || '').split('.').pop().toLowerCase())).slice(0, 6);
+  if (!usable.length) return res.status(400).json({ error: 'Formats non pris en charge pour l\'analyse (PDF, JPG ou PNG requis — pas de ZIP).' });
+
+  let fileBlocks;
+  try {
+    fileBlocks = await Promise.all(usable.map(async (doc) => {
+      const response = await fetch(doc.url);
+      if (!response.ok) throw new Error(`Téléchargement impossible : ${doc.name}`);
+      const buf = Buffer.from(await response.arrayBuffer());
+      const ext = (doc.name || '').split('.').pop().toLowerCase();
+      if (ext === 'pdf') {
+        return { type: 'document', source: { type: 'base64', media_type: 'application/pdf', data: buf.toString('base64') } };
+      }
+      const mediaType = ext === 'png' ? 'image/png' : ext === 'webp' ? 'image/webp' : 'image/jpeg';
+      return { type: 'image', source: { type: 'base64', media_type: mediaType, data: buf.toString('base64') } };
+    }));
+  } catch (e) {
+    console.error('diagnostics-summary fetch error:', e.message);
+    return res.status(502).json({ error: 'Impossible de récupérer un ou plusieurs diagnostics depuis le stockage.' });
+  }
+
+  const Anthropic = require('@anthropic-ai/sdk');
+  const client = new Anthropic.default({ apiKey: process.env.ANTHROPIC_API_KEY });
+
+  try {
+    const response = await client.messages.create({
+      model: 'claude-haiku-4-5-20251001',
+      max_tokens: 700,
+      system: `Tu résumes des diagnostics immobiliers réglementaires français (DPE, amiante, plomb, électricité, gaz, termites, ERP, assainissement...) pour un acheteur non spécialiste, à la demande du vendeur qui les a déposés.
+
+RÈGLES STRICTES :
+- Sois factuel et fidèle au contenu réel des documents fournis. N'invente rien, ne minimise rien, n'enjolive rien.
+- Si un diagnostic signale un risque, une anomalie ou une non-conformité (amiante présent, plomb détecté, installation électrique ou gaz à risque, DPE F/G...), dis-le clairement, sans l'euphémiser.
+- Si des travaux sont recommandés ou obligatoires suite à un diagnostic, liste-les explicitement.
+- Ne donne aucune estimation de coût de travaux (tu n'as pas cette information de façon fiable).
+- Rédige en français clair, sans jargon technique non expliqué. 120 à 180 mots maximum.
+- Termine TOUJOURS par une phrase rappelant que ce résumé ne remplace pas la lecture des documents originaux, disponibles dans le dossier.
+- Retourne uniquement le texte du résumé, sans titre, sans markdown, sans préambule.`,
+      messages: [{
+        role: 'user',
+        content: [
+          { type: 'text', text: `Résume les diagnostics suivants pour un acheteur intéressé par ce bien (${property.type || 'bien'} à ${property.city || ''}).` },
+          ...fileBlocks,
+        ],
+      }],
+    });
+    const summary = response.content.filter(b => b.type === 'text').map(b => b.text).join('\n').trim();
+    if (!summary) throw new Error('Réponse vide');
+    db.prepare(`
+      UPDATE properties SET diagnostics_ai_summary = ?, diagnostics_ai_summary_validated = 0, diagnostics_ai_summary_generated_at = CURRENT_TIMESTAMP
+      WHERE id = ?
+    `).run(summary, property.id);
+    res.json({ summary });
+  } catch (err) {
+    console.error('diagnostics-summary generate error:', err.message);
+    res.status(500).json({ error: 'Génération indisponible, réessayez.' });
+  }
+});
+
+router.post('/api/property/diagnostics-summary/save', requireAuth, express.json(), (req, res) => {
+  const property = db.prepare('SELECT id FROM properties WHERE seller_id = ?').get(req.seller.id);
+  if (!property) return res.status(404).json({ error: 'Créez d\'abord votre fiche bien.' });
+  const { text, validated } = req.body;
+  if (typeof text !== 'string' || !text.trim()) return res.status(400).json({ error: 'Texte requis.' });
+  db.prepare(`
+    UPDATE properties SET diagnostics_ai_summary = ?, diagnostics_ai_summary_validated = ?
+    WHERE id = ?
+  `).run(text.trim(), validated ? 1 : 0, property.id);
+  res.json({ success: true });
+});
+
 // ── Progression formation/coaching (persistance serveur) ────────
 router.get('/api/progress', requireAuth, (req, res) => {
   const rows = db.prepare('SELECT key, value FROM seller_progress WHERE seller_id = ?').all(req.seller.id);

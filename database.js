@@ -369,6 +369,9 @@ const newCols = [
   "ALTER TABLE sellers ADD COLUMN suivi_statut TEXT DEFAULT 'a_appeler'",
   "ALTER TABLE sellers ADD COLUMN suivi_rdv_date TEXT",
   "ALTER TABLE sellers ADD COLUMN suivi_notes TEXT",
+  "ALTER TABLE properties ADD COLUMN diagnostics_ai_summary TEXT",
+  "ALTER TABLE properties ADD COLUMN diagnostics_ai_summary_validated BOOLEAN DEFAULT 0",
+  "ALTER TABLE properties ADD COLUMN diagnostics_ai_summary_generated_at DATETIME",
 ];
 newCols.forEach(sql => { try { db.exec(sql); } catch(e) {} });
 

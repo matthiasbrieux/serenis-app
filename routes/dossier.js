@@ -80,6 +80,12 @@ router.get('/api/dossier/acheteur/:token', (req, res) => {
 
   // Ne jamais exposer le token notaire ni la session Stripe au dossier public
   const { notaire_token, stripe_session_id, stripe_customer_id, password, ...safeProperty } = prop;
+  // Le résumé IA des diagnostics n'est visible que si le vendeur l'a relu et validé,
+  // et seulement si les diagnostics eux-mêmes sont inclus dans le dossier.
+  if (safeProperty.diagnostics_ai_summary_validated !== 1 || prop.diagnostics_in_dossier === 0) {
+    safeProperty.diagnostics_ai_summary = null;
+  }
+  delete safeProperty.diagnostics_ai_summary_validated;
   res.json({ property: safeProperty, photos, documents: docs });
 });
 
