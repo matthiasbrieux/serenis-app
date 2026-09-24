@@ -1714,6 +1714,31 @@ router.post('/api/emails/send', requireAdmin, async (req, res) => {
   }
 });
 
+// ── Envoi de test (tout modèle du catalogue, données de démo) ──
+// Contrairement à /api/emails/send (envoi réel à un vendeur), cette route
+// couvre l'intégralité des modèles d'email — y compris ceux dont le
+// destinataire réel est un acheteur, un prospect ou l'admin — en les
+// redirigeant vers l'adresse de test choisie plutôt que vers seller.email.
+router.get('/api/emails/testable', requireAdmin, (req, res) => {
+  try {
+    const { listTestableTemplates } = require('../services/email');
+    res.json({ templates: listTestableTemplates() });
+  } catch(e) { res.status(500).json({ error: e.message }); }
+});
+
+router.post('/api/emails/send-test', requireAdmin, async (req, res) => {
+  const { template_id, to } = req.body;
+  if (!template_id || !to) return res.status(400).json({ error: 'template_id et to requis' });
+  try {
+    const { sendTestEmail } = require('../services/email');
+    const ok = await sendTestEmail(template_id, to);
+    if (ok) return res.json({ success: true });
+    return res.status(500).json({ error: 'Envoi échoué (vérifiez RESEND_API_KEY)' });
+  } catch(e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
 // ── Prévisualisation email ─────────────────────────────────────
 router.get('/api/emails/preview/:id', requireAdmin, async (req, res) => {
   try {

@@ -147,20 +147,21 @@ body {
 }
 .cover-number-strip {
   background:var(--vert);
-  padding:14px 44px;
-  display:flex; gap:40px;
+  padding:20px 44px;
+  display:grid; grid-template-columns:repeat(4,1fr);
+  gap:20px;
 }
 .cover-stat {
   text-align:center;
 }
 .cover-stat-num {
   font-family:'Cormorant Garamond',serif;
-  font-size:26px; font-weight:700;
-  color:var(--terra2);
+  font-size:19px; font-weight:700;
+  color:var(--terra2); line-height:1.25; margin-bottom:3px;
 }
 .cover-stat-label {
   font-size:9.5px; color:rgba(255,255,255,.5);
-  text-transform:uppercase; letter-spacing:.1em;
+  text-transform:uppercase; letter-spacing:.08em; line-height:1.35;
 }
 
 /* ═══════════════════════════════
@@ -632,6 +633,79 @@ hr.sep { border:none; border-top:1.5px solid #f0ebe4; margin:20px 0; }
   color:#3a3530;
 }
 
+/* Conseil fondateur (encadré inline) */
+.founder-tip {
+  background:var(--vert);
+  border-radius:10px;
+  padding:16px 20px;
+  margin:16px 0;
+  display:flex; gap:14px; align-items:flex-start;
+}
+.founder-tip-photo {
+  width:36px; height:36px; border-radius:50%;
+  background:linear-gradient(135deg,var(--terra),var(--terra2));
+  color:white; font-weight:700; font-size:13px;
+  display:flex; align-items:center; justify-content:center;
+  flex-shrink:0;
+}
+.founder-tip-body { flex:1; }
+.founder-tip-label {
+  font-size:9.5px; font-weight:700; color:var(--terra2);
+  text-transform:uppercase; letter-spacing:.1em; margin-bottom:6px;
+}
+.founder-tip-text {
+  font-family:'Cormorant Garamond',serif;
+  font-style:italic; font-size:14.5px;
+  color:rgba(255,255,255,.9); line-height:1.55;
+}
+
+/* Bloc outil — renvoi vers l'espace vendeur */
+.tool-box {
+  background:var(--creme);
+  border:1.5px solid var(--terra3);
+  border-radius:10px;
+  padding:16px 20px;
+  margin:16px 0;
+  display:flex; align-items:center; gap:16px;
+}
+.tool-box-qr {
+  width:48px; height:48px; flex-shrink:0;
+  background:white; border:1.5px solid var(--terra3);
+  border-radius:8px;
+  display:flex; align-items:center; justify-content:center;
+  font-size:20px;
+}
+.tool-box-body { flex:1; }
+.tool-box-titre {
+  font-size:9.5px; font-weight:700;
+  color:var(--terra); text-transform:uppercase;
+  letter-spacing:.1em; margin-bottom:4px;
+}
+.tool-box-list {
+  font-size:11.5px; color:#4a4540; line-height:1.5;
+  margin-bottom:6px;
+}
+.tool-box-cta {
+  font-size:11px; font-weight:700; color:var(--vert);
+}
+.tool-box-cta::after { content:' →'; color:var(--terra); }
+
+/* Bouton CTA (boîtes terracotta) */
+.cta-btn {
+  display:inline-block;
+  background:white; color:var(--terra);
+  font-size:12px; font-weight:700;
+  padding:10px 26px; border-radius:24px;
+  letter-spacing:.04em; text-decoration:none;
+}
+
+/* Mention légale / prudence */
+.legal-note {
+  font-size:10px; color:var(--gris2);
+  line-height:1.6; margin-top:14px;
+  padding-top:10px; border-top:1px solid #f0ebe4;
+}
+
 /* Étapes horizontales */
 .steps {
   display:flex; gap:0; margin:16px 0;
@@ -663,7 +737,10 @@ hr.sep { border:none; border-top:1.5px solid #f0ebe4; margin:20px 0; }
 
 /* QUIZ */
 .quiz-page { background:var(--creme); min-height:297mm; padding:40px 44px; }
-.quiz-big { font-family:'Cormorant Garamond',serif; font-size:56px; font-weight:700; color:white; letter-spacing:.2em; -webkit-text-stroke:2px var(--terra); color:transparent; margin-bottom:4px; }
+.quiz-big { font-family:'Cormorant Garamond',serif; font-size:56px; font-weight:700; color:var(--terra); letter-spacing:.2em; margin-bottom:4px; }
+@supports (-webkit-text-stroke: 2px black) {
+  .quiz-big { color:transparent; -webkit-text-stroke:2px var(--terra); }
+}
 .quiz-sous { font-size:10px; font-weight:700; color:var(--terra); text-transform:uppercase; letter-spacing:.15em; margin-bottom:24px; }
 .quiz-q { margin-bottom:18px; background:white; border-radius:10px; padding:16px 18px; border:1.5px solid var(--terra3); }
 .quiz-q-top { display:flex; align-items:flex-start; gap:12px; margin-bottom:12px; }
@@ -732,6 +809,12 @@ hr.sep { border:none; border-top:1.5px solid #f0ebe4; margin:20px 0; }
     <div class="cover-house"><div class="cover-house-icon">🏡</div></div>
   </div>
 
+  <div class="cover-number-strip">
+    <div class="cover-stat"><div class="cover-stat-num">9 chapitres</div><div class="cover-stat-label">Méthode complète</div></div>
+    <div class="cover-stat"><div class="cover-stat-num">Outils pratiques</div><div class="cover-stat-label">Prêts à l'emploi</div></div>
+    <div class="cover-stat"><div class="cover-stat-num">0 %</div><div class="cover-stat-label">de commission sur le prix de vente</div></div>
+    <div class="cover-stat"><div class="cover-stat-num">Accompagnement</div><div class="cover-stat-label">à chaque étape</div></div>
+  </div>
 </div>
 </div>
 
@@ -793,6 +876,40 @@ vous pouvez utiliser immédiatement.</p>
 Lisez-le une fois pour avoir la vision d'ensemble, puis revenez à chaque
  section au moment où vous en avez besoin.</p>
       <p><strong style="color:var(--terra);">Bonne vente.</strong></p>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- ═══════ VOTRE PARCOURS ═══════ -->
+<div class="page">
+<div class="founders-page">
+  <div class="founders-top">
+    <div class="founders-top-label">Avant de commencer</div>
+    <div class="founders-top-titre">Votre parcours<br>Vendu Par Moi</div>
+  </div>
+  <div class="founders-body">
+    <div class="founders-texte" style="margin-bottom:8px;">
+      <p>Vous restez propriétaire de votre vente. Nous vous apportons la méthode, les outils et les repères pour avancer étape par étape.</p>
+    </div>
+    <table class="t">
+      <thead><tr><th>Étape</th><th>Votre action</th><th>Vendu Par Moi vous aide à...</th></tr></thead>
+      <tbody>
+        <tr><td>1</td><td><strong>J'estime</strong></td><td>Comparer les ventes réellement réalisées et positionner le bien.</td></tr>
+        <tr><td>2</td><td><strong>Je prépare</strong></td><td>Valoriser le logement, réunir les diagnostics et préparer les photos.</td></tr>
+        <tr><td>3</td><td><strong>Je publie</strong></td><td>Créer une annonce claire et organiser sa diffusion.</td></tr>
+        <tr><td>4</td><td><strong>Je qualifie</strong></td><td>Identifier les projets sérieux avant de programmer une visite.</td></tr>
+        <tr><td>5</td><td><strong>Je fais visiter</strong></td><td>Préparer le bien et conduire une visite structurée.</td></tr>
+        <tr><td>6</td><td><strong>Je négocie</strong></td><td>Analyser une offre et répondre avec méthode.</td></tr>
+        <tr><td>7</td><td><strong>Je signe</strong></td><td>Transmettre le dossier au notaire et suivre les étapes jusqu'à l'acte authentique.</td></tr>
+      </tbody>
+    </table>
+    <div class="box-terra" style="text-align:center;margin-top:24px;">
+      <div class="box-titre" style="text-align:center;">Votre espace vendeur</div>
+      <div class="box-text" style="text-align:center;">
+        <p style="font-size:13.5px;margin-bottom:14px;">Tous les outils cités dans ce guide sont prêts à l'emploi dans votre espace personnel.</p>
+        <a href="https://venduparmoi.fr/login" class="cta-btn">Accéder à mes outils →</a>
+      </div>
     </div>
   </div>
 </div>
@@ -960,37 +1077,18 @@ des chiffres.</div>
     </div>
 
     <hr class="sep">
-    <div class="cp-h2">Ce qu'un intermédiaire fait — et ce que vous pouvez faire</div>
-    <div class="avant-apres">
-      <div class="avant">
-        <div class="avant-label">✕ Intermédiaire — ce que vous payez</div>
-        <div class="avant-text">
-          <ul class="vl" style="margin:0;">
-            <li>Estimation parfois orientée (à la hausse pour obtenir le
- mandat, à la baisse pour faciliter la vente — selon l'intérêt de 
-l'intermédiaire)</li>
-            <li>Photos (souvent confiées à un stagiaire)</li>
-            <li>Annonce sur leurs portails</li>
-            <li>Réception des appels</li>
-            <li>Organisation des visites</li>
-            <li>Rédaction du mandat</li>
-          </ul>
-        </div>
-      </div>
-      <div class="apres">
-        <div class="apres-label">✓ Vous — avec Vendu Par Moi</div>
-        <div class="apres-text">
-          <ul class="vl" style="margin:0;">
-            <li>Estimation par comparaison (données DVF officielles)</li>
-            <li>Photos guidées (checklist + tutoriel inclus)</li>
-            <li>Annonce multi-portails (vous choisissez)</li>
-            <li>Dossier acheteur prêt à envoyer en 1 clic</li>
-            <li>Agenda en ligne — les acheteurs réservent seuls</li>
-            <li>Emails automatiques à chaque étape</li>
-          </ul>
-        </div>
-      </div>
-    </div>
+    <div class="cp-h2">Ce qu'un professionnel structure pour une vente — et ce que vous pouvez organiser avec Vendu Par Moi</div>
+    <table class="t">
+      <thead><tr><th>Étape</th><th>Avec un intermédiaire</th><th>Avec Vendu Par Moi</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Positionnement du prix</strong></td><td>Analyse du marché et conseil de mise en vente</td><td>Méthode de comparaison, données disponibles et trame d'analyse</td></tr>
+        <tr><td><strong>Présentation</strong></td><td>Photos, descriptif et mise en valeur selon la prestation</td><td>Checklists, conseils photo et fiche descriptive structurée</td></tr>
+        <tr><td><strong>Diffusion</strong></td><td>Publication selon les canaux utilisés par le professionnel</td><td>Vous choisissez vos canaux de diffusion</td></tr>
+        <tr><td><strong>Contacts</strong></td><td>Réception et qualification des demandes</td><td>Méthode de qualification et outils de suivi</td></tr>
+        <tr><td><strong>Visites</strong></td><td>Organisation et conduite des visites</td><td>Préparation, trame de visite et conseils pratiques</td></tr>
+        <tr><td><strong>Négociation</strong></td><td>Accompagnement dans les échanges</td><td>Méthode d'analyse et modèles de réponse</td></tr>
+      </tbody>
+    </table>
   </div>
 </div>
 </div>
@@ -1084,7 +1182,7 @@ d'écart. Un bien affiché 200 000 € se vend souvent 193 000 € à 196 000
           <li><strong>Se baser sur un prix entendu</strong> de voisins sans vérification — les prix de vente ne se partagent pas facilement.</li>
         </ol>
         <div class="citation">
-          <div class="citation-text">Un bien au bon prix se vend en 6 semaines. Un bien surestimé se vend en 9 mois — et moins cher qu'il n'aurait dû.</div>
+          <div class="citation-text">Un prix cohérent avec le marché favorise généralement des contacts plus rapides. Une surestimation peut allonger le délai de commercialisation et conduire à des baisses successives.</div>
           <div class="citation-source">— D'après notre expérience en agence immobilière, Matthias &amp; Guillaume</div>
         </div>
       </div>
@@ -1092,6 +1190,21 @@ d'écart. Un bien affiché 200 000 € se vend souvent 193 000 € à 196 000
     <div class="alert" style="margin-top:16px;">
       <div class="alert-icon">💡</div>
       <div class="alert-text"><strong>Le saviez-vous ?</strong> Ces économies représentent plusieurs mois de dépenses courantes conservés — sans changer votre mode de vie.</div>
+    </div>
+    <div class="founder-tip">
+      <div class="founder-tip-photo">G</div>
+      <div class="founder-tip-body">
+        <div class="founder-tip-label">Le conseil de Guillaume</div>
+        <div class="founder-tip-text">« Ne cherchez pas à obtenir le prix le plus haut sur le papier. Cherchez le prix qui déclenche des contacts sérieux tout en défendant la valeur réelle du bien. »</div>
+      </div>
+    </div>
+    <div class="tool-box">
+      <div class="tool-box-qr">📱</div>
+      <div class="tool-box-body">
+        <div class="tool-box-titre">Disponible dans votre espace vendeur</div>
+        <div class="tool-box-list">Grille de comparaison des biens vendus · Fiche d'estimation</div>
+        <div class="tool-box-cta">Retrouvez cet outil dans votre espace vendeur Vendu Par Moi</div>
+      </div>
     </div>
   </div>
 </div>
@@ -1157,6 +1270,22 @@ ampoules grillées, c'est rédhibitoire.</li>
       </div>
     </div>
 
+    <div class="founder-tip">
+      <div class="founder-tip-photo">M</div>
+      <div class="founder-tip-body">
+        <div class="founder-tip-label">Le conseil de Matthias</div>
+        <div class="founder-tip-text">« Avant les photos, faites le tour du logement comme si vous le découvriez pour la première fois : ce que votre œil ne voit plus au quotidien sera immédiatement visible sur une annonce. »</div>
+      </div>
+    </div>
+    <div class="tool-box">
+      <div class="tool-box-qr">📱</div>
+      <div class="tool-box-body">
+        <div class="tool-box-titre">Disponible dans votre espace vendeur</div>
+        <div class="tool-box-list">Checklist home staging · Checklist photos · Diagnostics à préparer</div>
+        <div class="tool-box-cta">Retrouvez cet outil dans votre espace vendeur Vendu Par Moi</div>
+      </div>
+    </div>
+
     <hr class="sep">
     <div class="cp-h2">Les diagnostics obligatoires</div>
     <div class="body-text" style="margin-bottom:12px;"><p>Vous ne pouvez légalement pas vendre sans un <strong>Dossier de Diagnostics Techniques (DDT)</strong> complet. Commandez-les dès votre décision de vendre — certains prennent 2 à 3 semaines.</p></div>
@@ -1178,6 +1307,7 @@ ampoules grillées, c'est rédhibitoire.</li>
       <div class="alert-icon">📋</div>
       <div class="alert-text">Le budget diagnostics varie entre <strong>300 et 700 € selon le bien</strong>. C'est non négociable légalement — et c'est ce qui rassure les acheteurs sur l'état réel du logement.</div>
     </div>
+    <div class="legal-note">Les diagnostics requis et leur durée de validité dépendent notamment du type de bien, de sa date de construction, de sa localisation et des installations présentes. Vérifiez les obligations applicables à votre bien auprès d'un diagnostiqueur certifié ou sur Service-Public.fr.</div>
     <div class="alert" style="margin-top:16px;">
       <div class="alert-icon">💡</div>
       <div class="alert-text"><strong>Le saviez-vous ?</strong> Ces économies peuvent financer les études supérieures d'un enfant — sans contracter un crédit supplémentaire.</div>
@@ -1236,9 +1366,9 @@ demande — et vous positionne immédiatement comme un vendeur rigoureux et
           <div class="box-titre">Ce que dit un acheteur face à un dossier complet</div>
           <div class="box-text">
             <p><em>« Ce vendeur a tout préparé. Il sait ce qu'il fait, il n'a rien à cacher. Je peux lui faire confiance et avancer vite. »</em></p>
-            <p style="margin-top:12px;">Un dossier complet réduit 
-l'agressivité dans la négociation. L'acheteur qui a toutes les 
-informations négocie moins sur le prix — il négocie sur les délais.</p>
+            <p style="margin-top:12px;">Un dossier complet peut rassurer
+l'acheteur, limiter les zones d'incertitude et faciliter une négociation
+plus factuelle.</p>
           </div>
         </div>
         <div class="box" style="margin-top:12px;">
@@ -1269,6 +1399,14 @@ de 30m², cuisine ouverte équipée, 3 chambres dont une suite parentale,
 jardin 45m² plein sud. À 5 min des écoles et du marché. DPE C. Vente 
 suite à mutation."</p>
         </div>
+      </div>
+    </div>
+    <div class="tool-box">
+      <div class="tool-box-qr">📱</div>
+      <div class="tool-box-body">
+        <div class="tool-box-titre">Disponible dans votre espace vendeur</div>
+        <div class="tool-box-list">Checklist des documents · Fiche descriptive du bien</div>
+        <div class="tool-box-cta">Retrouvez cet outil dans votre espace vendeur Vendu Par Moi</div>
       </div>
     </div>
     <div class="alert" style="margin-top:16px;">
@@ -1307,7 +1445,7 @@ les bons portails, avec une annonce rédigée pour capter l'attention dans
 d'eux. La bonne nouvelle : le coût total de diffusion pour un 
 particulier ne dépasse pas 150 €/mois.</div>
 
-    <table class="t" style="margin-bottom:16px;">
+    <table class="t">
       <thead><tr><th>Portail</th><th>Trafic mensuel</th><th>Type d'acheteurs</th><th>Coût particulier</th><th>Priorité</th></tr></thead>
       <tbody>
         <tr><td><strong>LeBonCoin Immo</strong></td><td>~30M visites</td><td>Tous profils, très large</td><td>Gratuit à 35 €</td><td><strong style="color:var(--terra);">Indispensable</strong></td></tr>
@@ -1322,7 +1460,7 @@ particulier ne dépasse pas 150 €/mois.</div>
       <div>
         <div class="cp-h2">Les photos qui font vendre</div>
         <div class="body-text">
-          <p>Une annonce avec de mauvaises photos reçoit <strong>5 fois moins de contacts</strong> qu'une annonce avec de bonnes photos. L'acheteur décide en 3 secondes si votre bien mérite un clic.</p>
+          <p>La qualité des photos joue un rôle majeur dans l'attractivité d'une annonce et dans la décision de cliquer. Les premières secondes de consultation sont déterminantes : soignez particulièrement la photo principale et le titre.</p>
         </div>
         <div class="cp-h3" style="margin-top:12px;">Ordre idéal des photos</div>
         <ol class="nl">
@@ -1437,6 +1575,14 @@ c'est le cas, demandez-lui son accord de prêt relais.</p>
     <div class="body-text"><p>Cette séquence s'exécute seule, 7j/7, y
 compris la nuit. Vous ne manquez aucun contact, et les acheteurs sérieux
  progressent naturellement — les curieux ne vont pas plus loin.</p></div>
+    <div class="tool-box">
+      <div class="tool-box-qr">📱</div>
+      <div class="tool-box-body">
+        <div class="tool-box-titre">Disponible dans votre espace vendeur</div>
+        <div class="tool-box-list">Fiche qualification acheteur · Suivi des contacts</div>
+        <div class="tool-box-cta">Retrouvez cet outil dans votre espace vendeur Vendu Par Moi</div>
+      </div>
+    </div>
     <div class="alert" style="margin-top:16px;">
       <div class="alert-icon">💡</div>
       <div class="alert-text"><strong>Le saviez-vous ?</strong> Ces économies peuvent rembourser une année entière de crédit immobilier.</div>
@@ -1488,10 +1634,7 @@ lui montrer comment votre bien y répond.</div>
         </ul>
         <div class="alert" style="margin-top:12px;">
           <div class="alert-icon">💡</div>
-          <div class="alert-text"><strong>L'odeur du café</strong> est 
-un des déclencheurs émotionnels les plus puissants. Elle évoque un 
-foyer, une maison habitée, le confort. Ce n'est pas du hasard si les 
-agents pros font de même.</div>
+          <div class="alert-text">Si vous souhaitez créer une <strong>ambiance accueillante</strong>, privilégiez une odeur légère et naturelle — un café qui infuse discrètement, par exemple. Évitez les parfums artificiels trop marqués.</div>
         </div>
       </div>
       <div>
@@ -1510,6 +1653,21 @@ interrogent ? » Puis : « Seriez-vous intéressé par une seconde visite ? »</
           <div class="ex-box-titre"><div class="ex-tag">QUESTION FRÉQUENTE</div>"Pourquoi vous vendez ?"</div>
           <div class="ex-box-text"><p>Répondez simplement et honnêtement — <em>mutation, agrandissement, retraite, divorce…</em> — sans dramatiser. En revanche, vous ne pouvez jamais dissimuler un défaut réel du bien ou du quartier : la loi vous impose d'en informer l'acheteur. La transparence n'est pas une option — elle vous protège juridiquement et instaure la confiance.</p></div>
         </div>
+      </div>
+    </div>
+    <div class="founder-tip">
+      <div class="founder-tip-photo">G</div>
+      <div class="founder-tip-body">
+        <div class="founder-tip-label">Le conseil de Guillaume</div>
+        <div class="founder-tip-text">« Pendant une visite, ne récitez pas une fiche technique. Faites parler l'acheteur : ses questions vous indiquent ce qui compte réellement pour lui. »</div>
+      </div>
+    </div>
+    <div class="tool-box">
+      <div class="tool-box-qr">📱</div>
+      <div class="tool-box-body">
+        <div class="tool-box-titre">Disponible dans votre espace vendeur</div>
+        <div class="tool-box-list">Checklist 1 h avant · Trame de visite · Compte rendu après visite</div>
+        <div class="tool-box-cta">Retrouvez cet outil dans votre espace vendeur Vendu Par Moi</div>
       </div>
     </div>
     <div class="alert" style="margin-top:16px;">
@@ -1580,9 +1738,24 @@ signer rapidement. »</em></p>
           </div>
         </div>
         <div class="big-stat" style="margin-top:16px;">
-          <div class="big-stat-num">2<span class="big-stat-unit">à 4%</span></div>
+          <div class="big-stat-num">2 <span class="big-stat-unit">à 4%</span></div>
           <div class="big-stat-label">c'est la marge de négociation normale sur le marché immobilier français</div>
         </div>
+      </div>
+    </div>
+    <div class="founder-tip">
+      <div class="founder-tip-photo">M</div>
+      <div class="founder-tip-body">
+        <div class="founder-tip-label">Le conseil de Matthias</div>
+        <div class="founder-tip-text">« Une offre inférieure au prix n'est pas forcément une mauvaise offre. Regardez aussi le financement, les conditions suspensives et le calendrier proposé. »</div>
+      </div>
+    </div>
+    <div class="tool-box">
+      <div class="tool-box-qr">📱</div>
+      <div class="tool-box-body">
+        <div class="tool-box-titre">Disponible dans votre espace vendeur</div>
+        <div class="tool-box-list">Grille d'analyse d'une offre · Modèle de contre-proposition</div>
+        <div class="tool-box-cta">Retrouvez cet outil dans votre espace vendeur Vendu Par Moi</div>
       </div>
     </div>
     <div class="alert" style="margin-top:16px;">
@@ -1680,6 +1853,15 @@ remettez les clés. La vente est officiellement conclue.</p>
         </div>
       </div>
     </div>
+    <div class="tool-box">
+      <div class="tool-box-qr">📱</div>
+      <div class="tool-box-body">
+        <div class="tool-box-titre">Disponible dans votre espace vendeur</div>
+        <div class="tool-box-list">Checklist avant-compromis · Pièces à transmettre · Calendrier de vente</div>
+        <div class="tool-box-cta">Retrouvez cet outil dans votre espace vendeur Vendu Par Moi</div>
+      </div>
+    </div>
+    <div class="legal-note">Les délais et clauses d'un avant-contrat dépendent de la situation du bien et du financement de l'acquéreur. Le recours au notaire dès l'avant-contrat est recommandé. L'acquéreur non professionnel d'un logement bénéficie, dans les cas prévus par la loi, d'un délai légal de rétractation de 10 jours.</div>
     <div class="alert" style="margin-top:16px;">
       <div class="alert-icon">💡</div>
       <div class="alert-text"><strong>Le saviez-vous ?</strong> Ces économies vous permettent de démarrer votre prochaine étape de vie sans contrainte financière — qu'il s'agisse d'un déménagement, d'une rénovation ou d'une épargne de précaution.</div>
@@ -1776,6 +1958,11 @@ question."
       <div style="font-size:14px;color:white;font-weight:600;">06 95 44 36 54</div>
     </div>
   </div>
+
+  <div style="max-width:480px;font-size:10px;color:rgba(255,255,255,.45);line-height:1.6;margin-top:44px;padding-top:20px;border-top:1px solid rgba(255,255,255,.15);">
+    Ce guide a une vocation pédagogique et pratique. Il ne remplace pas les conseils personnalisés d'un notaire, d'un avocat, d'un diagnostiqueur ou de tout autre professionnel compétent lorsque la situation l'exige. Les règles et services mentionnés peuvent évoluer : vérifiez les informations applicables au moment de votre vente.
+  </div>
+  <div style="font-size:9px;color:rgba(255,255,255,.35);text-transform:uppercase;letter-spacing:.12em;margin-top:16px;">Édition 2026 — dernière vérification éditoriale et réglementaire : septembre 2026</div>
 
 </div>
 </div>
