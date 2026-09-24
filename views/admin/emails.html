@@ -60,8 +60,8 @@
     .search-bar input { flex: 1; padding: 9px 14px; border: 1px solid #ddd; border-radius: 8px; font-size: 0.88rem; }
     .filter-btn { padding: 8px 16px; border-radius: 8px; border: 1px solid #ddd; background: #fff; font-size: 0.82rem; cursor: pointer; }
     .filter-btn.active { background: #C4603A; color: #fff; border-color: #C4603A; }
-    #sendModal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.45); z-index: 1000; align-items: center; justify-content: center; }
-    #sendModal.show { display: flex; }
+    #sendModal, #testModal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.45); z-index: 1000; align-items: center; justify-content: center; }
+    #sendModal.show, #testModal.show { display: flex; }
     .modal-box { background: #fff; border-radius: 16px; padding: 32px; width: 520px; max-width: 95vw; box-shadow: 0 8px 40px rgba(0,0,0,0.18); }
     .modal-title { font-family: 'Cormorant Garamond', serif; font-size: 1.4rem; color: #1A1A16; margin: 0 0 24px; }
     .modal-close { float: right; background: none; border: none; font-size: 1.3rem; cursor: pointer; color: #999; line-height: 1; }
@@ -78,7 +78,10 @@
         <h1 style="font-family:'Cormorant Garamond',serif;color:#1A1A16;font-size:2rem;margin:0 0 4px;">Emails</h1>
         <p style="color:#888;font-size:0.88rem;margin:0;">Catalogue complet · Historique · Envoi manuel</p>
       </div>
-      <button class="send-btn-primary" onclick="openSendModal()"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg> Envoyer un email</button>
+      <div style="display:flex;gap:10px;">
+        <button class="send-btn-primary" style="background:#3D5A47;" onclick="openTestModal()"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Tester un modèle</button>
+        <button class="send-btn-primary" onclick="openSendModal()"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg> Envoyer un email</button>
+      </div>
     </div>
 
     <!-- Résumé rapide -->
@@ -177,15 +180,6 @@
       <label>Type d'email</label>
       <select id="modalEmailType" onchange="onEmailTypeChange()">
         <option value="">Choisir un type...</option>
-        <option value="no_photos">Photos manquantes</option>
-        <option value="missing_doc">Documents manquants</option>
-        <option value="not_published">Fiche non publiée</option>
-        <option value="post_first_visit">Retour 1ère session de visites</option>
-        <option value="check_in_no_offer">Check-in sans offre</option>
-        <option value="contract_renewal">Renouvellement contrat</option>
-        <option value="review_request">Demande d'avis</option>
-        <option value="prospect_nudge">Relance prospect</option>
-        <option value="custom">Message personnalisé</option>
       </select>
     </div>
 
@@ -199,6 +193,32 @@
     <div style="display:flex;gap:12px;justify-content:flex-end;">
       <button onclick="closeSendModal()" style="padding:11px 22px;border:1px solid #ddd;border-radius:8px;background:#fff;cursor:pointer;font-size:0.9rem;">Annuler</button>
       <button class="send-btn-primary" onclick="sendEmail()" id="sendConfirmBtn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg> Envoyer</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal test (n'importe quel modèle, données de démo, vers une adresse libre) -->
+<div id="testModal">
+  <div class="modal-box">
+    <button class="modal-close" onclick="closeTestModal()">✕</button>
+    <h2 class="modal-title">Tester un modèle d'email</h2>
+    <p style="font-size:0.82rem;color:#888;margin:-12px 0 20px;">Envoie le vrai template avec des données de démo (Sophie Martin / Thomas Durand) à l'adresse de votre choix — couvre tous les modèles du catalogue, y compris ceux destinés à un acheteur, un prospect ou l'admin.</p>
+
+    <div class="form-group">
+      <label>Modèle à tester</label>
+      <select id="testEmailType">
+        <option value="">Choisir un modèle...</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label>Adresse de destination</label>
+      <input type="email" id="testEmailTo" placeholder="matthias@venduparmoi.fr" style="width:100%;padding:10px 12px;border:1px solid #ddd;border-radius:8px;font-size:0.88rem;font-family:inherit;">
+    </div>
+
+    <div style="display:flex;gap:12px;justify-content:flex-end;">
+      <button onclick="closeTestModal()" style="padding:11px 22px;border:1px solid #ddd;border-radius:8px;background:#fff;cursor:pointer;font-size:0.9rem;">Annuler</button>
+      <button class="send-btn-primary" style="background:#3D5A47;" onclick="sendTestModalEmail()" id="testConfirmBtn">Envoyer le test</button>
     </div>
   </div>
 </div>
@@ -313,8 +333,44 @@ const EMAIL_DESCRIPTIONS = {
   custom: 'Message libre rédigé manuellement par l\'administrateur.',
 };
 
+// Libellés lisibles pour les modèles testables qui n'apparaissent pas dans
+// EMAIL_CATALOG (utilitaires transactionnels plutôt qu'emails de parcours).
+const TESTABLE_EXTRA_LABELS = {
+  password_reset: 'Réinitialisation mot de passe',
+  login_code: 'Code de connexion',
+  dossier: 'Dossier acheteur partagé',
+};
+
+let testableTemplates = [];
+
 async function init() {
-  await Promise.all([loadCatalog(), loadLog(0), loadSellers()]);
+  await Promise.all([loadCatalog(), loadLog(0), loadSellers(), loadTestable()]);
+  // allCatalog et testableTemplates se chargent en parallèle : on regénère les
+  // libellés une fois les deux disponibles, au cas où le catalogue arrive après.
+  renderTestableOptions();
+}
+
+async function loadTestable() {
+  try {
+    const r = await fetch('/admin/api/emails/testable');
+    const data = await r.json();
+    testableTemplates = data.templates || [];
+    renderTestableOptions();
+  } catch(e) {
+    document.getElementById('testEmailType').innerHTML = `<option value="">Erreur : ${e.message}</option>`;
+  }
+}
+
+function renderTestableOptions() {
+  const sel = document.getElementById('testEmailType');
+  const labelFor = id => {
+    const fromCatalog = allCatalog.find(e => e.id === id);
+    if (fromCatalog) return fromCatalog.label;
+    if (TESTABLE_EXTRA_LABELS[id]) return TESTABLE_EXTRA_LABELS[id];
+    return id.replace(/_/g, ' ');
+  };
+  sel.innerHTML = '<option value="">Choisir un modèle...</option>' +
+    testableTemplates.map(id => `<option value="${id}">${labelFor(id)}</option>`).join('');
 }
 
 async function loadCatalog() {
@@ -328,6 +384,7 @@ async function loadCatalog() {
     const autoCount = catalog.filter(e => e.auto).length;
     document.getElementById('statAuto').textContent = autoCount;
     document.getElementById('statManual').textContent = catalog.length - autoCount;
+    renderModalEmailTypeOptions();
   } catch(e) {
     document.getElementById('catalogBody').innerHTML = `<tr><td colspan="6" style="text-align:center;color:#c62828;padding:32px;">Erreur chargement catalogue : ${e.message}</td></tr>`;
   }
@@ -387,7 +444,7 @@ function renderCatalog(list) {
       <td class="log-time">${lastSent}</td>
       <td style="display:flex;gap:6px;">
         <button class="btn-send" style="background:#C4603A;" onclick="openPreview('${e.id}','${e.label.replace(/'/g,"\\'")}')" title="Voir l'aperçu"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg> Aperçu</button>
-        <button class="btn-send" onclick="openSendModalWith('${e.id}')">Envoyer</button>
+        <button class="btn-send" style="background:#3D5A47;" onclick="openTestModalWith('${e.id}')" title="Envoyer ce modèle à une adresse de test">Tester</button>
       </td>
     </tr>`;
   }).join('');
@@ -444,6 +501,14 @@ function setFilter(f, btn) {
   filterCatalog();
 }
 
+function renderModalEmailTypeOptions() {
+  const sel = document.getElementById('modalEmailType');
+  const vendeurTypes = allCatalog.filter(e => e.recipient === 'Vendeur');
+  sel.innerHTML = '<option value="">Choisir un type...</option>' +
+    vendeurTypes.map(e => `<option value="${e.id}">${e.label}</option>`).join('') +
+    '<option value="custom">Message personnalisé</option>';
+}
+
 function openSendModal() {
   document.getElementById('sendModal').classList.add('show');
   document.getElementById('modalEmailType').value = '';
@@ -451,15 +516,61 @@ function openSendModal() {
   document.getElementById('customMsgWrap').style.display = 'none';
 }
 
-function openSendModalWith(emailId) {
-  openSendModal();
-  document.getElementById('modalEmailType').value = emailId;
-  onEmailTypeChange();
-}
-
 function closeSendModal() {
   document.getElementById('sendModal').classList.remove('show');
 }
+
+function openTestModal() {
+  document.getElementById('testModal').classList.add('show');
+  document.getElementById('testEmailType').value = '';
+}
+
+function openTestModalWith(emailId) {
+  openTestModal();
+  document.getElementById('testEmailType').value = emailId;
+}
+
+function closeTestModal() {
+  document.getElementById('testModal').classList.remove('show');
+}
+
+async function sendTestModalEmail() {
+  const template_id = document.getElementById('testEmailType').value;
+  const to = document.getElementById('testEmailTo').value.trim();
+
+  if (!template_id) { showToast('Veuillez choisir un modèle', true); return; }
+  if (!to) { showToast('Veuillez saisir une adresse de destination', true); return; }
+
+  const btn = document.getElementById('testConfirmBtn');
+  btn.disabled = true;
+  btn.textContent = 'Envoi...';
+
+  try {
+    const r = await fetch('/admin/api/emails/send-test', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ template_id, to }),
+    });
+    const data = await r.json();
+    if (data.success) {
+      showToast(`Test envoyé à ${to} ✓`);
+      closeTestModal();
+      loadLog(0);
+    } else {
+      showToast(data.error || 'Erreur lors de l\'envoi', true);
+    }
+  } catch(e) {
+    showToast('Erreur réseau', true);
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Envoyer le test';
+  }
+}
+
+document.getElementById('testModal').addEventListener('click', function(e) {
+  if (e.target === this) closeTestModal();
+});
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeTestModal(); });
 
 function onEmailTypeChange() {
   const type = document.getElementById('modalEmailType').value;

@@ -25,6 +25,10 @@ function getResend() {
 }
 
 let _previewCapture = null;
+// Quand renseigné, redirige tout envoi réel vers cette adresse (garde le
+// contenu/sujet du template d'origine) — utilisé pour tester un modèle
+// d'email avec des données de démo sans l'envoyer au vrai destinataire.
+let _sendOverrideTo = null;
 
 function _logEmailSend(to, subject, success, resendId, source = 'auto') {
   try {
@@ -41,30 +45,32 @@ async function send(to, subject, html, source = 'auto') {
     _previewCapture = html;
     return true;
   }
+  const actualTo = _sendOverrideTo || to;
+  const actualSource = _sendOverrideTo ? 'test' : source;
   const resend = getResend();
   if (!resend) {
-    console.warn(`[EMAIL] RESEND_API_KEY manquant — email non envoyé à ${to} : ${subject}`);
-    _logEmailSend(to, subject, false, null, source);
+    console.warn(`[EMAIL] RESEND_API_KEY manquant — email non envoyé à ${actualTo} : ${subject}`);
+    _logEmailSend(actualTo, subject, false, null, actualSource);
     return false;
   }
   try {
     const { data, error } = await resend.emails.send({
       from: `${FROM_NAME} <${FROM_EMAIL}>`,
-      to,
+      to: actualTo,
       subject,
       html,
     });
     if (error) {
-      console.error(`[EMAIL] ✗ Resend error → ${to} : ${JSON.stringify(error)}`);
-      _logEmailSend(to, subject, false, null, source);
+      console.error(`[EMAIL] ✗ Resend error → ${actualTo} : ${JSON.stringify(error)}`);
+      _logEmailSend(actualTo, subject, false, null, actualSource);
       return false;
     }
-    console.log(`[EMAIL] ✓ Envoyé (${data?.id}) → ${to} : ${subject}`);
-    _logEmailSend(to, subject, true, data?.id || null, source);
+    console.log(`[EMAIL] ✓ Envoyé (${data?.id}) → ${actualTo} : ${subject}`);
+    _logEmailSend(actualTo, subject, true, data?.id || null, actualSource);
     return true;
   } catch (e) {
-    console.error(`[EMAIL] ✗ Exception → ${to} : ${e.message}`);
-    _logEmailSend(to, subject, false, null, source);
+    console.error(`[EMAIL] ✗ Exception → ${actualTo} : ${e.message}`);
+    _logEmailSend(actualTo, subject, false, null, actualSource);
     return false;
   }
 }
@@ -678,13 +684,17 @@ async function sendNewClientAdminNotif({ firstName, lastName, email, pack, phone
 // 14. PRÉVISUALISATION (admin marketing)
 // ─────────────────────────────────────────────────────────────
 
-async function previewEmail(templateName) {
+// Table partagée id → appel avec données de démo, utilisée à la fois pour la
+// prévisualisation (capture le HTML sans envoyer) et pour l'envoi de test
+// réel (envoie le vrai template, avec les mêmes données de démo, mais
+// redirigé vers l'adresse de test choisie par l'admin).
+function _templateFns() {
   const fakeProp = { type: 'maison', address: '12 rue des Lilas', city: 'Lyon', slug: 'maison-lyon-preview', price: 320000 };
   const fakeSellerEmail = 'sophie.martin@exemple.fr';
   const fakeBuyerEmail = 'thomas.durand@exemple.fr';
   const fakeDossierUrl = `${BASE_URL}/dossier/acheteur/preview-token`;
 
-  const fns = {
+  return {
     welcome_v2:            () => sendWelcomeImproved({ email: fakeSellerEmail, firstName: 'Sophie' }),
     password_reset:        () => sendPasswordResetEmail({ email: fakeSellerEmail, firstName: 'Sophie', resetUrl: `${BASE_URL}/reset-password?token=preview` }),
     login_code:            () => sendLoginCode(fakeSellerEmail, '482913'),
@@ -711,8 +721,10 @@ async function previewEmail(templateName) {
     buyer_contacted:       () => sendNewVisitRequest({ sellerEmail: fakeSellerEmail, buyerName: 'Thomas Durand', visitDate: '20 septembre 2026 à 14:00', notes: '📞 06 12 34 56 78' }),
     contact_notification:  () => sendContactNotification({ name: 'Thomas Durand', phone: '06 12 34 56 78', email: fakeBuyerEmail, offer: 'Pack Coaching Plus', city: 'Lyon', message: 'Je suis intéressé par votre offre.' }),
   };
+}
 
-  const fn = fns[templateName];
+async function previewEmail(templateName) {
+  const fn = _templateFns()[templateName];
   if (!fn) return `<p style="font-family:sans-serif;padding:20px;color:#c00;">Template inconnu : <strong>${templateName}</strong></p>`;
 
   _previewCapture = '';
@@ -725,6 +737,26 @@ async function previewEmail(templateName) {
   _previewCapture = null;
 
   return capturedHtml || `<p style="font-family:sans-serif;padding:20px;color:#c00;">Rendu indisponible pour ce template.</p>`;
+}
+
+// Envoie réellement un template (avec ses données de démo) à une adresse de
+// test choisie par l'admin — même contenu que la prévisualisation, mais
+// délivré pour de vrai via Resend au lieu d'être seulement capturé.
+async function sendTestEmail(templateName, toEmail) {
+  const fn = _templateFns()[templateName];
+  if (!fn) throw new Error(`Template inconnu : ${templateName}`);
+  if (!toEmail) throw new Error('Adresse de destination requise');
+
+  _sendOverrideTo = toEmail;
+  try {
+    return await fn();
+  } finally {
+    _sendOverrideTo = null;
+  }
+}
+
+function listTestableTemplates() {
+  return Object.keys(_templateFns());
 }
 
 // ─────────────────────────────────────────────────────────────
@@ -839,4 +871,6 @@ module.exports = {
   sendAdminDirectEmail,
   sendNewClientAdminNotif,
   previewEmail,
+  sendTestEmail,
+  listTestableTemplates,
 };
