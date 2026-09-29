@@ -51,6 +51,13 @@ app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
+// PDFs contractuels
+app.get('/downloads/:file', (req, res) => {
+  const file = path.join(__dirname, 'public', 'downloads', req.params.file);
+  res.setHeader('Content-Type', 'application/pdf');
+  res.sendFile(file);
+});
+
 // Pages publiques statiques
 app.get('/cgv', (req, res) => { res.set('Cache-Control', 'no-store, no-cache, must-revalidate'); res.sendFile(path.join(__dirname, 'public', 'cgv.html')); });
 app.get('/cgu', (req, res) => { res.set('Cache-Control', 'no-store, no-cache, must-revalidate'); res.sendFile(path.join(__dirname, 'public', 'cgu.html')); });
