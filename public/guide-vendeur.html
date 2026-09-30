@@ -1,1050 +1,368 @@
 <!DOCTYPE html>
 <html lang="fr"><head>
-<meta http-equiv="content-type" content="text/html; charset=UTF-8">
 <meta charset="UTF-8">
 <title>Le Guide du Vendeur — Vendu Par Moi</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,700&family=DM+Sans:wght@300;400;500;600;700;800&display=swap');
+:root{--terra:#C4603A;--terra2:#D4785A;--terra3:#F0D5C8;--creme:#F5F0E8;--vert:#0C1910;--vert2:#1D3A28;--noir:#1a1a1a;--gris:#6b6965;--gris2:#9a9087;}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'DM Sans',sans-serif;background:#d8d2cb;font-size:13px;color:var(--noir);line-height:1.65;}
+.page{width:210mm;min-height:297mm;background:white;margin:16px auto;position:relative;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,.18);}
 
-:root {
-  --terra:  #C4603A;
-  --terra2: #D4785A;
-  --terra3: #F0D5C8;
-  --creme:  #F5F0E8;
-  --vert:   #0C1910;
-  --vert2:  #1D3A28;
-  --noir:   #1a1a1a;
-  --gris:   #6b6965;
-  --gris2:  #9a9087;
-  --blanc:  #ffffff;
-}
+/* COVER */
+.cover{background:var(--creme);min-height:297mm;display:flex;flex-direction:column;}
+.cover-band{background:var(--terra);padding:22px 40px;display:flex;align-items:center;justify-content:space-between;}
+.cover-logo-name{font-family:'Cormorant Garamond',serif;font-size:16px;font-weight:700;color:white;letter-spacing:.04em;}
+.cover-edition{font-size:9px;font-weight:600;color:rgba(255,255,255,.55);letter-spacing:.18em;text-transform:uppercase;}
+.cover-main{flex:1;padding:48px 40px 36px;display:flex;flex-direction:column;justify-content:space-between;}
+.cover-tag{display:inline-block;background:var(--terra);color:white;font-size:9px;font-weight:700;padding:5px 14px;border-radius:20px;letter-spacing:.12em;text-transform:uppercase;margin-bottom:18px;}
+.cover-h1{font-family:'Cormorant Garamond',serif;font-size:58px;font-weight:700;color:var(--vert);line-height:1.0;margin-bottom:8px;}
+.cover-h1 em{font-style:italic;color:var(--terra);}
+.cover-sub{font-size:13px;color:var(--gris);font-weight:300;line-height:1.7;max-width:340px;margin-bottom:32px;}
+.cover-stats{display:flex;gap:28px;flex-wrap:wrap;}
+.cover-stat{text-align:center;}
+.cover-stat-num{font-family:'Cormorant Garamond',serif;font-size:36px;font-weight:700;color:var(--terra);line-height:1;}
+.cover-stat-label{font-size:9px;color:var(--gris);margin-top:3px;max-width:90px;line-height:1.3;}
+.cover-footer{padding:20px 40px;border-top:1px solid #ddd8d0;display:flex;align-items:center;justify-content:space-between;}
+.cover-founders{font-size:10px;color:var(--gris);}
+.cover-founders strong{color:var(--noir);}
+.cover-badges{display:flex;gap:10px;}
+.cover-badge{background:var(--terra3);color:var(--terra);font-size:9px;font-weight:700;padding:4px 10px;border-radius:3px;letter-spacing:.05em;}
 
-* { margin:0; padding:0; box-sizing:border-box; }
+/* FOUNDERS */
+.founders-page{min-height:297mm;display:flex;flex-direction:column;background:var(--vert);}
+.founders-header{background:rgba(255,255,255,.06);padding:22px 40px;display:flex;align-items:center;justify-content:space-between;}
+.founders-label{font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:rgba(255,255,255,.35);}
+.founders-title{font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:700;color:white;padding:32px 40px 8px;}
+.founders-title em{font-style:italic;color:var(--terra2);}
+.founders-sous{font-size:11px;color:rgba(255,255,255,.45);padding:0 40px 28px;}
+.founders-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;padding:0 40px;flex:1;}
+.founder-card{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);border-radius:6px;padding:20px;}
+.founder-photo{width:52px;height:52px;border-radius:50%;background:var(--terra);display:flex;align-items:center;justify-content:center;font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:700;color:white;margin-bottom:12px;}
+.founder-name{font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:700;color:white;margin-bottom:2px;}
+.founder-role{font-size:9px;color:var(--terra2);text-transform:uppercase;letter-spacing:.12em;margin-bottom:10px;}
+.founder-bio{font-size:11px;color:rgba(255,255,255,.6);line-height:1.6;}
+.founders-quote{margin:20px 40px;padding:18px 22px;background:rgba(255,255,255,.05);border-left:3px solid var(--terra);border-radius:0 4px 4px 0;}
+.founders-quote p{font-family:'Cormorant Garamond',serif;font-size:14px;font-style:italic;color:rgba(255,255,255,.75);line-height:1.6;margin-bottom:6px;}
+.founders-quote cite{font-size:10px;color:rgba(255,255,255,.35);}
+.founders-footer{padding:16px 40px;border-top:1px solid rgba(255,255,255,.08);display:flex;justify-content:space-between;align-items:center;}
+.footer-brand{font-family:'Cormorant Garamond',serif;font-size:10px;font-weight:700;color:rgba(255,255,255,.4);}
+.footer-pg{font-size:9px;color:rgba(255,255,255,.25);}
 
-body {
-  font-family:'DM Sans',sans-serif;
-  background:#e0dbd4;
-  font-size:13px;
-  color:var(--noir);
-  line-height:1.7;
-}
+/* SOMMAIRE */
+.som-page{min-height:297mm;background:white;display:flex;flex-direction:column;}
+.som-header{background:var(--terra);padding:22px 40px;}
+.som-header-label{font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:rgba(255,255,255,.5);}
+.som-header-title{font-family:'Cormorant Garamond',serif;font-size:30px;font-weight:700;color:white;}
+.som-body{flex:1;padding:20px 40px;display:grid;grid-template-columns:1fr 1fr;gap:0 28px;}
+.som-ch{padding:10px 0;border-bottom:1px solid #f0ece6;}
+.som-ch:last-child{border-bottom:none;}
+.som-ch-num{font-size:9px;font-weight:700;color:var(--terra);text-transform:uppercase;letter-spacing:.15em;margin-bottom:2px;}
+.som-ch-titre{font-family:'Cormorant Garamond',serif;font-size:15px;font-weight:700;color:var(--noir);margin-bottom:6px;}
+.som-items{list-style:none;}
+.som-items li{display:flex;justify-content:space-between;font-size:10px;color:var(--gris);padding:1px 0;}
+.som-items li span:last-child{color:var(--terra);font-weight:600;flex-shrink:0;padding-left:8px;}
+.som-items li.new-item span:first-child{color:var(--terra);font-weight:600;}
+.som-footer{padding:14px 40px;border-top:1px solid #f0ece6;display:flex;justify-content:space-between;}
 
-/* PAGE */
-.page {
-  width:210mm;
-  min-height:297mm;
-  background:white;
-  margin:20px auto;
-  position:relative;
-  overflow:hidden;
-  box-shadow:0 4px 24px rgba(0,0,0,.15);
-}
+/* CHAPTER SEPARATORS */
+.sep{min-height:297mm;background:var(--vert);display:flex;flex-direction:column;position:relative;overflow:hidden;}
+.sep-deco{position:absolute;right:-40px;top:50%;transform:translateY(-50%);font-family:'Cormorant Garamond',serif;font-size:320px;font-weight:700;color:rgba(255,255,255,.03);line-height:1;pointer-events:none;}
+.sep-inner{flex:1;padding:44px 44px 36px;display:flex;flex-direction:column;justify-content:space-between;position:relative;z-index:1;}
+.sep-tag{display:inline-block;background:var(--terra);color:white;font-size:9px;font-weight:700;padding:5px 12px;border-radius:3px;letter-spacing:.12em;text-transform:uppercase;width:fit-content;margin-bottom:20px;}
+.sep-tag.integration{background:rgba(196,96,58,.3);border:1px solid var(--terra);color:var(--terra2);}
+.sep-icon{font-size:48px;margin-bottom:16px;}
+.sep-titre{font-family:'Cormorant Garamond',serif;font-size:42px;font-weight:700;color:white;line-height:1.1;margin-bottom:14px;}
+.sep-titre em{font-style:italic;color:var(--terra2);}
+.sep-desc{font-size:12px;color:rgba(255,255,255,.5);line-height:1.7;max-width:400px;}
+.sep-bottom{display:flex;justify-content:space-between;align-items:flex-end;}
+.sep-num{font-family:'Cormorant Garamond',serif;font-size:120px;font-weight:700;color:rgba(255,255,255,.08);line-height:1;}
+.sep-footer{font-size:9px;color:rgba(255,255,255,.2);letter-spacing:.15em;text-transform:uppercase;}
 
-/* ═══════════════════════════════
-   COUVERTURE
-═══════════════════════════════ */
-.cover {
-  background:var(--creme);
-  min-height:297mm;
-  display:flex;
-  flex-direction:column;
-}
-.cover-band {
-  background:var(--terra);
-  padding:28px 44px;
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-}
-.cover-logo {
-  display:flex; align-items:center; gap:10px;
-}
-.cover-logo svg { opacity:.95; }
-.cover-logo-name {
-  font-family:'Cormorant Garamond',serif;
-  font-size:17px; font-weight:700;
-  color:white; letter-spacing:.04em;
-}
-.cover-edition {
-  font-size:10px; font-weight:600;
-  color:rgba(255,255,255,.6);
-  letter-spacing:.15em; text-transform:uppercase;
-}
-.cover-main {
-  flex:1;
-  padding:52px 44px 40px;
-  display:flex;
-  flex-direction:column;
-  justify-content:space-between;
-}
-.cover-tag {
-  display:inline-block;
-  background:var(--terra);
-  color:white;
-  font-size:10px; font-weight:700;
-  padding:5px 14px; border-radius:20px;
-  letter-spacing:.12em; text-transform:uppercase;
-  margin-bottom:20px;
-}
-.cover-h1 {
-  font-family:'Cormorant Garamond',serif;
-  font-size:62px; font-weight:700;
-  color:var(--vert); line-height:1.0;
-  margin-bottom:10px;
-}
-.cover-h1 em {
-  font-style:italic; color:var(--terra);
-}
-.cover-sub {
-  font-size:14px; color:var(--gris);
-  font-weight:300; line-height:1.7;
-  max-width:380px; margin-bottom:36px;
-}
-.cover-pills {
-  display:flex; flex-wrap:wrap; gap:8px;
-  margin-bottom:44px;
-}
-.cover-pill {
-  background:white;
-  border:1.5px solid var(--terra3);
-  color:var(--terra);
-  font-size:10.5px; font-weight:600;
-  padding:5px 12px; border-radius:20px;
-}
-.cover-founders {
-  display:flex; gap:16px; align-items:center;
-  background:white;
-  border-radius:14px;
-  padding:18px 20px;
-  border:1.5px solid var(--terra3);
-}
-.cover-founder-photos {
-  display:flex;
-}
-.cover-founder-photo {
-  width:44px; height:44px;
-  border-radius:50%;
-  background:linear-gradient(135deg,var(--terra),var(--terra2));
-  border:2px solid white;
-  display:flex; align-items:center; justify-content:center;
-  font-size:11px; color:white; font-weight:700;
-}
-.cover-founder-photo:last-child { margin-left:-12px; }
-.cover-founder-info { flex:1; }
-.cover-founder-names {
-  font-size:13px; font-weight:700; color:var(--vert);
-}
-.cover-founder-role {
-  font-size:11px; color:var(--gris);
-}
-.cover-house {
-  text-align:right;
-  padding:0 44px 44px;
-}
-.cover-house-icon {
-  font-size:100px; opacity:.08;
-  line-height:1;
-}
-.cover-number-strip {
-  background:var(--vert);
-  padding:20px 44px;
-  display:grid; grid-template-columns:repeat(4,1fr);
-  gap:20px;
-}
-.cover-stat {
-  text-align:center;
-}
-.cover-stat-num {
-  font-family:'Cormorant Garamond',serif;
-  font-size:19px; font-weight:700;
-  color:var(--terra2); line-height:1.25; margin-bottom:3px;
-}
-.cover-stat-label {
-  font-size:9.5px; color:rgba(255,255,255,.5);
-  text-transform:uppercase; letter-spacing:.08em; line-height:1.35;
-}
+/* INTEGRATION PAGE SEPARATOR */
+.sep.integration-sep{background:linear-gradient(135deg,#7A2B12 0%,#9E3A18 55%,var(--terra) 100%);}
 
-/* ═══════════════════════════════
-   PAGE FONDATEURS
-═══════════════════════════════ */
-.founders-page {
-  min-height:297mm;
-  display:flex; flex-direction:column;
-}
-.founders-top {
-  background:var(--terra);
-  padding:32px 44px 28px;
-}
-.founders-top-label {
-  font-size:10px; font-weight:700;
-  color:rgba(255,255,255,.55);
-  text-transform:uppercase; letter-spacing:.2em;
-  margin-bottom:6px;
-}
-.founders-top-titre {
-  font-family:'Cormorant Garamond',serif;
-  font-size:34px; font-weight:700;
-  color:white; line-height:1.15;
-}
-.founders-body {
-  flex:1; padding:36px 44px;
-}
-.founders-grid {
-  display:grid; grid-template-columns:1fr 1fr;
-  gap:20px; margin-bottom:28px;
-}
-.founder-card {
-  background:var(--creme);
-  border-radius:12px;
-  overflow:hidden;
-}
-.founder-card-photo {
-  height:150px;
-  background:linear-gradient(135deg,var(--vert),var(--vert2));
-  display:flex; align-items:center; justify-content:center;
-  position:relative;
-}
-.founder-card-photo img {
-  width:100%; height:100%; object-fit:cover;
-}
-.founder-card-photo-ph {
-  color:rgba(255,255,255,.25);
-  font-size:11px; text-align:center; padding:12px;
-  font-family:'DM Sans',sans-serif;
-}
-.founder-card-body {
-  padding:16px 18px;
-}
-.founder-card-nom {
-  font-family:'Cormorant Garamond',serif;
-  font-size:20px; font-weight:700;
-  color:var(--vert); margin-bottom:2px;
-}
-.founder-card-titre {
-  font-size:10px; font-weight:700;
-  color:var(--terra); text-transform:uppercase;
-  letter-spacing:.1em; margin-bottom:10px;
-}
-.founder-card-bio {
-  font-size:12px; color:#4a4540; line-height:1.65;
-}
-.founders-citation {
-  background:var(--vert);
-  border-radius:12px;
-  padding:24px 28px;
-  margin-bottom:24px;
-}
-.founders-citation-text {
-  font-family:'Cormorant Garamond',serif;
-  font-size:18px; font-style:italic;
-  color:rgba(255,255,255,.85); line-height:1.6;
-  margin-bottom:10px;
-}
-.founders-citation-sig {
-  font-size:11px; color:var(--terra2);
-  font-weight:600;
-}
-.founders-texte {
-  font-size:13px; color:#3a3530; line-height:1.8;
-}
-.founders-texte p { margin-bottom:12px; }
+/* CONTENT PAGES */
+.cp{min-height:297mm;background:white;display:flex;flex-direction:column;}
+.cp-header{background:var(--vert);padding:10px 40px;display:flex;justify-content:space-between;align-items:center;flex-shrink:0;}
+.cp-header-ch{font-size:9px;color:rgba(255,255,255,.4);letter-spacing:.15em;text-transform:uppercase;}
+.cp-header-pg{font-size:9px;color:rgba(255,255,255,.4);font-weight:600;}
+.cp-body{flex:1;padding:20px 40px 14px;display:flex;flex-direction:column;gap:10px;}
+.cp-label{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.18em;color:var(--terra);}
+.cp-h1{font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:700;color:var(--vert);line-height:1.15;}
+.cp-h1 em{font-style:italic;color:var(--terra);}
+.cp-h2{font-family:'Cormorant Garamond',serif;font-size:17px;font-weight:700;color:var(--vert);margin-top:2px;}
+.cp-h3{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:var(--gris);margin-bottom:4px;}
+.cp-intro{font-size:12px;color:var(--gris);line-height:1.6;border-left:3px solid var(--terra3);padding-left:12px;}
+.sep-rule{border:none;border-top:1px solid #f0ece6;margin:2px 0;}
+.body-text{font-size:12px;color:var(--noir);line-height:1.65;}
+.body-text p+p{margin-top:8px;}
+.cp-footer{padding:10px 40px;border-top:1px solid #f0ece6;display:flex;justify-content:space-between;align-items:center;flex-shrink:0;}
 
-/* ═══════════════════════════════
-   SOMMAIRE
-═══════════════════════════════ */
-.som-page { min-height:297mm; }
-.som-header {
-  background:var(--terra);
-  padding:36px 44px 28px;
-}
-.som-titre-label {
-  font-size:10px; font-weight:700;
-  color:rgba(255,255,255,.55);
-  text-transform:uppercase; letter-spacing:.2em;
-  margin-bottom:6px;
-}
-.som-titre {
-  font-family:'Cormorant Garamond',serif;
-  font-size:44px; font-weight:700; color:white;
-}
-.som-body {
-  padding:28px 44px;
-  display:grid; grid-template-columns:1fr 1fr;
-  gap:0 32px;
-}
-.som-ch {
-  padding:14px 0;
-  border-bottom:1px solid #ede7de;
-}
-.som-ch-num {
-  font-size:9.5px; font-weight:700;
-  color:var(--terra); text-transform:uppercase;
-  letter-spacing:.15em; margin-bottom:3px;
-}
-.som-ch-titre {
-  font-family:'Cormorant Garamond',serif;
-  font-size:16px; font-weight:700;
-  color:var(--vert); margin-bottom:6px;
-  line-height:1.2;
-}
-.som-items { list-style:none; }
-.som-items li {
-  display:flex; justify-content:space-between;
-  font-size:11px; color:var(--gris);
-  padding:2px 0; gap:6px;
-}
-.som-items li span:last-child {
-  color:var(--terra); font-weight:700;
-  white-space:nowrap; font-size:10.5px;
-}
+/* TWO COL */
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+.col-4060{display:grid;grid-template-columns:2fr 3fr;gap:14px;}
 
-/* ═══════════════════════════════
-   SÉPARATEUR CHAPITRE
-═══════════════════════════════ */
-.sep-page {
-  background:var(--terra);
-  min-height:297mm;
-  display:flex; flex-direction:column;
-  justify-content:flex-end;
-  padding:48px 44px;
-  position:relative;
-  overflow:hidden;
-}
-.sep-bg-num {
-  position:absolute;
-  bottom:-40px; right:20px;
-  font-family:'Cormorant Garamond',serif;
-  font-size:260px; font-weight:700;
-  color:rgba(255,255,255,.06);
-  line-height:1; user-select:none;
-}
-.sep-bg-circles {
-  position:absolute;
-  top:-60px; right:-60px;
-  width:300px; height:300px;
-  border-radius:50%;
-  border:60px solid rgba(255,255,255,.04);
-}
-.sep-tag {
-  display:inline-block;
-  background:rgba(255,255,255,.15);
-  color:white;
-  font-size:9.5px; font-weight:700;
-  padding:4px 12px; border-radius:20px;
-  letter-spacing:.12em; text-transform:uppercase;
-  margin-bottom:16px;
-  width:fit-content;
-}
-.sep-icon {
-  font-size:52px; margin-bottom:16px;
-}
-.sep-titre {
-  font-family:'Cormorant Garamond',serif;
-  font-size:50px; font-weight:700;
-  color:white; line-height:1.05;
-  margin-bottom:16px;
-}
-.sep-titre em {
-  font-style:italic;
-  color:rgba(255,255,255,.65);
-}
-.sep-desc {
-  font-size:13.5px; color:rgba(255,255,255,.65);
-  max-width:360px; line-height:1.75;
-}
-.sep-line {
-  width:40px; height:3px;
-  background:rgba(255,255,255,.3);
-  border-radius:2px;
-  margin:20px 0;
-}
+/* BOXES */
+.box{border:1px solid #ede8e0;border-radius:5px;padding:12px 14px;}
+.box-terra{background:var(--terra);border-radius:5px;padding:12px 14px;}
+.box-titre{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--vert);margin-bottom:6px;}
+.box-terra .box-titre{color:rgba(255,255,255,.65);}
+.box-text{font-size:11.5px;color:var(--noir);line-height:1.55;}
+.box-text p+p{margin-top:7px;}
+.box-terra .box-text{color:rgba(255,255,255,.88);}
+.box-terra .box-text strong{color:white;}
+.box-note{background:#fff8f5;border-left:3px solid var(--terra);border-radius:0 4px 4px 0;padding:8px 12px;}
+.box-note p{font-size:11px;color:#7A2B12;line-height:1.5;}
 
-/* ═══════════════════════════════
-   PAGE CONTENU
-═══════════════════════════════ */
-.cp { min-height:297mm; display:flex; flex-direction:column; }
-.cp-header {
-  padding:14px 44px;
-  border-bottom:1.5px solid var(--terra3);
-  display:flex; justify-content:space-between; align-items:center;
-}
-.cp-header-ch {
-  font-size:9.5px; font-weight:700;
-  color:var(--terra); text-transform:uppercase;
-  letter-spacing:.15em;
-}
-.cp-header-pg { font-size:9.5px; color:#ccc; }
-.cp-body { flex:1; padding:28px 44px; }
+/* TABLES */
+table.t{width:100%;border-collapse:collapse;font-size:11px;}
+table.t thead tr th{background:var(--vert);color:white;padding:7px 10px;text-align:left;font-size:10px;font-weight:600;}
+table.t thead tr th:first-child{border-radius:3px 0 0 3px;}
+table.t thead tr th:last-child{border-radius:0 3px 3px 0;}
+table.t tbody td{padding:5px 10px;color:var(--noir);border-bottom:1px solid #f5f0eb;vertical-align:top;}
+table.t tbody tr:last-child td{border-bottom:none;}
+table.t tbody tr:nth-child(even) td{background:#fdfaf7;}
+.t-terra thead tr th{background:var(--terra);}
 
-/* Typographie contenu */
-.cp-h1 {
-  font-family:'Cormorant Garamond',serif;
-  font-size:34px; font-weight:700;
-  color:var(--vert); line-height:1.15;
-  margin-bottom:5px;
-}
-.cp-h2 {
-  font-family:'Cormorant Garamond',serif;
-  font-size:22px; font-weight:700;
-  color:var(--terra); margin:22px 0 10px;
-  line-height:1.2;
-}
-.cp-h3 {
-  font-size:11.5px; font-weight:700;
-  color:var(--vert); text-transform:uppercase;
-  letter-spacing:.1em; margin:16px 0 8px;
-}
-.cp-label {
-  font-size:9.5px; font-weight:700;
-  color:var(--terra); text-transform:uppercase;
-  letter-spacing:.15em; margin-bottom:4px;
-}
-.cp-intro {
-  font-size:14.5px; color:#3a3530;
-  line-height:1.75; margin-bottom:20px;
-  font-weight:300;
-}
-.body-text {
-  font-size:12.5px; color:#3a3530;
-  line-height:1.8;
-}
-.body-text p { margin-bottom:12px; }
-.body-text strong { color:var(--vert); font-weight:600; }
+/* LISTS */
+ul.cl{list-style:none;display:flex;flex-direction:column;gap:4px;}
+ul.cl li{display:flex;align-items:flex-start;gap:8px;font-size:11.5px;color:var(--noir);line-height:1.4;}
+.cl-box{width:12px;height:12px;min-width:12px;border:1.5px solid #ccc;border-radius:2px;margin-top:1px;}
+ul.vl{list-style:none;display:flex;flex-direction:column;gap:4px;}
+ul.vl li{font-size:11.5px;color:var(--noir);padding-left:14px;position:relative;line-height:1.4;}
+ul.vl li::before{content:'–';position:absolute;left:0;color:var(--terra);font-weight:600;}
+ol.nl{counter-reset:nl;list-style:none;display:flex;flex-direction:column;gap:6px;}
+ol.nl li{counter-increment:nl;font-size:11.5px;color:var(--noir);padding-left:22px;position:relative;line-height:1.45;}
+ol.nl li::before{content:counter(nl)'.';position:absolute;left:0;color:var(--terra);font-weight:700;font-size:11px;}
 
-/* Grilles */
-.two-col { display:grid; grid-template-columns:1fr 1fr; gap:24px; margin-bottom:20px; }
-.col-6040 { display:grid; grid-template-columns:1.6fr 1fr; gap:24px; margin-bottom:20px; }
-.col-4060 { display:grid; grid-template-columns:1fr 1.6fr; gap:24px; margin-bottom:20px; }
+/* STEPS */
+.steps{display:flex;flex-direction:column;gap:0;}
+.step{display:flex;align-items:flex-start;gap:10px;padding:6px 0;border-bottom:1px solid #f8f4f0;}
+.step:last-child{border-bottom:none;}
+.step-num{width:22px;height:22px;min-width:22px;border-radius:50%;background:var(--vert);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:white;margin-top:1px;}
+.step-num.vpm{background:var(--terra);}
+.step-label{font-size:11.5px;color:var(--noir);line-height:1.45;flex:1;}
+.step-timing{font-size:9px;font-weight:700;color:var(--terra);text-transform:uppercase;letter-spacing:.08em;display:block;margin-bottom:1px;}
+.step-final{background:var(--vert);border-radius:5px;padding:10px 14px;display:flex;align-items:center;gap:12px;margin-top:6px;}
+.sf-circle{width:26px;height:26px;min-width:26px;border-radius:50%;background:var(--terra);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:white;}
+.sf-badge{background:var(--terra);color:white;font-size:9px;font-weight:700;padding:3px 9px;border-radius:3px;white-space:nowrap;}
+.sf-title{font-size:12px;font-weight:700;color:white;margin-bottom:2px;}
+.sf-desc{font-size:10px;color:rgba(255,255,255,.55);}
 
-/* Boîtes */
-.box {
-  background:var(--creme);
-  border-radius:10px; padding:18px 20px;
-  border-left:3px solid var(--terra);
-  margin:16px 0;
-}
-.box-terra {
-  background:var(--terra);
-  border-radius:10px; padding:18px 20px;
-  margin:16px 0;
-}
-.box-white {
-  background:white;
-  border-radius:10px; padding:18px 20px;
-  border:1.5px solid var(--terra3);
-  margin:16px 0;
-}
-.box-titre {
-  font-size:9.5px; font-weight:700;
-  text-transform:uppercase; letter-spacing:.12em;
-  margin-bottom:10px;
-  color:var(--terra);
-}
-.box-terra .box-titre { color:rgba(255,255,255,.6); }
-.box-text { font-size:12px; color:#4a4540; line-height:1.65; }
-.box-text p { margin-bottom:8px; }
-.box-terra .box-text { color:rgba(255,255,255,.85); }
-.box-terra .box-text strong { color:white; }
+/* ALERT / FOUNDER TIP / TOOL REF */
+.alert{background:#f8f4f0;border-left:3px solid var(--terra2);border-radius:0 4px 4px 0;padding:8px 12px;display:flex;gap:8px;align-items:flex-start;}
+.alert-icon{font-size:14px;flex-shrink:0;margin-top:1px;}
+.alert-text{font-size:11px;color:var(--noir);line-height:1.5;}
+.alert-text strong{color:var(--vert);}
+.founder-tip{display:flex;gap:10px;align-items:flex-start;background:#fdfaf7;border:1px solid #ede8e0;border-radius:5px;padding:12px 14px;}
+.founder-photo{width:32px;height:32px;min-width:32px;border-radius:50%;background:var(--terra);display:flex;align-items:center;justify-content:center;font-family:'Cormorant Garamond',serif;font-size:16px;font-weight:700;color:white;}
+.founder-tip-label{font-size:9px;font-weight:700;color:var(--terra);text-transform:uppercase;letter-spacing:.1em;margin-bottom:4px;}
+.founder-tip-text{font-size:11.5px;color:var(--gris);font-style:italic;line-height:1.5;}
+.tool-ref{background:var(--terra3);border-radius:5px;padding:10px 14px;display:flex;gap:10px;align-items:flex-start;}
+.tool-ref-icon{font-size:18px;flex-shrink:0;}
+.tool-ref-titre{font-size:10px;font-weight:700;color:var(--terra);text-transform:uppercase;letter-spacing:.08em;margin-bottom:3px;}
+.tool-ref-list{font-size:11px;color:#7A2B12;line-height:1.5;}
 
-/* Listes */
-ul.vl { list-style:none; margin:10px 0; }
-ul.vl li {
-  font-size:12.5px; color:#3a3530;
-  padding:5px 0 5px 22px;
-  position:relative; line-height:1.6;
-  border-bottom:1px solid #f0ebe4;
-}
-ul.vl li::before {
-  content:'→';
-  position:absolute; left:0;
-  color:var(--terra); font-weight:700;
-}
-ul.vl li:last-child { border:none; }
+/* AVANT/APRES */
+.avant-apres{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.avant{background:#fdf0f0;border:1px solid #e8c0b0;border-radius:4px;padding:10px 12px;}
+.avant-label{font-size:9px;font-weight:700;color:#a03020;text-transform:uppercase;letter-spacing:.1em;margin-bottom:6px;}
+.apres{background:#f0fdf4;border:1px solid #a0d8b0;border-radius:4px;padding:10px 12px;}
+.apres-label{font-size:9px;font-weight:700;color:#2a6040;text-transform:uppercase;letter-spacing:.1em;margin-bottom:6px;}
+.avant-text,.apres-text{font-size:11px;line-height:1.5;color:var(--noir);}
 
-ol.nl { list-style:none; counter-reset:nl; margin:10px 0; }
-ol.nl li {
-  font-size:12.5px; color:#3a3530;
-  padding:7px 0 7px 36px;
-  position:relative; line-height:1.6;
-  counter-increment:nl;
-  border-bottom:1px solid #f0ebe4;
-}
-ol.nl li::before {
-  content:counter(nl);
-  position:absolute; left:0; top:7px;
-  width:22px; height:22px;
-  background:var(--terra); color:white;
-  font-size:10px; font-weight:700;
-  border-radius:50%;
-  display:flex; align-items:center; justify-content:center;
-  line-height:22px; text-align:center;
-}
-ol.nl li:last-child { border:none; }
+/* CITATION */
+.citation{border-left:3px solid var(--terra3);padding-left:12px;}
+.citation-text{font-size:12px;font-style:italic;color:var(--gris);line-height:1.6;margin-bottom:4px;}
+.citation-source{font-size:10px;color:var(--gris2);}
 
-/* Checklist */
-ul.cl { list-style:none; margin:10px 0; }
-ul.cl li {
-  display:flex; align-items:flex-start; gap:10px;
-  font-size:12.5px; color:#3a3530;
-  padding:6px 0;
-  border-bottom:1px solid #f0ebe4;
-  line-height:1.55;
-}
-ul.cl li:last-child { border:none; }
-.cl-box {
-  width:16px; height:16px;
-  border:2px solid var(--terra);
-  border-radius:3px; flex-shrink:0;
-  margin-top:2px;
-}
+/* EX-BOX */
+.ex-box{background:#fdfaf7;border:1px solid #ede8e0;border-radius:4px;padding:10px 12px;}
+.ex-tag{display:inline-block;background:var(--terra);color:white;font-size:8px;font-weight:700;padding:2px 7px;border-radius:2px;letter-spacing:.1em;margin-bottom:4px;}
+.ex-box-titre{font-size:11px;font-weight:700;color:var(--vert);margin-bottom:6px;}
+.ex-box-text{font-size:11px;color:var(--noir);line-height:1.55;}
 
-/* Tableau */
-table.t {
-  width:100%; border-collapse:collapse;
-  font-size:11.5px; margin:14px 0;
-}
-table.t th {
-  background:var(--vert);
-  color:white; padding:8px 10px;
-  text-align:left; font-size:10px;
-  font-weight:700; letter-spacing:.05em;
-}
-table.t td {
-  padding:7px 10px;
-  border-bottom:1px solid #ede7de;
-  vertical-align:top; color:#3a3530;
-}
-table.t tr:nth-child(even) td { background:#faf7f3; }
-table.t td strong { color:var(--terra); }
+/* BIG STAT */
+.big-stat{text-align:center;padding:10px;}
+.big-stat-num{font-family:'Cormorant Garamond',serif;font-size:48px;font-weight:700;color:var(--terra);line-height:1;}
+.big-stat-unit{font-size:22px;}
+.big-stat-label{font-size:10px;color:var(--gris);line-height:1.4;max-width:180px;margin:4px auto 0;}
 
-/* Stat visuelle */
-.big-stat {
-  text-align:center; padding:16px 8px;
-}
-.big-stat-num {
-  font-family:'Cormorant Garamond',serif;
-  font-size:52px; font-weight:700;
-  color:var(--terra); line-height:1;
-}
-.big-stat-unit {
-  font-size:22px; font-weight:700; color:var(--terra);
-}
-.big-stat-label {
-  font-size:11px; color:var(--gris);
-  margin-top:4px; line-height:1.4;
-}
-
-/* Encadré exemple */
-.ex-box {
-  background:white;
-  border-radius:10px;
-  border:1.5px solid var(--terra3);
-  padding:16px 18px;
-  margin:14px 0;
-}
-.ex-box-titre {
-  display:flex; align-items:center; gap:8px;
-  font-size:10px; font-weight:700;
-  color:var(--terra); text-transform:uppercase;
-  letter-spacing:.1em; margin-bottom:10px;
-}
-.ex-tag {
-  background:var(--terra3);
-  color:var(--terra); font-size:9px; font-weight:700;
-  padding:2px 8px; border-radius:10px;
-}
-.ex-box-text { font-size:12px; color:#4a4540; line-height:1.65; }
-.ex-box-text p { margin-bottom:8px; }
-.ex-box-text em { color:var(--terra); font-style:italic; }
-
-/* Citation */
-.citation {
-  border-left:4px solid var(--terra);
-  padding:12px 20px;
-  margin:16px 0;
-  background:var(--creme);
-  border-radius:0 8px 8px 0;
-}
-.citation-text {
-  font-family:'Cormorant Garamond',serif;
-  font-size:17px; font-style:italic;
-  color:var(--vert); line-height:1.5;
-}
-.citation-source {
-  font-size:10.5px; color:var(--gris);
-  margin-top:6px; font-weight:500;
-}
-
-/* Alerte / avertissement */
-.alert {
-  background:#fff4f0;
-  border-radius:10px;
-  border:1.5px solid var(--terra3);
-  padding:14px 18px;
-  margin:14px 0;
-  display:flex; gap:12px; align-items:flex-start;
-}
-.alert-icon { font-size:18px; flex-shrink:0; }
-.alert-text { font-size:12px; color:#5a3520; line-height:1.6; }
-.alert-text strong { color:var(--terra); }
-
-/* Séparateur */
-hr.sep { border:none; border-top:1.5px solid #f0ebe4; margin:20px 0; }
-
-/* Badge */
-.badge {
-  display:inline-block;
-  background:var(--terra); color:white;
-  font-size:9px; font-weight:700;
-  padding:3px 10px; border-radius:20px;
-  letter-spacing:.06em; text-transform:uppercase;
-  margin-bottom:8px;
-}
-.badge-creme {
-  background:var(--creme); color:var(--terra);
-  border:1px solid var(--terra3);
-}
-
-/* Avant/Après */
-.avant-apres {
-  display:grid; grid-template-columns:1fr 1fr;
-  gap:12px; margin:14px 0;
-}
-.avant, .apres {
-  border-radius:10px; padding:14px 16px;
-}
-.avant {
-  background:#fff4f0;
-  border:1.5px solid #f0c0a8;
-}
-.apres {
-  background:#f0fff4;
-  border:1.5px solid #a8e0b8;
-}
-.avant-label, .apres-label {
-  font-size:9.5px; font-weight:700;
-  text-transform:uppercase; letter-spacing:.1em;
-  margin-bottom:8px;
-}
-.avant-label { color:#c04030; }
-.apres-label { color:#2a7a4a; }
-.avant-text, .apres-text {
-  font-size:11.5px; line-height:1.6;
-  color:#3a3530;
-}
-
-/* Conseil fondateur (encadré inline) */
-.founder-tip {
-  background:var(--vert);
-  border-radius:10px;
-  padding:16px 20px;
-  margin:16px 0;
-  display:flex; gap:14px; align-items:flex-start;
-}
-.founder-tip-photo {
-  width:36px; height:36px; border-radius:50%;
-  background:linear-gradient(135deg,var(--terra),var(--terra2));
-  color:white; font-weight:700; font-size:13px;
-  display:flex; align-items:center; justify-content:center;
-  flex-shrink:0;
-}
-.founder-tip-body { flex:1; }
-.founder-tip-label {
-  font-size:9.5px; font-weight:700; color:var(--terra2);
-  text-transform:uppercase; letter-spacing:.1em; margin-bottom:6px;
-}
-.founder-tip-text {
-  font-family:'Cormorant Garamond',serif;
-  font-style:italic; font-size:14.5px;
-  color:rgba(255,255,255,.9); line-height:1.55;
-}
-
-/* Bloc outil — renvoi vers l'espace vendeur */
-.tool-box {
-  background:var(--creme);
-  border:1.5px solid var(--terra3);
-  border-radius:10px;
-  padding:16px 20px;
-  margin:16px 0;
-  display:flex; align-items:center; gap:16px;
-}
-.tool-box-qr {
-  width:48px; height:48px; flex-shrink:0;
-  background:white; border:1.5px solid var(--terra3);
-  border-radius:8px;
-  display:flex; align-items:center; justify-content:center;
-  font-size:20px;
-}
-.tool-box-body { flex:1; }
-.tool-box-titre {
-  font-size:9.5px; font-weight:700;
-  color:var(--terra); text-transform:uppercase;
-  letter-spacing:.1em; margin-bottom:4px;
-}
-.tool-box-list {
-  font-size:11.5px; color:#4a4540; line-height:1.5;
-  margin-bottom:6px;
-}
-.tool-box-cta {
-  font-size:11px; font-weight:700; color:var(--vert);
-}
-.tool-box-cta::after { content:' →'; color:var(--terra); }
-
-/* Bouton CTA (boîtes terracotta) */
-.cta-btn {
-  display:inline-block;
-  background:white; color:var(--terra);
-  font-size:12px; font-weight:700;
-  padding:10px 26px; border-radius:24px;
-  letter-spacing:.04em; text-decoration:none;
-}
-
-/* Mention légale / prudence */
-.legal-note {
-  font-size:10px; color:var(--gris2);
-  line-height:1.6; margin-top:14px;
-  padding-top:10px; border-top:1px solid #f0ebe4;
-}
-
-/* Étapes horizontales */
-.steps {
-  display:flex; gap:0; margin:16px 0;
-}
-.step {
-  flex:1; text-align:center;
-  position:relative; padding:0 4px;
-}
-.step::after {
-  content:'→';
-  position:absolute; right:-8px; top:16px;
-  color:var(--terra3); font-size:14px;
-  line-height:1;
-}
-.step:last-child::after { display:none; }
-.step-num {
-  width:36px; height:36px;
-  background:var(--terra); color:white;
-  border-radius:50%;
-  font-family:'Cormorant Garamond',serif;
-  font-size:18px; font-weight:700;
-  display:flex; align-items:center; justify-content:center;
-  margin:0 auto 8px;
-}
-.step-label {
-  font-size:10.5px; font-weight:600;
-  color:var(--vert); line-height:1.3;
-}
+/* LEGAL NOTE */
+.legal-note{font-size:9px;color:var(--gris2);line-height:1.5;border-top:1px solid #f0ece6;padding-top:8px;}
 
 /* QUIZ */
-.quiz-page { background:var(--creme); min-height:297mm; padding:40px 44px; }
-.quiz-big { font-family:'Cormorant Garamond',serif; font-size:56px; font-weight:700; color:var(--terra); letter-spacing:.2em; margin-bottom:4px; }
-@supports (-webkit-text-stroke: 2px black) {
-  .quiz-big { color:transparent; -webkit-text-stroke:2px var(--terra); }
-}
-.quiz-sous { font-size:10px; font-weight:700; color:var(--terra); text-transform:uppercase; letter-spacing:.15em; margin-bottom:24px; }
-.quiz-q { margin-bottom:18px; background:white; border-radius:10px; padding:16px 18px; border:1.5px solid var(--terra3); }
-.quiz-q-top { display:flex; align-items:flex-start; gap:12px; margin-bottom:12px; }
-.qnum { width:28px; height:28px; background:var(--terra); color:white; border-radius:50%; font-size:12px; font-weight:700; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
-.qtext { font-size:13px; color:var(--vert); font-weight:600; line-height:1.4; padding-top:2px; }
-.choices { display:flex; gap:20px; padding-left:40px; }
-.choice { display:flex; align-items:center; gap:7px; font-size:11px; font-weight:700; color:var(--gris); text-transform:uppercase; letter-spacing:.08em; }
-.ch-box { width:18px; height:18px; border:2px solid #ccc; border-radius:4px; }
-.quiz-rep { background:white; border-radius:8px; padding:14px 18px; margin-top:20px; border-left:3px solid var(--terra); }
-.quiz-rep-titre { font-size:10px; font-weight:700; color:var(--terra); text-transform:uppercase; letter-spacing:.1em; margin-bottom:6px; }
-.quiz-rep-text { font-size:11.5px; color:var(--gris); line-height:1.6; }
-.quiz-rep-text strong { color:var(--terra); }
+.quiz-page{min-height:297mm;background:var(--creme);display:flex;flex-direction:column;padding:28px 40px;}
+.quiz-big{font-family:'Cormorant Garamond',serif;font-size:72px;font-weight:700;color:var(--terra);line-height:1;margin-bottom:4px;}
+.quiz-sous{font-size:11px;color:var(--gris);margin-bottom:20px;}
+.quiz-q{background:white;border-radius:5px;padding:10px 14px;margin-bottom:8px;display:flex;flex-direction:column;gap:6px;}
+.quiz-q-top{display:flex;gap:10px;align-items:flex-start;}
+.qnum{width:22px;height:22px;min-width:22px;border-radius:50%;background:var(--terra);color:white;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;}
+.qtext{font-size:12px;color:var(--noir);line-height:1.5;flex:1;}
+.choices{display:flex;gap:12px;padding-left:32px;}
+.choice{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--gris);}
+.ch-box{width:14px;height:14px;border:1.5px solid #ccc;border-radius:2px;}
+.quiz-rep{background:var(--vert);border-radius:5px;padding:12px 16px;margin-top:4px;}
+.quiz-rep-titre{font-size:10px;font-weight:700;color:var(--terra2);text-transform:uppercase;letter-spacing:.15em;margin-bottom:8px;}
+.quiz-rep-text{font-size:10.5px;color:rgba(255,255,255,.65);line-height:1.6;}
+.quiz-rep-text strong{color:rgba(255,255,255,.9);}
 
-/* PAGE FINALE */
-.fin-page {
-  background:var(--terra);
-  min-height:297mm;
-  display:flex; flex-direction:column;
-  align-items:center; justify-content:center;
-  padding:48px 44px; text-align:center;
-}
+/* FINAL PAGE */
+.fin-page{min-height:297mm;background:linear-gradient(145deg,var(--vert) 0%,var(--vert2) 100%);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:44px;}
+.fin-logo{font-family:'Cormorant Garamond',serif;font-size:44px;font-weight:700;color:white;margin-bottom:6px;}
+.fin-logo em{font-style:italic;color:var(--terra2);}
+.fin-sub{font-size:10px;color:rgba(255,255,255,.4);letter-spacing:.2em;text-transform:uppercase;margin-bottom:36px;}
+.fin-quote{max-width:380px;font-family:'Cormorant Garamond',serif;font-size:18px;font-style:italic;color:rgba(255,255,255,.75);line-height:1.6;margin-bottom:36px;}
+.fin-contacts{display:flex;gap:36px;justify-content:center;margin-bottom:36px;}
+.fin-contact-label{font-size:8px;color:rgba(255,255,255,.3);text-transform:uppercase;letter-spacing:.15em;margin-bottom:4px;}
+.fin-contact-val{font-size:13px;color:white;font-weight:600;}
+.fin-legal{max-width:440px;font-size:9px;color:rgba(255,255,255,.35);line-height:1.6;border-top:1px solid rgba(255,255,255,.1);padding-top:16px;margin-top:16px;}
+
+/* PHASE LABELS */
+.phase-label{font-size:9px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--gris2);border-bottom:1px solid #f0ece6;padding-bottom:5px;margin:10px 0 5px;}
 
 /* PRINT */
-@media print {
-  body { background:white; }
-  .page { margin:0; box-shadow:none; page-break-after:always; }
-}
+@media print{body{background:white;}.page{box-shadow:none;margin:0;}@page{size:A4;margin:0;}}
+@media screen{.page{margin:16px auto;}}
 </style>
 </head>
 <body>
 
-<!-- ═══════ COUVERTURE ═══════ -->
+<!-- ═══ COVER ═══ -->
 <div class="page">
 <div class="cover">
   <div class="cover-band">
-    <div class="cover-logo">
-      <svg width="26" height="26" viewBox="0 0 24 24" fill="none"><path d="M3 12L12 4L21 12V20C21 20.6 20.6 21 20 21H15V16H9V21H4C3.4 21 3 20.6 3 20V12Z" fill="white"></path></svg>
-      <div class="cover-logo-name">Vendu Par Moi</div>
-    </div>
+    <div class="cover-logo-name">Vendu Par Moi</div>
     <div class="cover-edition">Édition 2026</div>
   </div>
-
   <div class="cover-main">
     <div>
       <div class="cover-tag">Guide officiel</div>
       <div class="cover-h1">Le Guide<br>du <em>Vendeur</em><br>Particulier</div>
       <div class="cover-sub">De la décision de vendre à la signature chez le notaire — toutes les étapes expliquées et illustrées par des exemples concrets.</div>
-      <div class="cover-pills">
-        <div class="cover-pill">✓ 9 chapitres complets</div>
-        <div class="cover-pill">✓ Exemples chiffrés</div>
-        <div class="cover-pill">✓ Checklists pratiques</div>
-        <div class="cover-pill">✓ Quiz de validation</div>
-        <div class="cover-pill">✓ 0% de commission</div>
+    </div>
+    <div class="cover-stats">
+      <div class="cover-stat">
+        <div class="cover-stat-num">9</div>
+        <div class="cover-stat-label">chapitres complets</div>
       </div>
-      <div class="cover-founders">
-        <div class="cover-founder-photos">
-          <div class="cover-founder-photo">M</div>
-          <div class="cover-founder-photo">G</div>
-        </div>
-        <div class="cover-founder-info">
-          <div class="cover-founder-names">Matthias Brieux &amp; Guillaume Girod</div>
-          <div class="cover-founder-role">Fondateurs · Anciens professionnels de l'immobilier</div>
-        </div>
+      <div class="cover-stat">
+        <div class="cover-stat-num">0%</div>
+        <div class="cover-stat-label">de frais d'intermédiaire</div>
+      </div>
+      <div class="cover-stat">
+        <div class="cover-stat-num">5</div>
+        <div class="cover-stat-label">outils pratiques intégrés</div>
       </div>
     </div>
-    <div class="cover-house"><div class="cover-house-icon">🏡</div></div>
   </div>
-
-  <div class="cover-number-strip">
-    <div class="cover-stat"><div class="cover-stat-num">9 chapitres</div><div class="cover-stat-label">Méthode complète</div></div>
-    <div class="cover-stat"><div class="cover-stat-num">Outils pratiques</div><div class="cover-stat-label">Prêts à l'emploi</div></div>
-    <div class="cover-stat"><div class="cover-stat-num">0 %</div><div class="cover-stat-label">de commission sur le prix de vente</div></div>
-    <div class="cover-stat"><div class="cover-stat-num">Accompagnement</div><div class="cover-stat-label">à chaque étape</div></div>
+  <div class="cover-footer">
+    <div class="cover-founders"><strong>Matthias Brieux &amp; Guillaume Girod</strong><br>Fondateurs · Anciens professionnels de l'immobilier</div>
+    <div class="cover-badges">
+      <div class="cover-badge">Exemples chiffrés</div>
+      <div class="cover-badge">Checklists pratiques</div>
+      <div class="cover-badge">Quiz de validation</div>
+    </div>
   </div>
 </div>
 </div>
 
-<!-- ═══════ FONDATEURS ═══════ -->
+<!-- ═══ FONDATEURS ═══ -->
 <div class="page">
 <div class="founders-page">
-  <div class="founders-top">
-    <div class="founders-top-label">Mot des fondateurs</div>
-    <div class="founders-top-titre">Pourquoi avons-nous<br>créé Vendu Par Moi ?</div>
+  <div class="founders-header">
+    <div class="founders-label">Mot des fondateurs</div>
+    <div class="footer-brand" style="color:rgba(255,255,255,.3);">Vendu Par Moi</div>
   </div>
-  <div class="founders-body">
-    <div class="founders-grid">
-      <div class="founder-card">
-        <div class="founder-card-photo">
-          <div class="founder-card-photo-ph">📸 Insérez votre<br>photo ici</div>
-        </div>
-        <div class="founder-card-body">
-          <div class="founder-card-nom">Matthias Brieux</div>
-          <div class="founder-card-titre">Co-fondateur · Expert en transaction</div>
-          <div class="founder-card-bio">Après des années à accompagner 
-des vendeurs en agence, Matthias a vu de l'intérieur ce qui crée 
-vraiment de la valeur — et ce qui ne fait qu'alourdir la facture. Il a 
-co-conçu toute la méthode Vendu Par Moi pour que vous bénéficiiez de 
-cette expertise sans en payer le prix.</div>
-        </div>
-      </div>
-      <div class="founder-card">
-        <div class="founder-card-photo">
-          <div class="founder-card-photo-ph">📸 Insérez votre<br>photo ici</div>
-        </div>
-        <div class="founder-card-body">
-          <div class="founder-card-nom">Guillaume Girod</div>
-          <div class="founder-card-titre">Co-fondateur · Expert en valorisation</div>
-          <div class="founder-card-bio">Fort de plus de 10 ans 
-d'expérience terrain, Guillaume maîtrise la valorisation de biens et 
-l'art de la négociation. Sa conviction : chaque vendeur particulier peut
- obtenir le même résultat qu'un agent — avec la bonne méthode et les 
-bons outils.</div>
-        </div>
-      </div>
+  <div class="founders-title">Pourquoi avons-nous<br>créé <em>Vendu Par Moi</em> ?</div>
+  <div class="founders-sous">Deux professionnels de l'immobilier qui ont décidé de changer les règles du jeu.</div>
+  <div class="founders-grid">
+    <div class="founder-card">
+      <div class="founder-photo">M</div>
+      <div class="founder-name">Matthias Brieux</div>
+      <div class="founder-role">Co-fondateur · Expert en transaction</div>
+      <div class="founder-bio">Après des années à accompagner des vendeurs dans l'immobilier, Matthias a vu de l'intérieur ce qui crée vraiment de la valeur — et ce qui ne fait qu'alourdir la facture. Il a co-conçu toute la méthode Vendu Par Moi pour que vous bénéficiez de cette expertise sans en payer le prix.</div>
     </div>
-    <div class="founders-citation">
-      <div class="founders-citation-text">« À l'heure où chaque euro 
-compte, nous trouvions dommage de voir des propriétaires consacrer 
-plusieurs milliers d'euros à une commission pour des étapes qu'ils 
-peuvent parfois réaliser eux-mêmes. Avec les bons outils, une méthode 
-éprouvée et les bons conseils, ils peuvent être accompagnés autrement. 
-Alors, plutôt que de simplement le constater, nous avons décidé de créer
- Vendu Par Moi. »</div>
-      <div class="founders-citation-sig">— Matthias &amp; Guillaume, Fondateurs de Vendu Par Moi</div>
+    <div class="founder-card">
+      <div class="founder-photo">G</div>
+      <div class="founder-name">Guillaume Girod</div>
+      <div class="founder-role">Co-fondateur · Expert en valorisation</div>
+      <div class="founder-bio">Fort de plus de 10 ans d'expérience terrain, Guillaume maîtrise la valorisation de biens et l'art de la négociation. Sa conviction : chaque vendeur particulier peut obtenir le même résultat qu'un agent — avec la bonne méthode et les bons outils.</div>
     </div>
-    <div class="founders-texte">
-      <p>Ce guide est le compagnon de route que nous aurions voulu 
-remettre à chacun de nos clients dès le premier jour. Il ne s'agit pas 
-d'un document technique et rébarbatif, mais d'un parcours clair, 
-progressif, avec des exemples chiffrés basés sur les pratiques du marché et des outils que
-vous pouvez utiliser immédiatement.</p>
-      <p>Chaque chapitre correspond à une étape réelle de votre vente. 
-Lisez-le une fois pour avoir la vision d'ensemble, puis revenez à chaque
- section au moment où vous en avez besoin.</p>
-      <p><strong style="color:var(--terra);">Bonne vente.</strong></p>
-    </div>
+  </div>
+  <div class="founders-quote">
+    <p>« À l'heure où chaque euro compte, nous trouvions dommage de voir des propriétaires consacrer plusieurs milliers d'euros à une commission pour des étapes qu'ils peuvent réaliser eux-mêmes. Avec les bons outils, une méthode éprouvée et les bons conseils, ils peuvent être accompagnés autrement. Alors, plutôt que de simplement le constater, nous avons décidé de créer Vendu Par Moi. »</p>
+    <cite>— Matthias &amp; Guillaume, Fondateurs de Vendu Par Moi</cite>
+  </div>
+  <div class="founders-footer">
+    <div class="footer-brand">Vendu Par Moi</div>
+    <div class="footer-pg">contact@venduparmoi.fr · 06 95 44 36 54</div>
   </div>
 </div>
 </div>
 
-<!-- ═══════ VOTRE PARCOURS ═══════ -->
-<div class="page">
-<div class="founders-page">
-  <div class="founders-top">
-    <div class="founders-top-label">Avant de commencer</div>
-    <div class="founders-top-titre">Votre parcours<br>Vendu Par Moi</div>
-  </div>
-  <div class="founders-body">
-    <div class="founders-texte" style="margin-bottom:8px;">
-      <p>Vous restez propriétaire de votre vente. Nous vous apportons la méthode, les outils et les repères pour avancer étape par étape.</p>
-    </div>
-    <table class="t">
-      <thead><tr><th>Étape</th><th>Votre action</th><th>Vendu Par Moi vous aide à...</th></tr></thead>
-      <tbody>
-        <tr><td>1</td><td><strong>J'estime</strong></td><td>Comparer les ventes réellement réalisées et positionner le bien.</td></tr>
-        <tr><td>2</td><td><strong>Je prépare</strong></td><td>Valoriser le logement, réunir les diagnostics et préparer les photos.</td></tr>
-        <tr><td>3</td><td><strong>Je publie</strong></td><td>Créer une annonce claire et organiser sa diffusion.</td></tr>
-        <tr><td>4</td><td><strong>Je qualifie</strong></td><td>Identifier les projets sérieux avant de programmer une visite.</td></tr>
-        <tr><td>5</td><td><strong>Je fais visiter</strong></td><td>Préparer le bien et conduire une visite structurée.</td></tr>
-        <tr><td>6</td><td><strong>Je négocie</strong></td><td>Analyser une offre et répondre avec méthode.</td></tr>
-        <tr><td>7</td><td><strong>Je signe</strong></td><td>Transmettre le dossier au notaire et suivre les étapes jusqu'à l'acte authentique.</td></tr>
-      </tbody>
-    </table>
-    <div class="box-terra" style="text-align:center;margin-top:24px;">
-      <div class="box-titre" style="text-align:center;">Votre espace vendeur</div>
-      <div class="box-text" style="text-align:center;">
-        <p style="font-size:13.5px;margin-bottom:14px;">Tous les outils cités dans ce guide sont prêts à l'emploi dans votre espace personnel.</p>
-        <a href="https://venduparmoi.fr/login" class="cta-btn">Accéder à mes outils →</a>
-      </div>
-    </div>
-  </div>
-</div>
-</div>
-
-<!-- ═══════ SOMMAIRE ═══════ -->
+<!-- ═══ SOMMAIRE ═══ -->
 <div class="page">
 <div class="som-page">
   <div class="som-header">
-    <div class="som-titre-label">Plan du guide</div>
-    <div class="som-titre">Sommaire</div>
+    <div class="som-header-label">Plan du guide</div>
+    <div class="som-header-title">Sommaire</div>
   </div>
-  <div class="som-body">
-    <div class="som-ch">
-      <div class="som-ch-num">Chapitre 01</div>
-      <div class="som-ch-titre">Décider de vendre seul</div>
-      <ul class="som-items">
-        <li><span>Les vraies économies réalisées</span><span>08</span></li>
-        <li><span>Ce qu'un intermédiaire fait (et ce que vous pouvez faire)</span><span>10</span></li>
-        <li><span>Test : êtes-vous prêt à vendre seul ?</span><span>12</span></li>
-      </ul>
+  <div class="som-body" style="padding:16px 40px;display:flex;flex-direction:column;gap:0;flex:1;">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:0 28px;flex:1;">
+      <div>
+        <div class="som-ch"><div class="som-ch-num">Chapitre 01</div><div class="som-ch-titre">Décider de vendre seul</div><ul class="som-items"><li><span>Les vraies économies réalisées</span><span>5</span></li><li><span>Ce qu'un professionnel fait — et vous pouvez faire</span><span>5</span></li></ul></div>
+        <div class="som-ch"><div class="som-ch-num">Chapitre 02</div><div class="som-ch-titre">Estimer son bien au juste prix</div><ul class="som-items"><li><span>La méthode DVF</span><span>7</span></li><li><span>Les 5 erreurs de surestimation</span><span>7</span></li></ul></div>
+        <div class="som-ch" style="background:#fff8f5;margin:0 -6px;padding:8px 6px;border-radius:4px;border-bottom:none;"><div class="som-ch-num" style="color:var(--terra);">Outil Pratique</div><div class="som-ch-titre">Planning Mise en Vente</div><ul class="som-items"><li class="new-item"><span>J-30 → J0 · 3 phases · 9 étapes</span><span>8</span></li></ul></div>
+        <div class="som-ch"><div class="som-ch-num">Chapitre 03</div><div class="som-ch-titre">Préparer son bien pour séduire</div><ul class="som-items"><li><span>Home staging : les règles d'or</span><span>9</span></li><li><span>Les diagnostics obligatoires (guide complet)</span><span>9</span></li></ul></div>
+        <div class="som-ch"><div class="som-ch-num">Chapitre 04</div><div class="som-ch-titre">Créer son dossier vendeur pro</div><ul class="som-items"><li><span>Documents indispensables · Fiche descriptive</span><span>11</span></li><li><span>Démarrer sur la plateforme VPM</span><span>11</span></li></ul></div>
+        <div class="som-ch"><div class="som-ch-num">Chapitre 05</div><div class="som-ch-titre">Publier et diffuser son annonce</div><ul class="som-items"><li><span>Comparatif des portails</span><span>13</span></li><li><span>Les photos qui font vendre</span><span>13</span></li></ul></div>
+      </div>
+      <div>
+        <div class="som-ch"><div class="som-ch-num">Chapitre 06</div><div class="som-ch-titre">Gérer les contacts acheteurs</div><ul class="som-items"><li><span>Les 3 questions qui filtrent les curieux</span><span>15</span></li><li><span>Script du premier appel (4 scénarios)</span><span>15</span></li></ul></div>
+        <div class="som-ch"><div class="som-ch-num">Chapitre 07</div><div class="som-ch-titre">Préparer et réussir ses visites</div><ul class="som-items"><li><span>Checklist 1h avant · Structure de visite</span><span>17</span></li></ul></div>
+        <div class="som-ch"><div class="som-ch-num">Chapitre 08</div><div class="som-ch-titre">Recevoir et négocier une offre</div><ul class="som-items"><li><span>Analyser une offre · Contre-proposition</span><span>19</span></li></ul></div>
+        <div class="som-ch" style="background:#fff8f5;margin:0 -6px;padding:8px 6px;border-radius:4px;border-bottom:none;"><div class="som-ch-num" style="color:var(--terra);">Outil Pratique</div><div class="som-ch-titre">Planning Fin de Vente</div><ul class="som-items"><li class="new-item"><span>J0 → J+90 · 3 phases · 9 étapes</span><span>21</span></li></ul></div>
+        <div class="som-ch"><div class="som-ch-num">Chapitre 09</div><div class="som-ch-titre">Du compromis à la signature</div><ul class="som-items"><li><span>Compromis · Conditions suspensives</span><span>22</span></li><li><span>L'acte authentique — le grand jour</span><span>22</span></li></ul></div>
+        <div class="som-ch"><div class="som-ch-num">Annexes</div><div class="som-ch-titre">Quiz &amp; ressources</div><ul class="som-items"><li><span>Quiz — testez vos connaissances</span><span>24</span></li></ul></div>
+      </div>
     </div>
-    <div class="som-ch">
-      <div class="som-ch-num">Chapitre 02</div>
-      <div class="som-ch-titre">Estimer son bien au juste prix</div>
-      <ul class="som-items">
-        <li><span>Les méthodes d'estimation fiables</span><span>16</span></li>
-        <li><span>Lire les données du marché (DVF)</span><span>18</span></li>
-        <li><span>Les erreurs classiques de surestimation</span><span>20</span></li>
-      </ul>
-    </div>
-    <div class="som-ch">
-      <div class="som-ch-num">Chapitre 03</div>
-      <div class="som-ch-titre">Préparer son bien pour séduire</div>
-      <ul class="som-items">
-        <li><span>Home staging : les règles d'or</span><span>24</span></li>
-        <li><span>Les diagnostics obligatoires</span><span>27</span></li>
-        <li><span>Les photos qui font vendre</span><span>30</span></li>
-      </ul>
-    </div>
-    <div class="som-ch">
-      <div class="som-ch-num">Chapitre 04</div>
-      <div class="som-ch-titre">Créer son dossier vendeur pro</div>
-      <ul class="som-items">
-        <li><span>Les documents indispensables</span><span>34</span></li>
-        <li><span>La fiche descriptive qui convertit</span><span>37</span></li>
-        <li><span>Le dossier partageable en 1 clic</span><span>39</span></li>
-      </ul>
-    </div>
-    <div class="som-ch">
-      <div class="som-ch-num">Chapitre 05</div>
-      <div class="som-ch-titre">Publier et diffuser son annonce</div>
-      <ul class="som-items">
-        <li><span>Où publier (comparatif des portails)</span><span>43</span></li>
-        <li><span>Rédiger une annonce qui attire</span><span>46</span></li>
-        <li><span>La stratégie de prix affichée</span><span>48</span></li>
-      </ul>
-    </div>
-    <div class="som-ch">
-      <div class="som-ch-num">Chapitre 06</div>
-      <div class="som-ch-titre">Gérer les contacts acheteurs</div>
-      <ul class="som-items">
-        <li><span>Répondre au premier appel</span><span>52</span></li>
-        <li><span>Les 3 questions qui filtrent les curieux</span><span>54</span></li>
-        <li><span>Les signaux d'un acheteur sérieux</span><span>56</span></li>
-      </ul>
-    </div>
-    <div class="som-ch">
-      <div class="som-ch-num">Chapitre 07</div>
-      <div class="som-ch-titre">Préparer et réussir ses visites</div>
-      <ul class="som-items">
-        <li><span>La préparation 1h avant</span><span>60</span></li>
-        <li><span>Le discours de visite efficace</span><span>62</span></li>
-        <li><span>Répondre aux questions difficiles</span><span>65</span></li>
-      </ul>
-    </div>
-    <div class="som-ch">
-      <div class="som-ch-num">Chapitre 08</div>
-      <div class="som-ch-titre">Recevoir et négocier une offre</div>
-      <ul class="som-items">
-        <li><span>Analyser une offre d'achat</span><span>69</span></li>
-        <li><span>Négocier sans céder trop vite</span><span>71</span></li>
-        <li><span>Accepter, refuser, contre-proposer</span><span>74</span></li>
-      </ul>
-    </div>
-    <div class="som-ch">
-      <div class="som-ch-num">Chapitre 09</div>
-      <div class="som-ch-titre">Du compromis à la signature</div>
-      <ul class="som-items">
-        <li><span>Le compromis de vente expliqué</span><span>78</span></li>
-        <li><span>Les conditions suspensives</span><span>81</span></li>
-        <li><span>L'acte notarié — le grand jour</span><span>84</span></li>
-      </ul>
-    </div>
-    <div class="som-ch">
-      <div class="som-ch-num">Annexes</div>
-      <div class="som-ch-titre">Outils &amp; ressources</div>
-      <ul class="som-items">
-        <li><span>Quiz — testez vos connaissances</span><span>88</span></li>
-        <li><span>Les 10 erreurs à éviter</span><span>91</span></li>
-        <li><span>Checklist complète de la vente</span><span>94</span></li>
-        <li><span>Glossaire immobilier</span><span>96</span></li>
-      </ul>
-    </div>
+  </div>
+  <div class="som-footer">
+    <div style="font-size:9px;color:var(--gris2);">Vendu Par Moi · Guide du Vendeur Particulier · Édition 2026</div>
+    <div style="font-size:9px;color:var(--terra);font-weight:600;">venduparmoi.fr</div>
   </div>
 </div>
 </div>
 
-<!-- ═══════ CH.1 SÉPARATEUR ═══════ -->
+<!-- ═══ CH.1 SEP ═══ -->
 <div class="page">
-<div class="sep-page">
-  <div class="sep-bg-circles"></div>
-  <div class="sep-bg-num">1</div>
-  <div class="sep-icon">💡</div>
-  <div class="sep-tag">Chapitre 01</div>
-  <div class="sep-titre">Décider de<br>vendre <em>seul</em> —<br>le bon moment</div>
-  <div class="sep-line"></div>
-  <div class="sep-desc">Avant de publier la moindre annonce, il faut 
-comprendre ce que représente vraiment la vente entre particuliers. Ses 
-avantages chiffrés, ce qu'elle implique concrètement — et un test rapide
- pour savoir si vous êtes dans la bonne configuration pour vous lancer.</div>
+<div class="sep">
+  <div class="sep-deco">1</div>
+  <div class="sep-inner">
+    <div>
+      <div class="sep-tag">Chapitre 01</div>
+      <div class="sep-icon">💡</div>
+      <div class="sep-titre">Décider de<br>vendre <em>seul</em><br>— le bon moment</div>
+      <div class="sep-desc">Avant de publier la moindre annonce, il faut comprendre ce que représente vraiment la vente entre particuliers. Ses avantages chiffrés, ce qu'elle implique concrètement — et un test rapide pour savoir si vous êtes dans la bonne configuration pour vous lancer.</div>
+    </div>
+    <div class="sep-bottom">
+      <div class="sep-num">01</div>
+      <div class="sep-footer">venduparmoi.fr</div>
+    </div>
+  </div>
 </div>
 </div>
 
-<!-- ═══════ CH.1 CONTENU ═══════ -->
+<!-- ═══ CH.1 CONTENU ═══ -->
 <div class="page">
 <div class="cp">
-  <div class="cp-header"><div class="cp-header-ch">/ Décider de vendre seul /</div><div class="cp-header-pg">08</div></div>
+  <div class="cp-header"><div class="cp-header-ch">/ Décider de vendre seul /</div><div class="cp-header-pg">05</div></div>
   <div class="cp-body">
     <div class="cp-label">Chapitre 01</div>
     <div class="cp-h1">Ce que vous gagnez vraiment<br>à vendre sans intermédiaire</div>
-    <div class="cp-intro">En France, un intermédiaire immobilier perçoit entre 4 et 6 %
-du prix de vente en commission. Sur un bien à 280 000 €, c'est entre 11 
-200 € et 16 800 € qui partent — pas dans votre poche. Voici la réalité 
-des chiffres.</div>
+    <div class="cp-intro">En France, les frais d'intermédiaire représentent entre 4 et 6 % du prix de vente. Sur un bien à 280 000 €, c'est entre 11 200 € et 16 800 € qui partent — pas dans votre poche.</div>
 
     <div class="two-col">
       <div>
@@ -1058,347 +376,280 @@ des chiffres.</div>
             <tr><td>450 000 €</td><td>22 500 €</td><td>à partir de 999 €</td><td><strong>à partir de 21 501 €</strong></td></tr>
           </tbody>
         </table>
-        <div class="alert">
+        <div class="alert" style="margin-top:8px;">
           <div class="alert-icon">💡</div>
-          <div class="alert-text"><strong>Le saviez-vous ?</strong> Ces économies représentent l'équivalent d'une cuisine entière rénovée — sans puiser dans vos économies.</div>
+          <div class="alert-text">Ces économies représentent une cuisine entière rénovée, plusieurs mois de salaire, ou l'apport pour un prochain achat.</div>
         </div>
       </div>
       <div>
         <div class="box-terra">
-          <div class="box-titre">Exemple hypothétique — Bien à 265 000 €</div>
+          <div class="box-titre">Exemple — Bien à 265 000 €</div>
           <div class="box-text">
             <p><strong>Bien vendu : 265 000 €</strong></p>
-            <p>Frais habituellement pratiqués (5 %) :<br>— 13 250 €</p>
-            <p>Pack Coaching Plus Vendu Par Moi :<br>— 1 548 € (soit 0,6 % du prix)</p>
-            <p style="margin-top:12px;font-size:16px;"><strong>Économie nette : 11 702 €</strong></p>
+            <p>Frais habituellement pratiqués (5 %) :<br><strong>— 13 250 €</strong></p>
+            <p>Pack Coaching Plus Vendu Par Moi :<br><strong>— 1 548 € (soit 0,6 % du prix)</strong></p>
+            <p style="margin-top:10px;font-size:15px;"><strong>Économie nette : 11 702 €</strong></p>
           </div>
         </div>
       </div>
     </div>
 
-    <hr class="sep">
-    <div class="cp-h2">Ce qu'un professionnel structure pour une vente — et ce que vous pouvez organiser avec Vendu Par Moi</div>
-    <table class="t">
+    <hr class="sep-rule">
+    <div class="cp-h2">Ce qu'un professionnel fait — et ce que vous pouvez faire</div>
+    <table class="t" style="font-size:10.5px;">
       <thead><tr><th>Étape</th><th>Avec un intermédiaire</th><th>Avec Vendu Par Moi</th></tr></thead>
       <tbody>
-        <tr><td><strong>Positionnement du prix</strong></td><td>Analyse du marché et conseil de mise en vente</td><td>Méthode de comparaison, données disponibles et trame d'analyse</td></tr>
-        <tr><td><strong>Présentation</strong></td><td>Photos, descriptif et mise en valeur selon la prestation</td><td>Checklists, conseils photo et fiche descriptive structurée</td></tr>
-        <tr><td><strong>Diffusion</strong></td><td>Publication selon les canaux utilisés par le professionnel</td><td>Vous choisissez vos canaux de diffusion</td></tr>
-        <tr><td><strong>Contacts</strong></td><td>Réception et qualification des demandes</td><td>Méthode de qualification et outils de suivi</td></tr>
-        <tr><td><strong>Visites</strong></td><td>Organisation et conduite des visites</td><td>Préparation, trame de visite et conseils pratiques</td></tr>
-        <tr><td><strong>Négociation</strong></td><td>Accompagnement dans les échanges</td><td>Méthode d'analyse et modèles de réponse</td></tr>
+        <tr><td><strong>Estimation</strong></td><td>Analyse du marché, conseil de mise en vente</td><td>Méthode DVF, données officielles, trame d'analyse</td></tr>
+        <tr><td><strong>Photos &amp; annonce</strong></td><td>Photos, descriptif, mise en valeur</td><td>Checklist photo, générateur IA, fiche descriptive</td></tr>
+        <tr><td><strong>Diffusion</strong></td><td>Publication sur leurs portails</td><td>Vous choisissez vos portails — multi-diffusion</td></tr>
+        <tr><td><strong>Contacts &amp; visites</strong></td><td>Réception, qualification, organisation</td><td>Méthode, script d'appel, agenda intelligent</td></tr>
+        <tr><td><strong>Négociation</strong></td><td>Accompagnement dans les échanges</td><td>Méthode d'analyse, modèles de réponse</td></tr>
+        <tr><td><strong>Signature</strong></td><td>Dossier notaire, suivi</td><td>Planning fin de vente, checklist notaire</td></tr>
       </tbody>
     </table>
+  </div>
+  <div class="cp-footer"><div style="font-size:9px;color:var(--gris2);">Vendu Par Moi · Guide du Vendeur</div><div style="font-size:9px;color:var(--gris2);">05</div></div>
+</div>
+</div>
+
+<!-- ═══ CH.2 SEP ═══ -->
+<div class="page">
+<div class="sep">
+  <div class="sep-deco">2</div>
+  <div class="sep-inner">
+    <div>
+      <div class="sep-tag">Chapitre 02</div>
+      <div class="sep-icon">📊</div>
+      <div class="sep-titre">Estimer son bien<br>au <em>juste prix</em></div>
+      <div class="sep-desc">Le prix, c'est la clé de tout. Trop haut : des mois sans visite, une baisse forcée qui décrédibilise le bien. Trop bas : vous perdez de l'argent. Ce chapitre vous donne les méthodes et les outils pour trouver le prix juste — celui qui attire les bons acheteurs dès le premier jour.</div>
+    </div>
+    <div class="sep-bottom"><div class="sep-num">02</div><div class="sep-footer">venduparmoi.fr</div></div>
   </div>
 </div>
 </div>
 
-<!-- ═══════ CH.2 SÉPARATEUR ═══════ -->
-<div class="page">
-<div class="sep-page">
-  <div class="sep-bg-circles"></div>
-  <div class="sep-bg-num">2</div>
-  <div class="sep-icon">📊</div>
-  <div class="sep-tag">Chapitre 02</div>
-  <div class="sep-titre">Estimer son bien<br>au <em>juste prix</em></div>
-  <div class="sep-line"></div>
-  <div class="sep-desc">Le prix, c'est la clé de tout. Trop haut : des 
-mois sans visite, une baisse forcée qui décrédibilise le bien. Trop bas :
- vous perdez de l'argent. Ce chapitre vous donne les méthodes et les 
-outils pour trouver le prix juste — celui qui attire les bons acheteurs 
-dès le premier jour.</div>
-</div>
-</div>
-
-<!-- ═══════ CH.2 CONTENU ═══════ -->
+<!-- ═══ CH.2 CONTENU ═══ -->
 <div class="page">
 <div class="cp">
-  <div class="cp-header"><div class="cp-header-ch">/ Estimer son bien /</div><div class="cp-header-pg">16</div></div>
+  <div class="cp-header"><div class="cp-header-ch">/ Estimer son bien /</div><div class="cp-header-pg">07</div></div>
   <div class="cp-body">
     <div class="cp-label">Chapitre 02</div>
     <div class="cp-h1">Les méthodes d'estimation<br>qui ne mentent pas</div>
-    <div class="cp-intro">L'estimation n'est pas une science mystérieuse
- réservée aux agents immobiliers. C'est une comparaison méthodique entre
- votre bien et les biens réellement vendus dans votre secteur. Voici 
-comment faire.</div>
-
     <div class="col-4060">
       <div>
         <div class="cp-h3">La méthode DVF</div>
         <div class="body-text">
-          <p>Le site <strong>dvf.etalab.gouv.fr</strong> recense toutes 
-les transactions notariées des 5 dernières années. C'est la source la 
-plus fiable qui soit — ce sont les prix réels, pas les prix affichés.</p>
-          <p>Cherchez dans un rayon de 500m à 1km : même type de bien, 
-surface similaire (±20%), même état général. Calculez le prix moyen au 
-m² obtenu.</p>
+          <p>Le site <strong>dvf.etalab.gouv.fr</strong> recense toutes les transactions notariées des 5 dernières années. Ce sont les prix réels, pas les prix affichés.</p>
+          <p>Cherchez dans un rayon de 500 m à 1 km : même type de bien, surface similaire (±20%), même état général. Calculez le prix moyen au m².</p>
         </div>
-        <div class="cp-h3" style="margin-top:16px;">Les outils à utiliser</div>
+        <div class="cp-h3" style="margin-top:10px;">Outils à utiliser</div>
         <ul class="vl">
           <li><strong>DVF</strong> — prix de vente réels notariaux</li>
           <li><strong>MeilleursAgents</strong> — tendances du marché</li>
-          <li><strong>SeLoger / LeBonCoin</strong> — prix affichés (à corriger de -3 à -5%)</li>
-          <li><strong>Votre notaire</strong> — accès aux transactions locales</li>
+          <li><strong>SeLoger / LeBonCoin</strong> — prix affichés (corriger -3 à -5%)</li>
+          <li><strong>Votre notaire</strong> — transactions locales</li>
         </ul>
       </div>
       <div>
         <div class="ex-box">
           <div class="ex-box-titre"><div class="ex-tag">EXEMPLE</div>Appartement 65m² à Lille</div>
           <div class="ex-box-text">
-            <p>Transactions récentes dans le même quartier :</p>
-            <p>• Appt 62m² vendu <strong>185 000 €</strong> → 2 984 €/m²<br>
-            • Appt 68m² vendu <strong>198 000 €</strong> → 2 912 €/m²<br>
-            • Appt 65m² vendu <strong>192 000 €</strong> → 2 954 €/m²<br>
-            • Appt 63m² vendu <strong>188 000 €</strong> → 2 984 €/m²</p>
-            <p><strong style="color:var(--terra);">Prix moyen du m² : 2 960 €</strong></p>
-            <p><strong style="color:var(--terra);">Estimation : 65 × 2 960 = 192 400 €</strong></p>
-            <p><em>Ajustements : + balcon (2 000 €), + cave (1 500 €), - travaux peinture (- 3 000 €)</em></p>
-            <p><strong style="color:var(--vert);">Prix final recommandé : 193 000 €</strong></p>
+            <p>Transactions récentes :<br>• 62m² vendu 185 000 € → 2 984 €/m²<br>• 68m² vendu 198 000 € → 2 912 €/m²<br>• 65m² vendu 192 000 € → 2 954 €/m²</p>
+            <p style="margin-top:6px;"><strong style="color:var(--terra);">Prix moyen : 2 960 €/m²<br>Estimation : 65 × 2 960 = 192 400 €</strong></p>
+            <p style="font-size:10.5px;margin-top:4px;color:var(--gris);">+ balcon 2 000 € + cave 1 500 € − peinture 3 000 €</p>
+            <p><strong style="color:var(--vert2);">→ Prix recommandé : 193 000 €</strong></p>
           </div>
         </div>
-        <div class="alert">
+        <div class="alert" style="margin-top:8px;">
           <div class="alert-icon">⚠️</div>
-          <div class="alert-text"><strong>Attention :</strong> Prix 
-affiché ≠ prix vendu. La négociation représente en moyenne 2 à 4% 
-d'écart. Un bien affiché 200 000 € se vend souvent 193 000 € à 196 000 
-€.</div>
+          <div class="alert-text"><strong>Attention :</strong> Prix affiché ≠ prix vendu. La négociation représente en moyenne 2 à 4 % d'écart.</div>
         </div>
       </div>
     </div>
 
-    <hr class="sep">
+    <hr class="sep-rule">
     <div class="cp-h2">Les 5 erreurs de surestimation les plus fréquentes</div>
     <div class="two-col">
-      <div>
-        <ol class="nl">
-          <li><strong>Ajouter le coût des travaux</strong> au prix de marché — un acheteur ne rembourse pas vos travaux au prix coûtant.</li>
-          <li><strong>Comparer avec des biens en vente</strong> (et non vendus) — un bien affiché depuis 8 mois est peut-être surestimé, lui aussi.</li>
-          <li><strong>Surévaluer les équipements</strong> — une cuisine équipée ajoute rarement plus de 3 000 à 5 000 € à la valeur.</li>
-        </ol>
-      </div>
+      <ol class="nl">
+        <li><strong>Ajouter le coût des travaux</strong> au prix de marché — un acheteur ne rembourse pas vos travaux au prix coûtant.</li>
+        <li><strong>Comparer avec des biens en vente</strong> (et non vendus) — un bien affiché depuis 8 mois est peut-être surestimé lui aussi.</li>
+        <li><strong>Surévaluer les équipements</strong> — une cuisine équipée ajoute rarement plus de 3 000 à 5 000 €.</li>
+      </ol>
       <div>
         <ol class="nl" style="counter-reset:nl 3;">
-          <li><strong>L'attachement émotionnel</strong> — vous aimez votre bien, c'est normal. Un acheteur, lui, voit les défauts en premier.</li>
-          <li><strong>Se baser sur un prix entendu</strong> de voisins sans vérification — les prix de vente ne se partagent pas facilement.</li>
+          <li><strong>L'attachement émotionnel</strong> — vous aimez votre bien, c'est normal. Un acheteur voit les défauts en premier.</li>
+          <li><strong>Se baser sur un prix entendu</strong> de voisins sans vérification DVF.</li>
         </ol>
-        <div class="citation">
-          <div class="citation-text">Un prix cohérent avec le marché favorise généralement des contacts plus rapides. Une surestimation peut allonger le délai de commercialisation et conduire à des baisses successives.</div>
-          <div class="citation-source">— D'après notre expérience en agence immobilière, Matthias &amp; Guillaume</div>
+        <div class="founder-tip" style="margin-top:10px;">
+          <div class="founder-photo">G</div>
+          <div><div class="founder-tip-label">Le conseil de Guillaume</div><div class="founder-tip-text">« Ne cherchez pas le prix le plus haut sur le papier. Cherchez le prix qui déclenche des contacts sérieux dès le premier jour. »</div></div>
         </div>
       </div>
     </div>
-    <div class="alert" style="margin-top:16px;">
-      <div class="alert-icon">💡</div>
-      <div class="alert-text"><strong>Le saviez-vous ?</strong> Ces économies représentent plusieurs mois de dépenses courantes conservés — sans changer votre mode de vie.</div>
-    </div>
-    <div class="founder-tip">
-      <div class="founder-tip-photo">G</div>
-      <div class="founder-tip-body">
-        <div class="founder-tip-label">Le conseil de Guillaume</div>
-        <div class="founder-tip-text">« Ne cherchez pas à obtenir le prix le plus haut sur le papier. Cherchez le prix qui déclenche des contacts sérieux tout en défendant la valeur réelle du bien. »</div>
-      </div>
-    </div>
-    <div class="tool-box">
-      <div class="tool-box-qr">📱</div>
-      <div class="tool-box-body">
-        <div class="tool-box-titre">Disponible dans votre espace vendeur</div>
-        <div class="tool-box-list">Grille de comparaison des biens vendus · Fiche d'estimation</div>
-        <div class="tool-box-cta">Retrouvez cet outil dans votre espace vendeur Vendu Par Moi</div>
-      </div>
-    </div>
   </div>
+  <div class="cp-footer"><div style="font-size:9px;color:var(--gris2);">Vendu Par Moi · Guide du Vendeur</div><div style="font-size:9px;color:var(--gris2);">07</div></div>
 </div>
 </div>
 
-<!-- ═══════ CH.3 SÉPARATEUR ═══════ -->
-<div class="page">
-<div class="sep-page">
-  <div class="sep-bg-circles"></div>
-  <div class="sep-bg-num">3</div>
-  <div class="sep-icon">🏡</div>
-  <div class="sep-tag">Chapitre 03</div>
-  <div class="sep-titre">Préparer son bien<br>pour <em>séduire</em></div>
-  <div class="sep-line"></div>
-  <div class="sep-desc">Un bien bien préparé se vend plus vite et à 
-meilleur prix. Home staging, diagnostics obligatoires, photos 
-professionnelles — ce chapitre couvre les trois piliers d'une 
-présentation qui inspire confiance dès le premier regard de l'acheteur.</div>
-</div>
-</div>
-
-<!-- ═══════ PLANNING MISE EN VENTE ═══════ -->
+<!-- ═══ PLANNING MISE EN VENTE ═══ -->
 <div class="page">
 <div class="cp">
-  <div class="cp-header"><div class="cp-header-ch">/ Préparer son bien /</div><div class="cp-header-pg">22</div></div>
+  <div class="cp-header" style="background:var(--terra);"><div class="cp-header-ch">/ Outil Pratique /</div><div class="cp-header-pg">08</div></div>
   <div class="cp-body">
-    <div class="cp-label" style="color:var(--terra);">Outil Pratique</div>
-    <div class="cp-h1">Planning — De la décision<br>à la <em>mise en ligne</em></div>
-    <div class="cp-intro">Organisez votre préparation en remontant depuis votre <strong>date de publication cible (J0)</strong>. Ce planning vous donne les jalons réalistes pour ne rien oublier avant le lancement.</div>
+    <div class="cp-label">Outil Pratique — Intégré au parcours vendeur</div>
+    <div class="cp-h1">Planning <em>Mise en Vente</em></div>
+    <div class="cp-intro">Définissez d'abord votre <strong>date de publication cible (J0)</strong> puis remontez chaque étape à rebours. Un lundi ou jeudi matin génèrent le plus de vues dans la semaine.</div>
 
-    <div style="font-size:9px;font-weight:700;letter-spacing:1.8px;text-transform:uppercase;color:var(--gris2);border-bottom:1px solid #f0ece6;padding-bottom:5px;margin:14px 0 7px;">Phase 1 — Préparation · J-30 à J-21</div>
+    <div class="phase-label">Phase 1 — Préparation · J-30 à J-21</div>
     <div class="steps">
-      <div class="step"><div class="step-num">1</div><div class="step-label"><strong>J — 30 · Décision de vendre</strong> — Définir le projet (achat simultané ? délai ?), premier contact Vendu Par Moi</div></div>
-      <div class="step"><div class="step-num">2</div><div class="step-label"><strong>J — 25 · Commander les diagnostics</strong> — DPE, électricité, gaz, amiante, plomb, termites (selon zone), ERRIAL, Carrez</div></div>
-      <div class="step"><div class="step-num">3</div><div class="step-label"><strong>J — 21 · Réunir les documents administratifs</strong> — Titre de propriété, taxe foncière, charges copropriété, PV AG, règlement</div></div>
-    </div>
-
-    <div style="font-size:9px;font-weight:700;letter-spacing:1.8px;text-transform:uppercase;color:var(--gris2);border-bottom:1px solid #f0ece6;padding-bottom:5px;margin:14px 0 7px;">Phase 2 — Séance 1 VPM · J-14 à J-7</div>
-    <div class="steps">
-      <div class="step"><div class="step-num" style="background:var(--terra);">4</div><div class="step-label"><strong>J — 14 · Séance 1 Vendu Par Moi</strong> — Analyse DVF, prix de vente défini, reportage photo, remise du kit documentaire</div></div>
-      <div class="step"><div class="step-num">5</div><div class="step-label"><strong>J — 10 · Préparer le bien pour les visites</strong> — Home staging, dépersonnalisation, rangement, petites réparations visibles</div></div>
-      <div class="step"><div class="step-num">6</div><div class="step-label"><strong>J — 7 · Rédiger l'annonce</strong> — Titre accrocheur, sélection des 10 meilleures photos, vérification des mentions légales</div></div>
-    </div>
-
-    <div style="font-size:9px;font-weight:700;letter-spacing:1.8px;text-transform:uppercase;color:var(--gris2);border-bottom:1px solid #f0ece6;padding-bottom:5px;margin:14px 0 7px;">Phase 3 — Publication · J-3 à J0</div>
-    <div class="steps">
-      <div class="step"><div class="step-num">7</div><div class="step-label"><strong>J — 3 · Créer le dossier acheteur VPM</strong> — Uploader photos, diagnostics, documents, générer le lien partageable, tester l'affichage</div></div>
-      <div class="step"><div class="step-num">8</div><div class="step-label"><strong>J — 1 · Relecture finale</strong> — Vérifier prix, orthographe, cohérence des photos, agenda des visites configuré</div></div>
-    </div>
-
-    <div style="background:var(--terra);border-radius:6px;padding:12px 18px;margin:8px 0 14px;display:flex;align-items:center;gap:14px;">
-      <div style="background:rgba(255,255,255,0.18);border-radius:50%;width:30px;height:30px;min-width:30px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;">9</div>
-      <div style="background:rgba(255,255,255,0.18);color:#fff;font-size:9px;font-weight:700;padding:3px 10px;border-radius:3px;white-space:nowrap;">J 0</div>
-      <div>
-        <div style="font-size:12px;font-weight:700;color:#fff;">Publication de l'annonce</div>
-        <div style="font-size:10px;color:rgba(255,255,255,0.65);">LeBonCoin · PAP · SeLoger · Logic-Immo · Réseaux sociaux</div>
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-label"><span class="step-timing">J — 30</span><strong>Décision de vendre</strong> — Définir le projet (achat simultané ? délai souhaité ?). Premier contact Vendu Par Moi.</div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-label"><span class="step-timing">J — 25</span><strong>Commander les diagnostics</strong> — DPE · Électricité · Gaz · Amiante · Plomb · Termites (selon zone) · ERRIAL · Mesurage Carrez</div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-label"><span class="step-timing">J — 21</span><strong>Réunir les documents administratifs</strong> — Titre de propriété · Taxe foncière · Charges copropriété · PV AG · Règlement (si applicable)</div>
       </div>
     </div>
 
-    <div class="alert">
-      <div class="alert-icon">💡</div>
-      <div class="alert-text"><strong>Méthode :</strong> Choisissez d'abord votre <strong>date de mise en ligne cible</strong>, puis remontez chaque étape à rebours. Un lundi ou un jeudi matin génèrent le plus de vues dans la semaine — planifiez en conséquence.</div>
+    <div class="phase-label" style="margin-top:8px;">Phase 2 — Séance 1 Vendu Par Moi · J-14 à J-7</div>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num vpm">4</div>
+        <div class="step-label"><span class="step-timing">J — 14</span><strong>Séance 1 — Estimation &amp; préparation</strong> — Analyse DVF · Prix de vente défini · Mesures loi Carrez · Reportage photo · Remise du kit documentaire</div>
+      </div>
+      <div class="step">
+        <div class="step-num">5</div>
+        <div class="step-label"><span class="step-timing">J — 10</span><strong>Préparer le bien pour les visites</strong> — Home staging léger · Dépersonnalisation · Rangement · Petites réparations visibles</div>
+      </div>
+      <div class="step">
+        <div class="step-num">6</div>
+        <div class="step-label"><span class="step-timing">J — 7</span><strong>Rédiger l'annonce</strong> — Titre accrocheur · Description valorisante · Sélection des 10 meilleures photos · Vérification mentions légales</div>
+      </div>
     </div>
+
+    <div class="phase-label" style="margin-top:8px;">Phase 3 — Publication · J-3 à J0</div>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">7</div>
+        <div class="step-label"><span class="step-timing">J — 3</span><strong>Créer le dossier acheteur VPM</strong> — Uploader photos · Diagnostics · Documents · Générer le lien partageable · Tester l'affichage</div>
+      </div>
+      <div class="step">
+        <div class="step-num">8</div>
+        <div class="step-label"><span class="step-timing">J — 1</span><strong>Relecture finale &amp; validation</strong> — Vérifier prix · Orthographe annonce · Cohérence photos · Agenda visites configuré</div>
+      </div>
+    </div>
+    <div class="step-final">
+      <div class="sf-circle">9</div>
+      <div class="sf-badge">J 0</div>
+      <div><div class="sf-title">Publication de l'annonce</div><div class="sf-desc">LeBonCoin · PAP · SeLoger · Logic-Immo · Réseaux sociaux</div></div>
+    </div>
+  </div>
+  <div class="cp-footer"><div style="font-size:9px;color:var(--gris2);">Vendu Par Moi · Planning Mise en Vente</div><div style="font-size:9px;color:var(--gris2);">08</div></div>
+</div>
+</div>
+
+<!-- ═══ CH.3 SEP ═══ -->
+<div class="page">
+<div class="sep">
+  <div class="sep-deco">3</div>
+  <div class="sep-inner">
+    <div>
+      <div class="sep-tag">Chapitre 03</div>
+      <div class="sep-icon">🏡</div>
+      <div class="sep-titre">Préparer son bien<br>pour <em>séduire</em></div>
+      <div class="sep-desc">Un bien bien préparé se vend plus vite et à meilleur prix. Home staging, diagnostics obligatoires, photos professionnelles — ce chapitre couvre les trois piliers d'une présentation qui inspire confiance dès le premier regard.</div>
+    </div>
+    <div class="sep-bottom"><div class="sep-num">03</div><div class="sep-footer">venduparmoi.fr</div></div>
   </div>
 </div>
 </div>
 
-<!-- ═══════ CH.3 CONTENU ═══════ -->
+<!-- ═══ CH.3 CONTENU ═══ -->
 <div class="page">
 <div class="cp">
-  <div class="cp-header"><div class="cp-header-ch">/ Préparer son bien /</div><div class="cp-header-pg">24</div></div>
+  <div class="cp-header"><div class="cp-header-ch">/ Préparer son bien /</div><div class="cp-header-pg">09</div></div>
   <div class="cp-body">
     <div class="cp-label">Chapitre 03</div>
-    <div class="cp-h1">Home staging — les règles d'or<br>qui font la différence</div>
-    <div class="cp-intro">Le home staging ne nécessite pas de dépenser 
-des milliers d'euros. C'est l'art de mettre en valeur ce qui existe. Des
- études montrent qu'un acheteur se forge son opinion dans les <strong>90 premières secondes</strong> d'une visite.</div>
+    <div class="cp-h1">Home staging &amp; diagnostics —<br>les bases <em>incontournables</em></div>
 
     <div class="two-col">
       <div>
+        <div class="cp-h3">Home staging — les 6 règles d'or</div>
         <ol class="nl">
-          <li><strong>Désencombrer</strong> — rangez et retirez l'excès de meubles et d'objets. Un espace dégagé paraît plus grand et permet à l'acheteur de se projeter.</li>
-          <li><strong>Dépersonnaliser</strong> — photos de famille, collections, décos très perso : tout range. L'acheteur doit se projeter, pas vous voir.</li>
-          <li><strong>Nettoyer profondément</strong> — joints de cuisine et salle de bain, vitres, plinthes. Un bien propre = un bien entretenu.</li>
-          <li><strong>Maximiser la lumière naturelle</strong> — ouvrez 
-volets et rideaux, privilégiez les visites en milieu de journée quand la
- lumière est la meilleure. Évitez les créneaux en fin de journée. Les 
-ampoules grillées, c'est rédhibitoire.</li>
-          <li><strong>Neutraliser les odeurs</strong> — aérez 24h avant. Évitez les désodorisants trop marqués. La neutralité rassure.</li>
-          <li><strong>Soigner l'entrée</strong> — c'est la première impression et les 30 premières secondes comptent. Miroir, luminaire propre, espace dégagé.</li>
+          <li><strong>Désencombrer</strong> — un espace dégagé paraît plus grand et permet à l'acheteur de se projeter.</li>
+          <li><strong>Dépersonnaliser</strong> — photos de famille, collections, décos très perso : tout range.</li>
+          <li><strong>Nettoyer profondément</strong> — joints, vitres, plinthes. Un bien propre = un bien entretenu.</li>
+          <li><strong>Maximiser la lumière</strong> — volets et rideaux ouverts, visites en milieu de journée. Ampoules grillées = rédhibitoire.</li>
+          <li><strong>Neutraliser les odeurs</strong> — aérez 24h avant. La neutralité rassure.</li>
+          <li><strong>Soigner l'entrée</strong> — première impression, premières 30 secondes.</li>
         </ol>
+        <div class="box-terra" style="margin-top:8px;">
+          <div class="box-titre">Budget réaliste</div>
+          <div class="box-text">
+            <p><strong>0 à 200 € :</strong> Désencombrement, nettoyage, petites réparations visibles</p>
+            <p><strong>200 à 800 € :</strong> Rafraîchissement peinture (blanc/beige), ampoules, accessoires neutres</p>
+            <p style="margin-top:6px;">Un home staging bien réalisé peut réduire le délai de vente et favoriser de meilleures offres.</p>
+          </div>
+        </div>
       </div>
       <div>
-        <div class="box-terra">
-          <div class="box-titre">Budget réaliste home staging</div>
-          <div class="box-text">
-            <p><strong>0 à 200 € :</strong> Désencombrement, nettoyage professionnel, petites réparations visibles (joints, poignées, peinture écaillée)</p>
-            <p style="margin-top:10px;"><strong>200 à 800 € :</strong> Rafraîchissement peinture (blanc ou beige), changement des ampoules, quelques accessoires neutres (plaid, plantes)</p>
-            <p style="margin-top:10px;"><strong>Retour sur investissement :</strong><br>Les études du secteur montrent que le home staging peut réduire significativement le délai de vente et peut augmenter l'offre reçue de <strong>2 à 5%</strong>.</p>
-          </div>
+        <div class="cp-h3">Diagnostics obligatoires (DDT complet)</div>
+        <table class="t" style="font-size:10px;">
+          <thead><tr><th>Diagnostic</th><th>Obligatoire si</th><th>Validité</th><th>Coût</th></tr></thead>
+          <tbody>
+            <tr><td><strong>DPE</strong></td><td>Tous les biens</td><td>10 ans*</td><td>100–200 €</td></tr>
+            <tr><td><strong>Audit énergétique</strong></td><td>Maison classée E, F ou G</td><td>5 ans</td><td>500–1000 €</td></tr>
+            <tr><td><strong>ERRIAL</strong></td><td>Tous les biens</td><td>6 mois</td><td>Gratuit</td></tr>
+            <tr><td><strong>Amiante</strong></td><td>PC avant juil. 1997</td><td>Illimitée si nég.</td><td>100–150 €</td></tr>
+            <tr><td><strong>Plomb (CREP)</strong></td><td>Construit avant 1949</td><td>Illimitée si nég.</td><td>150–200 €</td></tr>
+            <tr><td><strong>Électricité</strong></td><td>Installation &gt; 15 ans</td><td>3 ans</td><td>100–150 €</td></tr>
+            <tr><td><strong>Gaz</strong></td><td>Installation &gt; 15 ans</td><td>3 ans</td><td>100–150 €</td></tr>
+            <tr><td><strong>Termites</strong></td><td>Zone à risque (arrêté)</td><td>6 mois</td><td>100–150 €</td></tr>
+            <tr><td><strong>Mérule</strong></td><td>Commune classée à risque</td><td>—</td><td>Inclus DDT</td></tr>
+            <tr><td><strong>Loi Carrez</strong></td><td>Copropriété (obligatoire)</td><td>Illimitée</td><td>80–120 €</td></tr>
+            <tr><td><strong>Assainissement</strong></td><td>Hors réseau public</td><td>3 ans</td><td>100–150 €</td></tr>
+          </tbody>
+        </table>
+        <div class="alert" style="margin-top:6px;">
+          <div class="alert-icon">📋</div>
+          <div class="alert-text">Budget total : <strong>300 à 700 €</strong> selon le bien. Commandez dès la décision de vendre — certains prennent 2 à 3 semaines. Un diagnostiqueur certifié établit le DDT complet en une seule intervention.</div>
         </div>
-        <div class="ex-box" style="margin-top:12px;">
-          <div class="ex-box-titre"><div class="ex-tag">EXEMPLE</div></div>
-          <div class="ex-box-text">
-            <p><em>« J'ai repeint le couloir en blanc et changé les ampoules. Ça m'a coûté 80€ et 4 heures. Le premier visiteur a fait une offre. »</em></p>
-            <p>— Exemple de vendeur ayant appliqué cette méthode</p>
-          </div>
-        </div>
       </div>
     </div>
+    <div class="legal-note">Les diagnostics requis dépendent du type de bien, de sa date de construction, de sa localisation et des installations présentes. *Refaire après travaux énergétiques significatifs. DPE avant juillet 2021 : invalide. Vérifiez les obligations applicables à votre bien sur Service-Public.fr ou auprès d'un diagnostiqueur certifié.</div>
+  </div>
+  <div class="cp-footer"><div style="font-size:9px;color:var(--gris2);">Vendu Par Moi · Guide du Vendeur</div><div style="font-size:9px;color:var(--gris2);">09</div></div>
+</div>
+</div>
 
-    <div class="founder-tip">
-      <div class="founder-tip-photo">M</div>
-      <div class="founder-tip-body">
-        <div class="founder-tip-label">Le conseil de Matthias</div>
-        <div class="founder-tip-text">« Avant les photos, faites le tour du logement comme si vous le découvriez pour la première fois : ce que votre œil ne voit plus au quotidien sera immédiatement visible sur une annonce. »</div>
-      </div>
+<!-- ═══ CH.4 SEP ═══ -->
+<div class="page">
+<div class="sep">
+  <div class="sep-deco">4</div>
+  <div class="sep-inner">
+    <div>
+      <div class="sep-tag">Chapitre 04</div>
+      <div class="sep-icon">📁</div>
+      <div class="sep-titre">Créer son dossier<br>vendeur <em>professionnel</em></div>
+      <div class="sep-desc">Un dossier complet et bien présenté, c'est votre carte de visite. Il inspire confiance immédiatement, répond aux questions avant même que l'acheteur les formule, et vous distingue de 90% des particuliers qui vendent sans préparation.</div>
     </div>
-    <div class="tool-box">
-      <div class="tool-box-qr">📱</div>
-      <div class="tool-box-body">
-        <div class="tool-box-titre">Disponible dans votre espace vendeur</div>
-        <div class="tool-box-list">Checklist home staging · Checklist photos · Diagnostics à préparer</div>
-        <div class="tool-box-cta">Retrouvez cet outil dans votre espace vendeur Vendu Par Moi</div>
-      </div>
-    </div>
-
-    <hr class="sep">
-    <div class="cp-h2">Les diagnostics obligatoires</div>
-    <div class="body-text" style="margin-bottom:12px;"><p>Vous ne pouvez légalement pas vendre sans un <strong>Dossier de Diagnostics Techniques (DDT)</strong> complet. Commandez-les dès votre décision de vendre — certains prennent 2 à 3 semaines.</p></div>
-    <table class="t">
-      <thead><tr><th>Diagnostic</th><th>Obligatoire si</th><th>Validité</th><th>Coût estimé</th></tr></thead>
-      <tbody>
-        <tr><td><strong>DPE</strong> (Performance énergétique)</td><td>Tous les biens</td><td>10 ans</td><td>100–200 €</td></tr>
-        <tr><td><strong>Amiante</strong></td><td>Permis de construire avant 1997</td><td>Illimitée si négatif</td><td>100–150 €</td></tr>
-        <tr><td><strong>Plomb (CREP)</strong></td><td>Construit avant 1949</td><td>1 an si positif</td><td>150–200 €</td></tr>
-        <tr><td><strong>Électricité</strong></td><td>Installation &gt; 15 ans</td><td>3 ans</td><td>100–150 €</td></tr>
-        <tr><td><strong>Gaz</strong></td><td>Installation &gt; 15 ans</td><td>3 ans</td><td>100–150 €</td></tr>
-        <tr><td><strong>ERRIAL</strong> (Risques et résiliences — ex-ERP)</td><td>Tous les biens</td><td>6 mois</td><td>Gratuit — errial.georisques.gouv.fr</td></tr>
-        <tr><td><strong>Termites</strong></td><td>Zone à risque</td><td>6 mois</td><td>100–150 €</td></tr>
-        <tr><td><strong>Loi Carrez</strong> (métrage officiel)</td><td>Biens en copropriété — obligatoire. Sans lui, l'acheteur peut exiger une réduction de prix.</td><td>Illimitée si aucun travaux</td><td>80–120 €</td></tr>
-        <tr><td><strong>Assainissement non collectif</strong></td><td>Biens hors réseau public (fosse septique) — contrôle de l'installation obligatoire.</td><td>3 ans</td><td>100–150 €</td></tr>
-        <tr><td><strong>Bruit (PPBE)</strong></td><td>Biens situés dans une zone de bruit (classement Préfecture)</td><td>6 mois</td><td>Gratuit — géorisques.gouv.fr</td></tr>
-        <tr><td><strong>Mérule</strong></td><td>Communes ayant délimité des zones à risque (en progression)</td><td>—</td><td>Inclus dans le DDT ou sur demande</td></tr>
-      </tbody>
-    </table>
-    <div class="alert">
-      <div class="alert-icon">📋</div>
-      <div class="alert-text">Le budget diagnostics varie entre <strong>300 et 700 € selon le bien</strong>. Commandez-les dès la décision de vendre — certains prennent 2 à 3 semaines. Un diagnostiqueur certifié établit le <strong>DDT complet en une seule intervention</strong>, ce qui réduit le coût global.</div>
-    </div>
-    <div class="tool-box" style="margin-top:10px;">
-      <div class="tool-box-qr">📄</div>
-      <div class="tool-box-body">
-        <div class="tool-box-titre">Guide complet des diagnostics</div>
-        <div class="tool-box-list">Tableau détaillé · Validités · Coûts · Questions à poser au diagnostiqueur</div>
-        <div class="tool-box-cta">Disponible dans votre espace vendeur Vendu Par Moi — rubrique Bibliothèque</div>
-      </div>
-    </div>
-    <div class="legal-note">Les diagnostics requis et leur durée de validité dépendent notamment du type de bien, de sa date de construction, de sa localisation et des installations présentes. Vérifiez les obligations applicables à votre bien auprès d'un diagnostiqueur certifié ou sur Service-Public.fr.</div>
-    <div class="alert" style="margin-top:16px;">
-      <div class="alert-icon">💡</div>
-      <div class="alert-text"><strong>Le saviez-vous ?</strong> Ces économies peuvent financer les études supérieures d'un enfant — sans contracter un crédit supplémentaire.</div>
-    </div>
+    <div class="sep-bottom"><div class="sep-num">04</div><div class="sep-footer">venduparmoi.fr</div></div>
   </div>
 </div>
 </div>
 
-<!-- ═══════ CH.4 SÉPARATEUR ═══════ -->
-<div class="page">
-<div class="sep-page">
-  <div class="sep-bg-circles"></div>
-  <div class="sep-bg-num">4</div>
-  <div class="sep-icon">📁</div>
-  <div class="sep-tag">Chapitre 04</div>
-  <div class="sep-titre">Créer son dossier<br>vendeur <em>professionnel</em></div>
-  <div class="sep-line"></div>
-  <div class="sep-desc">Un dossier complet et bien présenté, c'est votre
- carte de visite. Il inspire confiance immédiatement, répond aux 
-questions avant même que l'acheteur les formule, et vous distingue de 
-90% des particuliers qui vendent sans préparation.</div>
-</div>
-</div>
-
-<!-- ═══════ CH.4 CONTENU ═══════ -->
+<!-- ═══ CH.4 CONTENU ═══ -->
 <div class="page">
 <div class="cp">
-  <div class="cp-header"><div class="cp-header-ch">/ Créer son dossier vendeur /</div><div class="cp-header-pg">34</div></div>
+  <div class="cp-header"><div class="cp-header-ch">/ Créer son dossier vendeur /</div><div class="cp-header-pg">11</div></div>
   <div class="cp-body">
     <div class="cp-label">Chapitre 04</div>
-    <div class="cp-h1">Le dossier vendeur complet<br>qui inspire confiance</div>
-    <div class="cp-intro">Un acheteur sérieux vérifie toujours. Avoir 
-votre dossier prêt dès le départ vous évite de perdre du temps à chaque 
-demande — et vous positionne immédiatement comme un vendeur rigoureux et
- professionnel.</div>
+    <div class="cp-h1">Le dossier vendeur complet<br>qui inspire <em>confiance</em></div>
 
     <div class="two-col">
       <div>
@@ -1416,105 +667,58 @@ demande — et vous positionne immédiatement comme un vendeur rigoureux et
           <li><div class="cl-box"></div>Photos professionnelles du bien</li>
           <li><div class="cl-box"></div>Fiche descriptive complète et relue</li>
         </ul>
+        <div class="avant-apres" style="margin-top:8px;">
+          <div class="avant"><div class="avant-label">✕ Fiche amateur</div><div class="avant-text"><p style="font-style:italic;font-size:10.5px;">"Vends maison 95m², 3 chambres, garage, jardin. Bon état. Pas agence."</p></div></div>
+          <div class="apres"><div class="apres-label">✓ Fiche pro</div><div class="apres-text"><p style="font-size:10.5px;font-style:italic;">"Belle maison de ville 95m² rénovée 2021, séjour traversant 30m², cuisine ouverte, 3 chambres, jardin 45m² plein sud, DPE C, 5 min écoles."</p></div></div>
+        </div>
       </div>
       <div>
-        <div class="box-terra">
+        <div class="box-terra" style="margin-bottom:8px;">
           <div class="box-titre">Ce que dit un acheteur face à un dossier complet</div>
-          <div class="box-text">
-            <p><em>« Ce vendeur a tout préparé. Il sait ce qu'il fait, il n'a rien à cacher. Je peux lui faire confiance et avancer vite. »</em></p>
-            <p style="margin-top:12px;">Un dossier complet peut rassurer
-l'acheteur, limiter les zones d'incertitude et faciliter une négociation
-plus factuelle.</p>
-          </div>
+          <div class="box-text"><p><em>« Ce vendeur a tout préparé. Il sait ce qu'il fait, il n'a rien à cacher. Je peux lui faire confiance et avancer vite. »</em></p><p>Un dossier complet réduit l'agressivité dans la négociation — l'acheteur négocie moins sur le prix, il négocie sur les délais.</p></div>
         </div>
-        <div class="box" style="margin-top:12px;">
-          <div class="box-titre">Sur Vendu Par Moi</div>
-          <div class="box-text">
-            <p>Nous construisons votre dossier <strong>ensemble</strong>, lors de notre venue à votre domicile : nous vous aidons à renseigner les informations et à classer les bonnes photos au bon endroit. Une fois l'annonce en ligne, vous partagez votre dossier en 1 clic — l'acheteur reçoit automatiquement un message avec le lien de vos photos et toutes les informations du bien, ce qui facilite vos échanges dès le premier contact.</p>
-          </div>
+        <div class="cp-h3">Démarrer sur la plateforme VPM</div>
+        <div class="steps">
+          <div class="step"><div class="step-num vpm">1</div><div class="step-label"><strong>Renseigner votre bien</strong> — Adresse, surface, pièces, DPE, équipements dans <em>Mon Bien</em>. Le générateur IA crée automatiquement une description valorisante.</div></div>
+          <div class="step"><div class="step-num vpm">2</div><div class="step-label"><strong>Importer vos photos</strong> — Organisez par catégorie (façade, séjour, cuisine…). Dans <em>Documents</em>, déposez diagnostics et actes.</div></div>
+          <div class="step"><div class="step-num vpm">3</div><div class="step-label"><strong>Configurer l'agenda</strong> — Bloquez vos indisponibilités. Les acheteurs réservent directement en ligne, avec rappels SMS automatiques.</div></div>
+          <div class="step"><div class="step-num vpm">4</div><div class="step-label"><strong>Partager le dossier en 1 clic</strong> — Un lien unique regroupe tout. À envoyer après chaque appel : les acheteurs sérieux consultent avant la visite.</div></div>
+        </div>
+        <div class="alert" style="margin-top:8px;">
+          <div class="alert-icon">💡</div>
+          <div class="alert-text">Complétez votre espace VPM <em>avant</em> de publier votre annonce — un dossier à 100% dès le premier jour évite les relances.</div>
         </div>
       </div>
     </div>
+  </div>
+  <div class="cp-footer"><div style="font-size:9px;color:var(--gris2);">Vendu Par Moi · Guide du Vendeur</div><div style="font-size:9px;color:var(--gris2);">11</div></div>
+</div>
+</div>
 
-    <hr class="sep">
-    <div class="cp-h2">Démarrer avec votre espace vendeur</div>
-    <div class="body-text" style="margin-bottom:12px;"><p>Votre espace vendeur Vendu Par Moi centralise tous les outils dont vous avez besoin. Voici comment le prendre en main dès votre accès activé.</p></div>
-    <div class="steps">
-      <div class="step"><div class="step-num" style="background:var(--terra);">1</div><div class="step-label"><strong>Renseignez votre bien</strong> — Adresse, surface, type, DPE, équipements. Ces informations alimentent automatiquement l'annonce et le dossier acheteur.</div></div>
-      <div class="step"><div class="step-num" style="background:var(--terra);">2</div><div class="step-label"><strong>Importez vos photos</strong> — Chargez-les dans l'ordre recommandé (façade, séjour, cuisine, chambres…). Le générateur IA peut créer votre description à partir de ces photos et des informations du bien.</div></div>
-      <div class="step"><div class="step-num" style="background:var(--terra);">3</div><div class="step-label"><strong>Ajoutez vos diagnostics et documents</strong> — DPE, diagnostics, taxe foncière, règlement de copropriété. Tout est stocké et organisé dans votre dossier.</div></div>
-      <div class="step"><div class="step-num" style="background:var(--terra);">4</div><div class="step-label"><strong>Configurez votre agenda</strong> — Bloquez les créneaux où vous n'êtes pas disponible. Les acheteurs réservent leurs visites directement, 24h/24, sans vous appeler pour chaque demande.</div></div>
-      <div class="step"><div class="step-num" style="background:var(--terra);">5</div><div class="step-label"><strong>Partagez le dossier acheteur en 1 clic</strong> — Un lien unique regroupe photos, diagnostics et documents. Envoyez-le après chaque appel — les acheteurs sérieux consulteront tout avant la visite.</div></div>
+<!-- ═══ CH.5 SEP ═══ -->
+<div class="page">
+<div class="sep">
+  <div class="sep-deco">5</div>
+  <div class="sep-inner">
+    <div>
+      <div class="sep-tag">Chapitre 05</div>
+      <div class="sep-icon">📢</div>
+      <div class="sep-titre">Publier et <em>diffuser</em><br>son annonce</div>
+      <div class="sep-desc">Votre bien est prêt, votre dossier est bouclé. Il est temps d'aller chercher vos acheteurs là où ils se trouvent — sur les bons portails, avec une annonce rédigée pour capter l'attention dans un marché saturé.</div>
     </div>
-    <div class="alert" style="margin-top:12px;">
-      <div class="alert-icon">💡</div>
-      <div class="alert-text"><strong>Conseil :</strong> Complétez votre espace vendeur <em>avant</em> de publier votre annonce. Un dossier à 100% dès le premier jour vous évite de rappeler chaque acheteur pour envoyer un document manquant.</div>
-    </div>
-
-    <hr class="sep">
-    <div class="cp-h2">La fiche descriptive qui retient l'attention</div>
-    <div class="avant-apres">
-      <div class="avant">
-        <div class="avant-label">✕ Fiche amateur — ce qui ne marche pas</div>
-        <div class="avant-text">
-          <p style="font-size:12px;color:#5a3520;font-style:italic;">"Vends maison 95m², 3 chambres, garage, jardin. Bon état. Cherche sérieux uniquement. Pas agence."</p>
-          <p style="font-size:11px;margin-top:8px;color:#8a5040;">→ Aucune émotion, aucune projection possible, aucune information sur le quartier ou la vie dans le bien.</p>
-        </div>
-      </div>
-      <div class="apres">
-        <div class="apres-label">✓ Fiche pro — ce qui fait cliquer</div>
-        <div class="apres-text">
-          <p style="font-size:12px;color:#1a4a2a;font-style:italic;">"Belle
- maison de ville de 95m² entièrement rénovée (2021), séjour traversant 
-de 30m², cuisine ouverte équipée, 3 chambres dont une suite parentale, 
-jardin 45m² plein sud. À 5 min des écoles et du marché. DPE C. Vente 
-suite à mutation."</p>
-        </div>
-      </div>
-    </div>
-    <div class="tool-box">
-      <div class="tool-box-qr">📱</div>
-      <div class="tool-box-body">
-        <div class="tool-box-titre">Disponible dans votre espace vendeur</div>
-        <div class="tool-box-list">Checklist des documents · Fiche descriptive du bien</div>
-        <div class="tool-box-cta">Retrouvez cet outil dans votre espace vendeur Vendu Par Moi</div>
-      </div>
-    </div>
-    <div class="alert" style="margin-top:16px;">
-      <div class="alert-icon">💡</div>
-      <div class="alert-text"><strong>Le saviez-vous ?</strong> Ces économies représentent l'apport nécessaire pour votre prochain achat immobilier.</div>
-    </div>
+    <div class="sep-bottom"><div class="sep-num">05</div><div class="sep-footer">venduparmoi.fr</div></div>
   </div>
 </div>
 </div>
 
-<!-- ═══════ CH.5 SÉPARATEUR ═══════ -->
-<div class="page">
-<div class="sep-page">
-  <div class="sep-bg-circles"></div>
-  <div class="sep-bg-num">5</div>
-  <div class="sep-icon">📢</div>
-  <div class="sep-tag">Chapitre 05</div>
-  <div class="sep-titre">Publier et <em>diffuser</em><br>son annonce</div>
-  <div class="sep-line"></div>
-  <div class="sep-desc">Votre bien est prêt, votre dossier est bouclé. 
-Il est temps d'aller chercher vos acheteurs là où ils se trouvent — sur 
-les bons portails, avec une annonce rédigée pour capter l'attention dans
- un marché saturé d'offres similaires.</div>
-</div>
-</div>
-
-<!-- ═══════ CH.5 CONTENU ═══════ -->
+<!-- ═══ CH.5 CONTENU ═══ -->
 <div class="page">
 <div class="cp">
-  <div class="cp-header"><div class="cp-header-ch">/ Publier son annonce /</div><div class="cp-header-pg">43</div></div>
+  <div class="cp-header"><div class="cp-header-ch">/ Publier son annonce /</div><div class="cp-header-pg">13</div></div>
   <div class="cp-body">
     <div class="cp-label">Chapitre 05</div>
-    <div class="cp-h1">Où et comment publier<br>pour maximiser sa visibilité</div>
-    <div class="cp-intro">Un acheteur consulte en moyenne <strong>3 à 5 portails différents</strong>
- avant de contacter un vendeur. Votre bien doit être présent sur chacun 
-d'eux. La bonne nouvelle : le coût total de diffusion pour un 
-particulier ne dépasse pas 150 €/mois.</div>
+    <div class="cp-h1">Où et comment publier<br>pour maximiser sa <em>visibilité</em></div>
+    <div class="cp-intro">Un acheteur consulte en moyenne <strong>3 à 5 portails différents</strong> avant de contacter un vendeur. Le coût total de diffusion pour un particulier ne dépasse pas 150 €/mois.</div>
 
     <table class="t">
       <thead><tr><th>Portail</th><th>Trafic mensuel</th><th>Type d'acheteurs</th><th>Coût particulier</th><th>Priorité</th></tr></thead>
@@ -1523,17 +727,16 @@ particulier ne dépasse pas 150 €/mois.</div>
         <tr><td><strong>PAP.fr</strong></td><td>~4M visites</td><td>Particulier à particulier</td><td>~40 €</td><td><strong style="color:var(--terra);">Indispensable</strong></td></tr>
         <tr><td><strong>SeLoger</strong></td><td>~12M visites</td><td>Projets avancés, qualifiés</td><td>~80 €/mois</td><td>Recommandé</td></tr>
         <tr><td><strong>Bien'ici</strong></td><td>~5M visites</td><td>Tous profils</td><td>~40 €</td><td>Recommandé</td></tr>
-        <tr><td><strong>Facebook Marketplace</strong></td><td>Très large</td><td>Local, primoacheteurs</td><td>Gratuit</td><td>Complémentaire</td></tr>
+        <tr><td><strong>Facebook Marketplace</strong></td><td>Très large</td><td>Local, primo-accédants</td><td>Gratuit</td><td>Complémentaire</td></tr>
       </tbody>
     </table>
 
+    <hr class="sep-rule">
     <div class="two-col">
       <div>
         <div class="cp-h2">Les photos qui font vendre</div>
-        <div class="body-text">
-          <p>La qualité des photos joue un rôle majeur dans l'attractivité d'une annonce et dans la décision de cliquer. Les premières secondes de consultation sont déterminantes : soignez particulièrement la photo principale et le titre.</p>
-        </div>
-        <div class="cp-h3" style="margin-top:12px;">Ordre idéal des photos</div>
+        <div class="body-text"><p>Une annonce avec de mauvaises photos récolte 5× moins de contacts. L'acheteur décide en 3 secondes si votre bien mérite un clic.</p></div>
+        <div class="cp-h3" style="margin-top:8px;">Ordre idéal</div>
         <ol class="nl">
           <li>Façade / vue extérieure</li>
           <li>Pièce de vie principale</li>
@@ -1550,362 +753,314 @@ particulier ne dépasse pas 150 €/mois.</div>
           <div class="box-titre">Les règles photo</div>
           <div class="box-text">
             <ul class="vl" style="margin:0;">
-              <li>Lumière naturelle maximale — milieu de journée, volets et rideaux ouverts</li>
-              <li>Format paysage uniquement — jamais portrait</li>
-              <li>Minimum 10 photos, idéalement 15 à 20</li>
-              <li>Retouche légère OK (luminosité, contraste)</li>
-              <li>Évitez le grand-angle extrême qui déforme</li>
+              <li style="color:rgba(255,255,255,.85);">Lumière naturelle maximale — milieu de journée, volets ouverts</li>
+              <li style="color:rgba(255,255,255,.85);">Format paysage uniquement — jamais portrait</li>
+              <li style="color:rgba(255,255,255,.85);">Minimum 10 photos, idéalement 15 à 20</li>
+              <li style="color:rgba(255,255,255,.85);">Retouche légère OK (luminosité, contraste)</li>
+              <li style="color:rgba(255,255,255,.85);">Évitez le grand-angle extrême qui déforme</li>
             </ul>
           </div>
         </div>
-        <div class="alert" style="margin-top:12px;">
+        <div class="alert" style="margin-top:8px;">
           <div class="alert-icon">📱</div>
-          <div class="alert-text">Pour le <strong>Pack Autonome</strong>, un smartphone récent bien utilisé suffit — mode portrait désactivé, trépied à 20 € recommandé. Le <strong>Pack Coaching Plus</strong> inclut un photographe professionnel.</div>
+          <div class="alert-text">Pack Autonome : un smartphone récent + trépied à 20 €. <strong>Pack Coaching Plus</strong> : photographe professionnel Meero inclus.</div>
         </div>
       </div>
     </div>
-    <div class="alert" style="margin-top:16px;">
-      <div class="alert-icon">💡</div>
-      <div class="alert-text"><strong>Le saviez-vous ?</strong> Ces économies correspondent à plusieurs années de vacances en famille.</div>
+  </div>
+  <div class="cp-footer"><div style="font-size:9px;color:var(--gris2);">Vendu Par Moi · Guide du Vendeur</div><div style="font-size:9px;color:var(--gris2);">13</div></div>
+</div>
+</div>
+
+<!-- ═══ CH.6 SEP ═══ -->
+<div class="page">
+<div class="sep">
+  <div class="sep-deco">6</div>
+  <div class="sep-inner">
+    <div>
+      <div class="sep-tag">Chapitre 06</div>
+      <div class="sep-icon">📞</div>
+      <div class="sep-titre">Gérer les contacts<br>et <em>qualifier</em> les acheteurs</div>
+      <div class="sep-desc">Les premiers appels arrivent. Avec eux, les curieux, les chasseurs de bonnes affaires — et quelques acheteurs vraiment sérieux. Apprendre à les distinguer dès le premier échange vous économise plusieurs demi-journées de visites inutiles.</div>
     </div>
+    <div class="sep-bottom"><div class="sep-num">06</div><div class="sep-footer">venduparmoi.fr</div></div>
   </div>
 </div>
 </div>
 
-<!-- ═══════ CH.6 SÉPARATEUR ═══════ -->
-<div class="page">
-<div class="sep-page">
-  <div class="sep-bg-circles"></div>
-  <div class="sep-bg-num">6</div>
-  <div class="sep-icon">📞</div>
-  <div class="sep-tag">Chapitre 06</div>
-  <div class="sep-titre">Gérer les contacts<br>et <em>qualifier</em> les acheteurs</div>
-  <div class="sep-line"></div>
-  <div class="sep-desc">Les premiers appels arrivent. Avec eux, les 
-curieux, les chasseurs de bonnes affaires — et quelques acheteurs 
-vraiment sérieux. Apprendre à les distinguer dès le premier échange vous
- économise plusieurs demi-journées de visites inutiles.</div>
-</div>
-</div>
-
-<!-- ═══════ CH.6 CONTENU ═══════ -->
+<!-- ═══ CH.6 CONTENU ═══ -->
 <div class="page">
 <div class="cp">
-  <div class="cp-header"><div class="cp-header-ch">/ Gérer les contacts /</div><div class="cp-header-pg">52</div></div>
+  <div class="cp-header"><div class="cp-header-ch">/ Gérer les contacts /</div><div class="cp-header-pg">15</div></div>
   <div class="cp-body">
     <div class="cp-label">Chapitre 06</div>
-    <div class="cp-h1">Les 3 questions qui séparent<br>les curieux des acheteurs sérieux</div>
-    <div class="cp-intro">Vous n'êtes pas obligé de faire visiter votre 
-bien à tout le monde. Trois questions simples lors du premier appel 
-permettent d'évaluer le sérieux d'un acheteur — naturellement, sans 
-l'intimider.</div>
+    <div class="cp-h1">Qualifier les acheteurs &amp;<br>script du <em>premier appel</em></div>
 
     <div class="two-col">
       <div>
-        <div class="box-terra">
+        <div class="box-terra" style="margin-bottom:8px;">
           <div class="box-titre">Les 3 questions à toujours poser</div>
           <div class="box-text">
-            <p><strong>① « Avez-vous déjà vu votre banque ? »</strong><br>Un acheteur sérieux a un accord de principe ou est en cours. Un curieux n'a pas avancé sur ce point.</p>
-            <p style="margin-top:10px;"><strong>② « Quel est votre délai d'achat idéal ? »</strong><br>Réponse idéale : 1 à 3 mois. "Dans 6 mois" = il est trop tôt, vous risquez de perdre du temps.</p>
-            <p style="margin-top:10px;"><strong>③ « Avez-vous un bien à vendre avant d'acheter ? »</strong><br>Un
- acheteur avec un bien non vendu peut bloquer votre transaction 
-plusieurs mois — à moins qu'il dispose d'un prêt relais accordé. Si 
-c'est le cas, demandez-lui son accord de prêt relais.</p>
+            <p><strong>① « Avez-vous déjà vu votre banque ? »</strong><br>Un acheteur sérieux a un accord de principe ou est en cours.</p>
+            <p style="margin-top:7px;"><strong>② « Quel est votre délai d'achat idéal ? »</strong><br>Réponse idéale : 1 à 3 mois. "Dans 6 mois" = trop tôt.</p>
+            <p style="margin-top:7px;"><strong>③ « Avez-vous un bien à vendre avant d'acheter ? »</strong><br>Si oui, demandez-lui son accord de prêt relais.</p>
           </div>
         </div>
+        <div class="cp-h3">Script — Structure de l'appel (5 à 8 min)</div>
+        <ol class="nl">
+          <li><strong>Accueil</strong> — Laissez l'acheteur parler en premier : <em>« Qu'est-ce qui vous attire ? »</em></li>
+          <li><strong>Qualification</strong> — Posez naturellement les 3 questions dans la conversation.</li>
+          <li><strong>Présentation ciblée</strong> — 2 ou 3 points forts qui correspondent à ses besoins.</li>
+          <li><strong>Visite</strong> — <em>« Seriez-vous disponible mardi ou jeudi ? »</em> Proposez 2 créneaux.</li>
+          <li><strong>Dossier</strong> — <em>« Je vous envoie notre dossier complet par SMS. »</em></li>
+        </ol>
+        <div class="alert" style="margin-top:8px;">
+          <div class="alert-icon">⚠️</div>
+          <div class="alert-text"><strong>Règle absolue :</strong> Ne négociez jamais le prix au téléphone. <em>« On en parlera lors de la visite. »</em></div>
+        </div>
       </div>
       <div>
-        <div class="cp-h3">Les signaux d'un acheteur sérieux</div>
+        <div class="cp-h3">Réponses aux scénarios courants</div>
+        <div class="box" style="margin-bottom:8px;">
+          <p style="font-size:11px;margin-bottom:7px;"><strong>Demande d'infos générales</strong><br><em>→ « J'ai un dossier complet en ligne — photos HD, diagnostics, documents. Je vous envoie le lien par SMS dans la minute. »</em></p>
+          <p style="font-size:11px;margin-bottom:7px;"><strong>Demande de visite</strong><br><em>→ « Pour réserver, j'utilise un agenda en ligne — vous choisissez directement l'horaire. Je vous envoie le lien de réservation. »</em></p>
+          <p style="font-size:11px;margin-bottom:7px;"><strong>« Le prix est trop élevé. »</strong><br><em>→ « Il correspond aux ventes réelles du secteur. Je vous transmets les données DVF avec le dossier. »</em></p>
+          <p style="font-size:11px;"><strong>« Vous vendez sans agence, c'est sérieux ? »</strong><br><em>→ « Tout à fait — j'utilise une plateforme professionnelle avec dossier complet, agenda et suivi. »</em></p>
+        </div>
+        <div class="cp-h3">Signaux d'un acheteur sérieux</div>
         <ul class="vl">
           <li>Il pose des questions sur les charges et la taxe foncière</li>
-          <li>Il demande à voir les diagnostics <em>avant</em> la visite</li>
+          <li>Il demande les diagnostics <em>avant</em> la visite</li>
           <li>Il veut visiter dans la semaine</li>
           <li>Il mentionne son banquier ou un courtier</li>
-          <li>Il a une situation concrète (mutation, naissance, divorce)</li>
-          <li>Il demande si d'autres offres ont déjà été faites</li>
         </ul>
-        <div class="cp-h3" style="margin-top:12px;">Les signaux d'alarme</div>
-        <ul class="vl">
-          <li>Il demande une baisse de prix avant même de visiter</li>
-          <li>Il est évasif sur son financement</li>
-          <li>Il annule et reporte plusieurs fois</li>
-          <li>Il "veut juste voir" sans projet défini</li>
-        </ul>
+        <div class="box-note" style="margin-top:8px;">
+          <p><strong>VPM Connect (Coaching Plus) :</strong> numéro dédié qui enregistre chaque appel entrant — transcrit dans votre espace vendeur. Aucun contact manqué, même absent.</p>
+        </div>
       </div>
     </div>
+  </div>
+  <div class="cp-footer"><div style="font-size:9px;color:var(--gris2);">Vendu Par Moi · Guide du Vendeur</div><div style="font-size:9px;color:var(--gris2);">15</div></div>
+</div>
+</div>
 
-    <hr class="sep">
-    <div class="cp-h2">Script — Conduire le premier appel efficacement</div>
-    <div class="two-col">
-      <div>
-        <div class="cp-h3">Structure de l'appel (5 à 8 min)</div>
-        <ol class="nl">
-          <li><strong>Accueil</strong> — Laissez l'acheteur parler en premier : <em>« Qu'est-ce qui vous attire dans ce bien ? »</em> Vous obtenez d'emblée ce qu'il cherche.</li>
-          <li><strong>Qualification</strong> — Posez naturellement les 3 questions clés (banque, délai, bien à vendre) dans la conversation, sans interrogatoire.</li>
-          <li><strong>Présentation ciblée</strong> — Mettez en avant 2 ou 3 points forts qui correspondent à ce que l'acheteur vient de mentionner.</li>
-          <li><strong>Proposition de visite</strong> — <em>« Seriez-vous disponible mardi ou jeudi ? »</em> Proposez toujours deux créneaux — cela évite le <em>« je vous rappelle »</em>.</li>
-          <li><strong>Envoi dossier</strong> — <em>« Je vous envoie notre dossier complet par SMS maintenant. »</em> Le lien VPM part immédiatement.</li>
-        </ol>
-        <div class="alert" style="margin-top:12px;">
-          <div class="alert-icon">⚠️</div>
-          <div class="alert-text"><strong>Règle absolue :</strong> Ne négociez <em>jamais</em> le prix au téléphone. Répondez : <em>« On en parlera lors de la visite, une fois que vous aurez vu le bien. »</em></div>
-        </div>
-      </div>
-      <div>
-        <div class="cp-h3">Réponses aux objections fréquentes</div>
-        <div class="box" style="padding:12px 14px;">
-          <p style="font-size:11.5px;margin-bottom:10px;"><strong>« Le prix est trop élevé. »</strong><br><em>→ « Il correspond aux ventes réelles du secteur. Je vous transmets les données DVF avec le dossier. »</em></p>
-          <p style="font-size:11.5px;margin-bottom:10px;"><strong>« Je dois d'abord vendre mon appartement. »</strong><br><em>→ « Pour quelle date estimez-vous votre vente ? On peut en tenir compte dans le calendrier. »</em></p>
-          <p style="font-size:11.5px;margin-bottom:10px;"><strong>« Pas de parking ? »</strong><br><em>→ Préparez une réponse factuelle et neutre : distance du parking public, tarif abonnement.</em></p>
-          <p style="font-size:11.5px;"><strong>« Je veux juste avoir une idée. »</strong><br><em>→ « Bien sûr — envoyez-moi votre projet, si ça correspond on se voit. »</em> Ne forcez pas la visite.</p>
-        </div>
-        <div class="box-terra" style="margin-top:10px;">
-          <div class="box-titre">VPM Connect — numéro intelligent dédié</div>
-          <div class="box-text"><p>Le Pack Coaching Plus inclut un numéro dédié (VPM Connect) qui enregistre chaque appel entrant. Vous ne ratez aucun contact, même absent — les messages sont transcrits dans votre espace vendeur.</p></div>
-        </div>
-      </div>
+<!-- ═══ CH.7 SEP ═══ -->
+<div class="page">
+<div class="sep">
+  <div class="sep-deco">7</div>
+  <div class="sep-inner">
+    <div>
+      <div class="sep-tag">Chapitre 07</div>
+      <div class="sep-icon">🚪</div>
+      <div class="sep-titre">Préparer et réussir<br>ses <em>visites</em></div>
+      <div class="sep-desc">La visite est le moment décisif. C'est là que l'acheteur bascule de la tête au cœur — ou renonce définitivement. Votre posture, votre discours et votre préparation font toute la différence.</div>
     </div>
-
-    <hr class="sep">
-    <div class="cp-h2">Sur Vendu Par Moi — l'automatisation qui filtre pour vous</div>
-    <div class="steps">
-      <div class="step"><div class="step-num">1</div><div class="step-label">Acheteur contacte via l'annonce</div></div>
-      <div class="step"><div class="step-num">2</div><div class="step-label">Votre dossier prêt à envoyer en 1 clic</div></div>
-      <div class="step"><div class="step-num">3</div><div class="step-label">SMS de relance J+2 si pas de réponse</div></div>
-      <div class="step"><div class="step-num">4</div><div class="step-label">L'acheteur réserve sa visite selon vos disponibilités, que vous modifiez en 1 clic depuis votre espace</div></div>
-      <div class="step"><div class="step-num">5</div><div class="step-label">Email de confirmation automatique</div></div>
-    </div>
-    <div class="body-text"><p>Cette séquence s'exécute seule, 7j/7, y
-compris la nuit. Vous ne manquez aucun contact, et les acheteurs sérieux
- progressent naturellement — les curieux ne vont pas plus loin.</p></div>
-    <div class="tool-box">
-      <div class="tool-box-qr">📱</div>
-      <div class="tool-box-body">
-        <div class="tool-box-titre">Disponible dans votre espace vendeur</div>
-        <div class="tool-box-list">Fiche qualification acheteur · Suivi des contacts</div>
-        <div class="tool-box-cta">Retrouvez cet outil dans votre espace vendeur Vendu Par Moi</div>
-      </div>
-    </div>
-    <div class="alert" style="margin-top:16px;">
-      <div class="alert-icon">💡</div>
-      <div class="alert-text"><strong>Le saviez-vous ?</strong> Ces économies peuvent rembourser une année entière de crédit immobilier.</div>
-    </div>
+    <div class="sep-bottom"><div class="sep-num">07</div><div class="sep-footer">venduparmoi.fr</div></div>
   </div>
 </div>
 </div>
 
-<!-- ═══════ CH.7 SÉPARATEUR ═══════ -->
-<div class="page">
-<div class="sep-page">
-  <div class="sep-bg-circles"></div>
-  <div class="sep-bg-num">7</div>
-  <div class="sep-icon">🚪</div>
-  <div class="sep-tag">Chapitre 07</div>
-  <div class="sep-titre">Préparer et réussir<br>ses <em>visites</em></div>
-  <div class="sep-line"></div>
-  <div class="sep-desc">La visite est le moment décisif. C'est là que 
-l'acheteur bascule de la tête au cœur — ou renonce définitivement. Votre
- posture, votre discours et votre préparation font toute la différence 
-entre un visiteur qui repart sans suite et un acheteur qui fait une 
-offre.</div>
-</div>
-</div>
-
-<!-- ═══════ CH.7 CONTENU ═══════ -->
+<!-- ═══ CH.7 CONTENU ═══ -->
 <div class="page">
 <div class="cp">
-  <div class="cp-header"><div class="cp-header-ch">/ Réussir ses visites /</div><div class="cp-header-pg">60</div></div>
+  <div class="cp-header"><div class="cp-header-ch">/ Réussir ses visites /</div><div class="cp-header-pg">17</div></div>
   <div class="cp-body">
     <div class="cp-label">Chapitre 07</div>
-    <div class="cp-h1">La visite parfaite —<br>préparation et discours</div>
-    <div class="cp-intro">Le discours de visite idéal n'est pas un 
-monologue de présentation — c'est une conversation guidée où vous posez 
-des questions à l'acheteur pour comprendre ce qu'il cherche, avant de 
-lui montrer comment votre bien y répond.</div>
+    <div class="cp-h1">La visite parfaite —<br>préparation et <em>discours</em></div>
+    <div class="cp-intro">Le discours idéal n'est pas un monologue — c'est une conversation guidée où vous posez des questions à l'acheteur pour comprendre ce qu'il cherche, avant de lui montrer comment votre bien y répond.</div>
 
     <div class="col-4060">
       <div>
         <div class="cp-h3">1h avant la visite</div>
         <ul class="cl">
-          <li><div class="cl-box"></div>Volets et rideaux ouverts — lumière naturelle maximale</li>
+          <li><div class="cl-box"></div>Volets et rideaux ouverts — lumière maximale</li>
           <li><div class="cl-box"></div>Fenêtres ouvertes 30 min puis refermées</li>
-          <li><div class="cl-box"></div>Musique douce en fond (facultatif)</li>
           <li><div class="cl-box"></div>Café en train de couler</li>
+          <li><div class="cl-box"></div>Musique douce en fond (facultatif)</li>
           <li><div class="cl-box"></div>Chaussures et manteaux rangés</li>
           <li><div class="cl-box"></div>Copie du dossier prête à remettre</li>
           <li><div class="cl-box"></div>Enfants et animaux pris en charge</li>
         </ul>
-        <div class="alert" style="margin-top:12px;">
-          <div class="alert-icon">💡</div>
-          <div class="alert-text">Si vous souhaitez créer une <strong>ambiance accueillante</strong>, privilégiez une odeur légère et naturelle — un café qui infuse discrètement, par exemple. Évitez les parfums artificiels trop marqués.</div>
+        <div class="box-note" style="margin-top:10px;">
+          <p><strong>L'odeur du café</strong> est un des déclencheurs émotionnels les plus puissants. Elle évoque un foyer, une maison habitée. Ce n'est pas du hasard si les agents pros font de même.</p>
         </div>
       </div>
       <div>
         <div class="cp-h2">La structure d'une visite réussie</div>
-        <ol class="nl">
-          <li><strong>Accueil (5 min)</strong><br>« Qu'est-ce qui vous a attiré dans l'annonce ? » Écoutez. L'acheteur vous dit exactement ce qu'il cherche.</li>
-          <li><strong>Parcours guidé (20 min)</strong><br>Commencez par 
-la pièce la plus belle. Mentionnez 1 fait concret par pièce (« Ici, la 
-lumière entre jusqu'à 17h »). Terminez par les espaces techniques.</li>
-          <li><strong>Vos points forts (5 min)</strong><br>Mentionnez spontanément les éléments valorisants : travaux récents, DPE, voisinage calme, transports.</li>
-          <li><strong>Question de clôture (5 min)</strong><br>« 
-Qu'est-ce qui vous a le plus plu ? Y a-t-il des points qui vous 
-interrogent ? » Puis : « Seriez-vous intéressé par une seconde visite ? »</li>
+        <ol class="nl" style="gap:8px;">
+          <li><strong>Accueil (5 min)</strong><br><em>« Qu'est-ce qui vous a attiré dans l'annonce ? »</em> Écoutez. L'acheteur vous dit exactement ce qu'il cherche.</li>
+          <li><strong>Parcours guidé (20 min)</strong><br>Commencez par la pièce la plus belle. Mentionnez 1 fait concret par pièce. Terminez par les espaces techniques.</li>
+          <li><strong>Vos points forts (5 min)</strong><br>Mentionnez spontanément : travaux récents, DPE, voisinage, transports.</li>
+          <li><strong>Question de clôture (5 min)</strong><br><em>« Qu'est-ce qui vous a le plus plu ? Y a-t-il des points qui vous interrogent ? »</em></li>
         </ol>
-        <div class="ex-box">
+        <div class="ex-box" style="margin-top:10px;">
           <div class="ex-box-titre"><div class="ex-tag">QUESTION FRÉQUENTE</div>"Pourquoi vous vendez ?"</div>
-          <div class="ex-box-text"><p>Répondez simplement et honnêtement — <em>mutation, agrandissement, retraite, divorce…</em> — sans dramatiser. En revanche, vous ne pouvez jamais dissimuler un défaut réel du bien ou du quartier : la loi vous impose d'en informer l'acheteur. La transparence n'est pas une option — elle vous protège juridiquement et instaure la confiance.</p></div>
+          <div class="ex-box-text">Répondez simplement et honnêtement — mutation, agrandissement, retraite. Vous ne pouvez jamais dissimuler un défaut réel : la loi vous impose d'en informer l'acheteur. La transparence vous protège juridiquement.</div>
+        </div>
+        <div class="founder-tip" style="margin-top:8px;">
+          <div class="founder-photo">G</div>
+          <div><div class="founder-tip-label">Le conseil de Guillaume</div><div class="founder-tip-text">« Pendant une visite, ne récitez pas une fiche technique. Faites parler l'acheteur : ses questions vous indiquent ce qui compte réellement pour lui. »</div></div>
         </div>
       </div>
     </div>
-    <div class="founder-tip">
-      <div class="founder-tip-photo">G</div>
-      <div class="founder-tip-body">
-        <div class="founder-tip-label">Le conseil de Guillaume</div>
-        <div class="founder-tip-text">« Pendant une visite, ne récitez pas une fiche technique. Faites parler l'acheteur : ses questions vous indiquent ce qui compte réellement pour lui. »</div>
-      </div>
+  </div>
+  <div class="cp-footer"><div style="font-size:9px;color:var(--gris2);">Vendu Par Moi · Guide du Vendeur</div><div style="font-size:9px;color:var(--gris2);">17</div></div>
+</div>
+</div>
+
+<!-- ═══ CH.8 SEP ═══ -->
+<div class="page">
+<div class="sep">
+  <div class="sep-deco">8</div>
+  <div class="sep-inner">
+    <div>
+      <div class="sep-tag">Chapitre 08</div>
+      <div class="sep-icon">🤝</div>
+      <div class="sep-titre">Recevoir et <em>négocier</em><br>une offre</div>
+      <div class="sep-desc">Une offre reçue, c'est le moment de vérité. Ce chapitre vous apprend à analyser une offre sérieusement, à négocier avec méthode sans casser la relation — et à prendre la bonne décision.</div>
     </div>
-    <div class="tool-box">
-      <div class="tool-box-qr">📱</div>
-      <div class="tool-box-body">
-        <div class="tool-box-titre">Disponible dans votre espace vendeur</div>
-        <div class="tool-box-list">Checklist 1 h avant · Trame de visite · Compte rendu après visite</div>
-        <div class="tool-box-cta">Retrouvez cet outil dans votre espace vendeur Vendu Par Moi</div>
-      </div>
-    </div>
-    <div class="alert" style="margin-top:16px;">
-      <div class="alert-icon">💡</div>
-      <div class="alert-text"><strong>Le saviez-vous ?</strong> Ces économies représentent des travaux de rénovation dans votre prochain logement.</div>
-    </div>
+    <div class="sep-bottom"><div class="sep-num">08</div><div class="sep-footer">venduparmoi.fr</div></div>
   </div>
 </div>
 </div>
 
-<!-- ═══════ CH.8 SÉPARATEUR ═══════ -->
-<div class="page">
-<div class="sep-page">
-  <div class="sep-bg-circles"></div>
-  <div class="sep-bg-num">8</div>
-  <div class="sep-icon">🤝</div>
-  <div class="sep-tag">Chapitre 08</div>
-  <div class="sep-titre">Recevoir et <em>négocier</em><br>une offre</div>
-  <div class="sep-line"></div>
-  <div class="sep-desc">Une offre reçue, c'est le moment de vérité. Ce 
-chapitre vous apprend à analyser une offre sérieusement, à négocier avec
- méthode sans casser la relation avec l'acheteur — et à prendre la bonne
- décision : accepter, refuser ou contre-proposer.</div>
-</div>
-</div>
-
-<!-- ═══════ CH.8 CONTENU ═══════ -->
+<!-- ═══ CH.8 CONTENU ═══ -->
 <div class="page">
 <div class="cp">
-  <div class="cp-header"><div class="cp-header-ch">/ Négocier une offre /</div><div class="cp-header-pg">69</div></div>
+  <div class="cp-header"><div class="cp-header-ch">/ Négocier une offre /</div><div class="cp-header-pg">19</div></div>
   <div class="cp-body">
     <div class="cp-label">Chapitre 08</div>
     <div class="cp-h1">Analyser et négocier<br>une offre d'achat</div>
-    <div class="cp-intro">Recevoir une offre en dessous de votre prix ne
- signifie pas que l'acheteur n'est pas sérieux — c'est souvent une 
-invitation à négocier. Ce qui compte, c'est d'analyser l'offre dans sa 
-globalité, pas seulement le montant.</div>
+    <div class="cp-intro">Recevoir une offre en dessous de votre prix ne signifie pas que l'acheteur n'est pas sérieux — c'est souvent une invitation à négocier. Ce qui compte, c'est d'analyser l'offre dans sa globalité.</div>
 
     <div class="two-col">
       <div>
         <div class="cp-h3">Les 4 éléments d'une offre à analyser</div>
-        <ol class="nl">
+        <ol class="nl" style="gap:8px;">
           <li><strong>Le montant proposé</strong> — est-il justifié par le marché local ou purement spéculatif ?</li>
           <li><strong>Les conditions suspensives</strong> — prêt, vente d'un bien ? Chaque condition est un risque de retour arrière.</li>
           <li><strong>Le délai souhaité</strong> — un acheteur qui veut signer vite est souvent plus sérieux qu'un acheteur qui temporise.</li>
-          <li><strong>Le financement</strong> — apport personnel, accord de principe bancaire ? Une offre sans aucun engagement financier est fragile.</li>
+          <li><strong>Le financement</strong> — apport personnel, accord bancaire ? Une offre sans engagement financier est fragile.</li>
         </ol>
-        <div class="ex-box" style="margin-top:16px;">
+        <div class="ex-box" style="margin-top:10px;">
           <div class="ex-box-titre"><div class="ex-tag">MODÈLE</div>Contre-proposition écrite</div>
-          <div class="ex-box-text">
-            <p><em>« Bonjour [Prénom], merci pour votre offre. Après 
-réflexion, nous ne pouvons pas descendre en dessous de 274 000 €. Ce 
-montant reflète l'état du bien, les travaux réalisés en 2022 et les prix
- actuels du secteur. Si vous souhaitez avancer, nous sommes prêts à 
-signer rapidement. »</em></p>
-          </div>
+          <div class="ex-box-text"><em>« Bonjour [Prénom], merci pour votre offre. Après réflexion, nous ne pouvons pas descendre en dessous de 274 000 €. Ce montant reflète l'état du bien, les travaux réalisés en 2022 et les prix actuels du secteur. Si vous souhaitez avancer, nous sommes prêts à signer rapidement. »</em></div>
         </div>
       </div>
       <div>
-        <div class="box-terra">
+        <div class="box-terra" style="margin-bottom:10px;">
           <div class="box-titre">Stratégie de négociation</div>
           <div class="box-text">
-            <p><strong>Ne répondez jamais dans l'urgence.</strong><br>Demandez
- 24 à 48h. Cela montre que vous prenez l'offre au sérieux — et cela vous
- laisse le temps de comparer si d'autres visites sont prévues.</p>
-            <p style="margin-top:10px;"><strong>Ne refusez jamais sèchement.</strong><br>Un refus sec ferme définitivement la porte. Une contre-proposition maintient le dialogue et laisse l'acheteur monter.</p>
-            <p style="margin-top:10px;"><strong>La marge standard du marché : 2 à 4%.</strong><br>Si votre prix est 280 000 €, préparez-vous à descendre à 270 000 € maximum. Au-delà, vous perdez de l'argent inutilement.</p>
+            <p><strong>Ne répondez jamais dans l'urgence.</strong> Demandez 24 à 48h. Cela montre que vous prenez l'offre au sérieux.</p>
+            <p style="margin-top:7px;"><strong>Ne refusez jamais sèchement.</strong> Un refus sec ferme définitivement la porte. Une contre-proposition maintient le dialogue.</p>
+            <p style="margin-top:7px;"><strong>La marge standard : 2 à 4 %.</strong> Sur un bien à 280 000 €, préparez-vous à descendre à 270 000 € maximum.</p>
           </div>
         </div>
-        <div class="big-stat" style="margin-top:16px;">
+        <div class="big-stat">
           <div class="big-stat-num">2 <span class="big-stat-unit">à 4%</span></div>
-          <div class="big-stat-label">c'est la marge de négociation normale sur le marché immobilier français</div>
+          <div class="big-stat-label">marge de négociation normale sur le marché immobilier français</div>
+        </div>
+        <div class="founder-tip" style="margin-top:10px;">
+          <div class="founder-photo">M</div>
+          <div><div class="founder-tip-label">Le conseil de Matthias</div><div class="founder-tip-text">« Une offre inférieure n'est pas forcément une mauvaise offre. Regardez aussi le financement, les conditions suspensives et le calendrier proposé. »</div></div>
         </div>
       </div>
     </div>
-    <div class="founder-tip">
-      <div class="founder-tip-photo">M</div>
-      <div class="founder-tip-body">
-        <div class="founder-tip-label">Le conseil de Matthias</div>
-        <div class="founder-tip-text">« Une offre inférieure au prix n'est pas forcément une mauvaise offre. Regardez aussi le financement, les conditions suspensives et le calendrier proposé. »</div>
+  </div>
+  <div class="cp-footer"><div style="font-size:9px;color:var(--gris2);">Vendu Par Moi · Guide du Vendeur</div><div style="font-size:9px;color:var(--gris2);">19</div></div>
+</div>
+</div>
+
+<!-- ═══ PLANNING FIN DE VENTE ═══ -->
+<div class="page">
+<div class="cp">
+  <div class="cp-header" style="background:var(--terra);"><div class="cp-header-ch">/ Outil Pratique /</div><div class="cp-header-pg">21</div></div>
+  <div class="cp-body">
+    <div class="cp-label">Outil Pratique — De l'offre acceptée à la signature</div>
+    <div class="cp-h1">Planning <em>Fin de Vente</em></div>
+    <div class="cp-intro"><strong>Point de départ : offre d'achat acceptée.</strong> Les délais ci-dessous sont des moyennes — négociables avec les deux parties au moment du compromis.</div>
+
+    <div class="phase-label">Phase 1 — Mise en place · J0 à J+15</div>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num vpm">1</div>
+        <div class="step-label"><span class="step-timing">J + 2</span><strong>Choisir le(s) notaire(s)</strong> — Notaire vendeur + notaire acheteur possible et sans surcoût. Transmettez les coordonnées des deux parties.</div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-label"><span class="step-timing">J + 5</span><strong>Envoyer le dossier complet au notaire</strong> — Titre de propriété · Diagnostics · Taxe foncière · Règlement copropriété · PV AG · Identités des parties</div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-label"><span class="step-timing">J + 15</span><strong>Signature du compromis de vente</strong> — Dépôt de garantie (5-10%) versé par l'acheteur. <strong>Délai de rétractation de 10 jours</strong> à compter de la réception — la vente n'est définitive qu'à l'issue de ce délai.</div>
       </div>
     </div>
-    <div class="tool-box">
-      <div class="tool-box-qr">📱</div>
-      <div class="tool-box-body">
-        <div class="tool-box-titre">Disponible dans votre espace vendeur</div>
-        <div class="tool-box-list">Grille d'analyse d'une offre · Modèle de contre-proposition</div>
-        <div class="tool-box-cta">Retrouvez cet outil dans votre espace vendeur Vendu Par Moi</div>
+
+    <div class="phase-label" style="margin-top:8px;">Phase 2 — Financement acheteur · J+15 à J+60</div>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">4</div>
+        <div class="step-label"><span class="step-timing">J + 30</span><strong>Dossier de financement déposé en banque</strong> — L'acheteur a 45 jours légaux à compter du compromis pour obtenir son prêt.</div>
+      </div>
+      <div class="step">
+        <div class="step-num">5</div>
+        <div class="step-label"><span class="step-timing">J + 45</span><strong>Accord de principe bancaire</strong> — Offre de prêt officielle émise. Délai de réflexion légal de 10 jours pour l'acheteur.</div>
+      </div>
+      <div class="step">
+        <div class="step-num vpm">6</div>
+        <div class="step-label"><span class="step-timing">J + 55</span><strong>Séance 2 — Accompagnement Vendu Par Moi</strong> — Préparation visite pré-remise des clés · Vérification dossier notaire · Points à régler avant la signature</div>
       </div>
     </div>
-    <div class="alert" style="margin-top:16px;">
-      <div class="alert-icon">💡</div>
-      <div class="alert-text"><strong>Le saviez-vous ?</strong> Ces économies correspondent à l'achat d'une voiture récente — sans crédit.</div>
+
+    <div class="phase-label" style="margin-top:8px;">Phase 3 — Signature finale · J+60 à J+90</div>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">7</div>
+        <div class="step-label"><span class="step-timing">J + 60</span><strong>Levée des conditions suspensives</strong> — Financement obtenu · Absence de droit de préemption (DPU) · Toutes conditions remplies → vente certaine</div>
+      </div>
+      <div class="step">
+        <div class="step-num">8</div>
+        <div class="step-label"><span class="step-timing">J + 75</span><strong>Visite de pré-remise des clés</strong> — État des lieux contradictoire · Vérification équipements restants · Relevés compteurs</div>
+      </div>
     </div>
+    <div class="step-final">
+      <div class="sf-circle">9</div>
+      <div class="sf-badge">Signature !</div>
+      <div><div class="sf-title">Acte authentique de vente chez le notaire</div><div class="sf-desc">Remise des clés · Virement du prix de vente sur votre compte sous 48-72h</div></div>
+    </div>
+  </div>
+  <div class="cp-footer"><div style="font-size:9px;color:var(--gris2);">Vendu Par Moi · Planning Fin de Vente</div><div style="font-size:9px;color:var(--gris2);">21</div></div>
+</div>
+</div>
+
+<!-- ═══ CH.9 SEP ═══ -->
+<div class="page">
+<div class="sep">
+  <div class="sep-deco">9</div>
+  <div class="sep-inner">
+    <div>
+      <div class="sep-tag">Chapitre 09</div>
+      <div class="sep-icon">⚖️</div>
+      <div class="sep-titre">Du compromis à<br>la <em>signature</em> notariale</div>
+      <div class="sep-desc">L'offre est acceptée — félicitations ! Mais la vente n'est pas encore terminée. Ce chapitre vous guide à travers les étapes juridiques : compromis, conditions suspensives, délais et acte authentique.</div>
+    </div>
+    <div class="sep-bottom"><div class="sep-num">09</div><div class="sep-footer">venduparmoi.fr</div></div>
   </div>
 </div>
 </div>
 
-<!-- ═══════ CH.9 SÉPARATEUR ═══════ -->
-<div class="page">
-<div class="sep-page">
-  <div class="sep-bg-circles"></div>
-  <div class="sep-bg-num">9</div>
-  <div class="sep-icon">⚖️</div>
-  <div class="sep-tag">Chapitre 09</div>
-  <div class="sep-titre">Du compromis à<br>la <em>signature</em> notariale</div>
-  <div class="sep-line"></div>
-  <div class="sep-desc">L'offre est acceptée — félicitations ! Mais la 
-vente n'est pas encore terminée. Ce chapitre vous guide à travers les 
-étapes juridiques : compromis, conditions suspensives, délais et acte 
-authentique. Tout ce qu'il faut savoir pour franchir cette dernière 
-ligne droite sereinement.</div>
-</div>
-</div>
-
-<!-- ═══════ CH.9 CONTENU ═══════ -->
+<!-- ═══ CH.9 CONTENU ═══ -->
 <div class="page">
 <div class="cp">
-  <div class="cp-header"><div class="cp-header-ch">/ Du compromis à la signature /</div><div class="cp-header-pg">78</div></div>
+  <div class="cp-header"><div class="cp-header-ch">/ Du compromis à la signature /</div><div class="cp-header-pg">22</div></div>
   <div class="cp-body">
     <div class="cp-label">Chapitre 09</div>
     <div class="cp-h1">Le compromis de vente —<br>tout ce qu'il faut savoir</div>
-    <div class="cp-intro">Le compromis engage définitivement les deux 
-parties. C'est un contrat sérieux, rédigé avec soin. Voici comment il 
-fonctionne et ce à quoi vous devez être attentif avant de signer.</div>
 
     <div class="two-col">
       <div class="body-text">
-        <p>Le compromis de vente (ou promesse synallagmatique) est le 
-contrat par lequel vendeur et acheteur s'engagent mutuellement à 
-conclure la vente à un prix déterminé. Il précède l'acte notarié final 
-de 2 à 3 mois.</p>
-        <p>Il peut être signé sous seing privé ou chez un notaire. Le 
-recours au notaire dès le compromis est fortement recommandé — surtout 
-pour un vendeur particulier.</p>
+        <p>Le compromis de vente est le contrat par lequel vendeur et acheteur s'engagent mutuellement à conclure la vente à un prix déterminé. Il précède l'acte notarié final de 2 à 3 mois.</p>
+        <p>Il peut être signé sous seing privé ou chez un notaire. <strong>Le recours au notaire dès le compromis est fortement recommandé</strong> — surtout pour un vendeur particulier.</p>
       </div>
       <div>
         <div class="box">
@@ -1925,178 +1080,78 @@ pour un vendeur particulier.</p>
       </div>
     </div>
 
-    <div class="cp-h2">Le calendrier de la vente</div>
+    <div class="cp-h2">Calendrier de la vente</div>
     <table class="t">
       <thead><tr><th>Étape</th><th>Délai</th><th>Ce qui se passe</th><th>Point de vigilance</th></tr></thead>
       <tbody>
         <tr><td><strong>Signature du compromis</strong></td><td>Jour J</td><td>Versement du dépôt de garantie (5 à 10%)</td><td>Vérifiez chaque clause avant de signer</td></tr>
-        <tr><td><strong>Délai de rétractation acheteur</strong></td><td>J+10 jours</td><td>L'acheteur peut se rétracter sans frais ni justification</td><td>Attendez ce délai avant de planifier votre déménagement</td></tr>
-        <tr><td><strong>Condition suspensive prêt</strong></td><td>45 à 60 jours</td><td>L'acheteur obtient (ou non) son financement bancaire</td><td>Si refus bancaire : vente annulée, dépôt restitué</td></tr>
-        <tr><td><strong>Acte authentique</strong></td><td>2 à 3 mois après compromis</td><td>Signature chez le notaire, remise des clés</td><td>Préparez votre relevé de compteurs et état des lieux</td></tr>
+        <tr><td><strong>Rétractation acheteur</strong></td><td>J+10 jours</td><td>L'acheteur peut se rétracter sans frais</td><td>Attendez ce délai avant de planifier</td></tr>
+        <tr><td><strong>Condition suspensive prêt</strong></td><td>45 à 60 jours</td><td>L'acheteur obtient (ou non) son financement</td><td>Si refus : vente annulée, dépôt restitué</td></tr>
+        <tr><td><strong>Acte authentique</strong></td><td>2 à 3 mois</td><td>Signature notaire, remise des clés</td><td>Préparez relevés compteurs, état des lieux</td></tr>
       </tbody>
     </table>
-
-    <div class="cp-h2" style="margin-top:16px;">Planning détaillé — de l'offre acceptée à la signature</div>
-    <div style="font-size:9px;font-weight:700;letter-spacing:1.8px;text-transform:uppercase;color:var(--gris2);border-bottom:1px solid #f0ece6;padding-bottom:5px;margin-bottom:7px;">Phase 1 — Mise en place · J0 à J+15</div>
-    <div class="steps" style="margin-bottom:10px;">
-      <div class="step"><div class="step-num" style="background:var(--terra);">1</div><div class="step-label"><strong>J + 2 · Choisir le(s) notaire(s)</strong> — Vendeur et acheteur peuvent avoir chacun leur notaire, sans surcoût. Transmettez les coordonnées des deux parties.</div></div>
-      <div class="step"><div class="step-num">2</div><div class="step-label"><strong>J + 5 · Transmettre le dossier au notaire</strong> — Titre de propriété, diagnostics, taxe foncière, règlement de copropriété, PV AG, identités des parties.</div></div>
-      <div class="step"><div class="step-num">3</div><div class="step-label"><strong>J + 15 · Signature du compromis</strong> — Dépôt de garantie (5 à 10 %) versé par l'acheteur. Le délai de rétractation de 10 jours commence à courir.</div></div>
-    </div>
-    <div style="font-size:9px;font-weight:700;letter-spacing:1.8px;text-transform:uppercase;color:var(--gris2);border-bottom:1px solid #f0ece6;padding-bottom:5px;margin-bottom:7px;">Phase 2 — Financement acheteur · J+15 à J+60</div>
-    <div class="steps" style="margin-bottom:10px;">
-      <div class="step"><div class="step-num">4</div><div class="step-label"><strong>J + 30 · Dossier bancaire déposé</strong> — L'acheteur dispose de 45 jours légaux à compter du compromis pour obtenir son financement.</div></div>
-      <div class="step"><div class="step-num">5</div><div class="step-label"><strong>J + 45 · Accord de principe bancaire</strong> — Offre de prêt officielle émise par la banque. Délai de réflexion légal de 10 jours pour l'acheteur.</div></div>
-      <div class="step"><div class="step-num" style="background:var(--terra);">6</div><div class="step-label"><strong>J + 55 · Séance 2 Vendu Par Moi</strong> — Accompagnement fin de vente : préparation de la visite pré-remise des clés, vérification du dossier notaire.</div></div>
-    </div>
-    <div style="font-size:9px;font-weight:700;letter-spacing:1.8px;text-transform:uppercase;color:var(--gris2);border-bottom:1px solid #f0ece6;padding-bottom:5px;margin-bottom:7px;">Phase 3 — Signature finale · J+60 à J+90</div>
-    <div class="steps" style="margin-bottom:8px;">
-      <div class="step"><div class="step-num">7</div><div class="step-label"><strong>J + 60 · Levée des conditions suspensives</strong> — Financement obtenu, absence de droit de préemption (DPU) confirmée → vente certaine.</div></div>
-      <div class="step"><div class="step-num">8</div><div class="step-label"><strong>J + 75 · Visite de pré-remise des clés</strong> — État des lieux contradictoire, vérification des équipements restants, relevés de compteurs.</div></div>
-    </div>
-    <div style="background:var(--vert);border-radius:6px;padding:12px 18px;margin-bottom:14px;display:flex;align-items:center;gap:14px;">
-      <div style="background:var(--terra);border-radius:50%;width:30px;height:30px;min-width:30px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;">9</div>
-      <div style="background:var(--terra);color:#fff;font-size:9px;font-weight:700;padding:3px 10px;border-radius:3px;white-space:nowrap;">Signature !</div>
-      <div>
-        <div style="font-size:12px;font-weight:700;color:#fff;">Acte authentique de vente chez le notaire</div>
-        <div style="font-size:10px;color:rgba(255,255,255,0.6);">Remise des clés · Virement du prix de vente sous 48-72h</div>
-      </div>
-    </div>
 
     <div class="two-col" style="margin-top:8px;">
       <div class="box-terra">
         <div class="box-titre">La condition suspensive de prêt</div>
         <div class="box-text">
-          <p>Si la banque refuse le prêt de l'acheteur dans les délais
-légaux, la vente est annulée et le dépôt de garantie lui est
-intégralement restitué. <strong>Vous, vendeur, ne perdez rien</strong> — mais vous perdez du temps.</p>
-          <p style="margin-top:8px;">Pour limiter ce risque : vérifiez l'accord de principe bancaire avant de signer le compromis.</p>
+          <p>Si la banque refuse le prêt dans les délais légaux, la vente est annulée et le dépôt restitué. <strong>Vous, vendeur, ne perdez rien</strong> — mais vous perdez du temps.</p>
+          <p style="margin-top:6px;">Pour limiter ce risque : vérifiez l'accord de principe bancaire <em>avant</em> de signer le compromis.</p>
         </div>
       </div>
       <div class="box">
         <div class="box-titre">L'acte authentique — le grand jour</div>
         <div class="box-text">
-          <p>Vous signez chez le notaire en présence de l'acheteur. Le
-notaire lit l'acte, les fonds sont virés sur son compte séquestre, vous
-remettez les clés. La vente est officiellement conclue.</p>
-          <p style="margin-top:8px;">Le notaire verse les fonds sur votre compte dans les 48h à 72h suivantes.</p>
+          <p>Vous signez chez le notaire en présence de l'acheteur. Le notaire lit l'acte, les fonds sont virés sur son compte séquestre, vous remettez les clés.</p>
+          <p style="margin-top:6px;">Le notaire verse les fonds sur votre compte dans les <strong>48h à 72h</strong> suivantes.</p>
         </div>
       </div>
     </div>
-    <div class="tool-box">
-      <div class="tool-box-qr">📱</div>
-      <div class="tool-box-body">
-        <div class="tool-box-titre">Disponible dans votre espace vendeur</div>
-        <div class="tool-box-list">Checklist avant-compromis · Pièces à transmettre · Calendrier de vente</div>
-        <div class="tool-box-cta">Retrouvez cet outil dans votre espace vendeur Vendu Par Moi</div>
-      </div>
-    </div>
-    <div class="legal-note">Les délais et clauses d'un avant-contrat dépendent de la situation du bien et du financement de l'acquéreur. Le recours au notaire dès l'avant-contrat est recommandé. L'acquéreur non professionnel d'un logement bénéficie, dans les cas prévus par la loi, d'un délai légal de rétractation de 10 jours.</div>
-    <div class="alert" style="margin-top:16px;">
-      <div class="alert-icon">💡</div>
-      <div class="alert-text"><strong>Le saviez-vous ?</strong> Ces économies vous permettent de démarrer votre prochaine étape de vie sans contrainte financière — qu'il s'agisse d'un déménagement, d'une rénovation ou d'une épargne de précaution.</div>
-    </div>
+    <div class="legal-note">Les délais et clauses d'un avant-contrat dépendent de la situation du bien et du financement de l'acquéreur. Le recours au notaire dès l'avant-contrat est recommandé. L'acquéreur non professionnel bénéficie, dans les cas prévus par la loi, d'un délai légal de rétractation de 10 jours.</div>
   </div>
+  <div class="cp-footer"><div style="font-size:9px;color:var(--gris2);">Vendu Par Moi · Guide du Vendeur</div><div style="font-size:9px;color:var(--gris2);">22</div></div>
 </div>
 </div>
 
-<!-- ═══════ QUIZ ═══════ -->
+<!-- ═══ QUIZ ═══ -->
 <div class="page">
 <div class="quiz-page">
-  <div class="quiz-big">QUIZ</div>
+  <div class="quiz-big">Quiz</div>
   <div class="quiz-sous">Testez vos connaissances avant de vous lancer</div>
-
-  <div class="quiz-q">
-    <div class="quiz-q-top"><div class="qnum">1</div><div class="qtext">Une commission d'intermédiaire immobilier représente en moyenne entre 4 et 6% du prix de vente.</div></div>
-    <div class="choices"><div class="choice"><div class="ch-box"></div>VRAI</div><div class="choice"><div class="ch-box"></div>FAUX</div></div>
-  </div>
-
-  <div class="quiz-q">
-    <div class="quiz-q-top"><div class="qnum">2</div><div class="qtext">Un bien surestimé de 10% se vend généralement dans les mêmes délais qu'un bien au prix juste.</div></div>
-    <div class="choices"><div class="choice"><div class="ch-box"></div>VRAI</div><div class="choice"><div class="ch-box"></div>FAUX</div></div>
-  </div>
-
-  <div class="quiz-q">
-    <div class="quiz-q-top"><div class="qnum">3</div><div class="qtext">Le site DVF (Demandes de Valeurs Foncières) permet de consulter les prix de vente réels des transactions notariales.</div></div>
-    <div class="choices"><div class="choice"><div class="ch-box"></div>VRAI</div><div class="choice"><div class="ch-box"></div>FAUX</div></div>
-  </div>
-
-  <div class="quiz-q">
-    <div class="quiz-q-top"><div class="qnum">4</div><div class="qtext">L'acheteur dispose d'un délai de 10 jours pour se rétracter après la signature du compromis de vente, sans pénalités.</div></div>
-    <div class="choices"><div class="choice"><div class="ch-box"></div>VRAI</div><div class="choice"><div class="ch-box"></div>FAUX</div></div>
-  </div>
-
-  <div class="quiz-q">
-    <div class="quiz-q-top"><div class="qnum">5</div><div class="qtext">Si la banque refuse le prêt de l'acheteur, celui-ci perd son dépôt de garantie.</div></div>
-    <div class="choices"><div class="choice"><div class="ch-box"></div>VRAI</div><div class="choice"><div class="ch-box"></div>FAUX</div></div>
-  </div>
-
-  <div class="quiz-q">
-    <div class="quiz-q-top"><div class="qnum">6</div><div class="qtext">Un bien bien préparé (home staging) se vend généralement plus rapidement qu'un bien non préparé.</div></div>
-    <div class="choices"><div class="choice"><div class="ch-box"></div>VRAI</div><div class="choice"><div class="ch-box"></div>FAUX</div></div>
-  </div>
-
+  <div class="quiz-q"><div class="quiz-q-top"><div class="qnum">1</div><div class="qtext">Une commission d'intermédiaire immobilier représente en moyenne entre 4 et 6% du prix de vente.</div></div><div class="choices"><div class="choice"><div class="ch-box"></div>VRAI</div><div class="choice"><div class="ch-box"></div>FAUX</div></div></div>
+  <div class="quiz-q"><div class="quiz-q-top"><div class="qnum">2</div><div class="qtext">Un bien surestimé de 10% se vend généralement dans les mêmes délais qu'un bien au prix juste.</div></div><div class="choices"><div class="choice"><div class="ch-box"></div>VRAI</div><div class="choice"><div class="ch-box"></div>FAUX</div></div></div>
+  <div class="quiz-q"><div class="quiz-q-top"><div class="qnum">3</div><div class="qtext">Le site DVF (Demandes de Valeurs Foncières) permet de consulter les prix de vente réels des transactions notariales.</div></div><div class="choices"><div class="choice"><div class="ch-box"></div>VRAI</div><div class="choice"><div class="ch-box"></div>FAUX</div></div></div>
+  <div class="quiz-q"><div class="quiz-q-top"><div class="qnum">4</div><div class="qtext">L'acheteur dispose d'un délai de 10 jours pour se rétracter après la signature du compromis de vente, sans pénalités.</div></div><div class="choices"><div class="choice"><div class="ch-box"></div>VRAI</div><div class="choice"><div class="ch-box"></div>FAUX</div></div></div>
+  <div class="quiz-q"><div class="quiz-q-top"><div class="qnum">5</div><div class="qtext">Si la banque refuse le prêt de l'acheteur, celui-ci perd son dépôt de garantie.</div></div><div class="choices"><div class="choice"><div class="ch-box"></div>VRAI</div><div class="choice"><div class="ch-box"></div>FAUX</div></div></div>
+  <div class="quiz-q"><div class="quiz-q-top"><div class="qnum">6</div><div class="qtext">Un bien bien préparé (home staging) se vend généralement plus rapidement qu'un bien non préparé.</div></div><div class="choices"><div class="choice"><div class="ch-box"></div>VRAI</div><div class="choice"><div class="ch-box"></div>FAUX</div></div></div>
   <div class="quiz-rep">
     <div class="quiz-rep-titre">Réponses</div>
     <div class="quiz-rep-text">
-      <strong>1. VRAI</strong> — La fourchette standard est de 4 à 6%, ce qui représente plusieurs milliers d'euros sur la plupart des ventes. ·
-      <strong>2. FAUX</strong> — Un bien surestimé reste en moyenne 3 
-fois plus longtemps sur le marché et finit souvent par se vendre moins 
-cher qu'au prix juste initial. ·
-      <strong>3. VRAI</strong> — DVF (dvf.etalab.gouv.fr) recense toutes les ventes notariées des 5 dernières années. C'est la source la plus fiable. ·
-      <strong>4. VRAI</strong> — Le délai légal de rétractation est de 10 jours calendaires à compter du lendemain de la première présentation du compromis. ·
-      <strong>5. FAUX</strong> — La condition suspensive de prêt protège
- l'acheteur. Si la banque refuse dans les délais légaux, il récupère 
-intégralement son dépôt. ·
-      <strong>6. VRAI</strong> — Les études du secteur confirment que le home staging réduit le délai de vente de façon significative, parfois de plusieurs semaines.
+      <strong>1. VRAI</strong> — La fourchette standard est de 4 à 6%, soit plusieurs milliers d'euros sur la plupart des ventes. ·
+      <strong>2. FAUX</strong> — Un bien surestimé reste en moyenne 3× plus longtemps sur le marché et finit souvent par se vendre moins cher qu'au prix juste. ·
+      <strong>3. VRAI</strong> — DVF (dvf.etalab.gouv.fr) recense toutes les ventes notariées des 5 dernières années. ·
+      <strong>4. VRAI</strong> — Délai légal de 10 jours calendaires à compter du lendemain de la première présentation. ·
+      <strong>5. FAUX</strong> — La condition suspensive de prêt protège l'acheteur : si la banque refuse dans les délais légaux, il récupère intégralement son dépôt. ·
+      <strong>6. VRAI</strong> — Le home staging réduit le délai de vente de façon significative.
     </div>
   </div>
 </div>
 </div>
 
-<!-- ═══════ PAGE FINALE ═══════ -->
+<!-- ═══ PAGE FINALE ═══ -->
 <div class="page">
 <div class="fin-page">
-  <svg width="64" height="64" viewBox="0 0 24 24" fill="none" style="margin-bottom:28px;">
-    <path d="M3 12L12 4L21 12V20C21 20.6 20.6 21 20 21H15V16H9V21H4C3.4 21 3 20.6 3 20V12Z" fill="white" opacity=".9"></path>
-  </svg>
-
-  <div style="font-family:'Cormorant Garamond',serif;font-size:48px;font-weight:700;color:white;margin-bottom:6px;letter-spacing:-.01em;">Vendu Par Moi</div>
-  <div style="font-size:11px;color:rgba(255,255,255,.55);letter-spacing:.2em;text-transform:uppercase;margin-bottom:40px;">La vente immobilière entre particuliers</div>
-
-  <div style="width:50px;height:2px;background:rgba(255,255,255,.3);border-radius:1px;margin:0 auto 40px;"></div>
-
-  <div style="max-width:420px;margin-bottom:48px;">
-    <div style="font-family:'Cormorant Garamond',serif;font-size:22px;font-style:italic;color:rgba(255,255,255,.85);line-height:1.6;margin-bottom:16px;">
-      "Vous avez maintenant tout ce qu'il faut pour vendre votre bien 
-vous-même. Matthias et Guillaume sont là si vous avez la moindre 
-question."
-    </div>
+  <div class="fin-logo"><em>Vendu</em> Par Moi</div>
+  <div class="fin-sub">La vente immobilière entre particuliers</div>
+  <div class="fin-quote">« Vous avez maintenant tout ce qu'il faut pour vendre votre bien vous-même. Matthias et Guillaume sont là si vous avez la moindre question. »</div>
+  <div class="fin-contacts">
+    <div><div class="fin-contact-label">Site web</div><div class="fin-contact-val">venduparmoi.fr</div></div>
+    <div><div class="fin-contact-label">Email</div><div class="fin-contact-val">contact@venduparmoi.fr</div></div>
+    <div><div class="fin-contact-label">Téléphone</div><div class="fin-contact-val">06 95 44 36 54</div></div>
   </div>
-
-  <div style="display:flex;gap:40px;justify-content:center;margin-bottom:48px;flex-wrap:wrap;">
-    <div style="text-align:center;">
-      <div style="font-size:9px;color:rgba(255,255,255,.35);text-transform:uppercase;letter-spacing:.15em;margin-bottom:5px;">Site web</div>
-      <div style="font-size:14px;color:white;font-weight:600;">venduparmoi.fr</div>
-    </div>
-    <div style="text-align:center;">
-      <div style="font-size:9px;color:rgba(255,255,255,.35);text-transform:uppercase;letter-spacing:.15em;margin-bottom:5px;">Email</div>
-      <div style="font-size:14px;color:white;font-weight:600;">contact@venduparmoi.fr</div>
-    </div>
-    <div style="text-align:center;">
-      <div style="font-size:9px;color:rgba(255,255,255,.35);text-transform:uppercase;letter-spacing:.15em;margin-bottom:5px;">Téléphone</div>
-      <div style="font-size:14px;color:white;font-weight:600;">06 95 44 36 54</div>
-    </div>
-  </div>
-
-  <div style="max-width:480px;font-size:10px;color:rgba(255,255,255,.45);line-height:1.6;margin-top:44px;padding-top:20px;border-top:1px solid rgba(255,255,255,.15);">
-    Ce guide a une vocation pédagogique et pratique. Il ne remplace pas les conseils personnalisés d'un notaire, d'un avocat, d'un diagnostiqueur ou de tout autre professionnel compétent lorsque la situation l'exige. Les règles et services mentionnés peuvent évoluer : vérifiez les informations applicables au moment de votre vente.
-  </div>
-  <div style="font-size:9px;color:rgba(255,255,255,.35);text-transform:uppercase;letter-spacing:.12em;margin-top:16px;">Édition 2026 — dernière vérification éditoriale et réglementaire : septembre 2026</div>
-
+  <div class="fin-legal">Ce guide a une vocation pédagogique et pratique. Il ne remplace pas les conseils personnalisés d'un notaire, d'un avocat, d'un diagnostiqueur ou de tout autre professionnel compétent lorsque la situation l'exige. Les règles et services mentionnés peuvent évoluer : vérifiez les informations applicables au moment de votre vente.<br><br>Édition 2026 — dernière vérification éditoriale et réglementaire : septembre 2026</div>
 </div>
 </div>
 
-
-
-</body></html>
+</body>
+</html>
