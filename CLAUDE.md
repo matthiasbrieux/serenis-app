@@ -5,7 +5,7 @@
 - **Produit** : Vendu Par Moi (venduparmoi.fr)
 - **Dépôt local** : `/Users/brieuxmatthias/serenis-app` (ancien nom "serenis", ne pas renommer)
 - **Dépôt GitHub** : `matthiasbrieux/serenis-app`
-- **Déploiement** : Render (auto-deploy sur push `main`, ~3 min)
+- **Déploiement** : OVHcloud VPS Strasbourg (ubuntu@152.228.236.39) — PM2 + Nginx + Let's Encrypt. Push `main` → pull manuellement sur le VPS.
 - **Propriétaire** : Matthias Brieux (matthiasbrieux260598@gmail.com)
 
 ## Vision produit
@@ -182,9 +182,15 @@ Définis dans `server.js` :
 - **18h00 quotidien** : rappels visites, rappels missions, nudges, prélèvements mensualités, nudges baisse de prix
 - **Lundi 8h00** : rapport hebdomadaire vendeurs
 
-## Déploiement Render
+## Déploiement OVHcloud VPS
 
-- Push sur `main` → déploiement automatique (~3 min)
-- Variables d'environnement à configurer dans le dashboard Render
+- VPS Ubuntu 24.04 LTS, Strasbourg SBG, IP 152.228.236.39
+- SSH : `ssh ubuntu@152.228.236.39` (clé ED25519 `~/.ssh/id_ed25519`)
+- App dans `/home/ubuntu/app/`, DB dans `/home/ubuntu/data/database.db`
+- Process manager : PM2 (`pm2 status`, `pm2 restart vpm`, `pm2 logs vpm`)
+- Reverse proxy : Nginx → localhost:3000
+- SSL : Let's Encrypt via Certbot (expire 2026-12-29, auto-renewal)
+- Déploiement : `git pull` depuis `/home/ubuntu/app/` puis `pm2 restart vpm`
 - `CLOUDINARY_URL` obligatoire en prod (sinon photos non sauvegardées)
 - `ANTHROPIC_API_KEY` obligatoire pour les fonctions IA
+- Env vars dans `/home/ubuntu/app/.env`
