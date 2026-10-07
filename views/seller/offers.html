@@ -240,8 +240,9 @@
       .sms-modal-btn-send, .sms-modal-btn-close, .btn-copy-accept, .btn-close-accept { min-height: 52px; touch-action: manipulation; }
     }
   </style>
+  <link rel="stylesheet" href="/css/offers-premium.css">
 </head>
-<body>
+<body class="vpm-offers">
 <div class="app-layout">
 
   <aside class="sidebar" id="sidebar">
@@ -397,8 +398,8 @@
           <div class="invite-link-hint">L'acheteur remplit le formulaire en ligne — aucune action de votre part requise.</div>
         </div>
         <!-- SMS -->
-        <div>
-          <div class="invite-section-label">Message SMS à envoyer</div>
+        <details class="vpm-sms-details">
+          <summary class="invite-section-label">Message SMS à envoyer</summary>
           <div class="invite-sms-preview" id="smsPreview">Chargement…</div>
           <div class="invite-sms-actions">
             <button class="btn-copy-sms" id="btnCopySms" onclick="copySmsText()">
@@ -410,7 +411,7 @@
               Ouvrir SMS
             </a>
           </div>
-        </div>
+        </details>
       </div>
     </div>
 
@@ -448,6 +449,21 @@
       </div>
       <div class="offers-list" id="pastOffers"></div>
     </div>
+
+    <section class="vpm-buyer-dossier" aria-labelledby="buyerDossierTitle">
+      <div class="vpm-buyer-art" aria-hidden="true"><svg viewBox="0 0 80 80" fill="none"><rect x="24" y="8" width="40" height="53" rx="5" fill="white" stroke="currentColor"/><path d="m34 29 10-8 10 8m-18-2v18h16V27m-13 18V34h6v11M34 51h19" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><path d="M9 38h24l7 7h30l-4 25H14L9 38Z" fill="#F0E3D5" stroke="currentColor" stroke-width="1.5"/><path d="M32 57h16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></div>
+      <div class="vpm-buyer-copy">
+        <span class="vpm-buyer-eyebrow">Conseil après la visite</span>
+        <h2 id="buyerDossierTitle">Envoyez votre dossier acheteur sérieux</h2>
+        <p>Transmettez vos documents complémentaires pour répondre aux dernières questions, rassurer l’acheteur et l’aider à préparer son offre.</p>
+        <span class="vpm-buyer-note" id="buyerDossierNote" aria-live="polite">Chargement du dossier…</span>
+      </div>
+      <div class="vpm-buyer-actions">
+        <button type="button" id="buyerDossierCopy" onclick="copyBuyerDossier(this)" disabled>Copier le message et le lien</button>
+        <a id="buyerDossierPreview" target="_blank" rel="noopener noreferrer" aria-disabled="true">Voir le dossier acheteur ↗</a>
+        <a href="/mon-bien">Gérer mes documents →</a>
+      </div>
+    </section>
 
     <!-- Chargement -->
     <div id="loadingState" style="text-align:center;padding:80px 20px;">
@@ -557,15 +573,55 @@ function progressPct(offer, listing) {
   return Math.min(Math.round((offer / listing) * 100), 100);
 }
 
+/* VPM buyer dossier — start */
+let buyerDossierUrl = '';
+function setupBuyerDossier(property, documents) {
+  buyerDossierUrl = '';
+  const preview = document.getElementById('buyerDossierPreview');
+  const button = document.getElementById('buyerDossierCopy');
+  const note = document.getElementById('buyerDossierNote');
+  preview.removeAttribute('href');
+  preview.setAttribute('aria-disabled', 'true');
+  button.disabled = true;
+  const docs = (Array.isArray(documents) ? documents : []).filter(doc => doc.folder === 'acheteur_serieux');
+  note.textContent = property.acheteur_docs_visible !== 1
+    ? 'Activez le partage du dossier acheteur dans Mon bien pour transmettre ces documents.'
+    : !docs.length ? 'Ajoutez vos documents complémentaires dans Mon bien avant de les transmettre.'
+    : docs.length + ' document' + (docs.length > 1 ? 's' : '') + ' complémentaire' + (docs.length > 1 ? 's' : '') + ' partagé' + (docs.length > 1 ? 's' : '');
+  try {
+    const url = new URL(property.acheteur_url);
+    if (!['http:', 'https:'].includes(url.protocol)) return;
+    url.hash = 'documents';
+    if (property.acheteur_docs_visible !== 1 || !docs.length) return;
+    buyerDossierUrl = url.href;
+    preview.href = buyerDossierUrl;
+    preview.removeAttribute('aria-disabled');
+    button.disabled = false;
+  } catch (_) {}
+}
+async function copyBuyerDossier(button) {
+  if (!buyerDossierUrl) return;
+  const signature = _sellerFullName || _sellerFirstName || 'Le propriétaire';
+  const message = `Bonjour,\n\nSuite à votre visite, je vous transmets mes documents complémentaires pour vous accompagner dans votre réflexion et répondre à vos dernières questions :\n\n${buyerDossierUrl}\n\nN’hésitez pas à me contacter si vous souhaitez échanger.\n\nCordialement,\n${signature}`;
+  try {
+    await navigator.clipboard.writeText(message);
+    button.textContent = 'Message et lien copiés !';
+    setTimeout(() => { button.textContent = 'Copier le message et le lien'; }, 2200);
+    showToast('Message et lien copiés !', 'success');
+  } catch (_) { showToast('Copie impossible. Consultez votre dossier dans Mon bien.', 'error'); }
+}
+/* VPM buyer dossier — end */
+
 async function load() {
   try {
     try {
       const [propRes, meRes] = await Promise.all([fetch('/api/property'), fetch('/api/me')]);
       const propData = await propRes.json();
-      listingPrice = propData.price || propData.asking_price || 0;
+      listingPrice = propData.property?.price || propData.price || propData.asking_price || 0;
       const meData = await meRes.json();
       _sellerFirstName = meData.seller?.first_name || '';
       _sellerFullName = [meData.seller?.first_name, meData.seller?.last_name].filter(Boolean).join(' ');
+      setupBuyerDossier(propData.property || {}, propData.documents || []);
     } catch(e) {}
 
     const r = await fetch('/api/offers');
@@ -593,6 +649,7 @@ function renderOffers() {
 
   // Page badge
   const badge = document.getElementById('totalBadge');
+  badge.style.display = total > 0 ? 'inline-flex' : 'none';
   if (total > 0) {
     badge.style.display = 'inline-flex';
     document.getElementById('totalBadgeLabel').textContent = total + ' offre' + (total > 1 ? 's' : '') + ' reçue' + (total > 1 ? 's' : '');

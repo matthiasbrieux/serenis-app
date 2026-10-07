@@ -761,6 +761,109 @@
     .qualif-copy-btn { width:100%; padding:11px; background:var(--terracotta); color:#fff; border:none; border-radius:10px; font-family:'DM Sans',sans-serif; font-size:0.87rem; font-weight:700; cursor:pointer; transition:0.15s; display:flex; align-items:center; justify-content:center; gap:7px; margin-bottom:4px; }
     .qualif-copy-btn:hover { background:var(--terracotta-dark); }
     .qualif-copy-btn.copied { background:#059669; }
+
+    /* ── APH flat header ──────────────────────────────── */
+    .aph { display:flex; justify-content:space-between; align-items:flex-start; gap:16px; margin-bottom:24px; padding:24px 0 16px; border-bottom:1.5px solid #e8e0d6; flex-wrap:wrap; }
+    .aph-left { flex:1; min-width:0; }
+    .aph-badge { display:inline-flex; align-items:center; gap:6px; padding:3px 12px; border-radius:100px; background:rgba(158,58,24,0.06); border:1px solid rgba(158,58,24,0.12); color:var(--terracotta); font-size:0.67rem; font-weight:700; letter-spacing:0.09em; text-transform:uppercase; margin-bottom:10px; }
+    .aph-title { font-family:'Cormorant Garamond',serif; font-size:clamp(2.2rem,3.5vw,3rem); font-weight:600; color:#1A1A16; line-height:1.1; margin:0 0 6px; }
+    .aph-title em { font-style:italic; color:var(--terracotta); }
+    .aph-sub { font-size:0.83rem; color:#888; line-height:1.6; margin:0; max-width:520px; }
+    .aph-actions { display:flex; flex-direction:column; align-items:flex-end; gap:8px; padding-top:4px; flex-shrink:0; }
+    @media(max-width:600px){ .aph { flex-direction:column; } .aph-actions { align-items:stretch; width:100%; } .aph-title { font-size:2.2rem; } }
+
+    /* ── Agenda 2-col layout ──────────────────────────── */
+    .agenda-layout { display:grid; grid-template-columns:1fr 340px; gap:20px; align-items:start; margin-bottom:28px; }
+    @media(max-width:900px){ .agenda-layout { grid-template-columns:1fr; } }
+    .cal-panel { display:flex; flex-direction:column; gap:16px; }
+    .agenda-right-col { display:flex; flex-direction:column; gap:16px; position:sticky; top:16px; }
+    @media(max-width:900px){ .agenda-right-col { position:static; } }
+
+    /* ── Calendar cells enriched content ───────────────── */
+    .agenda-layout .cal-cell { aspect-ratio:unset; min-height:68px; align-items:flex-start; padding:4px 5px; justify-content:flex-start; }
+    .agenda-layout .cal-num { align-self:flex-start; }
+    .cal-cell-avail { width:100%; background:rgba(158,58,24,0.07); border-radius:4px; padding:2px 4px; margin-top:3px; }
+    .cal-cell-avail-lbl { font-size:0.52rem; font-weight:700; color:var(--terracotta); text-transform:uppercase; letter-spacing:0.04em; line-height:1.3; display:block; }
+    .cal-cell-avail-time { font-size:0.55rem; color:#555; line-height:1.4; }
+    .cal-cell-visit-chip { width:100%; background:rgba(255,255,255,0.18); color:rgba(255,255,255,0.92); border-radius:4px; padding:2px 4px; margin-top:2px; font-size:0.57rem; font-weight:600; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; display:block; }
+    .cal-cell:not(.cal-has-confirmed):not(.cal-has-sru):not(.cal-has-conditions):not(.cal-has-acte) .cal-cell-visit-chip { background:#e8f5e9; color:#2e7d32; }
+
+    /* ── Dispo section (right col) ─────────────────────── */
+    .dispo-section { background:#fff; border:1.5px solid #e8e0d6; border-radius:14px; overflow:hidden; }
+    .dispo-section-hdr { display:flex; justify-content:space-between; align-items:center; padding:14px 18px; border-bottom:1px solid #f0ebe4; background:#fafaf8; }
+    .dispo-section-title { font-size:0.88rem; font-weight:700; color:#1A1A16; margin:0 0 2px; }
+    .dispo-section-sub { font-size:0.72rem; color:#999; margin:0; line-height:1.4; }
+    .dispo-section-inner { padding:0 14px 14px; }
+    .dispo-section .avail-month-nav { margin:12px 0 0; }
+    .dispo-section .avail-slot-list { margin-bottom:4px; }
+    .dispo-section .avail-add-form { margin:0; border-radius:0; border:none; border-top:1px solid #f0ebe4; padding:14px 0 0; background:none; }
+
+    /* ── Dispo slot row ─────────────────────────────────── */
+    .dispo-slot-row { display:flex; align-items:center; gap:10px; padding:9px 0; border-bottom:1px solid #f5f0e8; }
+    .dispo-slot-row:last-child { border-bottom:none; }
+    .dispo-slot-icon { width:30px; height:30px; border-radius:8px; background:rgba(158,58,24,0.06); color:var(--terracotta); display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+    .dispo-slot-text { flex:1; font-size:0.83rem; font-weight:500; color:#1A1A16; line-height:1.4; }
+    .dispo-slot-del { width:28px; height:28px; border-radius:7px; border:1.5px solid #ffd5d5; background:#fff0f0; color:#e74c3c; display:flex; align-items:center; justify-content:center; cursor:pointer; flex-shrink:0; transition:0.15s; touch-action:manipulation; }
+    .dispo-slot-del:hover { background:#e74c3c; color:#fff; border-color:#e74c3c; }
+    .dispo-slot-del svg { width:12px; height:12px; stroke:currentColor; pointer-events:none; }
+    @keyframes slotRowOut { from{opacity:1;transform:translateX(0);max-height:60px;} to{opacity:0;transform:translateX(16px);max-height:0;padding:0;margin:0;border:none;} }
+    .dispo-slot-row.removing { animation:slotRowOut 0.22s ease forwards; }
+
+    /* ── Next visit mini ───────────────────────────────── */
+    .next-visit-card { background:#fff; border:1.5px solid rgba(46,125,50,0.18); border-left:4px solid #2e7d32; border-radius:12px; padding:14px 16px; }
+    .next-visit-card-title { display:flex; align-items:center; gap:8px; font-size:0.7rem; font-weight:700; text-transform:uppercase; letter-spacing:0.07em; color:#2e7d32; margin-bottom:8px; }
+    .next-visit-check { width:22px; height:22px; border-radius:50%; background:#e8f5e9; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+    .next-visit-info { font-size:0.97rem; font-weight:700; color:#1A1A16; margin-bottom:3px; }
+    .next-visit-buyer { font-size:0.81rem; color:#888; }
+
+    /* ── Visits below ──────────────────────────────────── */
+    .visits-below { margin-bottom:28px; display:flex; flex-direction:column; gap:14px; }
+    .visits-below .sidebar-body.no-max { max-height:none; }
+
+    /* ── Compromis bar ─────────────────────────────────── */
+    .compromis-bar { background:#fff; border:1.5px solid #e8e0d6; border-radius:16px; overflow:hidden; margin-bottom:28px; }
+    .compromis-bar-hdr { background:linear-gradient(135deg,var(--terracotta-dark),var(--terracotta)); color:#fff; padding:16px 24px; display:flex; align-items:center; gap:10px; }
+    .compromis-bar-hdr h3 { font-family:'DM Sans',sans-serif; font-size:0.95rem; font-weight:700; margin:0; }
+    .compromis-bar-body { padding:20px 24px; }
+
+    /* ── Share agenda block ────────────────────────────── */
+    .share-agenda { display:flex; align-items:center; gap:17px; background:#F8F1E7; border:1px solid #DFC9B7; border-radius:12px; margin-bottom:24px; padding:20px 24px; }
+    .share-agenda-icon { background:#fff; border:1px solid #E8D9CC; border-radius:10px; display:flex; align-items:center; justify-content:center; width:46px; height:46px; flex-shrink:0; color:var(--terracotta); }
+    .share-agenda-copy { flex:1; min-width:0; }
+    .share-agenda-copy h2 { font-family:'DM Sans',sans-serif; font-size:0.97rem; font-weight:700; margin:0 0 5px; color:#1A1A16; }
+    .share-agenda-copy p { font-size:0.82rem; color:#71645B; line-height:1.65; margin:0; }
+    .btn-copy-link { display:inline-flex; align-items:center; gap:8px; background:var(--terracotta); color:#fff; border:none; border-radius:8px; padding:11px 18px; font-family:'DM Sans',sans-serif; font-size:0.85rem; font-weight:700; white-space:nowrap; cursor:pointer; flex-shrink:0; transition:background 0.15s; min-height:44px; }
+    .btn-copy-link:hover { background:var(--terracotta-dark); }
+    @media(max-width:700px){ .share-agenda { display:grid; grid-template-columns:38px 1fr; padding:16px; gap:12px; } .share-agenda-copy { grid-column:1/-1; } .btn-copy-link { grid-column:1/-1; width:100%; justify-content:center; } }
+
+    /* ── Available calendar cells ─────────────────────── */
+    .cal-has-avail { border:1.5px solid var(--terracotta) !important; background:#F8F1E7 !important; box-shadow:inset 0 3px 0 var(--terracotta) !important; border-radius:10px; }
+    .cal-has-avail .cal-num { color:#86412A; font-weight:700; }
+    .cal-has-avail:hover { background:#f0e8dc !important; }
+    .cal-has-avail.cal-past-day { border-color:rgba(158,58,24,0.2) !important; background:#faf7f2 !important; box-shadow:inset 0 3px 0 rgba(158,58,24,0.15) !important; }
+    .cal-has-avail.cal-past-day .cal-num { color:#ccc; font-weight:400; }
+    .cal-has-confirmed.cal-has-avail { background:var(--terracotta-dark) !important; border-color:var(--terracotta-dark) !important; box-shadow:inset 0 3px 0 #69311E !important; }
+
+    /* ── De/À time inputs grid ────────────────────────── */
+    .avail-times-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:8px; }
+    .avail-time-field label { display:block; font-size:0.72rem; font-weight:700; text-transform:uppercase; letter-spacing:0.06em; color:#888; margin-bottom:5px; }
+    .avail-time-field .avail-input { width:100%; }
+    .avail-date-field { margin-bottom:10px; }
+    .avail-date-field label { display:block; font-size:0.72rem; font-weight:700; text-transform:uppercase; letter-spacing:0.06em; color:#888; margin-bottom:5px; }
+    .avail-date-field .avail-input { width:100%; }
+
+    /* ── Manual visit section ──────────────────────────── */
+    .manual-visit-section { display:flex; align-items:center; justify-content:space-between; gap:18px; padding:22px 0; border-top:1px solid #e8e0d6; margin-bottom:28px; }
+    .manual-visit-section-text h3 { font-family:'DM Sans',sans-serif; font-size:0.97rem; font-weight:700; margin:0 0 4px; color:#1A1A16; }
+    .manual-visit-section-text p { font-size:0.82rem; color:#888; line-height:1.6; margin:0; }
+    .btn-outline-manual { display:inline-flex; align-items:center; gap:8px; background:#fff; color:var(--terracotta); border:1.5px solid var(--terracotta); border-radius:8px; padding:11px 18px; font-family:'DM Sans',sans-serif; font-size:0.88rem; font-weight:600; cursor:pointer; transition:all 0.15s; min-height:44px; white-space:nowrap; flex-shrink:0; }
+    .btn-outline-manual:hover { background:rgba(158,58,24,0.06); }
+    @media(max-width:680px){ .manual-visit-section { flex-direction:column; align-items:stretch; background:#fff; border:1px solid #e8e0d6; border-radius:12px; padding:18px; border-top:none; margin-bottom:20px; } .btn-outline-manual { width:100%; justify-content:center; } }
+
+    /* ── Mobile right-col ordering ────────────────────── */
+    @media(max-width:900px){
+      .agenda-right-col { order:-1; }
+    }
   </style>
 </head>
 <body>
@@ -847,36 +950,41 @@
 
   <main class="main-content">
 
-    <!-- Hero -->
-    <div class="agenda-hero">
-      <div class="agenda-hero-top">
-        <div>
-          <div class="agenda-hero-badge">
-            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-            Agenda intelligent
-          </div>
-          <h1 class="agenda-hero-title">Vos visites,<br><em>parfaitement organisées</em></h1>
-          <p class="agenda-hero-desc">Centralisez vos rendez-vous, laissez les acheteurs réserver leurs créneaux et gardez une vision claire de votre planning jusqu'au compromis.</p>
+    <!-- En-tête plat -->
+    <div class="aph">
+      <div class="aph-left">
+        <div class="aph-badge">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          Mon agenda
         </div>
-        <div class="agenda-hero-actions">
-          <button class="add-btn" onclick="openModal('addVisitOverlay')">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-            Programmer une visite
-          </button>
-          <input type="text" id="bookingLink" readonly style="position:absolute;opacity:0;pointer-events:none;width:0;height:0;">
-          <div id="bookingLinkBox" style="display:none;">
-            <button onclick="copyBookingLink()" style="display:inline-flex;align-items:center;gap:5px;background:none;border:1px solid rgba(158,58,24,0.12);border-radius:7px;padding:5px 11px;font-size:0.75rem;color:var(--terracotta);font-family:'DM Sans',sans-serif;cursor:pointer;font-weight:500;white-space:nowrap;">
-              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
-              Copier le lien de réservation
-            </button>
-          </div>
-          <p id="noLinkMsg" style="display:none;font-size:0.72rem;color:#bbb;margin:0;"></p>
-          <div class="serenis-number-pill" id="serenisNumberPill" style="display:none;">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.27h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 9a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
-            <span id="serenisNumberText">—</span>
-          </div>
+        <h1 class="aph-title">Mon <em>agenda</em></h1>
+        <p class="aph-sub">Centralisez vos rendez-vous, laissez les acheteurs réserver leurs créneaux et gardez une vision claire de votre planning jusqu'au compromis.</p>
+      </div>
+      <div class="aph-actions">
+        <div class="serenis-number-pill" id="serenisNumberPill" style="display:none;">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.27h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 9a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+          <span id="serenisNumberText">—</span>
         </div>
       </div>
+      <!-- bookingLink caché (utilisé par copyBookingLink) -->
+      <input type="text" id="bookingLink" readonly style="position:absolute;opacity:0;pointer-events:none;width:0;height:0;">
+      <!-- noLinkMsg caché (utilisé par loadData) -->
+      <p id="noLinkMsg" style="display:none;"></p>
+    </div>
+
+    <!-- Partage de l'agenda -->
+    <div class="share-agenda" id="bookingLinkBox" style="display:none;">
+      <div class="share-agenda-icon">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M7 3v4M17 3v4M3 10h18M9 16h6M12 13v6"/></svg>
+      </div>
+      <div class="share-agenda-copy">
+        <h2>Votre agenda à partager aux acheteurs</h2>
+        <p>Renseignez vos disponibilités, puis envoyez ce lien à vos acheteurs pour qu'ils choisissent un créneau.</p>
+      </div>
+      <button class="btn-copy-link" onclick="copyBookingLink()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+        Copier le lien de mon agenda
+      </button>
     </div>
 
     <!-- Stats filtrables -->
@@ -913,11 +1021,11 @@
       </div>
     </div>
 
-    <!-- Dashboard principale : calendrier + sidebar actions -->
-    <div class="dash-main-grid">
+    <!-- Layout 2 colonnes : calendrier + panneau droit -->
+    <div class="agenda-layout">
 
       <!-- ── Calendrier (haut gauche) ────────────────── -->
-      <div class="dash-cal-primary">
+      <div class="cal-panel">
 
         <!-- Grand calendrier -->
         <div class="calendar-card">
@@ -952,20 +1060,20 @@
         <!-- Détail jour sélectionné -->
         <div id="calDayDetail" style="display:none;"></div>
 
-      </div><!-- end dash-cal-primary -->
+      </div><!-- end cal-panel -->
 
       <!-- ── Disponibilités + outils (bas gauche) ─────── -->
-      <div class="dash-cal-secondary">
-        <!-- Disponibilités -->
-        <div class="dispo-card">
-          <div class="dispo-card-hdr">
-            <div class="dispo-card-hdr-left">
-              <h3>Mes disponibilités</h3>
-              <p>Créneaux proposés aux acquéreurs</p>
+      <div class="agenda-right-col">
+        <div id="nextVisitMini" style="display:none;"></div>
+        <div class="dispo-section">
+          <div class="dispo-section-hdr">
+            <div>
+              <h3 class="dispo-section-title">Mes disponibilités de visite</h3>
+              <p class="dispo-section-sub">Créneaux proposés aux acquéreurs</p>
             </div>
             <span class="dispo-count-badge" id="dispoCountBadge">0 créneau</span>
           </div>
-          <div class="dispo-card-body">
+          <div class="dispo-section-inner">
             <div class="avail-month-nav">
               <button class="cal-nav" id="availPrev">&#8249;</button>
               <span class="avail-month-label" id="availMonthLabel"></span>
@@ -982,62 +1090,25 @@
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
                 Ajouter un créneau
               </h4>
-              <div class="avail-form-row">
+              <div class="avail-date-field">
+                <label>Date</label>
                 <input type="date" class="avail-input" id="availDate">
-                <span style="color:var(--terracotta);font-size:0.82rem;font-weight:600;">de</span>
-                <input type="time" class="avail-input" id="availStart" value="09:00">
-                <span style="color:var(--terracotta);font-size:0.82rem;font-weight:600;">à</span>
-                <input type="time" class="avail-input" id="availEnd" value="18:00">
+              </div>
+              <div class="avail-times-grid">
+                <div class="avail-time-field">
+                  <label>De</label>
+                  <input type="time" class="avail-input" id="availStart" value="09:00">
+                </div>
+                <div class="avail-time-field">
+                  <label>À</label>
+                  <input type="time" class="avail-input" id="availEnd" value="18:00">
+                </div>
               </div>
               <button id="addAvailSlot" class="btn-primary"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Ajouter ce créneau</button>
             </div>
           </div>
         </div>
 
-
-        <!-- Mon compromis de vente -->
-        <div class="compromis-card" id="compromis-vente">
-          <div class="compromis-card-hdr">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
-            <h3>Mon compromis de vente</h3>
-          </div>
-          <div class="compromis-card-body">
-            <p style="font-size:0.81rem;color:#888;margin:0 0 16px;line-height:1.5;">Renseignez la date de signature pour générer automatiquement les 3 dates clés jusqu'à la vente de votre bien dans votre agenda.</p>
-            <div class="compromis-form">
-              <div style="display:flex;flex-direction:column;gap:4px;flex:1;min-width:140px;">
-                <label style="font-size:0.75rem;font-weight:700;color:#555;text-transform:uppercase;letter-spacing:0.06em;">Date du compromis</label>
-                <input type="date" id="compromisDateInput" style="padding:9px 12px;border:1.5px solid #e0d8ce;border-radius:9px;font-family:'DM Sans',sans-serif;font-size:0.88rem;color:#1A1A16;background:#fafaf8;outline:none;width:100%;box-sizing:border-box;">
-              </div>
-              <div class="compromis-form-delay" style="display:flex;flex-direction:column;gap:4px;">
-                <label style="font-size:0.75rem;font-weight:700;color:#555;text-transform:uppercase;letter-spacing:0.06em;">Délai prêt</label>
-                <select id="compromisDelayInput" style="padding:9px 12px;border:1.5px solid #e0d8ce;border-radius:9px;font-family:'DM Sans',sans-serif;font-size:0.88rem;color:#1A1A16;background:#fafaf8;outline:none;">
-                  <option value="45">45 jours</option>
-                  <option value="60">60 jours</option>
-                </select>
-              </div>
-              <button onclick="saveCompromis()" class="btn-primary compromis-form-btn" style="padding:10px 18px;font-size:0.85rem;border-radius:9px;white-space:nowrap;height:40px;">Enregistrer</button>
-            </div>
-            <div id="compromisMilestones" style="display:none;margin-top:18px;border-top:1px solid #f0ebe4;padding-top:14px;">
-              <div class="compromis-milestone">
-                <span class="compromis-milestone-dot" style="background:#D32F2F;"></span>
-                <span class="compromis-milestone-label">Fin délai de rétractation <span style="color:#aaa;">(J+10)</span></span>
-                <span class="compromis-milestone-date" id="milestoneSru">—</span>
-              </div>
-              <div class="compromis-milestone">
-                <span class="compromis-milestone-dot" style="background:#1565C0;"></span>
-                <span class="compromis-milestone-label">Limite condition suspensive prêt <span id="milestoneConditionsLabel" style="color:#aaa;">(J+45)</span></span>
-                <span class="compromis-milestone-date" id="milestoneConditions">—</span>
-              </div>
-              <div class="compromis-milestone">
-                <span class="compromis-milestone-dot" style="background:var(--terracotta);"></span>
-                <span class="compromis-milestone-label">Signature acte authentique <span style="color:#aaa;">(J+90)</span></span>
-                <span class="compromis-milestone-date" id="milestoneActe">—</span>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Synchronisation calendrier externe -->
         <div id="calSyncBox" style="display:none;background:#fff;border:1px solid #e8e0d6;border-radius:14px;padding:20px;">
           <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#9E3A18" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
@@ -1057,10 +1128,10 @@
           <p style="font-size:0.72rem;color:#bbb;margin-top:8px;margin-bottom:0;">Ce lien est privé — ne le partagez pas.</p>
         </div>
 
-      </div><!-- end dash-cal-secondary -->
+      </div><!-- end agenda-right-col -->
 
-      <!-- ── Sidebar actions (droite) ──────────────────── -->
-      <aside class="dash-sidebar">
+      </div><!-- end agenda-layout -->
+      <div class="visits-below">
 
 
         <!-- État vide visites (amélioré) -->
@@ -1150,9 +1221,60 @@
           </div>
         </div>
 
-      </aside>
-    </div><!-- end dash-main-grid -->
+      </div><!-- end visits-below -->
 
+      <!-- Programmer une visite manuellement -->
+      <div class="manual-visit-section">
+        <div class="manual-visit-section-text">
+          <h3>Un rendez-vous convenu directement ?</h3>
+          <p>Si vous avez fixé une visite par téléphone ou message, ajoutez-la à votre agenda.</p>
+        </div>
+        <button class="btn-outline-manual" onclick="openModal('addVisitOverlay')">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Programmer une visite manuellement
+        </button>
+      </div>
+
+      <div class="compromis-bar" id="compromis-vente">
+        <div class="compromis-bar-hdr">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+          <h3>Mon compromis de vente</h3>
+        </div>
+        <div class="compromis-bar-body">
+          <p style="font-size:0.81rem;color:#888;margin:0 0 16px;line-height:1.5;">Renseignez la date de signature pour générer automatiquement les 3 dates clés jusqu'à la vente de votre bien dans votre agenda.</p>
+          <div class="compromis-form">
+            <div style="display:flex;flex-direction:column;gap:4px;flex:1;min-width:140px;">
+              <label style="font-size:0.75rem;font-weight:700;color:#555;text-transform:uppercase;letter-spacing:0.06em;">Date du compromis</label>
+              <input type="date" id="compromisDateInput" style="padding:9px 12px;border:1.5px solid #e0d8ce;border-radius:9px;font-family:'DM Sans',sans-serif;font-size:0.88rem;color:#1A1A16;background:#fafaf8;outline:none;width:100%;box-sizing:border-box;">
+            </div>
+            <div class="compromis-form-delay" style="display:flex;flex-direction:column;gap:4px;">
+              <label style="font-size:0.75rem;font-weight:700;color:#555;text-transform:uppercase;letter-spacing:0.06em;">Délai prêt</label>
+              <select id="compromisDelayInput" style="padding:9px 12px;border:1.5px solid #e0d8ce;border-radius:9px;font-family:'DM Sans',sans-serif;font-size:0.88rem;color:#1A1A16;background:#fafaf8;outline:none;">
+                <option value="45">45 jours</option>
+                <option value="60">60 jours</option>
+              </select>
+            </div>
+            <button onclick="saveCompromis()" class="btn-primary compromis-form-btn" style="padding:10px 18px;font-size:0.85rem;border-radius:9px;white-space:nowrap;height:40px;">Enregistrer</button>
+          </div>
+          <div id="compromisMilestones" style="display:none;margin-top:18px;border-top:1px solid #f0ebe4;padding-top:14px;">
+            <div class="compromis-milestone">
+              <span class="compromis-milestone-dot" style="background:#D32F2F;"></span>
+              <span class="compromis-milestone-label">Fin délai de rétractation <span style="color:#aaa;">(J+10)</span></span>
+              <span class="compromis-milestone-date" id="milestoneSru">—</span>
+            </div>
+            <div class="compromis-milestone">
+              <span class="compromis-milestone-dot" style="background:#1565C0;"></span>
+              <span class="compromis-milestone-label">Limite condition suspensive prêt <span id="milestoneConditionsLabel" style="color:#aaa;">(J+45)</span></span>
+              <span class="compromis-milestone-date" id="milestoneConditions">—</span>
+            </div>
+            <div class="compromis-milestone">
+              <span class="compromis-milestone-dot" style="background:var(--terracotta);"></span>
+              <span class="compromis-milestone-label">Signature acte authentique <span style="color:#aaa;">(J+90)</span></span>
+              <span class="compromis-milestone-date" id="milestoneActe">—</span>
+            </div>
+          </div>
+        </div>
+      </div>
 
   </main>
 </div>
@@ -2010,6 +2132,8 @@ function renderCalendar() {
       const isEve = eveDates.has(dateStr) && !hasConfirmed;
       const isPast = dateStr < today;
       if (hasConfirmed) cls += ' cal-has-confirmed';
+      const hasAvail = availSlots.some(s => s.date === dateStr);
+      if (hasAvail) cls += ' cal-has-avail';
       if (isEve) dotsHtml += `<span class="cal-dot cal-dot-eve"></span>`;
       if (isPast) cls += ' cal-past-day';
     } else if (activeStatFilter === 'avenir') {
@@ -2178,18 +2302,10 @@ function renderAvailMonth() {
     const fullDate=d.toLocaleDateString('fr-FR',{day:'numeric',month:'long',year:'numeric'});
     const globalIdx=availSlots.indexOf(s);
     const isRecurrent = s.recurrent || false;
-    return `<div class="${isRecurrent?'avail-slot2 recurrent':'avail-slot2'}" data-slot-idx="${globalIdx}">
-      <div class="avail-slot2-datecol">
-        <div class="avail-slot2-month">${monthShort}</div>
-        <div class="avail-slot2-day">${dayNum}</div>
-      </div>
-      <div class="avail-slot2-info">
-        <div class="avail-slot2-dow">${dow}</div>
-        <div class="avail-slot2-fulldate">${fullDate}</div>
-        <span class="avail-slot2-time">${svgClock} ${s.start} – ${s.end}</span>
-        ${isRecurrent?`<span class="avail-slot2-type-badge recurrent">↻ Récurrent</span>`:``}
-      </div>
-      <button class="avail-slot2-del" data-del-idx="${globalIdx}" title="Supprimer">${svgX}</button>
+    return `<div class="dispo-slot-row" data-slot-idx="${globalIdx}">
+      <div class="dispo-slot-icon">${svgClock}</div>
+      <div class="dispo-slot-text">${dow} ${dayNum} ${monthShort} · ${s.start}–${s.end}</div>
+      <button class="dispo-slot-del" data-del-idx="${globalIdx}" title="Supprimer">${svgX}</button>
     </div>`;
   }).join('');
 }
@@ -2199,7 +2315,7 @@ document.getElementById('availSlotList').addEventListener('click',function(e) {
   if (!btn) return;
   const idx=parseInt(btn.dataset.delIdx,10);
   if (isNaN(idx)||idx<0||idx>=availSlots.length) return;
-  const itemEl=btn.closest('.avail-slot-item,.avail-slot2');
+  const itemEl=btn.closest('.avail-slot-item,.avail-slot2,.dispo-slot-row');
   if (itemEl) {
     itemEl.classList.add('removing');
     itemEl.addEventListener('animationend',()=>{ availSlots.splice(idx,1); persistAvail('Créneau supprimé'); renderAvailMonth(); },{once:true});
@@ -2684,7 +2800,7 @@ loadData().then(() => {
   loadCompromis();
   if (_urlDate) {
     setTimeout(() => {
-      const cal = document.querySelector('.dash-cal-primary');
+      const cal = document.querySelector('.cal-panel');
       if (cal) cal.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }, 300);
   } else if (window.location.hash) {

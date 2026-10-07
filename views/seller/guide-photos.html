@@ -550,8 +550,9 @@
     }
   </style>
   <style id="embed-style"></style>
+<link rel="stylesheet" href="/css/guide-photos-premium.css">
 </head>
-<body>
+<body class="vpm-photo-guide">
 <script>
   if (new URLSearchParams(location.search).get('embed') === '1') {
     document.getElementById('embed-style').textContent = `
@@ -667,7 +668,8 @@
     <div class="guide-layout">
       <!-- Room list -->
       <div class="room-list">
-        <div class="room-list-header">Pièces à photographier</div>
+        <div class="room-list-header"><label for="guideRoomSelect">Pièces à photographier</label></div>
+        <select id="guideRoomSelect" class="vpm-room-select" onchange="selectRoom(this.value)"></select>
         <div id="roomList"></div>
         <div class="room-list-divider"></div>
         <button class="room-add-btn" onclick="addOptionalRoom()">+ Ajouter une pièce</button>
@@ -696,7 +698,7 @@ const ALL_ROOMS = [
   {
     id: 'entree', label: 'Entrée', icon: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="2" width="18" height="20" rx="2"/><line x1="15" y1="2" x2="15" y2="22"/><circle cx="17.5" cy="12" r="1" fill="currentColor"/></svg>', required: true,
     desc: "La première impression compte. L'acheteur doit visualiser l'arrivée dans le bien.",
-    tip: "x0.5 obligatoire. Placez-vous depuis la porte d'entrée, volets ouverts. Montrez la circulation vers le reste du logement.",
+    tip: "Placez-vous depuis la porte d'entrée, volets ouverts. Montrez la circulation vers le reste du logement.",
     angles: [
       { id: 'porte', label: 'Depuis la porte', hint: 'Vue vers l\'intérieur à l\'ouverture', required: true },
       { id: 'interieur', label: 'Depuis l\'intérieur', hint: 'Vue vers la porte depuis le couloir', required: true },
@@ -884,6 +886,18 @@ function getRoomCompletion(room) {
 function renderRoomList() {
   const container = document.getElementById('roomList');
   container.innerHTML = '';
+  /* VPM room selector — start */
+  const selector = document.getElementById('guideRoomSelect');
+  selector.replaceChildren();
+  visibleRooms.forEach((room, index) => {
+    const option = document.createElement('option');
+    const completion = getRoomCompletion(room);
+    option.value = room.id;
+    option.textContent = (index + 1) + '. ' + room.label + ' · ' + completion.covered + '/' + completion.total + ' photos';
+    selector.append(option);
+  });
+  if (activeRoomId) selector.value = activeRoomId;
+  /* VPM room selector — end */
   visibleRooms.forEach(room => {
     const comp = getRoomCompletion(room);
     let statusHtml = '';
@@ -934,6 +948,9 @@ function updateGlobalProgress() {
 // ── Select room ──────────────────────────────────────────────────
 function selectRoom(roomId) {
   activeRoomId = roomId;
+  /* VPM room selector sync — start */
+  document.getElementById('guideRoomSelect').value = roomId;
+  /* VPM room selector sync — end */
   const room = visibleRooms.find(r => r.id === roomId);
   if (!room) return;
 
@@ -1036,12 +1053,18 @@ function renderRoomContent(room) {
       <div class="room-header-left">
         <div class="room-icon-circle">${room.icon}</div>
         <div class="room-title-block">
+          <div class="vpm-room-position">Pièce ${idx + 1} sur ${visibleRooms.length}</div>
           <h1 class="room-title">${room.label}</h1>
           <div class="room-desc">${room.desc}</div>
           <div class="room-completion-pill ${pillClass}">${pillText}</div>
         </div>
       </div>
       ${idx < visibleRooms.length - 1 ? `<button class="btn-skip" onclick="selectRoom('${visibleRooms[idx+1]?.id}')">Passer →</button>` : ''}
+    </div>
+
+    <div class="vpm-wide-angle">
+      <div class="vpm-phone-setting" aria-hidden="true"><svg width="36" height="48" viewBox="0 0 36 48" fill="none"><rect x="5" y="2" width="26" height="44" rx="5" stroke="currentColor" stroke-width="1.5"/><path d="M14 7h8M15 41h6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><text x="18" y="28" text-anchor="middle" fill="currentColor" font-family="Arial,sans-serif" font-size="10" font-weight="bold">0,5×</text></svg></div>
+      <div><strong>Utilisez le mode grand-angle (0,5×)</strong><p>Avant de prendre vos photos, sélectionnez « 0,5× » sur votre téléphone, si ce mode est disponible.</p></div>
     </div>
 
     <div class="tip-banner">
@@ -1054,37 +1077,37 @@ function renderRoomContent(room) {
       </div>
     </div>
 
-    <div class="golden-rules-strip">
+    <details class="vpm-guide-settings"><summary>Les 5 réglages à vérifier avant de photographier</summary><div class="golden-rules-strip">
       <div class="golden-rule-card">
-        <div class="gr-icon-wrap">📱</div>
+        <div class="gr-icon-wrap"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="2" width="12" height="20" rx="2"/><path d="M10 18h4M10 5h4"/></svg></div>
         <div class="gr-body">
           <div class="gr-title">Mode x0.5 obligatoire</div>
           <div class="gr-desc">Sur iPhone appuyez sur "0.5×", sur Android utilisez le grand-angle. Chaque pièce paraîtra plus grande.</div>
         </div>
       </div>
       <div class="golden-rule-card">
-        <div class="gr-icon-wrap">🪟</div>
+        <div class="gr-icon-wrap"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="18" rx="1"/><path d="M12 3v18M4 12h16"/></svg></div>
         <div class="gr-body">
           <div class="gr-title">Lumière maximale</div>
           <div class="gr-desc">Volets ouverts, stores levés, toutes les lumières allumées. Une pièce lumineuse se vend plus vite.</div>
         </div>
       </div>
       <div class="golden-rule-card">
-        <div class="gr-icon-wrap">📐</div>
+        <div class="gr-icon-wrap"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21V3l18 18H3Zm5-5V12l4 4H8Z"/></svg></div>
         <div class="gr-body">
           <div class="gr-title">Reculez au maximum</div>
           <div class="gr-desc">Jusqu'au coin opposé, visez légèrement vers le bas. Plus vous êtes loin, plus la pièce paraît grande.</div>
         </div>
       </div>
       <div class="golden-rule-card">
-        <div class="gr-icon-wrap">🧎</div>
+        <div class="gr-icon-wrap"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="4" r="2"/><path d="m10 8-2 6 5 2-3 5H5m5-13 5 3h5m-7 5 5 5"/></svg></div>
         <div class="gr-body">
           <div class="gr-title">Téléphone à hauteur de taille</div>
           <div class="gr-desc">Photographiez à hauteur de hanche ou accroupi — jamais à hauteur des yeux. L'angle bas ouvre l'espace et donne du volume à la pièce.</div>
         </div>
       </div>
       <div class="golden-rule-card">
-        <div class="gr-icon-wrap">☀️</div>
+        <div class="gr-icon-wrap"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M2 12h2m16 0h2M5 5l2 2m10 10 2 2M5 19l2-2M17 7l2-2"/></svg></div>
         <div class="gr-body">
           <div class="gr-title">Tapez l'écran avant de déclencher</div>
           <div class="gr-desc">Avant de prendre la photo, touchez la zone la plus lumineuse de l'écran. Votre téléphone ajuste automatiquement l'exposition et évite les photos trop sombres.</div>
@@ -1092,6 +1115,7 @@ function renderRoomContent(room) {
       </div>
     </div>
 
+    </details>
     <div class="section-label">
       <div class="section-label-text">Angles à photographier</div>
       <div class="section-label-count">${requiredCount} obligatoire${requiredCount>1?'s':''}</div>

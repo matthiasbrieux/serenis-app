@@ -13,7 +13,7 @@
   <meta name="apple-mobile-web-app-title" content="VPM"/>
   <script>if("scrollRestoration"in history)history.scrollRestoration="manual";</script>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Ma Bibliothèque — Vendu Par Moi</title>
+  <title>Ma boîte à outils — Vendu Par Moi</title>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,400&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/css/style.css?v=3">
   <style>
@@ -343,6 +343,7 @@
       .dv-footer-stamp { padding: 14px 22px; flex-direction: column; gap: 4px; text-align: center; }
     }
   </style>
+<link rel="stylesheet" href="/css/toolbox-premium.css">
 </head>
 <body>
 <div class="app-layout">
@@ -426,7 +427,7 @@
     </div>
   </aside>
 
-  <main class="main-content">
+  <main class="main-content vpm-toolbox">
 
     <!-- Hero -->
     <div class="bib-hero">
@@ -443,217 +444,33 @@
         </div>
         <div class="bib-hero-stat">
           <div class="bib-hero-stat-dot" style="background:#6366F1;"></div>
-          <span>9 documents téléchargeables</span>
+          <span id="heroDocCount">Documents de formation</span>
         </div>
       </div>
     </div>
 
+<section class="vpm-quick-message" aria-labelledby="quickMessageTitle">
+ <div class="vpm-quick-message-heading"><span class="vpm-quick-label">ACCÈS RAPIDE · LEBONCOIN</span><h3 id="quickMessageTitle">Répondre à une demande de renseignements</h3><p>Copiez ce message dans la messagerie de l’annonce pour poursuivre l’échange par téléphone.</p></div>
+ <div class="vpm-quick-message-actions"><button type="button" class="tpl-copy-btn" id="quickMessageCopy">Copier le message</button><button type="button" class="tpl-expand-btn" id="quickMessageToggle" aria-expanded="false" aria-controls="quickMessageText">Voir le message</button></div>
+ <p id="quickMessageText" hidden></p>
+</section>
     <!-- Tab bar -->
     <div class="bib-tab-bar">
-      <button class="bib-tab active" id="tabMessages" onclick="showTab('messages')">
+      <button class="bib-tab active" id="tabDocuments" onclick="showTab('documents')">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+        Documents types de la formation
+        <span class="bib-tab-count" id="docCount">9</span>
+      </button>
+      <button class="bib-tab" id="tabMessages" onclick="showTab('messages')">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
         Modèles de messages
         <span class="bib-tab-count" id="msgCount">38</span>
       </button>
-      <button class="bib-tab" id="tabDocuments" onclick="showTab('documents')">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-        Documents
-        <span class="bib-tab-count" id="docCount">9</span>
-      </button>
     </div>
 
     <!-- ═══ DOCUMENTS ═══ -->
-    <div id="docSection">
-
-      <!-- Catégorie : Essentiels -->
-      <div class="doc-category">
-        <div class="doc-category-header">
-          <div class="doc-category-icon" style="background:#FFF5F0;">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#9E3A18" stroke-width="1.8"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-          </div>
-          <div>
-            <div class="doc-category-title">Essentiels — À utiliser en priorité</div>
-            <div class="doc-category-desc">Les documents les plus utiles à chaque vendeur particulier</div>
-          </div>
-          <div class="doc-category-line"></div>
-        </div>
-        <div class="doc-grid">
-          <div class="doc-card essential">
-            <div class="doc-file-icon pdf">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
-              <span class="doc-file-ext">PDF</span>
-            </div>
-            <div class="doc-content">
-              <div class="doc-top-row">
-                <span class="doc-title">Guide complet du vendeur particulier</span>
-                <span class="doc-badge-essential"><svg width="9" height="9" viewBox="0 0 24 24" fill="currentColor" stroke="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg> Essentiel</span>
-              </div>
-              <div class="doc-desc">De la mise en vente à la signature — 32 pages</div>
-              <div class="doc-actions">
-                <button class="doc-btn doc-btn-secondary" onclick="openDoc('guide-vendeur')">Voir →</button>
-              </div>
-            </div>
-          </div>
-
-          <div class="doc-card essential">
-            <div class="doc-file-icon pdf">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-              <span class="doc-file-ext">PDF</span>
-            </div>
-            <div class="doc-content">
-              <div class="doc-top-row">
-                <span class="doc-title">Liste des diagnostics obligatoires</span>
-                <span class="doc-badge-essential"><svg width="9" height="9" viewBox="0 0 24 24" fill="currentColor" stroke="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg> Essentiel</span>
-              </div>
-              <div class="doc-desc">DPE, amiante, plomb, électricité… ce qui est requis</div>
-              <div class="doc-actions">
-                <button class="doc-btn doc-btn-secondary" onclick="openDoc('diagnostics-obligatoires')">Voir →</button>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Catégorie : Juridique & Actes -->
-      <div class="doc-category">
-        <div class="doc-category-header">
-          <div class="doc-category-icon" style="background:#EEF2FF;">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#4F46E5" stroke-width="1.8"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1"/><line x1="9" y1="12" x2="15" y2="12"/><line x1="9" y1="16" x2="12" y2="16"/></svg>
-          </div>
-          <div>
-            <div class="doc-category-title">Juridique &amp; Actes</div>
-            <div class="doc-category-desc">Documents légaux pour sécuriser votre vente</div>
-          </div>
-          <div class="doc-category-line"></div>
-        </div>
-        <div class="doc-grid">
-          <div class="doc-card">
-            <div class="doc-file-icon word">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-              <span class="doc-file-ext">DOC</span>
-            </div>
-            <div class="doc-content">
-              <div class="doc-top-row"><span class="doc-title">Modèle d'offre d'achat</span></div>
-              <div class="doc-desc">Trame d'offre écrite à faire remplir par l'acheteur</div>
-              <div class="doc-actions">
-                <button class="doc-btn doc-btn-secondary" onclick="openDoc('offre-achat')">Voir →</button>
-              </div>
-            </div>
-          </div>
-
-          <div class="doc-card">
-            <div class="doc-file-icon pdf">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-              <span class="doc-file-ext">PDF</span>
-            </div>
-            <div class="doc-content">
-              <div class="doc-top-row"><span class="doc-title">Comprendre le compromis de vente</span></div>
-              <div class="doc-desc">Les clauses essentielles expliquées simplement</div>
-              <div class="doc-actions">
-                <button class="doc-btn doc-btn-secondary" onclick="openDoc('compromis-vente')">Voir →</button>
-              </div>
-            </div>
-          </div>
-
-          <div class="doc-card essential">
-            <div class="doc-file-icon word">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="17" x2="12" y2="17"/></svg>
-              <span class="doc-file-ext">DOC</span>
-            </div>
-            <div class="doc-content">
-              <div class="doc-top-row">
-                <span class="doc-title">Fiche d'état des lieux</span>
-                <span class="doc-badge-essential"><svg width="9" height="9" viewBox="0 0 24 24" fill="currentColor" stroke="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg> Essentiel</span>
-              </div>
-              <div class="doc-desc">Modèle complet pièce par pièce — à signer le jour de la remise</div>
-              <div class="doc-actions">
-                <button class="doc-btn doc-btn-primary" onclick="openDoc('etat-des-lieux')">
-                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-                  Voir le modèle
-                </button>
-                <button class="doc-btn doc-btn-secondary" onclick="window.print()">Imprimer</button>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Catégorie : Check-lists interactives -->
-      <div class="doc-category">
-        <div class="doc-category-header">
-          <div class="doc-category-icon" style="background:#F0FDF4;">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#16A34A" stroke-width="1.8"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
-          </div>
-          <div>
-            <div class="doc-category-title">Check-lists interactives</div>
-            <div class="doc-category-desc">Cochez chaque étape en temps réel — issues de la formation</div>
-          </div>
-          <div class="doc-category-line"></div>
-        </div>
-        <div class="doc-grid">
-          <div class="doc-card ck-step-card">
-            <div class="ck-step-num">1</div>
-            <div class="doc-content">
-              <div class="doc-top-row"><span class="doc-title">Estimation du prix</span></div>
-              <div class="doc-desc">7 points à valider avant de fixer votre prix de vente</div>
-              <div class="doc-actions">
-                <button class="doc-btn doc-btn-secondary" onclick="openDoc('ck-estimation')">Ouvrir →</button>
-              </div>
-            </div>
-            <div class="ck-step-badge">Étape 1 / 5</div>
-          </div>
-
-          <div class="doc-card ck-step-card">
-            <div class="ck-step-num">2</div>
-            <div class="doc-content">
-              <div class="doc-top-row"><span class="doc-title">Dossier de vente</span></div>
-              <div class="doc-desc">Tous les documents à réunir avant la mise en vente</div>
-              <div class="doc-actions">
-                <button class="doc-btn doc-btn-secondary" onclick="openDoc('ck-docs')">Ouvrir →</button>
-              </div>
-            </div>
-            <div class="ck-step-badge">Étape 2 / 5</div>
-          </div>
-
-          <div class="doc-card ck-step-card">
-            <div class="ck-step-num">3</div>
-            <div class="doc-content">
-              <div class="doc-top-row"><span class="doc-title">Avant photos</span></div>
-              <div class="doc-desc">12 actions pour des photos professionnelles</div>
-              <div class="doc-actions">
-                <button class="doc-btn doc-btn-secondary" onclick="openDoc('ck-photos')">Ouvrir →</button>
-              </div>
-            </div>
-            <div class="ck-step-badge">Étape 3 / 5</div>
-          </div>
-
-          <div class="doc-card ck-step-card">
-            <div class="ck-step-num">4</div>
-            <div class="doc-content">
-              <div class="doc-top-row"><span class="doc-title">Avant visite</span></div>
-              <div class="doc-desc">10 points pour accueillir chaque visiteur dans les meilleures conditions</div>
-              <div class="doc-actions">
-                <button class="doc-btn doc-btn-secondary" onclick="openDoc('ck-visite')">Ouvrir →</button>
-              </div>
-            </div>
-            <div class="ck-step-badge">Étape 4 / 5</div>
-          </div>
-
-          <div class="doc-card ck-step-card">
-            <div class="ck-step-num">5</div>
-            <div class="doc-content">
-              <div class="doc-top-row"><span class="doc-title">Remise des clés</span></div>
-              <div class="doc-desc">8 étapes pour un état des lieux sans surprise</div>
-              <div class="doc-actions">
-                <button class="doc-btn doc-btn-secondary" onclick="openDoc('ck-edl')">Ouvrir →</button>
-              </div>
-            </div>
-            <div class="ck-step-badge">Étape 5 / 5</div>
-          </div>
-        </div>
-      </div>
-
-    </div>
+<div id="docSection">
+<div class="vpm-original-guide"><div><span class="vpm-quick-label">VOTRE FORMATION</span><h3>Le guide complet du vendeur</h3><p>Retrouvez les 61 pages de votre guide, puis les documents classés dans l’ordre de votre vente.</p></div><a class="doc-btn doc-btn-primary" href="/toolbox/formation/guide-complet.pdf" target="_blank" rel="noopener">Ouvrir le guide →</a></div><section class="doc-category"><div class="doc-category-header"><span class="vpm-document-step">01</span><div><div class="doc-category-title">Préparer sa vente</div></div><div class="doc-category-line"></div></div><div class="doc-grid"><article class="doc-card"><div class="doc-file-icon pdf"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M8 13h8M8 17h8"/></svg><span class="doc-file-ext">PDF</span></div><div class="doc-content"><div class="doc-title">Les méthodes d’estimation et le bon prix</div><div class="doc-desc">Pages 13 à 15 du guide · document original</div><div class="doc-actions"><a class="doc-btn doc-btn-primary" href="/toolbox/formation/estimation.pdf" target="_blank" rel="noopener">Consulter →</a><a class="doc-btn doc-btn-secondary" href="/toolbox/formation/estimation.pdf" download>Télécharger</a></div></div></article><article class="doc-card"><div class="doc-file-icon pdf"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M8 13h8M8 17h8"/></svg><span class="doc-file-ext">PDF</span></div><div class="doc-content"><div class="doc-title">Les documents indispensables</div><div class="doc-desc">Page 17 du guide · document original</div><div class="doc-actions"><a class="doc-btn doc-btn-primary" href="/toolbox/formation/documents.pdf" target="_blank" rel="noopener">Consulter →</a><a class="doc-btn doc-btn-secondary" href="/toolbox/formation/documents.pdf" download>Télécharger</a></div></div></article><article class="doc-card"><div class="doc-file-icon pdf"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M8 13h8M8 17h8"/></svg><span class="doc-file-ext">PDF</span></div><div class="doc-content"><div class="doc-title">Déclarations de travaux</div><div class="doc-desc">Page 18 du guide · document original</div><div class="doc-actions"><a class="doc-btn doc-btn-primary" href="/toolbox/formation/travaux.pdf" target="_blank" rel="noopener">Consulter →</a><a class="doc-btn doc-btn-secondary" href="/toolbox/formation/travaux.pdf" download>Télécharger</a></div></div></article><article class="doc-card"><div class="doc-file-icon pdf"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M8 13h8M8 17h8"/></svg><span class="doc-file-ext">PDF</span></div><div class="doc-content"><div class="doc-title">Guide des diagnostics</div><div class="doc-desc">Page 19 du guide · document original</div><div class="doc-actions"><a class="doc-btn doc-btn-primary" href="/toolbox/formation/diagnostics.pdf" target="_blank" rel="noopener">Consulter →</a><a class="doc-btn doc-btn-secondary" href="/toolbox/formation/diagnostics.pdf" download>Télécharger</a></div></div></article><article class="doc-card"><div class="doc-file-icon pdf"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M8 13h8M8 17h8"/></svg><span class="doc-file-ext">PDF</span></div><div class="doc-content"><div class="doc-title">Préparer ses photos et ses albums</div><div class="doc-desc">Pages 25 à 28 du guide · document original</div><div class="doc-actions"><a class="doc-btn doc-btn-primary" href="/toolbox/formation/photos.pdf" target="_blank" rel="noopener">Consulter →</a><a class="doc-btn doc-btn-secondary" href="/toolbox/formation/photos.pdf" download>Télécharger</a></div></div></article></div></section><section class="doc-category"><div class="doc-category-header"><span class="vpm-document-step">02</span><div><div class="doc-category-title">Échanger avec les acheteurs</div></div><div class="doc-category-line"></div></div><div class="doc-grid"><article class="doc-card"><div class="doc-file-icon pdf"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M8 13h8M8 17h8"/></svg><span class="doc-file-ext">PDF</span></div><div class="doc-content"><div class="doc-title">Le message pour les plateformes d’annonces</div><div class="doc-desc">Page 34 du guide · document original</div><div class="doc-actions"><a class="doc-btn doc-btn-primary" href="/toolbox/formation/message-leboncoin.pdf" target="_blank" rel="noopener">Consulter →</a><a class="doc-btn doc-btn-secondary" href="/toolbox/formation/message-leboncoin.pdf" download>Télécharger</a></div></div></article><article class="doc-card"><div class="doc-file-icon pdf"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M8 13h8M8 17h8"/></svg><span class="doc-file-ext">PDF</span></div><div class="doc-content"><div class="doc-title">Scripts d’appel, scénarios et objections</div><div class="doc-desc">Pages 35 à 38 du guide · document original</div><div class="doc-actions"><a class="doc-btn doc-btn-primary" href="/toolbox/formation/scripts-appel.pdf" target="_blank" rel="noopener">Consulter →</a><a class="doc-btn doc-btn-secondary" href="/toolbox/formation/scripts-appel.pdf" download>Télécharger</a></div></div></article></div></section><section class="doc-category"><div class="doc-category-header"><span class="vpm-document-step">03</span><div><div class="doc-category-title">Organiser et réussir les visites</div></div><div class="doc-category-line"></div></div><div class="doc-grid"><article class="doc-card"><div class="doc-file-icon pdf"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M8 13h8M8 17h8"/></svg><span class="doc-file-ext">PDF</span></div><div class="doc-content"><div class="doc-title">Organiser ses visites avec l’agenda</div><div class="doc-desc">Page 40 du guide · document original</div><div class="doc-actions"><a class="doc-btn doc-btn-primary" href="/toolbox/formation/organiser-visites.pdf" target="_blank" rel="noopener">Consulter →</a><a class="doc-btn doc-btn-secondary" href="/toolbox/formation/organiser-visites.pdf" download>Télécharger</a></div></div></article><article class="doc-card"><div class="doc-file-icon pdf"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M8 13h8M8 17h8"/></svg><span class="doc-file-ext">PDF</span></div><div class="doc-content"><div class="doc-title">Conduire la visite et préparer la suite</div><div class="doc-desc">Pages 42 à 44 du guide · document original</div><div class="doc-actions"><a class="doc-btn doc-btn-primary" href="/toolbox/formation/reussir-visites.pdf" target="_blank" rel="noopener">Consulter →</a><a class="doc-btn doc-btn-secondary" href="/toolbox/formation/reussir-visites.pdf" download>Télécharger</a></div></div></article></div></section><section class="doc-category"><div class="doc-category-header"><span class="vpm-document-step">04</span><div><div class="doc-category-title">Étudier une offre et négocier</div></div><div class="doc-category-line"></div></div><div class="doc-grid"><article class="doc-card"><div class="doc-file-icon pdf"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M8 13h8M8 17h8"/></svg><span class="doc-file-ext">PDF</span></div><div class="doc-content"><div class="doc-title">Comprendre, comparer et répondre à une offre</div><div class="doc-desc">Pages 46 à 49 du guide · document original</div><div class="doc-actions"><a class="doc-btn doc-btn-primary" href="/toolbox/formation/offres-negociation.pdf" target="_blank" rel="noopener">Consulter →</a><a class="doc-btn doc-btn-secondary" href="/toolbox/formation/offres-negociation.pdf" download>Télécharger</a></div></div></article></div></section><section class="doc-category"><div class="doc-category-header"><span class="vpm-document-step">05</span><div><div class="doc-category-title">Préparer le compromis</div></div><div class="doc-category-line"></div></div><div class="doc-grid"><article class="doc-card"><div class="doc-file-icon pdf"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M8 13h8M8 17h8"/></svg><span class="doc-file-ext">PDF</span></div><div class="doc-content"><div class="doc-title">Du compromis à la signature</div><div class="doc-desc">Page 51 du guide · document original</div><div class="doc-actions"><a class="doc-btn doc-btn-primary" href="/toolbox/formation/compromis.pdf" target="_blank" rel="noopener">Consulter →</a><a class="doc-btn doc-btn-secondary" href="/toolbox/formation/compromis.pdf" download>Télécharger</a></div></div></article><article class="doc-card"><div class="doc-file-icon pdf"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M8 13h8M8 17h8"/></svg><span class="doc-file-ext">PDF</span></div><div class="doc-content"><div class="doc-title">Les trois dates clés</div><div class="doc-desc">Page 52 du guide · document original</div><div class="doc-actions"><a class="doc-btn doc-btn-primary" href="/toolbox/formation/dates-cles.pdf" target="_blank" rel="noopener">Consulter →</a><a class="doc-btn doc-btn-secondary" href="/toolbox/formation/dates-cles.pdf" download>Télécharger</a></div></div></article><article class="doc-card"><div class="doc-file-icon pdf"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M8 13h8M8 17h8"/></svg><span class="doc-file-ext">PDF</span></div><div class="doc-content"><div class="doc-title">Fiche de renseignements d’état civil</div><div class="doc-desc">Page 53 du guide · document original</div><div class="doc-actions"><a class="doc-btn doc-btn-primary" href="/toolbox/formation/etat-civil.pdf" target="_blank" rel="noopener">Consulter →</a><a class="doc-btn doc-btn-secondary" href="/toolbox/formation/etat-civil.pdf" download>Télécharger</a></div></div></article></div></section><section class="doc-category"><div class="doc-category-header"><span class="vpm-document-step">06</span><div><div class="doc-category-title">Finaliser la vente</div></div><div class="doc-category-line"></div></div><div class="doc-grid"><article class="doc-card"><div class="doc-file-icon pdf"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M8 13h8M8 17h8"/></svg><span class="doc-file-ext">PDF</span></div><div class="doc-content"><div class="doc-title">La checklist de fin de vente</div><div class="doc-desc">Page 55 du guide · document original</div><div class="doc-actions"><a class="doc-btn doc-btn-primary" href="/toolbox/formation/checklist-fin.pdf" target="_blank" rel="noopener">Consulter →</a><a class="doc-btn doc-btn-secondary" href="/toolbox/formation/checklist-fin.pdf" download>Télécharger</a></div></div></article><article class="doc-card"><div class="doc-file-icon pdf"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M8 13h8M8 17h8"/></svg><span class="doc-file-ext">PDF</span></div><div class="doc-content"><div class="doc-title">Le jour de la signature</div><div class="doc-desc">Page 56 du guide · document original</div><div class="doc-actions"><a class="doc-btn doc-btn-primary" href="/toolbox/formation/signature.pdf" target="_blank" rel="noopener">Consulter →</a><a class="doc-btn doc-btn-secondary" href="/toolbox/formation/signature.pdf" download>Télécharger</a></div></div></article><article class="doc-card"><div class="doc-file-icon pdf"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M8 13h8M8 17h8"/></svg><span class="doc-file-ext">PDF</span></div><div class="doc-content"><div class="doc-title">Fiche d’état des lieux</div><div class="doc-desc">Page 57 du guide · document original</div><div class="doc-actions"><a class="doc-btn doc-btn-primary" href="/toolbox/formation/etat-des-lieux.pdf" target="_blank" rel="noopener">Consulter →</a><a class="doc-btn doc-btn-secondary" href="/toolbox/formation/etat-des-lieux.pdf" download>Télécharger</a></div></div></article><article class="doc-card"><div class="doc-file-icon pdf"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M8 13h8M8 17h8"/></svg><span class="doc-file-ext">PDF</span></div><div class="doc-content"><div class="doc-title">Planning de fin de vente</div><div class="doc-desc">Page 58 du guide · document original</div><div class="doc-actions"><a class="doc-btn doc-btn-primary" href="/toolbox/formation/planning-fin.pdf" target="_blank" rel="noopener">Consulter →</a><a class="doc-btn doc-btn-secondary" href="/toolbox/formation/planning-fin.pdf" download>Télécharger</a></div></div></article></div></section></div>
     <!-- /docSection -->
 
     <!-- ═══ MESSAGES ═══ -->
@@ -677,14 +494,18 @@
         </div>
       </div>
 
+      <div class="vpm-toolbox-workspace">
       <!-- Catégories -->
       <div class="bib-cats" id="bibCats"></div>
 
+      <div class="vpm-toolbox-results">
       <!-- Compteur -->
       <div class="bib-results-info" id="bibInfo"></div>
 
       <!-- Grille -->
       <div class="bib-grid" id="bibGrid"></div>
+      </div>
+      </div>
     </div>
     <!-- /msgSection -->
 
@@ -1276,6 +1097,17 @@ document.addEventListener('keydown', function(e) {
 });
 </script>
 
+<script>
+// Dedicated shortcut: copied verbatim from the supplied guide screenshot.
+const VPM_LEBONCOIN_MESSAGE = "Bonjour, merci pour votre intérêt concernant mon bien. Afin de faciliter nos échanges et l’organisation des visites, merci de me contacter directement par téléphone ou SMS au numéro indiqué sur l’annonce. Merci et à bientôt.";
+document.getElementById('quickMessageText').textContent = VPM_LEBONCOIN_MESSAGE;
+document.getElementById('quickMessageToggle').addEventListener('click', function(){const text=document.getElementById('quickMessageText');text.hidden=!text.hidden;this.setAttribute('aria-expanded',String(!text.hidden));this.textContent=text.hidden?'Voir le message':'Réduire';});
+document.getElementById('quickMessageCopy').addEventListener('click', async function(){try{if(navigator.clipboard&&navigator.clipboard.writeText) await navigator.clipboard.writeText(VPM_LEBONCOIN_MESSAGE);else fallbackCopy(VPM_LEBONCOIN_MESSAGE);bibToast('Message copié — collez-le dans la messagerie de l’annonce.');this.textContent='Copié !';setTimeout(()=>this.textContent='Copier le message',2200);}catch(e){fallbackCopy(VPM_LEBONCOIN_MESSAGE);bibToast('Message copié — collez-le dans la messagerie de l’annonce.');}});
+showTab('documents');
+const formationDocCount=document.querySelectorAll('#docSection .doc-card').length;
+document.getElementById('docCount').textContent=formationDocCount;
+document.getElementById('heroDocCount').textContent=formationDocCount+' documents de formation';
+</script>
 <script src="/js/seller-nav.js"></script>
 </body>
 </html>
