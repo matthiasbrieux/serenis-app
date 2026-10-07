@@ -14,21 +14,20 @@
   <script>if("scrollRestoration"in history)history.scrollRestoration="manual";</script>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Ma boîte à outils — Vendu Par Moi</title>
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,400&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/css/style.css?v=3">
   <style>
     /* ── Bibliothèque — Messages + Documents ── */
     .main-content { background: #F8F9FA; }
 
     /* Hero */
-    .bib-hero { margin-bottom: 32px; padding: 28px 28px 24px; background: linear-gradient(135deg, var(--terracotta-dark) 0%, var(--terracotta) 100%); border-radius: 20px; border: none; position: relative; overflow: hidden; }
-    .bib-hero::before { content: ''; position: absolute; top: -40px; right: -40px; width: 180px; height: 180px; background: radial-gradient(circle, rgba(255,255,255,0.04) 0%, transparent 70%); pointer-events: none; }
-    .bib-hero-badge { display: inline-flex; align-items: center; gap: 6px; padding: 4px 13px; border-radius: 100px; background: rgba(0,0,0,0.25); border: none; color: rgba(255,255,255,0.9); font-size: 0.67rem; font-weight: 700; letter-spacing: 0.09em; text-transform: uppercase; margin-bottom: 12px; }
-    .bib-hero-title { font-family: 'Cormorant Garamond', serif; font-size: 2rem; font-weight: 600; color: #FDFCF8; line-height: 1.15; margin: 0 0 10px; }
-    .bib-hero-title em { font-style: italic; color: var(--sable-dore); }
-    .bib-hero-desc { font-size: 0.84rem; color: rgba(255,255,255,0.7); line-height: 1.7; max-width: 560px; }
+    .bib-hero { margin-bottom: 32px; padding: 0 0 28px; background: none; border-radius: 0; border: none; border-bottom: 1px solid #E8D9CC; position: relative; overflow: visible; }
+    .bib-hero::before { display: none; }
+    .bib-hero-badge { display: inline-flex; align-items: center; gap: 6px; border: 1.5px solid rgba(134,65,42,0.28); border-radius: 100px; padding: 5px 13px; font-size: 0.625rem; font-weight: 700; letter-spacing: 0.11em; text-transform: uppercase; color: #86412A; background: transparent; margin-bottom: 10px; font-family:'Inter',sans-serif; }
+    .bib-hero-title { font-family: 'Cormorant Garamond', serif; font-size: 42px; font-weight: 500; letter-spacing: -0.7px; line-height: 1.07; color: #1A1A16; margin: 12px 0 15px; }
+    .bib-hero-title em { font-style: italic; color: #9E3A18; }
+    .bib-hero-desc { font-family:'Inter',sans-serif; font-size: 0.8125rem; color: #71645B; line-height: 1.8; max-width: 660px; }
     .bib-hero-meta { display: flex; gap: 18px; margin-top: 16px; flex-wrap: wrap; }
-    .bib-hero-stat { display: flex; align-items: center; gap: 7px; font-size: 0.78rem; color: rgba(255,255,255,0.65); font-weight: 500; }
+    .bib-hero-stat { display: flex; align-items: center; gap: 7px; font-size: 0.78rem; color: #71645B; font-weight: 500; font-family:'Inter',sans-serif; }
     .bib-hero-stat-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
 
     .bib-tip-banner { display: flex; align-items: flex-start; gap: 12px; padding: 14px 18px; background: #F8F6F2; border-radius: 12px; border-left: 3px solid var(--terracotta); margin-bottom: 24px; font-size: 0.82rem; color: #555; line-height: 1.65; }
@@ -36,7 +35,7 @@
 
     /* Tab bar — Documents | Messages */
     .bib-tab-bar { display: flex; gap: 4px; margin-bottom: 24px; border-bottom: 2px solid #E8E3DB; }
-    .bib-tab { padding: 10px 18px; font-size: 0.88rem; font-weight: 600; font-family: 'DM Sans', sans-serif; cursor: pointer; background: none; border: none; color: #888; border-bottom: 3px solid transparent; margin-bottom: -2px; transition: all 0.15s; display: flex; align-items: center; gap: 7px; }
+    .bib-tab { padding: 10px 18px; font-size: 0.88rem; font-weight: 600; font-family: 'Inter', sans-serif; cursor: pointer; background: none; border: none; color: #888; border-bottom: 3px solid transparent; margin-bottom: -2px; transition: all 0.15s; display: flex; align-items: center; gap: 7px; }
     .bib-tab:hover { color: var(--terracotta); }
     .bib-tab.active { color: var(--terracotta); border-bottom-color: var(--terracotta); }
     .bib-tab-count { display: inline-flex; align-items: center; justify-content: center; background: #E8E3DB; color: #888; border-radius: 100px; font-size: 0.68rem; font-weight: 700; padding: 1px 7px; }
@@ -83,7 +82,7 @@
 
     /* Action buttons */
     .doc-actions { display: flex; gap: 6px; flex-wrap: wrap; }
-    .doc-btn { display: inline-flex; align-items: center; gap: 5px; padding: 7px 13px; border-radius: 7px; font-size: 0.76rem; font-weight: 600; font-family: 'DM Sans', sans-serif; cursor: pointer; text-decoration: none; transition: all 0.15s; border: none; min-height: 36px; white-space: nowrap; }
+    .doc-btn { display: inline-flex; align-items: center; gap: 5px; padding: 7px 13px; border-radius: 7px; font-size: 0.76rem; font-weight: 600; font-family: 'Inter', sans-serif; cursor: pointer; text-decoration: none; transition: all 0.15s; border: none; min-height: 36px; white-space: nowrap; }
     .doc-btn-primary { background: var(--terracotta); color: #fff; }
     .doc-btn-primary:hover { background: var(--terracotta-dark); }
     .doc-btn-secondary { background: #fff; color: #555; border: 1.5px solid #E8E3DB; }
@@ -95,7 +94,7 @@
     .ck-step-card { }
     .ck-step-card:hover { outline: 1.5px solid #16A34A; }
     .ck-step-badge { position: absolute; top: 10px; right: 12px; background: rgba(22,163,74,0.12); color: #16A34A; font-size: 0.67rem; font-weight: 700; padding: 2px 8px; border-radius: 4px; letter-spacing: 0.04em; text-transform: uppercase; pointer-events: none; }
-    .ck-step-num { width: 44px; height: 44px; border-radius: 10px; background: linear-gradient(135deg, var(--terracotta-dark) 0%, var(--terracotta) 100%); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 1.35rem; font-weight: 700; font-family: 'Cormorant Garamond', serif; flex-shrink: 0; }
+    .ck-step-num { width: 44px; height: 44px; border-radius: 10px; background: linear-gradient(135deg, var(--terracotta-dark) 0%, var(--terracotta) 100%); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; font-weight: 600; font-family: 'Inter', sans-serif; flex-shrink: 0; }
 
     /* ═══════════════════════════════════════
        SECTION MESSAGES
@@ -104,18 +103,18 @@
     /* Search + filters */
     .bib-search-row { display: flex; gap: 8px; margin-bottom: 14px; align-items: center; flex-wrap: wrap; }
     .bib-search-wrap { position: relative; flex: 1; min-width: 180px; }
-    .bib-search { width: 100%; padding: 11px 16px 11px 40px; border: 1.5px solid #E2DDD6; border-radius: 100px; font-size: 0.85rem; font-family: 'DM Sans', sans-serif; outline: none; transition: border-color 0.18s; background: #fff; box-sizing: border-box; box-shadow: 0 1px 3px rgba(0,0,0,0.04); }
+    .bib-search { width: 100%; padding: 11px 16px 11px 40px; border: 1.5px solid #E2DDD6; border-radius: 100px; font-size: 0.85rem; font-family: 'Inter', sans-serif; outline: none; transition: border-color 0.18s; background: #fff; box-sizing: border-box; box-shadow: 0 1px 3px rgba(0,0,0,0.04); }
     .bib-search:focus { border-color: var(--terracotta); box-shadow: 0 0 0 3px rgba(158,58,24,0.08); }
     .bib-search-icon { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: #AAA; pointer-events: none; }
     .bib-filter-btns { display: flex; gap: 6px; flex-wrap: wrap; }
-    .bib-filter { padding: 9px 15px; border-radius: 100px; border: 1.5px solid #E2DDD6; background: #fff; font-size: 0.79rem; font-weight: 600; cursor: pointer; transition: all 0.15s; color: #555; font-family: 'DM Sans', sans-serif; white-space: nowrap; box-shadow: 0 1px 3px rgba(0,0,0,0.04); }
+    .bib-filter { padding: 9px 15px; border-radius: 100px; border: 1.5px solid #E2DDD6; background: #fff; font-size: 0.79rem; font-weight: 600; cursor: pointer; transition: all 0.15s; color: #555; font-family: 'Inter', sans-serif; white-space: nowrap; box-shadow: 0 1px 3px rgba(0,0,0,0.04); }
     .bib-filter:hover { border-color: var(--terracotta); color: var(--terracotta); }
     .bib-filter.on { background: var(--terracotta-dark); border-color: var(--terracotta-dark); color: #fff; }
     .bib-filter.fav-on { background: var(--terracotta); border-color: var(--terracotta); color: #fff; }
 
     /* Category pills */
     .bib-cats { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 20px; }
-    .bib-cat { display: inline-flex; align-items: center; gap: 7px; padding: 9px 16px; border-radius: 12px; border: 1.5px solid #E2DDD6; background: #fff; cursor: pointer; transition: all 0.16s; font-size: 0.81rem; font-weight: 600; color: #444; font-family: 'DM Sans', sans-serif; box-shadow: 0 1px 3px rgba(0,0,0,0.04); }
+    .bib-cat { display: inline-flex; align-items: center; gap: 7px; padding: 9px 16px; border-radius: 12px; border: 1.5px solid #E2DDD6; background: #fff; cursor: pointer; transition: all 0.16s; font-size: 0.81rem; font-weight: 600; color: #444; font-family: 'Inter', sans-serif; box-shadow: 0 1px 3px rgba(0,0,0,0.04); }
     .bib-cat:hover { border-color: var(--terracotta); color: var(--terracotta); background: rgba(158,58,24,0.04); }
     .bib-cat.active { background: var(--terracotta-dark); border-color: var(--terracotta-dark); color: #fff; box-shadow: 0 2px 8px rgba(158,58,24,0.2); }
     .bib-cat-icon { display: inline-flex; align-items: center; flex-shrink: 0; opacity: 0.7; }
@@ -151,24 +150,24 @@
     .tpl-body-wrap { display: none; padding: 0 18px 14px; }
     .tpl-body-wrap.open { display: block; animation: fadeInBib 0.2s; }
     @keyframes fadeInBib { from{opacity:0;transform:translateY(4px)} to{opacity:1;transform:none} }
-    .tpl-body-text { font-size: 0.8rem; color: #333; line-height: 1.85; white-space: pre-wrap; background: #F8F6F3; border-radius: 10px; padding: 14px 16px; border: 1px solid #EDE9E3; font-family: 'DM Sans', sans-serif; }
+    .tpl-body-text { font-size: 0.8rem; color: #333; line-height: 1.85; white-space: pre-wrap; background: #F8F6F3; border-radius: 10px; padding: 14px 16px; border: 1px solid #EDE9E3; font-family: 'Inter', sans-serif; }
     .tpl-tip-bib { margin-top: 10px; font-size: 0.74rem; color: var(--terracotta-dark); padding: 8px 12px 8px 14px; background: rgba(158,58,24,0.06); border-left: 3px solid var(--terracotta); border-radius: 0 8px 8px 0; line-height: 1.55; }
 
     .tpl-actions { display: flex; gap: 7px; padding: 11px 14px 13px; border-top: 1px solid rgba(0,0,0,0.04); background: #FAFAF8; align-items: center; }
-    .tpl-copy-btn { flex: 1; padding: 10px 14px; border-radius: 10px; background: var(--terracotta-dark); color: #fff; border: none; font-size: 0.82rem; font-weight: 700; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: all 0.18s; display: flex; align-items: center; justify-content: center; gap: 7px; letter-spacing: 0.01em; }
+    .tpl-copy-btn { flex: 1; padding: 10px 14px; border-radius: 10px; background: var(--terracotta-dark); color: #fff; border: none; font-size: 0.82rem; font-weight: 700; cursor: pointer; font-family: 'Inter', sans-serif; transition: all 0.18s; display: flex; align-items: center; justify-content: center; gap: 7px; letter-spacing: 0.01em; }
     .tpl-copy-btn:hover { background: #142A1C; }
     .tpl-copy-btn.copied { background: #16A34A; }
     .tpl-fav-btn { width: 40px; height: 40px; border-radius: 10px; border: 1.5px solid #E2DDD6; background: #fff; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.15s; color: #CCC; flex-shrink: 0; }
     .tpl-fav-btn:hover { border-color: var(--terracotta); color: var(--terracotta); }
     .tpl-fav-btn.active { border-color: var(--terracotta); color: var(--terracotta); background: #FDF8F5; }
-    .tpl-expand-btn { padding: 0 12px; height: 40px; border-radius: 10px; border: 1.5px solid #E2DDD6; background: #fff; font-size: 0.74rem; font-weight: 600; cursor: pointer; font-family: 'DM Sans', sans-serif; color: #666; transition: all 0.15s; white-space: nowrap; flex-shrink: 0; display: flex; align-items: center; }
+    .tpl-expand-btn { padding: 0 12px; height: 40px; border-radius: 10px; border: 1.5px solid #E2DDD6; background: #fff; font-size: 0.74rem; font-weight: 600; cursor: pointer; font-family: 'Inter', sans-serif; color: #666; transition: all 0.15s; white-space: nowrap; flex-shrink: 0; display: flex; align-items: center; }
     .tpl-expand-btn:hover { border-color: var(--terracotta); color: var(--terracotta); }
 
     .bib-empty { text-align: center; padding: 56px 20px; color: #BBB; font-size: 0.85rem; grid-column: 1 / -1; }
     .bib-empty-msg { font-size: 0.88rem; color: #999; }
 
     /* Toast */
-    .toast { position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(20px);background:#1a1a1a;color:#fff;padding:10px 20px;border-radius:100px;font-size:0.82rem;font-weight:500;font-family:'DM Sans',sans-serif;opacity:0;transition:all 0.28s;pointer-events:none;white-space:nowrap;z-index:9999; }
+    .toast { position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(20px);background:#1a1a1a;color:#fff;padding:10px 20px;border-radius:100px;font-size:0.82rem;font-weight:500;font-family:'Inter',sans-serif;opacity:0;transition:all 0.28s;pointer-events:none;white-space:nowrap;z-index:9999; }
     .toast.show { opacity:1;transform:translateX(-50%) translateY(0); }
 
     @keyframes copyPop { 0%{transform:scale(1)} 40%{transform:scale(1.06)} 100%{transform:scale(1)} }
@@ -176,7 +175,7 @@
     @media (max-width: 768px) {
       .bib-grid { grid-template-columns: 1fr; }
       .doc-grid { grid-template-columns: 1fr; }
-      .bib-hero-title { font-size: 1.4rem; }
+      .bib-hero-title { font-size: 36px; }
       .bib-tab { padding: 9px 12px; font-size: 0.82rem; }
     }
     @media (max-width: 480px) {
@@ -213,7 +212,7 @@
       display: inline-flex; align-items: center; gap: 7px;
       background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.2);
       color: #fff; border-radius: 8px; padding: 7px 14px;
-      font-size: 0.82rem; font-weight: 600; font-family: 'DM Sans', sans-serif;
+      font-size: 0.82rem; font-weight: 600; font-family: 'Inter', sans-serif;
       cursor: pointer; transition: all 0.15s; white-space: nowrap; flex-shrink: 0;
     }
     .dv-back-btn:hover { background: rgba(255,255,255,0.2); }
@@ -224,7 +223,7 @@
     .dv-header-sep { width: 1px; height: 22px; background: rgba(255,255,255,0.2); flex-shrink: 0; }
     .dv-header-title {
       font-size: 0.9rem; font-weight: 600; color: #fff;
-      font-family: 'DM Sans', sans-serif; flex: 1; white-space: nowrap;
+      font-family: 'Inter', sans-serif; flex: 1; white-space: nowrap;
       overflow: hidden; text-overflow: ellipsis;
     }
     .dv-header-actions { display: flex; gap: 8px; flex-shrink: 0; }
@@ -232,7 +231,7 @@
       display: inline-flex; align-items: center; gap: 6px;
       background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2);
       color: rgba(255,255,255,0.85); border-radius: 8px; padding: 7px 14px;
-      font-size: 0.8rem; font-weight: 600; font-family: 'DM Sans', sans-serif;
+      font-size: 0.8rem; font-weight: 600; font-family: 'Inter', sans-serif;
       cursor: pointer; transition: all 0.15s;
     }
     .dv-print-btn:hover { background: rgba(255,255,255,0.18); }
