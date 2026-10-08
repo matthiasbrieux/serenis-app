@@ -997,9 +997,9 @@
 
     /* ── 3. Section Mes envois : lisibilité et anti-débordement ── */
     @media(max-width:640px) {
-      .ev-msg-text {
-        font-size: 0.85rem !important;
-        line-height: 1.7 !important;
+      .ev-msg-bubble {
+        font-size: 0.84rem !important;
+        line-height: 1.75 !important;
         word-break: break-word;
         overflow-wrap: break-word;
       }
@@ -1031,15 +1031,6 @@
       .ev-card-sub {
         font-size: 0.7rem !important;
         white-space: normal;
-      }
-      .ev-msg-btn {
-        min-height: 44px;
-        width: 100%;
-        justify-content: center;
-        font-size: 0.85rem !important;
-      }
-      .ev-msg-box {
-        padding: 10px 12px;
       }
     }
 
@@ -2928,11 +2919,31 @@
         .ev-link-input { flex:1; min-width:0; padding:8px 11px; border:1.5px solid #e8e0d6; border-radius:7px; font-size:0.79rem; color:#555; background:#fafaf8; cursor:pointer; font-family:inherit; outline:none; }
         .ev-copy-btn { padding:8px 13px; color:#fff; border:none; border-radius:7px; font-size:0.79rem; font-weight:600; cursor:pointer; white-space:nowrap; font-family:inherit; transition:filter 0.15s; }
         .ev-copy-btn:hover { filter:brightness(0.88); }
-        .ev-msg-box { background:#1a1a1a; border-radius:9px; padding:12px 14px; }
-        .ev-msg-lbl { font-weight:700; font-size:0.78rem; color:#fff; margin-bottom:6px; }
-        .ev-msg-text { background:rgba(255,255,255,0.08); border-radius:6px; padding:9px 12px; font-size:0.78rem; color:#e8e8e8; line-height:1.8; margin-bottom:8px; }
-        .ev-msg-btn { display:inline-flex; align-items:center; gap:5px; color:#fff; border:none; border-radius:6px; padding:7px 12px; font-size:0.78rem; font-weight:600; cursor:pointer; font-family:inherit; transition:filter 0.15s; }
-        .ev-msg-btn:hover { filter:brightness(0.88); }
+        /* ── Messages prêts à l'envoi — design smartphone ── */
+        .ev-msg-wrap { margin-top:14px; }
+        .ev-msg-header { display:flex; align-items:center; gap:10px; margin-bottom:10px; }
+        .ev-msg-header-icon { width:40px; height:40px; border-radius:10px; background:#F8F1E7; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+        .ev-msg-header-label { font-size:0.65rem; font-weight:800; text-transform:uppercase; letter-spacing:0.09em; color:var(--terracotta); }
+        .ev-msg-header-sub { font-size:0.75rem; font-weight:600; color:#302A26; margin-top:2px; }
+        .ev-msg-phone { border:2px solid #d5cdc5; border-radius:24px; padding:8px 8px 6px; background:#fff; box-shadow:0 4px 16px rgba(0,0,0,0.07); }
+        .ev-msg-phone-handle { width:32px; height:4px; border-radius:2px; background:#d5cdc5; margin:0 auto 8px; }
+        .ev-msg-phone-handle-bot { width:32px; height:4px; border-radius:2px; background:#d5cdc5; margin:8px auto 0; }
+        .ev-msg-screen-hdr { display:flex; align-items:center; justify-content:center; gap:8px; padding:8px 14px 10px; border-bottom:1px solid #ede8e1; }
+        .ev-msg-screen-hdr-txt { font-size:0.82rem; font-weight:600; color:#302A26; }
+        .ev-msg-bubble { background:#F8F1E7; border-radius:12px; padding:14px 16px; margin:10px 8px 8px; font-size:0.86rem; color:#302A26; line-height:1.8; }
+        .ev-msg-bubble.notaire-bubble { white-space:pre-line; }
+        .ev-msg-var { background:rgba(158,58,24,0.12); color:var(--terracotta); border-radius:4px; padding:1px 6px; font-weight:600; white-space:nowrap; }
+        .ev-msg-copy-btn { display:block; width:100%; padding:13px 16px; background:var(--terracotta); color:#fff; border:none; border-radius:10px; font-size:0.9rem; font-weight:700; cursor:pointer; font-family:inherit; margin-top:12px; transition:background 0.15s; text-align:center; }
+        .ev-msg-copy-btn:hover { background:#7d2e12; }
+        .ev-msg-copy-btn.copied { background:#2e7d32; }
+        .ev-msg-note { font-size:0.72rem; color:#aaa; text-align:center; margin:8px 0 0; }
+        @media(max-width:640px) {
+          .ev-msg-phone { border:none; border-radius:12px; box-shadow:none; padding:0; background:#F8F1E7; }
+          .ev-msg-phone-handle, .ev-msg-phone-handle-bot { display:none; }
+          .ev-msg-screen-hdr { padding:10px 12px; border-radius:12px 12px 0 0; background:#fff; border-bottom:1px solid #ede8e1; }
+          .ev-msg-bubble { margin:0; border-radius:0 0 12px 12px; }
+          .ev-msg-copy-btn { min-height:44px; font-size:0.88rem; }
+        }
       </style>
 <div class="vpm-share-layout"><header class="vpm-section-heading"><h2>Prêt à envoyer</h2><p>Choisissez le dossier à transmettre à votre acheteur.</p></header><div class="ev-card vpm-featured" id="ev-card-fiche">
 <div class="vpm-card-actions"><button class="vpm-copy-action" onclick="evCopyLink('ev-link-fiche',this)" type="button">Copier le lien</button><button class="vpm-preview-action" onclick="vpmOpenDossier('fiche')" type="button">Voir le dossier acheteur →</button></div><button aria-controls="ev-body-fiche" aria-expanded="false" class="ev-card-btn" onclick="toggleEvCard('fiche')" type="button">
@@ -2946,10 +2957,19 @@
 <input class="ev-link-input" id="ev-link-fiche" onclick="this.select()" placeholder="Chargement du lien..." readonly="" type="text"/>
 <button class="ev-copy-btn" onclick="evCopyLink('ev-link-fiche',this)" type="button">Copier le lien</button>
 </div>
-<div class="ev-msg-box">
-<div class="ev-msg-lbl">📱 Message prêt à l'envoi</div>
-<div class="ev-msg-text">Bonjour, je suis [Votre prénom], le propriétaire du bien.<br/><br/>Suite à votre intérêt pour la maison, je vous transmets le dossier complet regroupant la fiche descriptive, les photos ainsi que les diagnostics obligatoires.<br/><br/><span id="ev-sms-fiche">Chargement...</span><br/><br/>Afin de faciliter nos échanges et de pouvoir répondre au mieux à vos questions concernant le bien, j'ai choisi d'être accompagné par Vendu par moi, qui m'aide à centraliser toutes les informations importantes et à mieux organiser les visites.<br/><br/>Vous retrouverez également en bas de la page mes disponibilités pour vous faire visiter le bien.<br/><br/>N'hésitez pas à me contacter si vous avez des questions complémentaires.<br/><br/>À bientôt,<br/>[Votre prénom]</div>
-<button class="ev-msg-btn" onclick="evCopyMsg('fiche',this)" type="button">📋 Copier le message</button>
+<div class="ev-msg-wrap">
+<div class="ev-msg-header">
+  <div class="ev-msg-header-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--terracotta)" stroke-width="1.8"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><polyline points="9 16 11 18 15 14"/></svg></div>
+  <div><div class="ev-msg-header-label">Message prêt à l'envoi</div><div class="ev-msg-header-sub">Dossier complet — avant la visite</div></div>
+</div>
+<div class="ev-msg-phone">
+  <div class="ev-msg-phone-handle"></div>
+  <div class="ev-msg-screen-hdr"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--terracotta)" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><polyline points="9 16 11 18 15 14"/></svg><span class="ev-msg-screen-hdr-txt">Votre message à l'acheteur</span></div>
+  <div class="ev-msg-bubble">Bonjour, je suis <span class="ev-msg-var">Votre prénom</span>, le propriétaire du bien.<br><br>Suite à votre intérêt pour la maison, je vous transmets le dossier complet regroupant la fiche descriptive, les photos ainsi que les diagnostics obligatoires.<br><br><span id="ev-sms-fiche">Chargement...</span><br><br>Afin de faciliter nos échanges et de pouvoir répondre au mieux à vos questions concernant le bien, j'ai choisi d'être accompagné par Vendu par moi, qui m'aide à centraliser toutes les informations importantes et à mieux organiser les visites.<br><br>Vous retrouverez également en bas de la page mes disponibilités pour vous faire visiter le bien.<br><br>N'hésitez pas à me contacter si vous avez des questions complémentaires.<br><br>À bientôt,<br><span class="ev-msg-var">Votre prénom</span></div>
+  <div class="ev-msg-phone-handle-bot"></div>
+</div>
+<button class="ev-msg-copy-btn" onclick="evCopyMsg('fiche',this)" type="button">Copier le message</button>
+<p class="ev-msg-note">Aperçu · aucun message n'est envoyé.</p>
 </div>
 </div>
 <div class="vpm-feature-chips"><span>Fiche descriptive</span><span>Photos</span><span>Diagnostics</span><span>Visites</span></div></div><div class="vpm-share-middle"><section class="vpm-separate"><h3>Partager un élément séparément</h3><p>Un lien pour chaque élément, à partager selon vos besoins.</p><div class="ev-card" id="ev-card-dpe">
@@ -2964,10 +2984,19 @@
 <input class="ev-link-input" id="ev-link-dpe" onclick="this.select()" placeholder="Chargement du lien..." readonly="" type="text"/>
 <button class="ev-copy-btn" onclick="evCopyLink('ev-link-dpe',this)" type="button">Copier le lien</button>
 </div>
-<div class="ev-msg-box">
-<div class="ev-msg-lbl">📱 Message prêt à l'envoi</div>
-<div class="ev-msg-text">Bonjour,<br/><br/>En amont de notre visite, je vous transmets le dossier complet incluant le DPE et l'ensemble des diagnostics obligatoires du bien (performance énergétique, amiante, plomb, électricité…) 🏡<br/><br/><span id="ev-sms-dpe">Chargement...</span><br/><br/>N'hésitez pas à me contacter si vous avez des questions avant la visite.<br/><br/>Cordialement,<br/>[Votre prénom]</div>
-<button class="ev-msg-btn" onclick="evCopyMsg('dpe',this)" type="button">📋 Copier le message</button>
+<div class="ev-msg-wrap">
+<div class="ev-msg-header">
+  <div class="ev-msg-header-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--terracotta)" stroke-width="1.8"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><polyline points="9 16 11 18 15 14"/></svg></div>
+  <div><div class="ev-msg-header-label">Message prêt à l'envoi</div><div class="ev-msg-header-sub">DPE et diagnostics — avant la visite</div></div>
+</div>
+<div class="ev-msg-phone">
+  <div class="ev-msg-phone-handle"></div>
+  <div class="ev-msg-screen-hdr"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--terracotta)" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><polyline points="9 16 11 18 15 14"/></svg><span class="ev-msg-screen-hdr-txt">Votre message à l'acheteur</span></div>
+  <div class="ev-msg-bubble">Bonjour,<br><br>En amont de notre visite, je vous transmets le dossier complet incluant le DPE et l'ensemble des diagnostics obligatoires du bien (performance énergétique, amiante, plomb, électricité…)<br><br><span id="ev-sms-dpe">Chargement...</span><br><br>N'hésitez pas à me contacter si vous avez des questions avant la visite.<br><br>Cordialement,<br><span class="ev-msg-var">Votre prénom</span></div>
+  <div class="ev-msg-phone-handle-bot"></div>
+</div>
+<button class="ev-msg-copy-btn" onclick="evCopyMsg('dpe',this)" type="button">Copier le message</button>
+<p class="ev-msg-note">Aperçu · aucun message n'est envoyé.</p>
 </div>
 </div>
 </div><div class="ev-card" id="ev-card-pro">
@@ -2982,10 +3011,19 @@
 <input class="ev-link-input" id="ev-link-pro" onclick="this.select()" placeholder="Chargement du lien..." readonly="" type="text"/>
 <button class="ev-copy-btn" onclick="evCopyLink('ev-link-pro',this)" type="button">Copier le lien</button>
 </div>
-<div class="ev-msg-box">
-<div class="ev-msg-lbl">📱 Message prêt à l'envoi</div>
-<div class="ev-msg-text">Bonjour,<br/><br/>Je vous transmets le lien vers les photos professionnelles de mon bien. N'hésitez pas à les consulter avant notre rendez-vous 🙂<br/><br/><span id="ev-sms-pro">Chargement...</span><br/><br/>Cordialement,<br/>[Votre prénom]</div>
-<button class="ev-msg-btn" onclick="evCopyMsg('pro',this)" type="button">📋 Copier le message</button>
+<div class="ev-msg-wrap">
+<div class="ev-msg-header">
+  <div class="ev-msg-header-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--terracotta)" stroke-width="1.8"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><polyline points="9 16 11 18 15 14"/></svg></div>
+  <div><div class="ev-msg-header-label">Message prêt à l'envoi</div><div class="ev-msg-header-sub">Photos professionnelles</div></div>
+</div>
+<div class="ev-msg-phone">
+  <div class="ev-msg-phone-handle"></div>
+  <div class="ev-msg-screen-hdr"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--terracotta)" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><polyline points="9 16 11 18 15 14"/></svg><span class="ev-msg-screen-hdr-txt">Votre message à l'acheteur</span></div>
+  <div class="ev-msg-bubble">Bonjour,<br><br>Je vous transmets le lien vers les photos professionnelles de mon bien. N'hésitez pas à les consulter avant notre rendez-vous.<br><br><span id="ev-sms-pro">Chargement...</span><br><br>Cordialement,<br><span class="ev-msg-var">Votre prénom</span></div>
+  <div class="ev-msg-phone-handle-bot"></div>
+</div>
+<button class="ev-msg-copy-btn" onclick="evCopyMsg('pro',this)" type="button">Copier le message</button>
+<p class="ev-msg-note">Aperçu · aucun message n'est envoyé.</p>
 </div>
 </div>
 </div><div class="ev-card" id="ev-card-decouverte">
@@ -3000,10 +3038,19 @@
 <input class="ev-link-input" id="ev-link-decouverte" onclick="this.select()" placeholder="Chargement du lien..." readonly="" type="text"/>
 <button class="ev-copy-btn" onclick="evCopyLink('ev-link-decouverte',this)" type="button">Copier le lien</button>
 </div>
-<div class="ev-msg-box">
-<div class="ev-msg-lbl">📱 Message prêt à l'envoi</div>
-<div class="ev-msg-text">Bonjour,<br/><br/>Je vous transmets le lien vers les photos immersives de mon bien (séjour, cuisine, chambres, salle de bain...). N'hésitez pas à les consulter avant notre rendez-vous 🙂<br/><br/><span id="ev-sms-decouverte">Chargement...</span><br/><br/>Cordialement,<br/>[Votre prénom]</div>
-<button class="ev-msg-btn" onclick="evCopyMsg('decouverte',this)" type="button">📋 Copier le message</button>
+<div class="ev-msg-wrap">
+<div class="ev-msg-header">
+  <div class="ev-msg-header-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--terracotta)" stroke-width="1.8"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><polyline points="9 16 11 18 15 14"/></svg></div>
+  <div><div class="ev-msg-header-label">Message prêt à l'envoi</div><div class="ev-msg-header-sub">Photos immersives</div></div>
+</div>
+<div class="ev-msg-phone">
+  <div class="ev-msg-phone-handle"></div>
+  <div class="ev-msg-screen-hdr"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--terracotta)" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><polyline points="9 16 11 18 15 14"/></svg><span class="ev-msg-screen-hdr-txt">Votre message à l'acheteur</span></div>
+  <div class="ev-msg-bubble">Bonjour,<br><br>Je vous transmets le lien vers les photos immersives de mon bien (séjour, cuisine, chambres, salle de bain...). N'hésitez pas à les consulter avant notre rendez-vous.<br><br><span id="ev-sms-decouverte">Chargement...</span><br><br>Cordialement,<br><span class="ev-msg-var">Votre prénom</span></div>
+  <div class="ev-msg-phone-handle-bot"></div>
+</div>
+<button class="ev-msg-copy-btn" onclick="evCopyMsg('decouverte',this)" type="button">Copier le message</button>
+<p class="ev-msg-note">Aperçu · aucun message n'est envoyé.</p>
 </div>
 </div>
 </div><div class="ev-card" id="ev-card-exterieur">
@@ -3018,10 +3065,19 @@
 <input class="ev-link-input" id="ev-link-exterieur" onclick="this.select()" placeholder="Chargement du lien..." readonly="" type="text"/>
 <button class="ev-copy-btn" onclick="evCopyLink('ev-link-exterieur',this)" type="button">Copier le lien</button>
 </div>
-<div class="ev-msg-box">
-<div class="ev-msg-lbl">📱 Message prêt à l'envoi</div>
-<div class="ev-msg-text">Bonjour,<br/><br/>Je vous transmets le lien vers les photos de la façade et de l'extérieur de mon bien. Vous pourrez ainsi visualiser l'environnement avant notre visite 🙂<br/><br/><span id="ev-sms-exterieur">Chargement...</span><br/><br/>Cordialement,<br/>[Votre prénom]</div>
-<button class="ev-msg-btn" onclick="evCopyMsg('exterieur',this)" type="button">📋 Copier le message</button>
+<div class="ev-msg-wrap">
+<div class="ev-msg-header">
+  <div class="ev-msg-header-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--terracotta)" stroke-width="1.8"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><polyline points="9 16 11 18 15 14"/></svg></div>
+  <div><div class="ev-msg-header-label">Message prêt à l'envoi</div><div class="ev-msg-header-sub">Photos extérieur et façade</div></div>
+</div>
+<div class="ev-msg-phone">
+  <div class="ev-msg-phone-handle"></div>
+  <div class="ev-msg-screen-hdr"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--terracotta)" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><polyline points="9 16 11 18 15 14"/></svg><span class="ev-msg-screen-hdr-txt">Votre message à l'acheteur</span></div>
+  <div class="ev-msg-bubble">Bonjour,<br><br>Je vous transmets le lien vers les photos de la façade et de l'extérieur de mon bien. Vous pourrez ainsi visualiser l'environnement avant notre visite.<br><br><span id="ev-sms-exterieur">Chargement...</span><br><br>Cordialement,<br><span class="ev-msg-var">Votre prénom</span></div>
+  <div class="ev-msg-phone-handle-bot"></div>
+</div>
+<button class="ev-msg-copy-btn" onclick="evCopyMsg('exterieur',this)" type="button">Copier le message</button>
+<p class="ev-msg-note">Aperçu · aucun message n'est envoyé.</p>
 </div>
 </div>
 </div><div class="ev-card" id="ev-card-details">
@@ -3036,10 +3092,19 @@
 <input class="ev-link-input" id="ev-link-details" onclick="this.select()" placeholder="Chargement du lien..." readonly="" type="text"/>
 <button class="ev-copy-btn" onclick="evCopyLink('ev-link-details',this)" type="button">Copier le lien</button>
 </div>
-<div class="ev-msg-box">
-<div class="ev-msg-lbl">📱 Message prêt à l'envoi</div>
-<div class="ev-msg-text">Bonjour,<br/><br/>Avant notre visite, je vous transmets les photos techniques du bien (chaudière, compteur, installation électrique...) pour que vous puissiez en prendre connaissance 🙂<br/><br/><span id="ev-sms-details">Chargement...</span><br/><br/>Cordialement,<br/>[Votre prénom]</div>
-<button class="ev-msg-btn" onclick="evCopyMsg('details',this)" type="button">📋 Copier le message</button>
+<div class="ev-msg-wrap">
+<div class="ev-msg-header">
+  <div class="ev-msg-header-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--terracotta)" stroke-width="1.8"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><polyline points="9 16 11 18 15 14"/></svg></div>
+  <div><div class="ev-msg-header-label">Message prêt à l'envoi</div><div class="ev-msg-header-sub">Photos des détails techniques</div></div>
+</div>
+<div class="ev-msg-phone">
+  <div class="ev-msg-phone-handle"></div>
+  <div class="ev-msg-screen-hdr"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--terracotta)" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><polyline points="9 16 11 18 15 14"/></svg><span class="ev-msg-screen-hdr-txt">Votre message à l'acheteur</span></div>
+  <div class="ev-msg-bubble">Bonjour,<br><br>Avant notre visite, je vous transmets les photos techniques du bien (chaudière, compteur, installation électrique...) pour que vous puissiez en prendre connaissance.<br><br><span id="ev-sms-details">Chargement...</span><br><br>Cordialement,<br><span class="ev-msg-var">Votre prénom</span></div>
+  <div class="ev-msg-phone-handle-bot"></div>
+</div>
+<button class="ev-msg-copy-btn" onclick="evCopyMsg('details',this)" type="button">Copier le message</button>
+<p class="ev-msg-note">Aperçu · aucun message n'est envoyé.</p>
 </div>
 </div>
 </div></section><aside class="vpm-share-advice"><span>Le bon réflexe</span><h3>Informer avant de faire visiter.</h3><p>Le dossier complet aide l’acheteur à découvrir votre bien et à préparer ses questions avant la visite.</p></aside></div><div class="vpm-share-bottom"><section class="vpm-after"><h3>Après la visite</h3><div class="ev-card" id="ev-card-acheteur">
@@ -3054,10 +3119,19 @@
 <input class="ev-link-input" id="ev-link-acheteur" onclick="this.select()" placeholder="Chargement du lien..." readonly="" type="text"/>
 <button class="ev-copy-btn" onclick="evCopyLink('ev-link-acheteur',this)" type="button">Copier le lien</button>
 </div>
-<div class="ev-msg-box">
-<div class="ev-msg-lbl">📱 Message prêt à l'envoi</div>
-<div class="ev-msg-text">Bonjour [Prénom],<br/><br/>Suite à votre visite et afin de vous aider dans votre réflexion, je vous transmets mes documents complémentaires (entretien chaudière, ramonage, travaux réalisés...) :<br/><br/><span id="ev-sms-acheteur">Chargement...</span><br/><br/>N'hésitez pas à me contacter si vous avez des questions. 🙂<br/><br/>Cordialement,<br/>[Votre prénom]</div>
-<button class="ev-msg-btn" onclick="evCopyMsg('acheteur',this)" type="button">📋 Copier le message</button>
+<div class="ev-msg-wrap">
+<div class="ev-msg-header">
+  <div class="ev-msg-header-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--terracotta)" stroke-width="1.8"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><polyline points="9 16 11 18 15 14"/></svg></div>
+  <div><div class="ev-msg-header-label">Message prêt à l'envoi</div><div class="ev-msg-header-sub">Dossier acheteur sérieux — après visite</div></div>
+</div>
+<div class="ev-msg-phone">
+  <div class="ev-msg-phone-handle"></div>
+  <div class="ev-msg-screen-hdr"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--terracotta)" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><polyline points="9 16 11 18 15 14"/></svg><span class="ev-msg-screen-hdr-txt">Votre message à l'acheteur</span></div>
+  <div class="ev-msg-bubble">Bonjour <span class="ev-msg-var">Prénom acheteur</span>,<br><br>Suite à votre visite et afin de vous aider dans votre réflexion, je vous transmets mes documents complémentaires (entretien chaudière, ramonage, travaux réalisés...) :<br><br><span id="ev-sms-acheteur">Chargement...</span><br><br>N'hésitez pas à me contacter si vous avez des questions.<br><br>Cordialement,<br><span class="ev-msg-var">Votre prénom</span></div>
+  <div class="ev-msg-phone-handle-bot"></div>
+</div>
+<button class="ev-msg-copy-btn" onclick="evCopyMsg('acheteur',this)" type="button">Copier le message</button>
+<p class="ev-msg-note">Aperçu · aucun message n'est envoyé.</p>
 </div>
 </div>
 </div></section><section class="vpm-notary"><h3>Pour mon notaire</h3><div class="ev-card" id="ev-card-notaire">
@@ -3072,10 +3146,19 @@
 <input class="ev-link-input" id="ev-link-notaire" onclick="this.select()" placeholder="Chargement du lien..." readonly="" type="text"/>
 <button class="ev-copy-btn" onclick="evCopyLink('ev-link-notaire',this)" type="button">Copier le lien</button>
 </div>
-<div class="ev-msg-box">
-<div class="ev-msg-lbl">✉️ Email professionnel prêt à l'envoi</div>
-<div class="ev-msg-text" id="ev-msg-notaire-text">Chargement...</div>
-<button class="ev-msg-btn" onclick="evCopyMsg('notaire',this)" type="button">📋 Copier le message</button>
+<div class="ev-msg-wrap">
+<div class="ev-msg-header">
+  <div class="ev-msg-header-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--terracotta)" stroke-width="1.8"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg></div>
+  <div><div class="ev-msg-header-label">Email professionnel</div><div class="ev-msg-header-sub">Dossier notaire — lien sécurisé</div></div>
+</div>
+<div class="ev-msg-phone">
+  <div class="ev-msg-phone-handle"></div>
+  <div class="ev-msg-screen-hdr"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--terracotta)" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg><span class="ev-msg-screen-hdr-txt">Votre email au notaire</span></div>
+  <div class="ev-msg-bubble notaire-bubble" id="ev-msg-notaire-text">Chargement...</div>
+  <div class="ev-msg-phone-handle-bot"></div>
+</div>
+<button class="ev-msg-copy-btn" onclick="evCopyMsg('notaire',this)" type="button">Copier l'email</button>
+<p class="ev-msg-note">Aperçu · aucun email n'est envoyé automatiquement.</p>
 </div>
 </div>
 </div></section></div></div>
@@ -3120,8 +3203,10 @@
         var text = msgs[key] || lnk;
         if (!text) return;
         navigator.clipboard.writeText(text).then(function() {
-          var orig = btn.textContent; btn.textContent = '✓ Copié !';
-          setTimeout(function() { btn.textContent = orig; }, 2000);
+          var orig = btn.textContent;
+          btn.textContent = 'Message copié ✓';
+          btn.classList.add('copied');
+          setTimeout(function() { btn.textContent = orig; btn.classList.remove('copied'); }, 2000);
         });
       }
       </script>
