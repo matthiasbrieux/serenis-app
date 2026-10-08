@@ -1,0 +1,434 @@
+/* ═══════════════════════════════════════════════════════════════
+   property-infos.css — Design premium onglet Informations
+   Scoped à #tab-infos #propertyForm pour éviter tout conflit
+   Variables : --terracotta:#9E3A18  --terracotta-dark:#86412A
+               --vpm-cream:#F8F1E7   --vpm-border:#E8D9CC
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ── Variables locales ──────────────────────────────────────── */
+#tab-infos #propertyForm {
+  --pi-terracotta: #9E3A18;
+  --pi-terracotta-dark: #86412A;
+  --pi-cream: #F8F1E7;
+  --pi-border: #E8D9CC;
+  --pi-card-bg: #ffffff;
+  --pi-card-radius: 14px;
+  --pi-card-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+/* ── Conteneur principal du formulaire ──────────────────────── */
+#tab-infos #propertyForm {
+  background: #F5F0EB;
+  border: none;
+  border-radius: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+/* ── Cartes de section (prop-card) ──────────────────────────── */
+/* Chaque section (depuis section-divider jusqu'au prochain) est
+   visuellement encadrée. On utilise un wrapping logique via les
+   section-divider comme séparateurs visuels de blocs. */
+#tab-infos #propertyForm .prop-card {
+  background: var(--pi-card-bg);
+  border: 1.5px solid var(--pi-border);
+  border-radius: var(--pi-card-radius);
+  padding: 24px;
+  margin-bottom: 16px;
+  box-shadow: var(--pi-card-shadow);
+}
+
+/* ── Section headers ─────────────────────────────────────────── */
+#tab-infos #propertyForm .section-divider {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #1C1A17;
+  margin: 0 0 18px !important;
+  padding: 0 0 14px;
+  border-bottom: 1.5px solid var(--pi-border);
+}
+
+/* Annule le pseudo-element ligne existant dans le style global */
+#tab-infos #propertyForm .section-divider::after {
+  display: none;
+}
+
+#tab-infos #propertyForm .section-divider h3 {
+  font-family: 'DM Sans', Arial, sans-serif;
+  font-size: 1rem;
+  font-weight: 700;
+  color: #1C1A17;
+  background: none;
+  border: none;
+  border-radius: 0;
+  padding: 0;
+  white-space: normal;
+  text-transform: none;
+  letter-spacing: 0;
+  margin: 0;
+}
+
+/* Icône décorative terracotta avant le titre */
+#tab-infos #propertyForm .section-divider::before {
+  content: '';
+  display: inline-block;
+  width: 4px;
+  height: 18px;
+  background: var(--pi-terracotta);
+  border-radius: 3px;
+  flex-shrink: 0;
+}
+
+/* ── Labels de champs ─────────────────────────────────────────── */
+#tab-infos #propertyForm .form-group label {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: #555;
+  display: block;
+  margin-bottom: 6px;
+}
+
+/* Marqueur obligatoire * sur les champs requis */
+#tab-infos #propertyForm .form-group label[for="address"],
+#tab-infos #propertyForm input[required] + label,
+#tab-infos #propertyForm .form-group:has(input[required]) label,
+#tab-infos #propertyForm .form-group:has(input[name="address"]) label,
+#tab-infos #propertyForm .form-group:has(input[name="city"]) label,
+#tab-infos #propertyForm .form-group:has(input[name="postal_code"]) label,
+#tab-infos #propertyForm .form-group:has(input[name="price"]) label {
+  /* L'astérisque est déjà dans le HTML via « * » — on le colore */
+}
+
+/* Colorer le * dans les labels obligatoires */
+#tab-infos #propertyForm .form-group label > span.req,
+#tab-infos #propertyForm .form-group .required-star {
+  color: #d0302a;
+  font-weight: 700;
+  margin-left: 2px;
+}
+
+/* ── Inputs, selects, textareas ──────────────────────────────── */
+#tab-infos #propertyForm input:not([type=checkbox]):not([type=radio]):not([type=range]):not([type=hidden]),
+#tab-infos #propertyForm select,
+#tab-infos #propertyForm textarea {
+  border: 1.5px solid var(--pi-border);
+  border-radius: 8px;
+  padding: 11px 14px;
+  font-family: 'DM Sans', Arial, sans-serif;
+  font-size: 0.9rem;
+  color: #1C1A17;
+  background: #fff;
+  min-height: 44px;
+  transition: border-color 0.15s, box-shadow 0.15s;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+#tab-infos #propertyForm input:not([type=checkbox]):not([type=radio]):not([type=range]):not([type=hidden]):focus,
+#tab-infos #propertyForm select:focus,
+#tab-infos #propertyForm textarea:focus {
+  border-color: var(--pi-terracotta);
+  box-shadow: 0 0 0 3px rgba(158,58,24,0.10);
+  outline: none;
+}
+
+/* ── Champ adresse mis en évidence ──────────────────────────── */
+#tab-infos #propertyForm input[name="address"] {
+  background: #FDF8F3;
+  border-color: #D9C4B4;
+  padding-left: 38px;
+  background-image: url("data:image/svg+xml,%3Csvg width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%239E3A18' stroke-width='1.8' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z'/%3E%3Ccircle cx='12' cy='10' r='3'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: 12px center;
+}
+
+/* ── Chips (.chip-option) ───────────────────────────────────── */
+#tab-infos #propertyForm .chip-option {
+  border: 1.5px solid #ddd;
+  border-radius: 8px;
+  padding: 8px 14px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  background: #fff;
+  color: #333;
+  cursor: pointer;
+  transition: all 0.15s;
+  min-height: 38px;
+  display: inline-flex;
+  align-items: center;
+  font-family: 'DM Sans', Arial, sans-serif;
+}
+
+#tab-infos #propertyForm .chip-option:hover {
+  border-color: var(--pi-terracotta);
+  color: var(--pi-terracotta);
+  background: rgba(158,58,24,0.04);
+}
+
+#tab-infos #propertyForm .chip-option.active {
+  background: rgba(158,58,24,0.08);
+  border-color: var(--pi-terracotta);
+  color: var(--pi-terracotta);
+  font-weight: 600;
+}
+
+/* ── Type de bien tiles (.type-card) ────────────────────────── */
+#tab-infos #propertyForm .type-card {
+  border-radius: 12px;
+  border: 1.5px solid var(--pi-border);
+  padding: 16px;
+  min-height: 80px;
+  background: #fff;
+  cursor: pointer;
+  transition: all 0.15s;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  box-shadow: none;
+}
+
+#tab-infos #propertyForm .type-card:hover {
+  border-color: var(--pi-terracotta);
+  background: rgba(158,58,24,0.03);
+}
+
+#tab-infos #propertyForm .type-card.active,
+#tab-infos #propertyForm .type-card.selected {
+  border: 2px solid var(--pi-terracotta);
+  background: var(--pi-cream);
+  box-shadow: none;
+}
+
+/* ── Mitoyenneté tiles (.mito-card) ─────────────────────────── */
+#tab-infos #propertyForm .mito-card {
+  border-radius: 10px;
+  border: 1.5px solid var(--pi-border);
+  background: #fff;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+#tab-infos #propertyForm .mito-card:hover {
+  border-color: var(--pi-terracotta);
+}
+
+#tab-infos #propertyForm .mito-card.active,
+#tab-infos #propertyForm .mito-card.selected {
+  border-color: var(--pi-terracotta);
+  background: var(--pi-cream);
+}
+
+/* ── Équipements tiles (.equip-tile) ────────────────────────── */
+#tab-infos #propertyForm .equip-tile {
+  border-radius: 10px;
+  padding: 10px 12px;
+  border: 1.5px solid #e0d8d0;
+  background: #fff;
+  cursor: pointer;
+  transition: all 0.15s;
+  font-family: 'DM Sans', Arial, sans-serif;
+  font-size: 0.83rem;
+}
+
+#tab-infos #propertyForm .equip-tile:hover {
+  border-color: var(--pi-terracotta);
+}
+
+#tab-infos #propertyForm .equip-tile.active,
+#tab-infos #propertyForm .equip-tile.selected {
+  background: var(--pi-cream);
+  border-color: var(--pi-terracotta);
+  color: var(--pi-terracotta);
+  font-weight: 600;
+}
+
+/* ── Grilles formulaire ─────────────────────────────────────── */
+#tab-infos #propertyForm .form-grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+#tab-infos #propertyForm .form-grid-3 {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 16px;
+}
+
+/* ── Boutons IA et suggestions ──────────────────────────────── */
+#tab-infos #propertyForm .btn-ai,
+#tab-infos #propertyForm .poi-suggest-btn,
+#tab-infos #propertyForm button[onclick*="generateAIDescription"],
+#tab-infos #propertyForm button[onclick*="fetchNearbyPOIs"] {
+  background: var(--pi-terracotta);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 11px 20px;
+  font-weight: 600;
+  font-family: 'DM Sans', Arial, sans-serif;
+  font-size: 0.88rem;
+  cursor: pointer;
+  transition: background 0.15s, transform 0.12s;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  min-height: 44px;
+}
+
+#tab-infos #propertyForm .btn-ai:hover,
+#tab-infos #propertyForm .poi-suggest-btn:hover,
+#tab-infos #propertyForm button[onclick*="generateAIDescription"]:hover,
+#tab-infos #propertyForm button[onclick*="fetchNearbyPOIs"]:hover {
+  background: var(--pi-terracotta-dark);
+  transform: translateY(-1px);
+}
+
+#tab-infos #propertyForm .btn-ai:disabled,
+#tab-infos #propertyForm .poi-suggest-btn:disabled {
+  opacity: 0.6;
+  cursor: wait;
+  transform: none;
+}
+
+/* Bouton régénérer (fond blanc, bordure terracotta) */
+#tab-infos #propertyForm #aiRegenBtn {
+  background: #fff;
+  color: var(--pi-terracotta);
+  border: 1.5px solid var(--pi-terracotta);
+}
+
+#tab-infos #propertyForm #aiRegenBtn:hover {
+  background: var(--pi-cream);
+}
+
+/* ── Barre de sauvegarde ────────────────────────────────────── */
+#tab-infos #propertyForm .save-action-bar {
+  background: #fff;
+  border: 1.5px solid var(--pi-border);
+  border-radius: 12px;
+  padding: 16px 20px;
+  box-shadow: 0 4px 16px rgba(28,26,23,0.06);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+/* ── POI panel ──────────────────────────────────────────────── */
+#tab-infos #propertyForm .poi-panel {
+  background: #f8f5f0;
+  border-radius: 10px;
+  border: 1.5px solid #e8e0d6;
+  padding: 14px 16px;
+  margin-top: 12px;
+}
+
+#tab-infos #propertyForm .poi-chip {
+  border-radius: 20px;
+  border: 1.5px solid var(--pi-terracotta);
+  background: #fff;
+  color: var(--pi-terracotta);
+  font-size: 0.78rem;
+  font-weight: 500;
+  padding: 5px 12px;
+  cursor: pointer;
+  transition: all 0.13s;
+  font-family: 'DM Sans', Arial, sans-serif;
+}
+
+#tab-infos #propertyForm .poi-chip:hover {
+  background: var(--pi-terracotta);
+  color: #fff;
+}
+
+#tab-infos #propertyForm .poi-chip.applied {
+  background: rgba(158,58,24,0.06);
+  border-color: rgba(158,58,24,0.18);
+  color: var(--pi-terracotta-dark);
+  cursor: default;
+}
+
+/* ── DPE display cards ──────────────────────────────────────── */
+#tab-infos #propertyForm .dpe-disp-card {
+  border-radius: 14px;
+  border: 1.5px solid #e8e0d6;
+  background: #fff;
+  box-shadow: var(--pi-card-shadow);
+}
+
+/* ── Prix coach ─────────────────────────────────────────────── */
+#tab-infos #propertyForm .prix-coach {
+  border-radius: 12px;
+  border: 1.5px solid rgba(158,58,24,0.15);
+  background: linear-gradient(135deg, rgba(158,58,24,0.04) 0%, #faf7f2 100%);
+  padding: 20px;
+  margin-top: 16px;
+}
+
+/* ── Rooms summary ──────────────────────────────────────────── */
+#tab-infos #propertyForm .rooms-summary {
+  background: var(--pi-cream);
+  border-radius: 10px;
+  border: 1.5px solid var(--pi-border);
+  padding: 12px 16px;
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+#tab-infos #propertyForm .rooms-summary-stat {
+  font-size: 0.88rem;
+  color: #555;
+}
+
+#tab-infos #propertyForm .rooms-summary-stat strong {
+  color: #1C1A17;
+  font-weight: 700;
+}
+
+/* ── Situation blocs ────────────────────────────────────────── */
+#tab-infos #propertyForm .situation-block {
+  background: #fff8f5;
+  border-radius: 10px;
+  border: 1.5px solid #f0c8b8;
+  margin-top: 10px;
+  padding: 16px;
+}
+
+/* ── Responsive mobile ──────────────────────────────────────── */
+@media (max-width: 768px) {
+  #tab-infos #propertyForm .form-grid-2,
+  #tab-infos #propertyForm .form-grid-3 {
+    grid-template-columns: 1fr;
+  }
+
+  #tab-infos #propertyForm .chip-option {
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+  }
+
+  #tab-infos #propertyForm .type-card {
+    min-height: 72px;
+  }
+
+  #tab-infos #propertyForm .prop-card {
+    padding: 18px 16px;
+  }
+
+  #tab-infos #propertyForm input[name="address"] {
+    padding-left: 38px;
+  }
+
+  #tab-infos #propertyForm .save-action-bar {
+    position: static;
+    margin-top: 16px;
+  }
+}

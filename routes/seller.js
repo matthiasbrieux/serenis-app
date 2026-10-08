@@ -447,7 +447,7 @@ router.post('/api/property/status', requireAuth, express.json(), async (req, res
 });
 
 // ── Agent IA — génération de texte d'annonce ─────────────────────
-router.post('/api/property/generate-description', requireAuth, express.json(), async (req, res) => {
+router.post('/api/property/generate-description', requireAuth, aiRateLimit, express.json(), async (req, res) => {
   const { property } = req.body;
   if (!property) return res.json({ error: 'Données manquantes' });
   if (!process.env.ANTHROPIC_API_KEY) return res.json({ error: 'Service IA non configuré — ajoutez ANTHROPIC_API_KEY dans les variables d\'environnement.' });
@@ -496,8 +496,16 @@ Retourne UNIQUEMENT un objet JSON valide, sans texte avant ni après, avec exact
     const raw = response.content[0].text.trim();
     let blocks;
     try {
-      const jsonMatch = raw.match(/\{[\s\S]*\}/);
-      blocks = JSON.parse(jsonMatch ? jsonMatch[0] : raw);
+      // Extraction JSON robuste : cherche le premier { et le dernier }
+      const start = raw.indexOf('{');
+      const end = raw.lastIndexOf('}');
+      if (start === -1 || end === -1) throw new Error('Pas de JSON');
+      blocks = JSON.parse(raw.slice(start, end + 1));
+      // Valide les 5 clés attendues
+      const required = ['accroche','presentation','espaces','localisation','conclusion'];
+      for (const k of required) {
+        if (!blocks[k]) blocks[k] = '';
+      }
     } catch(parseErr) {
       return res.json({ description: raw });
     }

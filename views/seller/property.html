@@ -3212,6 +3212,7 @@
 </div>
 
   <link rel="stylesheet" href="/css/property-sharing.css?v=1">
+  <link rel="stylesheet" href="/css/property-infos.css?v=1">
   </main>
 </div>
 
@@ -6402,7 +6403,11 @@ async function fetchNearbyPOIs() {
   const address = (document.querySelector('[name="address"]') || {}).value || '';
   const city    = (document.querySelector('[name="city"]')    || {}).value || '';
   if (!address.trim() && !city.trim()) {
-    alert('Renseignez d\'abord l\'adresse du bien (onglet Informations générales).');
+    const panel = document.getElementById('poiSuggestPanel');
+    if (panel) {
+      panel.innerHTML = '<div class="poi-err" style="display:flex;align-items:center;gap:6px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg> Renseignez d\'abord l\'adresse du bien dans la section <strong>Localisation</strong>.</div>';
+      panel.style.display = 'block';
+    }
     return;
   }
   const btn   = document.getElementById('poiSuggestBtn');
@@ -6432,7 +6437,7 @@ async function fetchNearbyPOIs() {
     if (!geoRes.ok) throw new Error('Nominatim HTTP ' + geoRes.status);
     const geoData = await geoRes.json();
     if (!geoData.length) {
-      panel.innerHTML = '<div class="poi-err">Adresse introuvable — vérifiez l\'adresse saisie.</div>';
+      panel.innerHTML = '<div class="poi-err" style="display:flex;align-items:center;gap:6px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg> Adresse introuvable — vérifiez que l\'adresse et la ville sont correctement renseignées.</div>';
       panel.style.display = 'block';
       return;
     }
@@ -6527,11 +6532,15 @@ async function fetchNearbyPOIs() {
     if (schools.lycee.length)      html += buildPoiRow('Lycée',            schools.lycee.slice(0,3).map(function(s){return s.lbl;}), 'school_lycee');
     if (gares.length)              html += buildPoiRow('Gare',             gares.slice(0,3).map(function(s){return'Gare '+s.lbl;}), 'train_station');
 
-    panel.innerHTML = html || '<div class="poi-empty">Aucun résultat trouvé dans un rayon de 2 km.</div>';
+    panel.innerHTML = html || '<div class="poi-empty" style="display:flex;align-items:center;gap:6px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg> Aucun résultat trouvé dans un rayon de 2 km — vous pouvez saisir les commodités manuellement.</div>';
     panel.style.display = 'block';
   } catch(e) {
     console.error('[fetchNearbyPOIs]', e);
-    panel.innerHTML = '<div class="poi-err">Erreur de recherche (service de géolocalisation indisponible). Réessayez dans quelques instants.</div>';
+    const isTimeout = e && (e.name === 'AbortError' || (e.message && e.message.includes('abort')));
+    const errMsg = isTimeout
+      ? 'Le service de géolocalisation a mis trop de temps à répondre. Réessayez dans quelques instants.'
+      : 'Service de géolocalisation temporairement indisponible. Réessayez dans quelques instants ou saisissez les commodités manuellement.';
+    panel.innerHTML = '<div class="poi-err" style="display:flex;align-items:flex-start;gap:6px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0;margin-top:1px"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>' + errMsg + '</div>';
     panel.style.display = 'block';
   } finally {
     btn.disabled = false;
@@ -7485,6 +7494,31 @@ loadProperty = async function() {
 };
 loadProperty();
 fetchSellerForFiche();
+
+// ── Injection prop-card autour des sections du formulaire ──
+(function wrapFormSections() {
+  var form = document.getElementById('propertyForm');
+  if (!form) return;
+  // Grouper les nœuds enfants entre chaque .section-divider en blocs
+  var children = Array.from(form.childNodes);
+  var groups = [], current = null;
+  children.forEach(function(node) {
+    var el = node.nodeType === 1 ? node : null;
+    if (el && el.classList && el.classList.contains('section-divider')) {
+      current = { divider: el, nodes: [] };
+      groups.push(current);
+    } else if (current) {
+      current.nodes.push(node);
+    }
+  });
+  groups.forEach(function(g) {
+    var card = document.createElement('div');
+    card.className = 'prop-card';
+    g.divider.parentNode.insertBefore(card, g.divider);
+    card.appendChild(g.divider);
+    g.nodes.forEach(function(n) { card.appendChild(n); });
+  });
+})();
 </script>
 <!-- ── Bento lightbox ─────────────────────────────────── -->
 <div class="lightbox-overlay" id="lightboxOverlay" onclick="if(event.target===this)closeLightbox()">
