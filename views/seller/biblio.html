@@ -26,9 +26,15 @@
     .bib-hero-title { font-family: 'Cormorant Garamond', serif; font-size: 42px; font-weight: 500; letter-spacing: -0.7px; line-height: 1.07; color: #1A1A16; margin: 12px 0 15px; }
     .bib-hero-title em { font-style: italic; color: #9E3A18; }
     .bib-hero-desc { font-family:'Inter',sans-serif; font-size: 0.8125rem; color: #71645B; line-height: 1.8; max-width: 660px; }
-    .bib-hero-meta { display: flex; gap: 18px; margin-top: 16px; flex-wrap: wrap; }
-    .bib-hero-stat { display: flex; align-items: center; gap: 7px; font-size: 0.78rem; color: #71645B; font-weight: 500; font-family:'Inter',sans-serif; }
-    .bib-hero-stat-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+    .bib-hero-inner { display: flex; align-items: flex-start; justify-content: space-between; gap: 28px; }
+    .bib-hero-content { flex: 1; min-width: 0; }
+    .bib-hero-meta { display: flex; flex-direction: column; gap: 10px; flex-shrink: 0; padding-top: 3px; margin-top: 0; }
+    .bib-hero-stat { display: flex; align-items: center; gap: 8px; font-size: 0.78rem; color: #71645B; font-weight: 500; font-family:'Inter',sans-serif; background: #fff; border: 1px solid #E8D9CC; border-radius: 20px; padding: 5px 12px; }
+    .bib-hero-stat-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+    @media (max-width: 768px) {
+      .bib-hero-inner { display: block; }
+      .bib-hero-meta { flex-direction: row; flex-wrap: wrap; gap: 10px; margin-top: 16px; }
+    }
 
     .bib-tip-banner { display: flex; align-items: flex-start; gap: 12px; padding: 14px 18px; background: #F8F6F2; border-radius: 12px; border-left: 3px solid var(--terracotta); margin-bottom: 24px; font-size: 0.82rem; color: #555; line-height: 1.65; }
     .bib-tip-icon { font-size: 1.1rem; flex-shrink: 0; margin-top: 1px; }
@@ -459,20 +465,24 @@
 
     <!-- Hero -->
     <div class="bib-hero">
-      <div class="bib-hero-badge">
-        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
-        Boîte à outils vendeur
-      </div>
-      <h2 class="bib-hero-title">Vos outils,<br><em>prêts à vous accompagner</em></h2>
-      <p class="bib-hero-desc">Accédez instantanément aux modèles de messages, guides et documents essentiels pour gagner du temps et avancer sereinement.</p>
-      <div class="bib-hero-meta">
-        <div class="bib-hero-stat">
-          <div class="bib-hero-stat-dot" style="background:#059669;"></div>
-          <span id="heroMsgCount">38 modèles de messages</span>
+      <div class="bib-hero-inner">
+        <div class="bib-hero-content">
+          <div class="bib-hero-badge">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
+            Boîte à outils vendeur
+          </div>
+          <h2 class="bib-hero-title">Vos outils,<br><em>prêts à vous accompagner</em></h2>
+          <p class="bib-hero-desc">Accédez instantanément aux modèles de messages, guides et documents essentiels pour gagner du temps et avancer sereinement.</p>
         </div>
-        <div class="bib-hero-stat">
-          <div class="bib-hero-stat-dot" style="background:#6366F1;"></div>
-          <span id="heroDocCount">Documents de formation</span>
+        <div class="bib-hero-meta">
+          <div class="bib-hero-stat">
+            <div class="bib-hero-stat-dot" style="background:#059669;"></div>
+            <span id="heroMsgCount">43 modèles de messages</span>
+          </div>
+          <div class="bib-hero-stat">
+            <div class="bib-hero-stat-dot" style="background:#6366F1;"></div>
+            <span id="heroDocCount">17 documents de formation</span>
+          </div>
         </div>
       </div>
     </div>
@@ -1135,6 +1145,8 @@ showTab('documents');
 const formationDocCount=document.querySelectorAll('#docSection .doc-card').length;
 document.getElementById('docCount').textContent=formationDocCount;
 document.getElementById('heroDocCount').textContent=formationDocCount+' documents de formation';
+document.getElementById('msgCount').textContent=BIB_TEMPLATES.length;
+document.getElementById('heroMsgCount').textContent=BIB_TEMPLATES.length+' modèles de messages';
 </script>
 <script src="/js/seller-nav.js"></script>
 
