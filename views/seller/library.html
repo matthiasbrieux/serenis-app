@@ -1216,23 +1216,112 @@
 <link rel="stylesheet" href="/css/formation-premium.css">
 <style>
   .mod-tabs-wrap{display:none!important}
-  /* Override formation-premium.css pour le nouveau hero 2 colonnes */
+  /* ── Override formation-premium.css : hero 2 colonnes ── */
   .form-hero{
     display:grid!important;
     grid-template-columns:1fr 1fr!important;
     padding:0!important;
+    padding-right:0!important;
     background:#F8F1E7!important;
     border:1.5px solid #E8D9CC!important;
     border-radius:20px!important;
-    min-height:260px!important;
+    min-height:280px!important;
     position:relative!important;
     overflow:hidden!important;
     box-sizing:border-box!important;
+    margin-bottom:24px!important;
   }
   .form-hero::after{display:none!important}
   .form-hero::before{display:none!important}
+  .form-hero-left{
+    padding:36px 36px 32px!important;
+    display:flex!important;
+    flex-direction:column!important;
+    justify-content:center!important;
+    gap:0!important;
+    position:static!important;
+    width:auto!important;
+    right:auto!important;
+    bottom:auto!important;
+  }
+  .form-hero-right{
+    background-image:url('/images/formation-hero.png')!important;
+    background-size:cover!important;
+    background-position:center!important;
+    min-height:280px!important;
+    position:relative!important;
+    display:block!important;
+  }
+  .form-hero-right::after{
+    content:'"Une méthode pour vendre sereinement !"'!important;
+    position:absolute!important;
+    bottom:22px!important;
+    left:18px!important;
+    right:18px!important;
+    font-family:'Caveat','Segoe Script',cursive!important;
+    font-size:1.08rem!important;
+    color:#fff!important;
+    text-shadow:0 2px 8px rgba(0,0,0,0.55)!important;
+    background:rgba(0,0,0,0.18)!important;
+    backdrop-filter:blur(2px)!important;
+    -webkit-backdrop-filter:blur(2px)!important;
+    border-radius:8px!important;
+    padding:8px 12px!important;
+    line-height:1.4!important;
+    display:block!important;
+    pointer-events:none!important;
+  }
+  .form-hero-badge{
+    background:rgba(158,58,24,0.1)!important;
+    color:#9E3A18!important;
+    border:none!important;
+    padding:5px 11px!important;
+    font-size:0.68rem!important;
+    letter-spacing:0.1em!important;
+    margin-bottom:16px!important;
+  }
+  .form-hero-title{
+    font-family:'Cormorant Garamond',serif!important;
+    font-size:2.4rem!important;
+    font-weight:600!important;
+    color:#1A1A16!important;
+    line-height:1.08!important;
+    margin:0 0 14px!important;
+    letter-spacing:0!important;
+    padding-right:0!important;
+    margin-top:0!important;
+  }
+  .form-hero-title em{font-style:italic!important;color:#9E3A18!important}
+  .form-hero-sub{
+    font-size:0.85rem!important;
+    color:#71645B!important;
+    margin:0 0 22px!important;
+    line-height:1.65!important;
+    max-width:none!important;
+  }
+  .form-hero a.form-hero-cta{
+    display:inline-flex!important;
+    align-items:center!important;
+    gap:8px!important;
+    background:#9E3A18!important;
+    color:#fff!important;
+    text-decoration:none!important;
+    border-radius:10px!important;
+    padding:12px 20px!important;
+    font-size:0.83rem!important;
+    font-weight:600!important;
+    position:static!important;
+    right:auto!important;
+    bottom:auto!important;
+    box-shadow:none!important;
+    margin-top:0!important;
+    width:fit-content!important;
+  }
   @media(max-width:900px){
     .form-hero{grid-template-columns:1fr!important;min-height:auto!important}
+    .form-hero-right{min-height:200px!important}
+    .form-hero-left{padding:28px 24px 24px!important}
+    .form-hero-title{font-size:1.8rem!important}
   }
 </style>
 </head>
@@ -1632,6 +1721,419 @@
     <!-- Checklists -->
     <div class="section-hdr" id="ckHdr">Checklists</div>
     <div id="ckContainer"></div>
+
+    <!-- ═══ SECTION DOCUMENTS DE VENTE ═══ -->
+    <style>
+    /* ── Section Mes documents de vente ── */
+    .vdocs-section{
+      background:#F8F1E7;
+      border:1.5px solid #E8D9CC;
+      border-radius:20px;
+      overflow:hidden;
+      margin:36px 0 32px;
+    }
+    .vdocs-hero{
+      display:grid;
+      grid-template-columns:1fr auto;
+      gap:0;
+      align-items:stretch;
+    }
+    .vdocs-hero-left{
+      padding:40px 40px 36px;
+    }
+    .vdocs-hero-badge{
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      background:rgba(158,58,24,0.1);
+      color:#9E3A18;
+      font-size:0.6rem;
+      font-weight:700;
+      letter-spacing:0.12em;
+      text-transform:uppercase;
+      padding:5px 12px;
+      border-radius:20px;
+      margin-bottom:18px;
+      width:fit-content;
+      font-family:'DM Sans',sans-serif;
+    }
+    .vdocs-hero-title{
+      font-family:'Cormorant Garamond',serif;
+      font-size:2.2rem;
+      font-weight:600;
+      color:#1A1A16;
+      line-height:1.1;
+      margin:0 0 14px;
+    }
+    .vdocs-hero-sub{
+      font-size:0.85rem;
+      color:#71645B;
+      line-height:1.65;
+      max-width:480px;
+      font-family:'DM Sans',sans-serif;
+    }
+    .vdocs-hero-right{
+      width:220px;
+      flex-shrink:0;
+      background:linear-gradient(135deg,rgba(158,58,24,0.08) 0%,rgba(232,195,158,0.18) 100%);
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      justify-content:center;
+      padding:28px 20px;
+      position:relative;
+      border-left:1.5px solid #E8D9CC;
+    }
+    .vdocs-hero-illus{
+      font-size:3.5rem;
+      line-height:1;
+      margin-bottom:12px;
+    }
+    .vdocs-hero-note{
+      font-family:'Caveat','Segoe Script',cursive;
+      font-size:0.95rem;
+      color:#86412A;
+      text-align:center;
+      line-height:1.4;
+    }
+    /* Grid 6 colonnes */
+    .vdocs-grid{
+      display:grid;
+      grid-template-columns:repeat(3,1fr);
+      gap:0;
+      border-top:1.5px solid #E8D9CC;
+    }
+    .vdocs-col{
+      padding:22px 20px 20px;
+      border-right:1.5px solid #E8D9CC;
+      border-bottom:1.5px solid #E8D9CC;
+      display:flex;
+      flex-direction:column;
+    }
+    .vdocs-col:nth-child(3n){border-right:none}
+    .vdocs-col:nth-child(4),.vdocs-col:nth-child(5),.vdocs-col:nth-child(6){border-bottom:none}
+    .vdocs-col-num{
+      font-family:'Cormorant Garamond',serif;
+      font-size:1.8rem;
+      font-weight:600;
+      color:rgba(158,58,24,0.2);
+      line-height:1;
+      margin-bottom:6px;
+    }
+    .vdocs-col-icon{
+      width:36px;height:36px;border-radius:10px;
+      display:flex;align-items:center;justify-content:center;
+      font-size:1rem;margin-bottom:10px;
+      flex-shrink:0;
+    }
+    .vdocs-col-title{
+      font-size:0.85rem;
+      font-weight:700;
+      color:#1A1A16;
+      margin-bottom:12px;
+      font-family:'DM Sans',sans-serif;
+      line-height:1.3;
+    }
+    .vdocs-docs-list{
+      flex:1;
+      display:flex;
+      flex-direction:column;
+      gap:6px;
+      margin-bottom:14px;
+    }
+    .vdocs-doc-item{
+      display:flex;
+      align-items:flex-start;
+      gap:7px;
+      font-size:0.76rem;
+      color:#555;
+      line-height:1.4;
+    }
+    .vdocs-doc-item a{
+      color:#555;
+      text-decoration:none;
+      border-bottom:1px dotted #C4A08A;
+      transition:color 0.15s;
+    }
+    .vdocs-doc-item a:hover{color:#9E3A18;border-bottom-color:#9E3A18}
+    .vdocs-doc-item.soon{opacity:0.5}
+    .vdocs-doc-item.soon .vdocs-doc-label{font-style:italic}
+    .vdocs-doc-pdf-icon{
+      width:18px;height:18px;border-radius:4px;
+      display:flex;align-items:center;justify-content:center;
+      flex-shrink:0;margin-top:1px;
+      font-size:0.58rem;font-weight:700;
+      letter-spacing:0.02em;
+    }
+    .vdocs-doc-pdf-icon.available{background:#9E3A18;color:#fff;}
+    .vdocs-doc-pdf-icon.soon{background:#ccc;color:#fff;}
+    .vdocs-col-btn{
+      display:inline-flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:8px;
+      width:100%;
+      padding:9px 14px;
+      border-radius:8px;
+      font-size:0.75rem;
+      font-weight:600;
+      text-decoration:none;
+      color:#fff;
+      margin-top:auto;
+      transition:opacity 0.15s, transform 0.12s;
+      font-family:'DM Sans',sans-serif;
+    }
+    .vdocs-col-btn:hover{opacity:0.88;transform:translateY(-1px)}
+    /* Couleurs boutons */
+    .vdocs-btn-terracotta{background:#9E3A18}
+    .vdocs-btn-green{background:#1B7A47}
+    .vdocs-btn-blue{background:#1B5FA0}
+    .vdocs-btn-gold{background:#A07820}
+    .vdocs-btn-purple{background:#5B3DAA}
+    .vdocs-btn-terracotta2{background:#86412A}
+    /* Responsive */
+    @media(max-width:900px){
+      .vdocs-hero{grid-template-columns:1fr}
+      .vdocs-hero-right{display:none}
+      .vdocs-grid{grid-template-columns:repeat(2,1fr)}
+      .vdocs-col:nth-child(3n){border-right:1.5px solid #E8D9CC}
+      .vdocs-col:nth-child(2n){border-right:none}
+      .vdocs-col:nth-child(4),.vdocs-col:nth-child(5),.vdocs-col:nth-child(6){border-bottom:1.5px solid #E8D9CC}
+      .vdocs-col:nth-child(5),.vdocs-col:nth-child(6){border-bottom:none}
+      .vdocs-hero-left{padding:28px 24px 24px}
+      .vdocs-hero-title{font-size:1.7rem}
+    }
+    @media(max-width:560px){
+      .vdocs-grid{grid-template-columns:1fr}
+      .vdocs-col{border-right:none!important}
+      .vdocs-col:not(:last-child){border-bottom:1.5px solid #E8D9CC!important}
+      .vdocs-col:last-child{border-bottom:none!important}
+    }
+    /* ── Section 30 mails types ── */
+    .vmails-section{
+      background:linear-gradient(135deg,#1A1A16 0%,#2A1A10 100%);
+      border-radius:16px;
+      padding:28px 32px;
+      margin:0 0 24px;
+      display:flex;
+      align-items:center;
+      gap:28px;
+      flex-wrap:wrap;
+    }
+    .vmails-icon-wrap{
+      width:56px;height:56px;border-radius:16px;
+      background:rgba(158,58,24,0.35);
+      border:1.5px solid rgba(232,195,158,0.2);
+      display:flex;align-items:center;justify-content:center;
+      font-size:1.5rem;flex-shrink:0;
+    }
+    .vmails-body{flex:1;min-width:200px}
+    .vmails-title{
+      font-family:'Cormorant Garamond',serif;
+      font-size:1.45rem;font-weight:600;
+      color:#F8F1E7;margin-bottom:5px;line-height:1.2;
+    }
+    .vmails-sub{
+      font-size:0.83rem;color:rgba(248,241,231,0.65);
+      line-height:1.55;margin-bottom:14px;
+    }
+    .vmails-chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:0}
+    .vmails-chip{
+      padding:4px 12px;border-radius:100px;
+      border:1px solid rgba(232,195,158,0.25);
+      background:rgba(255,255,255,0.06);
+      color:rgba(248,241,231,0.75);font-size:0.73rem;
+      font-family:'DM Sans',sans-serif;
+    }
+    .vmails-cta{
+      display:inline-flex;align-items:center;gap:8px;
+      background:#9E3A18;color:#fff;
+      padding:12px 22px;border-radius:10px;
+      font-size:0.85rem;font-weight:600;
+      text-decoration:none;white-space:nowrap;
+      flex-shrink:0;transition:background 0.15s;
+      font-family:'DM Sans',sans-serif;
+    }
+    .vmails-cta:hover{background:#86412A}
+    @media(max-width:640px){
+      .vmails-section{padding:22px 20px;gap:18px}
+      .vmails-icon-wrap{width:44px;height:44px;font-size:1.2rem}
+    }
+    </style>
+
+    <!-- Section Mes documents de vente -->
+    <div class="vdocs-section">
+      <div class="vdocs-hero">
+        <div class="vdocs-hero-left">
+          <div class="vdocs-hero-badge">
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+            Vendu Par Moi — Vos documents pratiques
+          </div>
+          <h2 class="vdocs-hero-title">Mes documents de vente</h2>
+          <p class="vdocs-hero-sub">Retrouvez tous les documents utiles à chaque étape de votre vente. Téléchargez-les ou accédez directement aux outils de votre espace.</p>
+        </div>
+        <div class="vdocs-hero-right">
+          <div class="vdocs-hero-illus">📁</div>
+          <div class="vdocs-hero-note">Des documents clairs<br>et prêts à l'emploi !</div>
+        </div>
+      </div>
+
+      <div class="vdocs-grid">
+        <!-- 01 Préparer ma vente -->
+        <div class="vdocs-col">
+          <div class="vdocs-col-num">01</div>
+          <div class="vdocs-col-icon" style="background:rgba(158,58,24,0.1);">📋</div>
+          <div class="vdocs-col-title">Préparer ma vente</div>
+          <div class="vdocs-docs-list">
+            <div class="vdocs-doc-item">
+              <div class="vdocs-doc-pdf-icon available">PDF</div>
+              <a href="/toolbox/formation/documents.pdf" target="_blank" class="vdocs-doc-label">Checklist des documents à réunir</a>
+            </div>
+            <div class="vdocs-doc-item">
+              <div class="vdocs-doc-pdf-icon available">PDF</div>
+              <a href="/toolbox/formation/diagnostics.pdf" target="_blank" class="vdocs-doc-label">Guide des diagnostics immobiliers</a>
+            </div>
+          </div>
+          <a href="/mon-bien?tab=documents" class="vdocs-col-btn vdocs-btn-terracotta">
+            <span>Voir mes documents</span>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+          </a>
+        </div>
+
+        <!-- 02 Annonce et photos -->
+        <div class="vdocs-col">
+          <div class="vdocs-col-num">02</div>
+          <div class="vdocs-col-icon" style="background:rgba(27,122,71,0.1);">📸</div>
+          <div class="vdocs-col-title">Annonce et photos</div>
+          <div class="vdocs-docs-list">
+            <div class="vdocs-doc-item">
+              <div class="vdocs-doc-pdf-icon available">PDF</div>
+              <a href="/toolbox/formation/photos.pdf" target="_blank" class="vdocs-doc-label">Guide des photos professionnelles</a>
+            </div>
+            <div class="vdocs-doc-item">
+              <div class="vdocs-doc-pdf-icon available">PDF</div>
+              <a href="/documents/home-staging-guide.pdf" target="_blank" class="vdocs-doc-label">Checklist préparation du bien pour les photos</a>
+            </div>
+          </div>
+          <a href="/mon-bien?tab=photos" class="vdocs-col-btn vdocs-btn-green">
+            <span>Voir mes photos</span>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+          </a>
+        </div>
+
+        <!-- 03 Contacts et visites -->
+        <div class="vdocs-col">
+          <div class="vdocs-col-num">03</div>
+          <div class="vdocs-col-icon" style="background:rgba(27,95,160,0.1);">📅</div>
+          <div class="vdocs-col-title">Contacts et visites</div>
+          <div class="vdocs-docs-list">
+            <div class="vdocs-doc-item">
+              <div class="vdocs-doc-pdf-icon available">PDF</div>
+              <a href="/toolbox/formation/scripts-appel.pdf" target="_blank" class="vdocs-doc-label">Script de qualification des acheteurs</a>
+            </div>
+            <div class="vdocs-doc-item">
+              <div class="vdocs-doc-pdf-icon available">PDF</div>
+              <a href="/toolbox/formation/organiser-visites.pdf" target="_blank" class="vdocs-doc-label">Modèle de confirmation de visite</a>
+            </div>
+            <div class="vdocs-doc-item">
+              <div class="vdocs-doc-pdf-icon available">PDF</div>
+              <a href="/toolbox/formation/reussir-visites.pdf" target="_blank" class="vdocs-doc-label">Modèle de suivi après visite</a>
+            </div>
+          </div>
+          <a href="/mon-agenda" class="vdocs-col-btn vdocs-btn-blue">
+            <span>Voir mon agenda</span>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+          </a>
+        </div>
+
+        <!-- 04 Recevoir et négocier une offre -->
+        <div class="vdocs-col">
+          <div class="vdocs-col-num">04</div>
+          <div class="vdocs-col-icon" style="background:rgba(160,120,32,0.1);">🤝</div>
+          <div class="vdocs-col-title">Recevoir et négocier une offre</div>
+          <div class="vdocs-docs-list">
+            <div class="vdocs-doc-item soon">
+              <div class="vdocs-doc-pdf-icon soon">PDF</div>
+              <span class="vdocs-doc-label">Fiche de vérification du financement <em style="font-size:0.68rem;color:#aaa;">(bientôt)</em></span>
+            </div>
+            <div class="vdocs-doc-item">
+              <div class="vdocs-doc-pdf-icon available">PDF</div>
+              <a href="/toolbox/formation/offres-negociation.pdf" target="_blank" class="vdocs-doc-label">Les différents cas d'offres et négociation</a>
+            </div>
+            <div class="vdocs-doc-item soon">
+              <div class="vdocs-doc-pdf-icon soon">PDF</div>
+              <span class="vdocs-doc-label">Modèles de réponse à une offre <em style="font-size:0.68rem;color:#aaa;">(bientôt)</em></span>
+            </div>
+          </div>
+          <a href="/mes-offres" class="vdocs-col-btn vdocs-btn-gold">
+            <span>Voir mes offres d'achat</span>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+          </a>
+        </div>
+
+        <!-- 05 Préparer le compromis -->
+        <div class="vdocs-col">
+          <div class="vdocs-col-num">05</div>
+          <div class="vdocs-col-icon" style="background:rgba(91,61,170,0.1);">🖊️</div>
+          <div class="vdocs-col-title">Préparer le compromis</div>
+          <div class="vdocs-docs-list">
+            <div class="vdocs-doc-item">
+              <div class="vdocs-doc-pdf-icon available">PDF</div>
+              <a href="/toolbox/formation/etat-civil.pdf" target="_blank" class="vdocs-doc-label">Fiche de renseignements acquéreur</a>
+            </div>
+            <div class="vdocs-doc-item">
+              <div class="vdocs-doc-pdf-icon available">PDF</div>
+              <a href="/toolbox/formation/compromis.pdf" target="_blank" class="vdocs-doc-label">Liste des documents pour le notaire</a>
+            </div>
+          </div>
+          <a href="/mon-agenda" class="vdocs-col-btn vdocs-btn-purple">
+            <span>Voir mon calendrier de vente</span>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+          </a>
+        </div>
+
+        <!-- 06 Finaliser ma vente -->
+        <div class="vdocs-col">
+          <div class="vdocs-col-num">06</div>
+          <div class="vdocs-col-icon" style="background:rgba(134,65,42,0.1);">🔑</div>
+          <div class="vdocs-col-title">Finaliser ma vente</div>
+          <div class="vdocs-docs-list">
+            <div class="vdocs-doc-item">
+              <div class="vdocs-doc-pdf-icon available">PDF</div>
+              <a href="/toolbox/formation/etat-des-lieux.pdf" target="_blank" class="vdocs-doc-label">Fiche d'état des lieux de sortie</a>
+            </div>
+            <div class="vdocs-doc-item">
+              <div class="vdocs-doc-pdf-icon available">PDF</div>
+              <a href="/toolbox/formation/checklist-fin.pdf" target="_blank" class="vdocs-doc-label">Checklist remise des clés et relevés de compteurs</a>
+            </div>
+          </div>
+          <a href="/mon-bien?tab=documents" class="vdocs-col-btn vdocs-btn-terracotta2">
+            <span>Voir tous les documents</span>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+          </a>
+        </div>
+
+      </div>
+    </div><!-- /.vdocs-section -->
+
+    <!-- ═══ SECTION 30 MAILS TYPES ═══ -->
+    <div class="vmails-section">
+      <div class="vmails-icon-wrap">✉️</div>
+      <div class="vmails-body">
+        <div class="vmails-title">30 mails types prêts à copier</div>
+        <div class="vmails-sub">Gagnez du temps avec nos modèles adaptés à chaque étape de votre vente.</div>
+        <div class="vmails-chips">
+          <span class="vmails-chip">Visites</span>
+          <span class="vmails-chip">Offres</span>
+          <span class="vmails-chip">Notaire</span>
+          <span class="vmails-chip">Signature</span>
+        </div>
+      </div>
+      <a href="#mailsHdr" class="vmails-cta" onclick="document.getElementById('mailsHdr').scrollIntoView({behavior:'smooth'});return false;">
+        Accéder aux mails types
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+      </a>
+    </div>
 
     <!-- Mails -->
     <div class="section-hdr" id="mailsHdr">Mails types prêts à copier</div>
