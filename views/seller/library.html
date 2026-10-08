@@ -1187,6 +1187,31 @@
     .ai-td:nth-child(2) { animation-delay:0.2s; } .ai-td:nth-child(3) { animation-delay:0.4s; }
     .page-title { font-family:'Cormorant Garamond',serif; font-size:clamp(1.5rem,4vw,1.85rem); font-weight:600; color:#1C1C1A; letter-spacing:-0.01em; line-height:1.1; margin:0 0 4px; }
 
+    /* ── Grille des chapitres — Lot 5 ── */
+    .ch-grid-section { margin-bottom: 32px; }
+    .ch-grid-group { margin-bottom: 28px; }
+    .ch-grid-group-hdr { display:flex; align-items:center; gap:12px; margin-bottom:16px; }
+    .ch-grid-group-hdr > span { font-size:0.7rem; font-weight:700; text-transform:uppercase; letter-spacing:0.09em; color:var(--terracotta); background:rgba(158,58,24,0.06); border:1.5px solid rgba(158,58,24,0.12); border-radius:20px; padding:5px 14px; white-space:nowrap; flex-shrink:0; }
+    .ch-grid-group-hdr::after { content:''; flex:1; height:1.5px; background:#e8e3db; }
+    .ch-grid-row { display:grid; grid-template-columns:repeat(3,1fr); gap:14px; }
+    @media(max-width:860px){ .ch-grid-row { grid-template-columns:repeat(2,1fr); } }
+    @media(max-width:540px){ .ch-grid-row { grid-template-columns:1fr; } }
+    .ch-card { background:#fff; border:1.5px solid #e8e0d6; border-radius:14px; overflow:hidden; box-shadow:0 2px 10px rgba(0,0,0,0.06); cursor:pointer; transition:transform 0.18s, box-shadow 0.18s, border-color 0.18s; display:flex; flex-direction:column; text-align:left; width:100%; font-family:inherit; }
+    .ch-card:hover { transform:translateY(-3px); box-shadow:0 8px 26px rgba(0,0,0,0.10); border-color:rgba(158,58,24,0.4); }
+    .ch-card.ch-active { border-color:var(--terracotta); box-shadow:0 4px 20px rgba(158,58,24,0.18); }
+    .ch-card-photo { position:relative; height:130px; background-size:cover; background-position:center; background-color:#F3EDE3; }
+    .ch-card-num { position:absolute; bottom:10px; left:10px; width:30px; height:30px; border-radius:50%; background:var(--terracotta); color:#fff; display:flex; align-items:center; justify-content:center; font-size:0.85rem; font-weight:800; font-family:'Inter','DM Sans',sans-serif; box-shadow:0 2px 8px rgba(158,58,24,0.5); }
+    .ch-card-body { padding:14px 16px 16px; flex:1; display:flex; flex-direction:column; }
+    .ch-card-title { font-size:0.92rem; font-weight:700; color:#1A1A16; margin-bottom:10px; font-family:'Inter','DM Sans',sans-serif; line-height:1.3; }
+    .ch-card-prog-wrap { display:flex; align-items:center; gap:8px; margin-bottom:12px; }
+    .ch-card-prog-bar { flex:1; height:4px; background:#e8e0d6; border-radius:2px; overflow:hidden; }
+    .ch-card-prog-fill { height:4px; background:var(--terracotta); border-radius:2px; transition:width 0.4s; }
+    .ch-card-prog-pct { font-size:0.66rem; font-weight:700; color:var(--terracotta); white-space:nowrap; min-width:26px; text-align:right; }
+    .ch-card-open-btn { display:inline-flex; align-items:center; gap:5px; color:var(--terracotta); font-size:0.78rem; font-weight:700; font-family:'Inter','DM Sans',sans-serif; margin-top:auto; padding:0; background:none; border:none; cursor:pointer; }
+    .ch-card:hover .ch-card-open-btn { text-decoration:underline; }
+    /* Cache les onglets texte au profit de la grille visuelle */
+    .mod-tabs-wrap { display:none !important; }
+
   </style>
 <link rel="stylesheet" href="/css/formation-premium.css">
 </head>
@@ -1343,7 +1368,10 @@
       </div>
     </div>
 
-    <!-- Module tabs -->
+    <!-- Grille des 6 chapitres -->
+    <div class="ch-grid-section" id="chaptersGrid"></div>
+
+    <!-- Module tabs (masqués — navigation via la grille ci-dessus) -->
     <div class="mod-tabs-wrap" id="modTabs"></div>
 
     <!-- Module content -->
@@ -2647,6 +2675,7 @@ function renderModules() {
   });
 
   updateProgress();
+  renderChapterCards();
 }
 
 // ── Mails ──
@@ -3432,6 +3461,70 @@ if (_overlayEl) {
     _sidebarEl.classList.remove('open');
     _overlayEl.classList.remove('open');
   });
+}
+
+// ── Grille des chapitres ──
+const CH_PHOTOS = [
+  '/images/guide/ch2-estimation.png',  // 0 : Estimer son bien
+  '/images/guide/ch5-maison.png',      // 1 : Préparer sa vente
+  '/images/guide/ch3-salon.png',       // 2 : Annonce & Photos
+  '/images/guide/ch7-visite.png',      // 3 : Préparer sa visite
+  null,                                 // 4 : Les visites — photo à fournir (/images/guide/ch-visites.png)
+  '/images/guide/ch8-offre.png',       // 5 : Négocier & Conclure
+];
+
+function renderChapterCards() {
+  const grid = document.getElementById('chaptersGrid');
+  if (!grid) return;
+  const phases = [
+    { label: 'Préparer votre vente',        keys: ['avant'] },
+    { label: 'Avancer vers la signature',   keys: ['apres'] },
+  ];
+  let html = '';
+  phases.forEach(phase => {
+    const mods = MODULES.map((m, i) => ({ m, i })).filter(({ m }) => phase.keys.includes(m.phase));
+    if (!mods.length) return;
+    html += `<div class="ch-grid-group"><div class="ch-grid-group-hdr"><span>${phase.label}</span></div><div class="ch-grid-row">`;
+    mods.forEach(({ m, i }) => {
+      const total = m.steps?.length || 0;
+      const done = m.steps ? m.steps.filter((_, si) => doneSteps[`${i}_${si}`]).length : 0;
+      const pct = total > 0 ? Math.round(done / total * 100) : 0;
+      const photo = CH_PHOTOS[i];
+      const photoStyle = photo ? `background-image:url('${photo}')` : 'background:linear-gradient(135deg,#F8F1E7,#EDE5D8)';
+      const isActive = i === activeModule;
+      html += `<button class="ch-card${isActive ? ' ch-active' : ''}" onclick="openModule(${i})" type="button" aria-label="Ouvrir le chapitre ${parseInt(m.num,10)} : ${m.title.replace(/'/g,'\\'')}">
+        <div class="ch-card-photo" style="${photoStyle}"><div class="ch-card-num">${parseInt(m.num,10)}</div></div>
+        <div class="ch-card-body">
+          <div class="ch-card-title">${m.title}</div>
+          <div class="ch-card-prog-wrap">
+            <div class="ch-card-prog-bar"><div class="ch-card-prog-fill" style="width:${pct}%"></div></div>
+            <span class="ch-card-prog-pct">${pct}%</span>
+          </div>
+          <span class="ch-card-open-btn">Ouvrir le chapitre →</span>
+        </div>
+      </button>`;
+    });
+    html += `</div></div>`;
+  });
+  grid.innerHTML = html;
+}
+
+function openModule(mi) {
+  const mod = MODULES[mi];
+  if (!mod) return;
+  stopAgent();
+  activeModule = mi;
+  if (mod.mailCat) activeMailCat = mod.mailCat;
+  renderModules();
+  updateKeyPoints();
+  updateModuleVideo();
+  showModuleSlides(mi);
+  triggerAiModuleMsg(mi);
+  renderMails();
+  renderChecklists();
+  setTimeout(() => {
+    document.getElementById('modContainer')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }, 60);
 }
 
 // ── Init ──
