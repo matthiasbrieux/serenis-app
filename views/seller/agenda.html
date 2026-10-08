@@ -629,6 +629,92 @@
       .vc-confirm, .vc-refuse, .vc-cancel { min-height: 44px; font-size: 0.88rem; }
     }
 
+    /* ── Calendrier compact sur mobile (< 640px) ───────── */
+    @media(max-width:640px){
+      /* Cellules carrées compactes */
+      .agenda-layout .cal-cell {
+        min-height: 44px !important;
+        height: 44px !important;
+        align-items: center;
+        justify-content: center;
+        padding: 0;
+        border-radius: 9px;
+        flex-direction: column;
+        gap: 3px;
+      }
+      /* Cacher les événements dans les cellules (affichés en détail en dessous) */
+      .agenda-layout .cal-cell-events { display: none; }
+      /* Point indicateur sous le numéro */
+      .cal-cell.cal-has-avail::after,
+      .cal-cell.cal-has-confirmed::after {
+        content: '';
+        display: block;
+        width: 5px; height: 5px;
+        border-radius: 50%;
+        background: var(--terracotta);
+        flex-shrink: 0;
+      }
+      .cal-cell.cal-has-confirmed::after { background: #fff; }
+      /* Cellule sélectionnée */
+      .cal-cell.cal-selected .cal-num {
+        background: var(--terracotta);
+        color: #fff;
+        border-radius: 50%;
+      }
+      /* Bloc détail du jour sous le calendrier */
+      #calDayDetail {
+        margin-top: 16px;
+        border-top: 1px solid #E8D9CC;
+        padding-top: 16px;
+      }
+      .cal-day-detail-title {
+        font-size: 0.88rem;
+        font-weight: 700;
+        color: #302A26;
+        margin: 0 0 10px;
+      }
+      .cal-detail-card {
+        background: #F8F1E7;
+        border: 1px solid #E4D1C0;
+        border-left: 3px solid var(--terracotta);
+        border-radius: 10px;
+        padding: 13px;
+        margin-bottom: 8px;
+      }
+      .cal-detail-card.confirmed-card {
+        background: var(--terracotta);
+        border: none;
+        color: #fff;
+      }
+      .cal-detail-card strong {
+        display: block;
+        font-size: 0.82rem;
+        color: var(--terracotta);
+        margin-bottom: 5px;
+      }
+      .cal-detail-card.confirmed-card strong { color: #fff; }
+      .cal-detail-hours {
+        font-size: 1.25rem;
+        font-weight: 700;
+        letter-spacing: -0.3px;
+        color: #302A26;
+        line-height: 1.2;
+      }
+      .cal-detail-card.confirmed-card .cal-detail-hours { color: #fff; }
+      .cal-detail-card p {
+        font-size: 0.8rem;
+        color: #71645B;
+        margin: 6px 0 0;
+        line-height: 1.5;
+      }
+      .cal-detail-card.confirmed-card p { color: rgba(255,255,255,0.85); }
+      .cal-detail-empty {
+        font-size: 0.82rem;
+        color: #71645B;
+        font-style: italic;
+      }
+    }
+
     /* ── Badges statut améliorés ─────────────────────────── */
     .vbadge { padding: 4px 12px; border-radius: 20px; font-size: 0.73rem; font-weight: 700; letter-spacing: 0.03em; }
     .vbadge-confirmed { background: #e8f5e9; color: #2e7d32; border: 1px solid #c8e6c9; }
@@ -782,14 +868,29 @@
     .cal-cell:not(.cal-has-confirmed):not(.cal-has-sru):not(.cal-has-conditions):not(.cal-has-acte) .cal-cell-visit-chip { background:#e8f5e9; color:#2e7d32; }
 
     /* ── Dispo section (right col) ─────────────────────── */
-    .dispo-section { background:#fff; border:1.5px solid #e8e0d6; border-radius:14px; overflow:hidden; }
-    .dispo-section-hdr { display:flex; justify-content:space-between; align-items:center; padding:14px 18px; border-bottom:1px solid #f0ebe4; background:#fafaf8; }
-    .dispo-section-title { font-size:0.88rem; font-weight:700; color:#1A1A16; margin:0 0 2px; }
-    .dispo-section-sub { font-size:0.72rem; color:#999; margin:0; line-height:1.4; }
-    .dispo-section-inner { padding:0 14px 14px; }
-    .dispo-section .avail-month-nav { margin:12px 0 0; }
-    .dispo-section .avail-slot-list { margin-bottom:4px; }
-    .dispo-section .avail-add-form { margin:0; border-radius:0; border:none; border-top:1px solid #f0ebe4; padding:14px 0 0; background:none; }
+    /* ── Deux blocs disponibilités (maquette validée) ──── */
+    .dispo-section { display:flex; flex-direction:column; gap:12px; }
+    /* Bloc A — Enregistrées (crème) */
+    .dispo-registered-block { background:#F8F1E7; border:1px solid #E4D1C0; border-radius:16px; padding:18px; }
+    .dispo-section-hdr { display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; }
+    .dispo-section-hdr-left { display:flex; align-items:center; gap:10px; }
+    .dispo-section-hdr-icon { color:var(--terracotta); }
+    .dispo-section-title { font-size:0.95rem; font-weight:700; color:#1A1A16; margin:0; }
+    .dispo-section-sub { font-size:0.8rem; color:#71645B; margin:4px 0 0; line-height:1.4; }
+    .dispo-count-badge { background:#fff; color:var(--terracotta); border:1.5px solid rgba(158,58,24,0.25); padding:4px 12px; border-radius:20px; font-size:0.8rem; font-weight:700; white-space:nowrap; }
+    .dispo-section-inner { }
+    .dispo-section .avail-month-nav { margin:0 0 10px; }
+    .dispo-section .avail-slot-list { margin-bottom:0; }
+    /* Bloc B — Ajouter (blanc) */
+    .dispo-add-block { background:#fff; border:1.5px solid #e8e0d6; border-radius:16px; overflow:hidden; }
+    .dispo-add-hdr { display:flex; align-items:center; justify-content:space-between; padding:14px 18px; cursor:pointer; user-select:none; }
+    .dispo-add-hdr-left { display:flex; align-items:center; gap:10px; }
+    .dispo-add-hdr-icon { width:34px; height:34px; background:#F8F1E7; border-radius:8px; display:flex; align-items:center; justify-content:center; color:var(--terracotta); flex-shrink:0; }
+    .dispo-add-hdr-title { font-size:0.92rem; font-weight:700; color:#1A1A16; }
+    .dispo-add-hdr-arrow { color:#aaa; transition:transform 0.2s; }
+    .dispo-add-hdr-arrow.open { transform:rotate(180deg); }
+    .avail-add-form { margin:0; padding:0 18px 18px; border-top:1px solid #f0ebe4; }
+    .dispo-section .avail-add-form h4 { display:none; } /* remplacé par dispo-add-hdr */
 
     /* ── Dispo slot row ─────────────────────────────────── */
     .dispo-slot-row { display:flex; align-items:center; gap:10px; padding:9px 0; border-bottom:1px solid #f5f0e8; }
@@ -821,17 +922,21 @@
     .compromis-bar-body { padding:12px 24px 24px; }
 
     /* ── Share agenda block ────────────────────────────── */
-    .share-agenda { display:flex; align-items:center; gap:17px; background:#F8F1E7; border:1px solid #DFC9B7; border-radius:12px; margin-bottom:24px; padding:20px 24px; }
-    .share-agenda-icon { background:#fff; border:1px solid #E8D9CC; border-radius:10px; display:flex; align-items:center; justify-content:center; width:46px; height:46px; flex-shrink:0; color:var(--terracotta); }
-    .share-agenda-copy { flex:1; min-width:0; }
-    .share-agenda-copy h2 { font-family:'Inter',sans-serif; font-size:0.97rem; font-weight:700; margin:0 0 5px; color:#1A1A16; }
-    .share-agenda-copy p { font-size:0.82rem; color:#71645B; line-height:1.65; margin:0; }
-    .btn-copy-link { display:inline-flex; align-items:center; gap:8px; background:var(--terracotta); color:#fff; border:none; border-radius:8px; padding:11px 18px; font-family:'Inter',sans-serif; font-size:0.85rem; font-weight:700; white-space:nowrap; cursor:pointer; flex-shrink:0; transition:background 0.15s; min-height:44px; }
-    .btn-copy-link:hover { background:var(--terracotta-dark); }
+    /* ── Partage agenda : terracotta (maquette validée) ── */
+    .share-agenda { display:flex; align-items:center; gap:20px; background:var(--terracotta); border-radius:18px; margin-bottom:22px; padding:24px 28px; position:relative; overflow:hidden; box-shadow:0 8px 24px rgba(158,58,24,0.22); }
+    .share-agenda::after { content:''; position:absolute; right:-60px; top:-80px; width:260px; height:260px; border:1px solid rgba(255,255,255,0.12); border-radius:50%; pointer-events:none; }
+    .share-agenda-icon { background:rgba(255,255,255,0.15); border:1px solid rgba(255,255,255,0.25); border-radius:12px; display:flex; align-items:center; justify-content:center; width:52px; height:52px; flex-shrink:0; color:#fff; position:relative; z-index:1; }
+    .share-agenda-copy { flex:1; min-width:0; position:relative; z-index:1; }
+    .share-agenda-copy h2 { font-family:'Inter',sans-serif; font-size:1rem; font-weight:600; margin:0 0 6px; color:#fff; }
+    .share-agenda-copy p { font-size:0.82rem; color:rgba(255,255,255,0.8); line-height:1.65; margin:0; }
+    .btn-copy-link { display:inline-flex; align-items:center; gap:8px; background:#fff; color:var(--terracotta); border:none; border-radius:10px; padding:13px 20px; font-family:'Inter',sans-serif; font-size:0.88rem; font-weight:700; white-space:nowrap; cursor:pointer; flex-shrink:0; transition:all 0.18s; min-height:44px; box-shadow:0 3px 10px rgba(28,8,4,0.12); position:relative; z-index:1; }
+    .btn-copy-link:hover { background:#F8F1E7; box-shadow:0 5px 16px rgba(28,8,4,0.18); }
     @media(max-width:700px){
-      .share-agenda { display:grid; grid-template-columns:42px 1fr; grid-template-rows:auto auto; gap:10px 13px; padding:16px; align-items:start; }
-      .share-agenda-icon { grid-column:1; grid-row:1; margin-top:2px; }
+      .share-agenda { display:grid; grid-template-columns:44px 1fr; grid-template-rows:auto auto; gap:10px 13px; padding:20px; align-items:start; }
+      .share-agenda-icon { grid-column:1; grid-row:1; width:44px; height:44px; }
       .share-agenda-copy { grid-column:2; grid-row:1; }
+      .share-agenda-copy h2 { font-size:0.92rem; line-height:1.35; }
+      .share-agenda-copy p { font-size:0.79rem; }
       .btn-copy-link { grid-column:1/-1; grid-row:2; width:100%; justify-content:center; font-size:0.9rem; }
     }
 
@@ -867,9 +972,10 @@
     .btn-outline-manual:hover { background:rgba(158,58,24,0.06); }
     @media(max-width:680px){ .manual-visit-section { flex-direction:column; align-items:stretch; background:#fff; border:1px solid #e8e0d6; border-radius:12px; padding:18px; border-top:none; margin-bottom:20px; } .btn-outline-manual { width:100%; justify-content:center; } }
 
-    /* ── Mobile right-col ordering ────────────────────── */
+    /* ── Mobile ordering : calendrier EN PREMIER ──────── */
     @media(max-width:900px){
-      .agenda-right-col { order:-1; }
+      .agenda-right-col { order:2; }
+      .cal-panel { order:1; }
     }
   
     /* Mobile menu button — géré par .mobile-header (style.css) */
@@ -1102,30 +1208,47 @@
       <div class="agenda-right-col">
         <div id="nextVisitMini" style="display:none;"></div>
         <div class="dispo-section">
-          <div class="dispo-section-hdr">
-            <div>
-              <h3 class="dispo-section-title">Mes disponibilités de visite</h3>
-              <p class="dispo-section-sub">Créneaux proposés aux acquéreurs</p>
+          <!-- Bloc A : Disponibilités enregistrées (fond crème) -->
+          <div class="dispo-registered-block">
+            <div class="dispo-section-hdr">
+              <div class="dispo-section-hdr-left">
+                <span class="dispo-section-hdr-icon">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M7 3v4M17 3v4M3 10h18M8 14h2M14 14h2M8 17h2"/></svg>
+                </span>
+                <div>
+                  <h3 class="dispo-section-title">Disponibilités enregistrées</h3>
+                  <p class="dispo-section-sub">Créneaux proposés aux acquéreurs</p>
+                </div>
+              </div>
+              <span class="dispo-count-badge" id="dispoCountBadge">0 créneau</span>
             </div>
-            <span class="dispo-count-badge" id="dispoCountBadge">0 créneau</span>
-          </div>
-          <div class="dispo-section-inner">
-            <div class="avail-month-nav">
-              <button class="cal-nav" id="availPrev">&#8249;</button>
-              <span class="avail-month-label" id="availMonthLabel"></span>
-              <button class="cal-nav" id="availNext">&#8250;</button>
-            </div>
-            <div class="avail-slot-list" id="availSlotList">
-              <div class="avail-slot-empty">
-                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#9E3A18" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><line x1="12" y1="14" x2="12" y2="18"/><line x1="10" y1="16" x2="14" y2="16"/></svg>
-                <p>Aucun créneau ce mois-ci.<br>Ajoutez-en un ci-dessous.</p>
+            <div class="dispo-section-inner">
+              <div class="avail-month-nav">
+                <button class="cal-nav" id="availPrev">&#8249;</button>
+                <span class="avail-month-label" id="availMonthLabel"></span>
+                <button class="cal-nav" id="availNext">&#8250;</button>
+              </div>
+              <div class="avail-slot-list" id="availSlotList">
+                <div class="avail-slot-empty">
+                  <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#9E3A18" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><line x1="12" y1="14" x2="12" y2="18"/><line x1="10" y1="16" x2="14" y2="16"/></svg>
+                  <p>Aucun créneau enregistré.<br>Ajoutez-en un ci-dessous.</p>
+                </div>
               </div>
             </div>
-            <div class="avail-add-form">
-              <h4>
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-                Ajouter un créneau
-              </h4>
+          </div>
+
+          <!-- Bloc B : Ajouter une disponibilité (fond blanc, repliable) -->
+          <div class="dispo-add-block">
+            <div class="dispo-add-hdr" id="dispoAddHdr" onclick="toggleDispoForm()" aria-expanded="false" role="button">
+              <div class="dispo-add-hdr-left">
+                <span class="dispo-add-hdr-icon">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                </span>
+                <span class="dispo-add-hdr-title">Ajouter une disponibilité</span>
+              </div>
+              <svg class="dispo-add-hdr-arrow" id="dispoAddArrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"/></svg>
+            </div>
+            <div class="avail-add-form" id="dispoAddForm" style="display:none;">
               <div class="avail-date-field">
                 <label>Date</label>
                 <input type="date" class="avail-input" id="availDate">
@@ -1140,7 +1263,10 @@
                   <input type="time" class="avail-input" id="availEnd" value="18:00">
                 </div>
               </div>
-              <button id="addAvailSlot" class="btn-primary"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Ajouter ce créneau</button>
+              <button id="addAvailSlot" class="btn-primary" style="margin-top:14px;width:100%;justify-content:center;">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                Enregistrer cette disponibilité
+              </button>
             </div>
           </div>
         </div>
@@ -2239,7 +2365,15 @@ function renderDayDetail(dateStr) {
   const _n=new Date(); const todayStr=`${_n.getFullYear()}-${String(_n.getMonth()+1).padStart(2,'0')}-${String(_n.getDate()).padStart(2,'0')}`;
   const isClickedToday = dateStr === todayStr;
 
-  if (!dayVisits.length && !nextVisits.length) { el.style.display='none'; return; }
+  const isMobile = window.innerWidth < 640;
+  const dayAvail = availSlots.filter(s => s.date === dateStr);
+  if (!dayVisits.length && !nextVisits.length && !dayAvail.length) {
+    if (isMobile) {
+      el.style.display = 'block';
+      el.innerHTML = `<h3 class="cal-day-detail-title">${dateLabel.charAt(0).toUpperCase() + dateLabel.slice(1)}</h3><p class="cal-detail-empty">Aucune visite ou disponibilité pour cette journée.</p>`;
+    } else { el.style.display='none'; }
+    return;
+  }
   el.style.display = 'block';
 
   let html = '';
@@ -2296,6 +2430,22 @@ function renderDayDetail(dateStr) {
       </button>
     </div>`;
   });
+
+  // Disponibilités du jour (mobile : cartes crème)
+  if (isMobile && dayAvail.length > 0) {
+    if (!dayVisits.length && !nextVisits.length) {
+      html += `<h3 class="cal-day-detail-title">${dateLabel.charAt(0).toUpperCase() + dateLabel.slice(1)}</h3>`;
+    }
+    dayAvail.forEach(a => {
+      const start = a.start ? a.start.slice(0,5).replace(':','h') : '—';
+      const end   = a.end   ? a.end.slice(0,5).replace(':','h')   : '—';
+      html += `<div class="cal-detail-card">
+        <div class="cal-detail-date" style="color:var(--terracotta);font-weight:700;margin-bottom:8px;">Créneau disponible</div>
+        <div class="cal-detail-hours">${start} – ${end}</div>
+        <p style="font-size:0.8rem;color:#71645B;margin:6px 0 0;">Ouvert à la réservation des acheteurs.</p>
+      </div>`;
+    });
+  }
 
   el.innerHTML = html;
 }
@@ -2833,6 +2983,18 @@ fetch('/api/notifications/read-by-type', {
   body: JSON.stringify({ types: ['visit_request','visit_confirmed','visit_reminder'] })
 }).catch(() => {});
 
+/* ── Toggle formulaire ajout disponibilité ─────────── */
+function toggleDispoForm(forceOpen) {
+  const form = document.getElementById('dispoAddForm');
+  const arrow = document.getElementById('dispoAddArrow');
+  const hdr = document.getElementById('dispoAddHdr');
+  if (!form) return;
+  const willOpen = forceOpen !== undefined ? forceOpen : form.style.display === 'none';
+  form.style.display = willOpen ? 'block' : 'none';
+  if (arrow) arrow.classList.toggle('open', willOpen);
+  if (hdr) hdr.setAttribute('aria-expanded', willOpen ? 'true' : 'false');
+}
+
 loadData().then(() => {
   const _urlDate = new URLSearchParams(window.location.search).get('date');
   if (_urlDate && /^\d{4}-\d{2}-\d{2}$/.test(_urlDate)) {
@@ -2842,6 +3004,8 @@ loadData().then(() => {
   }
   renderCalendar();
   renderAvailMonth();
+  /* Ouvrir le formulaire d'ajout si aucun créneau n'existe encore */
+  if (availSlots.length === 0) toggleDispoForm(true);
   loadNotifications();
   loadCompromis();
   if (_urlDate) {
