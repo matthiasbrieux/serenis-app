@@ -372,6 +372,9 @@ const newCols = [
   "ALTER TABLE properties ADD COLUMN diagnostics_ai_summary TEXT",
   "ALTER TABLE properties ADD COLUMN diagnostics_ai_summary_validated BOOLEAN DEFAULT 0",
   "ALTER TABLE properties ADD COLUMN diagnostics_ai_summary_generated_at DATETIME",
+  "ALTER TABLE properties ADD COLUMN ges_class TEXT",
+  "ALTER TABLE properties ADD COLUMN dpe_annee_ref TEXT",
+  "ALTER TABLE properties ADD COLUMN dpe_date TEXT",
 ];
 newCols.forEach(sql => { try { db.exec(sql); } catch(e) {} });
 

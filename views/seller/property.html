@@ -78,7 +78,8 @@
     .dpe-disp-classname { font-size:0.92rem; font-weight:700; color:#1A1A16; margin-bottom:4px; }
     .dpe-disp-val { font-size:0.8rem; color:#71645B; line-height:1.5; }
     .dpe-disp-scale { display:flex; gap:4px; margin:12px 0 6px; }
-    .dpe-disp-scale span { flex:1; height:32px; border-radius:6px; display:flex; align-items:center; justify-content:center; font-size:0.75rem; font-weight:700; color:#fff; cursor:default; position:relative; }
+    .dpe-disp-scale span { flex:1; height:32px; border-radius:6px; display:flex; align-items:center; justify-content:center; font-size:0.75rem; font-weight:700; color:#fff; cursor:pointer; position:relative; transition:opacity 0.12s,transform 0.12s; }
+    .dpe-disp-scale span:hover { opacity:0.85; transform:scaleY(1.06); }
     .dpe-disp-scale span.active-cls { outline:2.5px solid #302A26; outline-offset:2px; }
     .dpe-disp-scale span.active-cls::before { content:'▼'; position:absolute; top:-16px; font-size:0.65rem; color:#302A26; }
     .dpe-disp-legend { display:flex; justify-content:space-between; font-size:0.69rem; color:#aaa; }
@@ -1691,8 +1692,10 @@
           </label>
           <div id="assainissementDocStatus" style="font-size:0.78rem;color:var(--terracotta);margin-top:4px;"></div>
         </div>
-        <!-- Diagnostics énergétiques — affichage visuel -->
+        <!-- Diagnostics énergétiques -->
         <div class="section-divider" style="margin-top:32px;"><h3>Diagnostics énergétiques</h3></div>
+        <input type="hidden" name="dpe_class" id="field-dpe_class">
+        <input type="hidden" name="ges_class" id="field-ges_class">
         <div id="dpeDisplaySection" style="margin-bottom:8px;">
           <div class="dpe-disp-grid">
             <!-- Carte DPE -->
@@ -1703,20 +1706,37 @@
                 <div class="dpe-disp-box dpe-empty" id="dpeDispBox"><span id="dpeDispLetter">—</span></div>
                 <div>
                   <div class="dpe-disp-classname" id="dpeDispClassName">Classe à renseigner</div>
-                  <div class="dpe-disp-val" id="dpeDispConso">Consommation : —</div>
-                  <div class="dpe-disp-val" style="color:#9a9087;font-size:0.73rem;">kWh/m²/an</div>
+                  <div class="dpe-disp-val" id="dpeDispConso">Consommation : non renseignée</div>
+                  <div class="dpe-disp-val" style="color:#9a9087;font-size:0.73rem;">kWhEP/m²/an</div>
                 </div>
               </div>
+              <!-- Sélecteur A–G DPE -->
+              <div style="font-size:0.73rem;color:#888;margin:10px 0 4px;">Cliquez sur une lettre pour sélectionner la classe :</div>
               <div class="dpe-disp-scale" id="dpeDispScale">
-                <span style="background:#1a9e5a" data-dpe="A">A</span>
-                <span style="background:#4cb84c" data-dpe="B">B</span>
-                <span style="background:#b5d332;color:#333" data-dpe="C">C</span>
-                <span style="background:#f5c518;color:#333" data-dpe="D">D</span>
-                <span style="background:#f5a818;color:#333" data-dpe="E">E</span>
-                <span style="background:#e05a1a" data-dpe="F">F</span>
-                <span style="background:#cc1a1a" data-dpe="G">G</span>
+                <span style="background:#1a9e5a" data-dpe="A" onclick="selectDpe('A')" title="Classe A">A</span>
+                <span style="background:#4cb84c" data-dpe="B" onclick="selectDpe('B')" title="Classe B">B</span>
+                <span style="background:#b5d332;color:#333" data-dpe="C" onclick="selectDpe('C')" title="Classe C">C</span>
+                <span style="background:#f5c518;color:#333" data-dpe="D" onclick="selectDpe('D')" title="Classe D">D</span>
+                <span style="background:#f5a818;color:#333" data-dpe="E" onclick="selectDpe('E')" title="Classe E">E</span>
+                <span style="background:#e05a1a" data-dpe="F" onclick="selectDpe('F')" title="Classe F">F</span>
+                <span style="background:#cc1a1a" data-dpe="G" onclick="selectDpe('G')" title="Classe G">G</span>
               </div>
               <div class="dpe-disp-legend"><span>Plus performant</span><span>Moins performant</span></div>
+              <!-- Consommation d'énergie primaire -->
+              <div style="margin-top:14px;">
+                <label style="font-size:0.78rem;color:#888;margin-bottom:4px;display:block;">Consommation d'énergie primaire</label>
+                <div style="display:flex;align-items:center;gap:8px;">
+                  <input type="number" name="dpe_conso_energie" placeholder="Ex : 150" min="0" max="9999"
+                    style="flex:1;min-width:0;padding:8px 10px;border:1.5px solid #e8e0d6;border-radius:8px;font-size:0.9rem;font-family:'DM Sans',sans-serif;"
+                    oninput="updateDpeDisplay(document.getElementById('field-dpe_class')?.value||null,this.value)">
+                  <span style="font-size:0.78rem;color:#9a9087;white-space:nowrap;">kWhEP/m²/an</span>
+                </div>
+              </div>
+              <!-- Avertissement F/G -->
+              <div class="inline-warn" id="dpeWarn" style="display:none;margin-top:10px;">
+                <span style="display:inline-flex;align-items:center;vertical-align:middle;margin-right:4px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></span>
+                Classe F ou G — les acheteurs peuvent négocier plus agressivement et certaines banques conditionnent leur prêt à des travaux. Préparez un devis de rénovation énergétique pour rassurer.
+              </div>
             </div>
             <!-- Carte GES -->
             <div class="dpe-disp-card">
@@ -1726,22 +1746,35 @@
                 <div class="dpe-disp-box dpe-empty" id="gesDispBox"><span id="gesDispLetter">—</span></div>
                 <div>
                   <div class="dpe-disp-classname" id="gesDispClassName">Classe à renseigner</div>
-                  <div class="dpe-disp-val" id="gesDispVal">Émissions : —</div>
-                  <div class="dpe-disp-val" style="color:#9a9087;font-size:0.73rem;">kg CO₂/m²/an</div>
+                  <div class="dpe-disp-val" id="gesDispVal">Émissions : non renseignées</div>
+                  <div class="dpe-disp-val" style="color:#9a9087;font-size:0.73rem;">kg CO₂eq/m²/an</div>
                 </div>
               </div>
+              <!-- Sélecteur A–G GES -->
+              <div style="font-size:0.73rem;color:#888;margin:10px 0 4px;">Cliquez sur une lettre pour sélectionner la classe :</div>
               <div class="dpe-disp-scale" id="gesDispScale">
-                <span style="background:#dcd0e8;color:#302A26" data-ges="A">A</span>
-                <span style="background:#c3addb;color:#302A26" data-ges="B">B</span>
-                <span style="background:#a988cd" data-ges="C">C</span>
-                <span style="background:#8d64be" data-ges="D">D</span>
-                <span style="background:#733baf" data-ges="E">E</span>
-                <span style="background:#5b159f" data-ges="F">F</span>
-                <span style="background:#3d0080" data-ges="G">G</span>
+                <span style="background:#dcd0e8;color:#302A26" data-ges="A" onclick="selectGes('A')" title="Classe A">A</span>
+                <span style="background:#c3addb;color:#302A26" data-ges="B" onclick="selectGes('B')" title="Classe B">B</span>
+                <span style="background:#a988cd" data-ges="C" onclick="selectGes('C')" title="Classe C">C</span>
+                <span style="background:#8d64be" data-ges="D" onclick="selectGes('D')" title="Classe D">D</span>
+                <span style="background:#733baf" data-ges="E" onclick="selectGes('E')" title="Classe E">E</span>
+                <span style="background:#5b159f" data-ges="F" onclick="selectGes('F')" title="Classe F">F</span>
+                <span style="background:#3d0080" data-ges="G" onclick="selectGes('G')" title="Classe G">G</span>
               </div>
               <div class="dpe-disp-legend"><span>Faibles émissions</span><span>Fortes émissions</span></div>
+              <!-- Émissions kg CO₂ -->
+              <div style="margin-top:14px;">
+                <label style="font-size:0.78rem;color:#888;margin-bottom:4px;display:block;">Émissions de GES</label>
+                <div style="display:flex;align-items:center;gap:8px;">
+                  <input type="number" name="dpe_ges" placeholder="Ex : 35" min="0" max="9999"
+                    style="flex:1;min-width:0;padding:8px 10px;border:1.5px solid #e8e0d6;border-radius:8px;font-size:0.9rem;font-family:'DM Sans',sans-serif;"
+                    oninput="updateGesNumDisplay(this.value)">
+                  <span style="font-size:0.78rem;color:#9a9087;white-space:nowrap;">kg CO₂eq/m²/an</span>
+                </div>
+              </div>
             </div>
           </div>
+
           <!-- Footer : lien diagnostic -->
           <div class="dpe-disp-footer" id="dpeDispFooter" style="display:none;">
             <div>
@@ -1752,74 +1785,40 @@
               Consulter le diagnostic ↗
             </a>
           </div>
-        </div>
 
-        <div class="form-group" style="margin-top:16px;">
-          <label>Classe DPE</label>
-          <input type="hidden" name="dpe_class" id="field-dpe_class">
-          <div class="dpe-bars">
-            <div class="dpe-bar-row" data-value="A" onclick="selectDpe('A')">
-              <div class="dpe-bar-letter" style="background:#1a9e5a">A</div>
-              <div class="dpe-bar-fill" style="background:#1a9e5a;width:65px"></div>
-              <span class="dpe-bar-kwh">≤ 50 kWh/m²/an</span>
-            </div>
-            <div class="dpe-bar-row" data-value="B" onclick="selectDpe('B')">
-              <div class="dpe-bar-letter" style="background:#4cb84c">B</div>
-              <div class="dpe-bar-fill" style="background:#4cb84c;width:95px"></div>
-              <span class="dpe-bar-kwh">51–90 kWh/m²/an</span>
-            </div>
-            <div class="dpe-bar-row" data-value="C" onclick="selectDpe('C')">
-              <div class="dpe-bar-letter" style="background:#b5d332;color:#333">C</div>
-              <div class="dpe-bar-fill" style="background:#b5d332;width:125px"></div>
-              <span class="dpe-bar-kwh">91–150 kWh/m²/an</span>
-            </div>
-            <div class="dpe-bar-row" data-value="D" onclick="selectDpe('D')">
-              <div class="dpe-bar-letter" style="background:#f5c518;color:#333">D</div>
-              <div class="dpe-bar-fill" style="background:#f5c518;width:155px"></div>
-              <span class="dpe-bar-kwh">151–230 kWh/m²/an</span>
-            </div>
-            <div class="dpe-bar-row" data-value="E" onclick="selectDpe('E')">
-              <div class="dpe-bar-letter" style="background:#f5a818;color:#333">E</div>
-              <div class="dpe-bar-fill" style="background:#f5a818;width:185px"></div>
-              <span class="dpe-bar-kwh">231–330 kWh/m²/an</span>
-            </div>
-            <div class="dpe-bar-row" data-value="F" onclick="selectDpe('F')">
-              <div class="dpe-bar-letter" style="background:#e05a1a">F</div>
-              <div class="dpe-bar-fill" style="background:#e05a1a;width:215px"></div>
-              <span class="dpe-bar-kwh">331–450 kWh/m²/an</span>
-            </div>
-            <div class="dpe-bar-row" data-value="G" onclick="selectDpe('G')">
-              <div class="dpe-bar-letter" style="background:#cc1a1a">G</div>
-              <div class="dpe-bar-fill" style="background:#cc1a1a;width:245px"></div>
-              <span class="dpe-bar-kwh">> 450 kWh/m²/an</span>
-            </div>
-          </div>
-          <div class="inline-warn" id="dpeWarn" style="display:none">
-            <span style="display:inline-flex;align-items:center;vertical-align:middle;margin-right:4px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></span> Classe F ou G — les acheteurs peuvent négocier plus agressivement et certaines banques conditionnent leur prêt à des travaux. Préparez un devis de rénovation énergétique pour rassurer.
-          </div>
-          <div class="coach-tip" style="margin-top:10px;">
-            <span class="coach-tip-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><line x1="9" y1="18" x2="15" y2="18"/><line x1="10" y1="22" x2="14" y2="22"/><path d="M15.09 14c.18-.98.65-1.74 1.41-2.5A4.65 4.65 0 0 0 18 8 6 6 0 0 0 6 8c0 1 .23 2.23 1.5 3.5A4.61 4.61 0 0 1 8.91 14"/></svg></span>
-            <span>Le DPE est obligatoire pour publier une annonce. Un DPE A ou B permet souvent de justifier un prix 5–10 % plus élevé.</span>
-          </div>
-          <!-- DPE chiffres détaillés -->
-          <div style="margin-top:16px;padding:16px;background:#f8f5f0;border-radius:10px;border:1px solid #e8e0d6;">
-            <div style="font-size:0.78rem;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:#aaa;margin-bottom:12px;">Détails DPE (optionnel — figurent sur le certificat)</div>
+          <!-- Dépenses énergétiques annuelles -->
+          <div style="margin-top:20px;padding:18px 20px;background:#f8f5f0;border-radius:12px;border:1px solid #e8e0d6;">
+            <div style="font-size:0.78rem;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--terracotta);margin-bottom:4px;">Estimation des dépenses annuelles d'énergie</div>
+            <div style="font-size:0.78rem;color:#888;margin-bottom:14px;">Recopiez les informations figurant sur votre diagnostic.</div>
             <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px;">
               <div>
-                <label style="font-size:0.78rem;color:#888;margin-bottom:4px;display:block;">Conso. énergie (kWh/m²/an)</label>
-                <input type="number" name="dpe_conso_energie" placeholder="150" min="0" max="9999" style="width:100%;padding:8px 10px;border:1px solid #ddd;border-radius:8px;font-size:0.9rem;font-family:'DM Sans',sans-serif;" oninput="updateDpeDisplay(document.getElementById('field-dpe_class')?.value||null,this.value)">
+                <label style="font-size:0.78rem;color:#888;margin-bottom:4px;display:block;">Montant minimum</label>
+                <div style="display:flex;align-items:center;gap:6px;">
+                  <input type="number" name="dpe_cout_min" id="field-dpe_cout_min" placeholder="Ex : 800" min="0"
+                    style="flex:1;min-width:0;padding:8px 10px;border:1.5px solid #e8e0d6;border-radius:8px;font-size:0.9rem;font-family:'DM Sans',sans-serif;"
+                    oninput="validateDpeCost()">
+                  <span style="font-size:0.78rem;color:#9a9087;flex-shrink:0;">€/an</span>
+                </div>
               </div>
               <div>
-                <label style="font-size:0.78rem;color:#888;margin-bottom:4px;display:block;">GES (kg CO₂/m²/an)</label>
-                <input type="number" name="dpe_ges" placeholder="35" min="0" max="9999" style="width:100%;padding:8px 10px;border:1px solid #ddd;border-radius:8px;font-size:0.9rem;font-family:'DM Sans',sans-serif;" oninput="updateGesDisplay(this.value)">
+                <label style="font-size:0.78rem;color:#888;margin-bottom:4px;display:block;">Montant maximum</label>
+                <div style="display:flex;align-items:center;gap:6px;">
+                  <input type="number" name="dpe_cout_max" id="field-dpe_cout_max" placeholder="Ex : 1 200" min="0"
+                    style="flex:1;min-width:0;padding:8px 10px;border:1.5px solid #e8e0d6;border-radius:8px;font-size:0.9rem;font-family:'DM Sans',sans-serif;"
+                    oninput="validateDpeCost()">
+                  <span style="font-size:0.78rem;color:#9a9087;flex-shrink:0;">€/an</span>
+                </div>
+                <div id="dpeCostError" style="display:none;font-size:0.75rem;color:#e05a1a;margin-top:4px;">Le minimum ne peut pas dépasser le maximum.</div>
               </div>
               <div>
-                <label style="font-size:0.78rem;color:#888;margin-bottom:4px;display:block;">Coût estim. min (€/an)</label>
-                <input type="number" name="dpe_cout_min" placeholder="800" min="0" style="width:100%;padding:8px 10px;border:1px solid #ddd;border-radius:8px;font-size:0.9rem;font-family:'DM Sans',sans-serif;">
+                <label style="font-size:0.78rem;color:#888;margin-bottom:4px;display:block;">Année(s) de référence</label>
+                <input type="text" name="dpe_annee_ref" placeholder="Ex : 2021 ou 2021–2022"
+                  style="width:100%;padding:8px 10px;border:1.5px solid #e8e0d6;border-radius:8px;font-size:0.9rem;font-family:'DM Sans',sans-serif;">
               </div>
               <div>
-                <label style="font-size:0.78rem;color:#888;margin-bottom:4px;display:block;">Coût estim. max (€/an)</label>
-                <input type="number" name="dpe_cout_max" placeholder="1200" min="0" style="width:100%;padding:8px 10px;border:1px solid #ddd;border-radius:8px;font-size:0.9rem;font-family:'DM Sans',sans-serif;">
+                <label style="font-size:0.78rem;color:#888;margin-bottom:4px;display:block;">Date de réalisation du DPE</label>
+                <input type="date" name="dpe_date"
+                  style="width:100%;padding:8px 10px;border:1.5px solid #e8e0d6;border-radius:8px;font-size:0.9rem;font-family:'DM Sans',sans-serif;">
               </div>
             </div>
           </div>
@@ -3359,37 +3358,49 @@ function updateDpeDisplay(dpeClass, consoVal) {
   conso.textContent = consoVal ? 'Consommation : ' + consoVal : 'Consommation : non renseignée';
   document.querySelectorAll('#dpeDispScale span').forEach(s => s.classList.toggle('active-cls', s.dataset.dpe === dpeClass));
 }
-function getGesClass(ges) {
-  if (ges === null || ges === undefined || ges === '') return null;
-  const v = parseFloat(ges);
-  if (isNaN(v)) return null;
-  if (v <= 5) return 'A'; if (v <= 10) return 'B'; if (v <= 20) return 'C';
-  if (v <= 35) return 'D'; if (v <= 55) return 'E'; if (v <= 80) return 'F';
-  return 'G';
-}
 const GES_DISP_COLORS = { A:'#dcd0e8', B:'#c3addb', C:'#a988cd', D:'#8d64be', E:'#733baf', F:'#5b159f', G:'#3d0080' };
 const GES_DISP_TEXTCOLORS = { A:'#302A26', B:'#302A26', C:'#fff', D:'#fff', E:'#fff', F:'#fff', G:'#fff' };
-function updateGesDisplay(gesVal) {
+function selectGes(val) {
+  const hidden = document.getElementById('field-ges_class');
+  if (hidden) hidden.value = val;
+  updateGesCardDisplay(val);
+  updateCompletion();
+}
+function updateGesCardDisplay(gesClass) {
   const box = document.getElementById('gesDispBox');
   const letter = document.getElementById('gesDispLetter');
   const classname = document.getElementById('gesDispClassName');
-  const val = document.getElementById('gesDispVal');
   if (!box) return;
-  const gesClass = getGesClass(gesVal);
-  if (gesClass) {
+  if (gesClass && GES_DISP_COLORS[gesClass]) {
     box.style.background = GES_DISP_COLORS[gesClass];
     box.style.color = GES_DISP_TEXTCOLORS[gesClass];
     box.classList.remove('dpe-empty');
     letter.textContent = gesClass;
-    classname.textContent = 'Classe ' + gesClass;
+    classname.textContent = 'Classe GES ' + gesClass;
   } else {
     box.style.background = ''; box.style.color = '';
     box.classList.add('dpe-empty');
     letter.textContent = '—';
-    classname.textContent = gesVal === 0 ? 'Valeur zéro' : 'Classe à renseigner';
+    classname.textContent = 'Classe à renseigner';
   }
-  val.textContent = (gesVal !== null && gesVal !== undefined && gesVal !== '') ? 'Émissions : ' + gesVal : 'Émissions : non renseignées';
   document.querySelectorAll('#gesDispScale span').forEach(s => s.classList.toggle('active-cls', s.dataset.ges === gesClass));
+}
+function updateGesNumDisplay(gesVal) {
+  const val = document.getElementById('gesDispVal');
+  if (!val) return;
+  val.textContent = (gesVal !== null && gesVal !== undefined && gesVal !== '')
+    ? 'Émissions : ' + gesVal
+    : 'Émissions : non renseignées';
+}
+function updateGesDisplay(gesVal) { updateGesNumDisplay(gesVal); }
+function validateDpeCost() {
+  const minEl = document.getElementById('field-dpe_cout_min');
+  const maxEl = document.getElementById('field-dpe_cout_max');
+  const errEl = document.getElementById('dpeCostError');
+  if (!minEl || !maxEl || !errEl) return;
+  const min = parseFloat(minEl.value);
+  const max = parseFloat(maxEl.value);
+  errEl.style.display = (minEl.value && maxEl.value && min > max) ? 'block' : 'none';
 }
 
 function selectDpe(val) {
@@ -3557,7 +3568,9 @@ async function loadProperty() {
   if (p.type) selectType(p.type);
   if (p.dpe_class) selectDpe(p.dpe_class);
   else updateDpeDisplay(null, null);
-  updateGesDisplay(p.dpe_ges !== undefined ? p.dpe_ges : null);
+  if (p.ges_class) selectGes(p.ges_class);
+  else updateGesCardDisplay(null);
+  updateGesNumDisplay(p.dpe_ges !== undefined ? p.dpe_ges : null);
   // Show diagnostic link if real documents exist
   if (data.documents && data.documents.some(d => d.folder === 'diagnostics') && p.acheteur_url) {
     var footer = document.getElementById('dpeDispFooter');
@@ -5607,9 +5620,11 @@ function buildFicheHtml() {
           <div style="display:flex;gap:20px;align-items:flex-start;flex-wrap:wrap;">
             <div style="flex:1;min-width:0;">${dpeBars}</div>
             <div style="display:flex;flex-direction:column;gap:9px;flex-shrink:0;">
-              ${p.dpe_conso_energie?`<div style="font-size:0.82rem;color:#2a3a2e;"><span style="color:#f5a623;margin-right:5px;">${fi.bolt}</span>Consommation : <strong>${p.dpe_conso_energie} kWh/m²/an</strong></div>`:''}
-              ${p.dpe_ges?`<div style="font-size:0.82rem;color:#2a3a2e;"><span style="color:#5b9bd5;margin-right:5px;">${fi.wind}</span>Émissions GES : <strong>${p.dpe_ges} kg CO₂/m²/an</strong></div>`:''}
-              ${p.dpe_cout_min&&p.dpe_cout_max?`<div style="font-size:0.82rem;color:#2a3a2e;"><span style="color:var(--terracotta);margin-right:5px;">${fi.euro}</span>Coût estimé : <strong>${parseInt(p.dpe_cout_min).toLocaleString('fr-FR')} – ${parseInt(p.dpe_cout_max).toLocaleString('fr-FR')} €/an</strong></div>`:''}
+              ${p.dpe_conso_energie?`<div style="font-size:0.82rem;color:#2a3a2e;"><span style="color:#f5a623;margin-right:5px;">${fi.bolt}</span>Consommation : <strong>${p.dpe_conso_energie} kWhEP/m²/an</strong></div>`:''}
+              ${p.ges_class?`<div style="font-size:0.82rem;color:#2a3a2e;"><span style="color:#5b9bd5;margin-right:5px;">${fi.wind}</span>GES : <strong>Classe ${p.ges_class}</strong>${p.dpe_ges?' · '+p.dpe_ges+' kg CO₂eq/m²/an':''}</div>`:p.dpe_ges?`<div style="font-size:0.82rem;color:#2a3a2e;"><span style="color:#5b9bd5;margin-right:5px;">${fi.wind}</span>Émissions GES : <strong>${p.dpe_ges} kg CO₂eq/m²/an</strong></div>`:''}
+              ${p.dpe_cout_min&&p.dpe_cout_max?`<div style="font-size:0.82rem;color:#2a3a2e;"><span style="color:var(--terracotta);margin-right:5px;">${fi.euro}</span>Dépenses annuelles estimées : <strong>${parseInt(p.dpe_cout_min).toLocaleString('fr-FR')} – ${parseInt(p.dpe_cout_max).toLocaleString('fr-FR')} €/an</strong>${p.dpe_annee_ref?' (réf. '+p.dpe_annee_ref+')':''}</div>`:''}
+              ${p.dpe_date?`<div style="font-size:0.78rem;color:#888;">DPE réalisé le ${new Date(p.dpe_date).toLocaleDateString('fr-FR')}</div>`:''}
+              ${['F','G'].includes(dpeClass)?`<div style="font-size:0.78rem;font-weight:600;color:#e05a1a;padding:6px 10px;background:#fff5f0;border-radius:6px;border:1px solid #f0c8b8;">⚠ Logement à consommation énergétique excessive</div>`:''}
             </div>
           </div>
         </div>
@@ -6592,6 +6607,7 @@ function restoreDraft(draft) {
   });
   if (draft.type) selectType(draft.type);
   if (draft.dpe_class) selectDpe(draft.dpe_class);
+  if (draft.ges_class) selectGes(draft.ges_class);
   if (draft.mitoyennete) selectMito(draft.mitoyennete);
   if (draft.heating_type) {
     draft.heating_type.split(',').forEach(function(v) { v = v.trim(); if (v) toggleHeating(v); });

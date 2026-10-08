@@ -193,7 +193,7 @@ router.post('/api/property', requireAuth, express.json(), (req, res) => {
     'fenetres_type','volets_type','sols_dalle','stationnement_type','garage_motorise','garage_sol','garage_surface',
     'terrace_revetement','terrace_surface','mitoyennete',
     'cheminee_type','eau_chaude_type','wc_count','cuisine_type','grenier','grenier_present',
-    'dpe_conso_energie','dpe_ges','dpe_cout_min','dpe_cout_max',
+    'dpe_conso_energie','dpe_ges','ges_class','dpe_cout_min','dpe_cout_max','dpe_annee_ref','dpe_date',
     'facture_eau','facture_electricite','facture_gaz',
     'commerces','school_maternelle','school_primaire','school_college','school_lycee',
     'highway','train_station','equipment','sale_reason','price','description','rooms_detail',
