@@ -1331,6 +1331,7 @@
 <link rel="stylesheet" href="/css/annonce-reference.css?v=1">
 <script defer src="/js/price-reference.js?v=5"></script>
 <script defer src="/js/diag-reference.js?v=1"></script>
+<link rel="stylesheet" href="/css/formation-estimez.css?v=2">
 </head>
 <body class="vpm-formation-page vpm-header-typography">
 <!-- En-tête mobile : logo complet + bouton menu -->
@@ -3037,6 +3038,7 @@ function updateProgress() {
       badge.style.background = 'linear-gradient(135deg, #888 0%, #999 100%)';
     }
   }
+  renderEstimateChapter();
 }
 
 // ── Alex agent vocal ──
@@ -3223,6 +3225,48 @@ document.addEventListener('click', e => {
     selectFormationLesson(mi, activeLessonByModule[mi] || 0);
   }
 });
+// Présentation exclusivement visuelle du chapitre 1 ; contenus et navigation réutilisés.
+function renderEstimateChapter() {
+  const workspace = document.querySelector('.formation-workspace');
+  if (!workspace) return;
+  const outlineShell = workspace.querySelector('.formation-outline-shell');
+  if (activeModule === 0 && !workspace.classList.contains('estimate-workspace') && outlineShell) {
+    outlineShell.dataset.estimateWasOpen = String(outlineShell.open);
+    outlineShell.open = false;
+  } else if (activeModule !== 0 && workspace.classList.contains('estimate-workspace') && outlineShell) {
+    outlineShell.open = outlineShell.dataset.estimateWasOpen === 'true';
+    delete outlineShell.dataset.estimateWasOpen;
+  }
+  workspace.classList.toggle('estimate-workspace', activeModule === 0);
+  const previous = workspace.querySelector('.estimate-chapter');
+  if (activeModule !== 0) { previous?.remove(); return; }
+  const chapter = MODULES[0];
+  const completed = chapter.steps.filter((_, si) => doneSteps[formationProgressKey(0, si)]).length;
+  const percentage = Math.round(completed / chapter.steps.length * 100);
+  const selected = activeLessonByModule[0] || 0;
+  const panel = previous || document.createElement('section');
+  panel.className = 'estimate-chapter';
+  panel.setAttribute('aria-label', 'Chapitre 1 — Estimez');
+  panel.innerHTML = `<div class="estimate-hero">
+    <img class="estimate-photo" src="${CH_PHOTOS[0]}" alt="" />
+    <div class="estimate-intro"><button type="button" class="estimate-return">← Retour aux chapitres</button>
+      <div class="estimate-kicker">Chapitre 1</div><h2>Estimez</h2>
+      <p>${chapter.subtitle}</p><span class="estimate-count">${chapter.steps.length} leçons</span>
+    </div>
+    <div class="estimate-progress"><div class="estimate-progress-heading"><strong>Ma progression</strong><span class="estimate-ring" style="--completion:${percentage}%" role="img" aria-label="${percentage}% des leçons du chapitre terminées"><span>${percentage}%</span></span></div>
+      <ol>${chapter.steps.map((step, si) => `<li><button type="button" data-estimate-lesson="${si}" ${si === selected ? 'aria-current="step"' : ''}><span>1.${si + 1}</span>${step.title.replace(/^◆\s*/, '')}${doneSteps[formationProgressKey(0, si)] ? '<span aria-label="Terminée">✓</span>' : ''}</button></li>`).join('')}</ol>
+    </div>
+  </div><nav class="estimate-lessons" aria-label="Leçons du chapitre Estimez">${chapter.steps.map((step, si) => `<button type="button" data-estimate-lesson="${si}" ${si === selected ? 'aria-current="step"' : ''}>${lessonIcon(['table','explanation','action','home'][si])}<span><span class="estimate-lesson-number">1.${si + 1}</span>${step.title.replace(/^◆\s*/, '')}</span><span class="estimate-arrow" aria-hidden="true">→</span></button>`).join('')}</nav>`;
+  panel.querySelector('.estimate-return').onclick = () => document.getElementById('chaptersGrid')?.scrollIntoView({behavior:'smooth', block:'start'});
+  panel.querySelectorAll('[data-estimate-lesson]').forEach(button => button.onclick = () => {
+    const si = Number(button.dataset.estimateLesson);
+    const inCards = !!button.closest('.estimate-lessons');
+    selectFormationLesson(0, si);
+    workspace.querySelector(`${inCards ? '.estimate-lessons' : '.estimate-progress'} [data-estimate-lesson="${si}"]`)?.focus({preventScroll:true});
+  });
+  if (!previous) workspace.prepend(panel);
+}
+
 function activateLessonPresentation(mi, si) {
   activeLessonByModule[mi] = si;
   document.querySelectorAll('#modContainer .step-card').forEach(card => card.classList.toggle('lesson-selected', card.id === `step-${mi}-${si}`));
@@ -3233,6 +3277,7 @@ function activateLessonPresentation(mi, si) {
   }
   renderFormationOutline();
   updateChapterDocuments();
+  renderEstimateChapter();
 }
 function selectFormationLesson(mi, si) {
   if (!MODULES[mi]?.steps[si]) return;
@@ -3543,7 +3588,9 @@ function renderModules() {
           <p>Chargement des ventes officielles…</p>
         </section>`;
       }
-      html += `<div class="lesson-support">${renderLessonResources(mi, si)}<button class="ask-coach-btn" data-step="${step.title.replace(/'/g,"\\'")}">Demander à Alex sur cette étape →</button></div></div></div>`;
+      const _nextStep = mi === 0 && si + 1 < mod.steps.length ? mod.steps[si + 1] : null;
+      const _nextBtn = _nextStep ? `<button type="button" class="estimate-lesson-next" onclick="selectFormationLesson(0,${si + 1})"><div><span class="estimate-lesson-next-label">Leçon suivante</span><span class="estimate-lesson-next-title">${_nextStep.title.replace(/^◆\s*/, '')}</span></div><span class="estimate-lesson-next-arrow" aria-hidden="true">→</span></button>` : '';
+      html += `<div class="lesson-support">${renderLessonResources(mi, si)}<button class="ask-coach-btn" data-step="${step.title.replace(/'/g,"\\'")}">Demander à Alex sur cette étape →</button></div>${_nextBtn}</div></div>`;
     });
     html += `</div></div>`;
     div.innerHTML = html;

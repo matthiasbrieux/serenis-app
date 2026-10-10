@@ -1,0 +1,665 @@
+/* ============================================================
+   formation-estimez.css — Chapitre 1 "Estimez" uniquement.
+   Portée : .estimate-workspace — aucun effet de bord sur
+   les autres chapitres, pages ou composants.
+   ============================================================ */
+
+/* --- Workspace layout --- */
+body.vpm-formation-page .formation-workspace.estimate-workspace {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 24px;
+  padding: 0;
+  background: var(--cream, #FCF7F0);
+  border: 0;
+  box-shadow: none;
+}
+.estimate-workspace .estimate-chapter { min-width: 0; grid-column: 1 / -1; }
+
+/* ============================================================
+   HERO — composition éditoriale du chapitre
+   ============================================================ */
+.estimate-workspace .estimate-hero {
+  position: relative;
+  isolation: isolate;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 252px;
+  align-items: stretch;
+  gap: 0;
+  min-height: 316px;
+  border-radius: 16px;
+  overflow: hidden;
+  background: #F8F1E7;
+  box-shadow: 0 2px 24px rgba(48, 42, 38, 0.07);
+}
+
+/* Photo */
+.estimate-workspace .estimate-photo {
+  position: absolute;
+  z-index: -2;
+  inset: 0 0 0 auto;
+  width: 65%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+}
+
+/* Gradient overlay */
+.estimate-workspace .estimate-hero::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  background: linear-gradient(
+    90deg,
+    #FCF7F0 0%,
+    #FCF7F0 26%,
+    rgba(252, 247, 240, 0.90) 42%,
+    rgba(252, 247, 240, 0.10) 76%
+  );
+  pointer-events: none;
+}
+
+/* Colonne texte */
+.estimate-workspace .estimate-intro {
+  padding: 34px 36px;
+  max-width: 510px;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+/* ← Retour */
+.estimate-workspace .estimate-return {
+  border: 0;
+  background: transparent;
+  padding: 0 0 22px;
+  color: #9E3A18;
+  font: 500 12px / 1.5 'DM Sans', Inter, sans-serif;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  min-height: 44px;
+  align-self: flex-start;
+  transition: opacity 0.15s;
+}
+.estimate-workspace .estimate-return:hover { opacity: 0.65; }
+
+/* CHAPITRE 1 badge */
+.estimate-workspace .estimate-kicker {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 12px;
+  border-radius: 20px;
+  background: rgba(158, 58, 24, 0.10);
+  border: 1px solid rgba(158, 58, 24, 0.22);
+  color: #9E3A18;
+  font: 700 10px / 1.4 'DM Sans', Inter, sans-serif;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  margin-bottom: 12px;
+  width: fit-content;
+}
+
+/* Titre */
+.estimate-workspace .estimate-intro h2 {
+  font: 500 clamp(46px, 5.5vw, 72px) / 1.0 'Cormorant Garamond', serif;
+  color: #201B18;
+  margin: 0 0 14px;
+  letter-spacing: -1.5px;
+}
+
+/* Sous-titre */
+.estimate-workspace .estimate-intro p {
+  font: 400 15px / 1.72 'DM Sans', Inter, sans-serif;
+  margin: 0 0 18px;
+  max-width: 400px;
+  color: #51463F;
+}
+
+/* N leçons */
+.estimate-workspace .estimate-count {
+  font: 600 12px / 1.5 'DM Sans', Inter, sans-serif;
+  color: #71645B;
+  letter-spacing: 0.02em;
+}
+
+/* ============================================================
+   WIDGET PROGRESSION — colonne droite du héro
+   ============================================================ */
+.estimate-workspace .estimate-progress {
+  padding: 28px 22px 28px 18px;
+  background: rgba(255, 253, 249, 0.94);
+  backdrop-filter: blur(6px);
+  border-left: 1px solid rgba(234, 223, 213, 0.55);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-width: 0;
+}
+
+.estimate-workspace .estimate-progress-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  font: 700 13px / 1.4 'DM Sans', Inter, sans-serif;
+  color: #302A26;
+  margin-bottom: 16px;
+}
+
+/* Anneau de progression */
+.estimate-workspace .estimate-ring {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: conic-gradient(#9E3A18 var(--completion, 0%), #EFE5D9 0);
+}
+.estimate-workspace .estimate-ring > span {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: #FFFDFA;
+  color: #302A26;
+  font: 700 12px / 1 'DM Sans', Inter, sans-serif;
+}
+
+/* Liste des leçons dans le widget */
+.estimate-workspace .estimate-progress ol {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.estimate-workspace .estimate-progress li { margin: 0; }
+.estimate-workspace .estimate-progress button {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  text-align: left;
+  width: 100%;
+  padding: 8px 10px;
+  min-height: 36px;
+  border: 0;
+  border-radius: 6px;
+  background: none;
+  color: #51463F;
+  font: 400 12px / 1.5 'DM Sans', Inter, sans-serif;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+.estimate-workspace .estimate-progress button > span:first-child {
+  color: #9E3A18;
+  flex-shrink: 0;
+  font-weight: 700;
+  font-size: 10px;
+}
+.estimate-workspace .estimate-progress button:hover {
+  background: rgba(158, 58, 24, 0.06);
+  color: #302A26;
+}
+.estimate-workspace .estimate-progress button[aria-current] {
+  background: rgba(158, 58, 24, 0.09);
+  color: #9E3A18;
+  font-weight: 600;
+}
+
+/* ============================================================
+   CARTES DE NAVIGATION — 4 leçons
+   ============================================================ */
+.estimate-workspace .estimate-lessons {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 0;
+}
+.estimate-workspace .estimate-lessons button {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 12px;
+  text-align: left;
+  min-width: 0;
+  min-height: 112px;
+  padding: 18px 16px 14px;
+  border: 1.5px solid #EADFD5;
+  border-radius: 12px;
+  background: #FFFDFA;
+  color: #302A26;
+  font: 500 13px / 1.45 'DM Sans', Inter, sans-serif;
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s, box-shadow 0.2s, transform 0.12s;
+  position: relative;
+}
+.estimate-workspace .estimate-lessons button:hover {
+  border-color: #9E3A18;
+  background: #FDFAF6;
+  box-shadow: 0 4px 18px rgba(158, 58, 24, 0.1);
+  transform: translateY(-2px);
+}
+.estimate-workspace .estimate-lessons button > .lesson-pictogram {
+  flex-shrink: 0;
+  width: 26px;
+  height: 26px;
+  color: #9E3A18;
+}
+.estimate-workspace .estimate-lesson-number {
+  display: block;
+  font: 700 10px / 1.3 'DM Sans', Inter, sans-serif;
+  color: #9E3A18;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  margin-bottom: 2px;
+}
+.estimate-workspace .estimate-arrow {
+  position: absolute;
+  bottom: 13px;
+  right: 14px;
+  font-size: 15px;
+  color: #9E3A18;
+  opacity: 0.5;
+  transition: opacity 0.15s, transform 0.15s;
+}
+.estimate-workspace .estimate-lessons button:hover .estimate-arrow {
+  opacity: 1;
+  transform: translateX(2px);
+}
+
+/* Leçon active */
+.estimate-workspace .estimate-lessons button[aria-current] {
+  background: #9E3A18;
+  border-color: #9E3A18;
+  color: #FFF;
+  box-shadow: 0 4px 22px rgba(158, 58, 24, 0.28);
+  transform: none;
+}
+.estimate-workspace .estimate-lessons button[aria-current]:hover {
+  background: #86412A;
+  border-color: #86412A;
+  transform: none;
+}
+.estimate-workspace .estimate-lessons button[aria-current] > .lesson-pictogram { color: rgba(255,255,255,0.9); }
+.estimate-workspace .estimate-lessons button[aria-current] .estimate-lesson-number { color: rgba(255,255,255,0.65); }
+.estimate-workspace .estimate-lessons button[aria-current] .estimate-arrow { color: rgba(255,255,255,0.75); opacity: 1; }
+
+/* Focus visible */
+.estimate-workspace button:focus-visible {
+  outline: 2px solid #9E3A18;
+  outline-offset: 3px;
+}
+
+/* ============================================================
+   LESSON SHELL — masqué dans Estimez
+   ============================================================ */
+body.vpm-formation-page .estimate-workspace .formation-outline-shell {
+  grid-column: 1 / -1;
+  position: static;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+body.vpm-formation-page .estimate-workspace .formation-outline-shell > summary {
+  display: list-item;
+  color: #9E3A18;
+  font: 500 13px / 1.5 'DM Sans', Inter, sans-serif;
+  cursor: pointer;
+  padding: 8px 4px;
+}
+body.vpm-formation-page .estimate-workspace .formation-outline-shell:not([open]) > .formation-outline { display: none; }
+body.vpm-formation-page .estimate-workspace .formation-outline { max-height: 320px; border: 0; padding: 12px 0; }
+body.vpm-formation-page .estimate-workspace #modContainer { padding: 0; min-width: 0; }
+body.vpm-formation-page .estimate-workspace #modContainer .step-card { background: transparent; }
+
+/* ============================================================
+   MASTHEAD DE LEÇON — typographie éditoriale
+   ============================================================ */
+body.vpm-formation-page .estimate-workspace #modContainer .lesson-masthead {
+  padding: 0 8px 22px;
+  gap: 8px 20px;
+}
+
+/* Numéro de leçon */
+body.vpm-formation-page .estimate-workspace #modContainer .lesson-number {
+  font: 700 11px / 1.5 'DM Sans', Inter, sans-serif;
+  color: #9E3A18;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+}
+
+/* Pagination */
+body.vpm-formation-page .estimate-workspace #modContainer .lesson-pagination {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0;
+  font: 500 12px / 1.5 'DM Sans', Inter, sans-serif;
+  color: #71645B;
+}
+body.vpm-formation-page .estimate-workspace #modContainer .lesson-pagination button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border: 1px solid #E4CCB8;
+  border-radius: 50%;
+  background: #FCF7F0;
+  color: #9E3A18;
+  font-size: 18px;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+}
+body.vpm-formation-page .estimate-workspace #modContainer .lesson-pagination button:hover {
+  background: #9E3A18;
+  border-color: #9E3A18;
+  color: #FFF;
+}
+
+/* Titre de leçon — grand Cormorant */
+body.vpm-formation-page .estimate-workspace #modContainer .step-t {
+  font-size: clamp(32px, 3.5vw, 46px) !important;
+  line-height: 1.1 !important;
+}
+
+/* Métadonnées */
+body.vpm-formation-page .estimate-workspace #modContainer .step-m {
+  font: 400 13px / 1.6 'DM Sans', Inter, sans-serif;
+  color: #71645B !important;
+}
+
+/* Tag VPM */
+body.vpm-formation-page .estimate-workspace #modContainer .step-tag { color: #9E3A18 !important; line-height: 1.6; margin-top: 10px; }
+body.vpm-formation-page .estimate-workspace #modContainer .step-arr { color: #9E3A18 !important; flex-shrink: 0; }
+body.vpm-formation-page .estimate-workspace #modContainer .step-chk { border-color: #9E3A18 !important; flex-shrink: 0; }
+body.vpm-formation-page .estimate-workspace #modContainer .step-card.done .step-chk { background: #9E3A18 !important; color: #FFF !important; }
+body.vpm-formation-page .estimate-workspace #modContainer .step-card.open .vpm-badge { color: #9E3A18; background: #FCF7F0; border-color: #E4CCB8; }
+
+/* ============================================================
+   CORPS DE LA LEÇON — rythme éditorial
+   ============================================================ */
+body.vpm-formation-page .estimate-workspace #modContainer .step-body { padding: 8px !important; }
+body.vpm-formation-page .estimate-workspace #modContainer .step-card.open .step-body { display: block !important; border: 0; }
+body.vpm-formation-page .estimate-workspace #modContainer .sst { margin-top: 26px; min-width: 0; }
+
+/* Labels de section */
+body.vpm-formation-page .estimate-workspace #modContainer .sst-title {
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  font: 700 10px / 1.5 'DM Sans', Inter, sans-serif !important;
+  letter-spacing: 1.2px !important;
+  text-transform: uppercase !important;
+  color: #9E3A18 !important;
+  margin: 0 0 14px !important;
+  padding: 0 !important;
+}
+body.vpm-formation-page .estimate-workspace #modContainer .sst-title::after { display: none !important; }
+body.vpm-formation-page .estimate-workspace #modContainer .sst-title[onclick] {
+  border-top: 1px solid #EADFD5 !important;
+  padding: 12px 0 !important;
+  min-height: 44px;
+  box-sizing: border-box;
+}
+
+/* Corps de texte */
+body.vpm-formation-page .estimate-workspace #modContainer .sst-text { font-size: 15px !important; line-height: 1.8 !important; }
+body.vpm-formation-page .estimate-workspace #modContainer .sst-text p { margin: 0 0 14px; }
+body.vpm-formation-page .estimate-workspace #modContainer .sst-text li { margin-bottom: 8px; }
+
+/* Explication — fond transparent */
+body.vpm-formation-page .estimate-workspace #modContainer .lesson-explanation { background: transparent; border: 0; padding: 12px 0 20px; }
+
+/* ============================================================
+   CONSEILS — encadré éditorial gauche-bordure
+   ============================================================ */
+body.vpm-formation-page .estimate-workspace #modContainer .tip-i {
+  margin: 0;
+  padding: 13px 16px !important;
+  background: rgba(252, 247, 240, 0.9) !important;
+  border: 0 !important;
+  border-left: 3px solid #9E3A18 !important;
+  border-radius: 0 8px 8px 0 !important;
+  gap: 10px;
+  align-items: flex-start;
+}
+body.vpm-formation-page .estimate-workspace #modContainer .tip-icon {
+  background: transparent !important;
+  color: #9E3A18;
+  margin-top: 1px;
+  flex-shrink: 0;
+}
+body.vpm-formation-page .estimate-workspace #modContainer .tip-text { font-size: 13px !important; line-height: 1.75 !important; color: #51463F; }
+
+/* ============================================================
+   AVERTISSEMENTS — bordure gauche ambrée
+   ============================================================ */
+body.vpm-formation-page .estimate-workspace #modContainer .warn-i {
+  padding: 13px 0 13px 18px !important;
+  margin: 22px 0 !important;
+  border: 0 !important;
+  border-left: 3px solid #C0651A !important;
+  border-radius: 0 !important;
+  background: rgba(192, 101, 26, 0.04) !important;
+  gap: 12px;
+  align-items: flex-start;
+}
+body.vpm-formation-page .estimate-workspace #modContainer .warn-icon { background: transparent; color: #C0651A; }
+body.vpm-formation-page .estimate-workspace #modContainer .warn-text { font-size: 13px !important; line-height: 1.75 !important; color: #51463F; }
+
+/* ============================================================
+   GRILLE OUTILS (lesson 1.2)
+   ============================================================ */
+body.vpm-formation-page .estimate-workspace #modContainer .lesson-tools-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px;
+  margin-top: 20px;
+}
+body.vpm-formation-page .estimate-workspace #modContainer .lesson-tool { margin: 0; padding: 0; background: transparent; border: 0; }
+
+/* ============================================================
+   CONSEILS GRID
+   ============================================================ */
+body.vpm-formation-page .estimate-workspace #modContainer .lesson-advice-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+/* ============================================================
+   PASSAGE "À RETENIR"
+   ============================================================ */
+body.vpm-formation-page .estimate-workspace #modContainer .lesson-takeaway {
+  padding: 18px 0;
+  border-top: 1px solid #EADFD5;
+  border-bottom: 1px solid #EADFD5;
+}
+body.vpm-formation-page .estimate-workspace #modContainer .lesson-takeaway .sst-text > div {
+  background: transparent !important;
+  color: #302A26 !important;
+  padding: 0 !important;
+  border-radius: 0 !important;
+}
+body.vpm-formation-page .estimate-workspace #modContainer .lesson-takeaway strong { color: #9E3A18 !important; }
+
+/* ============================================================
+   EXEMPLE / CITATION
+   ============================================================ */
+body.vpm-formation-page .estimate-workspace #modContainer .lesson-example {
+  border-left: 2px solid #E4CCB8;
+  padding-left: 16px;
+}
+
+/* ============================================================
+   BOUTON "LEÇON SUIVANTE"
+   ============================================================ */
+.estimate-workspace .estimate-lesson-next {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin: 32px 0 0;
+  padding: 16px 20px;
+  background: #F8F1E7;
+  border: 1.5px solid #E4CCB8;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s, box-shadow 0.2s;
+  text-align: left;
+  width: 100%;
+  box-sizing: border-box;
+}
+.estimate-workspace .estimate-lesson-next:hover {
+  border-color: #9E3A18;
+  background: #FCF2E8;
+  box-shadow: 0 4px 18px rgba(158, 58, 24, 0.1);
+}
+.estimate-workspace .estimate-lesson-next-label {
+  display: block;
+  font: 700 10px / 1.3 'DM Sans', Inter, sans-serif;
+  color: #9E3A18;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+.estimate-workspace .estimate-lesson-next-title {
+  display: block;
+  font: 600 14px / 1.45 'DM Sans', Inter, sans-serif;
+  color: #302A26;
+}
+.estimate-workspace .estimate-lesson-next-arrow {
+  flex-shrink: 0;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: #9E3A18;
+  color: #FFF;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 17px;
+  transition: transform 0.15s;
+  line-height: 1;
+}
+.estimate-workspace .estimate-lesson-next:hover .estimate-lesson-next-arrow { transform: translateX(3px); }
+
+/* ============================================================
+   PIED DE LEÇON — ressources + coach
+   ============================================================ */
+body.vpm-formation-page .estimate-workspace #modContainer .lesson-support {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(170px, .65fr);
+  gap: 16px;
+  align-items: end;
+  margin-top: 28px;
+  padding-top: 20px;
+  border-top: 1px solid #EADFD5;
+  padding-bottom: 16px;
+}
+body.vpm-formation-page .estimate-workspace #modContainer .lesson-support .lesson-resources { padding: 0; margin: 0; border: 0; }
+body.vpm-formation-page .estimate-workspace #modContainer .lesson-resource-links { display: flex; flex-wrap: wrap; gap: 10px; }
+body.vpm-formation-page .estimate-workspace #modContainer .lesson-resource-links :is(a, button) {
+  display: inline-flex;
+  align-items: center;
+  box-sizing: border-box;
+  min-height: 40px;
+  padding: 8px 12px;
+  background: transparent;
+  border: 1px solid #E4CCB8;
+  border-radius: 6px;
+  color: #9E3A18;
+  font: 500 12px / 1.5 'DM Sans', Inter, sans-serif;
+  text-decoration: none;
+  overflow-wrap: anywhere;
+}
+body.vpm-formation-page .estimate-workspace #modContainer .lesson-support .ask-coach-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 42px;
+  box-sizing: border-box;
+  margin: 0;
+  padding: 10px 14px;
+  border: 1px solid #9E3A18 !important;
+  border-radius: 6px;
+  background: #9E3A18 !important;
+  color: #FFF !important;
+  opacity: 1 !important;
+  font: 600 12px / 1.5 'DM Sans', Inter, sans-serif;
+  white-space: normal;
+  cursor: pointer;
+}
+body.vpm-formation-page .estimate-workspace #modContainer .lesson-support .ask-coach-btn:hover {
+  background: #86412A !important;
+  color: #FFF !important;
+}
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+@media (max-width: 1100px) {
+  .estimate-workspace .estimate-lessons { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .estimate-workspace .estimate-hero { grid-template-columns: minmax(0, 1fr) 230px; padding: 0; gap: 0; }
+}
+
+@media (max-width: 750px) {
+  body.vpm-formation-page .formation-workspace.estimate-workspace { gap: 18px; }
+
+  .estimate-workspace .estimate-hero {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    min-height: 0;
+  }
+  .estimate-workspace .estimate-photo {
+    position: static;
+    order: 2;
+    width: 100%;
+    height: 180px;
+    border-radius: 0 0 12px 12px;
+    object-fit: cover;
+  }
+  .estimate-workspace .estimate-hero::before { display: none; }
+  .estimate-workspace .estimate-intro { order: 1; padding: 22px 20px 16px; max-width: none; }
+  .estimate-workspace .estimate-intro h2 { font-size: 48px; }
+  .estimate-workspace .estimate-intro p { font-size: 13px; }
+  .estimate-workspace .estimate-progress {
+    order: 3;
+    padding: 18px 20px;
+    border-left: 0;
+    border-top: 1px solid rgba(234, 223, 213, 0.7);
+  }
+  .estimate-workspace .estimate-progress button { font-size: 12px; min-height: 40px; }
+
+  .estimate-workspace .estimate-lessons { grid-template-columns: minmax(0, 1fr); gap: 10px; }
+  .estimate-workspace .estimate-lessons button {
+    min-height: 68px;
+    flex-direction: row;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 16px;
+  }
+  .estimate-workspace .estimate-arrow { position: static; margin-left: auto; opacity: 0.5; }
+  .estimate-workspace .estimate-lessons button[aria-current] .estimate-arrow { opacity: 1; }
+
+  body.vpm-formation-page .estimate-workspace #modContainer .lesson-masthead { padding-left: 0; padding-right: 0; }
+  body.vpm-formation-page .estimate-workspace #modContainer .step-body { padding: 0 !important; }
+  body.vpm-formation-page .estimate-workspace #modContainer .lesson-advice-grid,
+  body.vpm-formation-page .estimate-workspace #modContainer .lesson-support { grid-template-columns: minmax(0, 1fr); }
+  body.vpm-formation-page .estimate-workspace #modContainer .lesson-tools-grid { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 480px) {
+  .estimate-workspace .estimate-intro h2 { font-size: 42px; }
+  .estimate-workspace .estimate-lesson-next { gap: 12px; padding: 14px 16px; }
+  .estimate-workspace .estimate-lesson-next-title { font-size: 13px; }
+}
