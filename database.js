@@ -2,6 +2,9 @@ const Database = require('better-sqlite3');
 const path = require('path');
 
 const DB_PATH = process.env.DATABASE_URL || './database.db';
+if(process.env.NODE_ENV==='production' && !require('fs').existsSync(path.resolve(DB_PATH)) && process.env.ALLOW_EMPTY_DATABASE!=='true') {
+  throw Error('Base de production absente : restaurer une sauvegarde vérifiée avant démarrage. Initialisation neuve uniquement avec ALLOW_EMPTY_DATABASE=true explicite.');
+}
 const db = new Database(path.resolve(DB_PATH));
 
 db.pragma('journal_mode = WAL');
@@ -375,6 +378,7 @@ const newCols = [
   "ALTER TABLE properties ADD COLUMN ges_class TEXT",
   "ALTER TABLE properties ADD COLUMN dpe_annee_ref TEXT",
   "ALTER TABLE properties ADD COLUMN dpe_date TEXT",
+  "ALTER TABLE properties ADD COLUMN prix_souhaite INTEGER",
 ];
 newCols.forEach(sql => { try { db.exec(sql); } catch(e) {} });
 
@@ -616,21 +620,8 @@ db.exec(`
   )
 `);
 
-// Seed initial si la table est vide
-const adminCount = db.prepare('SELECT COUNT(*) as n FROM admins').get().n;
-if (adminCount === 0) {
-  const bcrypt = require('bcryptjs');
-  const seed = [
-    { email: 'matthias@venduparmoi.fr', name: 'Matthias',    password: 'VPM-Matthias2026'  },
-    { email: 'guillaume@venduparmoi.fr', name: 'Guillaume',   password: 'VPM-Guillaume2026' },
-    { email: 'contact@venduparmoi.fr',  name: 'Secrétariat', password: 'VPM-Contact2026'   },
-  ];
-  for (const acc of seed) {
-    const hash = bcrypt.hashSync(acc.password, 10);
-    db.prepare('INSERT OR IGNORE INTO admins (email, name, password) VALUES (?,?,?)').run(acc.email, acc.name, hash);
-  }
-  console.log('[ADMINS] 3 comptes admin créés (mots de passe temporaires)');
-}
+// Administrators are provisioned explicitly by scripts/provision-admin.js.
+// Existing credentials are never reset or replaced at startup.
 
 // ── Anti-bruteforce par compte : compte les échecs de mot de passe
 // pour déclencher une vérification par email seulement après plusieurs
@@ -671,14 +662,26 @@ try {
   `);
 } catch(e) { console.error('[DB] VRP tables error:', e.message); }
 
-// ── Nettoyage photos locales (avant Cloudinary) ─────────────────
-// Supprime les photos et documents dont l'URL commence par /uploads/
-// (stockage local éphémère Render — fichiers définitivement perdus)
-try {
-  const deletedPhotos = db.prepare("DELETE FROM property_photos WHERE url LIKE '/uploads/%'").run();
-  const deletedDocs = db.prepare("DELETE FROM property_documents WHERE url LIKE '/uploads/%'").run();
-  if (deletedPhotos.changes > 0) console.log(`🧹 Nettoyage : ${deletedPhotos.changes} photo(s) locale(s) supprimée(s) de la base`);
-  if (deletedDocs.changes > 0) console.log(`🧹 Nettoyage : ${deletedDocs.changes} document(s) local/aux supprimé(s) de la base`);
-} catch(e) {}
-
+db.exec(`
+  CREATE TABLE IF NOT EXISTS media_cleanup_jobs (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    media_json TEXT NOT NULL,
+    state TEXT DEFAULT 'pending',
+    created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+    last_error TEXT
+  );
+  CREATE TABLE IF NOT EXISTS delivery_events (
+    event_key TEXT PRIMARY KEY,
+    state TEXT NOT NULL,
+    lease_until INTEGER,
+    sent_at TEXT,
+    attempts INTEGER NOT NULL DEFAULT 0,
+    last_error TEXT
+  );
+  CREATE TABLE IF NOT EXISTS provider_webhook_events (
+    event_key TEXT PRIMARY KEY,
+    response TEXT,
+    created_at TEXT DEFAULT CURRENT_TIMESTAMP
+  );
+`);
 module.exports = db;

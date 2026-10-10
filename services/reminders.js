@@ -1,3 +1,5 @@
+const { deliverOnce } = require('./delivery');
+const { parisDay } = require('./validation');
 const db = require('../database');
 const { sendVisitConfirmation, sendMissionReminderJ1, sendPostFirstVisitFeedbackSeller, sendCheckInNoOffer } = require('./email');
 const { sendSmsNotification } = require('./twilio');
@@ -5,24 +7,25 @@ const { sendSmsNotification } = require('./twilio');
 async function sendVisitReminders() {
   const tomorrow = new Date();
   tomorrow.setDate(tomorrow.getDate() + 1);
-  const tomorrowStr = tomorrow.toISOString().split('T')[0];
+  const tomorrowStr = parisDay(tomorrow);
 
   const visits = db.prepare(`
     SELECT v.*, p.address, p.city, p.type, p.slug, s.phone as seller_phone, s.first_name as seller_name
     FROM visits v
     JOIN properties p ON p.id = v.property_id
     JOIN sellers s ON s.id = v.seller_id
-    WHERE v.visit_date = ? AND v.status = 'confirmed' AND v.reminder_sent = 0
+    WHERE v.status = 'confirmed' AND v.visit_date = ? AND v.reminder_sent = 0
   `).all(tomorrowStr);
 
   for (const visit of visits) {
     try {
       const property = { type: visit.type, address: visit.address, city: visit.city, slug: visit.slug };
 
-      await sendVisitConfirmation(
+      const delivered = await deliverOnce(`visit-reminder:${visit.id}:${visit.visit_date}:${visit.visit_time}`, () => sendVisitConfirmation(
         visit.buyer_email, visit.buyer_name, property,
         visit.visit_date, visit.visit_time, false
-      );
+      ));
+      if (!delivered) continue;
 
       db.prepare('UPDATE visits SET reminder_sent = 1 WHERE id = ?').run(visit.id);
       db.prepare("INSERT INTO notifications (seller_id, type, title, body) VALUES (?,?,?,?)")
@@ -44,7 +47,7 @@ async function sendVisitReminders() {
 async function sendMissionReminders() {
   const tomorrow = new Date();
   tomorrow.setDate(tomorrow.getDate() + 1);
-  const tomorrowStr = tomorrow.toISOString().split('T')[0];
+  const tomorrowStr = parisDay(tomorrow);
 
   const missions = db.prepare(`
     SELECT m.*, p.first_name as phot_first, p.last_name as phot_last, p.email as phot_email
@@ -56,7 +59,8 @@ async function sendMissionReminders() {
   for (const m of missions) {
     try {
       const photographer = { first_name: m.phot_first, last_name: m.phot_last, email: m.phot_email };
-      await sendMissionReminderJ1(m.client_email, m.client_name, m, photographer);
+      const delivered=await deliverOnce(`mission-reminder:${m.uuid}:${m.scheduled_date}`,()=>sendMissionReminderJ1(m.client_email,m.client_name,m,photographer));
+      if(!delivered)continue;
       console.log(`Mission reminder J-1 sent for mission ${m.uuid}`);
     } catch(e) {
       console.error(`Mission reminder error for ${m.uuid}:`, e.message);
@@ -70,9 +74,13 @@ async function sendAutomatedNudges() {
   // Helper: check if email was sent for trigger within N hours
   function alreadySent(email, triggerType, withinHours) {
     const row = db.prepare(
-      'SELECT id FROM email_log WHERE recipient_email=? AND trigger_type=? AND sent_at > datetime("now", ?)'
+      "SELECT id FROM email_log WHERE recipient_email=? AND trigger_type=? AND sent_at > datetime('now', ?)"
     ).get(email, triggerType, `-${withinHours} hours`);
     return !!row;
+  }
+  function deliveryKey(email, triggerType) {
+    const last=db.prepare('SELECT MAX(sent_at) AS at FROM email_log WHERE recipient_email=? AND trigger_type=?').get(email,triggerType);
+    return `nudge:${triggerType}:${email}:${last.at||'initial'}`;
   }
   function logEmail(email, triggerType) {
     db.prepare('INSERT INTO email_log (recipient_email, trigger_type) VALUES (?,?)').run(email, triggerType);
@@ -90,7 +98,7 @@ async function sendAutomatedNudges() {
     for (const p of prospects) {
       if (!p.email) continue;
       if (alreadySent(p.email, 'prospect_nudge', 9999)) continue;
-      const ok = await sendProspectNudge({ name: p.name, email: p.email });
+      const ok = await deliverOnce(deliveryKey(p.email, 'prospect_nudge'),()=>sendProspectNudge({ name: p.name, email: p.email }));
       if (ok) { logEmail(p.email, 'prospect_nudge'); console.log('[NUDGE] prospect_nudge sent:', p.email); }
     }
   } catch (e) { console.error('[NUDGE] Trigger 1 error:', e.message); }
@@ -106,7 +114,7 @@ async function sendAutomatedNudges() {
     `).all();
     for (const s of sellers) {
       if (alreadySent(s.email, 'no_property_nudge', 9999)) continue;
-      const ok = await sendNoPropertyNudge({ email: s.email });
+      const ok = await deliverOnce(deliveryKey(s.email, 'no_property_nudge'),()=>sendNoPropertyNudge({ email: s.email }));
       if (ok) { logEmail(s.email, 'no_property_nudge'); console.log('[NUDGE] no_property_nudge sent:', s.email); }
     }
   } catch (e) { console.error('[NUDGE] Trigger 2 error:', e.message); }
@@ -123,7 +131,7 @@ async function sendAutomatedNudges() {
     `).all();
     for (const s of sellers) {
       if (alreadySent(s.email, 'no_photos_nudge', 168)) continue;
-      const ok = await sendNoPhotosNudge({ email: s.email });
+      const ok = await deliverOnce(deliveryKey(s.email, 'no_photos_nudge'),()=>sendNoPhotosNudge({ email: s.email }));
       if (ok) { logEmail(s.email, 'no_photos_nudge'); console.log('[NUDGE] no_photos_nudge sent:', s.email); }
     }
   } catch (e) { console.error('[NUDGE] Trigger 3 error:', e.message); }
@@ -159,7 +167,7 @@ async function sendAutomatedNudges() {
         score += propRow.dpe_class ? 10 : 0;
       }
       if (score < 70) continue;
-      const ok = await sendNotPublishedNudge({ email: s.email, score });
+      const ok = await deliverOnce(deliveryKey(s.email, 'not_published_nudge'),()=>sendNotPublishedNudge({ email: s.email, score }));
       if (ok) { logEmail(s.email, 'not_published_nudge'); console.log('[NUDGE] not_published_nudge sent:', s.email); }
     }
   } catch (e) { console.error('[NUDGE] Trigger 4 error:', e.message); }
@@ -177,7 +185,7 @@ async function sendAutomatedNudges() {
       const missingDocs = [];
       if (!s.dpe_class) missingDocs.push('Diagnostics techniques complets — un doute sur lesquels réaliser ? Votre espace formation vous guide');
       if (!s.taxe_fonciere) missingDocs.push('Montant de la taxe foncière annuelle');
-      const ok = await sendMissingDocNudge({ email: s.email, missingDocs });
+      const ok = await deliverOnce(deliveryKey(s.email, 'missing_doc_nudge'),()=>sendMissingDocNudge({ email: s.email, missingDocs }));
       if (ok) { logEmail(s.email, 'missing_doc_nudge'); console.log('[NUDGE] missing_doc_nudge sent:', s.email); }
     }
   } catch (e) { console.error('[NUDGE] Trigger 7 error:', e.message); }
@@ -202,7 +210,7 @@ async function sendContractExpiryReminders() {
       const expiryDate = new Date(s.contrat_signe_at);
       expiryDate.setMonth(expiryDate.getMonth() + 6);
       const daysLeft = Math.round((expiryDate - new Date()) / (1000 * 3600 * 24));
-      const ok = await sendContractRenewal({ email: s.email, firstName: s.first_name, expiryDate: expiryDate.toISOString(), daysLeft });
+      const ok = await deliverOnce(`contract-expiry:${s.id}:${s.contrat_signe_at}`,()=>sendContractRenewal({ email: s.email, firstName: s.first_name, expiryDate: expiryDate.toISOString(), daysLeft }));
       if (ok) {
         db.prepare('UPDATE sellers SET relance_extension_at=CURRENT_TIMESTAMP WHERE id=?').run(s.id);
         console.log(`[CONTRAT] Relance extension envoyée → ${s.email} (J-${daysLeft})`);
@@ -216,12 +224,12 @@ async function sendPostVisitBuyerNudges() {
   const { sendPostVisitBuyerNudge } = require('./email');
 
   const visits = db.prepare(`
-    SELECT v.buyer_email, v.buyer_name, p.slug, p.city, p.type, p.price
+    SELECT v.visit_date, v.buyer_email, v.buyer_name, p.slug, p.city, p.type, p.price
     FROM visits v
     JOIN properties p ON p.id = v.property_id
     WHERE v.visit_date <= date('now', '-7 days')
       AND v.visit_date >= date('now', '-8 days')
-      AND v.status = 'confirmed'
+      AND v.status IN ('confirmed','done')
       AND NOT EXISTS (
         SELECT 1 FROM offers o WHERE o.property_id = v.property_id AND o.buyer_email = v.buyer_email
       )
@@ -233,7 +241,7 @@ async function sendPostVisitBuyerNudges() {
         "SELECT id FROM email_log WHERE recipient_email=? AND trigger_type=? AND sent_at > datetime('now', '-30 days')"
       ).get(v.buyer_email, `post_visit_${v.slug}`);
       if (alreadySent) continue;
-      const ok = await sendPostVisitBuyerNudge({ buyerEmail: v.buyer_email, buyerName: v.buyer_name, propertyCity: v.city, propertyType: v.type, propertySlug: v.slug, price: v.price });
+      const ok = await deliverOnce(`post-visit:${v.slug}:${v.buyer_email}:${v.visit_date}`,()=>sendPostVisitBuyerNudge({ buyerEmail: v.buyer_email, buyerName: v.buyer_name, propertyCity: v.city, propertyType: v.type, propertySlug: v.slug, price: v.price }));
       if (ok) {
         db.prepare('INSERT INTO email_log (recipient_email, trigger_type) VALUES (?,?)').run(v.buyer_email, `post_visit_${v.slug}`);
         console.log(`[NUDGE] post_visit sent → ${v.buyer_email} (${v.slug})`);
@@ -246,24 +254,27 @@ async function sendPostFirstVisitFeedbackNudges() {
   // Sellers who had their first visit 2 days ago
   const twoDaysAgo = new Date();
   twoDaysAgo.setDate(twoDaysAgo.getDate() - 2);
-  const twoDaysAgoStr = twoDaysAgo.toISOString().split('T')[0];
+  const twoDaysAgoStr = parisDay(twoDaysAgo);
 
   const sellers = db.prepare(`
     SELECT s.email, s.first_name, s.id
     FROM sellers s
     JOIN visits v ON v.seller_id = s.id
-    WHERE v.visit_date = ? AND v.status = 'confirmed'
+    WHERE v.status IN ('confirmed','done')
       AND (s.archived IS NULL OR s.archived = 0)
+      AND COALESCE(s.vente_realisee,0)=0
+      AND NOT EXISTS (SELECT 1 FROM properties sold WHERE sold.seller_id=s.id AND sold.status='vendu')
     GROUP BY s.id
     HAVING MIN(v.visit_date) = ?
     LIMIT 20
-  `).all(twoDaysAgoStr, twoDaysAgoStr);
+  `).all(twoDaysAgoStr);
   for (const s of sellers) {
     const key = `post_first_visit_seller:${s.id}`;
     const already = db.prepare(`SELECT id FROM email_log WHERE trigger_type=? AND recipient_email=?`).get(key, s.email);
     if (already) continue;
     try {
-      await sendPostFirstVisitFeedbackSeller({ email: s.email, firstName: s.first_name });
+      const delivered=await deliverOnce(key,()=>sendPostFirstVisitFeedbackSeller({ email: s.email, firstName: s.first_name }));
+      if(!delivered)continue;
       db.prepare(`INSERT INTO email_log (trigger_type, recipient_email) VALUES (?,?)`).run(key, s.email);
     } catch(e) { console.error('[NUDGE] post_first_visit_seller error:', e.message); }
   }
@@ -279,6 +290,8 @@ async function sendCheckInNoOfferNudges() {
     LEFT JOIN offers o ON o.seller_id = s.id
     WHERE p.published_at IS NOT NULL
       AND (s.archived IS NULL OR s.archived = 0)
+      AND COALESCE(s.vente_realisee,0)=0
+      AND NOT EXISTS (SELECT 1 FROM properties sold WHERE sold.seller_id=s.id AND sold.status='vendu')
       AND o.id IS NULL
       AND p.published_at <= date('now', '-14 days')
     LIMIT 20
@@ -288,7 +301,8 @@ async function sendCheckInNoOfferNudges() {
     const already = db.prepare(`SELECT id FROM email_log WHERE trigger_type=? AND recipient_email=?`).get(key, s.email);
     if (already) continue;
     try {
-      await sendCheckInNoOffer({ email: s.email, firstName: s.first_name, daysPublished: s.days_published });
+      const delivered=await deliverOnce(key,()=>sendCheckInNoOffer({ email: s.email, firstName: s.first_name, daysPublished: s.days_published }));
+      if(!delivered)continue;
       db.prepare(`INSERT INTO email_log (trigger_type, recipient_email) VALUES (?,?)`).run(key, s.email);
     } catch(e) { console.error('[NUDGE] check_in_no_offer error:', e.message); }
   }
@@ -308,6 +322,8 @@ async function sendPriceDropNudges() {
     WHERE p.published_at IS NOT NULL
       AND p.published = 1
       AND (s.archived IS NULL OR s.archived = 0)
+      AND COALESCE(s.vente_realisee,0)=0
+      AND NOT EXISTS (SELECT 1 FROM properties sold WHERE sold.seller_id=s.id AND sold.status='vendu')
       AND o.id IS NULL
       AND p.published_at <= date('now', '-30 days')
     LIMIT 20
@@ -318,7 +334,7 @@ async function sendPriceDropNudges() {
     const already = db.prepare(`SELECT id FROM email_log WHERE trigger_type=? AND recipient_email=?`).get(key, s.email);
     if (already) continue;
     try {
-      const ok = await sendPriceDropNudge({ email: s.email, firstName: s.first_name, daysPublished: s.days_published, currentPrice: s.price, propertyCity: s.city });
+      const ok = await deliverOnce(key,()=>sendPriceDropNudge({ email: s.email, firstName: s.first_name, daysPublished: s.days_published, currentPrice: s.price, propertyCity: s.city }));
       if (ok) {
         db.prepare(`INSERT INTO email_log (trigger_type, recipient_email) VALUES (?,?)`).run(key, s.email);
         console.log(`[NUDGE] price_drop_nudge → ${s.email} (J+${s.days_published})`);

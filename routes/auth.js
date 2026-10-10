@@ -63,12 +63,8 @@ router.post('/login', loginLimit, express.json(), async (req, res) => {
   }
 
   db.prepare('UPDATE sellers SET failed_login_attempts = 0 WHERE id=?').run(seller.id);
-  const token = jwt.sign(
-    { id: seller.id, uuid: seller.uuid, email: seller.email, pack: seller.pack },
-    process.env.JWT_SECRET,
-    { expiresIn: '30d' }
-  );
-  res.cookie('token', token, { httpOnly: true, secure: process.env.NODE_ENV === 'production', maxAge: 30 * 24 * 3600 * 1000 });
+  const token = require('../services/session').sign(seller, 'seller');
+  res.cookie('token', token, { httpOnly: true, secure: process.env.NODE_ENV === 'production', sameSite: 'lax', maxAge: 30 * 24 * 3600 * 1000 });
   res.json({ success: true, redirect: '/dashboard' });
 });
 
@@ -89,12 +85,8 @@ router.post('/api/login/verify-2fa', verify2faLimit, express.json(), async (req,
     const seller = db.prepare('SELECT * FROM sellers WHERE id = ?').get(payload.accountId);
     if (!seller) return res.json({ error: 'Compte introuvable.' });
     db.prepare('UPDATE sellers SET failed_login_attempts = 0 WHERE id=?').run(seller.id);
-    const token = jwt.sign(
-      { id: seller.id, uuid: seller.uuid, email: seller.email, pack: seller.pack },
-      process.env.JWT_SECRET,
-      { expiresIn: '30d' }
-    );
-    res.cookie('token', token, { httpOnly: true, secure: process.env.NODE_ENV === 'production', maxAge: 30 * 24 * 3600 * 1000 });
+    const token = require('../services/session').sign(seller, 'seller');
+    res.cookie('token', token, { httpOnly: true, secure: process.env.NODE_ENV === 'production', sameSite: 'lax', maxAge: 30 * 24 * 3600 * 1000 });
     return res.json({ success: true, redirect: '/dashboard' });
   }
 
@@ -102,8 +94,8 @@ router.post('/api/login/verify-2fa', verify2faLimit, express.json(), async (req,
     const admin = db.prepare('SELECT * FROM admins WHERE id = ?').get(payload.accountId);
     if (!admin) return res.json({ error: 'Compte introuvable.' });
     db.prepare('UPDATE admins SET failed_login_attempts = 0 WHERE id=?').run(admin.id);
-    const token = jwt.sign({ role: 'admin', email: admin.email, name: admin.name }, process.env.JWT_SECRET, { expiresIn: '8h' });
-    res.cookie('admin_token', token, { httpOnly: true, secure: process.env.NODE_ENV === 'production', maxAge: 8 * 3600 * 1000 });
+    const token = require('../services/session').sign(admin, 'admin');
+    res.cookie('admin_token', token, { httpOnly: true, secure: process.env.NODE_ENV === 'production', sameSite: 'lax', maxAge: 8 * 3600 * 1000 });
     return res.json({ success: true, redirect: '/admin' });
   }
 
@@ -143,8 +135,8 @@ router.post('/admin/login', loginLimit, express.json(), async (req, res) => {
       }
 
       db.prepare('UPDATE admins SET failed_login_attempts = 0 WHERE id=?').run(admin.id);
-      const token = jwt.sign({ role: 'admin', email: admin.email, name: admin.name }, process.env.JWT_SECRET, { expiresIn: '8h' });
-      res.cookie('admin_token', token, { httpOnly: true, secure: process.env.NODE_ENV === 'production', maxAge: 8 * 3600 * 1000 });
+      const token = require('../services/session').sign(admin, 'admin');
+      res.cookie('admin_token', token, { httpOnly: true, secure: process.env.NODE_ENV === 'production', sameSite: 'lax', maxAge: 8 * 3600 * 1000 });
       return res.json({ success: true, redirect: '/admin' });
     }
     // Fallback env vars (ancien système, pas de compte en base donc pas de
@@ -152,8 +144,10 @@ router.post('/admin/login', loginLimit, express.json(), async (req, res) => {
     // en base, laissé pour compatibilité)
     if (process.env.ADMIN_EMAIL && process.env.ADMIN_PASSWORD) {
       if (email === process.env.ADMIN_EMAIL && password === process.env.ADMIN_PASSWORD) {
-        const token = jwt.sign({ role: 'admin', email }, process.env.JWT_SECRET, { expiresIn: '8h' });
-        res.cookie('admin_token', token, { httpOnly: true, secure: process.env.NODE_ENV === 'production', maxAge: 8 * 3600 * 1000 });
+        db.prepare('INSERT OR IGNORE INTO admins(email,name,password) VALUES(?,?,?)').run(email.toLowerCase().trim(), 'Administrateur', await bcrypt.hash(password, 12));
+        const account = db.prepare('SELECT * FROM admins WHERE email=?').get(email.toLowerCase().trim());
+        const token = require('../services/session').sign(account, 'admin');
+        res.cookie('admin_token', token, { httpOnly: true, secure: process.env.NODE_ENV === 'production', sameSite: 'lax', maxAge: 8 * 3600 * 1000 });
         return res.json({ success: true, redirect: '/admin' });
       }
     }
@@ -163,32 +157,7 @@ router.post('/admin/login', loginLimit, express.json(), async (req, res) => {
   }
 });
 
-router.get('/creer-compte-test', async (req, res) => {
-  if (process.env.NODE_ENV === 'production') return res.status(404).send('Not found');
-  try {
-    const { v4: uuidv4 } = require('uuid');
-    const accounts = [
-      { email: 'matthiasbrieux260598@gmail.com', password: 'VPM2026!', pack: 'serenite' },
-      { email: 'associe@test.fr', password: 'Test2025', pack: 'serenite' },
-    ];
-    const results = [];
-    for (const acc of accounts) {
-      const hashed = await bcrypt.hash(acc.password, 12);
-      const existing = db.prepare('SELECT id FROM sellers WHERE email = ?').get(acc.email);
-      if (existing) {
-        db.prepare('UPDATE sellers SET password=?, paid_at=CURRENT_TIMESTAMP WHERE email=?').run(hashed, acc.email);
-        results.push(`MàJ: ${acc.email} — mdp: ${acc.password}`);
-      } else {
-        const r = db.prepare('INSERT INTO sellers (uuid, email, password, pack, paid_at) VALUES (?,?,?,?,CURRENT_TIMESTAMP)')
-          .run(uuidv4(), acc.email, hashed, acc.pack);
-        db.prepare('INSERT INTO properties (uuid, seller_id, slug, acheteur_token, notaire_token, status) VALUES (?,?,?,?,?,?)')
-          .run(uuidv4(), r.lastInsertRowid, `bien-${r.lastInsertRowid}`, uuidv4(), uuidv4(), 'preparation');
-        results.push(`Créé: ${acc.email} — mdp: ${acc.password}`);
-      }
-    }
-    res.send(results.join('<br>'));
-  } catch(e) { res.status(500).send('Erreur: ' + e.message); }
-});
+router.get('/creer-compte-test', (req,res) => res.status(404).send('Not found'));
 
 router.get('/admin/logout', (req, res) => {
   res.clearCookie('admin_token');
@@ -224,12 +193,18 @@ router.post('/api/reset-password', express.json(), async (req, res) => {
     return res.json({ error: 'Ce mot de passe est apparu dans des fuites de données connues. Choisissez-en un autre.' });
   }
 
-  const row = db.prepare("SELECT * FROM password_reset_tokens WHERE token=? AND used_at IS NULL AND expires_at > datetime('now')").get(token);
+  const row = db.prepare("SELECT * FROM password_reset_tokens WHERE token=? AND used_at IS NULL AND julianday(expires_at) > julianday('now')").get(token);
   if (!row) return res.json({ error: 'Lien expiré ou invalide. Demandez un nouveau lien.' });
 
   const hashed = await bcrypt.hash(password, 12);
-  db.prepare('UPDATE sellers SET password=? WHERE id=?').run(hashed, row.seller_id);
-  db.prepare("UPDATE password_reset_tokens SET used_at=datetime('now') WHERE id=?").run(row.id);
+  const changed = db.transaction(() => {
+    const consumed = db.prepare("UPDATE password_reset_tokens SET used_at=datetime('now') WHERE id=? AND used_at IS NULL AND julianday(expires_at)>julianday('now')").run(row.id);
+    if (!consumed.changes) return false;
+    db.prepare('UPDATE sellers SET password=? WHERE id=?').run(hashed, row.seller_id);
+    db.prepare("UPDATE password_reset_tokens SET used_at=datetime('now') WHERE seller_id=? AND used_at IS NULL").run(row.seller_id);
+    return true;
+  })();
+  if (!changed) return res.status(400).json({error:'Lien expiré ou invalide.'});
 
   res.json({ success: true });
 });

@@ -488,28 +488,11 @@ router.delete('/api/seed-demo', requireAdmin, (req, res) => {
   res.json({ success: true, deleted: existing.length });
 });
 
-router.get('/create-test-account', requireAdmin, async (req, res) => {
-  const email = 'associe@test.fr';
-  const password = 'Test2025';
-  const hashed = await bcrypt.hash(password, 12);
-  const existing = db.prepare('SELECT id FROM sellers WHERE email = ?').get(email);
-  if (existing) {
-    db.prepare('UPDATE sellers SET password=?, paid_at=CURRENT_TIMESTAMP WHERE email=?').run(hashed, email);
-    return res.send('✓ Compte mis à jour — email: associe@test.fr — mot de passe: Test2025 — connectez-vous sur /login');
-  }
-  const uuid = uuidv4();
-  const r = db.prepare('INSERT INTO sellers (uuid, email, password, pack, paid_at) VALUES (?,?,?,?,CURRENT_TIMESTAMP)')
-    .run(uuid, email, hashed, 'serenite');
-  const sellerId = r.lastInsertRowid;
-  const propUuid = uuidv4();
-  db.prepare('INSERT INTO properties (uuid, seller_id, slug, acheteur_token, notaire_token, status) VALUES (?,?,?,?,?,?)')
-    .run(propUuid, sellerId, `bien-${sellerId}`, uuidv4(), uuidv4(), 'preparation');
-  res.send('✓ Compte créé — email: associe@test.fr — mot de passe: Test2025 — connectez-vous sur /login');
-});
+router.post('/create-test-account', requireAdmin, (req,res)=>res.status(410).json({error:'Utilisez la création explicite d’un vendeur avec des identifiants uniques.'}));
 
-router.get('/create-seller', requireAdmin, async (req, res) => {
-  const { email, password, pack } = req.query;
-  if (!email || !password) return res.status(400).send('Paramètres manquants');
+router.post('/create-seller', requireAdmin, async (req, res) => {
+  const { email, password, pack } = req.body;
+  if (!require('../services/validation').email(email) || typeof password!=='string' || password.length<12) return res.status(400).send('Email valide et mot de passe de 12 caractères minimum requis');
   const hashed = await bcrypt.hash(password, 12);
   const existing = db.prepare('SELECT id FROM sellers WHERE email = ?').get(email.toLowerCase());
   if (existing) {
@@ -609,7 +592,7 @@ router.post('/api/clients', requireAdmin, express.json(), async (req, res) => {
   if (!email || !pack) return res.json({ error: 'Email et pack requis' });
   const existing = db.prepare('SELECT id FROM sellers WHERE email = ?').get(email.toLowerCase());
   if (existing) return res.json({ error: 'Email déjà utilisé' });
-  const tempPassword = Math.random().toString(36).slice(2, 10);
+  const tempPassword = require('crypto').randomBytes(18).toString('base64url');
   const hashed = await bcrypt.hash(tempPassword, 12);
   const uuid = uuidv4();
   db.prepare('INSERT INTO sellers (uuid, email, password, pack, first_name, last_name, phone, paid_at) VALUES (?,?,?,?,?,?,?,CURRENT_TIMESTAMP)')
@@ -630,7 +613,7 @@ router.post('/api/clients', requireAdmin, express.json(), async (req, res) => {
 });
 
 router.post('/api/clients/:id/reset-password', requireAdmin, express.json(), async (req, res) => {
-  const newPassword = Math.random().toString(36).slice(2, 10);
+  const newPassword = require('crypto').randomBytes(18).toString('base64url');
   const hashed = await bcrypt.hash(newPassword, 12);
   db.prepare('UPDATE sellers SET password=? WHERE id=?').run(hashed, req.params.id);
   res.json({ success: true, new_password: newPassword });
@@ -1534,11 +1517,11 @@ router.get('/api/crm/:id/views', requireAdmin, (req, res) => {
 });
 
 // ── Backup manuel de la base SQLite ──────────────────────────
-router.post('/api/backup', requireAdmin, (req, res) => {
+router.post('/api/backup', requireAdmin, async (req, res) => {
   try {
     const { backupDatabase } = require('../services/backup');
-    const dest = backupDatabase();
-    const files = require('fs').readdirSync('./backups').filter(f => /^db-/.test(f)).sort().reverse();
+    const dest = await backupDatabase();
+    const files = require('fs').readdirSync(process.env.BACKUP_DIR || './backups').filter(f => /^db-/.test(f)).sort().reverse();
     res.json({ success: true, file: require('path').basename(dest || ''), backups: files });
   } catch(e) {
     console.error('Backup error:', e.message);

@@ -1,0 +1,95 @@
+/* Read-only price reference, confined to lesson 1.1. */
+(() => {
+  'use strict';
+  let result;
+  const euro=n=>new Intl.NumberFormat('fr-FR',{style:'currency',currency:'EUR',maximumFractionDigits:0}).format(n);
+  const fmtDate=s=>s.split('-').reverse().join('/');
+
+  function addrCell(addr) {
+    if (!addr) return '<span class="pr-na">Non disponible</span>';
+    if (addr.precision==='inconnu' || !addr.label) return '<span class="pr-na">Non disponible</span>';
+    if (addr.precision==='commune') return '<span class="pr-commune">'+escHtml(addr.label)+'<span class="pr-precision"> (commune)</span></span>';
+    return escHtml(addr.label);
+  }
+  function escHtml(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+  function renderComparables(box, comparables) {
+    const existing = box.querySelector('.pr-comparables');
+    if (existing) existing.remove();
+    if (!Array.isArray(comparables) || !comparables.length) return;
+
+    const addrKnown = comparables.some(c=>c.addr&&c.addr.precision==='rue');
+    const rows = comparables.map(c=>`
+      <tr>
+        <td class="pr-td-addr">${addrCell(c.addr)}</td>
+        <td class="pr-td-date">${fmtDate(c.date)}</td>
+        <td class="pr-td-num">${Math.round(c.area)}&nbsp;m²</td>
+        <td class="pr-td-num">${euro(c.price)}</td>
+        <td class="pr-td-num pr-td-ratio">${euro(c.priceM2)}/m²</td>
+        <td class="pr-td-num pr-td-dist">${c.distance}&nbsp;m</td>
+      </tr>`).join('');
+
+    const note = !addrKnown
+      ? '<p class="pr-comp-note-addr">Les adresses exactes ne sont pas disponibles dans les données DVF+ pour ces transactions. La commune est indiquée à la place.</p>'
+      : comparables.some(c=>c.addr&&c.addr.precision==='commune')
+        ? '<p class="pr-comp-note-addr">Certaines adresses de rue sont indisponibles dans DVF+ et ont été remplacées par la commune.</p>'
+        : '';
+
+    const html = `<div class="pr-comparables">
+      <h4 class="pr-comp-title">Les ventes comparables autour de votre bien</h4>
+      <p class="pr-comp-sub">Retrouvez les ventes immobilières qui ont servi à établir votre premier repère de prix.</p>
+      ${note}
+      <div class="pr-table-wrap">
+        <table class="pr-table">
+          <thead><tr>
+            <th>Adresse du bien</th>
+            <th>Date</th>
+            <th>Surface bâtie</th>
+            <th>Prix vendu</th>
+            <th>Prix / m²</th>
+            <th>Distance</th>
+          </tr></thead>
+          <tbody>${rows}</tbody>
+        </table>
+      </div>
+      <p class="pr-comp-disclaimer">Ces ventes constituent des références de marché. Leur prix peut varier selon l'état du logement, ses équipements, sa configuration et ses prestations. Votre estimation doit donc être affinée en tenant compte des caractéristiques propres à votre bien.</p>
+    </div>`;
+
+    box.insertAdjacentHTML('beforeend', html);
+  }
+
+  function show(box,data) {
+    const output=box.querySelector('[data-price-output]'); output.replaceChildren();
+    const line=(label,value)=>{const p=document.createElement('p'),strong=document.createElement('strong');strong.textContent=label+' ';p.append(strong,document.createTextNode(value));output.append(p);};
+    if(data.address) line('Votre bien :',data.address);
+    if(data.surface) line('Surface habitable renseignée :',data.surface+' m²');
+    if(data.status==='ok') {
+      line('Prix médian constaté par m² bâti DVF :',euro(data.priceM2)+' / m²');
+      line('Première valeur indicative :',euro(data.indicativeValue));
+      line('Ventes retenues :',String(data.count));
+      line('Période des ventes retenues :',data.periodFrom.split('-').reverse().join('/')+' au '+data.periodTo.split('-').reverse().join('/'));
+      line('Périmètre étudié :',data.radiusMeters+' m autour de votre adresse (distance aux parcelles cadastrales).');
+      renderComparables(box, data.comparables);
+    } else line('',data.message||'Les données officielles sont momentanément indisponibles.');
+    box.removeAttribute('aria-busy');
+  }
+  window.initPriceReference=()=>{
+    const box=document.querySelector('#step-0-0.lesson-selected [data-price-reference]');
+    if(!box||box.dataset.started)return;
+    box.dataset.started='true';
+    result ||= fetch('/api/formation/price-reference',{credentials:'same-origin',headers:{Accept:'application/json'}}).then(async r=>{
+      if(r.status===404) return {status:'unavailable',message:'Le serveur local n’a pas encore chargé cette fonctionnalité. Un redémarrage du serveur est nécessaire.'};
+      if(r.status===401 || r.status===403 || r.redirected) return {status:'unavailable',message:'Votre session ne permet pas de charger ce repère. Reconnectez-vous à votre espace vendeur.'};
+      let data;
+      try { data=await r.json(); }
+      catch { return {status:'unavailable',message:'Le serveur local ne renvoie pas la réponse attendue pour ce repère. Aucun prix n’a été calculé.'}; }
+      if(!r.ok) return {status:'unavailable',message:typeof data?.message==='string'?data.message:'Le serveur local rencontre une erreur technique. Aucun prix n’a été calculé.'};
+      if(!data || typeof data.status!=='string') return {status:'unavailable',message:'La réponse du serveur local est incomplète. Aucun prix n’a été calculé.'};
+      return data;
+    }).catch(()=>({status:'unavailable',message:'Impossible de joindre le serveur local. Vérifiez que votre application reste accessible, puis rechargez la page.'}));
+    result.then(data=>show(box,data));
+  };
+  const observer=new MutationObserver(()=>window.initPriceReference());
+  observer.observe(document.getElementById('modContainer'),{childList:true,subtree:true,attributes:true,attributeFilter:['class']});
+  window.initPriceReference();
+})();

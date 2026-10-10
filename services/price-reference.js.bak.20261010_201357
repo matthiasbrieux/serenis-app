@@ -1,0 +1,150 @@
+'use strict';
+// Local pilot only: the production URL/terms must be confirmed with Cerema.
+const CEREMA = 'https://apidf-preprod.cerema.fr/dvf_opendata/geomutations/';
+const IGN = 'https://data.geopf.fr/geocodage/search';
+const MIN_SALES = 5;
+const cache = new Map(), pending = new Map();
+const { createHash } = require('node:crypto');
+const num = v => v === null || v === '' || typeof v === 'boolean' ? NaN : Number(v);
+const median = xs => { const a = [...xs].sort((a,b)=>a-b), m=Math.floor(a.length/2); return a.length%2?a[m]:(a[m-1]+a[m])/2; };
+function project(c, origin) {
+  if (!Array.isArray(c) || c.length<2 || !c.slice(0,2).every(Number.isFinite) || c[0]<-6 || c[0]>10 || c[1]<41 || c[1]>52) throw Error('geometry');
+  return [(c[0]-origin[0])*111320*Math.cos(origin[1]*Math.PI/180),(c[1]-origin[1])*111320];
+}
+function ringDistance(ring, origin) {
+  if (!Array.isArray(ring) || ring.length<4) throw Error('geometry');
+  const pts=ring.map(c=>project(c,origin)); let inside=false, distance=Infinity;
+  for(let i=0,j=pts.length-1;i<pts.length;j=i++) {
+    const [x,y]=pts[i], [a,b]=pts[j];
+    if((y>0)!==(b>0) && 0<(a-x)*(-y)/(b-y)+x) inside=!inside;
+    const dx=a-x,dy=b-y,t=Math.max(0,Math.min(1,(-x*dx-y*dy)/(dx*dx+dy*dy||1)));
+    distance=Math.min(distance,Math.hypot(x+t*dx,y+t*dy));
+  }
+  return {inside,distance};
+}
+function geometryDistance(g, origin) {
+  const polygons=g?.type==='MultiPolygon'?g.coordinates:g?.type==='Polygon'?[g.coordinates]:null;
+  if(!polygons?.length) return NaN;
+  try { return Math.min(...polygons.map(poly=>{
+    if(!poly.length) throw Error('geometry');
+    const rings=poly.map(r=>ringDistance(r,origin));
+    return rings[0].inside&&!rings.slice(1).some(r=>r.inside)?0:Math.min(...rings.map(r=>r.distance));
+  })); } catch { return NaN; }
+}
+function buildAddress(p) {
+  // DVF+ may provide l_adresse as a pre-formatted array
+  const list = Array.isArray(p.l_adresse) ? p.l_adresse.filter(s=>typeof s==='string'&&s.trim()) : [];
+  const comm = String(p.adrcom ?? p.commune ?? '').trim();
+  const cp   = String(p.codepostal ?? '').trim();
+  const locality = [cp, comm].filter(Boolean).join(' ');
+  if (list.length===1) return { label: list[0].trim() + (locality ? ', ' + locality : ''), precision: 'rue' };
+  const numRaw = String(p.adrnumero ?? '').trim();
+  const idx    = String(p.adrindice ?? '').trim();
+  const typ    = String(p.adrtypvoie ?? '').trim();
+  const voie   = String(p.adrvoie ?? '').trim();
+  const numStr = numRaw ? (idx ? numRaw + ' ' + idx : numRaw) : '';
+  const street = [numStr, typ, voie].filter(Boolean).join(' ');
+  if (street && locality) return { label: street + ', ' + locality, precision: 'rue' };
+  if (locality) return { label: locality, precision: 'commune' };
+  return { label: null, precision: 'inconnu' };
+}
+function selectSales(features, origin, surface, radius, now) {
+  const cutoff=new Date(now); cutoff.setUTCFullYear(cutoff.getUTCFullYear()-3);
+  const groups=new Map();
+  for(const f of features) {
+    const p=f.properties || {}, id=p.idmutinvar;
+    if(typeof id!=='string' || !id.trim()) continue;
+    const signature=JSON.stringify([p,f.geometry]);
+    const previous=groups.get(id);
+    if(!previous) groups.set(id,{f,signature});
+    else if(previous.signature!==signature) previous.conflict=true;
+  }
+  let sales=[];
+  for(const {f,conflict} of groups.values()) {
+    if(conflict) continue;
+    const p=f.properties, area=num(p.sbatmai), total=num(p.sbati), price=num(p.valeurfonc);
+    const date=typeof p.datemut==='string'&&/^\d{4}-\d{2}-\d{2}$/.test(p.datemut)?new Date(p.datemut+'T00:00:00Z'):null;
+    if(!date || !Number.isFinite(+date) || date.toISOString().slice(0,10)!==p.datemut || date<cutoff || date>now) continue;
+    if(String(p.codtypbien)!=='111' || p.libnatmut!=='Vente' || ![false,0,'false','False','0'].includes(p.vefa)) continue;
+    if(num(p.nblocmai)!==1 || num(p.nblocmut)!==1 || num(p.nbpar)!==1) continue;
+    if(!(area>0 && total>0 && Math.abs(area-total)<=1 && price>0 && Number.isFinite(price))) continue;
+    if(area<surface*.75 || area>surface*1.25) continue;
+    const ratio=price/area, distance=geometryDistance(f.geometry,origin);
+    // Deliberately broad guardrails; these are exclusions, never generated prices.
+    if(!Number.isFinite(distance) || distance>radius || ratio<200 || ratio>10000) continue;
+    sales.push({id:p.idmutinvar, date:p.datemut, ratio, area, price, distance:Math.round(distance), addr:buildAddress(p)});
+  }
+  if(sales.length>=8) {
+    const a=sales.map(s=>s.ratio).sort((a,b)=>a-b), q1=median(a.slice(0,Math.floor(a.length/2))),q3=median(a.slice(Math.ceil(a.length/2))),iqr=q3-q1;
+    if(iqr>0) sales=sales.filter(s=>s.ratio>=q1-1.5*iqr&&s.ratio<=q3+1.5*iqr);
+  }
+  return sales;
+}
+function tiles(origin,radius) {
+  const dy=radius/111320,dx=dy/Math.cos(origin[1]*Math.PI/180), nx=Math.ceil(2*dx/.019),ny=Math.ceil(2*dy/.019), result=[];
+  for(let x=0;x<nx;x++) for(let y=0;y<ny;y++) result.push([origin[0]-dx+2*dx*x/nx,origin[1]-dy+2*dy*y/ny,origin[0]-dx+2*dx*(x+1)/nx,origin[1]-dy+2*dy*(y+1)/ny]);
+  return result;
+}
+async function requestJSON(url,fetcher,deadline) {
+  const remaining=deadline-Date.now(); if(remaining<=0) throw Error('timeout');
+  const response=await fetcher(url,{signal:AbortSignal.timeout(Math.min(8000,remaining)),redirect:'error',headers:{Accept:'application/json'}});
+  if(!response.ok) throw Error('upstream');
+  // Bound both body size and time, including streamed responses.
+  const reader=response.body.getReader(); let size=0, chunks=[];
+  for(;;) { const {done,value}=await reader.read(); if(done)break; size+=value.length; if(size>5*1024*1024){await reader.cancel();throw Error('size');} chunks.push(Buffer.from(value)); }
+  return JSON.parse(Buffer.concat(chunks).toString('utf8'));
+}
+async function calculate(property,{fetcher=fetch,now=new Date()}={}) {
+  const surface=num(property?.surface_habitable),address=[property?.address,property?.postal_code,property?.city].filter(Boolean).join(' ').trim();
+  const base={address,surface:Number.isFinite(surface)?surface:null,type:property?.type||''};
+  const status=(code,message)=>({...base,status:code,message});
+  if(!property || !property.address || !property.city || !/^59\d{3}$/.test(String(property.postal_code)) || !(surface>0&&surface<2000)) return status('missing','Renseignez une adresse complète dans le Nord et une surface habitable valide dans Mon bien.');
+  if(property.type!=='Maison') return status('unsupported','Ce premier repère est actuellement disponible uniquement pour les maisons du Nord (59).');
+  const deadline=Date.now()+45000;
+  try {
+    const geourl=new URL(IGN); geourl.search=new URLSearchParams({q:address,limit:'2',postcode:String(property.postal_code)});
+    const geo=await requestJSON(geourl,fetcher,deadline), candidates=geo.features;
+    const best=candidates?.[0], gp=best?.properties, origin=best?.geometry?.coordinates;
+    if(best?.geometry?.type!=='Point'||gp?.type!=='housenumber'||num(gp?.score)<.8||String(gp?.postcode)!==String(property.postal_code)||!String(gp?.citycode).startsWith('59')) return status('location','Adresse insuffisamment précise pour calculer un repère fiable.');
+    project(origin,origin);
+    if(candidates[1] && num(candidates[1].properties?.score)>=num(gp.score)-.05 && geometryPointDistance(candidates[1].geometry?.coordinates,origin)>100) return status('location','Plusieurs adresses possibles : précisez votre adresse dans Mon bien.');
+    let requests=0;
+    for(const radius of [500,1000,2000]) {
+      const features=[];
+      for(const box of tiles(origin,radius)) {
+        for(let page=1;;page++) {
+          if(++requests>40 || page>10) throw Error('incomplete');
+          const url=new URL(CEREMA);url.search=new URLSearchParams({in_bbox:box.join(','),anneemut_min:String(now.getUTCFullYear()-3),anneemut_max:String(now.getUTCFullYear()),codtypbien:'111',fields:'all',page_size:'500',page:String(page)});
+          const body=await requestJSON(url,fetcher,deadline);
+          const collection=body.type==='FeatureCollection'?body:body.results;
+          const batch=Array.isArray(collection)?collection:collection?.features;
+          if(!Array.isArray(batch)) throw Error('schema');
+          features.push(...batch);
+          const count=Number.isInteger(body.count)?body.count:Number.isInteger(collection.count)?collection.count:null;
+          // Require evidence of completeness; never use a truncated sample.
+          if(body.next===null || collection.next===null || (count!==null && page*500>=count)) break;
+          if(body.next || collection.next || (count!==null&&page*500<count)) continue;
+          if(batch.length<500) break;
+          throw Error('pagination');
+        }
+      }
+      const sales=selectSales(features,origin,surface,radius,now);
+      if(sales.length>=MIN_SALES) {
+        const priceM2=median(sales.map(s=>s.ratio)),dates=sales.map(s=>s.date).sort();
+        const comparables=sales.map(s=>({date:s.date,area:s.area,price:s.price,priceM2:Math.round(s.ratio),distance:s.distance,addr:s.addr})).sort((a,b)=>b.date.localeCompare(a.date));
+        return {...base,status:'ok',priceM2:Math.round(priceM2),indicativeValue:Math.round(priceM2*surface/1000)*1000,count:sales.length,periodFrom:dates[0],periodTo:dates.at(-1),radiusMeters:radius,comparables};
+      }
+    }
+    return status('insufficient','Données insuffisantes pour calculer un prix indicatif fiable.');
+  } catch { return status('unavailable','Les données officielles sont momentanément indisponibles ou incomplètes. Aucun prix ne peut être calculé.'); }
+}
+function geometryPointDistance(point,origin) { try{return Math.hypot(...project(point,origin));}catch{return Infinity;} }
+async function getReference(property) {
+  const key=createHash('sha256').update(JSON.stringify([property?.address,property?.city,property?.postal_code,property?.type,property?.surface_habitable])).digest('hex');
+  const hit=cache.get(key); if(hit&&hit.expires>Date.now()) return hit.value;
+  if(pending.has(key)) return pending.get(key);
+  if(pending.size>=4) return {status:'unavailable',message:'Le service est occupé. Réessayez dans quelques instants.'};
+  const job=calculate(property).then(value=>{if(cache.size>=100)cache.delete(cache.keys().next().value);cache.set(key,{value,expires:Date.now()+(value.status==='ok'?6*3600000:60000)});return value;}).finally(()=>pending.delete(key));
+  pending.set(key,job);return job;
+}
+module.exports={getReference,calculate,selectSales,geometryDistance,tiles,median};

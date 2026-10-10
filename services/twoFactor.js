@@ -25,7 +25,7 @@ async function issue2FACode(accountType, accountId, email) {
 // Compte les tentatives ratées pour empêcher le brute-force sur 6 chiffres.
 function verify2FACode(accountType, accountId, code) {
   const row = db.prepare(
-    `SELECT * FROM login_2fa_codes WHERE account_type=? AND account_id=? AND used_at IS NULL AND expires_at > datetime('now') ORDER BY id DESC LIMIT 1`
+    `SELECT * FROM login_2fa_codes WHERE account_type=? AND account_id=? AND used_at IS NULL AND julianday(expires_at) > julianday('now') ORDER BY id DESC LIMIT 1`
   ).get(accountType, accountId);
   if (!row) return { ok: false, error: 'Code expiré ou introuvable. Demandez-en un nouveau.' };
   if (row.attempts >= MAX_ATTEMPTS) return { ok: false, error: 'Trop de tentatives. Demandez un nouveau code.' };

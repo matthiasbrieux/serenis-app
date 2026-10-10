@@ -21,8 +21,11 @@ const checkoutLimit = rateLimit({
 
 // Checkout session creation
 router.post('/create-checkout', express.json(), checkoutLimit, async (req, res) => {
-  const { pack, email, first_name, last_name, phone } = req.body;
+  const { pack, first_name, last_name, phone } = req.body;
+  const email=typeof req.body.email==='string'?req.body.email.trim().toLowerCase():'';
+  if(!require('../services/validation').email(email))return res.status(400).json({error:'Email invalide'});
   let { password } = req.body;
+  if(password!==undefined && typeof password!=='string')return res.status(400).json({error:'Mot de passe invalide'});
   if (!['serenite', 'autonome'].includes(pack)) return res.json({ error: 'Pack invalide' });
   if (!email) return res.json({ error: 'Email requis' });
   // Si aucun mot de passe fourni (certains formulaires ne l'incluent pas), on en génère un temporaire
@@ -60,9 +63,12 @@ router.post('/create-checkout', express.json(), checkoutLimit, async (req, res) 
     const uuid = uuidv4();
     const existing = db.prepare('SELECT id FROM sellers WHERE email = ?').get(email.toLowerCase());
     if (existing) {
-      db.prepare('UPDATE sellers SET password=?, pack=?, first_name=COALESCE(NULLIF(?,\'\'), first_name), last_name=COALESCE(NULLIF(?,\'\'), last_name), phone=COALESCE(NULLIF(?,\'\'), phone) WHERE id=?').run(hashed, pack, first_name||'', last_name||'', phone||'', existing.id);
+      let authenticated;
+      try { authenticated = require('../services/session').verify(req.cookies?.token || req.headers.authorization?.replace('Bearer ', ''), 'seller', db); } catch {}
+      if (!authenticated || authenticated.id !== existing.id) return res.status(401).json({ error: 'Connectez-vous à votre compte pour poursuivre cet achat.', redirect: '/login' });
+      // An existing account's password and profile never change through checkout.
     } else {
-      db.prepare('INSERT INTO sellers (uuid, email, password, pack, first_name, last_name, phone) VALUES (?,?,?,?,?,?,?)').run(uuid, email.toLowerCase(), hashed, pack, first_name||'', last_name||'', phone||'');
+      db.prepare('INSERT INTO sellers (uuid, email, password, pack, first_name, last_name, phone) VALUES (?,?,?,?,?,?,?)').run(uuid, email.toLowerCase().trim(), hashed, pack, first_name||'', last_name||'', phone||'');
     }
     const seller = db.prepare('SELECT id FROM sellers WHERE email=?').get(email.toLowerCase());
 
@@ -104,7 +110,7 @@ router.get('/paiement-succes', async (req, res) => {
     if (!seller) return res.redirect('/dashboard');
 
     // Auto-login
-    const token = jwt.sign({ id: seller.id, uuid: seller.uuid, email: seller.email, pack: seller.pack }, process.env.JWT_SECRET, { expiresIn: '30d' });
+    const token = require('../services/session').sign(seller, 'seller');
     res.cookie('token', token, { httpOnly: true, secure: true, sameSite: 'lax', maxAge: 30 * 24 * 3600 * 1000 });
     res.redirect('/booking');
   } catch (err) {
@@ -204,7 +210,7 @@ async function activateSeller(session) {
   } else {
     // Créer le compte (cas webhook sans pré-création)
     const uuid = uuidv4();
-    const tempPwd = await bcrypt.hash(Math.random().toString(36).slice(2, 10), 12);
+    const tempPwd = await bcrypt.hash(crypto.randomBytes(24).toString('base64url'), 12);
     db.prepare('INSERT OR IGNORE INTO sellers (uuid, email, password, pack, stripe_session_id, stripe_customer_id, paid_at) VALUES (?,?,?,?,?,?,CURRENT_TIMESTAMP)')
       .run(uuid, (email || '').toLowerCase(), tempPwd, pack || 'serenite', session.id, session.customer || null);
     seller = db.prepare('SELECT * FROM sellers WHERE email=?').get((email || '').toLowerCase());

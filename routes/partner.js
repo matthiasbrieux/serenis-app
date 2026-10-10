@@ -7,7 +7,7 @@ const path = require('path');
 const db = require('../database');
 const { isPasswordPwned } = require('../services/passwordCheck');
 
-const JWT_SECRET = process.env.JWT_SECRET || 'venduparmoi-partner-secret';
+const JWT_SECRET = process.env.JWT_SECRET;
 const COOKIE = 'partner_token';
 const loginLimit = require('express-rate-limit')({ windowMs: 15 * 60 * 1000, max: 10, keyGenerator: (req) => req.ip });
 
@@ -16,7 +16,7 @@ function requirePartner(req, res, next) {
   const token = req.cookies[COOKIE];
   if (!token) return res.redirect('/partner/login');
   try {
-    req.partner = jwt.verify(token, JWT_SECRET);
+    req.partner = require('../services/session').verify(token, 'partner', db);
     next();
   } catch {
     res.clearCookie(COOKIE);
@@ -61,8 +61,8 @@ router.post('/partner/login', loginLimit, async (req, res) => {
   const { email, password } = req.body;
   const p = db.prepare('SELECT * FROM photographers WHERE email = ?').get((email || '').toLowerCase());
   if (!p || !(await bcrypt.compare(password, p.password))) return res.json({ error: 'Identifiants incorrects' });
-  const token = jwt.sign({ id: p.id, uuid: p.uuid, email: p.email, name: p.first_name }, JWT_SECRET, { expiresIn: '30d' });
-  res.cookie(COOKIE, token, { httpOnly: true, maxAge: 30 * 24 * 3600 * 1000, sameSite: 'lax' });
+  const token = require('../services/session').sign(p, 'partner');
+  res.cookie(COOKIE, token, { httpOnly: true, secure: process.env.NODE_ENV === 'production', maxAge: 30 * 24 * 3600 * 1000, sameSite: 'lax' });
   res.json({ success: true });
 });
 

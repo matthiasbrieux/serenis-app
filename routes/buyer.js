@@ -1,3 +1,4 @@
+const validation = require('../services/validation');
 const express = require('express');
 const router = express.Router();
 const rateLimit = require('express-rate-limit');
@@ -98,8 +99,7 @@ router.get('/api/bien/:slug/pdf', async (req, res) => {
   </body></html>`;
 
   try {
-    const HtmlPdf = require('html-pdf-node');
-    const buffer = await HtmlPdf.generatePdf({ content: html }, { format: 'A4', printBackground: true, margin: { top: '0', bottom: '0', left: '0', right: '0' } });
+    const buffer = await require('../services/pdf').generateSafePdf(html,photos);
     res.setHeader('Content-Type', 'application/pdf');
     res.setHeader('Content-Disposition', `attachment; filename="dossier-${property.slug}.pdf"`);
     res.send(buffer);
@@ -114,7 +114,7 @@ router.get('/api/bien/:slug', (req, res) => {
   const property = db.prepare('SELECT * FROM properties WHERE slug = ? AND published = 1').get(req.params.slug);
   if (!property) return res.status(404).json({ error: 'Bien non trouvé' });
   const photos = db.prepare('SELECT url, thumbnail_url, order_index FROM property_photos WHERE property_id = ? ORDER BY order_index').all(property.id);
-  const allPublicDocs = db.prepare("SELECT name, url, doc_type, folder FROM property_documents WHERE property_id = ? AND (folder='diagnostics' OR folder IS NULL OR folder='')").all(property.id);
+  const allPublicDocs = db.prepare("SELECT id, name, url, doc_type, folder FROM property_documents WHERE property_id = ? AND (folder='diagnostics' OR folder IS NULL OR folder='')").all(property.id);
   const documents = allPublicDocs.filter(doc => {
     const f = doc.folder || '';
     if (f === 'diagnostics') return property.diagnostics_in_dossier !== 0;
@@ -126,11 +126,20 @@ router.get('/api/bien/:slug', (req, res) => {
   const diagnosticsAiSummary = (property.diagnostics_ai_summary_validated === 1 && property.diagnostics_in_dossier !== 0)
     ? property.diagnostics_ai_summary
     : null;
-  const { diagnostics_ai_summary, diagnostics_ai_summary_validated, ...safeProperty } = property;
+  const safeProperty = require('../services/public-property').publicProperty(property);
   res.json({
-    property: { ...safeProperty, diagnostics_ai_summary: diagnosticsAiSummary, photos, documents },
+    property: { ...safeProperty, dossier_url:property.acheteur_token?`/dossier/acheteur/${encodeURIComponent(property.acheteur_token)}`:null, diagnostics_ai_summary: diagnosticsAiSummary, photos, documents:documents.map(d=>({...d,url:`/api/bien/${encodeURIComponent(req.params.slug)}/document/${d.id}`})) },
     contact_number: seller?.twilio_number || null,
   });
+});
+
+router.get('/api/bien/:slug/document/:docId', (req,res)=>{
+  const prop=db.prepare('SELECT * FROM properties WHERE slug=? AND published=1').get(req.params.slug);
+  const doc=prop && db.prepare('SELECT * FROM property_documents WHERE property_id=? AND id=?').get(prop.id,req.params.docId);
+  if(!doc)return res.status(404).json({error:'Document introuvable'});
+  const folder=doc.folder||'';
+  if(!(folder==='diagnostics'&&prop.diagnostics_in_dossier!==0 || folder===''&&prop.plan_docs_visible!==0))return res.status(403).json({error:'Document non accessible'});
+  return require('../services/documents').sendDocument(doc,res);
 });
 
 // ── Réservation visite ──
@@ -143,23 +152,26 @@ router.post('/api/bien/:slug/reserver', publicFormLimit, async (req, res) => {
     return res.json({ error: 'Informations manquantes' });
   }
 
-  const conflict = db.prepare(`
-    SELECT id FROM visits WHERE property_id=? AND visit_date=? AND visit_time=? AND status != 'cancelled'
-  `).get(property.id, visit_date, visit_time);
-  if (conflict) return res.json({ error: 'Ce créneau est déjà pris. Choisissez un autre horaire.' });
-
-  db.prepare(`
-    INSERT INTO visits (property_id, seller_id, buyer_name, buyer_email, buyer_phone, visit_date, visit_time, status)
-    VALUES (?,?,?,?,?,?,?,'confirmed')
-  `).run(property.id, property.seller_id, buyer_name, buyer_email, buyer_phone || '', visit_date, visit_time);
+  const invalid = validation.bookingError(db, property, req.body);
+  if (invalid) return res.status(400).json({error:invalid});
+  const booking=db.transaction(()=>{
+    const invalidNow=validation.bookingError(db,property,req.body);
+    if(invalidNow)return {status:400,error:invalidNow};
+    const conflict=db.prepare("SELECT id FROM visits WHERE property_id=? AND visit_date=? AND visit_time=? AND status!='cancelled'").get(property.id,visit_date,visit_time);
+    if(conflict)return {status:409,error:'Ce créneau est déjà pris. Choisissez un autre horaire.'};
+    db.prepare("INSERT INTO visits (property_id,seller_id,buyer_name,buyer_email,buyer_phone,visit_date,visit_time,status) VALUES(?,?,?,?,?,?,?,'confirmed')").run(property.id,property.seller_id,buyer_name,buyer_email.trim().toLowerCase(),buyer_phone||'',visit_date,visit_time);
+    return {};
+  }).immediate();
+  if(booking.error)return res.status(booking.status).json({error:booking.error});
 
   const seller = db.prepare('SELECT email, phone, first_name FROM sellers WHERE id = ?').get(property.seller_id);
 
   db.prepare("INSERT INTO notifications (seller_id, type, title, body) VALUES (?,'visit_confirmed',?,?)")
     .run(property.seller_id, 'Nouvelle visite confirmée', `${buyer_name} — ${visit_date} à ${visit_time}`);
 
+  let confirmationSent=false;
   try {
-    await sendVisitConfirmation(buyer_email, buyer_name, property, visit_date, visit_time, false);
+    confirmationSent=(await sendVisitConfirmation(buyer_email, buyer_name, property, visit_date, visit_time, false))===true;
     if (seller.email) await sendNewVisitRequest({ sellerEmail: seller.email, buyerName: buyer_name, visitDate: `${visit_date} à ${visit_time}`, notes: '' });
     if (seller.phone) {
       await sendSmsNotification(seller.phone,
@@ -170,7 +182,7 @@ router.post('/api/bien/:slug/reserver', publicFormLimit, async (req, res) => {
     console.error('Visit request email error:', e.message);
   }
 
-  res.json({ success: true });
+  res.json({ success: true, confirmation_sent:confirmationSent, ...(!confirmationSent?{warning:'Visite enregistrée ; confirmation email non envoyée.'}:{}) });
 });
 
 // ── Créneaux disponibles ──
@@ -187,7 +199,27 @@ router.get('/api/bien/:slug/creneaux', (req, res) => {
 });
 
 // ── Webhook SMS Twilio (exporté séparément pour urlencoded brut) ──
+function verifiedWebhook(req,res) {
+  const secret=process.env.TWILIO_AUTH_TOKEN;
+  const signature=req.get ? req.get('x-twilio-signature') : req.headers?.['x-twilio-signature'];
+  const base=process.env.BASE_URL;
+  if(!secret||!signature||!base)return res.status(403).send('Signature requise'),false;
+  const url=new URL(req.originalUrl || req.url,base).href;
+  if(!require('twilio').validateRequest(secret,signature,url,req.body))return res.status(403).send('Signature invalide'),false;
+  const sid=req.body?.MessageSid || req.body?.CallSid;
+  if(!sid || !/^[A-Za-z0-9]{10,80}$/.test(sid))return res.status(400).send('Identifiant fournisseur requis'),false;
+  const key=(req.path||new URL(url).pathname)+':'+sid;
+  const existing=db.prepare('SELECT response FROM provider_webhook_events WHERE event_key=?').get(key);
+  if(existing){res.type('text/xml').send(existing.response || '<?xml version="1.0"?><Response/>');return false;}
+  const inserted=db.prepare('INSERT OR IGNORE INTO provider_webhook_events(event_key) VALUES(?)').run(key);
+  if(!inserted.changes){res.type('text/xml').send('<?xml version="1.0"?><Response/>');return false;}
+  const originalSend=res.send.bind(res);
+  res.send=function(body){db.prepare('UPDATE provider_webhook_events SET response=? WHERE event_key=?').run(String(body),key);return originalSend(body);};
+  return true;
+}
+
 async function smsWebhook(req, res) {
+  if(!verifiedWebhook(req,res))return;
   const { From, To, Body } = req.body;
 
   const seller = db.prepare(`
@@ -212,19 +244,21 @@ async function smsWebhook(req, res) {
     const buyerEmail = emailMatch[0].toLowerCase();
     const existing = db.prepare('SELECT id FROM buyer_contacts WHERE property_id=? AND buyer_phone=?').get(seller.property_id, From);
     if (existing) {
-      db.prepare('UPDATE buyer_contacts SET buyer_email=?, dossier_sent=1, dossier_sent_at=CURRENT_TIMESTAMP WHERE id=?').run(buyerEmail, existing.id);
+      db.prepare('UPDATE buyer_contacts SET buyer_email=? WHERE id=?').run(buyerEmail, existing.id);
     } else {
-      db.prepare(`INSERT INTO buyer_contacts (property_id, seller_id, buyer_phone, buyer_email, dossier_sent, dossier_sent_at, source) VALUES (?,?,?,?,1,CURRENT_TIMESTAMP,'sms')`).run(seller.property_id, seller.id, From, buyerEmail);
+      db.prepare(`INSERT INTO buyer_contacts (property_id, seller_id, buyer_phone, buyer_email, dossier_sent, source) VALUES (?,?,?,?,0,'sms')`).run(seller.property_id, seller.id, From, buyerEmail);
     }
     const property = db.prepare('SELECT * FROM properties WHERE id = ?').get(seller.property_id);
     const photos = db.prepare('SELECT url FROM property_photos WHERE property_id = ? ORDER BY order_index LIMIT 5').all(seller.property_id);
+    let dossierDelivered=false;
     try {
-      await sendDossierEmail({ to: buyerEmail, buyerName: null, dossierUrl, propertyCity: property.city, propertyType: property.type });
-      if (seller.phone) await sendSmsNotification(seller.phone, `Nouveau contact sur votre bien.\nDossier envoyé à ${buyerEmail} (${From}).`);
+      dossierDelivered=await require('../services/delivery').deliverOnce(`sms-dossier:${seller.property_id}:${From}:${buyerEmail}`,()=>sendDossierEmail({ to: buyerEmail, buyerName: null, dossierUrl, propertyCity: property.city, propertyType: property.type }));
+      if(dossierDelivered)db.prepare('UPDATE buyer_contacts SET dossier_sent=1,dossier_sent_at=CURRENT_TIMESTAMP WHERE property_id=? AND buyer_phone=?').run(seller.property_id,From);
+      if (dossierDelivered && seller.phone) await sendSmsNotification(seller.phone, `Nouveau contact sur votre bien.\nDossier envoyé à ${buyerEmail} (${From}).`);
     } catch (e) { console.error('Dossier email error:', e.message); }
 
     return res.type('text/xml').send(`<?xml version="1.0" encoding="UTF-8"?>
-<Response><Message>Parfait ! Le dossier complet vient de vous être envoyé à ${buyerEmail}. Vous pouvez aussi y accéder directement ici : ${dossierUrl}</Message></Response>`);
+<Response><Message>${dossierDelivered ? `Parfait ! Le dossier complet vient de vous être envoyé à ${buyerEmail}. Vous pouvez aussi y accéder directement ici : ${dossierUrl}` : `L’envoi du mail n’a pas été confirmé. Votre dossier reste accessible ici : ${dossierUrl}`}</Message></Response>`);
   }
 
   // Premier contact → on enregistre le numéro et on envoie le lien directement
@@ -244,6 +278,7 @@ Pour recevoir ce dossier par email et être tenu(e) informé(e), répondez avec 
 
 // ── Webhook Voice Twilio ──
 function voiceWebhook(req, res) {
+  if(!verifiedWebhook(req,res))return;
   const { From, To } = req.body;
   if (From && To) {
     try {

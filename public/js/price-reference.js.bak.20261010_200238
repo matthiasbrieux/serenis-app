@@ -1,0 +1,39 @@
+/* Read-only price reference, confined to lesson 1.1. */
+(() => {
+  'use strict';
+  let result;
+  const euro=n=>new Intl.NumberFormat('fr-FR',{style:'currency',currency:'EUR',maximumFractionDigits:0}).format(n);
+  function show(box,data) {
+    const output=box.querySelector('[data-price-output]'); output.replaceChildren();
+    const line=(label,value)=>{const p=document.createElement('p'),strong=document.createElement('strong');strong.textContent=label+' ';p.append(strong,document.createTextNode(value));output.append(p);};
+    if(data.address) line('Votre bien :',data.address);
+    if(data.surface) line('Surface habitable renseignée :',data.surface+' m²');
+    if(data.status==='ok') {
+      line('Prix médian constaté par m² bâti DVF :',euro(data.priceM2)+' / m²');
+      line('Première valeur indicative :',euro(data.indicativeValue));
+      line('Ventes retenues :',String(data.count));
+      line('Période des ventes retenues :',data.periodFrom.split('-').reverse().join('/')+' au '+data.periodTo.split('-').reverse().join('/'));
+      line('Périmètre étudié :',data.radiusMeters+' m autour de votre adresse (distance aux parcelles cadastrales).');
+    } else line('',data.message||'Les données officielles sont momentanément indisponibles.');
+    box.removeAttribute('aria-busy');
+  }
+  window.initPriceReference=()=>{
+    const box=document.querySelector('#step-0-0.lesson-selected [data-price-reference]');
+    if(!box||box.dataset.started)return;
+    box.dataset.started='true';
+    result ||= fetch('/api/formation/price-reference',{credentials:'same-origin',headers:{Accept:'application/json'}}).then(async r=>{
+      if(r.status===404) return {status:'unavailable',message:'Le serveur local n’a pas encore chargé cette fonctionnalité. Un redémarrage du serveur est nécessaire.'};
+      if(r.status===401 || r.status===403 || r.redirected) return {status:'unavailable',message:'Votre session ne permet pas de charger ce repère. Reconnectez-vous à votre espace vendeur.'};
+      let data;
+      try { data=await r.json(); }
+      catch { return {status:'unavailable',message:'Le serveur local ne renvoie pas la réponse attendue pour ce repère. Aucun prix n’a été calculé.'}; }
+      if(!r.ok) return {status:'unavailable',message:typeof data?.message==='string'?data.message:'Le serveur local rencontre une erreur technique. Aucun prix n’a été calculé.'};
+      if(!data || typeof data.status!=='string') return {status:'unavailable',message:'La réponse du serveur local est incomplète. Aucun prix n’a été calculé.'};
+      return data;
+    }).catch(()=>({status:'unavailable',message:'Impossible de joindre le serveur local. Vérifiez que votre application reste accessible, puis rechargez la page.'}));
+    result.then(data=>show(box,data));
+  };
+  const observer=new MutationObserver(()=>window.initPriceReference());
+  observer.observe(document.getElementById('modContainer'),{childList:true,subtree:true,attributes:true,attributeFilter:['class']});
+  window.initPriceReference();
+})();

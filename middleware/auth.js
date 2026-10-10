@@ -12,7 +12,7 @@ function requireAuth(req, res, next) {
     return res.redirect('/login');
   }
   try {
-    req.seller = jwt.verify(token, process.env.JWT_SECRET);
+    req.seller = require('../services/session').verify(token, 'seller', db);
 
     // Vérifier signature contrat (sauf routes exemptées)
     const exempt = CONTRAT_EXEMPT.some(p => req.path === p || req.path.startsWith(p));
@@ -36,7 +36,7 @@ function requireAdmin(req, res, next) {
   const token = req.cookies?.admin_token;
   if (!token) return res.redirect('/admin/login');
   try {
-    const payload = jwt.verify(token, process.env.JWT_SECRET);
+    const payload = require('../services/session').verify(token, 'admin', db);
     if (payload.role !== 'admin') return res.redirect('/admin/login');
     req.admin = payload;
     next();

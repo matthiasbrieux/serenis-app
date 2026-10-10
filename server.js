@@ -31,7 +31,7 @@ app.use(helmet({
       scriptSrcAttr: ["'unsafe-inline'"],
       styleSrc: ["'self'", "'unsafe-inline'", "fonts.googleapis.com", "fonts.gstatic.com"],
       fontSrc: ["'self'", "fonts.gstatic.com"],
-      imgSrc: ["'self'", "data:", "*.cloudinary.com", "res.cloudinary.com", "images.unsplash.com", "api.qrserver.com"],
+      imgSrc: ["'self'", "data:", "*.cloudinary.com", "res.cloudinary.com", "images.unsplash.com", "images.pexels.com", "api.qrserver.com"],
       connectSrc: ["'self'", "api.stripe.com", "https://nominatim.openstreetmap.org", "https://overpass-api.de", "https://overpass.kumi.systems"],
       frameSrc: ["'self'", "js.stripe.com"],
       mediaSrc: ["'self'"],
@@ -44,6 +44,7 @@ app.use(rateLimit({ windowMs: 15 * 60 * 1000, max: 300, standardHeaders: true, l
 // Rate limit ciblé sur le webhook SMS (anti-spam)
 const smsLimit = rateLimit({ windowMs: 60 * 1000, max: 20, keyGenerator: (req) => req.body?.From || req.ip });
 app.use(cookieParser());
+app.use(require('./middleware/csrf'));
 
 // Serve index.html with no-cache so browsers always get the latest version
 app.get('/', (req, res) => {
@@ -54,7 +55,7 @@ app.get('/', (req, res) => {
 // PDFs contractuels
 app.get('/downloads/:file', (req, res) => {
   const file = path.join(__dirname, 'public', 'downloads', req.params.file);
-  res.setHeader('Content-Type', 'application/pdf');
+  res.type(path.extname(file));
   res.sendFile(file);
 });
 
@@ -101,9 +102,16 @@ app.get('/fiche-visite', (req, res) => { res.set('Cache-Control', 'no-store, no-
 app.get('/fiche-acces-emails', (req, res) => { res.set('Cache-Control', 'no-store, no-cache, must-revalidate'); res.sendFile(path.join(__dirname, 'public', 'fiche-acces-emails.html')); });
 
 
+app.use('/uploads/documents', require('./services/documents').guardLegacyDocument);
+app.use(require('./middleware/private-pages'));
+app.use('/uploads/photos', (req,res,next) => {
+  if (!/\.(jpe?g|png|webp|gif)$/i.test(req.path)) return res.sendStatus(404);
+  res.setHeader('X-Content-Type-Options','nosniff'); next();
+});
 app.use(express.static(path.join(__dirname, 'public'), {
   maxAge: '7d',
   setHeaders: (res, filePath) => {
+    if (/\.(js|css)$/.test(filePath)) res.setHeader('Cache-Control','public, max-age=0, must-revalidate');
     if (filePath.endsWith('.html')) res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate');
   },
 }));
@@ -120,47 +128,9 @@ app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
 // ── Restauration DB depuis Cloudinary si vide (Render éphémère) ──
-async function restoreFromCloudinary() {
-  if (!process.env.CLOUDINARY_URL) return;
-  const DB_PATH = path.resolve(process.env.DATABASE_URL || './database.db');
-  try {
-    const Database = require('better-sqlite3');
-    const tmpDb = new Database(DB_PATH, { readonly: true });
-    const count = tmpDb.prepare('SELECT COUNT(*) as n FROM sellers').get();
-    tmpDb.close();
-    if (count.n > 0) return; // DB déjà peuplée, pas besoin de restaurer
-  } catch(e) { /* DB vide ou inexistante, on restaure */ }
-
-  console.log('🔄 Base de données vide — restauration depuis Cloudinary...');
-  try {
-    const cloudinary = require('cloudinary').v2;
-    cloudinary.config(true);
-    let { resources } = await cloudinary.api.resources({
-      type: 'upload', resource_type: 'raw', prefix: 'venduparmo-backups/prod/', max_results: 50
-    });
-    // Fallback : anciens backups sans sous-dossier (migration)
-    if (!resources.length) {
-      const { resources: old } = await cloudinary.api.resources({
-        type: 'upload', resource_type: 'raw', prefix: 'venduparmo-backups/', max_results: 50
-      });
-      resources = old.filter(r => !r.public_id.includes('/prod/') && !r.public_id.includes('/dev/'));
-    }
-    if (!resources.length) { console.log('Aucun backup Cloudinary trouvé.'); return; }
-    resources.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
-    const latest = resources[0];
-    console.log(`Restauration depuis ${latest.public_id}...`);
-    const https = require('https');
-    await new Promise((resolve, reject) => {
-      const file = fs.createWriteStream(DB_PATH);
-      https.get(latest.secure_url, (response) => {
-        response.pipe(file);
-        file.on('finish', () => { file.close(); resolve(); });
-        file.on('error', reject);
-      }).on('error', reject);
-    });
-    console.log('✓ Base de données restaurée depuis Cloudinary');
-  } catch(e) { console.error('Restore Cloudinary error:', e.message); }
-}
+// Restoration is deliberately offline and explicit (scripts/restore-database.js).
+// Never overwrite a live SQLite database or download an unverified public backup.
+async function restoreFromCloudinary() { return; }
 
 // ── Chargement des routes (après restauration DB) ──
 async function loadRoutes() {
@@ -262,15 +232,6 @@ app.get('/health', (req, res) => {
   }
 });
 
-// Nettoyage des photos avec URLs locales (non persistantes sur Render)
-function cleanLocalPhotos() {
-  try {
-    const db = require('./database');
-    const result = db.prepare("DELETE FROM property_photos WHERE url LIKE '/uploads/%'").run();
-    if (result.changes > 0) console.log(`✓ ${result.changes} photo(s) locale(s) supprimée(s) de la base`);
-  } catch(e) { console.error('Clean local photos error:', e.message); }
-}
-
 // Seed compte vendeur de démo au démarrage si aucun compte n'existe
 async function seedSellerAccount() {
   try {
@@ -305,43 +266,24 @@ loadRoutes().then(() => {
 
 app.listen(PORT, () => {
   console.log(`✓ Vendu Par Moi démarré — http://localhost:${PORT}`);
-  cleanLocalPhotos();
   seedSellerAccount();
 
   // Rappels visites + nudges automatiques — tourne chaque jour à 18h
   const { backupDatabase } = require('./services/backup');
-  backupDatabase(); // premier backup au démarrage
-  setInterval(() => backupDatabase(), 24 * 60 * 60 * 1000); // backup quotidien
+  backupDatabase().catch(e => console.error('Backup failed:', e.message)); // premier backup au démarrage
+  setInterval(() => backupDatabase().catch(e => console.error('Backup failed:', e.message)), 24 * 60 * 60 * 1000); // backup quotidien
 
   const { sendVisitReminders, sendMissionReminders, sendAutomatedNudges, sendContractExpiryReminders, sendPostVisitBuyerNudges, sendPostFirstVisitFeedbackNudges, sendCheckInNoOfferNudges, sendPriceDropNudges } = require('./services/reminders');
 
-  function runDailyJobs() {
-    sendVisitReminders().catch(e => console.error('Reminder job error:', e.message));
-    sendMissionReminders().catch(e => console.error('Mission reminder job error:', e.message));
-    sendAutomatedNudges().catch(e => console.error('Automated nudges job error:', e.message));
-    sendContractExpiryReminders().catch(e => console.error('Contract expiry job error:', e.message));
-    sendPostVisitBuyerNudges().catch(e => console.error('Post-visit nudge job error:', e.message));
-    sendPostFirstVisitFeedbackNudges().catch(e => console.error('Post-visit feedback job error:', e.message));
-    sendCheckInNoOfferNudges().catch(e => console.error('Check-in no offer job error:', e.message));
-    sendPriceDropNudges().catch(e => console.error('Price drop nudge job error:', e.message));
-    // Nettoyage notifications lues de plus de 60 jours
-    try {
-      const db = require('./database');
-      db.prepare("DELETE FROM notifications WHERE read_at IS NOT NULL AND created_at < datetime('now', '-60 days')").run();
-    } catch(e) { console.error('Notification cleanup error:', e.message); }
-  }
+  const jobs={sendVisitReminders,sendMissionReminders,sendAutomatedNudges,sendContractExpiryReminders,sendPostVisitBuyerNudges,sendPostFirstVisitFeedbackNudges,sendCheckInNoOfferNudges,sendPriceDropNudges,
+    cleanupMedia:()=>require('./services/media-cleanup').cleanupMedia(),
+    cleanupNotifications:()=>require('./database').prepare("DELETE FROM notifications WHERE read_at IS NOT NULL AND created_at < datetime('now', '-60 days')").run()
+  };
+  // Durable daily keys and leases prevent two processes from running the same job.
+  // Polling catches a same-day restart after 18:00 Paris, including DST changes.
+  const runDailyJobs=()=>require('./services/scheduler').runDueJobs(jobs).catch(e=>console.error('Daily jobs failed:',e.message));
+  runDailyJobs();
+  setInterval(runDailyJobs,60*1000);
 
-  function scheduleReminders() {
-    const now = new Date();
-    const next18h = new Date();
-    next18h.setHours(18, 0, 0, 0);
-    if (now >= next18h) next18h.setDate(next18h.getDate() + 1);
-    const msUntil18h = next18h - now;
-    setTimeout(() => {
-      runDailyJobs();
-      setInterval(runDailyJobs, 24 * 60 * 60 * 1000);
-    }, msUntil18h);
-  }
-  scheduleReminders();
 });
 }).catch(e => { console.error('Erreur démarrage:', e.message); process.exit(1); });

@@ -11,7 +11,9 @@
   <meta name="apple-mobile-web-app-capable" content="yes"/>
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
   <meta name="apple-mobile-web-app-title" content="VPM"/>
-  <script>if("scrollRestoration"in history)history.scrollRestoration="manual";</script>
+  <script>
+function escapeHtml(value) { return String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+if("scrollRestoration"in history)history.scrollRestoration="manual";</script>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Notifications — Vendu Par Moi</title>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
@@ -62,11 +64,11 @@
     .unread-dot { display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: var(--terracotta); margin-left: 5px; vertical-align: middle; }
   </style>
 </head>
-<body>
+<body class="vpm-header-typography">
 
 <div class="hdr">
   <a href="/dashboard">← Dashboard</a>
-  <h1>Notifications</h1>
+  <h1 class="vpm-header-title">Notifications</h1>
   <div class="hdr-actions">
     <button class="btn-readall" onclick="markAllRead()">Tout marquer comme lu</button>
   </div>
@@ -86,7 +88,7 @@
   </div>
 </div>
 
-<script src="/js/seller-nav.js"></script>
+<script src="/js/seller-nav.js?v=2"></script>
 <script>
 let data = null;
 let activeTab = 'all';
@@ -221,5 +223,6 @@ async function load() {
 
 load();
 </script>
+<link rel="stylesheet" href="/css/seller-header-typography.css?v=1">
 </body>
 </html>

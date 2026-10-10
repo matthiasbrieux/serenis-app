@@ -26,7 +26,7 @@ required.forEach(key => {
     console.log(`❌ MANQUANT  — ${key}`);
     allOk = false;
   } else {
-    const display = val.length > 20 ? val.slice(0, 8) + '...' + val.slice(-4) : val;
+    const display = 'valeur masquée';
     console.log(`✅ OK        — ${key} (${display})`);
   }
 });
@@ -34,7 +34,7 @@ required.forEach(key => {
 console.log('\n--- Optionnels ---');
 optional.forEach(key => {
   const val = process.env[key];
-  console.log(`${val ? '✅' : '⚠️ '} ${key} = ${val || '(non défini)'}`);
+  console.log(`${val ? '✅' : '⚠️ '} ${key} = ${val ? '(défini)' : '(non défini)'}`);
 });
 
 console.log('\n' + (allOk ? '✅ Tout est configuré !' : '❌ Des variables manquent — voir GUIDE_SAV.md section 6') + '\n');

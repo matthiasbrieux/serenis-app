@@ -1,3 +1,4 @@
+const validation = require('../services/validation');
 const express = require('express');
 const router = express.Router();
 const db = require('../database');
@@ -28,22 +29,7 @@ router.get('/api/dossier/acheteur/:token/document/:docId', async (req, res) => {
     ((f === '' || f === null) && prop.plan_docs_visible !== 0);
   if (!allowed) return res.status(403).json({ error: 'Document non accessible' });
 
-  try {
-    const response = await fetch(doc.url);
-    if (!response.ok) return res.status(502).json({ error: 'Impossible de récupérer le document' });
-
-    const ext = (doc.name || '').split('.').pop().toLowerCase();
-    const isPdf = ext === 'pdf' || doc.url.includes('/raw/upload/');
-    let safeName = (doc.name || 'document').replace(/[^a-zA-Z0-9._-]/g, '_');
-    if (isPdf && !safeName.toLowerCase().endsWith('.pdf')) safeName += '.pdf';
-
-    res.setHeader('Content-Type', isPdf ? 'application/pdf' : 'application/octet-stream');
-    res.setHeader('Content-Disposition', `inline; filename="${safeName}"`);
-    res.send(Buffer.from(await response.arrayBuffer()));
-  } catch (e) {
-    console.error('Document proxy error:', e.message);
-    res.status(502).json({ error: 'Erreur proxy document' });
-  }
+  return require('../services/documents').sendDocument(doc, res);
 });
 
 // ── Données dossier acheteur (token public) ───────────────────
@@ -79,14 +65,24 @@ router.get('/api/dossier/acheteur/:token', (req, res) => {
   });
 
   // Ne jamais exposer le token notaire ni la session Stripe au dossier public
-  const { notaire_token, stripe_session_id, stripe_customer_id, password, ...safeProperty } = prop;
+  const safeProperty = require('../services/public-property').publicProperty(prop);
+  for (const field of ['first_name','last_name','seller_phone','seller_email','diagnostics_ai_summary','diagnostics_ai_summary_validated']) {
+    if (Object.hasOwn(prop,field)) safeProperty[field]=prop[field];
+  }
   // Le résumé IA des diagnostics n'est visible que si le vendeur l'a relu et validé,
   // et seulement si les diagnostics eux-mêmes sont inclus dans le dossier.
   if (safeProperty.diagnostics_ai_summary_validated !== 1 || prop.diagnostics_in_dossier === 0) {
     safeProperty.diagnostics_ai_summary = null;
   }
   delete safeProperty.diagnostics_ai_summary_validated;
-  res.json({ property: safeProperty, photos, documents: docs });
+  res.json({ property: safeProperty, photos, documents: docs.map(d=>({...d,url:`/api/dossier/acheteur/${encodeURIComponent(req.params.token)}/document/${d.id}`})) });
+});
+
+router.get('/api/dossier/notaire/:token/document/:docId', (req,res) => {
+  const prop = db.prepare('SELECT id FROM properties WHERE notaire_token=?').get(req.params.token);
+  const doc = prop && db.prepare('SELECT * FROM property_documents WHERE id=? AND property_id=?').get(req.params.docId, prop.id);
+  if (!doc) return res.status(404).json({error:'Document introuvable'});
+  return require('../services/documents').sendDocument(doc,res);
 });
 
 // ── Données dossier notaire (token privé) ─────────────────────
@@ -111,7 +107,7 @@ router.get('/api/dossier/notaire/:token', (req, res) => {
   try { offers = db.prepare('SELECT amount, buyer_name, buyer_email, status, created_at FROM offers WHERE property_id = ? ORDER BY created_at DESC LIMIT 5').all(prop.id); } catch(e) {}
 
   const { acheteur_token, notaire_token: _nt, stripe_session_id, stripe_customer_id, password, ...safeNotaireProperty } = prop;
-  res.json({ property: safeNotaireProperty, photos, documents: docs, offers });
+  res.json({ property: safeNotaireProperty, photos, documents: docs.map(d=>({...d,url:`/api/dossier/notaire/${encodeURIComponent(req.params.token)}/document/${d.id}`})), offers });
 });
 
 // ── Créneaux disponibles (par token acheteur) ────────────────
@@ -143,8 +139,12 @@ router.post('/api/dossier/acheteur/:token/reserver', publicActionLimit, async (r
       return res.status(400).json({ error: 'Merci de renseigner votre budget, financement et délai d\'achat.' });
     }
 
+    const invalid = validation.bookingError(db, prop, req.body);
+    if (invalid) return res.status(400).json({error:invalid});
     // Transaction atomique pour éviter le double booking (P2-1)
     const bookVisit = db.transaction(() => {
+      const invalidNow=validation.bookingError(db,prop,req.body);
+      if(invalidNow)return {status:400,error:invalidNow};
       const conflict = db.prepare("SELECT id FROM visits WHERE property_id=? AND visit_date=? AND visit_time=? AND status != 'cancelled'").get(prop.id, visit_date, visit_time);
       if (conflict) return { error: 'Ce créneau est déjà pris. Choisissez un autre horaire.', status: 409 };
       const emailConflict = db.prepare("SELECT id FROM visits WHERE property_id=? AND buyer_email=? AND status != 'cancelled'").get(prop.id, buyer_email.trim().toLowerCase());
@@ -155,12 +155,13 @@ router.post('/api/dossier/acheteur/:token/reserver', publicActionLimit, async (r
         .run(prop.seller_id, 'visit_confirmed', 'Nouvelle visite confirmée', `${buyer_name} (${buyer_phone || buyer_email}) — ${visit_date} à ${visit_time}`);
       return { success: true };
     });
-    const bookResult = bookVisit();
+    const bookResult = bookVisit.immediate();
     if (bookResult.error) return res.status(bookResult.status).json({ error: bookResult.error });
 
+    let confirmationSent=false;
     try {
       const { sendVisitConfirmation, sendNewVisitRequest } = require('../services/email');
-      await sendVisitConfirmation(buyer_email, buyer_name, prop, visit_date, visit_time, false);
+      confirmationSent=(await sendVisitConfirmation(buyer_email, buyer_name, prop, visit_date, visit_time, false))===true;
       await sendNewVisitRequest({ sellerEmail: prop.seller_email, buyerName: buyer_name, visitDate: `${visit_date} à ${visit_time}`, notes: buyer_phone ? `📞 ${buyer_phone}` : buyer_email });
       if (prop.seller_phone) {
         const { sendSmsNotification } = require('../services/twilio');
@@ -172,7 +173,7 @@ router.post('/api/dossier/acheteur/:token/reserver', publicActionLimit, async (r
       console.error('Visit email error:', e.message);
     }
 
-    res.json({ success: true });
+    res.json({ success: true, confirmation_sent:confirmationSent, ...(!confirmationSent?{warning:'Visite enregistrée ; confirmation email non envoyée.'}:{}) });
   } catch (e) {
     console.error('Booking error:', e.message);
     res.status(500).json({ error: 'Erreur serveur' });
@@ -214,8 +215,9 @@ router.post('/api/dossier/notaire/send-email', requireAuth, async (req, res) => 
     const sellerName = [prop.first_name, prop.last_name].filter(Boolean).join(' ') || 'Votre client';
 
     const { sendDossierToNotaire } = require('../services/email');
-    await sendDossierToNotaire({ to: notaire_email, notaireName: notaire_name || '', dossierUrl, propertyAddress: prop.address || '', sellerName });
+    const sent = await sendDossierToNotaire({ to: notaire_email, notaireName: notaire_name || '', dossierUrl, propertyAddress: prop.address || '', sellerName });
 
+    if (!sent) return res.status(502).json({success:false,error:'Le dossier n’a pas pu être envoyé. Réessayez.',url:dossierUrl});
     res.json({ success: true, url: dossierUrl });
   } catch(e) {
     console.error('Send notaire email error:', e.message);
@@ -263,7 +265,8 @@ router.post('/api/soumettre-offre/:token', publicActionLimit, express.json(), as
     if (!firstName || !lastName || !email || !amount) {
       return res.status(400).json({ error: 'Champs obligatoires manquants' });
     }
-    const amountInt = parseInt(amount, 10);
+    if (!validation.text(firstName) || !validation.text(lastName) || !validation.email(email) || !validation.number(amount,1,1e12,true) || validity_days!=null && !validation.number(validity_days,1,365,true) || phone && !/^[+\d\s().-]{6,30}$/.test(phone) || conditions!=null && (typeof conditions!=='string'||conditions.length>20000) || message!=null && (typeof message!=='string'||message.length>20000)) return res.status(400).json({error:'Coordonnées, montant ou délai invalides'});
+    const amountInt = Number(amount);
     if (!amountInt || amountInt < 1) {
       return res.status(400).json({ error: 'Montant invalide' });
     }
@@ -274,10 +277,12 @@ router.post('/api/soumettre-offre/:token', publicActionLimit, express.json(), as
       message ? `Message : ${message}` : ''
     ].filter(Boolean).join('\n');
 
+    const duplicate = db.prepare("SELECT id FROM offers WHERE property_id=? AND lower(buyer_email)=? AND amount=? AND COALESCE(conditions,'')=? AND validity_days=? AND created_at>datetime('now','-10 minutes') ORDER BY id DESC LIMIT 1").get(prop.id, email.trim().toLowerCase(), amountInt, fullNote, validity_days || 10);
+    if (duplicate) return res.json({success:true,id:duplicate.id,duplicate:true});
     const result = db.prepare(`
       INSERT INTO offers (uuid, property_id, seller_id, buyer_name, buyer_email, buyer_phone, amount, conditions, validity_days, status)
       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending')
-    `).run(uuidv4(), prop.id, prop.seller_id, buyer_name, email.trim(), phone?.trim() || null,
+    `).run(uuidv4(), prop.id, prop.seller_id, buyer_name, email.trim().toLowerCase(), phone?.trim() || null,
            amountInt, fullNote || null, validity_days || 10);
 
     // Notification interne au vendeur

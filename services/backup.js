@@ -1,66 +1,42 @@
 const fs = require('fs');
 const path = require('path');
-
+const crypto = require('crypto');
+const Database = require('better-sqlite3');
 const DB_PATH = path.resolve(process.env.DATABASE_URL || './database.db');
-const BACKUP_DIR = path.resolve('./backups');
-const MAX_BACKUPS = 7;
-
-// Render sets RENDER=true automatically — use it to distinguish prod from local
-const IS_PROD = !!process.env.RENDER;
-const CLOUD_PREFIX = IS_PROD ? 'venduparmo-backups/prod' : 'venduparmo-backups/dev';
-
-async function backupDatabase() {
-  if (!fs.existsSync(DB_PATH)) { console.warn('Backup: DB file not found at', DB_PATH); return null; }
-  if (!fs.existsSync(BACKUP_DIR)) fs.mkdirSync(BACKUP_DIR, { recursive: true });
-
-  const ts = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);
-  const dest = path.join(BACKUP_DIR, `db-${ts}.db`);
-
-  fs.copyFileSync(DB_PATH, dest);
-  const sizeKo = (fs.statSync(dest).size / 1024).toFixed(0);
-  console.log(`✓ Backup SQLite → ${path.basename(dest)} (${sizeKo} Ko)`);
-
-  // Rotation locale : garder 7 backups max
-  const files = fs.readdirSync(BACKUP_DIR)
-    .filter(f => /^db-\d{4}-\d{2}-\d{2}/.test(f))
-    .sort();
-  while (files.length > MAX_BACKUPS) {
-    try { fs.unlinkSync(path.join(BACKUP_DIR, files.shift())); } catch(e) {}
-  }
-
-  // Upload vers Cloudinary pour persistance hors-serveur
+const BACKUP_DIR = path.resolve(process.env.BACKUP_DIR || './backups');
+const CLOUD_PREFIX = (process.env.NODE_ENV === 'production' || process.env.RENDER) ? 'venduparmo-backups/prod' : 'venduparmo-backups/dev';
+let running;
+async function performBackup() {
+  if (!fs.existsSync(DB_PATH)) throw Error('Base absente');
+  fs.mkdirSync(BACKUP_DIR, { recursive: true, mode: 0o700 });
+  fs.chmodSync(BACKUP_DIR,0o700);
+  const dest = path.join(BACKUP_DIR, `db-${new Date().toISOString().replace(/[:.]/g,'-')}-${crypto.randomBytes(4).toString('hex')}.db`);
+  const source = new Database(DB_PATH, { readonly: true, fileMustExist: true });
+  try { await source.backup(dest); } finally { source.close(); }
+  fs.chmodSync(dest, 0o600);
+  const copy = new Database(dest, { readonly: true });
+  try { if (copy.pragma('integrity_check', { simple: true }) !== 'ok') throw Error('Sauvegarde SQLite invalide'); } finally { copy.close(); }
+  // No deletion of historical local/remote backups: retention is an explicit operation.
   if (process.env.CLOUDINARY_URL) {
-    try {
-      const cloudinary = require('cloudinary').v2;
-      cloudinary.config(true);
-      const publicId = `${CLOUD_PREFIX}/db-${ts}`;
-      await cloudinary.uploader.upload(dest, {
-        resource_type: 'raw',
-        public_id: publicId,
-        overwrite: true,
-        tags: ['backup', 'sqlite', IS_PROD ? 'prod' : 'dev'],
-      });
-      console.log(`✓ Backup uploadé sur Cloudinary : ${publicId}`);
-
-      // Supprimer les backups de cet env de plus de 7 jours
-      const cutoff = new Date();
-      cutoff.setDate(cutoff.getDate() - 7);
-      const { resources } = await cloudinary.api.resources({
-        type: 'upload', resource_type: 'raw', prefix: CLOUD_PREFIX + '/', max_results: 50,
-      });
-      for (const r of resources) {
-        if (new Date(r.created_at) < cutoff) {
-          await cloudinary.uploader.destroy(r.public_id, { resource_type: 'raw' }).catch(() => {});
-        }
-      }
-    } catch(e) {
-      console.error('Backup Cloudinary error:', e.message);
+    const key = process.env.BACKUP_ENCRYPTION_KEY;
+    if (!key || !/^[a-f\d]{64}$/i.test(key)) {
+      console.error('Sauvegarde distante désactivée : BACKUP_ENCRYPTION_KEY (32 octets hex) requis. Copie locale conservée.');
+    } else {
+      const iv = crypto.randomBytes(12);
+      const cipher = crypto.createCipheriv('aes-256-gcm', Buffer.from(key,'hex'), iv);
+      const ciphertext = Buffer.concat([cipher.update(fs.readFileSync(dest)),cipher.final()]);
+      const encrypted = dest + '.enc';
+      fs.writeFileSync(encrypted, Buffer.concat([Buffer.from('VPMBACKUP1'),iv,cipher.getAuthTag(),ciphertext]), {mode:0o600});
+      try {
+        const cloud = require('cloudinary').v2; cloud.config(true);
+        await cloud.uploader.upload(encrypted, { resource_type:'raw', type:'authenticated', public_id:`${CLOUD_PREFIX}/${path.basename(encrypted)}`, overwrite:false });
+      } finally { fs.unlinkSync(encrypted); }
     }
-  } else {
-    console.warn('Backup: CLOUDINARY_URL non défini — backup local uniquement');
   }
-
   return dest;
 }
-
+function backupDatabase() {
+  if (!running) running = performBackup().finally(() => { running = null; });
+  return running;
+}
 module.exports = { backupDatabase, CLOUD_PREFIX };

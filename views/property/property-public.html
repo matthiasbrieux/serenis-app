@@ -896,9 +896,9 @@ function buildDpe(p) {
   html += `</div>`;
 
   // Coûts estimés
-  const hasCosts = p.dpe_cout_min && p.dpe_cout_max;
+  const hasCosts = [p.dpe_cout_min,p.dpe_cout_max].every(v=>v!==null && v!==undefined && v!=='');
   const hasConso = p.dpe_conso_energie;
-  const hasGes = p.dpe_ges;
+  const hasGes = p.dpe_ges!==null && p.dpe_ges!==undefined && p.dpe_ges!=='';
 
   if (hasCosts || hasConso || hasGes) {
     html += `<div class="dpe-costs">`;
@@ -1117,7 +1117,7 @@ async function loadProperty() {
   document.getElementById('pdfLink').href = `/api/bien/${slug}/pdf`;
 
   // Lien dossier acheteur
-  if (p.acheteur_token) setDossierLink(p.acheteur_token);
+  if (p.dossier_url) setDossierLink(p.dossier_url);
 
   // Préremplir simulateur avec le prix
   if (p.price) prefillLoan(p.price);
@@ -1173,9 +1173,9 @@ function scrollToForm() {
 }
 
 // Bouton dossier
-function setDossierLink(token) {
+function setDossierLink(url) {
   const btn = document.getElementById('dossierBtn');
-  if (btn && token) btn.href = `/dossier/acheteur/${token}`;
+  if (btn && typeof url==='string' && url.startsWith('/dossier/acheteur/')) btn.href = url;
 }
 
 // ── Share & PDF ──

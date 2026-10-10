@@ -842,9 +842,16 @@ async function sendContactNotification({ name, phone, email, offer, city, messag
 }
 
 // ─────────────────────────────────────────────────────────────
+// Transactional cancellation notice; no pedagogical or commercial template rewritten.
+async function sendVisitCancellation(to,name,property,day,hour) {
+  const esc=v=>String(v||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  return send(to,'Annulation de votre visite',layout(`<p>Bonjour ${esc(name)},</p><p>Votre visite du ${esc(day)} à ${esc(hour)} pour le logement situé à ${esc(property.city)} a été annulée par le propriétaire.</p><p>Vous pouvez contacter le propriétaire pour convenir d’un autre créneau.</p>`));
+}
+
 // Exports
 // ─────────────────────────────────────────────────────────────
 module.exports = {
+  sendVisitCancellation,
   // Auth
   sendPasswordResetEmail,
   sendLoginCode,

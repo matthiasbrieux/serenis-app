@@ -414,8 +414,8 @@ function render(p, ph, docs) {
         <div class="dpe-letter" style="background:${DPE_COLORS[p.dpe_class]||'#999'}">${p.dpe_class}</div>
         <div class="dpe-info"><strong>DPE ${p.dpe_class}</strong>${p.dpe_conso_energie ? p.dpe_conso_energie + ' kWh/m²/an' : ''}</div>
       </div>
-      ${p.ges_class ? `<div class="dpe-badge"><div class="dpe-letter" style="background:${DPE_COLORS[p.ges_class]||'#555'};font-size:0.9rem;">GES ${p.ges_class}</div><div class="dpe-info"><strong>Émissions GES</strong>${p.dpe_ges ? p.dpe_ges + ' kg CO₂/m²/an' : ''}</div></div>` : ''}
-      ${p.dpe_cout_min && p.dpe_cout_max ? `<div style="font-size:0.88rem;color:#555;">Coût énergétique estimé : <strong>${p.dpe_cout_min}–${p.dpe_cout_max} €/an</strong></div>` : ''}
+      ${p.ges_class ? `<div class="dpe-badge"><div class="dpe-letter" style="background:${DPE_COLORS[p.ges_class]||'#555'};font-size:0.9rem;">GES ${p.ges_class}</div><div class="dpe-info"><strong>Émissions GES</strong>${(p.dpe_ges !== null && p.dpe_ges !== undefined && p.dpe_ges !== '') ? p.dpe_ges + ' kg CO₂/m²/an' : ''}</div></div>` : ''}
+      ${[p.dpe_cout_min,p.dpe_cout_max].every(v=>v!==null && v!==undefined && v!=='') ? `<div style="font-size:0.88rem;color:#555;">Coût énergétique estimé : <strong>${p.dpe_cout_min}–${p.dpe_cout_max} €/an</strong></div>` : ''}
     </div>` : '<p style="color:#aaa;font-size:0.9rem;">DPE non renseigné</p>';
 
   function di(label, value) { return value ? { label, value } : null; }
@@ -958,7 +958,7 @@ async function submitBooking() {
     const MONTHS = ['janvier','février','mars','avril','mai','juin','juillet','août','septembre','octobre','novembre','décembre'];
     const label = DAYS[new Date(selectedDate+'T12:00:00').getDay()] + ' ' + parseInt(d) + ' ' + MONTHS[parseInt(mo)-1] + ' ' + y;
     document.getElementById('successMsg').innerHTML = `Votre visite du <strong>${label} à ${selectedTime}</strong> est confirmée !`;
-    document.getElementById('successMsgSub').innerHTML = `Un email de confirmation vous a été envoyé à <strong>${email}</strong>. Le vendeur a également été notifié.<br><br><span style="font-size:0.8rem;color:#bbb;">Pensez à vous munir d'une pièce d'identité le jour de la visite.</span>`;
+    document.getElementById('successMsgSub').innerHTML = `${data.confirmation_sent===false ? 'Votre réservation est enregistrée, mais l’envoi du mail de confirmation n’a pas été confirmé.' : `Un email de confirmation vous a été envoyé à <strong>${escapeHtml(email)}</strong>. Le vendeur a également été notifié.`}<br><br><span style="font-size:0.8rem;color:#bbb;">Pensez à vous munir d'une pièce d'identité le jour de la visite.</span>`;
     showStep('stepSuccess');
   } catch(e) {
     alert('Erreur réseau, réessayez.');
