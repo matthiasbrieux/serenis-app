@@ -1,3 +1,5 @@
+function icsEscape(v){return String(v||'').replace(/\\/g,'\\\\').replace(/\r?\n/g,'\\n').replace(/;/g,'\\;').replace(/,/g,'\\,');}
+const validation = require('../services/validation');
 const express = require('express');
 const router = express.Router();
 const bcrypt = require('bcryptjs');
@@ -140,6 +142,7 @@ router.post('/api/profile', requireAuth, express.json(), async (req, res) => {
   }
 
   const fields = Object.keys(updates).filter(k => updates[k] !== undefined);
+  if (!fields.length) return res.status(400).json({error:'Aucune modification fournie'});
   const sql = `UPDATE sellers SET ${fields.map(f => f + '=?').join(', ')} WHERE id = ?`;
   db.prepare(sql).run(...fields.map(f => updates[f]), req.seller.id);
   res.json({ success: true });
@@ -169,6 +172,47 @@ router.get('/api/debug-photos', requireAuth, (req, res) => {
   res.send(html);
 });
 
+// Read-only local pilot: only the authenticated seller's own property is read.
+router.get('/api/formation/price-reference', requireAuth, async (req, res) => {
+  try {
+    const property = db.prepare('SELECT address, city, postal_code, type, surface_habitable FROM properties WHERE seller_id = ?').get(req.seller.id);
+    const result = await require('../services/price-reference').getReference(property);
+    res.json(result);
+  } catch {
+    res.status(503).json({ status: 'unavailable', message: 'Le repère de prix est momentanément indisponible.' });
+  }
+});
+
+router.get('/api/formation/commune-reference', requireAuth, async (req, res) => {
+  try {
+    const property = db.prepare('SELECT address, city, postal_code, type, surface_habitable FROM properties WHERE seller_id = ?').get(req.seller.id);
+    const result = await require('../services/price-reference').getCommuneReference(property);
+    res.json(result);
+  } catch {
+    res.status(503).json({ status: 'unavailable', message: 'Le repère de prix communal est momentanément indisponible.' });
+  }
+});
+
+router.get('/api/formation/prix-souhaite', requireAuth, (req, res) => {
+  try {
+    const row = db.prepare('SELECT prix_souhaite FROM properties WHERE seller_id = ?').get(req.seller.id);
+    res.json({ prix_souhaite: row?.prix_souhaite ?? null });
+  } catch {
+    res.status(500).json({ error: 'Erreur serveur' });
+  }
+});
+
+router.post('/api/formation/prix-souhaite', requireAuth, express.json(), (req, res) => {
+  try {
+    const val = Number(req.body?.prix_souhaite);
+    if (!Number.isFinite(val) || val < 0 || val > 100000000) return res.status(400).json({ error: 'Valeur invalide' });
+    db.prepare('UPDATE properties SET prix_souhaite = ?, updated_at = CURRENT_TIMESTAMP WHERE seller_id = ?').run(Math.round(val), req.seller.id);
+    res.json({ ok: true, prix_souhaite: Math.round(val) });
+  } catch {
+    res.status(500).json({ error: 'Erreur serveur' });
+  }
+});
+
 // Property CRUD
 router.get('/api/property', requireAuth, (req, res) => {
   const property = db.prepare('SELECT * FROM properties WHERE seller_id = ?').get(req.seller.id);
@@ -179,12 +223,12 @@ router.get('/api/property', requireAuth, (req, res) => {
   property.acheteur_url = property.acheteur_token ? `${base}/dossier/acheteur/${property.acheteur_token}` : null;
   property.notaire_url  = property.notaire_token  ? `${base}/dossier/notaire/${property.notaire_token}`   : null;
   property.bien_url     = property.slug            ? `${base}/bien/${property.slug}`                       : null;
-  res.json({ property, photos, documents });
+  res.json({ property, photos, documents: documents.map(d=>({...d,url:'/api/property/document/'+d.id})) });
 });
 
 router.post('/api/property', requireAuth, express.json(), (req, res) => {
-  const existing = db.prepare('SELECT id FROM properties WHERE seller_id = ?').get(req.seller.id);
-  const slug = uuidv4().split('-')[0] + '-' + (req.body.city || 'bien').toLowerCase().replace(/\s+/g, '-');
+  const existing = db.prepare('SELECT * FROM properties WHERE seller_id = ?').get(req.seller.id);
+  const slug = uuidv4().split('-')[0] + '-' + String(req.body.city || 'bien').toLowerCase().replace(/\s+/g, '-');
   const fields = [
     'type','address','city','postal_code','surface_habitable','surface_terrain',
     'rooms','bedrooms','year_built','constructeur','heating_type','heating_details','heating_mechanism','heating_year',
@@ -202,6 +246,9 @@ router.post('/api/property', requireAuth, express.json(), (req, res) => {
   const data = {};
   fields.forEach(f => { if (req.body[f] !== undefined) data[f] = req.body[f]; });
 
+  if (!Object.keys(data).length) return res.status(400).json({error:'Aucune modification fournie'});
+  const invalid = validation.propertyError(data, existing);
+  if (invalid) return res.status(400).json({error:invalid});
   if (existing) {
     // Track price change
     if (data.price) {
@@ -261,13 +308,15 @@ router.post('/api/property/photos', requireAuth, uploadPhoto.array('photos', 150
 router.delete('/api/property/photos/:cloudinary_id', requireAuth, async (req, res) => {
   const property = db.prepare('SELECT id FROM properties WHERE seller_id = ?').get(req.seller.id);
   if (!property) return res.json({ error: 'Non autorisé' });
-  db.prepare('DELETE FROM property_photos WHERE property_id = ? AND cloudinary_id = ?').run(property.id, req.params.cloudinary_id);
+  const owned = db.prepare('SELECT * FROM property_photos WHERE property_id=? AND cloudinary_id=?').get(property.id, req.params.cloudinary_id);
+  if (!owned) return res.status(404).json({error:'Photo introuvable'});
+  try { await require('../services/documents').removeMedia(owned, 'photos'); } catch { return res.status(502).json({error:'Suppression du fichier impossible'}); }
+  db.prepare('DELETE FROM property_photos WHERE id=?').run(owned.id);
   // Re-index order_index to keep sequence contiguous
   const remaining = db.prepare('SELECT id FROM property_photos WHERE property_id = ? ORDER BY order_index ASC').all(property.id);
   const stmt = db.prepare('UPDATE property_photos SET order_index = ? WHERE id = ?');
   remaining.forEach((p, i) => stmt.run(i, p.id));
-  const cloudinary = require('../services/upload').cloudinary;
-  await cloudinary.uploader.destroy(req.params.cloudinary_id).catch(() => {});
+
   res.json({ success: true });
 });
 
@@ -299,11 +348,11 @@ router.post('/api/property/documents', requireAuth, (req, res, next) => {
   const validFolders = ['diagnostics', 'acheteur_serieux', 'notaire'];
   const safeFolder = validFolders.includes(folder) ? folder : 'diagnostics';
   const isLocal = !process.env.CLOUDINARY_URL;
-  const url = isLocal ? '/uploads/documents/' + req.file.filename : req.file.path;
+  const url = isLocal ? '/private-documents/' + req.file.filename : req.file.path;
   const cid = isLocal ? req.file.filename : (req.file.public_id || req.file.filename);
   const result = db.prepare('INSERT INTO property_documents (property_id, name, cloudinary_id, url, doc_type, folder) VALUES (?,?,?,?,?,?)')
     .run(property.id, name || req.file.originalname, cid, url, doc_type || 'autre', safeFolder);
-  res.json({ success: true, id: result.lastInsertRowid, url, name: name || req.file.originalname, doc_type: doc_type || 'autre', folder: safeFolder });
+  res.json({ success: true, id: result.lastInsertRowid, url: '/api/property/document/'+result.lastInsertRowid, name: name || req.file.originalname, doc_type: doc_type || 'autre', folder: safeFolder });
 });
 
 // Document delete
@@ -312,11 +361,8 @@ router.delete('/api/property/documents/:id', requireAuth, async (req, res) => {
   if (!property) return res.json({ error: 'Non autorisé' });
   const doc = db.prepare('SELECT * FROM property_documents WHERE id = ? AND property_id = ?').get(req.params.id, property.id);
   if (!doc) return res.json({ error: 'Document introuvable' });
+  try { await require('../services/documents').removeMedia(doc, 'documents'); } catch { return res.status(502).json({error:'Suppression du fichier impossible'}); }
   db.prepare('DELETE FROM property_documents WHERE id = ?').run(doc.id);
-  if (process.env.CLOUDINARY_URL && doc.cloudinary_id) {
-    const { cloudinary } = require('../services/upload');
-    await cloudinary.uploader.destroy(doc.cloudinary_id).catch(() => {});
-  }
   res.json({ success: true });
 });
 
@@ -327,23 +373,7 @@ router.get('/api/property/document/:docId', requireAuth, async (req, res) => {
   const doc = db.prepare('SELECT * FROM property_documents WHERE id = ? AND property_id = ?').get(req.params.docId, property.id);
   if (!doc) return res.status(404).json({ error: 'Document introuvable' });
 
-  try {
-    if (!doc.url.startsWith('http')) {
-      return res.sendFile(require('path').join(__dirname, '../public', doc.url));
-    }
-    const response = await fetch(doc.url);
-    if (!response.ok) return res.status(502).json({ error: 'Impossible de récupérer le document' });
-    const ext = (doc.name || '').split('.').pop().toLowerCase();
-    const isPdf = ext === 'pdf' || doc.url.includes('/raw/upload/');
-    let safeName = (doc.name || 'document').replace(/[^a-zA-Z0-9._-]/g, '_');
-    if (isPdf && !safeName.toLowerCase().endsWith('.pdf')) safeName += '.pdf';
-    res.setHeader('Content-Type', isPdf ? 'application/pdf' : 'application/octet-stream');
-    res.setHeader('Content-Disposition', `inline; filename="${safeName}"`);
-    res.send(Buffer.from(await response.arrayBuffer()));
-  } catch (e) {
-    console.error('Document proxy error:', e.message);
-    res.status(502).json({ error: 'Erreur proxy document' });
-  }
+  return require('../services/documents').sendDocument(doc, res);
 });
 
 // Publish property
@@ -380,6 +410,8 @@ router.get('/api/agenda', requireAuth, (req, res) => {
 router.post('/api/agenda', requireAuth, express.json(), (req, res) => {
   try {
     const { slots } = req.body;
+    const invalid = validation.slotError(slots);
+    if (invalid) return res.status(400).json({error:invalid});
     const TIME_RE = /^\d{2}:\d{2}$/;
     const saveAgenda = db.transaction(() => {
       db.prepare('UPDATE agenda_slots SET active=0 WHERE seller_id=?').run(req.seller.id);
@@ -418,6 +450,7 @@ router.get('/api/compromis', requireAuth, (req, res) => {
 
 router.post('/api/compromis', requireAuth, express.json(), (req, res) => {
   const { compromis_date, compromis_conditions_delay } = req.body;
+  if (compromis_date && !validation.date(compromis_date) || compromis_conditions_delay != null && !validation.number(compromis_conditions_delay,1,3650,true)) return res.status(400).json({error:'Date ou délai de compromis invalide'});
   const prop = db.prepare('SELECT id FROM properties WHERE seller_id=?').get(req.seller.id);
   if (!prop) return res.status(404).json({ error: 'Aucun bien enregistré' });
   db.prepare('UPDATE properties SET compromis_date=?, compromis_conditions_delay=? WHERE seller_id=?')
@@ -449,8 +482,8 @@ router.post('/api/property/status', requireAuth, express.json(), async (req, res
 // ── Agent IA — génération de texte d'annonce ─────────────────────
 router.post('/api/property/generate-description', requireAuth, aiRateLimit, express.json(), async (req, res) => {
   const { property } = req.body;
-  if (!property) return res.json({ error: 'Données manquantes' });
-  if (!process.env.ANTHROPIC_API_KEY) return res.json({ error: 'Service IA non configuré — ajoutez ANTHROPIC_API_KEY dans les variables d\'environnement.' });
+  if (!property || typeof property !== 'object' || Array.isArray(property)) return res.status(400).json({ error: 'Données manquantes' });
+  if (!process.env.ANTHROPIC_API_KEY) return res.status(503).json({ error: 'Service IA non configuré — ajoutez ANTHROPIC_API_KEY dans les variables d\'environnement.' });
 
   const Anthropic = require('@anthropic-ai/sdk');
   const client = new Anthropic.default({ apiKey: process.env.ANTHROPIC_API_KEY });
@@ -549,9 +582,7 @@ router.post('/api/property/diagnostics-summary/generate', requireAuth, aiRateLim
   let fileBlocks;
   try {
     fileBlocks = await Promise.all(usable.map(async ({ doc, ext }) => {
-      const response = await fetch(doc.url);
-      if (!response.ok) throw new Error(`Téléchargement impossible : ${doc.name}`);
-      const buf = Buffer.from(await response.arrayBuffer());
+      const {buffer:buf}=await require('../services/documents').readDocument(doc);
       if (ext === 'pdf') {
         return { type: 'document', source: { type: 'base64', media_type: 'application/pdf', data: buf.toString('base64') } };
       }
@@ -623,7 +654,7 @@ router.get('/api/progress', requireAuth, (req, res) => {
 
 router.post('/api/progress', requireAuth, express.json(), (req, res) => {
   const { key, value } = req.body;
-  if (!key || typeof key !== 'string' || typeof value !== 'string') {
+  if (!key || typeof key !== 'string' || key.length>150 || ['__proto__','constructor','prototype'].includes(key) || typeof value !== 'string' || value.length>200000) {
     return res.status(400).json({ error: 'key et value (string) requis' });
   }
   db.prepare(`
@@ -678,21 +709,11 @@ router.post('/api/property/export-pdf', requireAuth, express.json({ limit: '2mb'
   const { html, title } = req.body;
   if (!html) return res.status(400).json({ error: 'Contenu manquant' });
 
-  const htmlPdf = require('html-pdf-node');
-  const fullHtml = `<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8">
-  <style>
-    * { box-sizing: border-box; }
-    body { font-family: Arial, Helvetica, sans-serif; color: #1a1a1a; margin: 0; padding: 0; background: #fff; font-size: 13px; }
-    img { max-width: 100%; display: block; }
-    .fd-label { font-size: 11px; color: #888; padding: 4px 10px 4px 0; vertical-align: top; width: 42%; }
-    .fd-value { font-size: 11px; color: #222; padding: 4px 0; font-weight: 600; vertical-align: top; }
-  </style>
-  </head><body>${html}</body></html>`;
-
-  const options = { format: 'A4', margin: { top: '10mm', bottom: '10mm', left: '10mm', right: '10mm' }, args: ['--no-sandbox', '--disable-setuid-sandbox'] };
+  const property=db.prepare('SELECT id FROM properties WHERE seller_id=?').get(req.seller.id);
+  if(!property)return res.status(404).json({error:'Bien introuvable'});
+  const photos=db.prepare('SELECT url FROM property_photos WHERE property_id=?').all(property.id);
   try {
-    const file = { content: fullHtml };
-    const pdfBuffer = await htmlPdf.generatePdf(file, options);
+    const pdfBuffer=await require('../services/pdf').generateSafePdf(html,photos);
     res.setHeader('Content-Type', 'application/pdf');
     res.setHeader('Content-Disposition', `attachment; filename="Dossier_Envoi_Client.pdf"`);
     res.send(pdfBuffer);
@@ -712,7 +733,9 @@ router.get('/api/publications', requireAuth, (req, res) => {
 
 router.post('/api/publications', requireAuth, express.json(), (req, res) => {
   const { platform, url, active, published_at } = req.body;
-  if (!platform) return res.json({ error: 'Plateforme requise' });
+  if (!validation.text(platform)) return res.status(400).json({ error: 'Plateforme requise' });
+  if (req.body.url && !validation.webUrl(req.body.url)) return res.status(400).json({error:'Lien HTTP ou HTTPS valide requis'});
+  if (req.body.published_at && !validation.date(req.body.published_at)) return res.status(400).json({error:'Date de publication invalide'});
   const existing = db.prepare('SELECT id FROM property_publications WHERE seller_id = ? AND platform = ?').get(req.seller.id, platform);
   if (existing) {
     db.prepare('UPDATE property_publications SET url=?, active=?, published_at=?, updated_at=CURRENT_TIMESTAMP WHERE id=?')
@@ -737,7 +760,8 @@ router.get('/api/performances', requireAuth, (req, res) => {
 
 router.post('/api/performances', requireAuth, express.json(), (req, res) => {
   const { platform, views, favorites, messages, visits_done, offers } = req.body;
-  if (!platform) return res.json({ error: 'Plateforme requise' });
+  if (!validation.text(platform)) return res.status(400).json({error:'Plateforme requise'});
+  if ([views,favorites,messages,visits_done,offers].some(v=>v!=null&&!validation.number(v,0,1e12,true))) return res.status(400).json({error:'Compteurs entiers positifs requis'});
   db.prepare(`INSERT INTO property_performances (seller_id, platform, views, favorites, messages, visits_done, offers, updated_at)
     VALUES (?,?,?,?,?,?,?, CURRENT_TIMESTAMP)
     ON CONFLICT(seller_id, platform) DO UPDATE SET
@@ -874,7 +898,8 @@ router.post('/api/visits', requireAuth, express.json(), async (req, res) => {
   const property = db.prepare('SELECT id FROM properties WHERE seller_id = ?').get(req.seller.id);
   if (!property) return res.status(400).json({ error: 'Créez d\'abord votre bien' });
   const { buyer_name, buyer_phone, buyer_email, visit_date, visit_time, notes } = req.body;
-  if (!visit_date || !visit_time) return res.status(400).json({ error: 'Date et heure requises' });
+  if (!validation.date(visit_date)||!validation.time(visit_time)||validation.parisInstant(visit_date,visit_time)<=new Date()||buyer_email&&!validation.email(buyer_email)) return res.status(400).json({error:'Date, heure ou email invalide'});
+  if (db.prepare("SELECT id FROM visits WHERE property_id=? AND visit_date=? AND visit_time=? AND status!='cancelled'").get(property.id,visit_date,visit_time)) return res.status(409).json({error:'Créneau déjà réservé'});
   const result = db.prepare(
     'INSERT INTO visits (property_id, seller_id, buyer_name, buyer_phone, buyer_email, visit_date, visit_time, status, notes) VALUES (?,?,?,?,?,?,?,\'confirmed\',?)'
   ).run(property.id, req.seller.id, buyer_name || 'Acquéreur', buyer_phone || '', buyer_email || '', visit_date, visit_time, notes || '');
@@ -903,16 +928,19 @@ router.post('/api/visits', requireAuth, express.json(), async (req, res) => {
 router.put('/api/visits/:id/status', requireAuth, express.json(), async (req, res) => {
   const { status } = req.body;
   if (!['pending','confirmed','cancelled','done'].includes(status)) return res.status(400).json({ error: 'Statut invalide' });
-  db.prepare('UPDATE visits SET status=? WHERE id=? AND seller_id=?').run(status, req.params.id, req.seller.id);
-  const visit = db.prepare('SELECT v.*, p.type, p.address, p.city FROM visits v LEFT JOIN properties p ON p.id = v.property_id WHERE v.id=?').get(req.params.id);
-  if (visit && status === 'confirmed') {
-    db.prepare('INSERT INTO notifications (seller_id, type, title, body) VALUES (?,\'visit_confirmed\',?,?)')
-      .run(req.seller.id, 'Visite confirmée', `${visit.buyer_name} — ${visit.visit_date} à ${visit.visit_time}`);
-    if (visit.buyer_email) {
-      sendVisitConfirmation(visit.buyer_email, visit.buyer_name, visit, visit.visit_date, visit.visit_time, false).catch(e => console.error('Buyer confirm email error:', e.message));
-    }
+  const visit = db.prepare('SELECT v.*, p.type, p.address, p.city FROM visits v LEFT JOIN properties p ON p.id=v.property_id WHERE v.id=? AND v.seller_id=?').get(req.params.id, req.seller.id);
+  if (!visit) return res.status(404).json({error:'Visite introuvable'});
+  if (visit.status === status) return res.json({success:true,unchanged:true});
+  const changed = db.prepare('UPDATE visits SET status=? WHERE id=? AND seller_id=? AND status=?').run(status, visit.id, req.seller.id, visit.status);
+  if (!changed.changes) return res.status(409).json({error:'La visite vient de changer. Actualisez la page.'});
+  let notification_sent = null;
+  if (status === 'confirmed') {
+    db.prepare('INSERT INTO notifications (seller_id,type,title,body) VALUES (?,?,?,?)').run(req.seller.id,'visit_confirmed','Visite confirmée',`${visit.buyer_name} — ${visit.visit_date} à ${visit.visit_time}`);
+    if (visit.buyer_email) notification_sent = await sendVisitConfirmation(visit.buyer_email,visit.buyer_name,visit,visit.visit_date,visit.visit_time,false).catch(()=>false);
   }
-  res.json({ success: true });
+  if (status === 'cancelled' && visit.buyer_email) notification_sent = await require('../services/email').sendVisitCancellation(visit.buyer_email,visit.buyer_name,visit,visit.visit_date,visit.visit_time).catch(()=>false);
+  res.json({success:true,notification_sent,warning:notification_sent===false?'La visite est enregistrée mais le message n’a pas été envoyé.':undefined});
+
 });
 
 router.delete('/api/visits/:id', requireAuth, (req, res) => {
@@ -943,14 +971,15 @@ router.get('/api/visits/:id/calendar.ics', requireAuth, (req, res) => {
   const [yr, mo, dy] = (v.visit_date || '').split('-');
   const [hh, mm] = (v.visit_time || '00:00').split(':');
   const pad = n => String(n).padStart(2, '0');
-  const dtStart = `${yr}${pad(mo)}${pad(dy)}T${pad(hh)}${pad(mm)}00`;
-  const endH = (parseInt(hh, 10) + 1) % 24;
-  const dtEnd = `${yr}${pad(mo)}${pad(dy)}T${pad(endH)}${pad(mm)}00`;
+  const instant=validation.parisInstant(v.visit_date,v.visit_time||'00:00');
+  const stamp=d=>d.toISOString().replace(/[-:]/g,'').replace(/\.\d{3}Z$/, 'Z');
+  const dtStart=stamp(instant);
+  const dtEnd=stamp(new Date(instant.getTime()+3600000));
   const now = new Date().toISOString().replace(/[-:.]/g, '').slice(0, 15);
   const typeLabel = v.type === 'appartement' ? 'Appartement' : v.type === 'maison' ? 'Maison' : (v.type || 'Bien');
   const summary = `Visite — ${typeLabel} à ${v.city || ''}`;
   const location = [v.address, v.city].filter(Boolean).join(', ');
-  const description = `Acquéreur : ${v.buyer_name || ''}\\nTél : ${v.buyer_phone || '—'}\\nEmail : ${v.buyer_email || '—'}`;
+  const description = `Acquéreur : ${v.buyer_name || ''}\nTél : ${v.buyer_phone || '—'}\nEmail : ${v.buyer_email || '—'}`;
 
   const ics = [
     'BEGIN:VCALENDAR',
@@ -963,9 +992,9 @@ router.get('/api/visits/:id/calendar.ics', requireAuth, (req, res) => {
     `DTSTAMP:${now}Z`,
     `DTSTART:${dtStart}`,
     `DTEND:${dtEnd}`,
-    `SUMMARY:${summary}`,
-    `LOCATION:${location}`,
-    `DESCRIPTION:${description}`,
+    `SUMMARY:${icsEscape(summary)}`,
+    `LOCATION:${icsEscape(location)}`,
+    `DESCRIPTION:${icsEscape(description)}`,
     'END:VEVENT',
     'END:VCALENDAR',
   ].join('\r\n');
@@ -978,7 +1007,7 @@ router.get('/api/visits/:id/calendar.ics', requireAuth, (req, res) => {
 router.post('/api/visits/:id/reminder', requireAuth, (req, res) => {
   const visit = db.prepare('SELECT id FROM visits WHERE id=? AND seller_id=?').get(req.params.id, req.seller.id);
   if (!visit) return res.status(404).json({ error: 'Visite introuvable' });
-  db.prepare('UPDATE visits SET reminder_sent=1 WHERE id=?').run(visit.id);
+  db.prepare('UPDATE visits SET sms_copied_at=? WHERE id=?').run(new Date().toISOString(), visit.id);
   res.json({ success: true });
 });
 
@@ -1004,22 +1033,23 @@ router.get('/api/agenda/feed.ics', (req, res) => {
   const events = visits.map(v => {
     const [yr, mo, dy] = (v.visit_date || '').split('-');
     const [hh, mm] = (v.visit_time || '00:00').split(':');
-    const dtStart = `${yr}${pad(mo)}${pad(dy)}T${pad(hh)}${pad(mm)}00`;
-    const endH = (parseInt(hh, 10) + 1) % 24;
-    const dtEnd = `${yr}${pad(mo)}${pad(dy)}T${pad(endH)}${pad(mm)}00`;
+  const instant = validation.parisInstant(v.visit_date, v.visit_time || '00:00');
+  const stamp = d=>d.toISOString().replace(/[-:]/g,'').replace(/\.\d{3}Z$/, 'Z');
+  const dtStart = stamp(instant);
+  const dtEnd = stamp(new Date(instant.getTime()+3600000));
     const typeLabel = v.type === 'appartement' ? 'Appartement' : v.type === 'maison' ? 'Maison' : (v.type || 'Bien');
     const summary = `Visite — ${typeLabel} à ${v.city || ''}`;
     const location = [v.address, v.city].filter(Boolean).join(', ');
-    const description = `Acquéreur : ${v.buyer_name || ''}\\nTél : ${v.buyer_phone || '—'}\\nEmail : ${v.buyer_email || '—'}`;
+    const description = `Acquéreur : ${v.buyer_name || ''}\nTél : ${v.buyer_phone || '—'}\nEmail : ${v.buyer_email || '—'}`;
     return [
       'BEGIN:VEVENT',
       `UID:visit-${v.id}@venduparmoi.fr`,
       `DTSTAMP:${now}Z`,
       `DTSTART:${dtStart}`,
       `DTEND:${dtEnd}`,
-      `SUMMARY:${summary}`,
-      `LOCATION:${location}`,
-      `DESCRIPTION:${description}`,
+      `SUMMARY:${icsEscape(summary)}`,
+      `LOCATION:${icsEscape(location)}`,
+      `DESCRIPTION:${icsEscape(description)}`,
       'END:VEVENT',
     ].join('\r\n');
   });
@@ -1375,7 +1405,7 @@ router.get('/api/offers', requireAuth, (req, res) => {
 // Contre-proposition
 router.post('/api/offers/:id/counter', requireAuth, express.json(), (req, res) => {
   const { counter_amount } = req.body;
-  if (!counter_amount || Number(counter_amount) <= 0) return res.status(400).json({ error: 'Montant invalide' });
+  if (!validation.number(counter_amount, 1)) return res.status(400).json({ error: 'Montant invalide' });
   const offer = db.prepare('SELECT o.* FROM offers o JOIN properties p ON p.id = o.property_id WHERE o.id = ? AND p.seller_id = ?').get(req.params.id, req.seller.id);
   if (!offer) return res.status(403).json({ error: 'Offre introuvable' });
   db.prepare('UPDATE offers SET status=?, counter_amount=?, responded_at=CURRENT_TIMESTAMP WHERE id=?').run('countered', Number(counter_amount), offer.id);
@@ -1388,7 +1418,13 @@ router.put('/api/offers/:id/status', requireAuth, express.json(), (req, res) => 
   if (!['accepted', 'refused', 'pending'].includes(status)) return res.status(400).json({ error: 'Statut invalide' });
   const offer = db.prepare('SELECT o.* FROM offers o JOIN properties p ON p.id = o.property_id WHERE o.id = ? AND p.seller_id = ?').get(req.params.id, req.seller.id);
   if (!offer) return res.status(403).json({ error: 'Offre introuvable' });
-  db.prepare('UPDATE offers SET status=?, responded_at=CURRENT_TIMESTAMP WHERE id=?').run(status, offer.id);
+  const transition = db.transaction(() => {
+    if (status === 'accepted' && db.prepare("SELECT id FROM offers WHERE property_id=? AND status='accepted' AND id!=?").get(offer.property_id,offer.id)) return false;
+    db.prepare('UPDATE offers SET status=?, responded_at=CURRENT_TIMESTAMP WHERE id=?').run(status,offer.id);
+    if(status==='accepted')db.prepare("UPDATE properties SET status='offre' WHERE id=? AND status NOT IN ('compromis','vendu')").run(offer.property_id);
+    return true;
+  });
+  if (!transition.immediate()) return res.status(409).json({error:'Une autre offre est déjà acceptée pour ce bien. Vérifiez cette offre avant de poursuivre.'});
   res.json({ success: true });
 });
 
@@ -1434,11 +1470,10 @@ router.get('/api/guide-photos', requireAuth, (req, res) => {
 router.delete('/api/guide-photos/:cloudinary_id', requireAuth, async (req, res) => {
   const property = db.prepare('SELECT id FROM properties WHERE seller_id = ?').get(req.seller.id);
   if (!property) return res.json({ error: 'Non autorisé' });
-  db.prepare("DELETE FROM property_photos WHERE property_id = ? AND cloudinary_id = ? AND category = 'decouverte'").run(property.id, req.params.cloudinary_id);
-  if (process.env.CLOUDINARY_URL) {
-    const { cloudinary } = require('../services/upload');
-    await cloudinary.uploader.destroy(req.params.cloudinary_id).catch(() => {});
-  }
+  const owned = db.prepare("SELECT * FROM property_photos WHERE property_id=? AND cloudinary_id=? AND category='decouverte'").get(property.id, req.params.cloudinary_id);
+  if (!owned) return res.status(404).json({error:'Photo introuvable'});
+  try { await require('../services/documents').removeMedia(owned, 'photos'); } catch { return res.status(502).json({error:'Suppression du fichier impossible'}); }
+  db.prepare('DELETE FROM property_photos WHERE id=?').run(owned.id);
   res.json({ success: true });
 });
 
@@ -1451,7 +1486,13 @@ router.get('/api/seller/rgpd/export', requireAuth, (req, res) => {
   const visits = db.prepare('SELECT buyer_name, buyer_email, buyer_phone, visit_date, visit_time, status, created_at FROM visits WHERE seller_id=?').all(req.seller.id);
   const contacts = db.prepare('SELECT buyer_name, buyer_phone, buyer_email, source, status, notes, created_at FROM buyer_contacts WHERE seller_id=?').all(req.seller.id);
   const slots = db.prepare('SELECT day_of_week, specific_date, start_time, end_time, is_recurring FROM agenda_slots WHERE seller_id=?').all(req.seller.id);
-  const export_data = { exported_at: new Date().toISOString(), seller, property, photos, documents, visits, contacts, agenda_slots: slots };
+  const additional = {};
+  for (const table of ['offers','seller_progress','checklist_progress','property_publications','property_performances','notifications','missions','admin_activity_log']) {
+    additional[table] = db.prepare(`SELECT * FROM ${table} WHERE seller_id=?`).all(req.seller.id);
+  }
+  additional.email_sends=db.prepare('SELECT to_email,subject,success,source,sent_at FROM email_sends WHERE seller_id=?').all(req.seller.id);
+  additional.price_history = property ? db.prepare('SELECT * FROM property_price_history WHERE property_id=?').all(property.id) : [];
+  const export_data = { additional, exported_at: new Date().toISOString(), seller, property, photos, documents, visits, contacts, agenda_slots: slots };
   res.setHeader('Content-Type', 'application/json');
   res.setHeader('Content-Disposition', `attachment; filename="venduparmo-mes-donnees-${new Date().toISOString().slice(0,10)}.json"`);
   res.send(JSON.stringify(export_data, null, 2));
@@ -1461,41 +1502,26 @@ router.delete('/api/seller/rgpd/account', requireAuth, async (req, res) => {
   const sid = req.seller.id;
   const property = db.prepare('SELECT id FROM properties WHERE seller_id=?').get(sid);
 
-  // Suppression Cloudinary hors transaction (appels réseau)
-  if (property && process.env.CLOUDINARY_URL) {
-    const photos = db.prepare('SELECT cloudinary_id FROM property_photos WHERE property_id=?').all(property.id);
-    const docs = db.prepare('SELECT cloudinary_id FROM property_documents WHERE property_id=? AND cloudinary_id IS NOT NULL').all(property.id);
-    const { cloudinary } = require('../services/upload');
-    for (const ph of photos) await cloudinary.uploader.destroy(ph.cloudinary_id).catch(() => {});
-    for (const d of docs) await cloudinary.uploader.destroy(d.cloudinary_id).catch(() => {});
-  }
-
-  // Suppression SQLite dans une seule transaction atomique
+  const media = [...db.prepare('SELECT * FROM property_photos WHERE property_id IN (SELECT id FROM properties WHERE seller_id=?)').all(sid),...db.prepare('SELECT * FROM property_documents WHERE property_id IN (SELECT id FROM properties WHERE seller_id=?)').all(sid)];
   const deleteAccount = db.transaction(() => {
-    if (property) {
-      db.prepare('DELETE FROM property_photos WHERE property_id=?').run(property.id);
-      db.prepare('DELETE FROM property_documents WHERE property_id=?').run(property.id);
-      db.prepare('DELETE FROM property_page_views WHERE property_id=?').run(property.id);
-      db.prepare('DELETE FROM property_price_history WHERE property_id=?').run(property.id);
-      db.prepare('DELETE FROM buyer_contacts WHERE property_id=?').run(property.id);
-      db.prepare('DELETE FROM visits WHERE property_id=?').run(property.id);
-      db.prepare('DELETE FROM offers WHERE property_id=?').run(property.id);
-      db.prepare('DELETE FROM properties WHERE id=?').run(property.id);
+    // Queue before deletion; external storage must never be destroyed before SQL succeeds.
+    for (const item of media) db.prepare('INSERT INTO media_cleanup_jobs(media_json) VALUES(?)').run(JSON.stringify(item));
+    for (const table of ['property_photos','property_documents','property_page_views','property_price_history','buyer_contacts','visits','offers']) {
+      db.prepare(`DELETE FROM ${table} WHERE property_id IN (SELECT id FROM properties WHERE seller_id=?)`).run(sid);
     }
-    db.prepare('DELETE FROM checklist_progress WHERE seller_id=?').run(sid);
-    db.prepare('DELETE FROM property_publications WHERE seller_id=?').run(sid);
-    db.prepare('DELETE FROM property_performances WHERE seller_id=?').run(sid);
-    db.prepare('DELETE FROM offers WHERE seller_id=?').run(sid);
-    db.prepare('DELETE FROM agenda_slots WHERE seller_id=?').run(sid);
-    db.prepare('DELETE FROM notifications WHERE seller_id=?').run(sid);
+    for (const table of ['seller_progress','checklist_progress','property_publications','property_performances','offers','agenda_slots','notifications','password_reset_tokens','admin_activity_log','admin_todos']) db.prepare(`DELETE FROM ${table} WHERE seller_id=?`).run(sid);
+    // Preserve financial/operational records; detach the deleted account without reassigning its phone number.
+    db.prepare('UPDATE vrp_sales SET seller_id=NULL WHERE seller_id=?').run(sid);
+    db.prepare('UPDATE missions SET seller_id=NULL WHERE seller_id=?').run(sid);
+    db.prepare("UPDATE phone_numbers SET seller_id=NULL,status='inactive' WHERE seller_id=?").run(sid);
+    db.prepare('UPDATE email_sends SET seller_id=NULL WHERE seller_id=?').run(sid);
+    db.prepare("DELETE FROM login_2fa_codes WHERE account_type='seller' AND account_id=?").run(sid);
+    db.prepare('DELETE FROM properties WHERE seller_id=?').run(sid);
     db.prepare('DELETE FROM sellers WHERE id=?').run(sid);
   });
-  try {
-    deleteAccount();
-  } catch (e) {
-    console.error('[RGPD DELETE]', e.message);
-    return res.status(500).json({ success: false, error: 'Erreur lors de la suppression : ' + e.message });
-  }
+  try { deleteAccount(); }
+  catch(e) { console.error('[RGPD DELETE] Transaction refusée');return res.status(500).json({success:false,error:'Suppression impossible. Aucun fichier n’a été supprimé.'}); }
+  await require('../services/media-cleanup').cleanupMedia();
   res.clearCookie('token');
   res.json({ success: true });
 });
