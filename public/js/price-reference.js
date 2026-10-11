@@ -329,8 +329,71 @@
   const I_CHECK_CIRC = "<svg width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M22 11.08V12a10 10 0 1 1-5.93-9.14\"/><polyline points=\"22 4 12 14.01 9 11.01\"/></svg>";
   const I_LAYERS = "<svg width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><polygon points=\"12 2 2 7 12 12 22 7 12 2\"/><polyline points=\"2 17 12 22 22 17\"/><polyline points=\"2 12 12 17 22 12\"/></svg>";
   const I_ALERT = "<svg width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z\"/><line x1=\"12\" y1=\"9\" x2=\"12\" y2=\"13\"/><line x1=\"12\" y1=\"17\" x2=\"12.01\" y2=\"17\"/></svg>";
+  const I_PLUS = "<svg width=\"13\" height=\"13\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.5\" stroke-linecap=\"round\"><line x1=\"12\" y1=\"5\" x2=\"12\" y2=\"19\"/><line x1=\"5\" y1=\"12\" x2=\"19\" y2=\"12\"/></svg>";
 
-  function renderPriceTarget(box, dvf, commune, savedPrice) {
+  function buildAnnoncesTable(annonces) {
+    if (!annonces.length) {
+      return "<p class=\"pt-ann-empty\">Aucune annonce ajoutée. Cliquez sur « Ajouter une annonce » pour renseigner des biens comparables trouvés sur les portails ci-dessus.</p>";
+    }
+    const rows = annonces.map(function(a, i) {
+      const pm2 = (a.surface > 0 && a.prix > 0) ? Math.round(a.prix / a.surface) : null;
+      return "<tr>"
+        + "<td>" + escHtml(a.type || "—") + "</td>"
+        + "<td>" + escHtml(a.commune || "—") + "</td>"
+        + "<td>" + (a.surface ? escHtml(a.surface + " m²") : "<span class=\"pt-na\">—</span>") + "</td>"
+        + "<td>" + (a.prix ? euro(a.prix) : "<span class=\"pt-na\">—</span>") + "</td>"
+        + "<td class=\"pt-ann-pm2\">" + (pm2 ? euro(pm2) + "/m²" : "<span class=\"pt-na\">—</span>") + "</td>"
+        + "<td>" + (a.url ? "<a href=\"" + escHtml(a.url) + "\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"pt-ann-link\">Voir →</a>" : "<span class=\"pt-na\">—</span>") + "</td>"
+        + "<td><button type=\"button\" class=\"pt-ann-del\" data-idx=\"" + i + "\" aria-label=\"Supprimer\">×</button></td>"
+        + "</tr>";
+    }).join("");
+    return "<div class=\"pt-ann-table-scroll\"><table class=\"pt-ann-table\"><thead><tr>"
+      + "<th>Type</th><th>Commune</th><th>Surface</th><th>Prix affiché</th><th>Prix/m²</th><th>Lien</th><th></th>"
+      + "</tr></thead><tbody>" + rows + "</tbody></table></div>";
+  }
+
+  function buildAnnoncesBloc(annonces, cityHint, typeHint, surfaceHint) {
+    const typeLabel = typeHint === "Appartement" ? "appartements" : "maisons";
+    const lbcUrl = "https://www.leboncoin.fr/recherche?category=9" + (cityHint ? "&text=" + encodeURIComponent(cityHint) : "");
+    const papUrl = "https://www.pap.fr/annonce/ventes-" + typeLabel;
+    const surfaceNote = surfaceHint ? " (votre bien : " + Math.round(surfaceHint) + " m²)" : "";
+    const typeOpts = ["Maison","Appartement","Villa","Terrain"].map(function(t) {
+      return "<option value=\"" + t + "\"" + (t === typeHint ? " selected" : "") + ">" + t + "</option>";
+    }).join("");
+    return "<div class=\"pt-bloc\" id=\"pt-ann-bloc\">"
+      + "<div class=\"pt-bloc-header\"><div class=\"pt-bloc-num\">1</div>"
+      + "<h4 class=\"pt-bloc-title\">Annonces actuellement en vente dans votre commune</h4></div>"
+      + "<div class=\"pt-unavail\">" + I_INFO
+      + "<span class=\"pt-unavail-msg\">Aucune API publique ne donne accès aux annonces immobilières en temps réel en France. Consultez les portails ci-dessous pour trouver des biens comparables" + escHtml(surfaceNote) + " et ajoutez-les manuellement dans le tableau.</span>"
+      + "</div>"
+      + "<div class=\"pt-ann-portals\">"
+      + "<a href=\"" + lbcUrl + "\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"pt-ann-portal\">" + (cityHint ? escHtml(cityHint) + " — " : "") + "Leboncoin</a>"
+      + "<a href=\"" + papUrl + "\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"pt-ann-portal\">PAP.fr — " + escHtml(typeLabel) + "</a>"
+      + "<a href=\"https://www.seloger.com/\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"pt-ann-portal\">SeLoger</a>"
+      + "</div>"
+      + "<div id=\"pt-ann-table-wrap\">" + buildAnnoncesTable(annonces) + "</div>"
+      + "<div class=\"pt-ann-foot\">"
+      + "<button type=\"button\" class=\"pt-ann-add-btn\" id=\"pt-ann-add-btn\">" + I_PLUS + " Ajouter une annonce</button>"
+      + "<span class=\"pt-save-status\" id=\"pt-ann-status\" aria-live=\"polite\"></span>"
+      + "</div>"
+      + "<form class=\"pt-ann-form\" id=\"pt-ann-form\" novalidate>"
+      + "<div class=\"pt-ann-form-row\">"
+      + "<div class=\"pt-ann-fg\"><label for=\"pt-ann-type\">Type</label><select id=\"pt-ann-type\">" + typeOpts + "</select></div>"
+      + "<div class=\"pt-ann-fg\"><label for=\"pt-ann-commune\">Commune</label><input type=\"text\" id=\"pt-ann-commune\" value=\"" + escHtml(cityHint || "") + "\" autocomplete=\"off\"></div>"
+      + "<div class=\"pt-ann-fg\"><label for=\"pt-ann-surface\">Surface (m²) *</label><input type=\"number\" id=\"pt-ann-surface\" min=\"1\" max=\"5000\" step=\"1\" placeholder=\"100\" autocomplete=\"off\"></div>"
+      + "<div class=\"pt-ann-fg\"><label for=\"pt-ann-prix\">Prix affiché (€) *</label><input type=\"number\" id=\"pt-ann-prix\" min=\"1000\" max=\"100000000\" step=\"1000\" placeholder=\"250000\" autocomplete=\"off\"></div>"
+      + "<div class=\"pt-ann-fg pt-ann-fg-url\"><label for=\"pt-ann-url\">Lien <span class=\"pt-ann-opt\">(optionnel)</span></label><input type=\"url\" id=\"pt-ann-url\" placeholder=\"https://www.leboncoin.fr/…\" autocomplete=\"off\"></div>"
+      + "</div>"
+      + "<div class=\"pt-ann-form-actions\">"
+      + "<button type=\"button\" class=\"pt-ann-submit\" id=\"pt-ann-submit\">Ajouter</button>"
+      + "<button type=\"button\" class=\"pt-ann-cancel\" id=\"pt-ann-cancel\">Annuler</button>"
+      + "<span class=\"pt-ann-err\" id=\"pt-ann-err\"></span>"
+      + "</div>"
+      + "</form>"
+      + "</div>";
+  }
+
+  function renderPriceTarget(box, dvf, commune, savedPrice, savedAnnonces) {
     const output = box.querySelector("[data-price-target-output]");
     if (!output) return;
 
@@ -345,12 +408,9 @@
     const surface = dvf?.surface != null ? Number(dvf.surface) : (commune?.surface != null ? Number(commune.surface) : null);
     const hasSurface = surface != null && surface > 0 && Number.isFinite(surface);
 
-    const bloc1 = "<div class=\"pt-bloc\">"
-      + "<div class=\"pt-bloc-header\"><div class=\"pt-bloc-num\">1</div>"
-      + "<h4 class=\"pt-bloc-title\">Maisons actuellement en vente autour de votre bien</h4></div>"
-      + "<div class=\"pt-unavail\">" + I_CLOCK
-      + "<span class=\"pt-unavail-msg\">Données du marché actuellement indisponibles</span>"
-      + "</div></div>";
+    const cityHint = dvf?.city || commune?.city || commune?.commune || "";
+    const typeHint = dvf?.type || commune?.type || "";
+    const bloc1 = buildAnnoncesBloc(Array.isArray(savedAnnonces) ? savedAnnonces : [], cityHint, typeHint, surface);
 
     const communePm2Cell = communeOk ? escHtml(euro(communePm2) + "/m²") : "<span class=\"pt-na\">Indisponible</span>";
     const communeIndicCell = communeIndic ? escHtml(euro(communeIndic)) : "<span class=\"pt-na\">—</span>";
@@ -365,7 +425,7 @@
       + "</tr></thead><tbody>"
       + "<tr><td>1. DVF — Ventes à l'échelle de la commune</td><td>" + communePm2Cell + "</td><td>" + communeIndicCell + "</td></tr>"
       + "<tr><td>2. DVF — Ventes comparables du secteur</td><td>" + dvfPm2Cell + "</td><td>" + dvfIndicCell + "</td></tr>"
-      + "<tr><td>3. Annonces en ligne (concurrence actuelle)</td><td><span class=\"pt-na\">Données indisponibles</span></td><td><span class=\"pt-na\">—</span></td></tr>"
+      + "<tr><td>3. Annonces en ligne (concurrence actuelle)</td><td><span class=\"pt-na\">Non disponible — source non publique</span></td><td><span class=\"pt-na\">—</span></td></tr>"
       + "</tbody></table></div></div>";
 
     let meanPm2 = null, meanIndic = null, overlapWarning = false, availCount = 0;
@@ -443,10 +503,26 @@
 
     function updateFormula(priceVal) {
       if (!Number.isFinite(priceVal) || priceVal <= 0) {
-        formulaEl.innerHTML = "<span class=\"pt-formula-na\">Calcul indisponible — renseignez votre prix souhaité et attendez les données du marché.</span>";
+        formulaEl.innerHTML = "<span class=\"pt-formula-na\">Renseignez votre prix souhaité pour voir l'écart avec le marché.</span>";
         return;
       }
-      formulaEl.innerHTML = "<span class=\"pt-formula-na\">Calcul indisponible — les données des annonces en ligne sont nécessaires pour établir la moyenne du marché.</span>";
+      if (meanPm2 == null || !hasSurface) {
+        formulaEl.innerHTML = "<span class=\"pt-formula-na\">Données de marché insuffisantes pour calculer un prix de référence.</span>";
+        return;
+      }
+      const refPrice = meanIndic != null ? meanIndic : Math.round(meanPm2 * surface);
+      const gapPct = Math.round((priceVal - refPrice) / refPrice * 100);
+      const gapStr = (gapPct > 0 ? "+" : "") + gapPct + "%";
+      const gapClass = Math.abs(gapPct) <= 10 ? "pt-formula-gap pt-formula-ok" : Math.abs(gapPct) <= 20 ? "pt-formula-gap pt-formula-warn" : "pt-formula-gap pt-formula-alert";
+      const sourceLabel = availCount === 2 ? "Réf. DVF (moy. 2 sources)" : (communeOk ? "Réf. DVF commune" : "Réf. DVF secteur");
+      formulaEl.innerHTML =
+        "<div class=\"pt-formula-row\">"
+        + "<div class=\"pt-formula-item\"><span class=\"pt-formula-lbl\">Votre prix</span><span class=\"pt-formula-num\">" + euro(Math.round(priceVal)) + "</span></div>"
+        + "<span class=\"pt-formula-sep\">vs</span>"
+        + "<div class=\"pt-formula-item\"><span class=\"pt-formula-lbl\">" + escHtml(sourceLabel) + "</span><span class=\"pt-formula-num\">" + euro(refPrice) + "</span></div>"
+        + "<span class=\"pt-formula-sep\">=</span>"
+        + "<div class=\"pt-formula-item\"><span class=\"pt-formula-lbl\">Écart</span><span class=\"" + gapClass + "\">" + gapStr + "</span></div>"
+        + "</div>";
     }
 
     if (savedVal != null) updateFormula(savedVal);
@@ -484,6 +560,89 @@
         }
       }, 800);
     });
+
+    // ── Annonces comparables ──────────────────────────────────────
+    let _annonces = Array.isArray(savedAnnonces) ? savedAnnonces.slice() : [];
+    const annWrap = output.querySelector("#pt-ann-table-wrap");
+    const annStatus = output.querySelector("#pt-ann-status");
+    const annForm = output.querySelector("#pt-ann-form");
+    const annAddBtn = output.querySelector("#pt-ann-add-btn");
+    const annErr = output.querySelector("#pt-ann-err");
+
+    function wireAnnDel() {
+      annWrap && annWrap.querySelectorAll(".pt-ann-del").forEach(function(btn) {
+        btn.addEventListener("click", function() {
+          _annonces.splice(Number(btn.dataset.idx), 1);
+          if (annWrap) annWrap.innerHTML = buildAnnoncesTable(_annonces);
+          wireAnnDel();
+          saveAnn();
+        });
+      });
+    }
+    wireAnnDel();
+
+    async function saveAnn() {
+      if (!annStatus) return;
+      annStatus.textContent = "Enregistrement…";
+      annStatus.className = "pt-save-status pt-save-saving";
+      try {
+        const r = await fetch("/api/formation/annonces-comparables", {
+          method: "POST", credentials: "same-origin",
+          headers: {"Content-Type": "application/json", Accept: "application/json"},
+          body: JSON.stringify({annonces: _annonces})
+        });
+        if (r.ok) {
+          annStatus.textContent = "✓ Enregistré";
+          annStatus.className = "pt-save-status pt-save-ok";
+          setTimeout(function() { if (annStatus) { annStatus.textContent = ""; annStatus.className = "pt-save-status"; } }, 2500);
+        } else {
+          annStatus.textContent = "Erreur d'enregistrement";
+          annStatus.className = "pt-save-status pt-save-error";
+        }
+      } catch {
+        annStatus.textContent = "Erreur de connexion";
+        annStatus.className = "pt-save-status pt-save-error";
+      }
+    }
+
+    annAddBtn && annAddBtn.addEventListener("click", function() {
+      if (!annForm) return;
+      const open = annForm.style.display !== "none";
+      annForm.style.display = open ? "none" : "block";
+      if (!open) { const el = output.querySelector("#pt-ann-surface"); if (el) el.focus(); }
+    });
+
+    output.querySelector("#pt-ann-cancel") && output.querySelector("#pt-ann-cancel").addEventListener("click", function() {
+      if (annForm) annForm.style.display = "none";
+      if (annErr) annErr.textContent = "";
+    });
+
+    output.querySelector("#pt-ann-submit") && output.querySelector("#pt-ann-submit").addEventListener("click", function() {
+      const type = (output.querySelector("#pt-ann-type") || {}).value || "Maison";
+      const commune = ((output.querySelector("#pt-ann-commune") || {}).value || "").trim();
+      const surface = Math.round(Number((output.querySelector("#pt-ann-surface") || {}).value));
+      const prix = Math.round(Number((output.querySelector("#pt-ann-prix") || {}).value));
+      const url = ((output.querySelector("#pt-ann-url") || {}).value || "").trim();
+      if (!(surface > 0 && prix > 0)) {
+        if (annErr) annErr.textContent = "Surface et prix sont requis.";
+        return;
+      }
+      if (annErr) annErr.textContent = "";
+      _annonces.push({
+        type: type,
+        commune: commune || cityHint,
+        surface: surface,
+        prix: prix,
+        url: (url && /^https?:\/\//.test(url)) ? url : null
+      });
+      ["#pt-ann-surface","#pt-ann-prix","#pt-ann-url"].forEach(function(sel) {
+        const el = output.querySelector(sel); if (el) el.value = "";
+      });
+      if (annForm) annForm.style.display = "none";
+      if (annWrap) annWrap.innerHTML = buildAnnoncesTable(_annonces);
+      wireAnnDel();
+      saveAnn();
+    });
   }
 
   window.initPriceTarget = () => {
@@ -497,9 +656,14 @@
       communeResult,
       fetch("/api/formation/prix-souhaite", {credentials: "same-origin", headers: {Accept: "application/json"}})
         .then(r => r.ok ? r.json() : {prix_souhaite: null})
-        .catch(() => ({prix_souhaite: null}))
-    ]).then(([dvf, commune, priceData]) => {
-      renderPriceTarget(box, dvf, commune, priceData && priceData.prix_souhaite != null ? priceData.prix_souhaite : null);
+        .catch(() => ({prix_souhaite: null})),
+      fetch("/api/formation/annonces-comparables", {credentials: "same-origin", headers: {Accept: "application/json"}})
+        .then(r => r.ok ? r.json() : {annonces: []})
+        .catch(() => ({annonces: []}))
+    ]).then(([dvf, commune, priceData, annoncesData]) => {
+      renderPriceTarget(box, dvf, commune,
+        priceData && priceData.prix_souhaite != null ? priceData.prix_souhaite : null,
+        annoncesData && Array.isArray(annoncesData.annonces) ? annoncesData.annonces : []);
     });
   };
 

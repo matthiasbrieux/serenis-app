@@ -213,6 +213,35 @@ router.post('/api/formation/prix-souhaite', requireAuth, express.json(), (req, r
   }
 });
 
+router.get('/api/formation/annonces-comparables', requireAuth, (req, res) => {
+  try {
+    const row = db.prepare('SELECT annonces_comparables FROM properties WHERE seller_id = ?').get(req.seller.id);
+    const annonces = row?.annonces_comparables ? JSON.parse(row.annonces_comparables) : [];
+    res.json({ annonces: Array.isArray(annonces) ? annonces : [] });
+  } catch {
+    res.status(500).json({ error: 'Erreur serveur' });
+  }
+});
+
+router.post('/api/formation/annonces-comparables', requireAuth, express.json(), (req, res) => {
+  try {
+    const input = req.body?.annonces;
+    if (!Array.isArray(input)) return res.status(400).json({ error: 'Format invalide' });
+    const clean = input.slice(0, 20).map(a => ({
+      type: ['Maison','Appartement','Villa','Terrain'].includes(String(a.type)) ? String(a.type) : 'Maison',
+      commune: String(a.commune || '').slice(0, 100).trim(),
+      surface: Number(a.surface) > 0 ? Math.round(Number(a.surface)) : null,
+      prix: Number(a.prix) > 0 ? Math.round(Number(a.prix)) : null,
+      url: (typeof a.url === 'string' && /^https?:\/\//.test(a.url)) ? a.url.slice(0, 500) : null
+    })).filter(a => a.surface > 0 && a.prix > 0);
+    db.prepare('UPDATE properties SET annonces_comparables = ?, updated_at = CURRENT_TIMESTAMP WHERE seller_id = ?')
+      .run(JSON.stringify(clean), req.seller.id);
+    res.json({ ok: true, count: clean.length });
+  } catch {
+    res.status(500).json({ error: 'Erreur serveur' });
+  }
+});
+
 // Property CRUD
 router.get('/api/property', requireAuth, (req, res) => {
   const property = db.prepare('SELECT * FROM properties WHERE seller_id = ?').get(req.seller.id);
@@ -241,7 +270,8 @@ router.post('/api/property', requireAuth, express.json(), (req, res) => {
     'facture_eau','facture_electricite','facture_gaz',
     'commerces','school_maternelle','school_primaire','school_college','school_lycee',
     'highway','train_station','equipment','sale_reason','price','description','rooms_detail',
-    'virtual_tour_url','travaux_recents','exterieur_photos_public','pro_photos_public','decouverte_photos_public','details_photos_public','diagnostics_in_dossier','plan_docs_visible','acheteur_docs_visible'
+    'virtual_tour_url','travaux_recents','exterieur_photos_public','pro_photos_public','decouverte_photos_public','details_photos_public','diagnostics_in_dossier','plan_docs_visible','acheteur_docs_visible',
+    'code_insee','latitude','longitude','garage_attenant','garage_porte_largeur','garage_porte_hauteur'
   ];
   const data = {};
   fields.forEach(f => { if (req.body[f] !== undefined) data[f] = req.body[f]; });
@@ -509,7 +539,7 @@ router.post('/api/property/generate-description', requireAuth, aiRateLimit, expr
   try {
     const response = await client.messages.create({
       model: 'claude-haiku-4-5-20251001',
-      max_tokens: 500,
+      max_tokens: 800,
       system: `Tu es un rédacteur d'annonces immobilières expert pour particuliers vendeurs en France.
 Tu rédiges des annonces COURTES, PERCUTANTES, 100% factuelles. Total : 10 à 12 lignes maximum.
 MOTS INTERDITS : havre de paix, écrin de verdure, nid douillet, coup de cœur, exceptionnel, magnifique, paradis, idéal pour, rêve, charme intemporel, sérénité, cosy.

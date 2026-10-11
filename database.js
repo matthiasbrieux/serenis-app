@@ -379,6 +379,12 @@ const newCols = [
   "ALTER TABLE properties ADD COLUMN dpe_annee_ref TEXT",
   "ALTER TABLE properties ADD COLUMN dpe_date TEXT",
   "ALTER TABLE properties ADD COLUMN prix_souhaite INTEGER",
+  "ALTER TABLE properties ADD COLUMN code_insee TEXT",
+  "ALTER TABLE properties ADD COLUMN latitude REAL",
+  "ALTER TABLE properties ADD COLUMN longitude REAL",
+  "ALTER TABLE properties ADD COLUMN garage_attenant TEXT",
+  "ALTER TABLE properties ADD COLUMN garage_porte_largeur REAL",
+  "ALTER TABLE properties ADD COLUMN garage_porte_hauteur REAL",
 ];
 newCols.forEach(sql => { try { db.exec(sql); } catch(e) {} });
 
@@ -628,6 +634,7 @@ db.exec(`
 // tentatives ratées, plutôt qu'à chaque connexion (voir routes/auth.js).
 try { db.exec("ALTER TABLE sellers ADD COLUMN failed_login_attempts INTEGER DEFAULT 0"); } catch(e) {}
 try { db.exec("ALTER TABLE admins ADD COLUMN failed_login_attempts INTEGER DEFAULT 0"); } catch(e) {}
+try { db.exec("ALTER TABLE properties ADD COLUMN annonces_comparables TEXT"); } catch(e) {}
 
 // ── Tables VRP ──────────────────────────────────────────────────
 try {
