@@ -434,6 +434,9 @@ try { db.exec("ALTER TABLE properties ADD COLUMN floor INTEGER"); } catch(e) {}
 try { db.exec("ALTER TABLE properties ADD COLUMN furnished BOOLEAN DEFAULT 0"); } catch(e) {}
 try { db.exec("ALTER TABLE property_publications ADD COLUMN updated_at DATETIME"); } catch(e) {}
 
+// ── Montant payé réel (centimes Stripe) — suivi CA encaissé ──
+try { db.exec("ALTER TABLE sellers ADD COLUMN paid_amount INTEGER"); } catch(e) {}
+
 // ── Réinitialisation de mot de passe ─────────────────────────
 db.exec(`
   CREATE TABLE IF NOT EXISTS password_reset_tokens (
@@ -635,6 +638,15 @@ db.exec(`
 try { db.exec("ALTER TABLE sellers ADD COLUMN failed_login_attempts INTEGER DEFAULT 0"); } catch(e) {}
 try { db.exec("ALTER TABLE admins ADD COLUMN failed_login_attempts INTEGER DEFAULT 0"); } catch(e) {}
 try { db.exec("ALTER TABLE properties ADD COLUMN annonces_comparables TEXT"); } catch(e) {}
+try { db.exec("ALTER TABLE properties ADD COLUMN annonces_marche_cache TEXT"); } catch(e) {}
+try { db.exec("ALTER TABLE properties ADD COLUMN annonces_marche_cached_at DATETIME"); } catch(e) {}
+try {
+  db.exec(`CREATE TABLE IF NOT EXISTS commune_annonces_cache (
+    cache_key TEXT PRIMARY KEY,
+    data TEXT NOT NULL,
+    cached_at DATETIME DEFAULT CURRENT_TIMESTAMP
+  )`);
+} catch(e) {}
 
 // ── Tables VRP ──────────────────────────────────────────────────
 try {

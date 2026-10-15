@@ -49,12 +49,12 @@ router.post('/create-checkout', express.json(), checkoutLimit, async (req, res) 
 
   let amount, productName, productDesc;
   if (isSerenite) {
-    amount = 99900; // 999€ unique
-    productName = 'Vendu Par Moi — Pack Coaching Plus';
-    productDesc = 'Pack Coaching Plus · Fiche descriptive · Agenda intelligent · SMS automatiques · Formation complète · Coach IA';
+    amount = 154700; // 1 547 € TTC — Pack Accompagnement
+    productName = 'Vendu Par Moi — Pack Accompagnement';
+    productDesc = 'Pack Accompagnement · Fiche descriptive · Agenda intelligent · SMS automatiques · Formation complète · Coach IA · Photographe pro';
   } else {
-    amount = 49900; // 499€ — Pack Autonome
-    productName = 'Vendu Par Moi — Pack Autonome';
+    amount = 99900; // 999 € TTC — Pack Autonomie
+    productName = 'Vendu Par Moi — Pack Autonomie';
     productDesc = 'Fiche descriptive · Agenda intelligent · SMS automatiques · Formation complète · Coach IA';
   }
 
@@ -111,7 +111,7 @@ router.get('/paiement-succes', async (req, res) => {
 
     // Auto-login
     const token = require('../services/session').sign(seller, 'seller');
-    res.cookie('token', token, { httpOnly: true, secure: true, sameSite: 'lax', maxAge: 30 * 24 * 3600 * 1000 });
+    res.cookie('token', token, { httpOnly: true, secure: process.env.NODE_ENV === 'production', sameSite: 'lax', maxAge: 30 * 24 * 3600 * 1000 });
     res.redirect('/booking');
   } catch (err) {
     console.error('Payment success error:', err.message);
@@ -204,8 +204,8 @@ async function activateSeller(session) {
 
   if (seller) {
     // Activer le compte existant — AND paid_at IS NULL pour idempotence (P2-6)
-    const result = db.prepare('UPDATE sellers SET paid_at=CURRENT_TIMESTAMP, stripe_session_id=?, stripe_customer_id=?, pack=? WHERE id=? AND paid_at IS NULL')
-      .run(session.id, session.customer || null, pack || seller.pack, seller.id);
+    const result = db.prepare('UPDATE sellers SET paid_at=CURRENT_TIMESTAMP, stripe_session_id=?, stripe_customer_id=?, pack=?, paid_amount=? WHERE id=? AND paid_at IS NULL')
+      .run(session.id, session.customer || null, pack || seller.pack, session.amount_total || null, seller.id);
     if (result.changes === 0) return null; // déjà activé (double webhook / double appel)
   } else {
     // Créer le compte (cas webhook sans pré-création)
@@ -260,7 +260,7 @@ async function activateSeller(session) {
 
   // Facture automatique
   try {
-    const amount = session.amount_total || (pack === 'serenite' ? 99900 : 49900);
+    const amount = session.amount_total || (pack === 'serenite' ? 154700 : 99900);
     const invoiceNumber = `VPM-${new Date().getFullYear()}-${String(seller.id).padStart(5, '0')}-${Date.now().toString(36).toUpperCase()}`;
     await sendInvoiceEmail({ email: seller.email, firstName: seller.first_name, amount, pack: pack || 'serenite', invoiceNumber, date: new Date() });
   } catch(e) { console.error('Invoice email error:', e.message); }

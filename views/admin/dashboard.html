@@ -247,8 +247,8 @@
       <div class="form-group">
         <label>Pack *</label>
         <select name="pack" required>
-          <option value="autonome">Pack Autonome — 499 €</option>
-          <option value="serenite">Pack Coaching Plus — 999 €</option>
+          <option value="autonome">Pack Autonomie — 999 €</option>
+          <option value="serenite">Pack Accompagnement — 1 547 €</option>
         </select>
       </div>
       <button type="submit" class="btn-primary btn-full">Créer le compte</button>
@@ -275,7 +275,7 @@ let allClients = [];
 // ── TODOS ──────────────────────────────────────────────────────
 const TODO_CONFIG = {
   new_signup:    { icon: '🆕', label: 'Nouveau client',          action: 'Accueilli ✓',   color: '#059669' },
-  autonome_call: { icon: '📞', label: 'À appeler (Pack Autonome)', action: 'Appelé ✓',     color: '#C4603A' },
+  autonome_call: { icon: '📞', label: 'À appeler (Pack Autonomie)', action: 'Appelé ✓',     color: '#C4603A' },
   formation_rdv: { icon: '📅', label: 'Planifier la formation',   action: 'RDV planifié ✓', color: '#C4603A' },
 };
 
@@ -335,7 +335,7 @@ async function loadStats() {
   const res = await fetch('/admin/api/stats');
   const data = await res.json();
   document.getElementById('statRevenue').textContent = Number(data.revenue.total).toLocaleString('fr-FR') + ' €';
-  document.getElementById('revDetail').textContent = `Autonome: ${data.revenue.autonome.count} × 499€ — Coaching Plus: ${data.revenue.serenite.count} × 999€`;
+  document.getElementById('revDetail').textContent = `Autonomie : ${data.revenue.autonome.count} × 999 € — Accompagnement : ${data.revenue.serenite.count} × 1 547 €`;
   document.getElementById('statClients').textContent = data.sellers;
   document.getElementById('statProps').textContent = data.properties_active;
   document.getElementById('statContacts').textContent = data.contacts;

@@ -6,6 +6,19 @@ const FROM_EMAIL = process.env.SENDGRID_FROM_EMAIL || 'contact@venduparmoi.fr';
 const FROM_NAME  = 'Vendu Par Moi';
 const BASE_URL   = process.env.BASE_URL || 'https://www.venduparmoi.fr';
 
+// Mentions légales — à renseigner via variables d'environnement lors de
+// l'immatriculation. Tant que les valeurs restent XXXXX, le bloc légal
+// n'est PAS inséré dans les factures envoyées automatiquement.
+const LEGAL_RAISON_SOCIALE  = process.env.LEGAL_RAISON_SOCIALE  || 'XXXXX';
+const LEGAL_FORME_JURIDIQUE = process.env.LEGAL_FORME_JURIDIQUE || 'XXXXX';
+const LEGAL_ADRESSE_SIEGE   = process.env.LEGAL_ADRESSE_SIEGE   || 'XXXXX';
+const LEGAL_SIREN           = process.env.LEGAL_SIREN           || 'XXXXX';
+const LEGAL_RCS             = process.env.LEGAL_RCS             || 'XXXXX';
+const LEGAL_TVA_INTRA       = process.env.LEGAL_TVA_INTRA       || null;
+function legalInfoReady() {
+  return LEGAL_SIREN !== 'XXXXX' && LEGAL_RAISON_SOCIALE !== 'XXXXX';
+}
+
 // Le logo est encodé en base64 et intégré directement dans le HTML plutôt que
 // chargé depuis une URL distante : beaucoup de clients mail (Gmail, Apple
 // Mail…) bloquent les images distantes par défaut, ce qui affichait un
@@ -162,7 +175,7 @@ function badge(text, color = '#C4603A') {
 // ─────────────────────────────────────────────────────────────
 
 async function sendWelcomeImproved({ email, firstName, pack, loginUrl }) {
-  const packLabel = pack === 'serenite' ? 'Pack Coaching Plus' : 'Pack Autonome';
+  const packLabel = pack === 'serenite' ? 'Pack Accompagnement' : 'Pack Autonomie';
   const nextSteps = pack === 'serenite'
     ? '<li>Réservez votre séance photo professionnelle</li><li>Créez votre fiche bien</li><li>Préparez vos documents</li>'
     : '<li>Créez votre fiche bien</li><li>Ajoutez vos photos</li><li>Préparez vos documents</li>';
@@ -227,7 +240,7 @@ async function sendVisitConfirmation(buyerEmail, buyerName, property, visitDate,
     ${h1(isReminder ? `Rappel : votre visite est demain` : `Votre visite est confirmée, ${buyerName || ''} !`)}
     ${p(isReminder
       ? `Nous vous rappelons que vous avez une visite prévue <strong>demain</strong>. Voici les détails ci-dessous.`
-      : `Votre demande de visite a bien été enregistrée. Le propriétaire vous attend aux horaires indiqués.`
+      : `Votre rendez-vous avec le propriétaire a bien été enregistré.`
     )}
     ${infoTable(`
       ${infoRow('Bien', `${typeLabel} — ${property.city || ''}`)}
@@ -235,9 +248,9 @@ async function sendVisitConfirmation(buyerEmail, buyerName, property, visitDate,
       ${infoRow('Date', formattedDate)}
       ${infoRow('Heure', visitTime)}
     `)}
-    ${p('Si vous ne pouvez plus vous présenter, merci de prévenir le propriétaire dès que possible.')}
+    ${p('Si vous ne pouvez plus vous présenter, merci de contacter directement le propriétaire afin de le prévenir.')}
     ${divider()}
-    ${muted('Cette visite a été organisée via la plateforme <strong>Vendu Par Moi</strong>.')}
+    ${muted('Cet e-mail est envoyé automatiquement à la suite de votre réservation depuis l\'agenda mis à disposition par le propriétaire.')}
   `, { preheader: `Votre visite est confirmée — ${formattedDate} à ${visitTime}` });
 
   return send(buyerEmail, `${subjectPrefix}Visite — ${typeLabel} à ${property.city || ''}`, html);
@@ -305,24 +318,26 @@ async function sendDossierToNotaire({ to, notaireName, dossierUrl, propertyAddre
 // 5. PUBLICATION & VENTE
 // ─────────────────────────────────────────────────────────────
 
-async function sendPublishedConfirmation({ email, propertySlug }) {
+async function sendPublishedConfirmation({ email, propertySlug, hasActiveSlots }) {
   const publicUrl = `${BASE_URL}/bien/${propertySlug}`;
+  const agendaItems = hasActiveSlots ? `
+      <li>Votre agenda est ouvert : les acheteurs peuvent réserver leurs créneaux de visite en ligne.</li>
+      <li>Vous recevrez une notification à chaque nouvelle réservation.</li>` : '';
   const html = layout(`
     ${badge('🚀 Bien publié', '#C4603A')}
-    ${h1('Votre bien est en ligne !')}
-    ${p('Félicitations ! Vous avez suivi toutes les étapes de préparation de commercialisation, votre dossier est prêt. Votre annonce n\'attend plus que vous pour être visible par les acheteurs.')}
+    ${h1('Votre bien est prêt à être mis en ligne !')}
+    ${p('Félicitations ! Vous avez terminé toutes les étapes de préparation. Votre dossier est complet et votre annonce est prête à être diffusée auprès des acheteurs.')}
     ${btn('Voir mon annonce', publicUrl)}
     ${h2('Et maintenant ?')}
     <ul style="font-size:14px;color:#4a4540;line-height:2;padding-left:20px;margin:0 0 16px;">
-      <li>Diffusez votre annonce sur LeBonCoin, SeLoger, PAP...</li>
-      <li>Partagez le lien à vos contacts</li>
-      <li>Votre agenda est ouvert — les acheteurs peuvent réserver en ligne</li>
-      <li>Vous recevrez une notification à chaque nouvelle réservation</li>
+      <li>Choisissez les plateformes sur lesquelles vous souhaitez diffuser votre annonce : Leboncoin, SeLoger, PAP…</li>
+      <li>Partagez votre annonce à vos contacts si vous le souhaitez.</li>
+      ${agendaItems}
     </ul>
     ${divider()}
-    ${muted('Suivez vos performances depuis votre espace vendeur.')}
-  `, { preheader: 'Votre bien est en ligne — les acheteurs peuvent le consulter.' });
-  return send(email, '🚀 Votre bien est en ligne !', html);
+    ${muted('Suivez vos demandes et vos réservations directement depuis votre espace vendeur.')}
+  `, { preheader: 'Votre bien est prêt à être mis en ligne — les acheteurs peuvent le consulter.' });
+  return send(email, '🚀 Votre bien est prêt à être mis en ligne !', html);
 }
 
 async function sendSoldCongrats({ email, firstName, address, price }) {
@@ -357,12 +372,29 @@ async function sendPropertySoldToBuyer({ buyerEmail, buyerName, propertyType, pr
 // 6. FACTURE / PAIEMENT
 // ─────────────────────────────────────────────────────────────
 
-async function sendInvoiceEmail({ email, firstName, amount, pack, invoiceNumber, date }) {
+async function sendInvoiceEmail({ email, firstName, lastName, amount, pack, invoiceNumber, date }) {
   const amountTTC = (amount / 100).toFixed(2).replace('.', ',');
   const amountHT  = ((amount / 100) / 1.2).toFixed(2).replace('.', ',');
   const tva       = ((amount / 100) - (amount / 100) / 1.2).toFixed(2).replace('.', ',');
-  const packLabel = pack === 'serenite' ? 'Pack Coaching Plus' : 'Pack Autonome';
+  const packLabel = pack === 'serenite' ? 'Pack Accompagnement' : 'Pack Autonomie';
   const dateStr   = new Date(date).toLocaleDateString('fr-FR');
+  const clientName = `${firstName || ''} ${lastName || ''}`.trim() || '—';
+  const legalBlock = legalInfoReady() ? `
+    ${divider()}
+    ${infoTable(`
+      ${infoRow('Prestataire', `VENDU PAR MOI — ${LEGAL_RAISON_SOCIALE} (${LEGAL_FORME_JURIDIQUE})`)}
+      ${infoRow('Siège social', LEGAL_ADRESSE_SIEGE)}
+      ${infoRow('SIREN', LEGAL_SIREN)}
+      ${infoRow('RCS/RNE', LEGAL_RCS)}
+      ${LEGAL_TVA_INTRA ? infoRow('N° TVA intracommunautaire', LEGAL_TVA_INTRA) : ''}
+      ${infoRow('Client', clientName)}
+      ${infoRow('Nature de l\'opération', `Prestation de services — ${packLabel}`)}
+      ${infoRow('Date / encaissement', dateStr)}
+      ${infoRow('Mode de règlement', 'Carte bancaire (Stripe)')}
+      ${infoRow('Échéance', 'Paiement à la commande')}
+      ${infoRow('Escompte anticipé', 'Néant')}
+    `)}
+  ` : '';
   const html = layout(`
     ${badge('🧾 Facture', '#C4603A')}
     ${h1(`Facture — ${packLabel}`)}
@@ -376,7 +408,8 @@ async function sendInvoiceEmail({ email, firstName, amount, pack, invoiceNumber,
       ${infoRow('TVA (20%)', `${tva} €`)}
       ${infoRow('Total TTC', `<strong>${amountTTC} €</strong>`)}
     `)}
-    ${p('Cette facture fait foi pour votre comptabilité. Conservez-la précieusement.')}
+    ${p('Merci pour votre confiance.')}
+    ${legalBlock}
     ${divider()}
     ${muted('Pour toute question, contactez-nous à <a href="mailto:contact@venduparmoi.fr" style="color:#C4603A;">contact@venduparmoi.fr</a>')}
   `, { preheader: `Votre facture Vendu Par Moi — ${amountTTC} € TTC` });
@@ -387,14 +420,15 @@ async function sendInvoiceEmail({ email, firstName, amount, pack, invoiceNumber,
 // 7. CONTRAT
 // ─────────────────────────────────────────────────────────────
 
-async function sendContractRenewal({ email, firstName, expiryDate, daysLeft }) {
+async function sendContractRenewal({ email, firstName, expiryDate, daysLeft, twilioNumber }) {
   const expiryStr = new Date(expiryDate).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' });
   const html = layout(`
     ${badge(`⚠️ Contrat — J-${daysLeft}`, '#C4785A')}
     ${h1(`Votre accès expire dans ${daysLeft} jours`)}
     ${p(`Bonjour ${firstName || ''},`)}
-    ${p(`Votre contrat Vendu Par Moi arrive à expiration le <strong>${expiryStr}</strong>. Si votre bien n'est pas encore vendu, pensez à renouveler votre accès pour continuer à bénéficier de la plateforme et de votre numéro dédié.`)}
-    ${btn('Renouveler mon accès', `${BASE_URL}/tarifs`, '#C4785A')}
+    ${p(`Votre accès Vendu Par Moi arrive à expiration le <strong>${expiryStr}</strong>.`)}
+    ${p(`Si votre bien n'est pas encore vendu et que vous souhaitez continuer à bénéficier de votre espace vendeur${twilioNumber ? ' et de votre numéro dédié' : ''}, vous pouvez prolonger votre accès.`)}
+    ${btn('Prolonger mon accès', `${BASE_URL}/tarifs`, '#C4785A')}
     ${p('Si votre vente est finalisée, félicitations ! Vous pouvez nous le signaler depuis votre espace vendeur.')}
     ${divider()}
     ${muted('Une question ? Contactez-nous à <a href="mailto:contact@venduparmoi.fr" style="color:#C4603A;">contact@venduparmoi.fr</a>')}
@@ -411,7 +445,7 @@ async function sendReviewRequest({ email, firstName, daysSold, propertyCity }) {
     ${badge('⭐ Votre avis', '#C4785A')}
     ${h1(`Comment s'est passée votre vente ?`)}
     ${p(`Bonjour ${firstName || ''},`)}
-    ${p(`Vous avez vendu votre bien à <strong>${propertyCity || ''}</strong>${daysSold ? ` en ${daysSold} jours` : ''} grâce à Vendu Par Moi. Nous espérons que l'expérience a été à la hauteur de vos attentes.`)}
+    ${p(`Vous avez vendu votre bien avec l'accompagnement de Vendu Par Moi. Nous espérons que l'expérience a été à la hauteur de vos attentes.`)}
     ${p('Votre retour est précieux pour nous améliorer et aider les futurs vendeurs — cela ne prend que 2 minutes.')}
     ${btn('Laisser mon avis', 'https://g.page/r/venduparmo/review', '#C4785A')}
     ${p('Vous êtes dans notre secteur ? Nous serions ravis de venir trinquer avec vous pour célébrer votre vente — répondez simplement à cet email avec vos disponibilités.')}
@@ -473,17 +507,17 @@ async function sendNewOfferEmail({ sellerEmail, sellerFirstName, buyerName, amou
   const amountFmt = Number(amount).toLocaleString('fr-FR') + ' €';
   const html = layout(`
     ${badge('💰 Nouvelle offre', '#C4603A')}
-    ${h1(`${buyerName} vous a fait une offre`)}
+    ${h1(`${buyerName} vous a transmis une offre`)}
     ${p(`Bonjour ${sellerFirstName || ''},`)}
-    ${p(`Vous venez de recevoir une offre d'achat pour votre bien${city ? ` à <strong>${city}</strong>` : ''} :`)}
-    ${infoTable([
-      ['Acheteur', buyerName],
-      ['Montant proposé', `<strong style="color:#C4603A;font-size:1.1em;">${amountFmt}</strong>`],
-    ])}
-    ${p('Connectez-vous à votre espace vendeur pour consulter l\'offre, répondre ou faire une contre-offre.')}
+    ${p(`Vous venez de recevoir une offre d'achat concernant votre bien${city ? ` à <strong>${city}</strong>` : ''} :`)}
+    ${infoTable(`
+      ${infoRow('Acheteur', buyerName)}
+      ${infoRow('Montant proposé', `<strong style="color:#C4603A;font-size:1.1em;">${amountFmt}</strong>`)}
+    `)}
+    ${p('Connectez-vous à votre espace vendeur pour consulter l\'offre et y répondre directement.')}
     ${btn('Voir l\'offre', offersUrl || `${BASE_URL}/mes-offres`, '#C4603A')}
     ${divider()}
-    ${muted('Cette notification vous a été envoyée car vous avez reçu une offre sur votre bien via Vendu Par Moi.')}
+    ${muted('Cette notification est envoyée automatiquement à la suite d\'une offre transmise par un acheteur depuis votre espace vendeur.')}
   `, { preheader: `${buyerName} propose ${amountFmt} pour votre bien.` });
   return send(sellerEmail, `💰 Nouvelle offre de ${buyerName} — ${amountFmt}`, html);
 }
@@ -523,7 +557,7 @@ async function sendNoPhotosNudge({ email }) {
   const html = layout(`
     ${badge('📷 Photos manquantes', '#C4785A')}
     ${h1('Photos manquantes')}
-    ${p('Pensez à ajouter vos photos dès maintenant — elles seront intégrées automatiquement dans votre dossier acheteur, prêt à être envoyé en 1 clic dès le premier contact. La qualité de vos photos compte : c\'est la première impression que les acheteurs auront de votre bien. Besoin d\'aide ? L\'espace formation vous guide pas à pas et notre guide photo vous aide à réussir vos clichés.')}
+    ${p('Pensez à ajouter vos photos dès maintenant — elles seront intégrées automatiquement dans votre dossier acheteur, prêt à être envoyé en 1 clic dès le premier contact. La qualité de vos photos compte : c\'est la première impression que les acheteurs auront de votre bien. Besoin d\'aide ? Votre espace formation vous explique comment organiser vos différents albums photos, et notre guide photos vous accompagne pour réussir vos clichés.')}
     ${btn('Ajouter mes photos', `${BASE_URL}/mon-bien`)}
     ${muted('Vous souhaitez des photos encore plus qualitatives ? Nous pouvons vous mettre en relation avec un photographe professionnel qui sublimera votre bien.')}
   `, { preheader: 'Vos photos sont manquantes — ajoutez-les pour attirer plus d\'acheteurs.' });
@@ -541,17 +575,20 @@ async function sendNotPublishedNudge({ email, score }) {
   return send(email, '🚀 Publiez votre annonce — votre dossier est prêt', html);
 }
 
-async function sendMissingDocNudge({ email, missingDocs }) {
+async function sendMissingDocNudge({ email, firstName, missingDocs }) {
   const docList = (missingDocs || []).map(d => `<li>${d}</li>`).join('');
   const html = layout(`
     ${badge('📋 Documents manquants', '#C4785A')}
-    ${h1('Quelques documents à ajouter')}
-    ${p('Les acheteurs sérieux vérifient toujours les informations réglementaires avant de visiter. Les éléments suivants manquent encore dans votre dossier :')}
+    ${h1('Quelques documents sont encore manquants')}
+    ${p(`Bonjour ${firstName || ''},`)}
+    ${p('Il vous manque encore quelques éléments pour que votre dossier acheteur soit complet :')}
     <ul style="font-size:15px;color:#4a4540;line-height:2;padding-left:20px;margin:0 0 20px;">${docList}</ul>
-    ${p('Ajoutez-les dès maintenant pour rassurer vos acheteurs et éviter les questions répétées lors des visites.')}
+    ${p('Pensez à les ajouter dès que vous les avez à disposition afin de finaliser votre espace vendeur.')}
     ${btn('Compléter mon dossier', `${BASE_URL}/mon-bien`)}
+    ${divider()}
+    ${muted('À très bientôt,<br>L\'équipe Vendu Par Moi')}
   `, { preheader: 'Quelques documents manquent dans votre dossier — complétez-le.' });
-  return send(email, '📋 Documents manquants dans votre dossier', html);
+  return send(email, 'Documents manquants dans votre dossier', html);
 }
 
 async function sendPostFirstVisitFeedbackSeller({ email, firstName }) {
@@ -571,6 +608,31 @@ async function sendPostFirstVisitFeedbackSeller({ email, firstName }) {
     ${muted('Une question sur la négociation ou la suite ? Votre coach IA est disponible 7j/7 depuis votre espace.')}
   `, { preheader: 'Félicitations pour votre première visite — quelques conseils pour la suite.' });
   return send(email, '🏡 Après votre première visite — conseils', html);
+}
+
+async function sendFirstVisitReminderSeller({ email, firstName }) {
+  const html = layout(`
+    ${badge('🏡 Première visite', '#C4603A')}
+    ${h1('Votre première visite approche !')}
+    ${p(`Bonjour ${firstName || ''},`)}
+    ${p('Votre première visite approche ! C\'est une étape importante dans votre projet de vente, et vous avez déjà toutes les clés pour l\'aborder sereinement.')}
+    ${h2('Quelques bons réflexes à garder en tête :')}
+    <ul style="font-size:15px;color:#4a4540;line-height:2;padding-left:20px;margin:0 0 20px;">
+      <li><strong>Préparez votre intérieur :</strong> une maison rangée, lumineuse et accueillante permet aux acheteurs de mieux se projeter.</li>
+      <li><strong>Accueillez naturellement vos visiteurs :</strong> soyez souriant, disponible et laissez-leur le temps de découvrir votre bien.</li>
+      <li><strong>Présentez les points forts de votre maison :</strong> restez simple, sincère et transparent dans vos réponses.</li>
+      <li><strong>Laissez les acheteurs s\'exprimer :</strong> écoutez leurs questions et leurs remarques sans chercher à tout prix à les convaincre.</li>
+      <li><strong>Terminez la visite sereinement :</strong> laissez-leur le temps de réfléchir et rappelez-leur qu\'ils peuvent vous contacter s\'ils ont des questions.</li>
+    </ul>
+    ${h2('Et surtout, faites-vous confiance !')}
+    ${p('Vous connaissez votre maison mieux que personne. Vous n\'avez pas besoin d\'être un professionnel de l\'immobilier pour réussir votre visite.')}
+    ${p('Votre formation Vendu Par Moi est là pour vous accompagner à chaque étape. N\'hésitez pas à revoir nos conseils avant votre rendez-vous.')}
+    ${btn('Revoir mes conseils de visite', `${BASE_URL}/ma-formation#formation/lecon/5/1`)}
+    ${divider()}
+    ${p('Nous vous souhaitons une excellente première visite !')}
+    ${muted('L\'équipe Vendu Par Moi<br>L\'immobilier entre particuliers')}
+  `, { preheader: 'Votre première visite approche — quelques conseils pour l\'aborder sereinement.' });
+  return send(email, '🏡 Votre première visite approche !', html);
 }
 
 async function sendCheckInNoOffer({ email, firstName, daysPublished }) {
@@ -596,16 +658,17 @@ async function sendCheckInNoOffer({ email, firstName, daysPublished }) {
 // 11. RELANCE ACHETEUR POST-VISITE
 // ─────────────────────────────────────────────────────────────
 
-async function sendPostVisitBuyerNudge({ buyerEmail, buyerName, propertyCity, propertyType, propertySlug, price }) {
+async function sendPostVisitBuyerNudge({ buyerEmail, buyerName, propertyCity, propertyType, propertySlug, price, acheteurToken }) {
   const typeLabel = propertyType === 'appartement' ? 'l\'appartement' : propertyType === 'maison' ? 'la maison' : 'le bien';
   const priceFormatted = price ? new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 }).format(price) : '';
   const dossierUrl = `${BASE_URL}/bien/${propertySlug}`;
+  const offerUrl = acheteurToken ? `${BASE_URL}/soumettre-offre/${acheteurToken}` : dossierUrl;
   const html = layout(`
     ${h1(`Avez-vous des questions, ${buyerName || ''} ?`)}
     ${p(`Vous avez visité ${typeLabel} à <strong>${propertyCity || ''}</strong>${priceFormatted ? ` affiché à ${priceFormatted}` : ''}. Nous espérons que la visite vous a plu.`)}
     ${p('Le propriétaire est disponible pour répondre à vos questions ou vous faire parvenir des informations complémentaires.')}
     ${p('Si ce bien vous intéresse, vous pouvez soumettre une offre directement en ligne :')}
-    ${btn('Soumettre une offre d\'achat', dossierUrl, '#C4785A')}
+    ${btn('Soumettre une offre d\'achat', offerUrl, '#C4785A')}
     ${divider()}
     ${muted('Ce message vous est envoyé suite à votre visite. Vente entre particuliers accompagnée par Vendu Par Moi.')}
   `, { preheader: `Avez-vous des questions sur le bien visité à ${propertyCity} ?` });
@@ -625,23 +688,27 @@ async function sendPriceDropNudge({ email, firstName, daysPublished, currentPric
     </div>`;
   const html = layout(`
     ${badge('💡 Conseil stratégique', '#C4785A')}
-    ${h1(`${firstName ? firstName + ', ' : ''}une piste à envisager`)}
-    ${p(`Votre bien${propertyCity ? ` à <strong>${propertyCity}</strong>` : ''} est en ligne depuis <strong>${daysPublished} jours</strong>${priceFormatted ? ` affiché à ${priceFormatted}` : ''} et n'a pas encore reçu d'offre.`)}
-    ${p('Dans cette situation, une légère baisse de prix peut relancer l\'intérêt des acheteurs et générer de nouvelles visites. Même une réduction de 2 à 5 % peut faire passer votre bien au-dessus d\'un seuil psychologique important.')}
-    ${p('Le prix est le levier le plus efficace que vous maîtrisez directement. À titre de repère, une agence recommanderait souvent une baisse d\'au moins 10 000 € sur le net vendeur, tout en conservant ses honoraires à 5 %. En vendant par vous-même, c\'est vous qui décidez de l\'ajustement, sans cette contrainte supplémentaire.')}
+    ${h1('Une piste à envisager')}
+    ${p(`Bonjour ${firstName || ''},`)}
+    ${p(`Votre bien${propertyCity ? ` à <strong>${propertyCity}</strong>` : ''} est en ligne depuis <strong>${daysPublished} jours</strong>${priceFormatted ? `, affiché à ${priceFormatted}` : ''}, et n'a pas encore reçu d'offre.`)}
+    ${p('Dans cette situation, un ajustement du prix peut parfois relancer l\'intérêt des acheteurs et générer de nouvelles visites. Même une évolution de quelques pourcents peut permettre de mieux repositionner votre bien sur le marché.')}
+    ${h2('Vous gardez la maîtrise de votre prix')}
+    ${p('En vendant entre particuliers, vous pouvez ajuster votre prix si nécessaire sans avoir à intégrer les honoraires d\'un intermédiaire.')}
+    ${p('Vous disposez ainsi d\'une marge de manœuvre supplémentaire pour adapter votre positionnement, tout en préservant au mieux le montant que vous souhaitez obtenir de votre vente.')}
     ${h2('Quelques pistes à explorer')}
     <ul style="font-size:15px;color:#4a4540;line-height:2;padding-left:20px;margin:0 0 20px;">
-      <li>Vérifiez le prix au m² des biens vendus dans votre secteur (DVF)</li>
-      <li>Actualisez vos photos ou votre description si possible</li>
+      <li>Regardez le prix au m² dans votre secteur, notamment sur Meilleurs Agents.</li>
+      <li>Comparez votre annonce sur Leboncoin avec les biens similaires : prix, surface, état, prestations et qualité des photos.</li>
+      <li>Actualisez vos photos ou votre description si nécessaire.</li>
     </ul>
     ${h2('Le vrai test, c\'est le marché lui-même')}
-    ${p('Une estimation reste une hypothèse tant qu\'elle n\'a pas été confrontée à la demande réelle. Observez ces 3 signaux :')}
-    ${signalCard('Peu ou pas de demandes de visite', 'Le prix est probablement trop haut, ou l\'annonce manque de visibilité.')}
-    ${signalCard('Beaucoup de visites, aucune offre', 'Le prix est le problème, pas la visibilité : ajustez sans attendre.')}
-    ${signalCard('Offres rapides autour du prix affiché', 'Le prix est juste : ne perdez pas de temps à hésiter, tranchez vite.')}
+    ${p('Une estimation reste un point de départ. Les réactions des acheteurs vous donnent de précieux indicateurs :')}
+    ${signalCard('Peu ou pas de demandes de visite', 'Le prix, la présentation ou la visibilité de l\'annonce peuvent être à réexaminer.')}
+    ${signalCard('Beaucoup de visites, mais aucune offre', 'Cela peut indiquer un décalage entre le prix affiché et la perception des acheteurs.')}
+    ${signalCard('Des offres proches du prix affiché', 'Votre positionnement semble susciter un intérêt concret. À vous d\'apprécier les propositions reçues.')}
     ${btn('Accéder à mon espace', `${BASE_URL}/dashboard`)}
     ${divider()}
-    ${muted('Ce message est envoyé automatiquement dans le cadre du suivi de votre vente. Si vous avez déjà ajusté votre prix, ignorez ce message.')}
+    ${muted('Ce message est envoyé automatiquement dans le cadre du suivi de votre vente. Si vous avez déjà ajusté votre prix, vous pouvez ignorer ce message.')}
   `, { preheader: `Votre bien est en ligne depuis ${daysPublished} jours sans offre — quelques conseils.` });
   return send(email, `💡 Bilan J+${daysPublished} — Votre bien à ${propertyCity || ''}`, html);
 }
@@ -662,12 +729,12 @@ async function sendAdminDirectEmail({ to, subject, html: customHtml, text }) {
 // ─────────────────────────────────────────────────────────────
 
 async function sendNewClientAdminNotif({ firstName, lastName, email, pack, phone, sellerId }) {
-  const packLabel = pack === 'serenite' ? 'Pack Coaching Plus' : 'Pack Autonome';
+  const packLabel = pack === 'serenite' ? 'Pack Accompagnement' : 'Pack Autonomie';
   const packColor = pack === 'serenite' ? '#C4603A' : '#6b6965';
   const ficheUrl  = sellerId ? `${BASE_URL}/admin/crm/${sellerId}/fiche` : `${BASE_URL}/admin`;
   const urgency = pack === 'autonome'
-    ? `<p style="background:#fff8f0;border-left:3px solid #C4603A;padding:10px 14px;border-radius:0 6px 6px 0;font-size:13px;color:#8a4020;margin:16px 0 0;">⚡ Pack Autonome — appeler sous 48h</p>`
-    : `<p style="background:#fff8f0;border-left:3px solid #C4603A;padding:10px 14px;border-radius:0 6px 6px 0;font-size:13px;color:#8a4020;margin:16px 0 0;">📅 Pack Coaching Plus — planifier la formation (dans les 48h)</p>`;
+    ? `<p style="background:#fff8f0;border-left:3px solid #C4603A;padding:10px 14px;border-radius:0 6px 6px 0;font-size:13px;color:#8a4020;margin:16px 0 0;">⚡ Pack Autonomie — appeler sous 48h</p>`
+    : `<p style="background:#fff8f0;border-left:3px solid #C4603A;padding:10px 14px;border-radius:0 6px 6px 0;font-size:13px;color:#8a4020;margin:16px 0 0;">📅 Pack Accompagnement — planifier la formation (dans les 48h)</p>`;
   const html = `
     <p style="font-size:15px;color:#3a3530;margin:0 0 20px;">Un nouveau client vient de souscrire sur <strong>Vendu Par Moi</strong>.</p>
     <table style="width:100%;border-collapse:collapse;font-size:14px;color:#3a3530;" cellpadding="0" cellspacing="0">
@@ -706,8 +773,8 @@ function _templateFns() {
     welcome_v2:            () => sendWelcomeImproved({ email: fakeSellerEmail, firstName: 'Sophie' }),
     password_reset:        () => sendPasswordResetEmail({ email: fakeSellerEmail, firstName: 'Sophie', resetUrl: `${BASE_URL}/reset-password?token=preview` }),
     login_code:            () => sendLoginCode(fakeSellerEmail, '482913'),
-    invoice:               () => sendInvoiceEmail({ email: fakeSellerEmail, firstName: 'Sophie', amount: 99900, pack: 'serenite', invoiceNumber: 'SER-2026-00042-V1', date: new Date() }),
-    published:             () => sendPublishedConfirmation({ email: fakeSellerEmail, firstName: 'Sophie', property: fakeProp }),
+    invoice:               () => sendInvoiceEmail({ email: fakeSellerEmail, firstName: 'Sophie', amount: 154700, pack: 'serenite', invoiceNumber: 'SER-2026-00042-V1', date: new Date() }),
+    published:             () => sendPublishedConfirmation({ email: fakeSellerEmail, propertySlug: fakeProp.slug, hasActiveSlots: true }),
     visit_confirmation:    () => sendVisitConfirmation(fakeBuyerEmail, 'Thomas Durand', fakeProp, '2026-06-20', '14:00', false),
     new_visit_request:     () => sendNewVisitRequest({ sellerEmail: fakeSellerEmail, buyerName: 'Thomas Durand', visitDate: '20 juin 2026 à 14:00', notes: '📞 06 12 34 56 78' }),
     visit_reminder_seller: () => sendVisitConfirmation(fakeBuyerEmail, 'Thomas Durand', fakeProp, '2026-06-21', '10:00', false),
@@ -716,13 +783,14 @@ function _templateFns() {
     no_property:           () => sendNoPropertyNudge({ email: fakeSellerEmail }),
     no_photos:             () => sendNoPhotosNudge({ email: fakeSellerEmail }),
     not_published:         () => sendNotPublishedNudge({ email: fakeSellerEmail, score: 82 }),
-    missing_doc:           () => sendMissingDocNudge({ email: fakeSellerEmail, missingDocs: ['DPE', 'Taxe foncière'] }),
+    missing_doc:           () => sendMissingDocNudge({ email: fakeSellerEmail, firstName: 'Sophie', missingDocs: ['DPE', 'Taxe foncière'] }),
     post_first_visit:      () => sendPostFirstVisitFeedbackSeller({ email: fakeSellerEmail, firstName: 'Sophie' }),
     check_in_no_offer:     () => sendCheckInNoOffer({ email: fakeSellerEmail, firstName: 'Sophie', daysPublished: 18 }),
     contract_renewal:      () => sendContractRenewal({ email: fakeSellerEmail, firstName: 'Sophie', expiryDate: new Date(Date.now() + 14 * 86400000).toISOString(), daysLeft: 14 }),
     post_visit_buyer:      () => sendPostVisitBuyerNudge({ buyerEmail: fakeBuyerEmail, buyerName: 'Thomas Durand', propertyCity: 'Lyon', propertyType: 'maison', propertySlug: 'maison-lyon-preview', price: 320000 }),
     price_drop:            () => sendPriceDropNudge({ email: fakeSellerEmail, firstName: 'Sophie', daysPublished: 47, currentPrice: 320000, propertyCity: 'Lyon' }),
     first_meeting:         () => sendFirstMeetingEmail({ email: fakeSellerEmail, firstName: 'Sophie' }),
+    first_visit_reminder:  () => sendFirstVisitReminderSeller({ email: fakeSellerEmail, firstName: 'Sophie' }),
     review_request:        () => sendReviewRequest({ email: fakeSellerEmail, firstName: 'Sophie' }),
     sold_congrats:         () => sendSoldCongrats({ email: fakeSellerEmail, firstName: 'Sophie', property: fakeProp }),
     offer_notification:    () => sendNewOfferEmail({ sellerEmail: fakeSellerEmail, sellerFirstName: 'Sophie', buyerName: 'Thomas Durand', amount: 285000, city: 'Lyon', offersUrl: `${BASE_URL}/mes-offres` }),
@@ -792,7 +860,10 @@ async function sendFirstMeetingEmail({ email, firstName }) {
 
     ${p(`Bonjour${firstName ? ` ${firstName}` : ''},`)}
     ${p('Nous sommes ravis de vous accompagner dans la vente de votre bien, de particulier à particulier. Notre objectif : vous donner toutes les clés pour vendre vous-même, sereinement, en limitant les frais habituellement liés à une vente immobilière. <strong>Vous restez maître de votre vente, nous sommes simplement à vos côtés.</strong>')}
-    ${p('Pour que notre premier rendez-vous soit le plus efficace possible, voici quelques éléments qu\'il serait utile d\'avoir sous la main. <strong>Rien d\'urgent ni de figé</strong> : ce que nous n\'aurons pas, nous le peaufinerons ensemble.')}
+    ${p('Pour que notre premier rendez-vous soit le plus efficace possible, voici quelques éléments que vous pouvez préparer si vous les avez à disposition. Rien d\'urgent : nous compléterons ensemble ce qui manque.')}
+
+    ${h2('Un petit coup d\'œil avant notre rendez-vous')}
+    ${p('Prenez simplement quelques minutes pour parcourir le guide de formation Vendu Par Moi que vous avez reçu. Pas besoin de tout retenir : l\'objectif est simplement de vous familiariser avec les différentes étapes. Nous reprendrons tout ensemble lors de notre accompagnement.')}
 
     ${h2('À réunir si possible')}
     <ul style="font-size:14px;color:#4a4540;line-height:2;padding-left:20px;margin:0 0 20px;">
@@ -808,7 +879,7 @@ async function sendFirstMeetingEmail({ email, firstName }) {
 
     ${divider()}
     ${h2('Pour vos diagnostics')}
-    ${p('Si vous n\'avez pas encore réalisé vos diagnostics techniques, nous pouvons vous conseiller des organismes de confiance pour vous accompagner.')}
+    ${p('Si vos diagnostics techniques ne sont pas encore réalisés, pas d\'inquiétude. Nous pourrons vous indiquer des professionnels à contacter et faire le point ensemble lors de notre rendez-vous.')}
     ${muted('<em>N\'hésitez pas à nous en parler lors de notre échange.</em>')}
 
     ${divider()}
@@ -886,6 +957,7 @@ module.exports = {
   sendNotPublishedNudge,
   sendMissingDocNudge,
   sendPostFirstVisitFeedbackSeller,
+  sendFirstVisitReminderSeller,
   sendCheckInNoOffer,
   // Nudges acheteurs
   sendPostVisitBuyerNudge,

@@ -7,7 +7,11 @@ const fs = require('fs');
 const db = require('../database');
 const { isPasswordPwned } = require('../services/passwordCheck');
 const { requireAdmin } = require('../middleware/auth');
-const { sendWelcomeImproved, sendPostFirstVisitFeedbackSeller, sendCheckInNoOffer, sendNoPhotosNudge, sendMissingDocNudge, sendNotPublishedNudge, sendProspectNudge, sendContractRenewal, sendReviewRequest, sendAdminDirectEmail, sendFirstMeetingEmail, sendNewClientAdminNotif } = require('../services/email');
+const { sendWelcomeImproved, sendPostFirstVisitFeedbackSeller, sendCheckInNoOffer, sendNoPhotosNudge, sendMissingDocNudge, sendNotPublishedNudge, sendProspectNudge, sendContractRenewal, sendReviewRequest, sendAdminDirectEmail, sendFirstMeetingEmail, sendNewClientAdminNotif, sendFirstVisitReminderSeller } = require('../services/email');
+
+// ── Tarifs centralisés (en centimes TTC) ─────────────────────
+const PACK_PRICES = { autonome: 99900, serenite: 154700 };
+const PACK_LABELS = { autonome: 'Pack Autonomie', serenite: 'Pack Accompagnement' };
 
 router.get('/', requireAdmin, (req, res) => {
   res.sendFile('dashboard.html', { root: './views/admin' });
@@ -96,13 +100,14 @@ router.get('/guide', requireAdmin, (req, res) => {
 router.get('/crm/:id/contrat', requireAdmin, (req, res) => {
   const s = db.prepare(`SELECT id, first_name, last_name, email, phone, pack, contrat_signe_at, contrat_ip, paid_at FROM sellers WHERE id=?`).get(req.params.id);
   if (!s) return res.status(404).send('Vendeur introuvable');
+  const esc = v => String(v || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
   const nom = `${s.first_name || ''} ${s.last_name || ''}`.trim() || s.email;
   const dateSignature = s.contrat_signe_at
     ? new Date(s.contrat_signe_at).toLocaleDateString('fr-FR', { day: '2-digit', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' })
     : '—';
   res.send(`<!DOCTYPE html><html lang="fr"><head>
     <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>Contrat — ${nom}</title>
+    <title>Contrat — ${esc(nom)}</title>
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
     <style>
       *{box-sizing:border-box;margin:0;padding:0}
@@ -151,9 +156,9 @@ router.get('/crm/:id/contrat', requireAdmin, (req, res) => {
       <div class="parties">
         <div>
           <div class="partie-label">Le Client (vendeur)</div>
-          <div class="partie-val">${nom}</div>
-          <div class="partie-sub">${s.email}</div>
-          ${s.phone ? `<div class="partie-sub">${s.phone}</div>` : ''}
+          <div class="partie-val">${esc(nom)}</div>
+          <div class="partie-sub">${esc(s.email)}</div>
+          ${s.phone ? `<div class="partie-sub">${esc(s.phone)}</div>` : ''}
           <div class="partie-sub">Pack : ${s.pack || '—'}</div>
         </div>
         <div>
@@ -167,7 +172,7 @@ router.get('/crm/:id/contrat', requireAdmin, (req, res) => {
       <div class="cgv">
         <h2>1. Objet du contrat</h2>
         <p>Le présent contrat a pour objet de définir les conditions dans lesquelles Vendu Par Moi (ci-après « la Plateforme ») met à disposition du vendeur (ci-après « le Client ») un ensemble de services destinés à faciliter la vente immobilière entre particuliers.</p>
-        <h2>2. Services inclus dans le Pack Coaching Plus</h2>
+        <h2>2. Services inclus dans le Pack Accompagnement</h2>
         <ul>
           <li>Séance photo professionnelle au domicile du Client</li>
           <li>Visite virtuelle 360° du bien immobilier</li>
@@ -177,7 +182,7 @@ router.get('/crm/:id/contrat', requireAdmin, (req, res) => {
         </ul>
         <h2>3. Mandat simple</h2>
         <p>Le Client confie à Vendu Par Moi un mandat <strong>simple et non exclusif</strong> de mise en valeur et de diffusion de son bien immobilier. Le Client reste libre de vendre son bien par ses propres moyens ou via d'autres canaux.</p>
-        <p>Vendu Par Moi ne perçoit <strong>aucune commission</strong> sur la vente. Le prix du Pack Coaching Plus est forfaitaire et dû dès la souscription, indépendamment de la réalisation de la vente.</p>
+        <p>Vendu Par Moi ne perçoit <strong>aucune commission</strong> sur la vente. Le prix du pack souscrit est forfaitaire et dû dès la souscription, indépendamment de la réalisation de la vente.</p>
         <h2>4. Obligations du Client</h2>
         <ul>
           <li>Fournir des informations exactes et complètes sur le bien à vendre</li>
@@ -195,7 +200,7 @@ router.get('/crm/:id/contrat', requireAdmin, (req, res) => {
         <p>Le contrat est conclu pour une durée de <strong>12 mois</strong> à compter de la date de signature. En cas de vente du bien avant l'échéance, le contrat prend fin de plein droit sans remboursement du forfait.</p>
         <p>Le Client peut résilier dans un délai de <strong>14 jours</strong> suivant la souscription (délai légal de rétractation), sauf si la prestation photo a déjà été réalisée, conformément à l'article L221-28 du Code de la consommation.</p>
         <h2>7. Tarification</h2>
-        <p>Le Pack Coaching Plus est proposé au tarif de <strong>999 € TTC</strong> (paiement unique) ou <strong>4 × 250 € TTC</strong> (paiement échelonné, sans frais). Ce tarif est définitif et ne comprend aucun frais caché.</p>
+        <p>Le Pack Accompagnement est proposé au tarif de <strong>1 547 € TTC</strong> (paiement unique) ou en <strong>4 versements sans frais</strong> (paiement échelonné). Le Pack Autonomie est proposé au tarif de <strong>999 € TTC</strong>. Ces tarifs sont définitifs et ne comprennent aucun frais caché.</p>
         <h2>8. Données personnelles</h2>
         <p>Les données collectées sont traitées conformément au RGPD, utilisées exclusivement pour la fourniture des services Vendu Par Moi et ne sont pas revendues à des tiers.</p>
         <h2>9. Responsabilité</h2>
@@ -207,9 +212,9 @@ router.get('/crm/:id/contrat', requireAdmin, (req, res) => {
       <div class="signature-block">
         <div class="sig-box">
           <div class="sig-label">Signature du Client</div>
-          <div class="sig-val">${nom}</div>
+          <div class="sig-val">${esc(nom)}</div>
           <div class="sig-meta">Signé électroniquement le ${dateSignature}</div>
-          ${s.contrat_ip ? `<div class="sig-meta">IP : ${s.contrat_ip}</div>` : ''}
+          ${s.contrat_ip ? `<div class="sig-meta">IP : ${esc(s.contrat_ip)}</div>` : ''}
         </div>
         <div class="sig-box">
           <div class="sig-label">Pour Vendu Par Moi</div>
@@ -268,7 +273,7 @@ router.post('/api/contrats/:id/relance-extension', requireAdmin, async (req, res
     ? new Date(new Date(seller.contrat_signe_at).setMonth(new Date(seller.contrat_signe_at).getMonth() + 6))
     : new Date(Date.now() + 30 * 24 * 3600 * 1000);
   const daysLeft = Math.max(1, Math.round((expiryDate - new Date()) / (1000 * 3600 * 24)));
-  const ok = await sendContractRenewal({ email: seller.email, firstName: seller.first_name, expiryDate: expiryDate.toISOString(), daysLeft });
+  const ok = await sendContractRenewal({ email: seller.email, firstName: seller.first_name, expiryDate: expiryDate.toISOString(), daysLeft, twilioNumber: seller.twilio_number });
   if (ok) {
     db.prepare('UPDATE sellers SET relance_extension_at=CURRENT_TIMESTAMP WHERE id=?').run(seller.id);
     res.json({ success: true });
@@ -534,9 +539,9 @@ router.get('/api/stats', requireAdmin, (req, res) => {
   res.json({
     sellers: sellers.count,
     revenue: {
-      total: revenue_autonome.count * 99 + revenue_serenite.count * 999,
-      autonome: { count: revenue_autonome.count, amount: revenue_autonome.count * 99 },
-      serenite: { count: revenue_serenite.count, amount: revenue_serenite.count * 999 }
+      total: revenue_autonome.count * (PACK_PRICES.autonome / 100) + revenue_serenite.count * (PACK_PRICES.serenite / 100),
+      autonome: { count: revenue_autonome.count, amount: revenue_autonome.count * (PACK_PRICES.autonome / 100) },
+      serenite: { count: revenue_serenite.count, amount: revenue_serenite.count * (PACK_PRICES.serenite / 100) }
     },
     properties_active: properties_active.count,
     contacts: contacts.count,
@@ -1054,7 +1059,7 @@ router.get('/crm/:id/fiche', requireAdmin, (req, res) => {
         <div class="info-grid">
           <div class="info-item"><label>Email</label><div class="val">${s.email}</div></div>
           <div class="info-item"><label>Téléphone</label><div class="val">${s.phone||'—'}</div></div>
-          <div class="info-item"><label>Pack</label><span class="badge badge-${s.pack||'autonome'}">${s.pack==='serenite'?'Pack Coaching Plus':'Pack Autonome'}</span></div>
+          <div class="info-item"><label>Pack</label><span class="badge badge-${s.pack||'autonome'}">${s.pack==='serenite'?'Pack Accompagnement':'Pack Autonomie'}</span></div>
           <div class="info-item"><label>Inscription</label><div class="val">${s.paid_at ? new Date(s.paid_at).toLocaleDateString('fr-FR') : '—'}</div></div>
           <div class="info-item"><label>Contrat</label><div class="val">${s.contrat_signe ? '✓ Signé le '+new Date(s.contrat_signe_at||s.paid_at).toLocaleDateString('fr-FR') : '✗ Non signé'}</div></div>
         </div>
@@ -1270,8 +1275,8 @@ router.get('/marketing/flyer', requireAdmin, (req, res) => {
       </div>
       <div class="price-block">
         <div style="font-size:0.65rem;letter-spacing:0.25em;text-transform:uppercase;color:rgba(196,96,58,0.6);margin-bottom:8px;">Forfait tout compris</div>
-        <div class="price">999 €</div>
-        <div class="price-sub">ou 249€ × 4 sans frais · paiement unique · pas d'abonnement</div>
+        <div class="price">1 547 €</div>
+        <div class="price-sub">ou 4 versements sans frais · paiement unique · pas d'abonnement</div>
       </div>
       <a class="cta">venduparmoi.fr</a>
       <div class="footer">
@@ -1457,10 +1462,27 @@ router.post('/api/missions/:id/assign', requireAdmin, express.json(), (req, res)
 // ── API Finance ───────────────────────────────────────────────
 router.get('/api/finance', requireAdmin, (req, res) => {
   const totalClients = db.prepare("SELECT COUNT(*) as n FROM sellers WHERE paid_at IS NOT NULL").get()?.n || 0;
-  const totalRevenue = db.prepare("SELECT COUNT(*) as n FROM sellers WHERE paid_at IS NOT NULL AND pack='serenite'").get()?.n || 0;
+  const autonomeCount = db.prepare("SELECT COUNT(*) as n FROM sellers WHERE paid_at IS NOT NULL AND pack='autonome'").get()?.n || 0;
+  const sereniteCount = db.prepare("SELECT COUNT(*) as n FROM sellers WHERE paid_at IS NOT NULL AND pack='serenite'").get()?.n || 0;
   const activeClients = db.prepare("SELECT COUNT(*) as n FROM sellers WHERE paid_at IS NOT NULL AND (vente_realisee IS NULL OR vente_realisee=0)").get()?.n || 0;
   const soldClients = db.prepare("SELECT COUNT(*) as n FROM sellers WHERE vente_realisee=1").get()?.n || 0;
   const packDist = db.prepare("SELECT pack, COUNT(*) as n FROM sellers WHERE paid_at IS NOT NULL GROUP BY pack").all();
+
+  // CA théorique = count × tarifs actuels
+  const caTheorique = autonomeCount * (PACK_PRICES.autonome / 100) + sereniteCount * (PACK_PRICES.serenite / 100);
+
+  // CA encaissé = somme des montants réels Stripe (stockés depuis la migration paid_amount)
+  let caEncaisse = null;
+  let caEncaisseCount = 0;
+  try {
+    const enc = db.prepare(`
+      SELECT COALESCE(SUM(paid_amount), 0) as total_cents,
+             COUNT(CASE WHEN paid_amount IS NOT NULL THEN 1 END) as with_amount
+      FROM sellers WHERE paid_at IS NOT NULL
+    `).get();
+    caEncaisse = Math.round((enc?.total_cents || 0) / 100);
+    caEncaisseCount = enc?.with_amount || 0;
+  } catch(e) {}
   const monthly = db.prepare(`
     SELECT strftime('%Y-%m', paid_at) as month, COUNT(*) as clients, COUNT(CASE WHEN pack='serenite' THEN 1 END) as serenite
     FROM sellers WHERE paid_at IS NOT NULL
@@ -1491,7 +1513,7 @@ router.get('/api/finance', requireAdmin, (req, res) => {
   let offersSummary = { total: 0, pending: 0, accepted: 0 };
   try { offersSummary = db.prepare("SELECT COUNT(*) as total, SUM(status='pending') as pending, SUM(status='accepted') as accepted FROM offers").get() || offersSummary; } catch(e) {}
 
-  res.json({ totalClients, totalRevenue, activeClients, soldClients, packDist, monthly: monthly.reverse(), recent, topViewed, priceChanges, offersSummary });
+  res.json({ totalClients, autonomeCount, sereniteCount, caTheorique, caEncaisse, caEncaisseCount, activeClients, soldClients, packDist, monthly: monthly.reverse(), recent, topViewed, priceChanges, offersSummary });
 });
 
 // ── Historique des prix (admin) ───────────────────────────────
@@ -1572,6 +1594,7 @@ const EMAIL_CATALOG = [
   { category: 'Visites', id: 'visit_confirmation', label: 'Confirmation de visite', trigger: 'Réservation validée', recipient: 'Acheteur', auto: true },
   { category: 'Visites', id: 'visit_reminder_seller', label: 'Rappel visite (vendeur)', trigger: 'Veille de la visite', recipient: 'Vendeur', auto: true },
   { category: 'Visites', id: 'buyer_contacted', label: 'Un acheteur vous a contacté', trigger: 'Formulaire contact annonce', recipient: 'Vendeur', auto: true },
+  { category: 'Visites', id: 'first_visit_reminder', label: 'Rappel avant première visite', trigger: 'Veille de la 1ère visite confirmée', recipient: 'Vendeur', auto: true },
   { category: 'Visites', id: 'post_first_visit', label: 'Retour 1ère session de visites', trigger: 'J+2 après 1ère visite', recipient: 'Vendeur', auto: true },
 
   // ── Suivi sans offre ──────────────────────────────────────────
@@ -1658,7 +1681,7 @@ router.post('/api/emails/send', requireAdmin, async (req, res) => {
     } else if (email_type === 'no_photos') {
       ok = await sendNoPhotosNudge({ email: seller.email, firstName: seller.first_name });
     } else if (email_type === 'missing_doc') {
-      ok = await sendMissingDocNudge({ email: seller.email, missingDocs: [] });
+      ok = await sendMissingDocNudge({ email: seller.email, firstName: seller.first_name, missingDocs: [] });
     } else if (email_type === 'not_published') {
       ok = await sendNotPublishedNudge({ email: seller.email });
     } else if (email_type === 'post_first_visit') {
@@ -1667,8 +1690,14 @@ router.post('/api/emails/send', requireAdmin, async (req, res) => {
       const pub = prop?.published_at;
       const days = pub ? Math.floor((Date.now() - new Date(pub).getTime()) / 86400000) : 0;
       ok = await sendCheckInNoOffer({ email: seller.email, firstName: seller.first_name, daysPublished: days });
+    } else if (email_type === 'first_visit_reminder') {
+      ok = await sendFirstVisitReminderSeller({ email: seller.email, firstName: seller.first_name });
     } else if (email_type === 'contract_renewal') {
-      ok = await sendContractRenewal({ email: seller.email, firstName: seller.first_name });
+      const _expiry = seller.contrat_signe_at
+        ? new Date(new Date(seller.contrat_signe_at).setMonth(new Date(seller.contrat_signe_at).getMonth() + 6))
+        : new Date(Date.now() + 30 * 24 * 3600 * 1000);
+      const _daysLeft = Math.max(1, Math.round((_expiry - new Date()) / (1000 * 3600 * 24)));
+      ok = await sendContractRenewal({ email: seller.email, firstName: seller.first_name, expiryDate: _expiry.toISOString(), daysLeft: _daysLeft, twilioNumber: seller.twilio_number });
     } else if (email_type === 'review_request') {
       ok = await sendReviewRequest({ email: seller.email, firstName: seller.first_name });
     } else if (email_type === 'prospect_nudge') {

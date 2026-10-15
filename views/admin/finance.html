@@ -53,7 +53,8 @@
   <span style="font-size:.78rem;color:#9a9087;display:block;margin-top:-20px;margin-bottom:24px;" id="lastUpdate"></span>
 <div>
   <div class="kpi-row" id="kpiRow">
-    <div class="kpi"><div class="kpi-val" style="color:#059669;" id="kCA">—</div><div class="kpi-lbl">CA total estimé</div></div>
+    <div class="kpi"><div class="kpi-val" style="color:#059669;" id="kCA">—</div><div class="kpi-lbl">CA théorique (tarifs actuels)</div></div>
+    <div class="kpi"><div class="kpi-val" style="color:#2563eb;" id="kCAEnc">—</div><div class="kpi-lbl">CA encaissé tracé <span id="kCAEncNote" style="font-weight:400;font-style:italic;font-size:.65rem;display:block;color:#999;"></span></div></div>
     <div class="kpi"><div class="kpi-val" id="kClients">—</div><div class="kpi-lbl">Clients payants</div></div>
     <div class="kpi"><div class="kpi-val" style="color:#C4603A;" id="kActifs">—</div><div class="kpi-lbl">En cours de vente</div></div>
     <div class="kpi"><div class="kpi-val" style="color:#059669;" id="kVendus">—</div><div class="kpi-lbl">Biens vendus</div></div>
@@ -114,9 +115,14 @@ async function load() {
   document.getElementById('lastUpdate').textContent = 'Mis à jour ' + new Date().toLocaleTimeString('fr-FR');
 
   // KPIs
-  const pricePerClient = 999;
-  const ca = (d.totalRevenue || 0) * pricePerClient;
-  document.getElementById('kCA').textContent = fmtNum(ca) + ' €';
+  document.getElementById('kCA').textContent = fmtNum(d.caTheorique || 0) + ' €';
+  if (d.caEncaisse !== null && d.caEncaisseCount > 0) {
+    document.getElementById('kCAEnc').textContent = fmtNum(d.caEncaisse) + ' €';
+    document.getElementById('kCAEncNote').textContent = `${d.caEncaisseCount} client(s) tracé(s)`;
+  } else {
+    document.getElementById('kCAEnc').textContent = '—';
+    document.getElementById('kCAEncNote').textContent = 'Non tracé (historique)';
+  }
   document.getElementById('kClients').textContent = fmtNum(d.totalClients);
   document.getElementById('kActifs').textContent = fmtNum(d.activeClients);
   document.getElementById('kVendus').textContent = fmtNum(d.soldClients);
@@ -139,9 +145,10 @@ async function load() {
   // Pack distribution
   const total = (d.packDist || []).reduce((s, p) => s + p.n, 0);
   const colors = { serenite: '#C4603A', autonome: '#4a6e55' };
+  const packLabels = { serenite: 'Pack Accompagnement (1 547 €)', autonome: 'Pack Autonomie (999 €)' };
   const packHtml = (d.packDist || []).map(p => {
     const pct = total ? Math.round(p.n / total * 100) : 0;
-    return `<div class="legend-item"><div class="legend-dot" style="background:${colors[p.pack]||'#888'}"></div><span>${p.pack} — <strong>${p.n}</strong> (${pct}%)</span></div>`;
+    return `<div class="legend-item"><div class="legend-dot" style="background:${colors[p.pack]||'#888'}"></div><span>${packLabels[p.pack]||p.pack} — <strong>${p.n}</strong> (${pct}%)</span></div>`;
   }).join('');
   document.getElementById('packDist').innerHTML = `<div>${packHtml}</div>`;
 
@@ -158,11 +165,12 @@ async function load() {
   ).join('') : '<div style="color:#666;font-size:.85rem;">Aucun changement de prix</div>';
 
   // Recent table
+  const packLbl = { serenite: 'Accompagnement', autonome: 'Autonomie' };
   document.getElementById('recentTable').innerHTML = (d.recent || []).map(c =>
     `<tr>
       <td>${c.first_name || ''} ${c.last_name || ''}</td>
       <td style="color:#9a9a8e;">${c.email}</td>
-      <td><span class="badge badge-${c.pack}">${c.pack}</span></td>
+      <td><span class="badge badge-${c.pack}">${packLbl[c.pack] || c.pack}</span></td>
       <td style="color:#9a9a8e;">${fmtDate(c.paid_at)}</td>
     </tr>`
   ).join('');
