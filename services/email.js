@@ -16,7 +16,8 @@ const LEGAL_SIREN           = process.env.LEGAL_SIREN           || 'XXXXX';
 const LEGAL_RCS             = process.env.LEGAL_RCS             || 'XXXXX';
 const LEGAL_TVA_INTRA       = process.env.LEGAL_TVA_INTRA       || null;
 function legalInfoReady() {
-  return LEGAL_SIREN !== 'XXXXX' && LEGAL_RAISON_SOCIALE !== 'XXXXX';
+  const required = [LEGAL_SIREN, LEGAL_RAISON_SOCIALE, LEGAL_FORME_JURIDIQUE, LEGAL_ADRESSE_SIEGE, LEGAL_RCS];
+  return required.every(v => v && v !== 'XXXXX');
 }
 
 // Le logo est encodé en base64 et intégré directement dans le HTML plutôt que
@@ -65,6 +66,20 @@ async function send(to, subject, html, source = 'auto') {
   }
   const actualTo = _sendOverrideTo || to;
   const actualSource = _sendOverrideTo ? 'test' : source;
+
+  // Guard de test : activé uniquement si TEST_ALLOWED_RECIPIENTS est défini.
+  // Bloque tout envoi vers une adresse non autorisée — lève une exception plutôt
+  // que de rediriger silencieusement. N'est jamais actif en production.
+  if (process.env.TEST_ALLOWED_RECIPIENTS) {
+    const allowed = process.env.TEST_ALLOWED_RECIPIENTS.split(',').map(s => s.trim().toLowerCase());
+    if (!allowed.includes(actualTo.toLowerCase())) {
+      const guardErr = `[TEST GUARD] Destinataire non autorisé : ${actualTo} (autorisés : ${allowed.join(', ')})`;
+      console.error(guardErr);
+      _logEmailSend(actualTo, subject, false, null, 'blocked');
+      throw new Error(guardErr);
+    }
+  }
+
   const resend = getResend();
   if (!resend) {
     console.warn(`[EMAIL] RESEND_API_KEY manquant — email non envoyé à ${actualTo} : ${subject}`);
@@ -168,6 +183,10 @@ function infoTable(rows) {
 }
 function badge(text, color = '#C4603A') {
   return `<span style="display:inline-block;background:${color}20;color:${color};font-size:12px;font-weight:600;padding:3px 10px;border-radius:20px;margin-bottom:16px;">${text}</span>`;
+}
+function fmtEur(cents) {
+  const [int, dec] = (cents / 100).toFixed(2).replace('.', ',').split(',');
+  return int.replace(/\B(?=(\d{3})+$)/g, ' ') + ',' + dec;
 }
 
 // ─────────────────────────────────────────────────────────────
@@ -277,11 +296,6 @@ async function sendNewVisitRequest({ sellerEmail, buyerName, buyerEmail, buyerPh
   return send(sellerEmail, '📅 Nouvelle visite réservée', html);
 }
 
-// Alias pour compatibilité avec buyer.js
-async function sendVisitRequestReceived({ sellerEmail, buyerName, buyerEmail, buyerPhone, visitDate, visitTime, propertyAddress }) {
-  return sendNewVisitRequest({ sellerEmail, buyerName, buyerEmail, buyerPhone, visitDate, visitTime, propertyAddress });
-}
-
 // ─────────────────────────────────────────────────────────────
 // 4. DOSSIER ACHETEUR
 // ─────────────────────────────────────────────────────────────
@@ -373,9 +387,11 @@ async function sendPropertySoldToBuyer({ buyerEmail, buyerName, propertyType, pr
 // ─────────────────────────────────────────────────────────────
 
 async function sendInvoiceEmail({ email, firstName, lastName, amount, pack, invoiceNumber, date }) {
-  const amountTTC = (amount / 100).toFixed(2).replace('.', ',');
-  const amountHT  = ((amount / 100) / 1.2).toFixed(2).replace('.', ',');
-  const tva       = ((amount / 100) - (amount / 100) / 1.2).toFixed(2).replace('.', ',');
+  const htCents   = Math.round(amount / 1.2);
+  const tvaCents  = amount - htCents;
+  const amountTTC = fmtEur(amount);
+  const amountHT  = fmtEur(htCents);
+  const tva       = fmtEur(tvaCents);
   const packLabel = pack === 'serenite' ? 'Pack Accompagnement' : 'Pack Autonomie';
   const dateStr   = new Date(date).toLocaleDateString('fr-FR');
   const clientName = `${firstName || ''} ${lastName || ''}`.trim() || '—';
@@ -434,6 +450,34 @@ async function sendContractRenewal({ email, firstName, expiryDate, daysLeft, twi
     ${muted('Une question ? Contactez-nous à <a href="mailto:contact@venduparmoi.fr" style="color:#C4603A;">contact@venduparmoi.fr</a>')}
   `, { preheader: `Votre accès Vendu Par Moi expire dans ${daysLeft} jours.` });
   return send(email, `⚠️ Votre accès expire dans ${daysLeft} jours`, html);
+}
+
+// ─────────────────────────────────────────────────────────────
+// 7b. RAPPELS COMPROMIS (vendeur uniquement)
+// ─────────────────────────────────────────────────────────────
+
+async function sendCompromisMilestoneEmail({ email, firstName, label, dueDate, daysLeft }) {
+  const dueDateStr = new Date(dueDate).toLocaleDateString('fr-FR', {
+    weekday: 'long', day: 'numeric', month: 'long', year: 'numeric'
+  });
+  const urgencyColor = daysLeft <= 1 ? '#C4603A' : daysLeft <= 3 ? '#C4785A' : '#4d7a58';
+  const icon = daysLeft <= 1 ? '🔴' : daysLeft <= 3 ? '🟠' : '📋';
+  const html = layout(`
+    ${badge(`${icon} Échéance dans ${daysLeft} jour${daysLeft > 1 ? 's' : ''}`, urgencyColor)}
+    ${h1(`Rappel : ${label}`)}
+    ${p(`Bonjour ${firstName || ''},`)}
+    ${p(`L'échéance <strong>${label}</strong> de votre compromis de vente approche.`)}
+    ${infoTable(`
+      ${infoRow('Échéance', label)}
+      ${infoRow('Date', dueDateStr)}
+      ${infoRow('Dans', `<strong style="color:${urgencyColor};">${daysLeft} jour${daysLeft > 1 ? 's' : ''}</strong>`)}
+    `)}
+    ${p('Si vous avez des questions sur cette étape, votre notaire reste votre interlocuteur privilégié.')}
+    ${btn('Voir mon espace', `${BASE_URL}/dashboard`, urgencyColor)}
+    ${divider()}
+    ${muted('Ce rappel est envoyé automatiquement à partir des dates que vous avez renseignées dans votre espace vendeur.')}
+  `, { preheader: `Rappel : ${label} dans ${daysLeft} jour${daysLeft > 1 ? 's' : ''} — ${dueDateStr}` });
+  return send(email, `${icon} Compromis — ${label} dans ${daysLeft} jour${daysLeft > 1 ? 's' : ''}`, html);
 }
 
 // ─────────────────────────────────────────────────────────────
@@ -499,6 +543,25 @@ async function sendMissionReminderJ1(clientEmail, clientName, mission, photograp
   return send(clientEmail, '⏰ Rappel — Votre séance photo est demain', html);
 }
 
+async function sendMissionReminderJ1Photographer({ photographerEmail, photographerFirstName, mission, clientName, clientPhone }) {
+  const html = layout(`
+    ${badge('⏰ Rappel séance', '#3D5A47')}
+    ${h1('Votre séance photo est demain !')}
+    ${p(`Bonjour ${photographerFirstName || ''},`)}
+    ${p('Rappel : vous avez une séance prévue demain. Voici les coordonnées et informations :')}
+    ${infoTable(`
+      ${infoRow('Client', clientName || '—')}
+      ${infoRow('Téléphone', clientPhone || '—')}
+      ${infoRow('Adresse', mission.address + ', ' + mission.city)}
+      ${infoRow('Heure', mission.scheduled_time || '—')}
+    `)}
+    ${p('En cas d\'imprévu, contactez directement votre client ou notre équipe.')}
+    ${divider()}
+    ${muted('En cas d\'imprévu, contactez-nous à <a href="mailto:contact@venduparmoi.fr" style="color:#C4603A;">contact@venduparmoi.fr</a>')}
+  `, { preheader: 'Rappel — vous avez une séance photo demain.' });
+  return send(photographerEmail, '⏰ Rappel séance — demain', html);
+}
+
 // ─────────────────────────────────────────────────────────────
 // 10. NUDGES VENDEURS (automatisations)
 // ─────────────────────────────────────────────────────────────
@@ -520,6 +583,20 @@ async function sendNewOfferEmail({ sellerEmail, sellerFirstName, buyerName, amou
     ${muted('Cette notification est envoyée automatiquement à la suite d\'une offre transmise par un acheteur depuis votre espace vendeur.')}
   `, { preheader: `${buyerName} propose ${amountFmt} pour votre bien.` });
   return send(sellerEmail, `💰 Nouvelle offre de ${buyerName} — ${amountFmt}`, html);
+}
+
+async function sendOfferReceiptBuyer({ buyerEmail, buyerName, propertyCity, propertyType }) {
+  const typeLabel = propertyType === 'appartement' ? 'l\'appartement' : propertyType === 'maison' ? 'la maison' : 'le bien';
+  const html = layout(`
+    ${badge('📩 Offre transmise')}
+    ${h1('Votre offre a bien été transmise')}
+    ${p(`Bonjour${buyerName ? ` ${buyerName}` : ''},`)}
+    ${p(`Votre offre concernant ${typeLabel}${propertyCity ? ` à <strong>${propertyCity}</strong>` : ''} a bien été transmise au propriétaire.`)}
+    ${p('Celui-ci pourra en prendre connaissance et revenir vers vous directement.')}
+    ${divider()}
+    ${muted('Cet email de confirmation est envoyé automatiquement à la suite de votre dépôt d\'offre.')}
+  `, { preheader: `Votre offre a bien été transmise au propriétaire.` });
+  return send(buyerEmail, 'Votre offre a bien été transmise', html);
 }
 
 async function sendProspectNudge({ name, email }) {
@@ -603,7 +680,7 @@ async function sendPostFirstVisitFeedbackSeller({ email, firstName }) {
       <li>Notez ses remarques pour ajuster votre discours aux prochaines visites</li>
       <li>N'attendez pas — les acheteurs décident vite</li>
     </ul>
-    ${btn('Voir mes contacts acheteurs', `${BASE_URL}/mes-communications`)}
+    ${btn('Voir mon agenda', `${BASE_URL}/mon-agenda`)}
     ${divider()}
     ${muted('Une question sur la négociation ou la suite ? Votre coach IA est disponible 7j/7 depuis votre espace.')}
   `, { preheader: 'Félicitations pour votre première visite — quelques conseils pour la suite.' });
@@ -770,14 +847,15 @@ function _templateFns() {
   const fakeDossierUrl = `${BASE_URL}/dossier/acheteur/preview-token`;
 
   return {
-    welcome_v2:            () => sendWelcomeImproved({ email: fakeSellerEmail, firstName: 'Sophie' }),
-    password_reset:        () => sendPasswordResetEmail({ email: fakeSellerEmail, firstName: 'Sophie', resetUrl: `${BASE_URL}/reset-password?token=preview` }),
+    welcome_v2:            () => sendWelcomeImproved({ email: fakeSellerEmail, firstName: 'Sophie', pack: 'serenite' }),
+    password_reset:        () => sendPasswordResetEmail(fakeSellerEmail, `${BASE_URL}/reset-password?token=preview`),
     login_code:            () => sendLoginCode(fakeSellerEmail, '482913'),
-    invoice:               () => sendInvoiceEmail({ email: fakeSellerEmail, firstName: 'Sophie', amount: 154700, pack: 'serenite', invoiceNumber: 'SER-2026-00042-V1', date: new Date() }),
+    invoice:               () => sendInvoiceEmail({ email: fakeSellerEmail, firstName: 'Sophie', lastName: 'Martin', amount: 154700, pack: 'serenite', invoiceNumber: 'SER-2026-00042-V1', date: new Date() }),
     published:             () => sendPublishedConfirmation({ email: fakeSellerEmail, propertySlug: fakeProp.slug, hasActiveSlots: true }),
     visit_confirmation:    () => sendVisitConfirmation(fakeBuyerEmail, 'Thomas Durand', fakeProp, '2026-06-20', '14:00', false),
-    new_visit_request:     () => sendNewVisitRequest({ sellerEmail: fakeSellerEmail, buyerName: 'Thomas Durand', visitDate: '20 juin 2026 à 14:00', notes: '📞 06 12 34 56 78' }),
-    visit_reminder_seller: () => sendVisitConfirmation(fakeBuyerEmail, 'Thomas Durand', fakeProp, '2026-06-21', '10:00', false),
+    new_visit_request:     () => sendNewVisitRequest({ sellerEmail: fakeSellerEmail, buyerName: 'Thomas Durand', buyerEmail: fakeBuyerEmail, buyerPhone: '06 12 34 56 78', visitDate: '2026-06-20', visitTime: '14:00', propertyAddress: '12 rue des Lilas, Lyon' }),
+    visit_reminder_seller: () => sendVisitConfirmation(fakeBuyerEmail, 'Thomas Durand', fakeProp, '2026-06-21', '10:00', true),
+    compromis_milestone:   () => sendCompromisMilestoneEmail({ email: fakeSellerEmail, firstName: 'Sophie', label: 'Levée des conditions suspensives', dueDate: new Date(Date.now() + 3 * 86400000).toISOString().split('T')[0], daysLeft: 3 }),
     dossier:               () => sendDossierEmail({ to: fakeBuyerEmail, buyerName: 'Thomas Durand', dossierUrl: fakeDossierUrl, propertyCity: 'Lyon', propertyType: 'maison' }),
     prospect_nudge:        () => sendProspectNudge({ name: 'Thomas', email: fakeBuyerEmail }),
     no_property:           () => sendNoPropertyNudge({ email: fakeSellerEmail }),
@@ -794,8 +872,10 @@ function _templateFns() {
     review_request:        () => sendReviewRequest({ email: fakeSellerEmail, firstName: 'Sophie' }),
     sold_congrats:         () => sendSoldCongrats({ email: fakeSellerEmail, firstName: 'Sophie', property: fakeProp }),
     offer_notification:    () => sendNewOfferEmail({ sellerEmail: fakeSellerEmail, sellerFirstName: 'Sophie', buyerName: 'Thomas Durand', amount: 285000, city: 'Lyon', offersUrl: `${BASE_URL}/mes-offres` }),
-    buyer_contacted:       () => sendNewVisitRequest({ sellerEmail: fakeSellerEmail, buyerName: 'Thomas Durand', visitDate: '20 septembre 2026 à 14:00', notes: '📞 06 12 34 56 78' }),
+    offer_receipt_buyer:   () => sendOfferReceiptBuyer({ buyerEmail: fakeBuyerEmail, buyerName: 'Thomas Durand', propertyCity: 'Lyon', propertyType: 'maison' }),
+    buyer_contacted:       () => sendNewVisitRequest({ sellerEmail: fakeSellerEmail, buyerName: 'Thomas Durand', buyerEmail: fakeBuyerEmail, buyerPhone: '06 12 34 56 78', visitDate: '2026-09-20', visitTime: '14:00', propertyAddress: '12 rue des Lilas, Lyon' }),
     contact_notification:  () => sendContactNotification({ name: 'Thomas Durand', phone: '06 12 34 56 78', email: fakeBuyerEmail, offer: 'Pack Coaching Plus', city: 'Lyon', message: 'Je suis intéressé par votre offre.' }),
+    new_client_admin_notif: () => sendNewClientAdminNotif({ firstName: 'Sophie', lastName: 'Martin', email: fakeSellerEmail, pack: 'serenite', phone: '06 12 34 56 78', sellerId: 42 }),
   };
 }
 
@@ -922,6 +1002,7 @@ async function sendVisitCancellation(to,name,property,day,hour) {
 // Exports
 // ─────────────────────────────────────────────────────────────
 module.exports = {
+  legalInfoReady,
   sendVisitCancellation,
   // Auth
   sendPasswordResetEmail,
@@ -941,15 +1022,17 @@ module.exports = {
   // Visites
   sendVisitConfirmation,
   sendNewVisitRequest,
-  sendVisitRequestReceived,
   sendNewOfferEmail,
+  sendOfferReceiptBuyer,
   // Contrat
   sendContractRenewal,
+  sendCompromisMilestoneEmail,
   // Avis
   sendReviewRequest,
   // Missions photographes
   sendMissionConfirmed,
   sendMissionReminderJ1,
+  sendMissionReminderJ1Photographer,
   // Nudges vendeurs
   sendProspectNudge,
   sendNoPropertyNudge,

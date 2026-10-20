@@ -277,6 +277,21 @@ db.exec(`
     read_at DATETIME,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP
   );
+
+  CREATE TABLE IF NOT EXISTS agenda_actions (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    seller_id INTEGER NOT NULL REFERENCES sellers(id) ON DELETE CASCADE,
+    visit_id INTEGER NOT NULL REFERENCES visits(id) ON DELETE CASCADE,
+    kind TEXT NOT NULL CHECK(kind IN ('pending_visit','visit_reminder','visit_followup')),
+    source_due_date TEXT NOT NULL,
+    due_date TEXT NOT NULL,
+    status TEXT NOT NULL DEFAULT 'open' CHECK(status IN ('open','done')),
+    active INTEGER NOT NULL DEFAULT 1,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE(seller_id, visit_id, kind)
+  );
+  CREATE INDEX IF NOT EXISTS idx_agenda_actions_seller_due ON agenda_actions(seller_id, active, status, due_date);
 `);
 
 // ── Table email_log (déduplication des emails automatiques) ───
@@ -566,12 +581,19 @@ try {
 // ── Notifications — colonne link ───────────────────────────────
 try { db.exec("ALTER TABLE notifications ADD COLUMN link TEXT"); } catch(e) {}
 
+// ── Notifications — liaison visite (R1) ────────────────────────
+try { db.exec("ALTER TABLE notifications ADD COLUMN visit_id INTEGER REFERENCES visits(id)"); } catch(e) {}
+
 // ── Nom du constructeur ─────────────────────────────────────────
 try { db.exec("ALTER TABLE properties ADD COLUMN constructeur TEXT"); } catch(e) {}
 
 // ── Compromis de vente — jalons calendrier ─────────────────────
 try { db.exec("ALTER TABLE properties ADD COLUMN compromis_date DATE"); } catch(e) {}
 try { db.exec("ALTER TABLE properties ADD COLUMN compromis_conditions_delay INTEGER DEFAULT 45"); } catch(e) {}
+try { db.exec("ALTER TABLE properties ADD COLUMN compromis_retraction_date DATE"); } catch(e) {}
+try { db.exec("ALTER TABLE properties ADD COLUMN compromis_conditions_date DATE"); } catch(e) {}
+try { db.exec("ALTER TABLE properties ADD COLUMN compromis_acte_date DATE"); } catch(e) {}
+try { db.exec("ALTER TABLE properties ADD COLUMN compromis_dates_explicit INTEGER DEFAULT 0"); } catch(e) {}
 
 // ── Registre chèques parrainage ─────────────────────────────────
 db.exec(`

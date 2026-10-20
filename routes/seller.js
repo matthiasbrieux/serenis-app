@@ -417,12 +417,20 @@ router.post('/api/property/publish', requireAuth, async (req, res) => {
   db.prepare('UPDATE properties SET published=1, published_at=CURRENT_TIMESTAMP, status=? WHERE seller_id=?')
     .run('en-ligne', req.seller.id);
 
-  // Email confirmation to seller on publish
+  // Email confirmation to seller on publish — une seule fois (A4)
   try {
     const { sendPublishedConfirmation } = require('../services/email');
     const seller = db.prepare('SELECT email FROM sellers WHERE id=?').get(req.seller.id);
     if (seller) {
-      await sendPublishedConfirmation({ email: seller.email, propertySlug: property.slug });
+      const alreadySentPublish = db.prepare(
+        "SELECT id FROM email_log WHERE recipient_email=? AND trigger_type='published_confirmation'"
+      ).get(seller.email);
+      if (!alreadySentPublish) {
+        const agendaCheck = db.prepare("SELECT COUNT(*) as cnt FROM agenda_slots WHERE seller_id=? AND active=1").get(req.seller.id);
+        const hasActiveSlots = (agendaCheck?.cnt || 0) > 0;
+        await sendPublishedConfirmation({ email: seller.email, propertySlug: property.slug, hasActiveSlots });
+        db.prepare("INSERT INTO email_log (recipient_email, trigger_type) VALUES (?,?)").run(seller.email, 'published_confirmation');
+      }
     }
   } catch (e) {
     console.error('[EMAIL] sendPublishedConfirmation error:', e.message);
@@ -925,7 +933,7 @@ router.get('/api/connect/overview', requireAuth, (req, res) => {
 });
 
 router.post('/api/visits', requireAuth, express.json(), async (req, res) => {
-  const property = db.prepare('SELECT id FROM properties WHERE seller_id = ?').get(req.seller.id);
+  const property = db.prepare('SELECT id, address, city FROM properties WHERE seller_id = ?').get(req.seller.id);
   if (!property) return res.status(400).json({ error: 'Créez d\'abord votre bien' });
   const { buyer_name, buyer_phone, buyer_email, visit_date, visit_time, notes } = req.body;
   if (!validation.date(visit_date)||!validation.time(visit_time)||validation.parisInstant(visit_date,visit_time)<=new Date()||buyer_email&&!validation.email(buyer_email)) return res.status(400).json({error:'Date, heure ou email invalide'});
@@ -933,8 +941,8 @@ router.post('/api/visits', requireAuth, express.json(), async (req, res) => {
   const result = db.prepare(
     'INSERT INTO visits (property_id, seller_id, buyer_name, buyer_phone, buyer_email, visit_date, visit_time, status, notes) VALUES (?,?,?,?,?,?,?,\'confirmed\',?)'
   ).run(property.id, req.seller.id, buyer_name || 'Acquéreur', buyer_phone || '', buyer_email || '', visit_date, visit_time, notes || '');
-  db.prepare('INSERT INTO notifications (seller_id, type, title, body) VALUES (?,\'visit_request\',?,?)')
-    .run(req.seller.id, 'Nouvelle visite programmée', `${buyer_name || 'Acquéreur'} — ${visit_date} à ${visit_time}`);
+  db.prepare('INSERT INTO notifications (seller_id, type, title, body, visit_id) VALUES (?,\'visit_request\',?,?,?)')
+    .run(req.seller.id, 'Nouvelle visite programmée', `${buyer_name || 'Acquéreur'} — ${visit_date} à ${visit_time}`, result.lastInsertRowid);
 
   // Email notification to seller on new visit request
   try {
@@ -944,12 +952,25 @@ router.post('/api/visits', requireAuth, express.json(), async (req, res) => {
       await sendNewVisitRequest({
         sellerEmail: seller.email,
         buyerName: buyer_name || 'Acquéreur',
-        visitDate: `${visit_date} à ${visit_time}`,
-        notes: notes || '',
+        buyerEmail: buyer_email || '',
+        buyerPhone: buyer_phone || '',
+        visitDate: visit_date,
+        visitTime: visit_time,
+        propertyAddress: property.address ? `${property.address}${property.city ? ', ' + property.city : ''}` : '',
       });
     }
   } catch (e) {
     console.error('[EMAIL] sendNewVisitRequest error:', e.message);
+  }
+
+  // Confirmation to buyer when seller creates a visit (directly confirmed — no status transition fires)
+  if (buyer_email) {
+    try {
+      const prop = db.prepare('SELECT type, address, city, slug FROM properties WHERE id=?').get(property.id);
+      if (prop) await sendVisitConfirmation(buyer_email, buyer_name || 'Acquéreur', prop, visit_date, visit_time, false).catch(() => {});
+    } catch (e) {
+      console.error('[EMAIL] sendVisitConfirmation (manual) error:', e.message);
+    }
   }
 
   res.json({ success: true, id: result.lastInsertRowid });
@@ -965,10 +986,13 @@ router.put('/api/visits/:id/status', requireAuth, express.json(), async (req, re
   if (!changed.changes) return res.status(409).json({error:'La visite vient de changer. Actualisez la page.'});
   let notification_sent = null;
   if (status === 'confirmed') {
-    db.prepare('INSERT INTO notifications (seller_id,type,title,body) VALUES (?,?,?,?)').run(req.seller.id,'visit_confirmed','Visite confirmée',`${visit.buyer_name} — ${visit.visit_date} à ${visit.visit_time}`);
+    db.prepare('INSERT INTO notifications (seller_id,type,title,body,visit_id) VALUES (?,?,?,?,?)').run(req.seller.id,'visit_confirmed','Visite confirmée',`${visit.buyer_name} — ${visit.visit_date} à ${visit.visit_time}`,visit.id);
     if (visit.buyer_email) notification_sent = await sendVisitConfirmation(visit.buyer_email,visit.buyer_name,visit,visit.visit_date,visit.visit_time,false).catch(()=>false);
   }
-  if (status === 'cancelled' && visit.buyer_email) notification_sent = await require('../services/email').sendVisitCancellation(visit.buyer_email,visit.buyer_name,visit,visit.visit_date,visit.visit_time).catch(()=>false);
+  if (status === 'cancelled') {
+    db.prepare("UPDATE notifications SET read_at=CURRENT_TIMESTAMP WHERE seller_id=? AND visit_id=? AND type IN ('visit_confirmed','visit_reminder','visit_request') AND read_at IS NULL").run(req.seller.id, visit.id);
+    if (visit.buyer_email) notification_sent = await require('../services/email').sendVisitCancellation(visit.buyer_email,visit.buyer_name,visit,visit.visit_date,visit.visit_time).catch(()=>false);
+  }
   res.json({success:true,notification_sent,warning:notification_sent===false?'La visite est enregistrée mais le message n’a pas été envoyé.':undefined});
 
 });
@@ -1554,6 +1578,44 @@ router.delete('/api/seller/rgpd/account', requireAuth, async (req, res) => {
   await require('../services/media-cleanup').cleanupMedia();
   res.clearCookie('token');
   res.json({ success: true });
+});
+
+// A5 — Envoi du dossier acheteur par email depuis l'espace vendeur
+router.post('/api/dossier/send-email', requireAuth, express.json(), async (req, res) => {
+  const sellerId = req.seller.id;
+  const { email: rawEmail, buyerName } = req.body;
+  const email = typeof rawEmail === 'string' ? rawEmail.trim().toLowerCase() : '';
+  if (!require('../services/validation').email(email)) return res.status(400).json({ error: 'Email invalide.' });
+
+  const property = db.prepare(
+    'SELECT id, acheteur_token, type, city FROM properties WHERE seller_id = ? LIMIT 1'
+  ).get(sellerId);
+  if (!property || !property.acheteur_token) return res.status(404).json({ error: 'Aucun dossier disponible.' });
+
+  const already = db.prepare(
+    'SELECT id FROM email_log WHERE recipient_email=? AND trigger_type=?'
+  ).get(email, `dossier_sent:${property.id}`);
+  if (already) return res.status(409).json({ alreadySent: true, error: 'Ce dossier a déjà été envoyé à cette adresse.' });
+
+  const base = process.env.BASE_URL || 'https://venduparmoi.fr';
+  const dossierUrl = `${base}/dossier/acheteur/${property.acheteur_token}`;
+
+  try {
+    const { sendDossierEmail } = require('../services/email');
+    await sendDossierEmail({ to: email, buyerName: buyerName || '', dossierUrl, propertyCity: property.city, propertyType: property.type });
+    db.prepare('INSERT INTO email_log (trigger_type, recipient_email) VALUES (?,?)').run(`dossier_sent:${property.id}`, email);
+    const existing = db.prepare('SELECT id FROM buyer_contacts WHERE property_id=? AND buyer_email=?').get(property.id, email);
+    if (existing) {
+      db.prepare('UPDATE buyer_contacts SET dossier_sent=1, dossier_sent_at=CURRENT_TIMESTAMP WHERE id=?').run(existing.id);
+    } else {
+      db.prepare('INSERT INTO buyer_contacts (property_id, seller_id, buyer_email, buyer_name, source, dossier_sent, dossier_sent_at) VALUES (?,?,?,?,?,1,CURRENT_TIMESTAMP)')
+        .run(property.id, sellerId, email, buyerName || '', 'email_manual');
+    }
+    res.json({ success: true });
+  } catch (e) {
+    console.error('[DOSSIER EMAIL] Send error:', e.message);
+    res.status(500).json({ error: 'Envoi impossible. Réessayez ou contactez le support.' });
+  }
 });
 
 module.exports = router;

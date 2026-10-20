@@ -2934,6 +2934,21 @@ if("scrollRestoration"in history)history.scrollRestoration="manual";</script>
 <p class="ev-msg-note">Aperçu · aucun message n'est envoyé.</p>
 </div>
 </div>
+<div class="ev-send-dossier-section">
+  <div class="ev-send-dossier-header">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--terracotta)" stroke-width="1.8"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+    <span>Envoyer le dossier par e-mail</span>
+  </div>
+  <p class="ev-send-dossier-desc">Envoyez directement le lien du dossier acheteur à un contact. Il recevra un e-mail avec le lien vers votre dossier complet.</p>
+  <form class="ev-send-dossier-form" onsubmit="submitSendDossierEmail(event)" novalidate>
+    <div class="ev-send-dossier-fields">
+      <input class="ev-send-dossier-input" id="ev-dossier-buyer-name" placeholder="Prénom de l'acheteur (optionnel)" type="text" autocomplete="off"/>
+      <input class="ev-send-dossier-input" id="ev-dossier-buyer-email" placeholder="Email de l'acheteur" required type="email" autocomplete="off"/>
+    </div>
+    <button class="ev-send-dossier-btn" type="submit">Envoyer le dossier</button>
+  </form>
+  <div class="ev-send-dossier-feedback" id="ev-dossier-feedback" style="display:none;"></div>
+</div>
 <div class="vpm-feature-chips"><span>Fiche descriptive</span><span>Photos</span><span>Diagnostics</span><span>Visites</span></div></div><div class="vpm-share-middle"><section class="vpm-separate"><h3>Partager un élément séparément</h3><p>Un lien pour chaque élément, à partager selon vos besoins.</p><div class="ev-card" id="ev-card-dpe">
 <div class="vpm-card-actions"><button class="vpm-copy-action" onclick="evCopyLink('ev-link-dpe',this)" type="button">Copier le lien</button></div><button aria-controls="ev-body-dpe" aria-expanded="false" class="ev-card-btn" onclick="toggleEvCard('dpe')" type="button">
 <div class="ev-card-ico"><svg fill="none" height="16" stroke="#D4821A" stroke-width="1.8" viewbox="0 0 24 24" width="16"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg></div>
@@ -7700,5 +7715,63 @@ fetchSellerForFiche();
 </script>
 
 <link rel="stylesheet" href="/css/seller-header-typography.css?v=1">
+<link rel="stylesheet" href="/css/property-send-premium.css?v=1">
+<script src="/js/property-send-premium.js?v=1"></script>
+
+<style>
+.ev-send-dossier-section{border-top:1px solid rgba(200,190,178,0.25);margin-top:20px;padding-top:18px;}
+.ev-send-dossier-header{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:600;color:#3D3530;margin-bottom:6px;}
+.ev-send-dossier-desc{font-size:12px;color:#7a736c;margin:0 0 12px;}
+.ev-send-dossier-fields{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px;}
+.ev-send-dossier-input{flex:1;min-width:160px;height:36px;padding:0 10px;border:1px solid rgba(180,168,155,0.5);border-radius:6px;font-size:13px;color:#3D3530;background:#fdfaf7;outline:none;}
+.ev-send-dossier-input:focus{border-color:var(--terracotta);}
+.ev-send-dossier-btn{height:36px;padding:0 16px;background:var(--terracotta,#C4603A);color:#fff;border:none;border-radius:6px;font-size:13px;font-weight:600;cursor:pointer;transition:opacity .15s;}
+.ev-send-dossier-btn:hover{opacity:.88;}
+.ev-send-dossier-btn:disabled{opacity:.5;cursor:default;}
+.ev-send-dossier-feedback{font-size:12.5px;padding:8px 10px;border-radius:6px;margin-top:6px;}
+.ev-send-dossier-feedback.ok{background:#eaf5ec;color:#2a6b38;}
+.ev-send-dossier-feedback.err{background:#fde8e4;color:#b83223;}
+.ev-send-dossier-feedback.warn{background:#fef3e2;color:#9a5700;}
+</style>
+<script>
+async function submitSendDossierEmail(e) {
+  e.preventDefault();
+  const emailEl = document.getElementById('ev-dossier-buyer-email');
+  const nameEl  = document.getElementById('ev-dossier-buyer-name');
+  const feedEl  = document.getElementById('ev-dossier-feedback');
+  const btn     = e.target.querySelector('.ev-send-dossier-btn');
+  const email   = emailEl.value.trim();
+  const name    = nameEl ? nameEl.value.trim() : '';
+  if (!email) { emailEl.focus(); return; }
+  btn.disabled = true;
+  feedEl.style.display = 'none';
+  try {
+    const r = await fetch('/api/dossier/send-email', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, buyerName: name }),
+    });
+    const d = await r.json();
+    feedEl.style.display = 'block';
+    if (r.ok && d.success) {
+      feedEl.className = 'ev-send-dossier-feedback ok';
+      feedEl.textContent = 'Dossier envoyé à ' + email + ' ✓';
+      emailEl.value = '';
+      if (nameEl) nameEl.value = '';
+    } else if (r.status === 409) {
+      feedEl.className = 'ev-send-dossier-feedback warn';
+      feedEl.textContent = 'Ce dossier a déjà été envoyé à cette adresse.';
+    } else {
+      feedEl.className = 'ev-send-dossier-feedback err';
+      feedEl.textContent = d.error || 'Envoi impossible. Réessayez.';
+    }
+  } catch {
+    feedEl.style.display = 'block';
+    feedEl.className = 'ev-send-dossier-feedback err';
+    feedEl.textContent = 'Erreur réseau. Réessayez.';
+  }
+  btn.disabled = false;
+}
+</script>
 </body>
 </html>
