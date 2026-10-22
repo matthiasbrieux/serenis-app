@@ -1260,12 +1260,15 @@ if("scrollRestoration"in history)history.scrollRestoration="manual";</script>
 
         <!-- Prochaines visites confirmées -->
         <div class="agenda-panel" id="upcomingSection" style="display:none;">
-          <div class="agenda-panel-title confirmed-section-title">
+          <div class="agenda-panel-title confirmed-section-title" style="flex-wrap:wrap;gap:6px;">
             <span style="display:flex;align-items:center;gap:6px;">
               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
               Mes visites
             </span>
-            <span id="upcomingCountBadge" style="background:rgba(255,255,255,0.25);color:#fff;padding:2px 9px;border-radius:20px;font-size:0.72rem;font-weight:700;border:1px solid rgba(255,255,255,0.3);"></span>
+            <span style="display:flex;align-items:center;gap:6px;margin-left:auto;">
+              <button id="sortVisitsBtn" onclick="toggleUpcomingSort()" style="background:rgba(255,255,255,0.15);color:#fff;border:1px solid rgba(255,255,255,0.3);border-radius:20px;padding:2px 9px;font-size:0.65rem;font-weight:700;cursor:pointer;letter-spacing:0.03em;text-transform:uppercase;transition:background 0.15s;">⬆ Date</button>
+              <span id="upcomingCountBadge" style="background:rgba(255,255,255,0.25);color:#fff;padding:2px 9px;border-radius:20px;font-size:0.72rem;font-weight:700;border:1px solid rgba(255,255,255,0.3);"></span>
+            </span>
           </div>
           <div class="sidebar-body no-max" id="upcomingList"></div>
         </div>
@@ -1566,6 +1569,13 @@ function updateStats() {
 
 // ── Stat cards filtres interactifs ────────────────────
 let activeStatFilter = null;
+let upcomingSortByStatus = false;
+function toggleUpcomingSort() {
+  upcomingSortByStatus = !upcomingSortByStatus;
+  const btn = document.getElementById('sortVisitsBtn');
+  if (btn) btn.textContent = upcomingSortByStatus ? '⬆ À confirmer' : '⬆ Date';
+  renderVisits();
+}
 
 function setStatFilter(filter) {
   activeStatFilter = (activeStatFilter === filter && filter !== null) ? null : filter;
@@ -1792,7 +1802,14 @@ function buildVisitCompact(v) {
 
 function renderVisits() {
   const today = new Intl.DateTimeFormat('en-CA', {timeZone:'Europe/Paris',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date());
-  const upcoming = allVisits.filter(v => v.status==='confirmed' && !isPastVisit(v)).sort((a,b)=>(a.visit_date+a.visit_time).localeCompare(b.visit_date+b.visit_time));
+  const upcoming = allVisits.filter(v => v.status==='confirmed' && !isPastVisit(v)).sort((a,b)=>{
+    if (upcomingSortByStatus) {
+      const aConf = a.sms_copied_at ? 1 : 0;
+      const bConf = b.sms_copied_at ? 1 : 0;
+      if (aConf !== bConf) return aConf - bConf;
+    }
+    return (a.visit_date+(a.visit_time||'')).localeCompare(b.visit_date+(b.visit_time||''));
+  });
   const past = allVisits.filter(v => v.status==='done'||(v.status==='confirmed'&&isPastVisit(v))||(v.status==='pending'&&isPastVisit(v))).sort((a,b)=>b.visit_date.localeCompare(a.visit_date));
   const cancelled = allVisits.filter(v => v.status==='cancelled').sort((a,b)=>b.visit_date.localeCompare(a.visit_date));
 
