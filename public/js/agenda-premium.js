@@ -21,7 +21,7 @@
   const agendaTabs=make('nav','ap-agenda-tabs');agendaTabs.setAttribute('aria-label','Rubriques de l’agenda');
   main.insertBefore(agendaTabs,top);
   const pendingTabCount=make('span','ap-tab-count','0'),tabButtons={};
-  for(const [key,label] of [['agenda','Agenda'],['visits','Mes visites'],['pending','À confirmer']]){
+  for(const [key,label] of [['agenda','Agenda'],['visits','Mes visites']]){
     const b=button('',()=>selectAgendaTab(key),'ap-agenda-tab');b.dataset.tab=key;b.append(make('span','',label));
     if(key==='pending')b.append(pendingTabCount);
     agendaTabs.append(b);tabButtons[key]=b;
@@ -101,7 +101,7 @@
   actionsHeading.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();toggleActions();}});
   const todoList=make('div','ap-todo-list');actionsPanel.append(actionsHeading,todoList);
   const visitsPanel=make('section','ap-visits-panel');
-  visitsPanel.hidden=true;
+  visitsPanel.hidden=false;
   const visitsHeading=make('h2','ap-lower-heading','Mes visites');visitsPanel.append(visitsHeading);
   const visitsFilters=make('div','ap-visits-filters');
   const visitsFilterButtons={};
@@ -437,5 +437,5 @@
   calDate=new Date(cursor.getFullYear(),cursor.getMonth(),1);
   const hdr=document.getElementById('dispoAddHdr');hdr.tabIndex=0;hdr.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();toggleDispoForm();}});
   for(const [id,label]of [['availDate','Date'],['availStart','De'],['availEnd','À']]){const input=document.getElementById(id);const lab=input.closest('div').querySelector('label');if(lab)lab.htmlFor=id;input.setAttribute('aria-label',label);}
-  renderVisits();renderCalendar();refreshAgendaActions();
+  renderVisits();renderCalendar();refreshAgendaActions();setVisitsFilter('upcoming');
 })();
