@@ -1098,7 +1098,9 @@ async function handleFiles(files, roomId, angleId) {
     fd.append('angle_label', angleId);
 
     const res = await fetch('/api/property/photos', { method: 'POST', body: fd });
-    const data = await res.json();
+    const data = await res.json().catch(() => null);
+    if (res.status === 429) throw new Error(data?.error || 'Trop de demandes. Veuillez patienter avant de réessayer.');
+    if (!res.ok || !data) throw new Error(data?.error || 'Envoi interrompu. Vérifiez les photos enregistrées avant de reprendre.');
     if (data.error) throw new Error(data.error);
 
     const inserted = data.photos?.[0];

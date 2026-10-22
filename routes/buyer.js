@@ -147,7 +147,7 @@ router.post('/api/bien/:slug/reserver', publicFormLimit, async (req, res) => {
   const property = db.prepare('SELECT * FROM properties WHERE slug = ? AND published = 1').get(req.params.slug);
   if (!property) return res.json({ error: 'Bien non trouvé' });
 
-  const { buyer_name, buyer_email, buyer_phone, visit_date, visit_time } = req.body;
+  const { buyer_name, buyer_email, buyer_phone, visit_date, visit_time, buyer_budget, buyer_financing, buyer_timeline } = req.body;
   if (!buyer_name || !buyer_email || !visit_date || !visit_time) {
     return res.json({ error: 'Informations manquantes' });
   }
@@ -159,20 +159,20 @@ router.post('/api/bien/:slug/reserver', publicFormLimit, async (req, res) => {
     if(invalidNow)return {status:400,error:invalidNow};
     const conflict=db.prepare("SELECT id FROM visits WHERE property_id=? AND visit_date=? AND visit_time=? AND status!='cancelled'").get(property.id,visit_date,visit_time);
     if(conflict)return {status:409,error:'Ce créneau est déjà pris. Choisissez un autre horaire.'};
-    db.prepare("INSERT INTO visits (property_id,seller_id,buyer_name,buyer_email,buyer_phone,visit_date,visit_time,status) VALUES(?,?,?,?,?,?,?,'confirmed')").run(property.id,property.seller_id,buyer_name,buyer_email.trim().toLowerCase(),buyer_phone||'',visit_date,visit_time);
-    return {};
+    const visitInsert = db.prepare("INSERT INTO visits (property_id,seller_id,buyer_name,buyer_email,buyer_phone,visit_date,visit_time,status,buyer_budget,buyer_financing,buyer_timeline) VALUES(?,?,?,?,?,?,?,'confirmed',?,?,?)").run(property.id,property.seller_id,buyer_name,buyer_email.trim().toLowerCase(),buyer_phone||'',visit_date,visit_time,buyer_budget||null,buyer_financing||null,buyer_timeline||null);
+    return { visitId: visitInsert.lastInsertRowid };
   }).immediate();
   if(booking.error)return res.status(booking.status).json({error:booking.error});
 
   const seller = db.prepare('SELECT email, phone, first_name FROM sellers WHERE id = ?').get(property.seller_id);
 
-  db.prepare("INSERT INTO notifications (seller_id, type, title, body) VALUES (?,'visit_confirmed',?,?)")
-    .run(property.seller_id, 'Nouvelle visite confirmée', `${buyer_name} — ${visit_date} à ${visit_time}`);
+  db.prepare("INSERT INTO notifications (seller_id, type, title, body, visit_id) VALUES (?,'visit_confirmed',?,?,?)")
+    .run(property.seller_id, 'Nouvelle visite confirmée', `${buyer_name} — ${visit_date} à ${visit_time}`, booking.visitId);
 
   let confirmationSent=false;
   try {
     confirmationSent=(await sendVisitConfirmation(buyer_email, buyer_name, property, visit_date, visit_time, false))===true;
-    if (seller.email) await sendNewVisitRequest({ sellerEmail: seller.email, buyerName: buyer_name, visitDate: `${visit_date} à ${visit_time}`, notes: '' });
+    if (seller.email) await sendNewVisitRequest({ sellerEmail: seller.email, buyerName: buyer_name, buyerEmail: buyer_email, buyerPhone: buyer_phone || '', visitDate: visit_date, visitTime: visit_time, propertyAddress: property.address ? `${property.address}${property.city ? ', ' + property.city : ''}` : '' });
     if (seller.phone) {
       await sendSmsNotification(seller.phone,
         `📅 Visite confirmée !\n${visit_date} à ${visit_time}\nAcquéreur : ${buyer_name} — ${buyer_email}`

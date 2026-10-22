@@ -14,117 +14,220 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Emails — Vendu Par Moi Admin</title>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/css/style.css?v=3">
   <link rel="stylesheet" href="/css/admin.css">
   <style>
-    body { background: #f0f0ed; }
-    
-    
-    .admin-main { padding: 32px; }
-    
-    
-    
-    .card { background: #fff; border-radius: 12px; padding: 24px; margin-bottom: 24px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); }
-    .card-title { font-family: 'Cormorant Garamond', serif; font-size: 1.3rem; color: #1A1A16; margin: 0 0 20px; display: flex; align-items: center; gap: 9px; }
-    .card-title svg { flex-shrink: 0; color: #C4603A; }
-    table { width: 100%; border-collapse: collapse; font-size: 0.875rem; }
-    th { text-align: left; padding: 10px 12px; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.05em; color: #aaa; border-bottom: 2px solid #f0f0ed; }
-    td { padding: 12px 12px; border-bottom: 1px solid #f5f5f2; vertical-align: middle; }
-    tr:last-child td { border-bottom: none; }
-    tr:hover td { background: #fafafa; }
-    .badge { display: inline-block; padding: 3px 10px; border-radius: 20px; font-size: 0.72rem; font-weight: 600; }
-    .badge-auto { background: #e8f4ec; color: #2e7d32; }
-    .badge-manual { background: #fff3e0; color: #e65100; }
-    .badge-seller { background: #e8f0fe; color: #1a73e8; }
-    .badge-acheteur { background: #fce4ec; color: #c62828; }
-    .badge-prospect { background: #f3e5f5; color: #6a1b9a; }
-    .badge-prestataire { background: #e0f2f1; color: #00695c; }
-    .badge-admin { background: #fff3e0; color: #e65100; }
-    .catalog-section-row td { background: #F5F0E8; font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #9E3A18; padding: 8px 12px; }
-    .badge-success { background: #e8f4ec; color: #2e7d32; }
-    .badge-fail { background: #fdecea; color: #c62828; }
-    .btn-send { background: #C4785A; color: #fff; border: none; padding: 7px 16px; border-radius: 6px; font-size: 0.82rem; cursor: pointer; font-weight: 600; white-space: nowrap; display: inline-flex; align-items: center; gap: 5px; }
-    .btn-send:hover { background: #b0654a; }
-    .btn-send:disabled { background: #ccc; cursor: not-allowed; }
-    .form-group { margin-bottom: 16px; }
-    label { display: block; font-size: 0.82rem; font-weight: 600; color: #444; margin-bottom: 6px; }
-    select, textarea { width: 100%; padding: 10px 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 0.88rem; font-family: inherit; }
-    textarea { resize: vertical; min-height: 100px; }
-    .send-btn-primary { background: #C4603A; color: #fff; border: none; padding: 12px 28px; border-radius: 8px; font-size: 0.95rem; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; }
-    .send-btn-primary:hover { background: #2e4435; }
-    .toast { position: fixed; bottom: 24px; right: 24px; background: #C4603A; color: #fff; padding: 14px 24px; border-radius: 10px; font-size: 0.9rem; z-index: 9999; opacity: 0; transition: opacity 0.3s; pointer-events: none; }
-    .toast.show { opacity: 1; }
-    .toast.error { background: #c62828; }
-    .log-time { font-size: 0.78rem; color: #999; }
-    .search-bar { display: flex; gap: 12px; margin-bottom: 20px; align-items: center; }
-    .search-bar input { flex: 1; padding: 9px 14px; border: 1px solid #ddd; border-radius: 8px; font-size: 0.88rem; }
-    .filter-btn { padding: 8px 16px; border-radius: 8px; border: 1px solid #ddd; background: #fff; font-size: 0.82rem; cursor: pointer; }
-    .filter-btn.active { background: #C4603A; color: #fff; border-color: #C4603A; }
-    #sendModal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.45); z-index: 1000; align-items: center; justify-content: center; }
+    :root {
+      --cream: #F5F0E8;
+      --surface: #fff;
+      --dark: #1A1A16;
+      --terra: #C4603A;
+      --terra-2: #C4785A;
+      --border: #E8E3D9;
+      --border-card: #F0EBE4;
+      --text2: #68665E;
+      --text3: #A09C95;
+      --green: #2e6b3e;
+      --green-bg: #e8f2ec;
+      --amber: #d97706;
+      --amber-bg: #fef3c7;
+      --red: #c62828;
+      --red-bg: #fdecea;
+      --blue: #2563eb;
+      --blue-bg: #dbeafe;
+      --purple: #7c3aed;
+    }
+
+    body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(--dark); font-size: 14px; }
+    .admin-main { padding: 32px; overflow-y: auto; }
+
+    /* ── Page header ── */
+    .page-hdr { display: flex; align-items: flex-end; justify-content: space-between; margin-bottom: 28px; gap: 16px; }
+    .page-hdr h1 { font-family: 'Cormorant Garamond', serif; font-size: 2.1rem; font-weight: 600; line-height: 1; margin: 0 0 4px; }
+    .page-hdr .sub { font-size: 0.78rem; color: var(--text3); }
+    .btn-primary { display: inline-flex; align-items: center; gap: 7px; background: var(--terra); color: #FDFCF8; padding: 10px 20px; border-radius: 8px; font-size: 0.88rem; font-weight: 600; border: none; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: opacity .15s; }
+    .btn-primary:hover { opacity: .87; }
+
+    /* ── Stats ── */
+    .stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 28px; }
+    .stat-card { background: var(--surface); border-radius: 12px; padding: 18px 20px; box-shadow: 0 1px 4px rgba(0,0,0,.06); }
+    .stat-lbl { font-size: 0.67rem; color: var(--text3); text-transform: uppercase; letter-spacing: .06em; margin-bottom: 4px; }
+    .stat-val { font-family: 'Cormorant Garamond', serif; font-size: 2rem; font-weight: 600; line-height: 1; color: var(--terra); }
+    .stat-sub { font-size: 0.72rem; color: var(--text3); margin-top: 4px; }
+
+    /* ── Cards ── */
+    .card { background: var(--surface); border-radius: 12px; box-shadow: 0 1px 4px rgba(0,0,0,.06); overflow: hidden; margin-bottom: 20px; }
+    .card-hdr { padding: 16px 24px; border-bottom: 1px solid var(--border-card); display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+    .card-title { font-family: 'Cormorant Garamond', serif; font-size: 1.15rem; font-weight: 600; display: flex; align-items: center; gap: 8px; margin: 0; }
+    .card-title svg { color: var(--terra); flex-shrink: 0; }
+
+    /* ── Search / Filter bar ── */
+    .search-bar { display: flex; gap: 8px; align-items: center; padding: 12px 24px; border-bottom: 1px solid var(--border-card); flex-wrap: wrap; }
+    .search-input { flex: 1; min-width: 180px; padding: 7px 12px; border: 1px solid var(--border); border-radius: 7px; font-size: 0.84rem; font-family: 'DM Sans', sans-serif; outline: none; background: var(--cream); color: var(--dark); }
+    .search-input:focus { border-color: var(--terra); background: #fff; }
+    .filter-btn { padding: 6px 13px; border-radius: 7px; border: 1px solid var(--border); background: var(--surface); font-size: 0.78rem; font-weight: 600; cursor: pointer; font-family: 'DM Sans', sans-serif; color: var(--text2); transition: all .12s; white-space: nowrap; }
+    .filter-btn:hover { border-color: var(--dark); color: var(--dark); }
+    .filter-btn.active { background: var(--terra); color: #fff; border-color: var(--terra); }
+    .filter-btn.suspended-btn { border-color: #fca5a5; color: var(--red); background: var(--red-bg); }
+    .filter-btn.suspended-btn.active { background: var(--red); color: #fff; border-color: var(--red); }
+
+    /* ── Catalog table ── */
+    table.catalog { width: 100%; border-collapse: collapse; font-size: 0.84rem; }
+    table.catalog thead th { text-align: left; padding: 9px 16px; font-size: 0.63rem; text-transform: uppercase; letter-spacing: .06em; color: var(--text3); border-bottom: 2px solid var(--border-card); font-weight: 600; white-space: nowrap; }
+    table.catalog tbody td { padding: 12px 16px; border-bottom: 1px solid #F7F5F2; vertical-align: middle; line-height: 1.45; }
+    table.catalog tbody tr:last-child td { border-bottom: none; }
+    table.catalog tbody tr:hover td { background: #fdfcfa; }
+    table.catalog tbody tr.suspended-row td { background: #fff8f8; }
+    table.catalog tbody tr.suspended-row:hover td { background: #fff0f0; }
+
+    /* Category row */
+    .cat-row td { background: #f0e9de !important; font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: .07em; color: #8b3416; padding: 10px 16px !important; border-top: 2px solid #d9d0c4 !important; }
+    .cat-count { display: inline-block; background: rgba(196,96,58,.18); color: var(--terra); font-size: .67rem; font-weight: 700; padding: 2px 8px; border-radius: 10px; margin-left: 8px; letter-spacing: .02em; vertical-align: middle; }
+
+    /* E-XX badge */
+    .enum-badge { display: inline-block; font-family: monospace; font-size: 0.73rem; font-weight: 700; color: var(--terra); background: rgba(196,96,58,.1); padding: 3px 8px; border-radius: 5px; white-space: nowrap; }
+    .enum-badge.suspended { color: var(--red); background: var(--red-bg); }
+
+    /* Email label cell */
+    .email-label { font-weight: 600; font-size: 0.88rem; color: var(--dark); }
+    .email-trigger-text { font-size: 0.78rem; color: var(--text3); margin-top: 3px; line-height: 1.45; }
+    .suspended-note { font-size: .74rem; color: var(--red); margin-top: 4px; font-weight: 600; }
+
+    /* Recipient badges */
+    .dest-badge { display: inline-block; padding: 3px 9px; border-radius: 20px; font-size: 0.7rem; font-weight: 600; white-space: nowrap; }
+    .dest-vendeur     { background: #e8f0fe; color: #1a73e8; }
+    .dest-acheteur    { background: #fce4ec; color: #c62828; }
+    .dest-prospect    { background: #f3e5f5; color: #6a1b9a; }
+    .dest-admin       { background: #fff3e0; color: #e65100; }
+    .dest-photographe { background: #e0f2f1; color: #00695c; }
+    .dest-notaire     { background: #e8eaf6; color: #3949ab; }
+    .dest-libre       { background: #f5f5f5; color: #555; }
+
+    /* Auto / Manuel */
+    .trigger-auto   { display: inline-flex; align-items: center; gap: 4px; font-size: .7rem; color: var(--green); background: var(--green-bg); padding: 2px 8px; border-radius: 20px; font-weight: 600; white-space: nowrap; }
+    .trigger-manual { display: inline-flex; align-items: center; gap: 4px; font-size: .7rem; color: #7c5e00; background: var(--amber-bg); padding: 2px 8px; border-radius: 20px; font-weight: 600; white-space: nowrap; }
+
+    /* Status */
+    .status-actif     { display: inline-block; font-size: .72rem; font-weight: 700; color: var(--green); background: var(--green-bg); padding: 3px 10px; border-radius: 20px; }
+    .status-suspended { display: inline-block; font-size: .72rem; font-weight: 700; color: var(--red); background: var(--red-bg); padding: 3px 10px; border-radius: 20px; letter-spacing: .04em; }
+
+    /* Action buttons */
+    .btn-apercu  { display: inline-flex; align-items: center; gap: 5px; background: var(--terra); color: #fff; border: none; padding: 6px 12px; border-radius: 6px; font-size: .78rem; font-weight: 600; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: opacity .12s; white-space: nowrap; }
+    .btn-apercu:hover { opacity: .87; }
+    .btn-envoyer { display: inline-flex; align-items: center; gap: 5px; background: var(--terra-2); color: #fff; border: none; padding: 6px 12px; border-radius: 6px; font-size: .78rem; font-weight: 600; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: opacity .12s; white-space: nowrap; margin-left: 5px; }
+    .btn-envoyer:hover { opacity: .87; }
+    .btn-envoyer:disabled { background: #D4CFC9; cursor: not-allowed; opacity: 1; }
+    .no-preview-note { font-size: .76rem; color: var(--text3); font-style: italic; }
+    .actions-cell { display: flex; align-items: center; gap: 0; white-space: nowrap; }
+
+    /* ── Log table ── */
+    table.log { width: 100%; border-collapse: collapse; font-size: .82rem; }
+    table.log thead th { text-align: left; padding: 9px 14px; font-size: .62rem; text-transform: uppercase; letter-spacing: .06em; color: var(--text3); border-bottom: 2px solid var(--border-card); font-weight: 600; white-space: nowrap; }
+    table.log tbody td { padding: 11px 14px; border-bottom: 1px solid #F7F5F2; vertical-align: middle; }
+    table.log tbody tr:last-child td { border-bottom: none; }
+    table.log tbody tr:hover td { background: #fdfcfa; }
+    .log-time { font-size: .76rem; color: var(--text3); }
+    .badge-ok   { display: inline-block; background: var(--green-bg); color: var(--green); font-size: .68rem; font-weight: 700; padding: 2px 7px; border-radius: 10px; }
+    .badge-fail { display: inline-block; background: var(--red-bg); color: var(--red); font-size: .68rem; font-weight: 700; padding: 2px 7px; border-radius: 10px; }
+    .log-pagination { padding: 12px 24px; display: flex; gap: 8px; align-items: center; font-size: .82rem; color: var(--text3); border-top: 1px solid var(--border-card); }
+
+    /* ── Send modal ── */
+    #sendModal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.45); z-index: 1000; align-items: center; justify-content: center; }
     #sendModal.show { display: flex; }
-    .modal-box { background: #fff; border-radius: 16px; padding: 32px; width: 520px; max-width: 95vw; box-shadow: 0 8px 40px rgba(0,0,0,0.18); }
-    .modal-title { font-family: 'Cormorant Garamond', serif; font-size: 1.4rem; color: #1A1A16; margin: 0 0 24px; }
-    .modal-close { float: right; background: none; border: none; font-size: 1.3rem; cursor: pointer; color: #999; line-height: 1; }
+    .modal-box { background: #fff; border-radius: 16px; padding: 32px; width: 520px; max-width: 95vw; box-shadow: 0 8px 40px rgba(0,0,0,.18); }
+    .modal-title { font-family: 'Cormorant Garamond', serif; font-size: 1.4rem; color: var(--dark); margin: 0 0 24px; }
+    .modal-close { float: right; background: none; border: none; font-size: 1.3rem; cursor: pointer; color: var(--text3); line-height: 1; }
+    .form-group { margin-bottom: 16px; }
+    .form-group label { display: block; font-size: .82rem; font-weight: 600; color: #444; margin-bottom: 6px; }
+    .form-group select, .form-group input, .form-group textarea { width: 100%; padding: 9px 12px; border: 1px solid var(--border); border-radius: 8px; font-size: .88rem; font-family: 'DM Sans', sans-serif; outline: none; background: var(--cream); color: var(--dark); }
+    .form-group select:focus, .form-group input:focus, .form-group textarea:focus { border-color: var(--terra); background: #fff; }
+    .form-group textarea { resize: vertical; min-height: 100px; }
+    .send-btn-primary { background: var(--terra); color: #fff; border: none; padding: 11px 24px; border-radius: 8px; font-size: .9rem; font-weight: 600; cursor: pointer; font-family: 'DM Sans', sans-serif; display: inline-flex; align-items: center; gap: 8px; }
+    .send-btn-primary:hover { opacity: .87; }
     .custom-msg-wrap { display: none; }
-    .stat-pill { display: inline-block; background: #f0f0ed; border-radius: 20px; padding: 4px 12px; font-size: 0.82rem; color: #555; margin-right: 8px; }
+    #emailPreviewBox { background: var(--cream); border-radius: 8px; padding: 12px 14px; margin-bottom: 18px; font-size: .82rem; color: var(--text2); display: none; border: 1px solid var(--border); }
+
+    /* ── Toast ── */
+    .toast { position: fixed; bottom: 24px; right: 24px; background: var(--terra); color: #fff; padding: 12px 22px; border-radius: 10px; font-size: .88rem; z-index: 9999; opacity: 0; transition: opacity .3s; pointer-events: none; }
+    .toast.show { opacity: 1; }
+    .toast.error { background: var(--red); }
+
+    @media (max-width: 1100px) { .stats-row { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 700px)  { .stats-row { grid-template-columns: 1fr; } }
   </style>
 </head>
 <body class="admin-body">
 <div class="admin-layout">
   <div id="admin-sidebar-slot"></div>
   <main class="admin-main">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:28px;">
+
+    <!-- En-tête -->
+    <div class="page-hdr">
       <div>
-        <h1 style="font-family:'Cormorant Garamond',serif;color:#1A1A16;font-size:2rem;margin:0 0 4px;">Emails</h1>
-        <p style="color:#888;font-size:0.88rem;margin:0;">Catalogue complet · Historique · Envoi manuel</p>
+        <h1>Emails</h1>
+        <div class="sub">37 modèles · 13 catégories · Historique des envois · Envoi manuel</div>
       </div>
-      <button class="send-btn-primary" onclick="openSendModal()"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg> Envoyer un email</button>
+      <button class="btn-primary" onclick="openSendModal()">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+        Envoyer un email
+      </button>
     </div>
 
-    <!-- Résumé rapide -->
-    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:28px;" id="statsRow">
-      <div class="card" style="padding:18px 20px;margin-bottom:0;">
-        <div style="font-size:0.72rem;color:#aaa;text-transform:uppercase;letter-spacing:0.05em;">Total envoyés</div>
-        <div style="font-family:'Cormorant Garamond',serif;font-size:2rem;color:#C4603A;" id="statTotal">—</div>
+    <!-- Statistiques -->
+    <div class="stats-row" id="statsRow">
+      <div class="stat-card">
+        <div class="stat-lbl">Total envoyés</div>
+        <div class="stat-val" id="statTotal">—</div>
+        <div class="stat-sub">depuis le lancement</div>
       </div>
-      <div class="card" style="padding:18px 20px;margin-bottom:0;">
-        <div style="font-size:0.72rem;color:#aaa;text-transform:uppercase;letter-spacing:0.05em;">Cette semaine</div>
-        <div style="font-family:'Cormorant Garamond',serif;font-size:2rem;color:#C4603A;" id="statWeek">—</div>
+      <div class="stat-card">
+        <div class="stat-lbl">Cette semaine</div>
+        <div class="stat-val" id="statWeek">—</div>
+        <div class="stat-sub">auto + manuels</div>
       </div>
-      <div class="card" style="padding:18px 20px;margin-bottom:0;">
-        <div style="font-size:0.72rem;color:#aaa;text-transform:uppercase;letter-spacing:0.05em;">Types automatiques</div>
-        <div style="font-family:'Cormorant Garamond',serif;font-size:2rem;color:#C4603A;" id="statAuto">—</div>
+      <div class="stat-card">
+        <div class="stat-lbl">Modèles actifs</div>
+        <div class="stat-val" id="statAuto">—</div>
+        <div class="stat-sub" style="color:var(--red);" id="statSuspendedNote">4 suspendus (E-09, E-13, E-14, E-15)</div>
       </div>
-      <div class="card" style="padding:18px 20px;margin-bottom:0;">
-        <div style="font-size:0.72rem;color:#aaa;text-transform:uppercase;letter-spacing:0.05em;">Envois manuels</div>
-        <div style="font-family:'Cormorant Garamond',serif;font-size:2rem;color:#C4785A;" id="statManual">—</div>
+      <div class="stat-card">
+        <div class="stat-lbl">Envois manuels</div>
+        <div class="stat-val" style="color:var(--terra-2);" id="statManual">—</div>
+        <div class="stat-sub">modèles à déclenchement manuel</div>
       </div>
     </div>
 
     <!-- Catalogue -->
     <div class="card">
-      <h2 class="card-title"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg> Catalogue des emails</h2>
+      <div class="card-hdr">
+        <h2 class="card-title">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+          Catalogue des 37 emails
+        </h2>
+        <span id="catalogCount" style="font-size:.8rem;color:var(--text3);"></span>
+      </div>
       <div class="search-bar">
-        <input type="text" id="catalogSearch" placeholder="Rechercher un type d'email..." oninput="filterCatalog()">
+        <input type="text" class="search-input" id="catalogSearch" placeholder="Rechercher par nom, numéro E-XX, déclencheur…" oninput="filterCatalog()">
         <button class="filter-btn active" onclick="setFilter('all', this)">Tous</button>
         <button class="filter-btn" onclick="setFilter('auto', this)">Automatiques</button>
         <button class="filter-btn" onclick="setFilter('manual', this)">Manuels</button>
         <button class="filter-btn" onclick="setFilter('Vendeur', this)">Vendeurs</button>
+        <button class="filter-btn suspended-btn" onclick="setFilter('suspended', this)">Suspendus (4)</button>
       </div>
       <div style="overflow-x:auto;">
-        <table id="catalogTable">
+        <table class="catalog" id="catalogTable">
           <thead>
             <tr>
-              <th>Email</th>
-              <th>Déclencheur</th>
+              <th style="width:60px;">#</th>
+              <th>Email — déclencheur</th>
               <th>Destinataire</th>
               <th>Type</th>
+              <th>Statut</th>
               <th>Dernier envoi</th>
-              <th></th>
+              <th style="width:170px;">Actions</th>
             </tr>
           </thead>
           <tbody id="catalogBody">
-            <tr><td colspan="6" style="text-align:center;color:#aaa;padding:32px;">Chargement...</td></tr>
+            <tr><td colspan="7" style="text-align:center;color:var(--text3);padding:32px;">Chargement…</td></tr>
           </tbody>
         </table>
       </div>
@@ -132,31 +235,35 @@
 
     <!-- Historique -->
     <div class="card">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
-        <h2 class="card-title" style="margin:0;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Historique des envois</h2>
-        <div style="display:flex;gap:8px;">
-          <input type="text" id="logSearch" placeholder="Filtrer par email..." style="padding:8px 12px;border:1px solid #ddd;border-radius:8px;font-size:0.82rem;width:200px;" oninput="filterLog()">
+      <div class="card-hdr">
+        <h2 class="card-title">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          Historique des envois
+        </h2>
+        <div style="display:flex;gap:8px;align-items:center;">
+          <input type="text" class="search-input" id="logSearch" style="min-width:0;width:200px;" placeholder="Filtrer par adresse…" oninput="filterLog()">
           <button class="filter-btn" onclick="loadLog(0)">↺ Rafraîchir</button>
         </div>
       </div>
       <div style="overflow-x:auto;">
-        <table>
+        <table class="log">
           <thead>
             <tr>
               <th>Date</th>
-              <th>Type</th>
+              <th>Email</th>
               <th>Destinataire</th>
               <th>Vendeur</th>
               <th>Statut</th>
             </tr>
           </thead>
           <tbody id="logBody">
-            <tr><td colspan="5" style="text-align:center;color:#aaa;padding:32px;">Chargement...</td></tr>
+            <tr><td colspan="5" style="text-align:center;color:var(--text3);padding:32px;">Chargement…</td></tr>
           </tbody>
         </table>
       </div>
-      <div id="logPagination" style="margin-top:16px;display:flex;gap:8px;align-items:center;font-size:0.85rem;color:#666;"></div>
+      <div class="log-pagination" id="logPagination"></div>
     </div>
+
   </main>
 </div>
 
@@ -167,7 +274,7 @@
     <h2 class="modal-title">Envoyer un email</h2>
 
     <div class="form-group">
-      <label>Vendeur <span style="font-weight:400;color:#999;">(remplit l'adresse ci-dessous — modifiable)</span></label>
+      <label>Vendeur <span style="font-weight:400;color:var(--text3);">(remplit l'adresse ci-dessous — modifiable)</span></label>
       <select id="modalSeller" onchange="onSellerChange()">
         <option value="">Chargement...</option>
       </select>
@@ -175,8 +282,8 @@
 
     <div class="form-group">
       <label>Destinataire</label>
-      <input type="email" id="modalEmailTo" placeholder="email@exemple.fr" style="width:100%;padding:10px 12px;border:1px solid #ddd;border-radius:8px;font-size:0.88rem;font-family:inherit;">
-      <div style="font-size:0.76rem;color:#999;margin-top:4px;">Envoyé depuis votre propre adresse (le compte admin connecté), pas une adresse générique.</div>
+      <input type="email" id="modalEmailTo" placeholder="email@exemple.fr">
+      <div style="font-size:.76rem;color:var(--text3);margin-top:4px;">Envoyé depuis votre propre adresse (le compte admin connecté), pas une adresse générique.</div>
     </div>
 
     <div class="form-group">
@@ -191,11 +298,14 @@
       <textarea id="modalCustomMsg" placeholder="Bonjour [Prénom],&#10;..."></textarea>
     </div>
 
-    <div id="emailPreviewBox" style="background:#f7f7f5;border-radius:8px;padding:14px 16px;margin-bottom:20px;font-size:0.82rem;color:#555;display:none;"></div>
+    <div id="emailPreviewBox"></div>
 
     <div style="display:flex;gap:12px;justify-content:flex-end;">
-      <button onclick="closeSendModal()" style="padding:11px 22px;border:1px solid #ddd;border-radius:8px;background:#fff;cursor:pointer;font-size:0.9rem;">Annuler</button>
-      <button class="send-btn-primary" onclick="sendEmail()" id="sendConfirmBtn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg> Envoyer</button>
+      <button onclick="closeSendModal()" style="padding:10px 20px;border:1px solid var(--border);border-radius:8px;background:#fff;cursor:pointer;font-size:.88rem;font-family:'DM Sans',sans-serif;color:var(--text2);">Annuler</button>
+      <button class="send-btn-primary" onclick="sendEmail()" id="sendConfirmBtn">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+        Envoyer
+      </button>
     </div>
   </div>
 </div>
@@ -205,21 +315,24 @@
   <div style="background:#1A1A16;border-radius:16px;width:90vw;max-width:780px;height:88vh;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 24px 60px rgba(0,0,0,0.5);">
     <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid #2a2a24;flex-shrink:0;">
       <div>
-        <div style="font-size:0.65rem;text-transform:uppercase;letter-spacing:0.1em;color:#888;margin-bottom:2px;">Aperçu email</div>
+        <div style="font-size:.65rem;text-transform:uppercase;letter-spacing:.1em;color:#888;margin-bottom:2px;">Aperçu email</div>
         <div id="previewTitle" style="font-weight:700;color:#fff;font-size:1rem;"></div>
       </div>
       <div style="display:flex;gap:8px;align-items:center;">
-        <button id="previewToggleBtn" onclick="togglePreviewMode()" style="background:#2a2a24;border:none;color:#ccc;padding:7px 14px;border-radius:8px;cursor:pointer;font-size:0.82rem;">< > Source</button>
-        <button onclick="closePreview()" style="background:#2a2a24;border:none;color:#ccc;padding:7px 14px;border-radius:8px;cursor:pointer;font-size:0.82rem;">✕ Fermer</button>
+        <button id="previewToggleBtn" onclick="togglePreviewMode()" style="background:#2a2a24;border:none;color:#ccc;padding:7px 14px;border-radius:8px;cursor:pointer;font-size:.82rem;font-family:'DM Sans',sans-serif;">&lt; &gt; Source</button>
+        <button onclick="closePreview()" style="background:#2a2a24;border:none;color:#ccc;padding:7px 14px;border-radius:8px;cursor:pointer;font-size:.82rem;font-family:'DM Sans',sans-serif;">✕ Fermer</button>
       </div>
     </div>
     <div style="flex:1;overflow:hidden;position:relative;background:#fff;min-height:0;">
       <iframe id="previewIframe" style="position:absolute;inset:0;width:100%;height:100%;border:none;" allowfullscreen></iframe>
-      <textarea id="previewSource" style="display:none;position:absolute;inset:0;width:100%;height:100%;border:none;padding:16px;font-family:monospace;font-size:0.78rem;background:#0f0f0d;color:#a8d4b8;resize:none;box-sizing:border-box;"></textarea>
+      <textarea id="previewSource" style="display:none;position:absolute;inset:0;width:100%;height:100%;border:none;padding:16px;font-family:monospace;font-size:.78rem;background:#0f0f0d;color:#a8d4b8;resize:none;box-sizing:border-box;"></textarea>
     </div>
     <div style="padding:12px 20px;border-top:1px solid #2a2a24;display:flex;gap:8px;flex-shrink:0;">
-      <button onclick="copyHtml()" style="background:#2a2a24;border:none;color:#ccc;padding:8px 16px;border-radius:8px;cursor:pointer;font-size:0.82rem;display:inline-flex;align-items:center;gap:6px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Copier le HTML</button>
-      <span style="flex:1;font-size:0.75rem;color:#555;display:flex;align-items:center;">Données de démo : Marie Lambert · Toulouse · 385 000 €</span>
+      <button onclick="copyHtml()" style="background:#2a2a24;border:none;color:#ccc;padding:8px 16px;border-radius:8px;cursor:pointer;font-size:.82rem;font-family:'DM Sans',sans-serif;display:inline-flex;align-items:center;gap:6px;">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+        Copier le HTML
+      </button>
+      <span style="flex:1;font-size:.75rem;color:#555;display:flex;align-items:center;">Données de démo : Sophie Martin · Lyon · 320 000 €</span>
     </div>
   </div>
 </div>
@@ -227,7 +340,7 @@
 <div class="toast" id="toast"></div>
 
 <script>
-let previewMode = 'visual'; // 'visual' | 'source'
+let previewMode = 'visual';
 let currentPreviewHtml = '';
 let currentPreviewId = '';
 
@@ -241,9 +354,7 @@ async function openPreview(id, label) {
   document.getElementById('previewIframe').style.display = 'block';
   document.getElementById('previewSource').style.display = 'none';
   document.getElementById('previewSource').value = '';
-  // Load email HTML in iframe via src — browser sends auth cookie automatically
   document.getElementById('previewIframe').src = `/admin/api/emails/preview/${id}`;
-  // Also fetch source text for the textarea view
   try {
     const r = await fetch(`/admin/api/emails/preview/${id}`);
     currentPreviewHtml = await r.text();
@@ -283,7 +394,6 @@ function copyHtml() {
   navigator.clipboard.writeText(html).then(() => showToast('HTML copié !')).catch(() => showToast('Erreur copie', true));
 }
 
-// Fermer la modal sur Escape
 document.addEventListener('keydown', e => { if (e.key === 'Escape') closePreview(); });
 
 let allCatalog = [];
@@ -293,38 +403,55 @@ let logPage = 0;
 let sellers = [];
 
 const EMAIL_DESCRIPTIONS = {
-  no_photos: 'Rappelle au vendeur d\'ajouter des photos à son annonce.',
-  missing_doc: 'Indique au vendeur les diagnostics manquants dans son dossier.',
-  not_published: 'Incite le vendeur à publier sa fiche prête mais non visible.',
-  post_first_visit: 'Demande au vendeur son retour après ses premières visites.',
-  check_in_no_offer: 'Check-in de soutien pour un vendeur sans offre après 14 jours.',
-  contract_renewal: 'Rappel de renouvellement 30 jours avant expiration du contrat.',
-  review_request: 'Demande un avis en ligne après une offre acceptée.',
-  prospect_nudge: 'Relance un prospect inscrit mais non encore passé à l\'achat.',
-  info_needed: 'Demande des informations manquantes au vendeur pour compléter son dossier.',
-  buyer_contacted: 'Informe le vendeur qu\'un acheteur vient de remplir le formulaire de contact de son annonce.',
-  first_visit_reminder: 'Conseils pratiques envoyés la veille de la toute première visite confirmée du vendeur.',
-  post_visit_buyer: 'Relance l\'acheteur qui a visité sans faire d\'offre, une semaine après la visite.',
-  sold_congrats: 'Félicite le vendeur dès qu\'il passe le statut de son bien à "vendu".',
-  welcome_v2: 'Email de bienvenue amélioré envoyé à la création de compte.',
-  contact_notification: 'Prévient l\'admin qu\'un prospect a rempli le formulaire de contact ou de rappel du site.',
-  custom: 'Message libre rédigé manuellement par l\'administrateur.',
+  prospect_nudge:              'Relance un prospect inscrit mais non encore passé à l\'achat.',
+  welcome_v2:                  'Email de bienvenue envoyé à la création de compte.',
+  invoice:                     'Envoie la facture Pack Autonomie (999 € TTC) après paiement.',
+  invoice_serenite:            'Envoie la facture Pack Coaching Plus (1 547 € TTC) après paiement.',
+  first_meeting:               'Prépare le vendeur avant son premier rendez-vous de démarrage.',
+  new_client_admin_notif:      'Notifie l\'admin de l\'arrivée d\'un nouveau client payant.',
+  password_reset:              'Envoie le lien de réinitialisation du mot de passe.',
+  login_code:                  'Envoie le code de connexion lors de l\'authentification à deux facteurs.',
+  no_property:                 'Rappelle au vendeur de créer sa fiche bien.',
+  no_photos:                   'Rappelle au vendeur d\'ajouter des photos à son annonce.',
+  missing_doc:                 'Indique au vendeur les diagnostics manquants dans son dossier.',
+  not_published:               'Incite le vendeur à publier sa fiche prête mais non visible.',
+  mission_confirmed:           '[SUSPENDU] Confirme au vendeur la date et les détails de sa séance photo.',
+  mission_reminder_client:     '[SUSPENDU] Rappelle au vendeur la séance photo prévue le lendemain.',
+  mission_reminder_photographer:'[SUSPENDU] Rappelle au photographe partenaire la séance photo du lendemain.',
+  published:                   'Confirme au vendeur la mise en ligne de son annonce.',
+  new_visit_request:           'Informe le vendeur d\'une nouvelle demande de visite ou prise de contact acheteur.',
+  visit_confirmation:          'Confirme à l\'acheteur la visite réservée.',
+  first_visit_reminder:        'Conseils pratiques envoyés la veille de la toute première visite confirmée.',
+  visit_reminder_seller:       'Rappelle au vendeur la visite prévue le lendemain.',
+  visit_reminder_buyer:        'Rappelle à l\'acheteur sa visite prévue le lendemain, avec les coordonnées du propriétaire.',
+  visit_cancellation:          'Informe l\'acheteur de l\'annulation de la visite.',
+  dossier:                     'Envoie à l\'acheteur le lien vers le dossier partageable du bien.',
+  post_first_visit:            'Demande au vendeur son retour après ses premières visites.',
+  post_visit_buyer:            'Relance l\'acheteur qui a visité sans faire d\'offre, une semaine après la visite.',
+  check_in_no_offer:           'Check-in de soutien pour un vendeur sans offre après 30 jours.',
+  price_drop:                  'Conseille au vendeur d\'envisager une baisse de prix après 30 jours sans offre.',
+  offer_notification:          'Informe le vendeur d\'une nouvelle offre d\'achat reçue.',
+  offer_receipt_buyer:         'Confirme à l\'acheteur la bonne réception de son offre d\'achat.',
+  compromis_milestone:         'Rappelle au vendeur les prochaines échéances liées au compromis signé.',
+  sold_congrats:               'Félicite le vendeur dès qu\'il passe le statut de son bien à "vendu".',
+  sold_to_buyer:               'Informe les acheteurs ayant visité que le bien est désormais vendu.',
+  review_request:              'Demande un avis en ligne après la vente réalisée.',
+  contract_renewal:            'Rappel de renouvellement 30 jours avant expiration du contrat.',
+  dossier_notaire:             'Envoie le dossier complet au notaire pour préparer l\'acte authentique.',
+  contact_notification:        'Prévient l\'admin qu\'un prospect a rempli le formulaire de contact ou de rappel du site.',
+  custom:                      'Message libre rédigé manuellement par l\'administrateur.',
 };
 
-// Libellés lisibles pour les modèles testables qui n'apparaissent pas dans
-// EMAIL_CATALOG (utilitaires transactionnels plutôt qu'emails de parcours).
 const TESTABLE_EXTRA_LABELS = {
   password_reset: 'Réinitialisation mot de passe',
-  login_code: 'Code de connexion',
-  dossier: 'Dossier acheteur partagé',
+  login_code:     'Code de connexion',
+  dossier:        'Dossier acheteur partagé',
 };
 
 let testableTemplates = [];
 
 async function init() {
   await Promise.all([loadCatalog(), loadLog(0), loadSellers(), loadTestable()]);
-  // allCatalog et testableTemplates se chargent en parallèle : on regénère les
-  // libellés une fois les deux disponibles, au cas où le catalogue arrive après.
   renderModalEmailTypeOptions();
 }
 
@@ -344,15 +471,15 @@ async function loadCatalog() {
     const r = await fetch('/admin/api/emails/catalog');
     const data = await r.json();
     if (data.error) throw new Error(data.error);
-    const catalog = data.catalog || [];
-    allCatalog = catalog;
-    renderCatalog(catalog);
-    const autoCount = catalog.filter(e => e.auto).length;
-    document.getElementById('statAuto').textContent = autoCount;
-    document.getElementById('statManual').textContent = catalog.length - autoCount;
+    allCatalog = data.catalog || [];
+    renderCatalog(allCatalog);
+    const activeCount = allCatalog.filter(e => !e.suspended).length;
+    const manualCount = allCatalog.filter(e => !e.auto).length;
+    document.getElementById('statAuto').textContent = activeCount;
+    document.getElementById('statManual').textContent = manualCount;
     renderModalEmailTypeOptions();
   } catch(e) {
-    document.getElementById('catalogBody').innerHTML = `<tr><td colspan="6" style="text-align:center;color:#c62828;padding:32px;">Erreur chargement catalogue : ${e.message}</td></tr>`;
+    document.getElementById('catalogBody').innerHTML = `<tr><td colspan="7" style="text-align:center;color:var(--red);padding:32px;">Erreur chargement catalogue : ${e.message}</td></tr>`;
   }
 }
 
@@ -366,8 +493,11 @@ async function loadLog(page) {
     allLogs = logs;
     renderLog(logs, total, page);
     document.getElementById('statTotal').textContent = total.toLocaleString('fr-FR');
+    const weekAgo = new Date(Date.now() - 7 * 86400000).toISOString();
+    const weekCount = logs.filter(l => l.sent_at >= weekAgo).length;
+    document.getElementById('statWeek').textContent = weekCount;
   } catch(e) {
-    document.getElementById('logBody').innerHTML = `<tr><td colspan="5" style="text-align:center;color:#c62828;padding:32px;">Erreur : ${e.message}</td></tr>`;
+    document.getElementById('logBody').innerHTML = `<tr><td colspan="5" style="text-align:center;color:var(--red);padding:32px;">Erreur : ${e.message}</td></tr>`;
   }
 }
 
@@ -379,9 +509,6 @@ async function loadSellers() {
     const sel = document.getElementById('modalSeller');
     sel.innerHTML = '<option value="">Choisir un vendeur...</option>' +
       sellers.map(s => `<option value="${s.id}" data-email="${s.email}">${s.first_name} ${s.last_name} — ${s.email}</option>`).join('');
-    const weekAgo = new Date(Date.now() - 7*86400000).toISOString();
-    const weekCount = allLogs.filter(l => l.sent_at >= weekAgo).length;
-    document.getElementById('statWeek').textContent = weekCount;
   } catch(e) {
     document.getElementById('modalSeller').innerHTML = `<option>Erreur : ${e.message}</option>`;
   }
@@ -389,74 +516,168 @@ async function loadSellers() {
 
 function renderCatalog(list) {
   const tbody = document.getElementById('catalogBody');
-  if (!list.length) { tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:#aaa;padding:32px;">Aucun résultat</td></tr>'; return; }
+  const cnt = document.getElementById('catalogCount');
+  if (!list.length) {
+    tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:var(--text3);padding:32px;">Aucun résultat</td></tr>';
+    if (cnt) cnt.textContent = '';
+    return;
+  }
+  if (cnt) cnt.textContent = `${list.length} email${list.length > 1 ? 's' : ''}`;
+
+  // E-XX number from position in full catalog
+  const enumMap = {};
+  allCatalog.forEach((e, i) => { enumMap[e.id] = i + 1; });
+
+  const recMap = {
+    Vendeur:     'dest-vendeur',
+    Acheteur:    'dest-acheteur',
+    Prospect:    'dest-prospect',
+    Admin:       'dest-admin',
+    Notaire:     'dest-notaire',
+    Photographe: 'dest-photographe',
+    Libre:       'dest-libre',
+  };
+
+  // Count per category in this list
+  const catCount = {};
+  list.forEach(e => { catCount[e.category] = (catCount[e.category] || 0) + 1; });
+
   let lastCategory = null;
-  tbody.innerHTML = list.map(e => {
-    const recBadge = e.recipient === 'Vendeur' ? 'badge-seller' : e.recipient === 'Acheteur' ? 'badge-acheteur' : e.recipient === 'Prospect' ? 'badge-prospect' : e.recipient === 'Admin' ? 'badge-admin' : 'badge-prestataire';
-    const lastSent = e.last_sent ? new Date(e.last_sent).toLocaleDateString('fr-FR', { day:'2-digit', month:'short', year:'numeric' }) : '<span style="color:#ccc">Jamais</span>';
-    let sectionRow = '';
+  let rows = [];
+
+  list.forEach(e => {
+    const num   = enumMap[e.id] || 0;
+    const numStr = `E-${String(num).padStart(2, '0')}`;
+    const recCls = recMap[e.recipient] || 'dest-libre';
+    const lastSent = e.last_sent
+      ? new Date(e.last_sent).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: 'numeric' })
+      : '<span style="color:var(--text3)">—</span>';
+
+    // Category separator row
     if (e.category && e.category !== lastCategory) {
-      sectionRow = `<tr class="catalog-section-row"><td colspan="6">${e.category}</td></tr>`;
       lastCategory = e.category;
+      const cc = catCount[e.category];
+      const suspBadge = e.suspended
+        ? `<span style="background:var(--red-bg);color:var(--red);padding:1px 8px;border-radius:10px;font-size:.65rem;font-weight:700;margin-left:8px;letter-spacing:.06em;">SUSPENDU</span>`
+        : '';
+      rows.push(`<tr class="cat-row"><td colspan="7">${e.category}${suspBadge}<span class="cat-count">${cc} email${cc > 1 ? 's' : ''}</span></td></tr>`);
     }
-    return `${sectionRow}<tr>
+
+    const numBadge = `<span class="enum-badge${e.suspended ? ' suspended' : ''}">${numStr}</span>`;
+    const typeBadge = e.suspended
+      ? `<span class="status-suspended">SUSPENDU</span>`
+      : `<span class="${e.auto ? 'trigger-auto' : 'trigger-manual'}">${e.auto ? '● Auto' : '◆ Manuel'}</span>`;
+    const statusBadge = e.suspended
+      ? ''
+      : `<span class="status-actif">Actif</span>`;
+    const suspNote = e.suspended
+      ? `<div class="suspended-note">⛔ Guard actif — aucun envoi possible</div>`
+      : '';
+    const descHtml = EMAIL_DESCRIPTIONS[e.id]
+      ? `<div class="email-trigger-text">${EMAIL_DESCRIPTIONS[e.id]}</div>`
+      : '';
+
+    let actionCell;
+    if (e.noPreview) {
+      actionCell = `<span class="no-preview-note">Non prévisualisable</span>`;
+    } else if (e.suspended) {
+      actionCell = `<div class="actions-cell">
+        <button class="btn-apercu" onclick="openPreview('${e.id}','${e.label.replace(/'/g, "\\'")}')">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>Aperçu
+        </button>
+        <button class="btn-envoyer" disabled title="Email suspendu — envoi bloqué">Envoyer</button>
+      </div>`;
+    } else {
+      actionCell = `<div class="actions-cell">
+        <button class="btn-apercu" onclick="openPreview('${e.id}','${e.label.replace(/'/g, "\\'")}')">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>Aperçu
+        </button>
+        <button class="btn-envoyer" onclick="openSendModalWith('${e.id}')">Envoyer</button>
+      </div>`;
+    }
+
+    const rowCls = e.suspended ? ' class="suspended-row"' : '';
+    rows.push(`<tr${rowCls}>
+      <td>${numBadge}</td>
       <td>
-        <div style="font-weight:600;color:#1A1A16;">${e.label}</div>
-        <div style="font-size:0.78rem;color:#999;margin-top:2px;">${EMAIL_DESCRIPTIONS[e.id] || ''}</div>
+        <div class="email-label">${e.label}</div>
+        <div class="email-trigger-text" style="color:var(--text3)">${e.trigger}</div>
+        ${descHtml}${suspNote}
       </td>
-      <td style="color:#555;font-size:0.82rem;">${e.trigger}</td>
-      <td><span class="badge ${recBadge}">${e.recipient}</span></td>
-      <td><span class="badge ${e.auto ? 'badge-auto' : 'badge-manual'}">${e.auto ? 'Auto' : 'Manuel'}</span></td>
+      <td><span class="dest-badge ${recCls}">${e.recipient}</span></td>
+      <td>${typeBadge}</td>
+      <td>${statusBadge || `<span class="status-suspended">SUSPENDU</span>`}</td>
       <td class="log-time">${lastSent}</td>
-      <td style="display:flex;gap:6px;">
-        <button class="btn-send" style="background:#C4603A;" onclick="openPreview('${e.id}','${e.label.replace(/'/g,"\\'")}')" title="Voir l'aperçu"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg> Aperçu</button>
-        <button class="btn-send" onclick="openSendModalWith('${e.id}')">Envoyer</button>
-      </td>
-    </tr>`;
-  }).join('');
+      <td>${actionCell}</td>
+    </tr>`);
+  });
+
+  tbody.innerHTML = rows.join('');
 }
 
 function renderLog(logs, total, page) {
   const tbody = document.getElementById('logBody');
-  if (!logs.length) { tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:#aaa;padding:32px;">Aucun envoi enregistré</td></tr>'; return; }
+  if (!logs.length) {
+    tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--text3);padding:32px;">Aucun envoi enregistré</td></tr>';
+    document.getElementById('logPagination').innerHTML = '';
+    return;
+  }
   tbody.innerHTML = logs.map(l => {
-    const date = new Date(l.sent_at).toLocaleString('fr-FR', { day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit' });
+    const date = new Date(l.sent_at).toLocaleString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
     const typeLabel = l.trigger_type.replace(/_/g, ' ').replace(':', ' — ');
     const vendeur = (l.first_name || l.last_name) ? `${l.first_name || ''} ${l.last_name || ''}`.trim() : '—';
-    const statusBadge = l.success ? '<span class="badge badge-success">Envoyé</span>' : '<span class="badge badge-fail">Échec</span>';
+    const statusBadge = l.success ? '<span class="badge-ok">Envoyé</span>' : '<span class="badge-fail">Échec</span>';
     return `<tr>
       <td class="log-time">${date}</td>
-      <td style="font-size:0.82rem;color:#444;">${typeLabel}</td>
-      <td style="font-size:0.82rem;">${l.recipient_email}</td>
-      <td style="font-size:0.82rem;color:#666;">${vendeur}</td>
+      <td style="font-size:.82rem;color:var(--text2);">${typeLabel}</td>
+      <td style="font-size:.82rem;">${l.recipient_email}</td>
+      <td style="font-size:.82rem;color:var(--text3);">${vendeur}</td>
       <td>${statusBadge}</td>
     </tr>`;
   }).join('');
 
   const pages = Math.ceil(total / 50);
   const pag = document.getElementById('logPagination');
-  if (pages <= 1) { pag.innerHTML = `<span>${total} envoi(s) au total</span>`; return; }
+  if (pages <= 1) {
+    pag.innerHTML = `<span>${total.toLocaleString('fr-FR')} envoi${total > 1 ? 's' : ''} au total</span>`;
+    return;
+  }
   pag.innerHTML = `
-    <span>${total} envois · Page ${page + 1}/${pages}</span>
-    ${page > 0 ? `<button class="filter-btn" onclick="loadLog(${page-1})">← Précédente</button>` : ''}
-    ${page < pages-1 ? `<button class="filter-btn" onclick="loadLog(${page+1})">Suivante →</button>` : ''}
+    <span>${total.toLocaleString('fr-FR')} envois · Page ${page + 1}/${pages}</span>
+    ${page > 0 ? `<button class="filter-btn" onclick="loadLog(${page - 1})">← Précédente</button>` : ''}
+    ${page < pages - 1 ? `<button class="filter-btn" onclick="loadLog(${page + 1})">Suivante →</button>` : ''}
   `;
 }
 
 function filterCatalog() {
   const q = document.getElementById('catalogSearch').value.toLowerCase();
   let list = allCatalog;
-  if (activeFilter === 'auto') list = list.filter(e => e.auto);
-  else if (activeFilter === 'manual') list = list.filter(e => !e.auto);
-  else if (activeFilter !== 'all') list = list.filter(e => e.recipient === activeFilter);
-  if (q) list = list.filter(e => e.label.toLowerCase().includes(q) || e.trigger.toLowerCase().includes(q) || e.recipient.toLowerCase().includes(q));
+  if (activeFilter === 'auto')      list = list.filter(e => e.auto && !e.suspended);
+  else if (activeFilter === 'manual')    list = list.filter(e => !e.auto && !e.suspended);
+  else if (activeFilter === 'suspended') list = list.filter(e => e.suspended);
+  else if (activeFilter !== 'all')       list = list.filter(e => e.recipient === activeFilter);
+  if (q) {
+    const enumMap = {};
+    allCatalog.forEach((e, i) => { enumMap[e.id] = i + 1; });
+    list = list.filter(e => {
+      const numStr = `e-${String(enumMap[e.id] || 0).padStart(2, '0')}`;
+      return e.label.toLowerCase().includes(q) ||
+             e.trigger.toLowerCase().includes(q) ||
+             e.recipient.toLowerCase().includes(q) ||
+             numStr.includes(q) ||
+             (e.id || '').toLowerCase().includes(q);
+    });
+  }
   renderCatalog(list);
 }
 
 function filterLog() {
   const q = document.getElementById('logSearch').value.toLowerCase();
   if (!q) { renderLog(allLogs, allLogs.length, logPage); return; }
-  const filtered = allLogs.filter(l => l.recipient_email.toLowerCase().includes(q) || l.trigger_type.toLowerCase().includes(q));
+  const filtered = allLogs.filter(l =>
+    l.recipient_email.toLowerCase().includes(q) ||
+    l.trigger_type.toLowerCase().includes(q)
+  );
   renderLog(filtered, filtered.length, 0);
 }
 
@@ -512,7 +733,7 @@ function onEmailTypeChange() {
   customWrap.style.display = type === 'custom' ? 'block' : 'none';
   if (type && type !== 'custom') {
     preview.style.display = 'block';
-    preview.innerHTML = `<strong style="color:#C4603A;">Aperçu :</strong> ${EMAIL_DESCRIPTIONS[type] || 'Envoie le vrai modèle avec des données de démo (Sophie Martin / Thomas Durand).'}`;
+    preview.innerHTML = `<strong style="color:var(--terra);">Aperçu :</strong> ${EMAIL_DESCRIPTIONS[type] || 'Envoie le vrai modèle avec des données de démo (Sophie Martin / Thomas Durand).'}`;
   } else {
     preview.style.display = 'none';
   }
@@ -529,7 +750,7 @@ async function sendEmail() {
 
   const btn = document.getElementById('sendConfirmBtn');
   btn.disabled = true;
-  btn.textContent = 'Envoi...';
+  btn.textContent = 'Envoi…';
 
   try {
     const r = await fetch('/admin/api/emails/send-test', {
@@ -549,7 +770,7 @@ async function sendEmail() {
     showToast('Erreur réseau', true);
   } finally {
     btn.disabled = false;
-    btn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg> Envoyer';
+    btn.innerHTML = `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg> Envoyer`;
   }
 }
 

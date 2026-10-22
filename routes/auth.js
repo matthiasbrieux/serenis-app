@@ -11,13 +11,13 @@ const { issue2FACode, verify2FACode } = require('../services/twoFactor');
 // Limite dédiée sur les tentatives de connexion (la limite globale de
 // server.js est partagée par toutes les routes et bien trop large pour
 // contenir du brute-force ciblé sur un compte).
-const loginLimit = require('express-rate-limit')({ windowMs: 15 * 60 * 1000, max: 10, keyGenerator: (req) => req.ip });
+const loginLimit = require('express-rate-limit')({ windowMs: 15 * 60 * 1000, max: 10, keyGenerator: (req) => req.ip, handler: (req, res) => res.status(429).json({ error: 'Trop de tentatives de connexion. Réessayez dans 15 minutes.' }) });
 // Limite séparée pour la vérification du code 2FA : le blocage par code
 // (5 essais, voir services/twoFactor.js) protège déjà du brute-force sur le
 // code lui-même, donc ce compteur peut être plus large — il ne doit pas
 // pénaliser un utilisateur qui a déjà consommé son quota sur /login juste
 // pour avoir mal tapé son mot de passe une fois avant de réussir.
-const verify2faLimit = require('express-rate-limit')({ windowMs: 15 * 60 * 1000, max: 20, keyGenerator: (req) => req.ip });
+const verify2faLimit = require('express-rate-limit')({ windowMs: 15 * 60 * 1000, max: 20, keyGenerator: (req) => req.ip, handler: (req, res) => res.status(429).json({ error: 'Trop de tentatives. Réessayez dans 15 minutes.' }) });
 
 // Le 2FA par email n'est demandé qu'en réaction à plusieurs mots de passe
 // erronés d'affilée sur le compte (signe d'une tentative d'intrusion) — pas
@@ -54,7 +54,10 @@ router.post('/login', loginLimit, express.json(), async (req, res) => {
   // Mot de passe correct mais plusieurs échecs récents sur ce compte →
   // vérification par email avant de laisser passer.
   if (seller.failed_login_attempts >= FAILED_ATTEMPTS_2FA_THRESHOLD) {
-    await issue2FACode('seller', seller.id, seller.email);
+    const { emailSent, devMode } = await issue2FACode('seller', seller.id, seller.email);
+    if (!emailSent && !devMode) {
+      return res.json({ error: "L'envoi du code de vérification a échoué. Réessayez dans quelques instants ou contactez le support." });
+    }
     return res.json({
       requires2fa: true,
       pendingToken: issuePendingToken('seller', seller.id),
@@ -107,6 +110,11 @@ router.post('/logout', (req, res) => {
   res.redirect('/');
 });
 
+router.get('/logout', (req, res) => {
+  res.clearCookie('token');
+  res.redirect('/');
+});
+
 router.get('/admin/login', (req, res) => {
   res.sendFile('admin-login.html', { root: './public' });
 });
@@ -126,7 +134,10 @@ router.post('/admin/login', loginLimit, express.json(), async (req, res) => {
       }
 
       if (admin.failed_login_attempts >= FAILED_ATTEMPTS_2FA_THRESHOLD) {
-        await issue2FACode('admin', admin.id, admin.email);
+        const { emailSent, devMode } = await issue2FACode('admin', admin.id, admin.email);
+        if (!emailSent && !devMode) {
+          return res.json({ error: "L'envoi du code de vérification a échoué. Réessayez dans quelques instants ou contactez le support." });
+        }
         return res.json({
           requires2fa: true,
           pendingToken: issuePendingToken('admin', admin.id),
@@ -165,7 +176,7 @@ router.get('/admin/logout', (req, res) => {
 });
 
 // ── Mot de passe oublié ────────────────────────────────────────
-const forgotLimit = require('express-rate-limit')({ windowMs: 15 * 60 * 1000, max: 5, keyGenerator: (req) => req.ip });
+const forgotLimit = require('express-rate-limit')({ windowMs: 15 * 60 * 1000, max: 5, keyGenerator: (req) => req.ip, handler: (req, res) => res.status(429).json({ error: 'Trop de demandes. Réessayez dans 15 minutes.' }) });
 
 router.post('/api/forgot-password', forgotLimit, express.json(), async (req, res) => {
   const { email } = req.body;

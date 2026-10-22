@@ -85,14 +85,23 @@ function tiles(origin,radius) {
   for(let x=0;x<nx;x++) for(let y=0;y<ny;y++) result.push([origin[0]-dx+2*dx*x/nx,origin[1]-dy+2*dy*y/ny,origin[0]-dx+2*dx*(x+1)/nx,origin[1]-dy+2*dy*(y+1)/ny]);
   return result;
 }
-async function requestJSON(url,fetcher,deadline) {
-  const remaining=deadline-Date.now(); if(remaining<=0) throw Error('timeout');
-  const response=await fetcher(url,{signal:AbortSignal.timeout(Math.min(8000,remaining)),redirect:'error',headers:{Accept:'application/json'}});
-  if(!response.ok) throw Error('upstream');
-  // Bound both body size and time, including streamed responses.
-  const reader=response.body.getReader(); let size=0, chunks=[];
-  for(;;) { const {done,value}=await reader.read(); if(done)break; size+=value.length; if(size>5*1024*1024){await reader.cancel();throw Error('size');} chunks.push(Buffer.from(value)); }
-  return JSON.parse(Buffer.concat(chunks).toString('utf8'));
+async function requestJSON(url,fetcher,deadline,{retries=1}={}) {
+  for(let attempt=0;;attempt++) {
+    const remaining=deadline-Date.now(); if(remaining<=0) throw Error('timeout');
+    const response=await fetcher(url,{signal:AbortSignal.timeout(Math.min(8000,remaining)),redirect:'error',headers:{Accept:'application/json'}});
+    // Retry once on transient server errors (502/503/504) if budget allows.
+    if(!response.ok) {
+      if(attempt<retries && (response.status===502||response.status===503||response.status===504) && deadline-Date.now()>5000) {
+        await new Promise(r=>setTimeout(r,1000));
+        continue;
+      }
+      throw Error('upstream');
+    }
+    // Bound both body size and time, including streamed responses.
+    const reader=response.body.getReader(); let size=0, chunks=[];
+    for(;;) { const {done,value}=await reader.read(); if(done)break; size+=value.length; if(size>5*1024*1024){await reader.cancel();throw Error('size');} chunks.push(Buffer.from(value)); }
+    return JSON.parse(Buffer.concat(chunks).toString('utf8'));
+  }
 }
 async function calculate(property,{fetcher=fetch,now=new Date()}={}) {
   const surface=num(property?.surface_habitable),address=[property?.address,property?.postal_code,property?.city].filter(Boolean).join(' ').trim();
@@ -105,7 +114,9 @@ async function calculate(property,{fetcher=fetch,now=new Date()}={}) {
     const geourl=new URL(IGN); geourl.search=new URLSearchParams({q:address,limit:'2',postcode:String(property.postal_code)});
     const geo=await requestJSON(geourl,fetcher,deadline), candidates=geo.features;
     const best=candidates?.[0], gp=best?.properties, origin=best?.geometry?.coordinates;
-    if(best?.geometry?.type!=='Point'||gp?.type!=='housenumber'||num(gp?.score)<.8||String(gp?.postcode)!==String(property.postal_code)||!String(gp?.citycode).startsWith('59')) return status('location','Adresse insuffisamment précise pour calculer un repère fiable.');
+    const geoType=gp?.type, geoScore=num(gp?.score);
+    const typeOk=(geoType==='housenumber'&&geoScore>=.5)||(geoType==='street'&&geoScore>=.7);
+    if(best?.geometry?.type!=='Point'||!typeOk||String(gp?.postcode)!==String(property.postal_code)||!String(gp?.citycode).startsWith('59')) return status('location','Adresse introuvable ou imprécise. Vérifiez le numéro, la rue, le code postal et la ville dans Mon bien.');
     project(origin,origin);
     if(candidates[1] && num(candidates[1].properties?.score)>=num(gp.score)-.05 && geometryPointDistance(candidates[1].geometry?.coordinates,origin)>100) return status('location','Plusieurs adresses possibles : précisez votre adresse dans Mon bien.');
     let requests=0;
@@ -142,7 +153,7 @@ async function calculate(property,{fetcher=fetch,now=new Date()}={}) {
           }));
         } catch { /* keep unenriched */ }
         const comparables=enriched.map(s=>({date:s.date,area:s.area,price:s.price,priceM2:Math.round(s.ratio),distance:s.distance,addr:s.addr})).sort((a,b)=>b.date.localeCompare(a.date));
-        return {...base,status:'ok',priceM2:Math.round(priceM2),indicativeValue:Math.round(priceM2*surface/1000)*1000,count:sales.length,periodFrom:dates[0],periodTo:dates.at(-1),radiusMeters:radius,comparables};
+        return {...base,status:'ok',locationPrecision:geoType,priceM2:Math.round(priceM2),indicativeValue:Math.round(priceM2*surface/1000)*1000,count:sales.length,periodFrom:dates[0],periodTo:dates.at(-1),radiusMeters:radius,comparables};
       }
     }
     return status('insufficient','Données insuffisantes pour calculer un prix indicatif fiable.');
@@ -204,7 +215,7 @@ async function calculateCommune(property,{fetcher=fetch,now=new Date()}={}) {
     const features=[];
     for(let page=1;;page++) {
       if(page>30) throw Error('incomplete');
-      const url=new URL(CEREMA);url.search=new URLSearchParams({code_commune:citycode,anneemut_min:String(now.getUTCFullYear()-3),anneemut_max:String(now.getUTCFullYear()),codtypbien:'111',fields:'all',page_size:'500',page:String(page)});
+      const url=new URL(CEREMA);url.search=new URLSearchParams({code_insee:citycode,anneemut_min:String(now.getUTCFullYear()-3),anneemut_max:String(now.getUTCFullYear()),codtypbien:'111',fields:'all',page_size:'500',page:String(page)});
       const body=await requestJSON(url,fetcher,deadline);
       const collection=body.type==='FeatureCollection'?body:body.results;
       const batch=Array.isArray(collection)?collection:collection?.features;

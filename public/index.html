@@ -2599,10 +2599,19 @@
           observer.unobserve(entry.target);
         }
       });
-    }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
+    }, { threshold: 0, rootMargin: '0px' });
 
     document.querySelectorAll('.reveal').forEach(function (el) {
       observer.observe(el);
+    });
+
+    // Reveal elements already visible in the initial viewport (e.g. on mobile or headless)
+    document.querySelectorAll('.reveal').forEach(function (el) {
+      var r = el.getBoundingClientRect();
+      if (r.top < window.innerHeight && r.bottom > 0) {
+        el.classList.add('visible');
+        observer.unobserve(el);
+      }
     });
   })();
 

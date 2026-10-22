@@ -1322,18 +1322,23 @@ if("scrollRestoration"in history)history.scrollRestoration="manual";</script>
           <span style="flex-shrink:0;margin-top:1px;display:inline-flex;align-items:center;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#9E3A18" stroke-width="1.8"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></span>
           <p style="margin:0;font-size:0.8rem;color:var(--terracotta);line-height:1.5;"><strong>Confidentialité garantie</strong> — L'adresse exacte n'apparaît pas dans le dossier envoyé aux acheteurs. Elle sera communiquée uniquement après validation d'une demande de visite, selon vos disponibilités.</p>
         </div>
-        <div class="form-group">
+        <!-- Champs geocodage — remplis automatiquement par l'autocomplétion BAN -->
+        <input type="hidden" name="code_insee" id="field-code_insee">
+        <input type="hidden" name="latitude" id="field-latitude">
+        <input type="hidden" name="longitude" id="field-longitude">
+        <div class="form-group" style="position:relative;">
           <label>Adresse complète *</label>
-          <input type="text" name="address" required placeholder="12 rue des Lilas">
+          <input type="text" name="address" id="addressInput" required placeholder="12 rue des Lilas" autocomplete="off">
+          <div id="addressDropdown" style="display:none;position:absolute;top:100%;left:0;right:0;z-index:200;background:#fff;border:1px solid #ddd;border-radius:8px;box-shadow:0 4px 16px rgba(0,0,0,0.10);margin-top:3px;max-height:260px;overflow-y:auto;"></div>
         </div>
         <div class="form-grid-3">
           <div class="form-group">
             <label>Ville *</label>
-            <input type="text" name="city" required placeholder="Douai">
+            <input type="text" name="city" id="cityInput" required placeholder="Douai">
           </div>
           <div class="form-group">
             <label>Code postal *</label>
-            <input type="text" name="postal_code" required placeholder="59500">
+            <input type="text" name="postal_code" id="postalInput" required placeholder="59500" maxlength="5" inputmode="numeric">
           </div>
           <div class="form-group">
             <label>Prix souhaité (€) *</label>
@@ -2005,6 +2010,33 @@ if("scrollRestoration"in history)history.scrollRestoration="manual";</script>
                 <button type="button" class="chip-option" data-value="Motorisée"><span style="display:inline-flex;align-items:center;vertical-align:middle;margin-right:4px;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></span>Motorisée</button>
                 <button type="button" class="chip-option" data-value="Manuelle">Manuelle</button>
                 <button type="button" class="chip-option" data-value="Mixte">Mixte</button>
+              </div>
+            </div>
+            <input type="hidden" name="garage_attenant" id="field-garage_attenant">
+            <div style="margin-top:12px;">
+              <div style="font-size:0.82rem;font-weight:600;color:#555;margin-bottom:6px;">Attenance</div>
+              <div class="chip-group" data-field="garage_attenant">
+                <button type="button" class="chip-option" data-value="Attenant">Attenant</button>
+                <button type="button" class="chip-option" data-value="Non attenant">Non attenant</button>
+              </div>
+            </div>
+            <div style="margin-top:12px;">
+              <div style="font-size:0.82rem;font-weight:600;color:#555;margin-bottom:8px;">Dimensions de la porte (optionnel)</div>
+              <div style="display:flex;flex-wrap:wrap;gap:16px;">
+                <div>
+                  <label style="font-size:0.82rem;color:#888;margin-bottom:4px;display:block;">Largeur</label>
+                  <div style="display:flex;align-items:center;gap:8px;">
+                    <input type="number" name="garage_porte_largeur" placeholder="2.40" step="0.05" min="0.5" max="10" style="width:80px;padding:8px 10px;border:1px solid #ddd;border-radius:8px;font-size:0.9rem;font-family:'DM Sans',sans-serif;">
+                    <span style="font-size:0.85rem;color:#888;">m</span>
+                  </div>
+                </div>
+                <div>
+                  <label style="font-size:0.82rem;color:#888;margin-bottom:4px;display:block;">Hauteur</label>
+                  <div style="display:flex;align-items:center;gap:8px;">
+                    <input type="number" name="garage_porte_hauteur" placeholder="2.00" step="0.05" min="0.5" max="5" style="width:80px;padding:8px 10px;border:1px solid #ddd;border-radius:8px;font-size:0.9rem;font-family:'DM Sans',sans-serif;">
+                    <span style="font-size:0.85rem;color:#888;">m</span>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -2907,6 +2939,7 @@ if("scrollRestoration"in history)history.scrollRestoration="manual";</script>
           .ev-msg-copy-btn { min-height:44px; font-size:0.88rem; }
         }
       </style>
+<div id="unpublished-notice" style="display:none;background:#fffbf0;border:1.5px solid #f0c040;border-radius:12px;padding:14px 18px;margin-bottom:20px;display:none;align-items:center;gap:12px;font-size:0.88rem;color:#7a5a00;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#c4a020" stroke-width="2" style="flex-shrink:0"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg><span>Votre annonce n'est pas encore publiée. <a href="/mes-publications" style="color:#9E3A18;font-weight:600;text-decoration:underline;">Publiez votre bien</a> pour activer son lien public.</span></div>
 <div class="vpm-share-layout"><header class="vpm-section-heading"><h2>Prêt à envoyer</h2><p>Choisissez le dossier à transmettre à votre acheteur.</p></header><div class="ev-card vpm-featured" id="ev-card-fiche">
 <div class="vpm-card-actions"><button class="vpm-copy-action" onclick="evCopyLink('ev-link-fiche',this)" type="button">Copier le lien</button><button class="vpm-preview-action" onclick="vpmOpenDossier('fiche')" type="button">Voir le dossier acheteur →</button></div><button aria-controls="ev-body-fiche" aria-expanded="false" class="ev-card-btn" onclick="toggleEvCard('fiche')" type="button">
 <div class="ev-card-ico"><svg fill="none" height="16" stroke="#fff" stroke-width="1.8" viewbox="0 0 24 24" width="16"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path><rect height="4" rx="1" width="8" x="8" y="2"></rect><line x1="8" x2="16" y1="13" y2="13"></line><line x1="8" x2="13" y1="17" y2="17"></line></svg></div>
@@ -2933,6 +2966,21 @@ if("scrollRestoration"in history)history.scrollRestoration="manual";</script>
 <button class="ev-msg-copy-btn" onclick="evCopyMsg('fiche',this)" type="button">Copier le message</button>
 <p class="ev-msg-note">Aperçu · aucun message n'est envoyé.</p>
 </div>
+</div>
+<div class="ev-send-dossier-section">
+  <div class="ev-send-dossier-header">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--terracotta)" stroke-width="1.8"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+    <span>Envoyer le dossier par e-mail</span>
+  </div>
+  <p class="ev-send-dossier-desc">Envoyez directement le lien du dossier acheteur à un contact. Il recevra un e-mail avec le lien vers votre dossier complet.</p>
+  <form class="ev-send-dossier-form" onsubmit="submitSendDossierEmail(event)" novalidate>
+    <div class="ev-send-dossier-fields">
+      <input class="ev-send-dossier-input" id="ev-dossier-buyer-name" placeholder="Prénom de l'acheteur (optionnel)" type="text" autocomplete="off"/>
+      <input class="ev-send-dossier-input" id="ev-dossier-buyer-email" placeholder="Email de l'acheteur" required type="email" autocomplete="off"/>
+    </div>
+    <button class="ev-send-dossier-btn" type="submit">Envoyer le dossier</button>
+  </form>
+  <div class="ev-send-dossier-feedback" id="ev-dossier-feedback" style="display:none;"></div>
 </div>
 <div class="vpm-feature-chips"><span>Fiche descriptive</span><span>Photos</span><span>Diagnostics</span><span>Visites</span></div></div><div class="vpm-share-middle"><section class="vpm-separate"><h3>Partager un élément séparément</h3><p>Un lien pour chaque élément, à partager selon vos besoins.</p><div class="ev-card" id="ev-card-dpe">
 <div class="vpm-card-actions"><button class="vpm-copy-action" onclick="evCopyLink('ev-link-dpe',this)" type="button">Copier le lien</button></div><button aria-controls="ev-body-dpe" aria-expanded="false" class="ev-card-btn" onclick="toggleEvCard('dpe')" type="button">
@@ -3213,7 +3261,14 @@ document.querySelectorAll('.tab-btn').forEach(btn => {
   if (t) {
     const btn = document.querySelector(`.tab-btn[data-tab="${t}"]`);
     if (btn) btn.click();
-    if (s) setTimeout(() => { const el = document.getElementById(s); if (el) el.scrollIntoView({ behavior:'smooth', block:'start' }); }, 250);
+    if (s) setTimeout(() => {
+      const el = document.getElementById(s);
+      if (t === 'documents' && s === 'dpanel-diag' && el) {
+        const manage = el.querySelector('.vpm-manage-docs');
+        if (el.classList.contains('collapsed') && manage) vpmManageDocuments(s, manage);
+      }
+      if (el) el.scrollIntoView({ behavior:'smooth', block:'start' });
+    }, 250);
   }
 })();
 
@@ -3478,7 +3533,7 @@ async function loadProperty() {
   const form = document.getElementById('propertyForm');
 
   // Chip fields (handled separately)
-  var chipFields = ['type','dpe_class','exposition','sale_reason','assainissement_type','fenetres_type','toiture_couverture','volets_type','sols_dalle','stationnement_type','garage_motorise','garage_sol','terrace_revetement','cheminee_type','eau_chaude_type','wc_count','cuisine_type','grenier'];
+  var chipFields = ['type','dpe_class','exposition','sale_reason','assainissement_type','fenetres_type','toiture_couverture','volets_type','sols_dalle','stationnement_type','garage_motorise','garage_sol','garage_attenant','terrace_revetement','cheminee_type','eau_chaude_type','wc_count','cuisine_type','grenier'];
   var multiChipFields = ['toiture_couverture','volets_type','stationnement_type','fenetres_type','cheminee_type','eau_chaude_type','cuisine_type'];
 
   var toggleFields = ['garden','terrace','certificat_assainissement','grenier_present'];
@@ -3488,7 +3543,7 @@ async function loadProperty() {
     if (key === 'heating_type' || key === 'heating_details') return;
     var el = form.elements[key];
     if (!el) return;
-    el.value = p[key] || '';
+    el.value = (p[key] !== undefined && p[key] !== null) ? p[key] : '';
   });
 
   // Toggle fields restore
@@ -3541,10 +3596,11 @@ async function loadProperty() {
   else updateGesCardDisplay(null);
   updateGesNumDisplay(p.dpe_ges !== undefined ? p.dpe_ges : null);
   // Show diagnostic link if real documents exist
-  if (data.documents && data.documents.some(d => d.folder === 'diagnostics') && p.acheteur_url) {
+  var diagDoc = data.documents && data.documents.find(function(d) { return d.folder === 'diagnostics'; });
+  if (diagDoc) {
     var footer = document.getElementById('dpeDispFooter');
     var link = document.getElementById('dpeDispConsultLink');
-    if (footer && link) { footer.style.display = 'flex'; link.href = p.acheteur_url + '#diagnostics'; }
+    if (footer && link) { footer.style.display = 'flex'; link.href = '/api/property/document/' + diagDoc.id; }
   }
   if (p.mitoyennete) selectMito(p.mitoyennete);
   // Heating multi-select restore
@@ -3602,6 +3658,10 @@ async function loadProperty() {
     renderRoomCards();
     computeRoomTotals();
   }
+
+  // Notice annonce non publiée
+  var noticeEl = document.getElementById('unpublished-notice');
+  if (noticeEl) noticeEl.style.display = p.published ? 'none' : 'flex';
 
   // Travaux récents
   window._propertyData = p;
@@ -3966,6 +4026,7 @@ async function uploadPhotos(files, category) {
   });
   renderGrid(category);
 
+  let saved = 0;
   try {
     for (let i = 0; i < files.length; i++) {
       text.textContent = `Upload ${i + 1}/${files.length} — ${files[i].name}`;
@@ -3974,11 +4035,16 @@ async function uploadPhotos(files, category) {
       fd.append('photos', files[i]);
       fd.append('category', category);
       const res = await fetch('/api/property/photos', { method: 'POST', body: fd });
-      const data = await res.json();
+      const data = await res.json().catch(() => null);
+      if (res.status === 429) throw new Error(data?.error || 'Trop de demandes. Veuillez patienter avant de reprendre les envois. Les photos déjà enregistrées sont conservées.');
+      if (!res.ok || !data) throw new Error(data?.error || 'Envoi interrompu. Vérifiez les photos enregistrées avant de reprendre.');
       if (data.error) {
         showToast(data.error, 'error');
+        const failed = allPhotos[category].find(p => p.cloudinary_id === tempIds[i]);
+        if (failed) URL.revokeObjectURL(failed.url);
         allPhotos[category] = allPhotos[category].filter(p => p.cloudinary_id !== tempIds[i]);
       } else if (data.photos && data.photos[0]) {
+        saved++;
         const idx = allPhotos[category].findIndex(p => p.cloudinary_id === tempIds[i]);
         if (idx !== -1) {
           const blobUrl = allPhotos[category][idx].url; // blob URL du fichier local — affichage immédiat sans attendre la génération Cloudinary
@@ -3986,15 +4052,25 @@ async function uploadPhotos(files, category) {
         } else {
           allPhotos[category] = allPhotos[category].filter(p => p.cloudinary_id !== tempIds[i]);
         }
+      } else {
+        throw new Error('Réponse inattendue. Vérifiez les photos enregistrées avant de reprendre.');
       }
     }
+  } catch (error) {
+    showToast(error.message || 'Envoi interrompu. Vérifiez les photos enregistrées avant de reprendre.', 'error');
   } finally {
+    // Remove only this batch's provisional images; never remove successful uploads.
+    allPhotos[category] = allPhotos[category].filter(photo => {
+      if (!photo._temp || !tempIds.includes(photo.cloudinary_id)) return true;
+      URL.revokeObjectURL(photo.url);
+      return false;
+    });
     _uploadLock[category] = false;
+    renderGrid(category);
+    text.textContent = saved === files.length ? 'Enregistré ✓' : `${saved}/${files.length} photos enregistrées — vérifiez les envois restants`;
+    setTimeout(() => progress.classList.add('hidden'), 2000);
+    if (typeof refreshPreview === 'function') refreshPreview();
   }
-  renderGrid(category);
-  text.textContent = 'Enregistré ✓';
-  setTimeout(() => progress.classList.add('hidden'), 2000);
-  if (typeof refreshPreview === 'function') refreshPreview();
 }
 
 async function refreshPhotoSection(cat) {
@@ -5327,7 +5403,7 @@ async function generateAIDescription() {
   const formData = new FormData(form);
   const property = {};
   formData.forEach((v, k) => { property[k] = v; });
-  ['type','heating_type','heating_details','dpe_class','exposition','sale_reason','garden','terrace',
+  ['type','heating_type','heating_details','dpe_class','ges_class','exposition','sale_reason','garden','terrace',
    'certificat_assainissement','assainissement_type','fenetres_type','toiture_couverture','volets_type','sols_dalle',
    'stationnement_type','garage_motorise','garage_sol','terrace_revetement',
    'cheminee_type','eau_chaude_type','wc_count','cuisine_type','grenier','grenier_present'].forEach(f => {
@@ -5572,282 +5648,303 @@ function buildFicheHtml() {
     if (p.dpe_class && ['A','B','C'].includes(p.dpe_class)) _atouts.push({ icon:fi.leaf, text: 'DPE ' + p.dpe_class + ' — Bonne performance' });
   })();
 
+  // ── GES bars ────────────────────────────────────────────
+  const GES_COLORS={A:'#c5d9ed',B:'#90bada',C:'#5796c4',D:'#2e73a8',E:'#1a538b',F:'#0e3568',G:'#071d45'};
+  const gesClass=p.ges_class||'';
+  const gesBars=DPE_LETTERS.map(l=>{
+    const w=DPE_WIDTHS[l];const active=l===gesClass;const tc=['A','B'].includes(l)?'#333':'#fff';
+    return `<div style="display:flex;align-items:center;margin-bottom:2px;"><div style="width:${w}%;height:16px;background:${GES_COLORS[l]};border-radius:0 3px 3px 0;display:flex;align-items:center;justify-content:flex-end;padding-right:6px;${active?'box-shadow:0 0 0 2px #1a3a2a;z-index:1;position:relative;':'opacity:0.65;'}"><span style="font-size:10px;font-weight:${active?800:500};color:${tc};">${l}${active?' ◄':''}</span></div></div>`;
+  }).join('');
+
+  // ── Titre, accroche, photos secondaires ─────────────────
+  const _propTitle=[p.type||'Bien immobilier',p.rooms?p.rooms+' pièce'+(parseInt(p.rooms)>1?'s':''):null,p.bedrooms?p.bedrooms+' chambre'+(parseInt(p.bedrooms)>1?'s':''):null].filter(Boolean).join(' · ');
+  const _accroche=(()=>{if(!p.description)return '';const c=p.description.replace(/^#{1,3}\s*/gm,'').replace(/\*\*/g,'').trim();const f=c.split(/\n\n+/)[0].split('\n')[0].trim();return f.length>20?f:'';})();
+  const _p2=proPhotos[1]||exterieurPhotos[0]||decouvertePhotos[0]||null;
+  const _p3=proPhotos[2]||exterieurPhotos[1]||decouvertePhotos[1]||null;
+  const _p2src=_p2?(_p2.url||_p2.file_path):null;
+  const _p3src=(_p3&&(_p3.url||_p3.file_path)!==_p2src)?(_p3.url||_p3.file_path):null;
+
+  // ── Icon row helper ──────────────────────────────────────
+  const iRow=(ico,lbl,val)=>val?`<div class="fd3-irow"><div class="fd3-icell">${ico}</div><span class="fd3-rlbl">${lbl}</span><span class="fd3-rval">${val}</span></div>`:'';
+
   var _html = `
 <style>
-/* fv2 — fiche v2 asymmetric layout */
+/* fd3 — fiche descriptive v3 */
 #ficheCard *{box-sizing:border-box}
-.fv2-grid{display:grid;grid-template-columns:1fr;background:#F9F9FB}
-.fv2-left{padding:22px 18px 28px}
-.fv2-right{padding:0 18px 28px}
-.fv2-card{background:#fff;border-radius:20px;box-shadow:0 8px 30px rgba(0,0,0,0.05);padding:20px;margin-bottom:14px}
-.fv2-stat-grid{display:grid;grid-template-columns:1fr 1fr}
-.fv2-stat-cell{padding:12px 8px;border-bottom:1px solid rgba(158,58,24,0.06)}
-.fv2-lbl{font-size:0.62rem;color:var(--terracotta);text-transform:uppercase;letter-spacing:0.1em;font-weight:600;opacity:.75;margin-bottom:5px}
-.fv2-val{font-family:'Cormorant Garamond',serif;font-size:1.55rem;font-weight:700;color:var(--terracotta);line-height:1.05}
-.fv2-bento{display:grid;grid-template-columns:1fr 1fr;gap:9px}
-.fv2-badge{background:#fff;border-radius:14px;padding:13px 14px;box-shadow:0 4px 18px rgba(0,0,0,0.05);display:flex;align-items:center;gap:10px}
-.fv2-bento-wide{grid-column:span 2}
-.fv2-hd{display:block;font-size:0.6rem;font-weight:700;text-transform:uppercase;letter-spacing:0.14em;color:#1a1a1a;margin-bottom:14px;padding-left:10px;border-left:3px solid var(--terracotta)}
-.fv2-hd-green{border-color:var(--terracotta)}
-.fv2-tag{display:inline-flex;align-items:center;gap:6px;padding:5px 13px;background:#fff;border-radius:20px;font-size:0.78rem;font-weight:500;color:#1a1a1a;box-shadow:0 2px 8px rgba(0,0,0,0.06)}
-.fv2-card-hd{font-size:0.6rem;font-weight:700;text-transform:uppercase;letter-spacing:0.14em;margin-bottom:12px}
-.fv2-photos{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}
-.fv2-photo{aspect-ratio:4/3;overflow:hidden;border-radius:10px;cursor:zoom-in;background:#ddd8d0}
-.fv2-photo img{width:100%;height:100%;object-fit:cover;transition:transform 0.25s}
-@media screen and (min-width:700px){
-  .fv2-grid{grid-template-columns:65fr 35fr;gap:28px;padding:28px;align-items:start}
-  .fv2-left{padding:0}
-  .fv2-right{padding:0;position:sticky;top:16px}
+.fd3-wrap{font-family:'DM Sans',sans-serif;background:#F9F8F6;color:#1a1a1a;}
+.fd3-pg{display:grid;grid-template-columns:65fr 35fr;grid-template-rows:320px;height:320px;gap:3px;overflow:hidden;}
+.fd3-pm{position:relative;overflow:hidden;}
+.fd3-pm img{width:100%;height:100%;object-fit:cover;display:block;}
+.fd3-ps{display:grid;grid-template-rows:1fr 1fr;gap:3px;overflow:hidden;min-height:0;}
+.fd3-pt{overflow:hidden;background:#ddd8d0;min-height:0;}
+.fd3-pt img{width:100%;height:100%;object-fit:cover;display:block;}
+.fd3-body{display:grid;grid-template-columns:1fr;background:#F9F8F6;position:relative;z-index:1;}
+.fd3-left{padding:24px 20px 32px;}
+.fd3-right{padding:0 20px 32px;}
+.fd3-sec{margin-bottom:26px;}
+.fd3-hd{display:flex;align-items:center;gap:8px;margin-bottom:12px;}
+.fd3-hd::before{content:'';display:block;width:3px;height:14px;background:var(--terracotta);border-radius:2px;flex-shrink:0;}
+.fd3-hd-t{font-size:0.6rem;font-weight:800;text-transform:uppercase;letter-spacing:0.14em;color:#1a1a1a;}
+.fd3-chip{display:inline-flex;align-items:center;gap:5px;padding:4px 12px;background:#fff;border:1px solid rgba(158,58,24,0.18);border-radius:20px;font-size:0.76rem;font-weight:500;color:#1a1a1a;box-shadow:0 1px 4px rgba(0,0,0,0.04);}
+.fd3-photos{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;}
+.fd3-photo{aspect-ratio:4/3;overflow:hidden;border-radius:8px;cursor:zoom-in;background:#ddd8d0;}
+.fd3-photo img{width:100%;height:100%;object-fit:cover;transition:transform 0.25s;}
+.fd3-photo:hover img{transform:scale(1.04);}
+.fd3-card{background:#fff;border-radius:14px;box-shadow:0 4px 18px rgba(0,0,0,0.05);padding:16px;margin-bottom:10px;}
+.fd3-card-hd{font-size:0.58rem;font-weight:800;text-transform:uppercase;letter-spacing:0.14em;color:var(--terracotta);margin-bottom:12px;}
+.fd3-irow{display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid rgba(0,0,0,0.05);}
+.fd3-irow:last-child{border-bottom:none;}
+.fd3-icell{width:26px;height:26px;border-radius:7px;background:rgba(158,58,24,0.07);display:flex;align-items:center;justify-content:center;flex-shrink:0;color:var(--terracotta);}
+.fd3-rlbl{font-size:0.72rem;color:#888;flex:1;min-width:0;}
+.fd3-rval{font-size:0.78rem;font-weight:600;color:#1a1a1a;text-align:right;}
+@media(min-width:700px){
+  .fd3-body{grid-template-columns:65fr 35fr;gap:24px;padding:24px;align-items:start;}
+  .fd3-left,.fd3-right{padding:0;}
+  .fd3-right{position:sticky;top:16px;}
 }
 </style>
 
-<div id="ficheCard" style="font-family:'DM Sans',sans-serif;background:#F9F9FB;color:#1a1a1a;">
+<div id="ficheCard" class="fd3-wrap">
 
   <!-- HEADER -->
-  <div style="background:var(--terracotta-dark);padding:14px 22px;display:flex;justify-content:space-between;align-items:center;">
-    <div>
-      <img src="/images/vendu-par-moi.svg" alt="Vendu Par Moi" style="height:38px;width:auto;display:block;">
-    </div>
+  <div style="background:var(--terracotta-dark);padding:13px 22px;display:flex;justify-content:space-between;align-items:center;">
+    <img src="/images/vendu-par-moi.svg" alt="Vendu Par Moi" style="height:36px;width:auto;display:block;">
     <div style="text-align:right;">
-      <div style="font-size:0.58rem;color:rgba(158,58,24,0.7);letter-spacing:0.1em;text-transform:uppercase;">Réf. ${refNum}</div>
-      <div style="font-size:0.62rem;color:rgba(255,255,255,0.28);margin-top:3px;">${today}</div>
+      <div style="font-size:0.58rem;color:rgba(255,255,255,0.45);letter-spacing:0.1em;text-transform:uppercase;">Réf. ${refNum}</div>
+      <div style="font-size:0.6rem;color:rgba(255,255,255,0.25);margin-top:2px;">${today}</div>
     </div>
   </div>
 
-  <!-- HERO PHOTO -->
-  ${mainPhoto ? `
-  <div style="position:relative;height:290px;overflow:hidden;">
+  <!-- PHOTO GRID -->
+  ${mainPhoto&&(_p2src||_p3src)?`
+  <div class="fd3-pg">
+    <div class="fd3-pm">
+      <img src="${mainPhoto.url||mainPhoto.file_path}" alt="">
+      <div style="position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,0.3) 0%,transparent 50%);pointer-events:none;"></div>
+      ${dpeClass?`<div style="position:absolute;bottom:14px;left:16px;"><span style="display:inline-flex;padding:3px 11px;background:${dpeColor};color:${dpeTextColor};border-radius:20px;font-size:0.65rem;font-weight:800;letter-spacing:0.06em;">DPE ${dpeClass}</span></div>`:''}
+    </div>
+    <div class="fd3-ps">
+      <div class="fd3-pt">${_p2src?`<img src="${_p2src}" alt="">`:''}</div>
+      <div class="fd3-pt">${_p3src?`<img src="${_p3src}" alt="">`:''}</div>
+    </div>
+  </div>`:mainPhoto?`
+  <div style="position:relative;height:280px;overflow:hidden;">
     <img src="${mainPhoto.url||mainPhoto.file_path}" style="width:100%;height:100%;object-fit:cover;" alt="">
-    <div style="position:absolute;inset:0;background:linear-gradient(to top,rgba(158,58,24,0.55) 0%,transparent 55%);"></div>
-    ${dpeClass ? `<div style="position:absolute;bottom:16px;left:20px;"><span style="display:inline-flex;padding:3px 12px;background:${dpeColor};color:${dpeTextColor};border-radius:20px;font-size:0.68rem;font-weight:800;letter-spacing:0.06em;">DPE ${dpeClass}</span></div>` : ''}
-  </div>` : `<div style="height:5px;background:linear-gradient(to right,var(--terracotta-dark),var(--terracotta),var(--terracotta-dark));"></div>`}
+    <div style="position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,0.3) 0%,transparent 50%);"></div>
+    ${dpeClass?`<div style="position:absolute;bottom:14px;left:16px;"><span style="display:inline-flex;padding:3px 11px;background:${dpeColor};color:${dpeTextColor};border-radius:20px;font-size:0.65rem;font-weight:800;letter-spacing:0.06em;">DPE ${dpeClass}</span></div>`:''}
+  </div>`:`<div style="height:5px;background:linear-gradient(to right,var(--terracotta-dark),var(--terracotta),var(--terracotta-dark));"></div>`}
 
-  <!-- 2-COL ASYMMETRIC GRID -->
-  <div class="fv2-grid">
+  <!-- BODY -->
+  <div class="fd3-body">
 
-    <!-- ═══ LEFT COLUMN — L'Émotionnel & L'Espace ═══ -->
-    <div class="fv2-left">
+    <!-- ═══ LEFT ═══ -->
+    <div class="fd3-left">
 
-      <!-- TITRE & PRIX -->
-      <div style="margin-bottom:24px;">
-        <div style="font-size:0.62rem;font-weight:600;text-transform:uppercase;letter-spacing:0.16em;color:var(--terracotta);margin-bottom:9px;">${icon} ${p.type||'Bien immobilier'}${p.city?' · '+(p.postal_code?p.postal_code+' ':'')+p.city:''}</div>
-        <div style="font-family:'Cormorant Garamond',serif;font-size:2.8rem;font-weight:700;color:#1a1a1a;line-height:1.0;margin-bottom:9px;">${priceFormatted}</div>
-        ${_shareAddress&&p.address?`<div style="font-size:0.84rem;color:var(--terracotta);opacity:0.75;">${p.address}</div>`:''}
+      <!-- LOCALISATION + TITRE + ACCROCHE -->
+      <div class="fd3-sec">
+        ${p.city?`<div style="display:flex;align-items:center;gap:6px;margin-bottom:8px;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--terracotta)" stroke-width="2.5"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg><span style="font-size:0.62rem;font-weight:700;text-transform:uppercase;letter-spacing:0.14em;color:var(--terracotta);">${p.city}${p.postal_code?' ('+p.postal_code+')':''}</span></div>`:''}
+        <div style="font-family:'Cormorant Garamond',serif;font-size:2.2rem;font-weight:700;color:#1a1a1a;line-height:1.1;margin-bottom:${_accroche?'10px':'0'}">${_propTitle}</div>
+        ${_accroche?`<div style="font-family:'Cormorant Garamond',serif;font-size:1.05rem;font-style:italic;color:var(--terracotta);line-height:1.6;opacity:0.85;">${_accroche}</div>`:''}
       </div>
 
-      <!-- PITCH — grand texte aéré -->
+      <!-- PRIX -->
+      <div class="fd3-sec" style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:12px;padding:16px 20px;background:#fff;border-radius:14px;box-shadow:0 4px 18px rgba(0,0,0,0.05);">
+        <div>
+          <div style="font-size:0.58rem;text-transform:uppercase;letter-spacing:0.1em;color:#888;margin-bottom:4px;">Prix de vente</div>
+          <div style="font-family:'Cormorant Garamond',serif;font-size:2.6rem;font-weight:700;color:var(--terracotta);line-height:1;">${priceFormatted}</div>
+          ${p.taxe_fonciere?`<div style="font-size:0.74rem;color:#888;margin-top:5px;">Taxe foncière : ${Number(p.taxe_fonciere).toLocaleString('fr-FR')} €/an</div>`:''}
+        </div>
+        ${_shareAddress&&p.address?`<div style="font-size:0.82rem;color:#555;display:flex;align-items:center;gap:5px;padding-top:8px;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>${p.address}</div>`:''}
+      </div>
+
+      <!-- DESCRIPTION -->
       ${p.description?`
-      <div style="margin-bottom:28px;">
-        <span class="fv2-hd">Le bien en quelques mots</span>
-        <div style="font-size:0.96rem;color:#2a3a2e;line-height:1.95;letter-spacing:0.01em;">${p.description.replace(/^#{1,3}\s*/gm,'').replace(/\*\*/g,'').replace(/\n\n+/g,'</p><p style="margin:0 0 16px;font-size:0.96rem;color:#2a3a2e;line-height:1.95;">').replace(/\n/g,'<br>')}</div>
+      <div class="fd3-sec">
+        <div class="fd3-hd"><span class="fd3-hd-t">Description</span></div>
+        ${_atouts.length?`<div style="padding:12px 16px;background:rgba(253,246,230,0.9);border-left:3px solid #f5a623;border-radius:0 10px 10px 0;margin-bottom:14px;font-size:0.86rem;color:#7a5800;font-weight:600;">${_atouts[0].text}</div>`:''}
+        <div style="font-size:0.92rem;color:#2a3a2e;line-height:1.85;">${p.description.replace(/^#{1,3}\s*/gm,'').replace(/\*\*/g,'').replace(/\n\n+/g,'</p><p style="margin:0 0 14px;font-size:0.92rem;color:#2a3a2e;line-height:1.85;">').replace(/\n/g,'<br>')}</div>
       </div>`:''}
 
-      <!-- POINTS FORTS — Bento Grid -->
-      ${_atouts.length?`
-      <div style="margin-bottom:28px;">
-        <span class="fv2-hd">Points forts</span>
-        <div class="fv2-bento">
-          ${_atouts.map((a,i)=>`<div class="fv2-badge${i===0?' fv2-bento-wide':''}">
-            <div style="width:34px;height:34px;border-radius:10px;background:rgba(158,58,24,0.08);display:flex;align-items:center;justify-content:center;flex-shrink:0;color:var(--terracotta);">${a.icon}</div>
-            <span style="font-size:0.84rem;font-weight:600;color:#1a1a1a;">${a.text}</span>
-          </div>`).join('')}
+      <!-- POINTS FORTS CHIPS -->
+      ${_atouts.length>1?`
+      <div class="fd3-sec">
+        <div class="fd3-hd"><span class="fd3-hd-t">Points forts</span></div>
+        <div style="display:flex;flex-wrap:wrap;gap:7px;">
+          ${_atouts.slice(1).map(a=>`<span class="fd3-chip">${a.icon}<span>${a.text}</span></span>`).join('')}
         </div>
       </div>`:''}
 
       <!-- COMPOSITION DES PIÈCES -->
       ${roomsRows?`
-      <div style="margin-bottom:28px;">
-        <span class="fv2-hd fv2-hd-green">Composition des pièces</span>
-        <div style="background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 4px 20px rgba(0,0,0,0.04);">
+      <div class="fd3-sec">
+        <div class="fd3-hd"><span class="fd3-hd-t">Composition des pièces</span></div>
+        <div style="background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 4px 18px rgba(0,0,0,0.04);">
           <table style="width:100%;border-collapse:collapse;font-size:0.82rem;">
-            <thead><tr style="background:#F9F9FB;">
-              <th style="text-align:left;padding:10px 14px;font-size:0.58rem;text-transform:uppercase;letter-spacing:0.1em;color:var(--terracotta);font-weight:700;border-bottom:1px solid rgba(158,58,24,0.08);opacity:.7;">Niveau</th>
-              <th style="text-align:left;padding:10px;font-size:0.58rem;text-transform:uppercase;letter-spacing:0.1em;color:var(--terracotta);font-weight:700;border-bottom:1px solid rgba(158,58,24,0.08);opacity:.7;">Pièce</th>
-              <th style="text-align:right;padding:10px 14px 10px 0;font-size:0.58rem;text-transform:uppercase;letter-spacing:0.1em;color:var(--terracotta);font-weight:700;border-bottom:1px solid rgba(158,58,24,0.08);opacity:.7;">Surface</th>
+            <thead><tr style="background:#F9F8F6;">
+              <th style="text-align:left;padding:9px 12px;font-size:0.58rem;text-transform:uppercase;letter-spacing:0.1em;color:var(--terracotta);font-weight:700;border-bottom:1px solid rgba(158,58,24,0.08);">Niveau</th>
+              <th style="text-align:left;padding:9px 8px;font-size:0.58rem;text-transform:uppercase;letter-spacing:0.1em;color:var(--terracotta);font-weight:700;border-bottom:1px solid rgba(158,58,24,0.08);">Pièce</th>
+              <th style="text-align:right;padding:9px 12px 9px 0;font-size:0.58rem;text-transform:uppercase;letter-spacing:0.1em;color:var(--terracotta);font-weight:700;border-bottom:1px solid rgba(158,58,24,0.08);">Surface</th>
             </tr></thead>
             <tbody>${roomsRows}</tbody>
           </table>
         </div>
       </div>`:''}
 
-      <!-- DPE -->
-      ${dpeClass?`
-      <div style="margin-bottom:28px;">
-        <span class="fv2-hd fv2-hd-green">Diagnostics énergétiques</span>
-        <div style="background:#fff;border-radius:16px;padding:18px;box-shadow:0 4px 20px rgba(0,0,0,0.04);">
-          <div style="display:flex;gap:20px;align-items:flex-start;flex-wrap:wrap;">
-            <div style="flex:1;min-width:0;">${dpeBars}</div>
-            <div style="display:flex;flex-direction:column;gap:9px;flex-shrink:0;">
-              ${p.dpe_conso_energie?`<div style="font-size:0.82rem;color:#2a3a2e;"><span style="color:#f5a623;margin-right:5px;">${fi.bolt}</span>Consommation : <strong>${p.dpe_conso_energie} kWhEP/m²/an</strong></div>`:''}
-              ${p.ges_class?`<div style="font-size:0.82rem;color:#2a3a2e;"><span style="color:#5b9bd5;margin-right:5px;">${fi.wind}</span>GES : <strong>Classe ${p.ges_class}</strong>${hasFieldValue(p.dpe_ges)?' · '+p.dpe_ges+' kg CO₂eq/m²/an':''}</div>`:hasFieldValue(p.dpe_ges)?`<div style="font-size:0.82rem;color:#2a3a2e;"><span style="color:#5b9bd5;margin-right:5px;">${fi.wind}</span>Émissions GES : <strong>${p.dpe_ges} kg CO₂eq/m²/an</strong></div>`:''}
-              ${hasFieldValue(p.dpe_cout_min)&&hasFieldValue(p.dpe_cout_max)?`<div style="font-size:0.82rem;color:#2a3a2e;"><span style="color:var(--terracotta);margin-right:5px;">${fi.euro}</span>Dépenses annuelles estimées : <strong>${parseInt(p.dpe_cout_min).toLocaleString('fr-FR')} – ${parseInt(p.dpe_cout_max).toLocaleString('fr-FR')} €/an</strong>${p.dpe_annee_ref?' (réf. '+p.dpe_annee_ref+')':''}</div>`:''}
-              ${p.dpe_date?`<div style="font-size:0.78rem;color:#888;">DPE réalisé le ${new Date(p.dpe_date).toLocaleDateString('fr-FR')}</div>`:''}
-              ${['F','G'].includes(dpeClass)?`<div style="font-size:0.78rem;font-weight:600;color:#e05a1a;padding:6px 10px;background:#fff5f0;border-radius:6px;border:1px solid #f0c8b8;">⚠ Logement à consommation énergétique excessive</div>`:''}
-            </div>
+      <!-- DIAGNOSTICS ÉNERGÉTIQUES — DPE + GES côte à côte -->
+      ${dpeClass||gesClass?`
+      <div class="fd3-sec">
+        <div class="fd3-hd"><span class="fd3-hd-t">Diagnostics énergétiques</span></div>
+        <div style="background:#fff;border-radius:12px;padding:16px;box-shadow:0 4px 18px rgba(0,0,0,0.04);">
+          <div style="display:grid;grid-template-columns:${dpeClass&&gesClass?'1fr 1fr':'1fr'};gap:16px;">
+            ${dpeClass?`
+            <div>
+              <div style="font-size:0.58rem;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:#888;margin-bottom:8px;">Consommation énergétique</div>
+              ${dpeBars}
+              ${p.dpe_conso_energie?`<div style="font-size:0.75rem;color:#555;margin-top:8px;">${fi.bolt} <strong>${p.dpe_conso_energie} kWhEP/m²/an</strong></div>`:''}
+            </div>`:''}
+            ${gesClass?`
+            <div>
+              <div style="font-size:0.58rem;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:#888;margin-bottom:8px;">Émissions GES</div>
+              ${gesBars}
+              ${hasFieldValue(p.dpe_ges)?`<div style="font-size:0.75rem;color:#555;margin-top:8px;">${fi.wind} <strong>${p.dpe_ges} kg CO₂eq/m²/an</strong></div>`:''}
+            </div>`:''}
           </div>
+          ${hasFieldValue(p.dpe_cout_min)&&hasFieldValue(p.dpe_cout_max)?`<div style="margin-top:12px;padding:9px 12px;background:#F9F8F6;border-radius:8px;font-size:0.78rem;color:#555;">${fi.euro} Dépenses estimées : <strong>${parseInt(p.dpe_cout_min).toLocaleString('fr-FR')} – ${parseInt(p.dpe_cout_max).toLocaleString('fr-FR')} €/an</strong>${p.dpe_annee_ref?' (réf. '+p.dpe_annee_ref+')':''}</div>`:''}
+          ${p.dpe_date?`<div style="font-size:0.72rem;color:#aaa;margin-top:7px;">DPE réalisé le ${new Date(p.dpe_date).toLocaleDateString('fr-FR')}</div>`:''}
+          ${['F','G'].includes(dpeClass)?`<div style="margin-top:10px;font-size:0.76rem;font-weight:600;color:#e05a1a;padding:6px 10px;background:#fff5f0;border-radius:6px;border:1px solid #f0c8b8;">⚠ Logement à consommation énergétique excessive</div>`:''}
         </div>
       </div>`:''}
 
       <!-- ÉQUIPEMENTS -->
       ${p.equipment?`
-      <div style="margin-bottom:28px;">
-        <span class="fv2-hd">Équipements inclus</span>
-        <div style="display:flex;flex-wrap:wrap;gap:8px;">
-          ${p.equipment.split(',').map(e=>`<span class="fv2-tag">${e.trim()}</span>`).join('')}
+      <div class="fd3-sec">
+        <div class="fd3-hd"><span class="fd3-hd-t">Équipements inclus</span></div>
+        <div style="display:flex;flex-wrap:wrap;gap:7px;">
+          ${p.equipment.split(',').map(e=>`<span class="fd3-chip">${e.trim()}</span>`).join('')}
         </div>
       </div>`:''}
 
       <!-- TRAVAUX RÉCENTS -->
       ${_travauxFiche.length?`
-      <div style="margin-bottom:28px;">
-        <span class="fv2-hd fv2-hd-green">Travaux récents</span>
-        <div style="display:flex;flex-wrap:wrap;gap:8px;">
-          ${_travauxFiche.map(t=>`<span class="fv2-tag"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#9E3A18" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>${t}</span>`).join('')}
+      <div class="fd3-sec">
+        <div class="fd3-hd"><span class="fd3-hd-t">Travaux récents (${_travauxFiche.length})</span></div>
+        <div style="display:flex;flex-direction:column;gap:6px;">
+          ${_travauxFiche.map(t=>`<div style="display:flex;align-items:center;gap:9px;font-size:0.84rem;color:#2a3a2e;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--terracotta)" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>${t}</div>`).join('')}
         </div>
       </div>`:''}
 
       <!-- PHOTOS PRO -->
       ${proPhotos.length>0?`
-      <div style="margin-bottom:28px;">
-        <span class="fv2-hd fv2-hd-green">Photos professionnelles <span style="font-size:0.62rem;font-weight:400;text-transform:none;letter-spacing:0;opacity:.6;">(${proPhotos.length})</span></span>
-        <div class="fv2-photos">
-          ${proPhotos.map((ph,i)=>`<div class="fv2-photo" onclick="openLightbox('pro',${i})"><img src="${ph.url||ph.file_path}" onmouseover="this.style.transform='scale(1.04)'" onmouseout="this.style.transform=''" alt=""></div>`).join('')}
-        </div>
+      <div class="fd3-sec">
+        <div class="fd3-hd"><span class="fd3-hd-t">Photos professionnelles (${proPhotos.length})</span></div>
+        <div class="fd3-photos">${proPhotos.map((ph,i)=>`<div class="fd3-photo" onclick="openLightbox('pro',${i})"><img src="${ph.url||ph.file_path}" alt=""></div>`).join('')}</div>
       </div>`:''}
 
-      <!-- PHOTOS EXTÉRIEUR -->
-      ${exterieurPhotos.length>0?`
-      <div style="margin-bottom:28px;">
-        <span class="fv2-hd fv2-hd-green">Extérieur &amp; façade <span style="font-size:0.62rem;font-weight:400;text-transform:none;letter-spacing:0;opacity:.6;">(${exterieurPhotos.length})</span></span>
-        <div class="fv2-photos">
-          ${exterieurPhotos.map((ph,i)=>`<div class="fv2-photo" onclick="openLightbox('exterieur',${i})"><img src="${ph.url||ph.file_path}" onmouseover="this.style.transform='scale(1.04)'" onmouseout="this.style.transform=''" alt=""></div>`).join('')}
-        </div>
-      </div>`:''}
-
-      <!-- PHOTOS IMMERSIVES -->
-      ${decouvertePhotos.length>0?`
-      <div style="margin-bottom:28px;">
-        <span class="fv2-hd fv2-hd-green">Photos immersives <span style="font-size:0.62rem;font-weight:400;text-transform:none;letter-spacing:0;opacity:.6;">(${decouvertePhotos.length})</span></span>
-        <div class="fv2-photos">
-          ${decouvertePhotos.map((ph,i)=>`<div class="fv2-photo" onclick="openLightbox('decouverte',${i})"><img src="${ph.url||ph.file_path}" onmouseover="this.style.transform='scale(1.04)'" onmouseout="this.style.transform=''" alt=""></div>`).join('')}
-        </div>
-      </div>`:''}
-
-      <!-- PHOTOS DÉTAILS -->
-      ${detailsPhotos.length>0?`
-      <div style="margin-bottom:28px;">
-        <span class="fv2-hd fv2-hd-green">Détails techniques <span style="font-size:0.62rem;font-weight:400;text-transform:none;letter-spacing:0;opacity:.6;">(${detailsPhotos.length})</span></span>
-        <div class="fv2-photos">
-          ${detailsPhotos.map((ph,i)=>`<div class="fv2-photo" onclick="openLightbox('details',${i})"><img src="${ph.url||ph.file_path}" onmouseover="this.style.transform='scale(1.04)'" onmouseout="this.style.transform=''" alt=""></div>`).join('')}
-        </div>
+      <!-- PHOTOS EXTÉRIEUR / IMMERSIVES / DÉTAILS -->
+      ${exterieurPhotos.length>0||decouvertePhotos.length>0||detailsPhotos.length>0?`
+      <div class="fd3-sec">
+        ${exterieurPhotos.length>0?`
+        <div class="fd3-hd"><span class="fd3-hd-t">Extérieur &amp; façade (${exterieurPhotos.length})</span></div>
+        <div class="fd3-photos" style="margin-bottom:${decouvertePhotos.length||detailsPhotos.length?'18px':'0'}">${exterieurPhotos.map((ph,i)=>`<div class="fd3-photo" onclick="openLightbox('exterieur',${i})"><img src="${ph.url||ph.file_path}" alt=""></div>`).join('')}</div>`:''}
+        ${decouvertePhotos.length>0?`
+        <div class="fd3-hd"><span class="fd3-hd-t">Photos immersives (${decouvertePhotos.length})</span></div>
+        <div class="fd3-photos" style="margin-bottom:${detailsPhotos.length?'18px':'0'}">${decouvertePhotos.map((ph,i)=>`<div class="fd3-photo" onclick="openLightbox('decouverte',${i})"><img src="${ph.url||ph.file_path}" alt=""></div>`).join('')}</div>`:''}
+        ${detailsPhotos.length>0?`
+        <div class="fd3-hd"><span class="fd3-hd-t">Détails techniques (${detailsPhotos.length})</span></div>
+        <div class="fd3-photos">${detailsPhotos.map((ph,i)=>`<div class="fd3-photo" onclick="openLightbox('details',${i})"><img src="${ph.url||ph.file_path}" alt=""></div>`).join('')}</div>`:''}
       </div>`:''}
 
     </div>
 
-    <!-- ═══ RIGHT COLUMN — Sticky Panel Technique ═══ -->
-    <div class="fv2-right">
+    <!-- ═══ RIGHT ═══ -->
+    <div class="fd3-right">
 
-      <!-- CARACTÉRISTIQUES CLÉS — valeurs massives terracotta -->
-      <div class="fv2-card">
-        <div class="fv2-card-hd" style="color:var(--terracotta);">Caractéristiques clés</div>
-        <div class="fv2-stat-grid">
-          ${[
-            p.surface_habitable?{v:p.surface_habitable+' m²',l:'Surface habitable'}:null,
-            p.rooms?{v:p.rooms+' pièces',l:'Pièces'}:null,
-            p.bedrooms?{v:p.bedrooms+' ch.',l:'Chambres'}:null,
-            p.year_built?{v:p.year_built,l:'Construction'}:null,
-            p.surface_terrain?{v:p.surface_terrain+' m²',l:'Terrain'}:null,
-            p.hauteur_plafond?{v:p.hauteur_plafond+' m',l:'Plafond'}:null,
-            p.taxe_fonciere?{v:Number(p.taxe_fonciere).toLocaleString('fr-FR')+' €',l:'Taxe foncière/an'}:null,
-          ].filter(Boolean).map(s=>`<div class="fv2-stat-cell">
-            <div class="fv2-lbl">${s.l}</div>
-            <div class="fv2-val">${s.v}</div>
-          </div>`).join('')}
-        </div>
+      <!-- CARACTÉRISTIQUES PRINCIPALES -->
+      <div class="fd3-card">
+        <div class="fd3-card-hd">Caractéristiques principales</div>
+        ${iRow(fi.home,'Type de bien',p.type||null)}
+        ${iRow(fi.sofa,'Surface habitable',p.surface_habitable?p.surface_habitable+' m²':null)}
+        ${iRow(fi.camera,'Pièces',p.rooms?p.rooms+' pièce'+(parseInt(p.rooms)>1?'s':''):null)}
+        ${iRow('<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 4v16M22 4v16M2 12h20M7 4v5M17 4v5"/></svg>','Chambres',p.bedrooms?p.bedrooms+' chambre'+(parseInt(p.bedrooms)>1?'s':''):null)}
+        ${iRow('<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="8" y1="4" x2="8" y2="9"/><line x1="16" y1="4" x2="16" y2="9"/></svg>','Année construction',p.year_built||null)}
+        ${iRow(fi.tree,'Terrain',p.surface_terrain?p.surface_terrain+' m²':null)}
+        ${iRow(fi.sun,'Exposition',p.exposition||null)}
+        ${dpeClass?iRow(fi.leaf,'DPE','Classe '+dpeClass):''}
       </div>
 
       <!-- SURFACES -->
       ${surfacesRows?`
-      <div class="fv2-card">
-        <div class="fv2-card-hd" style="color:var(--terracotta);">Surfaces</div>
+      <div class="fd3-card">
+        <div class="fd3-card-hd">Surfaces détaillées</div>
         <table style="width:100%;border-collapse:collapse;font-size:0.8rem;">${surfacesRows}</table>
       </div>`:''}
 
       <!-- INTÉRIEUR -->
       ${interiorRows?`
-      <div class="fv2-card">
-        <div class="fv2-card-hd" style="color:var(--terracotta);">Intérieur</div>
+      <div class="fd3-card">
+        <div class="fd3-card-hd">Intérieur</div>
         <table style="width:100%;border-collapse:collapse;font-size:0.8rem;">${interiorRows}</table>
       </div>`:''}
 
       <!-- EXTÉRIEUR -->
       ${exteriorRows?`
-      <div class="fv2-card">
-        <div class="fv2-card-hd" style="color:var(--terracotta);">Extérieur</div>
+      <div class="fd3-card">
+        <div class="fd3-card-hd">Extérieur</div>
         <table style="width:100%;border-collapse:collapse;font-size:0.8rem;">${exteriorRows}</table>
       </div>`:''}
 
       <!-- LOCALISATION -->
       ${locRows?`
-      <div class="fv2-card">
-        <div class="fv2-card-hd" style="color:var(--terracotta);">Localisation</div>
+      <div class="fd3-card">
+        <div class="fd3-card-hd">Localisation</div>
         <table style="width:100%;border-collapse:collapse;font-size:0.8rem;">${locRows}</table>
       </div>`:''}
 
       <!-- COPROPRIÉTÉ -->
       ${coproRows?`
-      <div class="fv2-card">
-        <div class="fv2-card-hd" style="color:var(--terracotta);">Copropriété</div>
+      <div class="fd3-card">
+        <div class="fd3-card-hd">Copropriété</div>
         <table style="width:100%;border-collapse:collapse;font-size:0.8rem;">${coproRows}</table>
       </div>`:''}
 
-      <!-- FINANCIER -->
+      <!-- ASPECTS FINANCIERS -->
       ${finRows?`
-      <div class="fv2-card">
-        <div class="fv2-card-hd" style="color:var(--terracotta);">Aspects financiers</div>
+      <div class="fd3-card">
+        <div class="fd3-card-hd">Aspects financiers</div>
         <table style="width:100%;border-collapse:collapse;font-size:0.8rem;">${finRows}</table>
       </div>`:''}
 
       <!-- VISITE 3D -->
       ${p.virtual_tour_url?`
-      <div class="fv2-card">
+      <div class="fd3-card">
         <a href="${p.virtual_tour_url}" target="_blank" style="display:flex;align-items:center;gap:12px;text-decoration:none;color:#1a1a1a;">
-          <div style="width:40px;height:40px;background:var(--terracotta-dark);border-radius:11px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">${fi.vr}</div>
-          <div>
-            <div style="font-size:0.86rem;font-weight:700;">Visite 3D disponible</div>
-            <div style="font-size:0.68rem;color:var(--terracotta);margin-top:2px;font-weight:600;">Ouvrir →</div>
-          </div>
+          <div style="width:38px;height:38px;background:var(--terracotta-dark);border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;color:#fff;">${fi.vr}</div>
+          <div><div style="font-size:0.84rem;font-weight:700;">Visite 3D disponible</div><div style="font-size:0.66rem;color:var(--terracotta);margin-top:2px;font-weight:600;">Ouvrir →</div></div>
         </a>
       </div>`:''}
 
-      <!-- RÉSUMÉ IA DIAGNOSTICS — seulement si le vendeur l'a validé -->
-      ${(p.diagnostics_ai_summary && Number(p.diagnostics_ai_summary_validated) === 1)?`
-      <div class="fv2-card">
-        <div class="fv2-card-hd" style="color:var(--terracotta);">Ce que disent les diagnostics, en clair</div>
-        <div style="font-size:0.8rem;color:#444;line-height:1.7;white-space:pre-line;">${String(p.diagnostics_ai_summary).replace(/[&<>"']/g, function(c){ return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c]; })}</div>
+      <!-- RÉSUMÉ IA DIAGNOSTICS -->
+      ${(p.diagnostics_ai_summary&&Number(p.diagnostics_ai_summary_validated)===1)?`
+      <div class="fd3-card">
+        <div class="fd3-card-hd">Ce que disent les diagnostics, en clair</div>
+        <div style="font-size:0.79rem;color:#444;line-height:1.7;white-space:pre-line;">${String(p.diagnostics_ai_summary).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c])}</div>
       </div>`:''}
 
       <!-- DOCUMENTS -->
       ${publicDocs.length>0?`
-      <div class="fv2-card">
-        <div class="fv2-card-hd" style="color:var(--terracotta);">Documents fournis</div>
-        <div style="display:flex;flex-direction:column;gap:7px;">
-          ${publicDocs.map(function(doc){
-            var m=DOC_META[doc.doc_type]||DOC_META.autre;
-            return '<a href="/api/property/document/'+doc.id+'" target="_blank" rel="noopener" style="display:flex;align-items:center;gap:9px;padding:8px 10px;background:#F9F9FB;border-radius:10px;text-decoration:none;color:inherit;">'
-              +'<div style="width:30px;height:30px;border-radius:8px;background:'+m.color+';display:flex;align-items:center;justify-content:center;flex-shrink:0;color:'+m.text+';">'+fi.clip+'</div>'
-              +'<div style="min-width:0;"><div style="font-size:0.76rem;font-weight:700;color:#1a1a1a;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" title="'+doc.name+'">'+doc.name+'</div>'
-              +'<div style="font-size:0.58rem;color:'+m.text+';background:'+m.color+';padding:1px 7px;border-radius:10px;display:inline-block;margin-top:2px;font-weight:700;text-transform:uppercase;">'+m.label+'</div></div></a>';
-          }).join('')}
+      <div class="fd3-card">
+        <div class="fd3-card-hd">Documents fournis</div>
+        <div style="display:flex;flex-direction:column;gap:6px;">
+          ${publicDocs.map(function(doc){var m=DOC_META[doc.doc_type]||DOC_META.autre;return '<a href="/api/property/document/'+doc.id+'" target="_blank" rel="noopener" style="display:flex;align-items:center;gap:8px;padding:8px 10px;background:#F9F8F6;border-radius:10px;text-decoration:none;color:inherit;"><div style="width:28px;height:28px;border-radius:7px;background:'+m.color+';display:flex;align-items:center;justify-content:center;flex-shrink:0;color:'+m.text+';">'+fi.clip+'</div><div style="min-width:0;"><div style="font-size:0.75rem;font-weight:700;color:#1a1a1a;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" title="'+doc.name+'">'+doc.name+'</div><div style="font-size:0.57rem;color:'+m.text+';background:'+m.color+';padding:1px 6px;border-radius:10px;display:inline-block;margin-top:2px;font-weight:700;text-transform:uppercase;">'+m.label+'</div></div></a>';}).join('')}
         </div>
       </div>`:''}
 
       <!-- CTA -->
-      <div style="background:linear-gradient(135deg,var(--terracotta-dark),var(--terracotta));border-radius:20px;padding:22px 20px;box-shadow:0 8px 30px rgba(158,58,24,0.22);margin-bottom:14px;text-align:center;">
-        <div style="font-family:'Cormorant Garamond',serif;font-size:1.5rem;color:#fff;font-weight:700;margin-bottom:5px;">Organiser une visite</div>
-        <div style="font-size:0.74rem;color:rgba(255,255,255,0.5);margin-bottom:16px;">Contactez directement le vendeur</div>
-        <div style="font-size:0.92rem;font-weight:700;color:#fff;" class="fiche-seller-name">Chargement...</div>
-        <div style="font-size:0.82rem;color:rgba(158,58,24,0.9);margin-top:5px;font-weight:600;" class="fiche-seller-phone"></div>
+      <div style="background:linear-gradient(135deg,var(--terracotta-dark),var(--terracotta));border-radius:18px;padding:22px 20px;box-shadow:0 8px 28px rgba(158,58,24,0.22);text-align:center;">
+        <div style="font-family:'Cormorant Garamond',serif;font-size:1.4rem;color:#fff;font-weight:700;margin-bottom:4px;">Organiser une visite</div>
+        <div style="font-size:0.72rem;color:rgba(255,255,255,0.5);margin-bottom:14px;">Contactez directement le vendeur</div>
+        <div style="font-size:0.9rem;font-weight:700;color:#fff;" class="fiche-seller-name">Chargement...</div>
+        <div style="font-size:0.8rem;color:rgba(255,255,255,0.7);margin-top:5px;" class="fiche-seller-phone"></div>
       </div>
 
     </div>
@@ -5855,9 +5952,9 @@ function buildFicheHtml() {
   </div>
 
   <!-- FOOTER -->
-  <div style="background:var(--terracotta-dark);padding:15px 22px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
-    <div style="font-size:0.58rem;color:rgba(255,255,255,0.2);">Documents notariaux exclus · Généré par Vendu Par Moi · ${today}</div>
-    <div style="font-family:'Cormorant Garamond',serif;font-size:1rem;color:rgba(255,255,255,0.22);font-weight:600;">Vendu Par Moi</div>
+  <div style="background:var(--terracotta-dark);padding:14px 22px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
+    <div style="font-size:0.58rem;color:rgba(255,255,255,0.22);">Document réalisé avec la méthode Vendu Par Moi · ${today}</div>
+    <div style="font-family:'Cormorant Garamond',serif;font-size:1rem;color:rgba(255,255,255,0.3);font-weight:600;">Vendu Par Moi</div>
   </div>
 
 </div>`;
@@ -6048,9 +6145,22 @@ function renderTravaux() {
     var opts = TRAVAUX_TYPES.map(function(ty) {
       return '<option value="' + ty + '"' + (t.type === ty ? ' selected' : '') + '>' + ty + '</option>';
     }).join('');
+    var factureHtml;
+    if (t.factureId) {
+      factureHtml =
+        '<a href="/api/property/document/' + t.factureId + '" target="_blank" rel="noopener" style="flex-shrink:0;display:inline-flex;align-items:center;gap:5px;padding:6px 11px;background:#f0ece6;border:1px solid rgba(158,58,24,0.2);border-radius:7px;font-family:\'DM Sans\',sans-serif;font-size:0.8rem;font-weight:500;color:var(--terracotta,#9E3A18);text-decoration:none;white-space:nowrap;">' +
+        '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg> Voir la facture</a>';
+    } else {
+      factureHtml =
+        '<label style="flex-shrink:0;display:inline-flex;align-items:center;gap:5px;padding:6px 11px;border:1px dashed rgba(158,58,24,0.35);border-radius:7px;font-family:\'DM Sans\',sans-serif;font-size:0.8rem;font-weight:500;color:rgba(158,58,24,0.75);cursor:pointer;white-space:nowrap;">' +
+        '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg> Joindre une facture' +
+        '<input type="file" accept=".pdf,.jpg,.jpeg,.png" style="display:none" onchange="uploadTravauxFacture(' + i + ',this)">' +
+        '</label>';
+    }
     row.innerHTML =
       '<select style="flex:1;padding:7px 10px;border:1px solid rgba(158,58,24,0.12);border-radius:7px;font-family:\'DM Sans\',sans-serif;font-size:0.88rem;background:#fff;" onchange="travauxList[' + i + '].type=this.value;syncTravauxField();renderAvantages()">' + opts + '</select>' +
       '<input type="number" min="1900" max="' + new Date().getFullYear() + '" placeholder="Année" value="' + (t.year || '') + '" style="width:90px;padding:7px 10px;border:1px solid rgba(158,58,24,0.12);border-radius:7px;font-family:\'DM Sans\',sans-serif;font-size:0.88rem;text-align:center;" oninput="travauxList[' + i + '].year=this.value;syncTravauxField();renderAvantages()">' +
+      factureHtml +
       '<button type="button" onclick="removeTravaux(' + i + ')" style="width:30px;height:30px;border:none;background:none;color:#bbb;font-size:1.2rem;cursor:pointer;padding:0;display:flex;align-items:center;justify-content:center;border-radius:5px;" onmouseover="this.style.color=\'#e53935\'" onmouseout="this.style.color=\'#bbb\'">×</button>';
     container.appendChild(row);
   });
@@ -6089,6 +6199,26 @@ function syncTravauxField() {
   if (el) el.value = JSON.stringify(travauxList);
 }
 
+function uploadTravauxFacture(idx, input) {
+  var file = input.files && input.files[0];
+  if (!file) return;
+  var fd = new FormData();
+  fd.append('document', file);
+  fd.append('folder', 'acheteur_serieux');
+  fd.append('doc_type', 'facture_travaux');
+  var t = travauxList[idx] || {};
+  fd.append('name', 'Facture ' + (t.type || 'travaux') + (t.year ? ' ' + t.year : ''));
+  fetch('/api/property/documents', { method: 'POST', body: fd })
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+      if (data.error) { showToast('Erreur : ' + data.error, 'error'); return; }
+      travauxList[idx].factureId = data.id;
+      syncTravauxField();
+      renderTravaux();
+      showToast('Facture jointe ✓');
+    })
+    .catch(function() { showToast('Erreur lors de l\'envoi', 'error'); });
+}
 
 function initTravaux() {
   if (window._propertyData && window._propertyData.travaux_recents) {
@@ -6459,7 +6589,8 @@ initEquipGrid();
 async function fetchNearbyPOIs() {
   const address = (document.querySelector('[name="address"]') || {}).value || '';
   const city    = (document.querySelector('[name="city"]')    || {}).value || '';
-  if (!address.trim() && !city.trim()) {
+  const hasSavedCoords = !!(document.getElementById('field-latitude')?.value && document.getElementById('field-longitude')?.value);
+  if (!address.trim() && !city.trim() && !hasSavedCoords) {
     const panel = document.getElementById('poiSuggestPanel');
     if (panel) {
       panel.innerHTML = '<div class="poi-err" style="display:flex;align-items:center;gap:6px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg> Renseignez d\'abord l\'adresse du bien dans la section <strong>Localisation</strong>.</div>';
@@ -6489,17 +6620,25 @@ async function fetchNearbyPOIs() {
   }
 
   try {
-    const q = [address.trim(), city.trim(), 'France'].filter(Boolean).join(', ');
-    const geoRes = await fetchWithTimeout('https://nominatim.openstreetmap.org/search?q=' + encodeURIComponent(q) + '&format=json&limit=1', { headers: { 'Accept-Language': 'fr' } }, 10000);
-    if (!geoRes.ok) throw new Error('Nominatim HTTP ' + geoRes.status);
-    const geoData = await geoRes.json();
-    if (!geoData.length) {
-      panel.innerHTML = '<div class="poi-err" style="display:flex;align-items:center;gap:6px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg> Adresse introuvable — vérifiez que l\'adresse et la ville sont correctement renseignées.</div>';
-      panel.style.display = 'block';
-      return;
+    // Utilise les coordonnées sauvegardées si disponibles (plus fiable que géocoder à nouveau)
+    const savedLat = parseFloat(document.getElementById('field-latitude')?.value);
+    const savedLon = parseFloat(document.getElementById('field-longitude')?.value);
+    let lat, lon;
+    if (savedLat && savedLon && !isNaN(savedLat) && !isNaN(savedLon)) {
+      lat = savedLat; lon = savedLon;
+    } else {
+      const q = [address.trim(), city.trim()].filter(Boolean).join(' ');
+      const geoRes = await fetchWithTimeout('https://api-adresse.data.gouv.fr/search/?q=' + encodeURIComponent(q) + '&limit=1', {}, 8000);
+      if (!geoRes.ok) throw new Error('BAN HTTP ' + geoRes.status);
+      const geoData = await geoRes.json();
+      if (!geoData.features || !geoData.features.length) {
+        panel.innerHTML = '<div class="poi-err" style="display:flex;align-items:center;gap:6px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg> Adresse introuvable — vérifiez que l\'adresse et la ville sont correctement renseignées.</div>';
+        panel.style.display = 'block';
+        return;
+      }
+      lon = geoData.features[0].geometry.coordinates[0];
+      lat = geoData.features[0].geometry.coordinates[1];
     }
-    const lat = parseFloat(geoData[0].lat);
-    const lon = parseFloat(geoData[0].lon);
 
     const oq = `[out:json][timeout:20];(
       node(around:1800,${lat},${lon})[amenity=kindergarten];
@@ -6520,9 +6659,8 @@ async function fetchNearbyPOIs() {
       node(around:2000,${lat},${lon})[railway=halt];
     );out center;`;
 
-    // overpass-api.de (le miroir public le plus utilisé) sature régulièrement
-    // (429/504) : on retente sur un second miroir avant d'abandonner.
-    const OVERPASS_MIRRORS = ['https://overpass-api.de/api/interpreter', 'https://overpass.kumi.systems/api/interpreter'];
+    // osm.ch en premier (stable), kumi.systems et overpass-api.de en fallback.
+    const OVERPASS_MIRRORS = ['https://overpass.osm.ch/api/interpreter', 'https://overpass.kumi.systems/api/interpreter', 'https://overpass-api.de/api/interpreter'];
     let ovData = null, ovErr = null;
     for (const mirror of OVERPASS_MIRRORS) {
       try {
@@ -6804,6 +6942,8 @@ const CMD_ACTIONS = [
   { section:'Actions',    icon:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>', label:'Sauvegarder le formulaire', fn: () => document.querySelector('form')?.requestSubmit() },
   { section:'Actions',    icon:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 3l1.5 4.5L18 9l-4.5 1.5L12 15l-1.5-4.5L6 9l4.5-1.5z"/><path d="M5 3l.75 2.25L8 6l-2.25.75L5 9l-.75-2.25L2 6l2.25-.75z"/><path d="M19 14l.75 2.25L22 17l-2.25.75L19 20l-.75-2.25L16 17l2.25-.75z"/></svg>', label:'Générer la description IA', fn: () => { switchTab('infos'); setTimeout(generateAIDescription, 200); } },
   { section:'Actions',    icon:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>', label:'Copier le lien public',   fn: () => {
+    const published = window._propertyData?.property?.published;
+    if (!published) { showToast('Votre annonce n\'est pas encore publiée. Rendez-vous dans Mes Publications pour l\'activer.', 'error'); return; }
     const slugEl = document.querySelector('[data-slug]') || document.querySelector('input[name="slug"]');
     const slugVal = slugEl?.value || slugEl?.dataset?.slug || window._propSlug;
     if (slugVal) { const url = (window._propertyData?.property?.bien_url) || (_baseUrl + '/bien/' + slugVal); navigator.clipboard.writeText(url); showToast('Lien copié !'); }
@@ -7588,6 +7728,75 @@ fetchSellerForFiche();
     g.nodes.forEach(function(n) { card.appendChild(n); });
   });
 })();
+
+// ── Autocomplétion BAN (Base Adresse Nationale) ────────────────────
+(function() {
+  var addressInput = document.getElementById('addressInput');
+  var dropdown = document.getElementById('addressDropdown');
+  var cityInput = document.getElementById('cityInput');
+  var postalInput = document.getElementById('postalInput');
+  if (!addressInput || !dropdown) return;
+
+  var _features = [];
+  var _debounce = null;
+
+  // Style des suggestions
+  var styleEl = document.createElement('style');
+  styleEl.textContent = '.ban-suggestion{padding:10px 14px;cursor:pointer;font-size:0.85rem;font-family:"DM Sans",sans-serif;border-bottom:1px solid #f0ede8;color:#302A26;line-height:1.3;} .ban-suggestion:last-child{border-bottom:none;} .ban-suggestion:hover{background:#fff8f4;color:var(--terracotta);}';
+  document.head.appendChild(styleEl);
+
+  addressInput.addEventListener('input', function() {
+    clearTimeout(_debounce);
+    var q = this.value.trim();
+    if (q.length < 3) { dropdown.style.display = 'none'; return; }
+    _debounce = setTimeout(function() { fetchBAN(q); }, 350);
+  });
+
+  addressInput.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') dropdown.style.display = 'none';
+  });
+
+  document.addEventListener('click', function(e) {
+    if (!dropdown.contains(e.target) && e.target !== addressInput) dropdown.style.display = 'none';
+  });
+
+  async function fetchBAN(q) {
+    try {
+      var r = await fetch('https://api-adresse.data.gouv.fr/search/?q=' + encodeURIComponent(q) + '&limit=5&type=housenumber');
+      if (!r.ok) return;
+      var data = await r.json();
+      _features = data.features || [];
+      if (!_features.length) { dropdown.style.display = 'none'; return; }
+      dropdown.innerHTML = _features.map(function(f, i) {
+        return '<div class="ban-suggestion" data-idx="' + i + '">' + (f.properties.label || '') + '</div>';
+      }).join('');
+      dropdown.querySelectorAll('.ban-suggestion').forEach(function(el) {
+        el.addEventListener('mousedown', function(e) {
+          e.preventDefault();
+          applyBAN(parseInt(el.getAttribute('data-idx'), 10));
+        });
+      });
+      dropdown.style.display = 'block';
+    } catch(e) {}
+  }
+
+  function applyBAN(idx) {
+    var f = _features[idx];
+    if (!f) return;
+    var p = f.properties;
+    addressInput.value = p.name || p.label || '';
+    if (cityInput) cityInput.value = p.city || '';
+    if (postalInput) postalInput.value = p.postcode || '';
+    var codeEl = document.getElementById('field-code_insee');
+    var latEl = document.getElementById('field-latitude');
+    var lonEl = document.getElementById('field-longitude');
+    if (codeEl) codeEl.value = p.citycode || '';
+    if (latEl) latEl.value = f.geometry.coordinates[1];
+    if (lonEl) lonEl.value = f.geometry.coordinates[0];
+    dropdown.style.display = 'none';
+    if (typeof markDirty === 'function') markDirty();
+  }
+})();
 </script>
 <!-- ── Bento lightbox ─────────────────────────────────── -->
 <div class="lightbox-overlay" id="lightboxOverlay" onclick="if(event.target===this)closeLightbox()">
@@ -7700,5 +7909,63 @@ fetchSellerForFiche();
 </script>
 
 <link rel="stylesheet" href="/css/seller-header-typography.css?v=1">
+<link rel="stylesheet" href="/css/property-send-premium.css?v=1">
+<script src="/js/property-send-premium.js?v=1"></script>
+
+<style>
+.ev-send-dossier-section{border-top:1px solid rgba(200,190,178,0.25);margin-top:20px;padding-top:18px;}
+.ev-send-dossier-header{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:600;color:#3D3530;margin-bottom:6px;}
+.ev-send-dossier-desc{font-size:12px;color:#7a736c;margin:0 0 12px;}
+.ev-send-dossier-fields{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px;}
+.ev-send-dossier-input{flex:1;min-width:160px;height:36px;padding:0 10px;border:1px solid rgba(180,168,155,0.5);border-radius:6px;font-size:13px;color:#3D3530;background:#fdfaf7;outline:none;}
+.ev-send-dossier-input:focus{border-color:var(--terracotta);}
+.ev-send-dossier-btn{height:36px;padding:0 16px;background:var(--terracotta,#C4603A);color:#fff;border:none;border-radius:6px;font-size:13px;font-weight:600;cursor:pointer;transition:opacity .15s;}
+.ev-send-dossier-btn:hover{opacity:.88;}
+.ev-send-dossier-btn:disabled{opacity:.5;cursor:default;}
+.ev-send-dossier-feedback{font-size:12.5px;padding:8px 10px;border-radius:6px;margin-top:6px;}
+.ev-send-dossier-feedback.ok{background:#eaf5ec;color:#2a6b38;}
+.ev-send-dossier-feedback.err{background:#fde8e4;color:#b83223;}
+.ev-send-dossier-feedback.warn{background:#fef3e2;color:#9a5700;}
+</style>
+<script>
+async function submitSendDossierEmail(e) {
+  e.preventDefault();
+  const emailEl = document.getElementById('ev-dossier-buyer-email');
+  const nameEl  = document.getElementById('ev-dossier-buyer-name');
+  const feedEl  = document.getElementById('ev-dossier-feedback');
+  const btn     = e.target.querySelector('.ev-send-dossier-btn');
+  const email   = emailEl.value.trim();
+  const name    = nameEl ? nameEl.value.trim() : '';
+  if (!email) { emailEl.focus(); return; }
+  btn.disabled = true;
+  feedEl.style.display = 'none';
+  try {
+    const r = await fetch('/api/dossier/send-email', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, buyerName: name }),
+    });
+    const d = await r.json();
+    feedEl.style.display = 'block';
+    if (r.ok && d.success) {
+      feedEl.className = 'ev-send-dossier-feedback ok';
+      feedEl.textContent = 'Dossier envoyé à ' + email + ' ✓';
+      emailEl.value = '';
+      if (nameEl) nameEl.value = '';
+    } else if (r.status === 409) {
+      feedEl.className = 'ev-send-dossier-feedback warn';
+      feedEl.textContent = 'Ce dossier a déjà été envoyé à cette adresse.';
+    } else {
+      feedEl.className = 'ev-send-dossier-feedback err';
+      feedEl.textContent = d.error || 'Envoi impossible. Réessayez.';
+    }
+  } catch {
+    feedEl.style.display = 'block';
+    feedEl.className = 'ev-send-dossier-feedback err';
+    feedEl.textContent = 'Erreur réseau. Réessayez.';
+  }
+  btn.disabled = false;
+}
+</script>
 </body>
 </html>

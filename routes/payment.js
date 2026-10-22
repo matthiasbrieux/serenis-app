@@ -6,7 +6,7 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { v4: uuidv4 } = require('uuid');
 const db = require('../database');
-const { sendWelcomeImproved, sendInvoiceEmail, sendFirstMeetingEmail, sendNewClientAdminNotif } = require('../services/email');
+const { sendWelcomeImproved, sendInvoiceEmail, sendFirstMeetingEmail, sendNewClientAdminNotif, legalInfoReady } = require('../services/email');
 const { isPasswordPwned } = require('../services/passwordCheck');
 const crypto = require('crypto');
 
@@ -43,6 +43,11 @@ router.post('/create-checkout', express.json(), checkoutLimit, async (req, res) 
 
   if (!process.env.STRIPE_SECRET_KEY) {
     return res.json({ error: 'Paiement non configuré. Contactez Matthias au 06 95 44 36 54.' });
+  }
+
+  if (!legalInfoReady()) {
+    console.error('[CHECKOUT] Informations légales de facturation manquantes — création Stripe refusée. Configurer LEGAL_SIREN, LEGAL_RAISON_SOCIALE, LEGAL_FORME_JURIDIQUE, LEGAL_ADRESSE_SIEGE et LEGAL_RCS.');
+    return res.status(503).json({ error: 'Paiement temporairement indisponible. Réessayez dans quelques instants ou contactez-nous au 06 95 44 36 54.' });
   }
 
   const isSerenite = pack === 'serenite';
@@ -121,6 +126,12 @@ router.get('/paiement-succes', async (req, res) => {
 
 // Stripe webhook handler
 async function stripeWebhook(req, res) {
+  // Garde explicite : sans secret configuré on rejette toute requête plutôt
+  // que de dépendre du comportement de la librairie Stripe avec `undefined`.
+  if (!process.env.STRIPE_WEBHOOK_SECRET) {
+    console.error('[STRIPE] STRIPE_WEBHOOK_SECRET absent — webhook rejeté.');
+    return res.status(500).send('Webhook non configuré.');
+  }
   const sig = req.headers['stripe-signature'];
   let event;
   try {
@@ -234,15 +245,18 @@ async function activateSeller(session) {
       const expires = new Date(Date.now() + 7 * 24 * 3600 * 1000).toISOString();
       db.prepare('INSERT INTO password_reset_tokens (seller_id, token, expires_at) VALUES (?,?,?)').run(seller.id, resetToken, expires);
       const base = process.env.BASE_URL || 'https://venduparmoi.fr';
-      await sendWelcomeImproved({ to: seller.email, firstName: seller.first_name, pack: pack || 'serenite', resetUrl: `${base}/reset-password?token=${resetToken}` });
+      await sendWelcomeImproved({ email: seller.email, firstName: seller.first_name, pack: pack || 'serenite', loginUrl: `${base}/reset-password?token=${resetToken}` });
     } else {
-      await sendWelcomeImproved({ to: seller.email, firstName: seller.first_name, pack: pack || 'serenite' });
+      await sendWelcomeImproved({ email: seller.email, firstName: seller.first_name, pack: pack || 'serenite' });
     }
   } catch(e) { console.error('Welcome email error:', e.message); }
 
-  // Email avant premier rendez-vous
+  // Email avant premier rendez-vous — Pack Sérenité uniquement (A1)
   try {
-    await sendFirstMeetingEmail({ email: seller.email, firstName: seller.first_name });
+    const activePack = pack || seller.pack;
+    if (activePack === 'serenite') {
+      await sendFirstMeetingEmail({ email: seller.email, firstName: seller.first_name });
+    }
   } catch(e) { console.error('First meeting email error:', e.message); }
 
   // Todos admin + notif admin
@@ -258,11 +272,15 @@ async function activateSeller(session) {
     await sendNewClientAdminNotif({ firstName: seller.first_name, lastName: seller.last_name, email: seller.email, pack: activePack, phone: seller.phone, sellerId: seller.id });
   } catch(e) { console.error('Admin todo/notif error:', e.message); }
 
-  // Facture automatique
+  // Facture automatique — bloquée si les mentions légales obligatoires ne sont pas configurées
   try {
-    const amount = session.amount_total || (pack === 'serenite' ? 154700 : 99900);
-    const invoiceNumber = `VPM-${new Date().getFullYear()}-${String(seller.id).padStart(5, '0')}-${Date.now().toString(36).toUpperCase()}`;
-    await sendInvoiceEmail({ email: seller.email, firstName: seller.first_name, amount, pack: pack || 'serenite', invoiceNumber, date: new Date() });
+    if (!legalInfoReady()) {
+      console.error(`[FACTURE] Mentions légales manquantes — facture non envoyée pour vendeur ${seller.id} (${seller.email}). Configurer LEGAL_SIREN et LEGAL_RAISON_SOCIALE, puis envoyer manuellement depuis /admin.`);
+    } else {
+      const amount = session.amount_total || (pack === 'serenite' ? 154700 : 99900);
+      const invoiceNumber = `VPM-${new Date().getFullYear()}-${String(seller.id).padStart(5, '0')}-${Date.now().toString(36).toUpperCase()}`;
+      await sendInvoiceEmail({ email: seller.email, firstName: seller.first_name, lastName: seller.last_name, amount, pack: pack || 'serenite', invoiceNumber, date: new Date() });
+    }
   } catch(e) { console.error('Invoice email error:', e.message); }
 
   return db.prepare('SELECT * FROM sellers WHERE id=?').get(seller.id);

@@ -10,15 +10,22 @@ function generateCode() {
 }
 
 // Crée un code à usage unique pour ce compte et l'envoie par email.
-// N'attend pas l'envoi de l'email pour ne pas bloquer la réponse de login
-// si SendGrid est lent — l'échec d'envoi est loggé côté services/email.js.
+// Retourne { emailSent, devMode } pour que l'appelant puisse détecter un
+// échec d'envoi et en informer l'utilisateur au lieu de l'attendre en vain.
+// Le console.log du code n'est activé qu'avec NODE_ENV=development explicite —
+// jamais par défaut, jamais en production même si RESEND_API_KEY est absent.
 async function issue2FACode(accountType, accountId, email) {
   const code = generateCode();
   const expiresAt = new Date(Date.now() + CODE_TTL_MS).toISOString();
   db.prepare(
     'INSERT INTO login_2fa_codes (account_type, account_id, code, expires_at) VALUES (?, ?, ?, ?)'
   ).run(accountType, accountId, code, expiresAt);
-  sendLoginCode(email, code).catch(() => {});
+  const devMode = process.env.NODE_ENV === 'development';
+  if (!process.env.RESEND_API_KEY && devMode) {
+    console.log(`\n[2FA DEV] Code de connexion pour ${email} : ${code}\n`);
+  }
+  const emailSent = await sendLoginCode(email, code).catch(() => false);
+  return { emailSent: emailSent === true, devMode };
 }
 
 // Vérifie le code le plus récent, non utilisé et non expiré pour ce compte.

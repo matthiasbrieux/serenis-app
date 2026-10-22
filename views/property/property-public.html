@@ -927,6 +927,7 @@ function buildDpe(p) {
 }
 
 // ── Full specs ──
+function esc(s) { return String(s == null ? '' : s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 function row(label, val) { return val ? `<tr><td>${label}</td><td>${val}</td></tr>` : ''; }
 function secHd(label) { return `<tr class="specs-section-hd"><td colspan="2">${label}</td></tr>`; }
 function buildSpecs(p) {
@@ -941,7 +942,19 @@ function buildSpecs(p) {
   html += row('Année de construction', p.year_built);
   html += row('Hauteur sous plafond', p.hauteur_plafond ? p.hauteur_plafond + ' m' : null);
   html += row('Mitoyenneté', p.mitoyennete);
-  html += row('Pièces (détail)', p.rooms_detail);
+  if (p.rooms_detail) {
+    try {
+      const rooms = typeof p.rooms_detail === 'string' ? JSON.parse(p.rooms_detail) : p.rooms_detail;
+      if (Array.isArray(rooms) && rooms.length > 0) {
+        const lines = rooms.filter(r => r.label).map(r => {
+          const surf = r.surface && !isNaN(r.surface) ? ` — ${Number(r.surface)} m²` : '';
+          const floor = r.floor && r.floor !== 'RDC' ? ` (${esc(r.floor)})` : '';
+          return `${esc(r.label)}${floor}${surf}`;
+        }).join('<br>');
+        html += `<tr><td>Pièces (détail)</td><td style="line-height:1.7">${lines}</td></tr>`;
+      }
+    } catch(e) {}
+  }
 
   if (p.heating_type || p.heating_mechanism || p.eau_chaude_type) {
     html += secHd('Chauffage & énergie');

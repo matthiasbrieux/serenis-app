@@ -5,6 +5,7 @@ function due(now=new Date()){
   return hour>=18;
 }
 async function runDueJobs(jobs,now=new Date()){
+  if(process.env.REMINDERS_ENABLED==='false')return [];
   if(!due(now))return [];
   const day=parisDay(now),results=[];
   for(const [name,run] of Object.entries(jobs)){

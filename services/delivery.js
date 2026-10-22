@@ -9,6 +9,6 @@ async function deliverOnce(key,send) {
   try {
     const ok=await send();if(ok!==true)throw Error('Livraison non confirmée');
     db.prepare("UPDATE delivery_events SET state='sent',sent_at=CURRENT_TIMESTAMP,lease_until=NULL,last_error=NULL WHERE event_key=?").run(key);return true;
-  }catch(e){db.prepare("UPDATE delivery_events SET state='failed',lease_until=NULL,last_error=? WHERE event_key=?").run(String(e.message).slice(0,200),key);return false;}
+  }catch(e){db.prepare("UPDATE delivery_events SET state='failed',lease_until=?,last_error=? WHERE event_key=?").run(now+4*60*60*1000,String(e.message).slice(0,200),key);return false;}
 }
 module.exports={deliverOnce};

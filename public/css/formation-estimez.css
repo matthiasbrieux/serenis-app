@@ -23,40 +23,36 @@ body.vpm-formation-page .formation-workspace.estimate-workspace {
   position: relative;
   isolation: isolate;
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 252px;
+  grid-template-columns: 300px minmax(0, 1fr) 256px;
   align-items: stretch;
   gap: 0;
-  min-height: 316px;
+  min-height: 360px;
   border-radius: 16px;
   overflow: hidden;
-  background: #F8F1E7;
-  box-shadow: 0 2px 24px rgba(48, 42, 38, 0.07);
+  background: #FAF7F2;
+  box-shadow: 0 2px 28px rgba(48, 42, 38, 0.08);
 }
 
-/* Photo */
+/* Photo — colonne centrale du grid */
 .estimate-workspace .estimate-photo {
-  position: absolute;
-  z-index: -2;
-  inset: 0 0 0 auto;
-  width: 65%;
+  position: static;
+  width: 100%;
   height: 100%;
+  min-width: 0;
   object-fit: cover;
-  object-position: center;
+  object-position: center 25%;
+  display: block;
 }
 
-/* Gradient overlay */
+/* Douceur à la jonction intro → photo */
 .estimate-workspace .estimate-hero::before {
   content: "";
   position: absolute;
-  z-index: -1;
-  inset: 0;
-  background: linear-gradient(
-    90deg,
-    #FCF7F0 0%,
-    #FCF7F0 26%,
-    rgba(252, 247, 240, 0.90) 42%,
-    rgba(252, 247, 240, 0.10) 76%
-  );
+  z-index: 1;
+  top: 0; bottom: 0;
+  left: 300px;
+  width: 48px;
+  background: linear-gradient(90deg, #FAF7F2 0%, transparent 100%);
   pointer-events: none;
 }
 
@@ -387,19 +383,32 @@ body.vpm-formation-page .estimate-workspace #modContainer .step-card.open .vpm-b
    ============================================================ */
 body.vpm-formation-page .estimate-workspace #modContainer .step-body { padding: 8px !important; }
 body.vpm-formation-page .estimate-workspace #modContainer .step-card.open .step-body { display: block !important; border: 0; }
-body.vpm-formation-page .estimate-workspace #modContainer .sst { margin-top: 26px; min-width: 0; }
+body.vpm-formation-page .estimate-workspace #modContainer .sst { margin-top: 18px; min-width: 0; }
 
 /* Labels de section */
 body.vpm-formation-page .estimate-workspace #modContainer .sst-title {
   display: flex !important;
   align-items: center !important;
   gap: 8px !important;
-  font: 700 10px / 1.5 'DM Sans', Inter, sans-serif !important;
-  letter-spacing: 1.2px !important;
+  font: 700 11px / 1.5 'DM Sans', Inter, sans-serif !important;
+  letter-spacing: 1.1px !important;
   text-transform: uppercase !important;
   color: #9E3A18 !important;
   margin: 0 0 14px !important;
   padding: 0 !important;
+}
+body.vpm-formation-page .estimate-workspace #modContainer .sst-title:not([onclick]) {
+  padding-bottom: 7px !important;
+  border-bottom: 1px solid rgba(158, 58, 24, 0.14) !important;
+}
+body.vpm-formation-page .estimate-workspace #modContainer .sst-title:not([onclick])::before {
+  content: '';
+  display: block;
+  width: 3px;
+  height: 12px;
+  background: #9E3A18;
+  border-radius: 2px;
+  flex-shrink: 0;
 }
 body.vpm-formation-page .estimate-workspace #modContainer .sst-title::after { display: none !important; }
 body.vpm-formation-page .estimate-workspace #modContainer .sst-title[onclick] {
@@ -415,7 +424,7 @@ body.vpm-formation-page .estimate-workspace #modContainer .sst-text p { margin: 
 body.vpm-formation-page .estimate-workspace #modContainer .sst-text li { margin-bottom: 8px; }
 
 /* Explication — fond transparent */
-body.vpm-formation-page .estimate-workspace #modContainer .lesson-explanation { background: transparent; border: 0; padding: 12px 0 20px; }
+body.vpm-formation-page .estimate-workspace #modContainer .lesson-explanation { background: transparent; border: 0; padding: 12px 0 14px; border-bottom: 1px solid rgba(234, 223, 213, 0.55); margin-bottom: 4px; }
 
 /* ============================================================
    CONSEILS — encadré éditorial gauche-bordure
@@ -443,7 +452,7 @@ body.vpm-formation-page .estimate-workspace #modContainer .tip-text { font-size:
    ============================================================ */
 body.vpm-formation-page .estimate-workspace #modContainer .warn-i {
   padding: 13px 0 13px 18px !important;
-  margin: 22px 0 !important;
+  margin: 16px 0 !important;
   border: 0 !important;
   border-left: 3px solid #C0651A !important;
   border-radius: 0 !important;
@@ -463,7 +472,14 @@ body.vpm-formation-page .estimate-workspace #modContainer .lesson-tools-grid {
   gap: 20px;
   margin-top: 20px;
 }
-body.vpm-formation-page .estimate-workspace #modContainer .lesson-tool { margin: 0; padding: 0; background: transparent; border: 0; }
+body.vpm-formation-page .estimate-workspace #modContainer .lesson-tool {
+  margin: 0;
+  padding: 18px 18px 16px;
+  background: #FFFFFF;
+  border: 1px solid #E4CCB8;
+  border-radius: 10px;
+  box-shadow: 0 2px 10px rgba(158, 58, 24, 0.06);
+}
 
 /* ============================================================
    CONSEILS GRID
@@ -478,9 +494,10 @@ body.vpm-formation-page .estimate-workspace #modContainer .lesson-advice-grid {
    PASSAGE "À RETENIR"
    ============================================================ */
 body.vpm-formation-page .estimate-workspace #modContainer .lesson-takeaway {
-  padding: 18px 0;
-  border-top: 1px solid #EADFD5;
-  border-bottom: 1px solid #EADFD5;
+  padding: 18px 20px;
+  background: rgba(252, 247, 240, 0.75);
+  border: 1px solid #E4CCB8;
+  border-radius: 10px;
 }
 body.vpm-formation-page .estimate-workspace #modContainer .lesson-takeaway .sst-text > div {
   background: transparent !important;
@@ -499,57 +516,62 @@ body.vpm-formation-page .estimate-workspace #modContainer .lesson-example {
 }
 
 /* ============================================================
-   BOUTON "LEÇON SUIVANTE"
+   NAVIGATION "LEÇON SUIVANTE" — éditoriale
    ============================================================ */
 .estimate-workspace .estimate-lesson-next {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 16px;
-  margin: 32px 0 0;
-  padding: 16px 20px;
-  background: #F8F1E7;
-  border: 1.5px solid #E4CCB8;
-  border-radius: 12px;
+  gap: 20px;
+  margin: 16px 0 0;
+  padding: 16px 0 4px;
+  background: transparent;
+  border: 0;
+  border-top: 1px solid rgba(228, 204, 184, 0.7);
+  border-radius: 0;
   cursor: pointer;
-  transition: border-color 0.2s, background 0.2s, box-shadow 0.2s;
   text-align: left;
   width: 100%;
   box-sizing: border-box;
 }
-.estimate-workspace .estimate-lesson-next:hover {
-  border-color: #9E3A18;
-  background: #FCF2E8;
-  box-shadow: 0 4px 18px rgba(158, 58, 24, 0.1);
+.estimate-workspace .estimate-lesson-next:hover .estimate-lesson-next-title {
+  color: #9E3A18;
 }
 .estimate-workspace .estimate-lesson-next-label {
   display: block;
-  font: 700 10px / 1.3 'DM Sans', Inter, sans-serif;
+  font: 700 9.5px / 1.2 'DM Sans', Inter, sans-serif;
   color: #9E3A18;
-  letter-spacing: 1.2px;
+  letter-spacing: 1.4px;
   text-transform: uppercase;
-  margin-bottom: 4px;
+  margin-bottom: 5px;
+  opacity: 0.65;
 }
 .estimate-workspace .estimate-lesson-next-title {
   display: block;
-  font: 600 14px / 1.45 'DM Sans', Inter, sans-serif;
+  font: 600 15px / 1.35 'DM Sans', Inter, sans-serif;
   color: #302A26;
+  transition: color 0.18s;
 }
 .estimate-workspace .estimate-lesson-next-arrow {
   flex-shrink: 0;
-  width: 34px;
-  height: 34px;
-  border-radius: 50%;
-  background: #9E3A18;
-  color: #FFF;
+  width: auto;
+  height: auto;
+  border-radius: 0;
+  background: transparent;
+  color: #9E3A18;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 17px;
-  transition: transform 0.15s;
+  font-size: 22px;
+  font-family: 'DM Sans', Inter, sans-serif;
   line-height: 1;
+  opacity: 0.7;
+  transition: transform 0.18s, opacity 0.18s;
 }
-.estimate-workspace .estimate-lesson-next:hover .estimate-lesson-next-arrow { transform: translateX(3px); }
+.estimate-workspace .estimate-lesson-next:hover .estimate-lesson-next-arrow {
+  transform: translateX(5px);
+  opacity: 1;
+}
 
 /* ============================================================
    PIED DE LEÇON — ressources + coach
@@ -607,8 +629,14 @@ body.vpm-formation-page .estimate-workspace #modContainer .lesson-support .ask-c
    RESPONSIVE
    ============================================================ */
 @media (max-width: 1100px) {
+  .estimate-workspace .estimate-hero { grid-template-columns: 240px minmax(0, 1fr) 218px; }
+  .estimate-workspace .estimate-hero::before { left: 240px; }
   .estimate-workspace .estimate-lessons { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .estimate-workspace .estimate-hero { grid-template-columns: minmax(0, 1fr) 230px; padding: 0; gap: 0; }
+}
+@media (max-width: 860px) {
+  .estimate-workspace .estimate-hero { grid-template-columns: minmax(0, 1fr) 218px; }
+  .estimate-workspace .estimate-photo { grid-row: 1 / 3; grid-column: 2; }
+  .estimate-workspace .estimate-hero::before { display: none; }
 }
 
 @media (max-width: 750px) {
@@ -662,4 +690,193 @@ body.vpm-formation-page .estimate-workspace #modContainer .lesson-support .ask-c
   .estimate-workspace .estimate-intro h2 { font-size: 42px; }
   .estimate-workspace .estimate-lesson-next { gap: 12px; padding: 14px 16px; }
   .estimate-workspace .estimate-lesson-next-title { font-size: 13px; }
+}
+
+/* ============================================================
+   DIRECTION ARTISTIQUE — Chapitre 1 "J'estime mon bien"
+   ============================================================ */
+
+/* Sections de contenu — léger encadrement chaud */
+body.vpm-formation-page .estimate-workspace #modContainer .lesson-section {
+  padding: 16px 18px;
+  background: rgba(252, 247, 240, 0.45);
+  border: 1px solid rgba(228, 204, 184, 0.6);
+  border-radius: 10px;
+}
+
+/* Paragraphe d'intro comparables — accent gauche */
+body.vpm-formation-page .estimate-workspace #modContainer .pr-comparables-intro {
+  border-left: 3px solid rgba(196, 96, 58, 0.3);
+  padding-left: 14px;
+  color: #51463F;
+  font-size: 14px;
+  line-height: 1.7;
+  margin-bottom: 18px;
+}
+
+/* Bloc outil prix de vente — séparateur en entrée */
+body.vpm-formation-page .estimate-workspace #modContainer .price-target-section {
+  padding-top: 4px;
+  margin-top: 4px;
+  border-top: 1px solid rgba(234, 223, 213, 0.55);
+}
+
+/* ============================================================
+   REFONTE ÉDITORIALE — titre, cartes leçons (v2)
+   ============================================================ */
+
+/* Titre bicolore */
+.estimate-workspace .estimate-t1 { display: block; color: #201B18; }
+.estimate-workspace .estimate-t2 { display: block; color: var(--terracotta, #9E3A18); }
+
+/* Filet terracotta sous le titre */
+.estimate-workspace .estimate-rule {
+  width: 40px;
+  height: 3px;
+  background: var(--terracotta, #9E3A18);
+  border-radius: 2px;
+  margin: 8px 0 20px;
+  flex-shrink: 0;
+}
+
+/* Compteur leçons + icône livre */
+.estimate-workspace .estimate-count {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+}
+
+/* ── Carte leçon — layout photo card ── */
+.estimate-workspace .estimate-lessons button {
+  padding: 0;
+  gap: 0;
+  overflow: hidden;
+  border-radius: 14px;
+  align-items: stretch;
+  min-height: auto;
+}
+
+/* Zone photo */
+.estimate-workspace .estimate-card-photo {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  background-size: cover;
+  background-position: center;
+  position: relative;
+  flex-shrink: 0;
+}
+
+/* Badge numéro de leçon */
+.estimate-workspace .estimate-card-num {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  background: rgba(255, 255, 255, 0.88);
+  backdrop-filter: blur(4px);
+  color: #302A26;
+  font: 700 11px / 1 'DM Sans', Inter, sans-serif;
+  padding: 4px 9px;
+  border-radius: 6px;
+  letter-spacing: 0.4px;
+}
+
+/* Cercle icône — chevauche photo/corps */
+.estimate-workspace .estimate-card-icon {
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: #FAF7F2;
+  border: 1.5px solid #EAE0D6;
+  color: var(--terracotta, #9E3A18);
+  flex-shrink: 0;
+  margin-top: -21px;
+  margin-left: 14px;
+  position: relative;
+  z-index: 1;
+}
+.estimate-workspace .estimate-card-icon svg {
+  width: 18px;
+  height: 18px;
+}
+
+/* Corps texte */
+.estimate-workspace .estimate-card-body {
+  padding: 10px 14px 36px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  flex: 1;
+  min-width: 0;
+}
+.estimate-workspace .estimate-card-title {
+  display: block;
+  font: 700 13.5px / 1.3 'DM Sans', Inter, sans-serif;
+  color: #201B18;
+}
+.estimate-workspace .estimate-card-desc {
+  font: 400 12px / 1.55 'DM Sans', Inter, sans-serif;
+  color: #7A6E66;
+  margin: 0;
+}
+
+/* Flèche — bas droit de la carte */
+.estimate-workspace .estimate-card-arrow {
+  position: absolute;
+  bottom: 12px;
+  right: 12px;
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: #FAF7F2;
+  border: 1px solid #E4CCB8;
+  color: var(--terracotta, #9E3A18);
+  transition: background 0.18s, border-color 0.18s, color 0.18s;
+  flex-shrink: 0;
+}
+.estimate-workspace .estimate-lessons button:hover .estimate-card-arrow {
+  background: var(--terracotta, #9E3A18);
+  border-color: var(--terracotta, #9E3A18);
+  color: #FFF;
+}
+
+/* Cacher le lesson-pictogram injecté par JS dans les cartes */
+.estimate-workspace .estimate-lessons button .lesson-pictogram { display: none; }
+
+/* ── Carte active ── */
+.estimate-workspace .estimate-lessons button[aria-current] {
+  background: transparent;
+  border-color: var(--terracotta, #9E3A18);
+}
+.estimate-workspace .estimate-lessons button[aria-current] .estimate-card-num {
+  background: rgba(255, 255, 255, 0.92);
+  color: var(--terracotta, #9E3A18);
+}
+.estimate-workspace .estimate-lessons button[aria-current] .estimate-card-icon {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.22);
+  color: #FFF;
+}
+.estimate-workspace .estimate-lessons button[aria-current] .estimate-card-body {
+  background: var(--terracotta, #9E3A18);
+}
+.estimate-workspace .estimate-lessons button[aria-current] .estimate-card-title { color: #FFF; }
+.estimate-workspace .estimate-lessons button[aria-current] .estimate-card-desc { color: rgba(255, 255, 255, 0.72); }
+.estimate-workspace .estimate-lessons button[aria-current] .estimate-card-arrow {
+  background: rgba(255, 255, 255, 0.15);
+  border-color: rgba(255, 255, 255, 0.2);
+  color: #FFF;
+}
+.estimate-workspace .estimate-lessons button[aria-current]:hover { background: transparent; transform: none; }
+
+/* ── Responsive cartes ── */
+@media (max-width: 750px) {
+  .estimate-workspace .estimate-card-photo { aspect-ratio: 16 / 7; }
+  .estimate-workspace .estimate-card-body { padding-bottom: 40px; }
+}
+@media (max-width: 480px) {
+  .estimate-workspace .estimate-card-photo { aspect-ratio: 16 / 8; }
 }

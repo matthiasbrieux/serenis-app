@@ -9,7 +9,7 @@ const { isPasswordPwned } = require('../services/passwordCheck');
 
 const JWT_SECRET = process.env.JWT_SECRET;
 const COOKIE = 'partner_token';
-const loginLimit = require('express-rate-limit')({ windowMs: 15 * 60 * 1000, max: 10, keyGenerator: (req) => req.ip });
+const loginLimit = require('express-rate-limit')({ windowMs: 15 * 60 * 1000, max: 10, keyGenerator: (req) => req.ip, handler: (req, res) => res.status(429).json({ error: 'Trop de tentatives. Réessayez dans 15 minutes.' }) });
 
 // ── Auth middleware ──────────────────────────────────────────────
 function requirePartner(req, res, next) {
@@ -164,11 +164,13 @@ router.post('/api/partner/mission/:uuid/accept', requirePartner, async (req, res
   if (!m) return res.json({ error: 'Mission introuvable ou déjà traitée' });
   db.prepare("UPDATE missions SET status='confirmed', photographer_accepted_at=CURRENT_TIMESTAMP, confirmed_at=CURRENT_TIMESTAMP WHERE id=?").run(m.id);
   db.prepare("UPDATE photographer_availability SET is_blocked=1 WHERE photographer_id=? AND date=? AND start_time=?").run(req.partner.id, m.scheduled_date, m.scheduled_time);
-  // Email de confirmation au client
-  try {
-    const photographer = db.prepare('SELECT * FROM photographers WHERE id=?').get(req.partner.id);
-    await require('../services/email').sendMissionConfirmed(m.client_email, m.client_name, m, photographer);
-  } catch(e) { console.error('Email confirmation error:', e.message); }
+  // Email de confirmation au client — suspendu via PHOTO_MISSIONS_ENABLED
+  if (process.env.PHOTO_MISSIONS_ENABLED === 'true') {
+    try {
+      const photographer = db.prepare('SELECT * FROM photographers WHERE id=?').get(req.partner.id);
+      await require('../services/email').sendMissionConfirmed(m.client_email, m.client_name, m, photographer);
+    } catch(e) { console.error('Email confirmation error:', e.message); }
+  }
   res.json({ success: true });
 });
 

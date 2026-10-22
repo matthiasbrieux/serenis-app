@@ -312,6 +312,15 @@
     .perf-platform-name{font-weight:600;color:var(--dark)}
     .perf-platform-stats{color:var(--text2);font-size:.73rem}
     .perf-loading{color:var(--text3);font-size:.8rem;font-style:italic}
+
+    /* ── Pipeline bar ── */
+    .pipeline{flex-shrink:0;display:flex;align-items:stretch;background:var(--surface);border-bottom:1px solid var(--border);padding:0 28px;overflow-x:auto}
+    .pipe-stage{flex:1;min-width:100px;display:flex;flex-direction:column;align-items:center;gap:3px;padding:12px 8px;cursor:pointer;border-bottom:3px solid transparent;transition:border-color .15s,background .15s;position:relative}
+    .pipe-stage:hover{background:#fdf9f6;border-bottom-color:#C4603A}
+    .pipe-stage.active{border-bottom-color:#C4603A;background:rgba(196,96,58,.04)}
+    .pipe-count{font-family:'Cormorant Garamond',serif;font-size:1.6rem;font-weight:600;line-height:1}
+    .pipe-label{font-size:.68rem;text-transform:uppercase;letter-spacing:.05em;color:var(--text3);font-weight:600;white-space:nowrap}
+    .pipe-arrow{position:absolute;right:0;top:50%;transform:translateY(-50%);color:var(--border);font-size:.9rem;pointer-events:none}
   </style>
 </head>
 <body class="admin-body">
@@ -339,6 +348,39 @@
         </div>
         <button class="btn-export" onclick="exportCSV()">↓ CSV</button>
         <button class="btn-sm-outline" onclick="manualRefresh()">↻ <span id="refreshCountdown"></span></button>
+      </div>
+    </div>
+
+    <!-- Pipeline -->
+    <div class="pipeline" id="pipeline">
+      <div class="pipe-stage" id="pipe-preparation" onclick="setPipelineFilter('preparation')">
+        <span class="pipe-count" id="pipeN-preparation">—</span>
+        <span class="pipe-label">Préparation</span>
+        <span class="pipe-arrow">›</span>
+      </div>
+      <div class="pipe-stage" id="pipe-en-ligne" onclick="setPipelineFilter('en-ligne')">
+        <span class="pipe-count" id="pipeN-en-ligne">—</span>
+        <span class="pipe-label">En ligne</span>
+        <span class="pipe-arrow">›</span>
+      </div>
+      <div class="pipe-stage" id="pipe-visites" onclick="setPipelineFilter('visites')">
+        <span class="pipe-count" id="pipeN-visites">—</span>
+        <span class="pipe-label">Visites</span>
+        <span class="pipe-arrow">›</span>
+      </div>
+      <div class="pipe-stage" id="pipe-offre" onclick="setPipelineFilter('offre')">
+        <span class="pipe-count" id="pipeN-offre">—</span>
+        <span class="pipe-label">Offre</span>
+        <span class="pipe-arrow">›</span>
+      </div>
+      <div class="pipe-stage" id="pipe-compromis" onclick="setPipelineFilter('compromis')">
+        <span class="pipe-count" id="pipeN-compromis">—</span>
+        <span class="pipe-label">Compromis</span>
+        <span class="pipe-arrow">›</span>
+      </div>
+      <div class="pipe-stage" id="pipe-vendu" onclick="setPipelineFilter('vendu')">
+        <span class="pipe-count" id="pipeN-vendu">—</span>
+        <span class="pipe-label">Vendu</span>
       </div>
     </div>
 
@@ -575,8 +617,35 @@ function getAlerts(c, score) {
 ══════════════════════════════════════════════ */
 let sellers = [], filtered = [], activeSellerId = null;
 let activeCrmFilter = 'all';
+let activePipelineFilter = null;
 let lastRefresh = Date.now();
 let refreshTimer = null;
+
+/* ══════════════════════════════════════════════
+   PIPELINE BAR
+══════════════════════════════════════════════ */
+const PIPE_STAGES = [
+  { id: 'preparation', fn: c => !c.vente_realisee && c.property_status !== 'vendu' && (!c.property_status || c.property_status === 'preparation') },
+  { id: 'en-ligne',    fn: c => !c.vente_realisee && c.property_status === 'en-ligne' },
+  { id: 'visites',     fn: c => !c.vente_realisee && c.property_status === 'visites' },
+  { id: 'offre',       fn: c => !c.vente_realisee && c.property_status === 'offre' },
+  { id: 'compromis',   fn: c => !c.vente_realisee && c.property_status === 'compromis' },
+  { id: 'vendu',       fn: c => !!(c.vente_realisee || c.property_status === 'vendu') },
+];
+
+function renderPipeline() {
+  PIPE_STAGES.forEach(stage => {
+    const el = document.getElementById('pipeN-' + stage.id);
+    if (el) el.textContent = sellers.filter(stage.fn).length;
+    const stageEl = document.getElementById('pipe-' + stage.id);
+    if (stageEl) stageEl.classList.toggle('active', activePipelineFilter === stage.id);
+  });
+}
+
+function setPipelineFilter(stageId) {
+  activePipelineFilter = activePipelineFilter === stageId ? null : stageId;
+  applyFilters();
+}
 
 /* ══════════════════════════════════════════════
    HELPERS CONTRAT
@@ -1167,6 +1236,11 @@ function applyFilters() {
     return true;
   });
 
+  if (activePipelineFilter) {
+    const stage = PIPE_STAGES.find(s => s.id === activePipelineFilter);
+    if (stage) filtered = filtered.filter(stage.fn);
+  }
+
   const cnt = document.getElementById('rowCount');
   if (filtered.length < sellers.length) {
     cnt.style.display = 'inline';
@@ -1175,6 +1249,7 @@ function applyFilters() {
 
   // Refresh contrats chip label + count with current period
   updateStats();
+  renderPipeline();
   if (activeView === 'kanban') renderKanban(); else renderTable();
 }
 

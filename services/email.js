@@ -16,7 +16,8 @@ const LEGAL_SIREN           = process.env.LEGAL_SIREN           || 'XXXXX';
 const LEGAL_RCS             = process.env.LEGAL_RCS             || 'XXXXX';
 const LEGAL_TVA_INTRA       = process.env.LEGAL_TVA_INTRA       || null;
 function legalInfoReady() {
-  return LEGAL_SIREN !== 'XXXXX' && LEGAL_RAISON_SOCIALE !== 'XXXXX';
+  const required = [LEGAL_SIREN, LEGAL_RAISON_SOCIALE, LEGAL_FORME_JURIDIQUE, LEGAL_ADRESSE_SIEGE, LEGAL_RCS];
+  return required.every(v => v && v !== 'XXXXX');
 }
 
 // Le logo est encodé en base64 et intégré directement dans le HTML plutôt que
@@ -65,6 +66,20 @@ async function send(to, subject, html, source = 'auto') {
   }
   const actualTo = _sendOverrideTo || to;
   const actualSource = _sendOverrideTo ? 'test' : source;
+
+  // Guard de test : activé uniquement si TEST_ALLOWED_RECIPIENTS est défini.
+  // Bloque tout envoi vers une adresse non autorisée — lève une exception plutôt
+  // que de rediriger silencieusement. N'est jamais actif en production.
+  if (process.env.TEST_ALLOWED_RECIPIENTS) {
+    const allowed = process.env.TEST_ALLOWED_RECIPIENTS.split(',').map(s => s.trim().toLowerCase());
+    if (!allowed.includes(actualTo.toLowerCase())) {
+      const guardErr = `[TEST GUARD] Destinataire non autorisé : ${actualTo} (autorisés : ${allowed.join(', ')})`;
+      console.error(guardErr);
+      _logEmailSend(actualTo, subject, false, null, 'blocked');
+      throw new Error(guardErr);
+    }
+  }
+
   const resend = getResend();
   if (!resend) {
     console.warn(`[EMAIL] RESEND_API_KEY manquant — email non envoyé à ${actualTo} : ${subject}`);
@@ -169,6 +184,10 @@ function infoTable(rows) {
 function badge(text, color = '#C4603A') {
   return `<span style="display:inline-block;background:${color}20;color:${color};font-size:12px;font-weight:600;padding:3px 10px;border-radius:20px;margin-bottom:16px;">${text}</span>`;
 }
+function fmtEur(cents) {
+  const [int, dec] = (cents / 100).toFixed(2).replace('.', ',').split(',');
+  return int.replace(/\B(?=(\d{3})+$)/g, ' ') + ',' + dec;
+}
 
 // ─────────────────────────────────────────────────────────────
 // 1. BIENVENUE
@@ -177,7 +196,7 @@ function badge(text, color = '#C4603A') {
 async function sendWelcomeImproved({ email, firstName, pack, loginUrl }) {
   const packLabel = pack === 'serenite' ? 'Pack Accompagnement' : 'Pack Autonomie';
   const nextSteps = pack === 'serenite'
-    ? '<li>Réservez votre séance photo professionnelle</li><li>Créez votre fiche bien</li><li>Préparez vos documents</li>'
+    ? '<li>Créez votre fiche bien</li><li>Préparez vos documents</li>'
     : '<li>Créez votre fiche bien</li><li>Ajoutez vos photos</li><li>Préparez vos documents</li>';
   const html = layout(`
     ${badge(packLabel)}
@@ -277,11 +296,6 @@ async function sendNewVisitRequest({ sellerEmail, buyerName, buyerEmail, buyerPh
   return send(sellerEmail, '📅 Nouvelle visite réservée', html);
 }
 
-// Alias pour compatibilité avec buyer.js
-async function sendVisitRequestReceived({ sellerEmail, buyerName, buyerEmail, buyerPhone, visitDate, visitTime, propertyAddress }) {
-  return sendNewVisitRequest({ sellerEmail, buyerName, buyerEmail, buyerPhone, visitDate, visitTime, propertyAddress });
-}
-
 // ─────────────────────────────────────────────────────────────
 // 4. DOSSIER ACHETEUR
 // ─────────────────────────────────────────────────────────────
@@ -348,7 +362,6 @@ async function sendSoldCongrats({ email, firstName, address, price }) {
     ${p(`Votre bien${address ? ` situé au <strong>${address}</strong>` : ''} est vendu${priceFormatted ? ` pour <strong>${priceFormatted}</strong>` : ''} !`)}
     ${p('C\'est une excellente nouvelle. Vous avez réussi à vendre entre particuliers, en gardant la maîtrise de votre vente du début à la fin.')}
     ${p('Si vous avez apprécié votre expérience Vendu Par Moi, votre avis compte énormément pour nous — et pour les futurs vendeurs qui se poseront les mêmes questions que vous au départ.')}
-    ${btn('Laisser un avis', 'https://g.page/r/venduparmo/review', '#C4785A')}
     ${divider()}
     ${muted('Merci de nous avoir fait confiance. L\'équipe Vendu Par Moi vous souhaite une excellente continuation.')}
   `, { preheader: 'Félicitations — votre bien est vendu !' });
@@ -359,7 +372,7 @@ async function sendPropertySoldToBuyer({ buyerEmail, buyerName, propertyType, pr
   const typeLabel = propertyType === 'appartement' ? 'l\'appartement' : propertyType === 'maison' ? 'la maison' : 'le bien';
   const html = layout(`
     ${h1(`Bonne nouvelle, ${buyerName || ''} !`)}
-    ${p(`Nous souhaitions vous informer que ${typeLabel} à <strong>${propertyCity || ''}</strong> que vous avez visité vient de trouver preneur.`)}
+    ${p(`Nous souhaitions vous informer que ${typeLabel} à <strong>${propertyCity || ''}</strong> que vous avez ${propertyType === 'maison' ? 'visitée' : 'visité'} vient de trouver preneur.`)}
     ${p('Si vous êtes toujours à la recherche d\'un bien, n\'hésitez pas à explorer d\'autres annonces sur notre plateforme.')}
     ${btn('Voir les biens disponibles', BASE_URL)}
     ${divider()}
@@ -373,9 +386,11 @@ async function sendPropertySoldToBuyer({ buyerEmail, buyerName, propertyType, pr
 // ─────────────────────────────────────────────────────────────
 
 async function sendInvoiceEmail({ email, firstName, lastName, amount, pack, invoiceNumber, date }) {
-  const amountTTC = (amount / 100).toFixed(2).replace('.', ',');
-  const amountHT  = ((amount / 100) / 1.2).toFixed(2).replace('.', ',');
-  const tva       = ((amount / 100) - (amount / 100) / 1.2).toFixed(2).replace('.', ',');
+  const htCents   = Math.round(amount / 1.2);
+  const tvaCents  = amount - htCents;
+  const amountTTC = fmtEur(amount);
+  const amountHT  = fmtEur(htCents);
+  const tva       = fmtEur(tvaCents);
   const packLabel = pack === 'serenite' ? 'Pack Accompagnement' : 'Pack Autonomie';
   const dateStr   = new Date(date).toLocaleDateString('fr-FR');
   const clientName = `${firstName || ''} ${lastName || ''}`.trim() || '—';
@@ -420,20 +435,48 @@ async function sendInvoiceEmail({ email, firstName, lastName, amount, pack, invo
 // 7. CONTRAT
 // ─────────────────────────────────────────────────────────────
 
-async function sendContractRenewal({ email, firstName, expiryDate, daysLeft, twilioNumber }) {
+async function sendContractRenewal({ email, firstName, expiryDate, daysLeft }) {
   const expiryStr = new Date(expiryDate).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' });
   const html = layout(`
     ${badge(`⚠️ Contrat — J-${daysLeft}`, '#C4785A')}
     ${h1(`Votre accès expire dans ${daysLeft} jours`)}
     ${p(`Bonjour ${firstName || ''},`)}
     ${p(`Votre accès Vendu Par Moi arrive à expiration le <strong>${expiryStr}</strong>.`)}
-    ${p(`Si votre bien n'est pas encore vendu et que vous souhaitez continuer à bénéficier de votre espace vendeur${twilioNumber ? ' et de votre numéro dédié' : ''}, vous pouvez prolonger votre accès.`)}
+    ${p(`Si votre bien n'est pas encore vendu et que vous souhaitez continuer à bénéficier de votre espace vendeur, vous pouvez prolonger votre accès.`)}
     ${btn('Prolonger mon accès', `${BASE_URL}/tarifs`, '#C4785A')}
     ${p('Si votre vente est finalisée, félicitations ! Vous pouvez nous le signaler depuis votre espace vendeur.')}
     ${divider()}
     ${muted('Une question ? Contactez-nous à <a href="mailto:contact@venduparmoi.fr" style="color:#C4603A;">contact@venduparmoi.fr</a>')}
   `, { preheader: `Votre accès Vendu Par Moi expire dans ${daysLeft} jours.` });
   return send(email, `⚠️ Votre accès expire dans ${daysLeft} jours`, html);
+}
+
+// ─────────────────────────────────────────────────────────────
+// 7b. RAPPELS COMPROMIS (vendeur uniquement)
+// ─────────────────────────────────────────────────────────────
+
+async function sendCompromisMilestoneEmail({ email, firstName, label, dueDate, daysLeft }) {
+  const dueDateStr = new Date(dueDate).toLocaleDateString('fr-FR', {
+    weekday: 'long', day: 'numeric', month: 'long', year: 'numeric'
+  });
+  const urgencyColor = daysLeft <= 1 ? '#C4603A' : daysLeft <= 3 ? '#C4785A' : '#4d7a58';
+  const icon = daysLeft <= 1 ? '🔴' : daysLeft <= 3 ? '🟠' : '📋';
+  const html = layout(`
+    ${badge(`${icon} Échéance dans ${daysLeft} jour${daysLeft > 1 ? 's' : ''}`, urgencyColor)}
+    ${h1(`Rappel : ${label}`)}
+    ${p(`Bonjour ${firstName || ''},`)}
+    ${p(`L'échéance <strong>${label}</strong> de votre compromis de vente approche.`)}
+    ${infoTable(`
+      ${infoRow('Échéance', label)}
+      ${infoRow('Date', dueDateStr)}
+      ${infoRow('Dans', `<strong style="color:${urgencyColor};">${daysLeft} jour${daysLeft > 1 ? 's' : ''}</strong>`)}
+    `)}
+    ${p('Si vous avez des questions sur cette étape, votre notaire reste votre interlocuteur privilégié.')}
+    ${btn('Voir mon espace', `${BASE_URL}/dashboard`, urgencyColor)}
+    ${divider()}
+    ${muted('Ce rappel est envoyé automatiquement à partir des dates que vous avez renseignées dans votre espace vendeur.')}
+  `, { preheader: `Rappel : ${label} dans ${daysLeft} jour${daysLeft > 1 ? 's' : ''} — ${dueDateStr}` });
+  return send(email, `${icon} Compromis — ${label} dans ${daysLeft} jour${daysLeft > 1 ? 's' : ''}`, html);
 }
 
 // ─────────────────────────────────────────────────────────────
@@ -447,7 +490,7 @@ async function sendReviewRequest({ email, firstName, daysSold, propertyCity }) {
     ${p(`Bonjour ${firstName || ''},`)}
     ${p(`Vous avez vendu votre bien avec l'accompagnement de Vendu Par Moi. Nous espérons que l'expérience a été à la hauteur de vos attentes.`)}
     ${p('Votre retour est précieux pour nous améliorer et aider les futurs vendeurs — cela ne prend que 2 minutes.')}
-    ${btn('Laisser mon avis', 'https://g.page/r/venduparmo/review', '#C4785A')}
+    ${btn('Laisser mon avis', 'https://g.page/r/venduparmo/review', '#C4785A')}<!-- E-31: lien Google Review NON VÉRIFIÉ — à confirmer avant activation -->
     ${p('Vous êtes dans notre secteur ? Nous serions ravis de venir trinquer avec vous pour célébrer votre vente — répondez simplement à cet email avec vos disponibilités.')}
     ${divider()}
     ${muted('Merci d\'avoir choisi Vendu Par Moi pour votre vente.')}
@@ -499,6 +542,25 @@ async function sendMissionReminderJ1(clientEmail, clientName, mission, photograp
   return send(clientEmail, '⏰ Rappel — Votre séance photo est demain', html);
 }
 
+async function sendMissionReminderJ1Photographer({ photographerEmail, photographerFirstName, mission, clientName, clientPhone }) {
+  const html = layout(`
+    ${badge('⏰ Rappel séance', '#3D5A47')}
+    ${h1('Votre séance photo est demain !')}
+    ${p(`Bonjour ${photographerFirstName || ''},`)}
+    ${p('Rappel : vous avez une séance prévue demain. Voici les coordonnées et informations :')}
+    ${infoTable(`
+      ${infoRow('Client', clientName || '—')}
+      ${infoRow('Téléphone', clientPhone || '—')}
+      ${infoRow('Adresse', mission.address + ', ' + mission.city)}
+      ${infoRow('Heure', mission.scheduled_time || '—')}
+    `)}
+    ${p('En cas d\'imprévu, contactez directement votre client ou notre équipe.')}
+    ${divider()}
+    ${muted('En cas d\'imprévu, contactez-nous à <a href="mailto:contact@venduparmoi.fr" style="color:#C4603A;">contact@venduparmoi.fr</a>')}
+  `, { preheader: 'Rappel — vous avez une séance photo demain.' });
+  return send(photographerEmail, '⏰ Rappel séance — demain', html);
+}
+
 // ─────────────────────────────────────────────────────────────
 // 10. NUDGES VENDEURS (automatisations)
 // ─────────────────────────────────────────────────────────────
@@ -520,6 +582,20 @@ async function sendNewOfferEmail({ sellerEmail, sellerFirstName, buyerName, amou
     ${muted('Cette notification est envoyée automatiquement à la suite d\'une offre transmise par un acheteur depuis votre espace vendeur.')}
   `, { preheader: `${buyerName} propose ${amountFmt} pour votre bien.` });
   return send(sellerEmail, `💰 Nouvelle offre de ${buyerName} — ${amountFmt}`, html);
+}
+
+async function sendOfferReceiptBuyer({ buyerEmail, buyerName, propertyCity, propertyType }) {
+  const typeLabel = propertyType === 'appartement' ? 'l\'appartement' : propertyType === 'maison' ? 'la maison' : 'le bien';
+  const html = layout(`
+    ${badge('📩 Offre transmise')}
+    ${h1('Votre offre a bien été transmise')}
+    ${p(`Bonjour${buyerName ? ` ${buyerName}` : ''},`)}
+    ${p(`Votre offre concernant ${typeLabel}${propertyCity ? ` à <strong>${propertyCity}</strong>` : ''} a bien été transmise au propriétaire.`)}
+    ${p('Celui-ci pourra en prendre connaissance et revenir vers vous directement.')}
+    ${divider()}
+    ${muted('Cet email de confirmation est envoyé automatiquement à la suite de votre dépôt d\'offre.')}
+  `, { preheader: `Votre offre a bien été transmise au propriétaire.` });
+  return send(buyerEmail, 'Votre offre a bien été transmise', html);
 }
 
 async function sendProspectNudge({ name, email }) {
@@ -559,7 +635,6 @@ async function sendNoPhotosNudge({ email }) {
     ${h1('Photos manquantes')}
     ${p('Pensez à ajouter vos photos dès maintenant — elles seront intégrées automatiquement dans votre dossier acheteur, prêt à être envoyé en 1 clic dès le premier contact. La qualité de vos photos compte : c\'est la première impression que les acheteurs auront de votre bien. Besoin d\'aide ? Votre espace formation vous explique comment organiser vos différents albums photos, et notre guide photos vous accompagne pour réussir vos clichés.')}
     ${btn('Ajouter mes photos', `${BASE_URL}/mon-bien`)}
-    ${muted('Vous souhaitez des photos encore plus qualitatives ? Nous pouvons vous mettre en relation avec un photographe professionnel qui sublimera votre bien.')}
   `, { preheader: 'Vos photos sont manquantes — ajoutez-les pour attirer plus d\'acheteurs.' });
   return send(email, '📷 Ajoutez vos photos pour attirer plus d\'acheteurs', html);
 }
@@ -568,7 +643,7 @@ async function sendNotPublishedNudge({ email, score }) {
   const html = layout(`
     ${badge(`✨ Dossier prêt à ${score}%`, '#C4603A')}
     ${h1('Votre bien est prêt — publiez-le !')}
-    ${p('Votre dossier est bien avancé. Il ne vous reste qu\'une chose à faire : publier votre annonce pour qu\'elle soit visible par les acheteurs et que votre numéro dédié soit activé.')}
+    ${p('Votre dossier est bien avancé. Il ne vous reste qu\'une chose à faire : publier votre annonce pour qu\'elle soit visible par les acheteurs.')}
     ${btn('Publier mon annonce', `${BASE_URL}/mon-bien`)}
     ${p('Une fois publié, les acheteurs pourront consulter votre dossier, réserver une visite et vous contacter directement.')}
   `, { preheader: 'Votre bien est prêt à être publié — une dernière étape.' });
@@ -598,22 +673,35 @@ async function sendPostFirstVisitFeedbackSeller({ email, firstName }) {
     ${p(`Bonjour ${firstName || ''},`)}
     ${p('Vous avez réalisé votre première visite ! C\'est une étape importante. Voici quelques conseils pour les prochaines visites :')}
     <ul style="font-size:14px;color:#4a4540;line-height:2;padding-left:20px;margin:0 0 16px;">
-      <li>Relancez l'acheteur 24 à 48h après la visite</li>
+      <li>Relancez l'acheteur 24 à 48 h après la visite</li>
       <li>Envoyez-lui le dossier acheteur sérieux si ce n'est pas encore fait</li>
       <li>Notez ses remarques pour ajuster votre discours aux prochaines visites</li>
       <li>N'attendez pas — les acheteurs décident vite</li>
     </ul>
-    ${btn('Voir mes contacts acheteurs', `${BASE_URL}/mes-communications`)}
+    ${btn('Voir mon agenda', `${BASE_URL}/mon-agenda`)}
     ${divider()}
     ${muted('Une question sur la négociation ou la suite ? Votre coach IA est disponible 7j/7 depuis votre espace.')}
   `, { preheader: 'Félicitations pour votre première visite — quelques conseils pour la suite.' });
   return send(email, '🏡 Après votre première visite — conseils', html);
 }
 
-async function sendFirstVisitReminderSeller({ email, firstName }) {
+async function sendFirstVisitReminderSeller({ email, firstName, visitInfo = null }) {
+  const formattedDate = visitInfo
+    ? new Date(visitInfo.visitDate).toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })
+    : null;
+  const subject = visitInfo ? '🏡 Votre première visite est demain !' : '🏡 Votre première visite approche !';
+  const preheader = visitInfo
+    ? `Rappel : visite demain avec ${visitInfo.buyerName || ''} — ${formattedDate} à ${visitInfo.visitTime}`
+    : 'Votre première visite approche — quelques conseils pour l\'aborder sereinement.';
   const html = layout(`
     ${badge('🏡 Première visite', '#C4603A')}
-    ${h1('Votre première visite approche !')}
+    ${h1(visitInfo ? `Votre première visite est demain, ${firstName || ''} !` : 'Votre première visite approche !')}
+    ${visitInfo ? infoTable(`
+      ${infoRow('Acheteur', visitInfo.buyerName || '—')}
+      ${infoRow('Bien', visitInfo.address || '—')}
+      ${infoRow('Date', formattedDate)}
+      ${infoRow('Heure', visitInfo.visitTime)}
+    `) : ''}
     ${p(`Bonjour ${firstName || ''},`)}
     ${p('Votre première visite approche ! C\'est une étape importante dans votre projet de vente, et vous avez déjà toutes les clés pour l\'aborder sereinement.')}
     ${h2('Quelques bons réflexes à garder en tête :')}
@@ -628,11 +716,53 @@ async function sendFirstVisitReminderSeller({ email, firstName }) {
     ${p('Vous connaissez votre maison mieux que personne. Vous n\'avez pas besoin d\'être un professionnel de l\'immobilier pour réussir votre visite.')}
     ${p('Votre formation Vendu Par Moi est là pour vous accompagner à chaque étape. N\'hésitez pas à revoir nos conseils avant votre rendez-vous.')}
     ${btn('Revoir mes conseils de visite', `${BASE_URL}/ma-formation#formation/lecon/5/1`)}
+    ${visitInfo ? btn('Voir mon agenda', `${BASE_URL}/mon-agenda`) : ''}
     ${divider()}
     ${p('Nous vous souhaitons une excellente première visite !')}
     ${muted('L\'équipe Vendu Par Moi<br>L\'immobilier entre particuliers')}
-  `, { preheader: 'Votre première visite approche — quelques conseils pour l\'aborder sereinement.' });
-  return send(email, '🏡 Votre première visite approche !', html);
+  `, { preheader });
+  return send(email, subject, html);
+}
+
+async function sendVisitReminderSeller({ email, firstName, buyerName, address, visitDate, visitTime }) {
+  const formattedDate = new Date(visitDate).toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+  const html = layout(`
+    ${badge('📅 Rappel visite', '#C4603A')}
+    ${h1(`Vous avez une visite demain, ${firstName || ''} !`)}
+    ${infoTable(`
+      ${infoRow('Acheteur', buyerName || '—')}
+      ${infoRow('Bien', address || '—')}
+      ${infoRow('Date', formattedDate)}
+      ${infoRow('Heure', visitTime)}
+    `)}
+    ${btn('Préparer ma visite', `${BASE_URL}/ma-formation#formation/lecon/4/3`)}
+    ${btn('Voir mon agenda', `${BASE_URL}/mon-agenda`)}
+    ${divider()}
+    ${p('Bonne visite !')}
+    ${muted('L\'équipe Vendu Par Moi')}
+  `, { preheader: `Rappel : visite demain avec ${buyerName || ''} — ${formattedDate} à ${visitTime}` });
+  return send(email, '⏰ Rappel — votre visite est demain', html);
+}
+
+async function sendVisitReminderBuyer({ buyerEmail, buyerName, property, visitDate, visitTime, sellerName, sellerPhone }) {
+  const formattedDate = new Date(visitDate).toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+  const typeLabel = property.type === 'appartement' ? 'Appartement' : property.type === 'maison' ? 'Maison' : (property.type || 'Bien');
+  const html = layout(`
+    ${badge('⏰ Rappel visite', '#C4603A')}
+    ${h1('Rappel : votre visite est demain')}
+    ${infoTable(`
+      ${infoRow('Bien', `${typeLabel} — ${property.city || ''}`)}
+      ${infoRow('Adresse', property.address || 'Communiquée par le propriétaire')}
+      ${infoRow('Date', formattedDate)}
+      ${infoRow('Heure', visitTime)}
+      ${sellerName ? infoRow('Propriétaire', sellerName) : ''}
+      ${sellerPhone ? infoRow('Téléphone', sellerPhone) : ''}
+    `)}
+    ${p('En cas d\'empêchement, merci de prévenir directement le propriétaire dès que possible.')}
+    ${divider()}
+    ${muted('Ce message est envoyé automatiquement suite à votre réservation de visite.')}
+  `, { preheader: `Rappel : visite demain — ${typeLabel} à ${property.city || ''} à ${visitTime}` });
+  return send(buyerEmail, `⏰ Rappel : votre visite est demain — ${typeLabel} à ${property.city || ''}`, html);
 }
 
 async function sendCheckInNoOffer({ email, firstName, daysPublished }) {
@@ -665,7 +795,7 @@ async function sendPostVisitBuyerNudge({ buyerEmail, buyerName, propertyCity, pr
   const offerUrl = acheteurToken ? `${BASE_URL}/soumettre-offre/${acheteurToken}` : dossierUrl;
   const html = layout(`
     ${h1(`Avez-vous des questions, ${buyerName || ''} ?`)}
-    ${p(`Vous avez visité ${typeLabel} à <strong>${propertyCity || ''}</strong>${priceFormatted ? ` affiché à ${priceFormatted}` : ''}. Nous espérons que la visite vous a plu.`)}
+    ${p(`Vous avez visité ${typeLabel} à <strong>${propertyCity || ''}</strong>${priceFormatted ? ` ${propertyType === 'maison' ? 'affichée' : 'affiché'} à ${priceFormatted}` : ''}. Nous espérons que la visite vous a plu.`)}
     ${p('Le propriétaire est disponible pour répondre à vos questions ou vous faire parvenir des informations complémentaires.')}
     ${p('Si ce bien vous intéresse, vous pouvez soumettre une offre directement en ligne :')}
     ${btn('Soumettre une offre d\'achat', offerUrl, '#C4785A')}
@@ -691,7 +821,7 @@ async function sendPriceDropNudge({ email, firstName, daysPublished, currentPric
     ${h1('Une piste à envisager')}
     ${p(`Bonjour ${firstName || ''},`)}
     ${p(`Votre bien${propertyCity ? ` à <strong>${propertyCity}</strong>` : ''} est en ligne depuis <strong>${daysPublished} jours</strong>${priceFormatted ? `, affiché à ${priceFormatted}` : ''}, et n'a pas encore reçu d'offre.`)}
-    ${p('Dans cette situation, un ajustement du prix peut parfois relancer l\'intérêt des acheteurs et générer de nouvelles visites. Même une évolution de quelques pourcents peut permettre de mieux repositionner votre bien sur le marché.')}
+    ${p('Dans cette situation, un ajustement du prix peut parfois relancer l\'intérêt des acheteurs et générer de nouvelles visites. Même une évolution de quelques pour cent peut permettre de mieux repositionner votre bien sur le marché.')}
     ${h2('Vous gardez la maîtrise de votre prix')}
     ${p('En vendant entre particuliers, vous pouvez ajuster votre prix si nécessaire sans avoir à intégrer les honoraires d\'un intermédiaire.')}
     ${p('Vous disposez ainsi d\'une marge de manœuvre supplémentaire pour adapter votre positionnement, tout en préservant au mieux le montant que vous souhaitez obtenir de votre vente.')}
@@ -733,8 +863,8 @@ async function sendNewClientAdminNotif({ firstName, lastName, email, pack, phone
   const packColor = pack === 'serenite' ? '#C4603A' : '#6b6965';
   const ficheUrl  = sellerId ? `${BASE_URL}/admin/crm/${sellerId}/fiche` : `${BASE_URL}/admin`;
   const urgency = pack === 'autonome'
-    ? `<p style="background:#fff8f0;border-left:3px solid #C4603A;padding:10px 14px;border-radius:0 6px 6px 0;font-size:13px;color:#8a4020;margin:16px 0 0;">⚡ Pack Autonomie — appeler sous 48h</p>`
-    : `<p style="background:#fff8f0;border-left:3px solid #C4603A;padding:10px 14px;border-radius:0 6px 6px 0;font-size:13px;color:#8a4020;margin:16px 0 0;">📅 Pack Accompagnement — planifier la formation (dans les 48h)</p>`;
+    ? `<p style="background:#fff8f0;border-left:3px solid #C4603A;padding:10px 14px;border-radius:0 6px 6px 0;font-size:13px;color:#8a4020;margin:16px 0 0;">⚡ Pack Autonomie — appeler sous 48 h</p>`
+    : `<p style="background:#fff8f0;border-left:3px solid #C4603A;padding:10px 14px;border-radius:0 6px 6px 0;font-size:13px;color:#8a4020;margin:16px 0 0;">📅 Pack Accompagnement — planifier la formation (dans les 48 h)</p>`;
   const html = `
     <p style="font-size:15px;color:#3a3530;margin:0 0 20px;">Un nouveau client vient de souscrire sur <strong>Vendu Par Moi</strong>.</p>
     <table style="width:100%;border-collapse:collapse;font-size:14px;color:#3a3530;" cellpadding="0" cellspacing="0">
@@ -770,14 +900,17 @@ function _templateFns() {
   const fakeDossierUrl = `${BASE_URL}/dossier/acheteur/preview-token`;
 
   return {
-    welcome_v2:            () => sendWelcomeImproved({ email: fakeSellerEmail, firstName: 'Sophie' }),
-    password_reset:        () => sendPasswordResetEmail({ email: fakeSellerEmail, firstName: 'Sophie', resetUrl: `${BASE_URL}/reset-password?token=preview` }),
+    welcome_v2:            () => sendWelcomeImproved({ email: fakeSellerEmail, firstName: 'Sophie', pack: 'serenite' }),
+    password_reset:        () => sendPasswordResetEmail(fakeSellerEmail, `${BASE_URL}/reset-password?token=preview`),
     login_code:            () => sendLoginCode(fakeSellerEmail, '482913'),
-    invoice:               () => sendInvoiceEmail({ email: fakeSellerEmail, firstName: 'Sophie', amount: 154700, pack: 'serenite', invoiceNumber: 'SER-2026-00042-V1', date: new Date() }),
+    invoice:               () => sendInvoiceEmail({ email: fakeSellerEmail, firstName: 'Sophie', lastName: 'Martin', amount: 99900,  pack: 'autonome',  invoiceNumber: 'VPM-2026-00041-V1', date: new Date() }),
+    invoice_serenite:      () => sendInvoiceEmail({ email: fakeSellerEmail, firstName: 'Sophie', lastName: 'Martin', amount: 154700, pack: 'serenite',  invoiceNumber: 'VPM-2026-00042-V1', date: new Date() }),
     published:             () => sendPublishedConfirmation({ email: fakeSellerEmail, propertySlug: fakeProp.slug, hasActiveSlots: true }),
     visit_confirmation:    () => sendVisitConfirmation(fakeBuyerEmail, 'Thomas Durand', fakeProp, '2026-06-20', '14:00', false),
-    new_visit_request:     () => sendNewVisitRequest({ sellerEmail: fakeSellerEmail, buyerName: 'Thomas Durand', visitDate: '20 juin 2026 à 14:00', notes: '📞 06 12 34 56 78' }),
-    visit_reminder_seller: () => sendVisitConfirmation(fakeBuyerEmail, 'Thomas Durand', fakeProp, '2026-06-21', '10:00', false),
+    new_visit_request:     () => sendNewVisitRequest({ sellerEmail: fakeSellerEmail, buyerName: 'Thomas Durand', buyerEmail: fakeBuyerEmail, buyerPhone: '06 12 34 56 78', visitDate: '2026-06-20', visitTime: '14:00', propertyAddress: '12 rue des Lilas, Lyon' }),
+    visit_reminder_seller: () => sendVisitReminderSeller({ email: fakeSellerEmail, firstName: 'Sophie', buyerName: 'Thomas Durand', address: '12 rue des Lilas, Lyon', visitDate: '2026-06-21', visitTime: '10:00' }),
+    visit_reminder_buyer:  () => sendVisitReminderBuyer({ buyerEmail: fakeBuyerEmail, buyerName: 'Thomas Durand', property: fakeProp, visitDate: '2026-06-21', visitTime: '10:00', sellerName: 'Sophie Martin', sellerPhone: '06 12 34 56 78' }),
+    compromis_milestone:   () => sendCompromisMilestoneEmail({ email: fakeSellerEmail, firstName: 'Sophie', label: 'Levée des conditions suspensives', dueDate: new Date(Date.now() + 3 * 86400000).toISOString().split('T')[0], daysLeft: 3 }),
     dossier:               () => sendDossierEmail({ to: fakeBuyerEmail, buyerName: 'Thomas Durand', dossierUrl: fakeDossierUrl, propertyCity: 'Lyon', propertyType: 'maison' }),
     prospect_nudge:        () => sendProspectNudge({ name: 'Thomas', email: fakeBuyerEmail }),
     no_property:           () => sendNoPropertyNudge({ email: fakeSellerEmail }),
@@ -790,12 +923,19 @@ function _templateFns() {
     post_visit_buyer:      () => sendPostVisitBuyerNudge({ buyerEmail: fakeBuyerEmail, buyerName: 'Thomas Durand', propertyCity: 'Lyon', propertyType: 'maison', propertySlug: 'maison-lyon-preview', price: 320000 }),
     price_drop:            () => sendPriceDropNudge({ email: fakeSellerEmail, firstName: 'Sophie', daysPublished: 47, currentPrice: 320000, propertyCity: 'Lyon' }),
     first_meeting:         () => sendFirstMeetingEmail({ email: fakeSellerEmail, firstName: 'Sophie' }),
-    first_visit_reminder:  () => sendFirstVisitReminderSeller({ email: fakeSellerEmail, firstName: 'Sophie' }),
+    first_visit_reminder:  () => sendFirstVisitReminderSeller({ email: fakeSellerEmail, firstName: 'Sophie', visitInfo: { buyerName: 'Thomas Durand', address: '12 rue des Lilas, Lyon', visitDate: '2026-06-21', visitTime: '10:00' } }),
     review_request:        () => sendReviewRequest({ email: fakeSellerEmail, firstName: 'Sophie' }),
-    sold_congrats:         () => sendSoldCongrats({ email: fakeSellerEmail, firstName: 'Sophie', property: fakeProp }),
+    sold_congrats:         () => sendSoldCongrats({ email: fakeSellerEmail, firstName: 'Sophie', address: fakeProp.address, price: fakeProp.price }),
     offer_notification:    () => sendNewOfferEmail({ sellerEmail: fakeSellerEmail, sellerFirstName: 'Sophie', buyerName: 'Thomas Durand', amount: 285000, city: 'Lyon', offersUrl: `${BASE_URL}/mes-offres` }),
-    buyer_contacted:       () => sendNewVisitRequest({ sellerEmail: fakeSellerEmail, buyerName: 'Thomas Durand', visitDate: '20 septembre 2026 à 14:00', notes: '📞 06 12 34 56 78' }),
+    offer_receipt_buyer:   () => sendOfferReceiptBuyer({ buyerEmail: fakeBuyerEmail, buyerName: 'Thomas Durand', propertyCity: 'Lyon', propertyType: 'maison' }),
     contact_notification:  () => sendContactNotification({ name: 'Thomas Durand', phone: '06 12 34 56 78', email: fakeBuyerEmail, offer: 'Pack Coaching Plus', city: 'Lyon', message: 'Je suis intéressé par votre offre.' }),
+    new_client_admin_notif:        () => sendNewClientAdminNotif({ firstName: 'Sophie', lastName: 'Martin', email: fakeSellerEmail, pack: 'serenite', phone: '06 12 34 56 78', sellerId: 42 }),
+    visit_cancellation:            () => sendVisitCancellation(fakeBuyerEmail, 'Thomas Durand', fakeProp, '2026-06-21', '10:00'),
+    sold_to_buyer:                 () => sendPropertySoldToBuyer({ buyerEmail: fakeBuyerEmail, buyerName: 'Thomas Durand', propertyType: 'maison', propertyCity: 'Lyon' }),
+    dossier_notaire:               () => sendDossierToNotaire({ to: 'notaire@dupont.fr', notaireName: 'Me Dupont', dossierUrl: fakeDossierUrl, propertyAddress: '12 rue des Lilas, Lyon', sellerName: 'Sophie Martin' }),
+    mission_confirmed:             () => sendMissionConfirmed(fakeSellerEmail, 'Sophie Martin', { scheduled_date: '2026-07-10', scheduled_time: '09:00', address: '12 rue des Lilas', city: 'Lyon' }, { first_name: 'Jean', last_name: 'Rousseau' }),
+    mission_reminder_client:       () => sendMissionReminderJ1(fakeSellerEmail, 'Sophie Martin', { scheduled_time: '09:00', address: '12 rue des Lilas', city: 'Lyon' }, { first_name: 'Jean', last_name: 'Rousseau' }),
+    mission_reminder_photographer: () => sendMissionReminderJ1Photographer({ photographerEmail: 'jean.rousseau@photo.fr', photographerFirstName: 'Jean', mission: { scheduled_time: '09:00', address: '12 rue des Lilas', city: 'Lyon' }, clientName: 'Sophie Martin', clientPhone: '06 12 34 56 78' }),
   };
 }
 
@@ -916,12 +1056,14 @@ async function sendContactNotification({ name, phone, email, offer, city, messag
 // Transactional cancellation notice; no pedagogical or commercial template rewritten.
 async function sendVisitCancellation(to,name,property,day,hour) {
   const esc=v=>String(v||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-  return send(to,'Annulation de votre visite',layout(`<p>Bonjour ${esc(name)},</p><p>Votre visite du ${esc(day)} à ${esc(hour)} pour le logement situé à ${esc(property.city)} a été annulée par le propriétaire.</p><p>Vous pouvez contacter le propriétaire pour convenir d’un autre créneau.</p>`));
+  const fmtDay=day?new Date(day+'T12:00:00').toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long',year:'numeric'}):day;
+  return send(to,'Annulation de votre visite',layout(`<p>Bonjour ${esc(name)},</p><p>Votre visite du ${esc(fmtDay)} à ${esc(hour)} pour le logement situé à ${esc(property.city)} a été annulée par le propriétaire.</p><p>Vous pouvez contacter le propriétaire pour convenir d'un autre créneau.</p>`));
 }
 
 // Exports
 // ─────────────────────────────────────────────────────────────
 module.exports = {
+  legalInfoReady,
   sendVisitCancellation,
   // Auth
   sendPasswordResetEmail,
@@ -941,15 +1083,17 @@ module.exports = {
   // Visites
   sendVisitConfirmation,
   sendNewVisitRequest,
-  sendVisitRequestReceived,
   sendNewOfferEmail,
+  sendOfferReceiptBuyer,
   // Contrat
   sendContractRenewal,
+  sendCompromisMilestoneEmail,
   // Avis
   sendReviewRequest,
   // Missions photographes
   sendMissionConfirmed,
   sendMissionReminderJ1,
+  sendMissionReminderJ1Photographer,
   // Nudges vendeurs
   sendProspectNudge,
   sendNoPropertyNudge,
@@ -958,6 +1102,8 @@ module.exports = {
   sendMissingDocNudge,
   sendPostFirstVisitFeedbackSeller,
   sendFirstVisitReminderSeller,
+  sendVisitReminderSeller,
+  sendVisitReminderBuyer,
   sendCheckInNoOffer,
   // Nudges acheteurs
   sendPostVisitBuyerNudge,

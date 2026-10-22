@@ -434,7 +434,7 @@ function render(p, ph, docs) {
     detailGroup('ruler', 'Surfaces & volumes', [
       di('Surface habitable', p.surface_habitable && p.surface_habitable + ' m²'),
       di('Surface terrain', p.surface_terrain && p.surface_terrain + ' m²'),
-      di('Hauteur plafond', p.hauteur_plafond && p.hauteur_plafond + ' cm'),
+      di('Hauteur plafond', p.hauteur_plafond && p.hauteur_plafond + ' m'),
       di('Surface terrasse', p.terrace_surface && p.terrace_surface + ' m²'),
       di('Surface garage', p.garage_surface && p.garage_surface + ' m²'),
     ]),
@@ -553,6 +553,27 @@ function render(p, ph, docs) {
     } catch(e) {}
   }
 
+  // ── Travaux récents ──
+  let travauxSectionHtml = '';
+  if (p.travaux_recents) {
+    try {
+      const twList = JSON.parse(p.travaux_recents).filter(t => t.year && t.type);
+      if (twList.length) {
+        const TW_LABELS = {
+          'Cuisine':'Cuisine refaite en ','Extension':'Extension réalisée en ','Toiture':'Toiture refaite en ',
+          'Cheminée':'Cheminée posée en ','Eau chaude':'Chauffe-eau neuf en ','Chauffage':'Chauffage rénové en ',
+          'Menuiseries':'Menuiseries refaites en ','Fenêtres':'Fenêtres remplacées en ','Extérieur':'Aménagement extérieur en ',
+          'Chaudière':'Chaudière neuve en ','Autre':'Travaux réalisés en ',
+        };
+        const chips = twList.map(t => {
+          const label = (TW_LABELS[t.type] || 'Travaux en ') + t.year;
+          return `<span style="display:inline-flex;align-items:center;gap:6px;padding:6px 12px;background:#f3f7f4;border:1px solid #c8dcd0;border-radius:20px;font-size:0.82rem;color:#2a4030;"><svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#3D9256" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>${escapeHtml(label)}</span>`;
+        }).join('');
+        travauxSectionHtml = `<div class="section"><div class="section-title"><div class="sec-icon"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg></div> Travaux récents</div><div style="display:flex;flex-wrap:wrap;gap:8px;">${chips}</div></div>`;
+      }
+    } catch(e) {}
+  }
+
   // ── Score dossier ──────────────────────────────────────────────
   const scoreItems = [];
   const proPhotos = ph.filter(p2 => p2.category === 'pro' || !p2.category).length;
@@ -627,6 +648,7 @@ function render(p, ph, docs) {
     </div>` : ''}
 
     ${roomsSectionHtml}
+    ${travauxSectionHtml}
 
     <div class="section" id="section-documents">
       <div class="section-title"><div class="sec-icon">${svgIcon('folder',16)}</div> Documents</div>
@@ -742,9 +764,9 @@ function render(p, ph, docs) {
     </div>
 
     <div class="contact-box">
-      <h3>Contacter ${p.first_name}</h3>
+      <h3>Contacter ${p.first_name || 'le propriétaire'}</h3>
       <p style="margin-bottom:16px;">Ce dossier a été constitué par le vendeur, propriétaire du bien, avec l'appui méthodologique de <strong style="color:#fff;">Vendu Par Moi</strong> dans le cadre de son accompagnement. Vendu Par Moi n'intervient à aucun titre dans la négociation ou la transaction : toute question, visite ou offre doit être adressée directement au vendeur, seul interlocuteur et seul décisionnaire de la vente.</p>
-      ${p.seller_phone ? `<a href="tel:${p.seller_phone}" class="contact-btn">${svgIcon('phone',16,'#fff')} Appeler ${p.first_name}</a>` : ''}
+      ${p.seller_phone ? `<a href="tel:${p.seller_phone}" class="contact-btn">${svgIcon('phone',16,'#fff')} Appeler ${p.first_name || 'le propriétaire'}</a>` : ''}
       <p style="margin-top:14px;margin-bottom:0;font-size:0.75rem;color:rgba(255,255,255,0.5);line-height:1.5;">Vente directe entre particuliers · Vendu Par Moi n'est pas partie à la transaction</p>
     </div>
     <div style="background:#fff;border-radius:16px;padding:20px 24px;margin-bottom:20px;box-shadow:0 1px 6px rgba(0,0,0,0.06);text-align:center;">

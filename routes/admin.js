@@ -7,7 +7,7 @@ const fs = require('fs');
 const db = require('../database');
 const { isPasswordPwned } = require('../services/passwordCheck');
 const { requireAdmin } = require('../middleware/auth');
-const { sendWelcomeImproved, sendPostFirstVisitFeedbackSeller, sendCheckInNoOffer, sendNoPhotosNudge, sendMissingDocNudge, sendNotPublishedNudge, sendProspectNudge, sendContractRenewal, sendReviewRequest, sendAdminDirectEmail, sendFirstMeetingEmail, sendNewClientAdminNotif, sendFirstVisitReminderSeller } = require('../services/email');
+const { sendWelcomeImproved, sendPostFirstVisitFeedbackSeller, sendCheckInNoOffer, sendNoPhotosNudge, sendMissingDocNudge, sendNotPublishedNudge, sendProspectNudge, sendContractRenewal, sendReviewRequest, sendAdminDirectEmail, sendFirstMeetingEmail, sendNewClientAdminNotif, sendFirstVisitReminderSeller, sendSoldCongrats } = require('../services/email');
 
 // ── Tarifs centralisés (en centimes TTC) ─────────────────────
 const PACK_PRICES = { autonome: 99900, serenite: 154700 };
@@ -273,7 +273,7 @@ router.post('/api/contrats/:id/relance-extension', requireAdmin, async (req, res
     ? new Date(new Date(seller.contrat_signe_at).setMonth(new Date(seller.contrat_signe_at).getMonth() + 6))
     : new Date(Date.now() + 30 * 24 * 3600 * 1000);
   const daysLeft = Math.max(1, Math.round((expiryDate - new Date()) / (1000 * 3600 * 24)));
-  const ok = await sendContractRenewal({ email: seller.email, firstName: seller.first_name, expiryDate: expiryDate.toISOString(), daysLeft, twilioNumber: seller.twilio_number });
+  const ok = await sendContractRenewal({ email: seller.email, firstName: seller.first_name, expiryDate: expiryDate.toISOString(), daysLeft });
   if (ok) {
     db.prepare('UPDATE sellers SET relance_extension_at=CURRENT_TIMESTAMP WHERE id=?').run(seller.id);
     res.json({ success: true });
@@ -293,6 +293,12 @@ router.post('/api/contrats/:id/demande-avis', requireAdmin, async (req, res) => 
     FROM sellers s LEFT JOIN properties p ON p.seller_id=s.id WHERE s.id=?
   `).get(req.params.id);
   if (!seller) return res.status(404).json({ error: 'Vendeur introuvable' });
+  if (seller.avis_demande_at && !req.body?.force) {
+    return res.status(409).json({
+      error: `Demande d'avis déjà envoyée le ${new Date(seller.avis_demande_at).toLocaleDateString('fr-FR')}. Passez force:true pour renvoyer.`,
+      sent_at: seller.avis_demande_at,
+    });
+  }
   const ok = await sendReviewRequest({ email: seller.email, firstName: seller.first_name, daysToSell: seller.jours_pour_vendre, propertyCity: seller.property_city });
   if (ok) {
     db.prepare('UPDATE sellers SET avis_demande_at=CURRENT_TIMESTAMP WHERE id=?').run(seller.id);
@@ -1566,52 +1572,75 @@ router.get('/emails', requireAdmin, (req, res) => {
   res.sendFile('emails.html', { root: './views/admin' });
 });
 
-// Classé dans l'ordre chronologique du parcours vendeur : prospection →
-// inscription/paiement → préparation du dossier → publication → visites →
-// suivi sans offre → offre/vente → après-vente. Les notifications internes
-// (destinataire ≠ vendeur/acheteur/prospect) sont regroupées à part.
+// Classé dans l'ordre chronologique du parcours client : prospection →
+// inscription/paiement → auth → préparation du dossier → photos (SUSPENDU) →
+// publication → visites → suivi sans offre → offre/vente → compromis →
+// fin de vente → après-vente → notifications.
+// suspended:true = emails désactivés (guard PHOTO_MISSIONS_ENABLED).
+// noPreview:true = pas de modèle prévisualisable (envoi libre admin).
 const EMAIL_CATALOG = [
   // ── Prospection ──────────────────────────────────────────────
-  { category: 'Prospection', id: 'prospect_nudge', label: 'Relance prospect', trigger: 'J+7 inscrit non payé', recipient: 'Prospect', auto: true },
+  { category: 'Prospection', id: 'prospect_nudge', label: 'Nudge prospect', trigger: 'J+7 inscrit non payé', recipient: 'Prospect', auto: true },
 
   // ── Inscription & paiement ───────────────────────────────────
-  { category: 'Inscription & paiement', id: 'welcome_v2', label: 'Bienvenue (version améliorée)', trigger: 'Création de compte', recipient: 'Vendeur', auto: true },
-  { category: 'Inscription & paiement', id: 'invoice', label: 'Facture paiement', trigger: 'Après paiement / mensualité', recipient: 'Vendeur', auto: true },
-  { category: 'Inscription & paiement', id: 'first_meeting', label: 'Préparation 1er rendez-vous', trigger: 'Après paiement', recipient: 'Vendeur', auto: true },
+  { category: 'Inscription & paiement', id: 'welcome_v2', label: 'Bienvenue', trigger: 'Création de compte', recipient: 'Vendeur', auto: true },
+  { category: 'Inscription & paiement', id: 'invoice', label: 'Facture — Pack Autonomie', trigger: 'Après paiement / mensualité', recipient: 'Vendeur', auto: true },
+  { category: 'Inscription & paiement', id: 'invoice_serenite', label: 'Facture — Pack Coaching Plus', trigger: 'Après paiement / mensualité', recipient: 'Vendeur', auto: true },
+  { category: 'Inscription & paiement', id: 'first_meeting', label: 'Avant le 1er rendez-vous', trigger: 'Après paiement', recipient: 'Vendeur', auto: true },
+  { category: 'Inscription & paiement', id: 'new_client_admin_notif', label: 'Alerte admin — nouveau client', trigger: 'Après paiement', recipient: 'Admin', auto: true },
+
+  // ── Auth & compte ─────────────────────────────────────────────
+  { category: 'Auth & compte', id: 'password_reset', label: 'Réinitialisation mot de passe', trigger: 'Demande de réinitialisation', recipient: 'Vendeur', auto: false },
+  { category: 'Auth & compte', id: 'login_code', label: 'Code de connexion 2FA', trigger: 'Connexion 2FA activée', recipient: 'Vendeur', auto: false },
 
   // ── Préparation du dossier ───────────────────────────────────
-  { category: 'Préparation du dossier', id: 'no_property', label: 'Pas encore de bien créé', trigger: 'J+3 sans fiche', recipient: 'Vendeur', auto: true },
-  { category: 'Préparation du dossier', id: 'no_photos', label: 'Photos manquantes', trigger: 'J+3 payé sans photos', recipient: 'Vendeur', auto: true },
-  { category: 'Préparation du dossier', id: 'missing_doc', label: 'Documents manquants', trigger: 'J+5 payé sans diagnostics', recipient: 'Vendeur', auto: true },
-  { category: 'Préparation du dossier', id: 'not_published', label: 'Fiche non publiée', trigger: 'J+7 non publié', recipient: 'Vendeur', auto: true },
-  { category: 'Préparation du dossier', id: 'info_needed', label: 'Renseignements manquants sur la fiche', trigger: 'Manuel admin', recipient: 'Vendeur', auto: false },
+  { category: 'Préparation du dossier', id: 'no_property', label: 'Nudge — fiche manquante', trigger: 'J+3 sans fiche', recipient: 'Vendeur', auto: true, suspended: true },
+  { category: 'Préparation du dossier', id: 'no_photos', label: 'Nudge — photos manquantes', trigger: 'J+3 payé sans photos', recipient: 'Vendeur', auto: true },
+  { category: 'Préparation du dossier', id: 'missing_doc', label: 'Nudge — documents manquants', trigger: 'J+5 payé sans diagnostics', recipient: 'Vendeur', auto: true },
+  { category: 'Préparation du dossier', id: 'not_published', label: 'Nudge — dossier prêt non publié', trigger: 'J+7 non publié', recipient: 'Vendeur', auto: true },
+
+  // ── Photos (SUSPENDU — guard PHOTO_MISSIONS_ENABLED) ─────────
+  { category: 'Photos', id: 'mission_confirmed', label: 'Confirmation séance photo', trigger: 'Validation mission — Manuel', recipient: 'Vendeur', auto: false, suspended: true },
+  { category: 'Photos', id: 'mission_reminder_client', label: 'Rappel séance photo J-1 — client', trigger: 'Cron J-1 avant séance', recipient: 'Vendeur', auto: true, suspended: true },
+  { category: 'Photos', id: 'mission_reminder_photographer', label: 'Rappel séance photo J-1 — photographe', trigger: 'Cron J-1 avant séance', recipient: 'Photographe', auto: true, suspended: true },
 
   // ── Publication ───────────────────────────────────────────────
-  { category: 'Publication', id: 'published', label: 'Bien publié — confirmation', trigger: 'Publication de l\'annonce', recipient: 'Vendeur', auto: true },
+  { category: 'Publication', id: 'published', label: 'Bien publié — confirmation', trigger: 'Publication de l\'annonce', recipient: 'Vendeur', auto: false },
 
   // ── Visites ───────────────────────────────────────────────────
-  { category: 'Visites', id: 'new_visit_request', label: 'Nouvelle demande de visite', trigger: 'Demande soumise', recipient: 'Vendeur', auto: true },
-  { category: 'Visites', id: 'visit_confirmation', label: 'Confirmation de visite', trigger: 'Réservation validée', recipient: 'Acheteur', auto: true },
-  { category: 'Visites', id: 'visit_reminder_seller', label: 'Rappel visite (vendeur)', trigger: 'Veille de la visite', recipient: 'Vendeur', auto: true },
-  { category: 'Visites', id: 'buyer_contacted', label: 'Un acheteur vous a contacté', trigger: 'Formulaire contact annonce', recipient: 'Vendeur', auto: true },
-  { category: 'Visites', id: 'first_visit_reminder', label: 'Rappel avant première visite', trigger: 'Veille de la 1ère visite confirmée', recipient: 'Vendeur', auto: true },
-  { category: 'Visites', id: 'post_first_visit', label: 'Retour 1ère session de visites', trigger: 'J+2 après 1ère visite', recipient: 'Vendeur', auto: true },
+  { category: 'Visites', id: 'new_visit_request', label: 'Nouvelle visite / contact acheteur', trigger: 'Demande soumise', recipient: 'Vendeur', auto: false },
+  { category: 'Visites', id: 'visit_confirmation', label: 'Confirmation de visite', trigger: 'Réservation validée', recipient: 'Acheteur', auto: false },
+  { category: 'Visites', id: 'first_visit_reminder', label: 'Rappel vendeur — 1ère visite (conseils + rappel)', trigger: 'Veille de la 1ère visite confirmée (via rappels visites)', recipient: 'Vendeur', auto: true },
+  { category: 'Visites', id: 'visit_reminder_seller', label: 'Rappel visite J-1 — vendeur', trigger: 'Veille de chaque visite confirmée', recipient: 'Vendeur', auto: true },
+  { category: 'Visites', id: 'visit_reminder_buyer', label: 'Rappel visite J-1 — acheteur', trigger: 'Veille de chaque visite confirmée', recipient: 'Acheteur', auto: true },
+  { category: 'Visites', id: 'visit_cancellation', label: 'Annulation de visite', trigger: 'Annulation de la visite', recipient: 'Acheteur', auto: false },
+  { category: 'Visites', id: 'dossier', label: 'Envoi dossier acheteur', trigger: 'Partage manuel du dossier', recipient: 'Acheteur', auto: false },
+  { category: 'Visites', id: 'post_first_visit', label: 'Feedback vendeur après 1ère visite', trigger: 'J+2 après 1ère visite', recipient: 'Vendeur', auto: true },
 
   // ── Suivi sans offre ──────────────────────────────────────────
-  { category: 'Suivi sans offre', id: 'check_in_no_offer', label: 'Check-in sans offre', trigger: 'J+14 publié sans offre', recipient: 'Vendeur', auto: true },
-  { category: 'Suivi sans offre', id: 'price_drop', label: 'Conseil baisse de prix', trigger: 'J+30 publié sans offre', recipient: 'Vendeur', auto: true },
-  { category: 'Suivi sans offre', id: 'post_visit_buyer', label: 'Relance acheteur post-visite', trigger: 'J+7 après visite sans offre', recipient: 'Acheteur', auto: true },
+  { category: 'Suivi sans offre', id: 'post_visit_buyer', label: 'Relance acheteur post-visite J+7', trigger: 'J+7 après visite sans offre', recipient: 'Acheteur', auto: true },
+  { category: 'Suivi sans offre', id: 'check_in_no_offer', label: 'Bilan J+30 sans offre', trigger: 'J+30 publié sans offre', recipient: 'Vendeur', auto: true },
+  { category: 'Suivi sans offre', id: 'price_drop', label: 'Conseil baisse de prix J+37+', trigger: 'J+37 min. — après bilan J+30', recipient: 'Vendeur', auto: true },
 
   // ── Offre & vente ─────────────────────────────────────────────
-  { category: 'Offre & vente', id: 'offer_notification', label: 'Notification offre reçue', trigger: 'Offre soumise par acheteur', recipient: 'Vendeur', auto: true },
-  { category: 'Offre & vente', id: 'sold_congrats', label: 'Félicitations — bien vendu !', trigger: 'Statut passé à "vendu"', recipient: 'Vendeur', auto: true },
+  { category: 'Offre & vente', id: 'offer_notification', label: 'Nouvelle offre — vendeur', trigger: 'Offre soumise par acheteur', recipient: 'Vendeur', auto: false },
+  { category: 'Offre & vente', id: 'offer_receipt_buyer', label: 'Accusé réception offre', trigger: 'Offre soumise par acheteur', recipient: 'Acheteur', auto: false },
+
+  // ── Compromis ─────────────────────────────────────────────────
+  { category: 'Compromis', id: 'compromis_milestone', label: 'Rappel échéances compromis', trigger: 'Cron hebdo — date compromis', recipient: 'Vendeur', auto: true },
+
+  // ── Fin de vente ──────────────────────────────────────────────
+  { category: 'Fin de vente', id: 'sold_congrats', label: 'Félicitations — vente réalisée', trigger: 'Statut passé à "vendu"', recipient: 'Vendeur', auto: false },
+  { category: 'Fin de vente', id: 'sold_to_buyer', label: 'Bien vendu — acheteurs visités', trigger: 'Statut passé à "vendu"', recipient: 'Acheteur', auto: false },
 
   // ── Après-vente ───────────────────────────────────────────────
-  { category: 'Après-vente', id: 'review_request', label: 'Demande d\'avis Google', trigger: 'Après vente réalisée (manuel)', recipient: 'Vendeur', auto: false },
-  { category: 'Après-vente', id: 'contract_renewal', label: 'Renouvellement contrat', trigger: '30j avant expiration (contrat 6 mois)', recipient: 'Vendeur', auto: true },
+  { category: 'Après-vente', id: 'review_request', label: 'Demande d\'avis J+3', trigger: 'J+3 après vente (cron)', recipient: 'Vendeur', auto: true },
+  { category: 'Après-vente', id: 'contract_renewal', label: 'Alerte expiration contrat', trigger: '30j avant expiration (contrat 6 mois)', recipient: 'Vendeur', auto: true },
 
-  // ── Notifications internes ───────────────────────────────────
-  { category: 'Notifications internes', id: 'contact_notification', label: 'Nouveau contact site', trigger: 'Formulaire de contact / rappel soumis', recipient: 'Admin', auto: true },
+  // ── Notifications ─────────────────────────────────────────────
+  { category: 'Notifications', id: 'dossier_notaire', label: 'Envoi dossier au notaire', trigger: 'Partage manuel au notaire', recipient: 'Notaire', auto: false },
+  { category: 'Notifications', id: 'contact_notification', label: 'Notification formulaire contact', trigger: 'Formulaire de contact / rappel soumis', recipient: 'Admin', auto: false },
+  { category: 'Notifications', id: 'custom', label: 'Email admin direct (manuel)', trigger: 'Manuel admin', recipient: 'Libre', auto: false, noPreview: true },
 ];
 
 router.get('/api/emails/catalog', requireAdmin, (req, res) => {
@@ -1697,9 +1726,16 @@ router.post('/api/emails/send', requireAdmin, async (req, res) => {
         ? new Date(new Date(seller.contrat_signe_at).setMonth(new Date(seller.contrat_signe_at).getMonth() + 6))
         : new Date(Date.now() + 30 * 24 * 3600 * 1000);
       const _daysLeft = Math.max(1, Math.round((_expiry - new Date()) / (1000 * 3600 * 24)));
-      ok = await sendContractRenewal({ email: seller.email, firstName: seller.first_name, expiryDate: _expiry.toISOString(), daysLeft: _daysLeft, twilioNumber: seller.twilio_number });
+      ok = await sendContractRenewal({ email: seller.email, firstName: seller.first_name, expiryDate: _expiry.toISOString(), daysLeft: _daysLeft });
     } else if (email_type === 'review_request') {
+      if (seller.avis_demande_at && !req.body?.force) {
+        return res.status(409).json({
+          error: `Demande d'avis déjà envoyée le ${new Date(seller.avis_demande_at).toLocaleDateString('fr-FR')}. Passez force:true pour renvoyer.`,
+          sent_at: seller.avis_demande_at,
+        });
+      }
       ok = await sendReviewRequest({ email: seller.email, firstName: seller.first_name });
+      if (ok) db.prepare('UPDATE sellers SET avis_demande_at=CURRENT_TIMESTAMP WHERE id=?').run(seller.id);
     } else if (email_type === 'prospect_nudge') {
       ok = await sendProspectNudge({ name: seller.first_name, email: seller.email });
     } else if (email_type === 'custom') {
@@ -1708,7 +1744,7 @@ router.post('/api/emails/send', requireAdmin, async (req, res) => {
     } else if (email_type === 'info_needed') {
       ok = await sendAdminDirectEmail({ to: seller.email, subject: 'Des renseignements sont nécessaires sur votre dossier', body: custom_message || `Bonjour ${seller.first_name || ''},\n\nDes informations complémentaires sont nécessaires pour compléter votre dossier.\n\nN\'hésitez pas à nous contacter pour plus de détails.\n\nL\'équipe Vendu Par Moi` });
     } else if (email_type === 'sold_congrats') {
-      ok = await sendAdminDirectEmail({ to: seller.email, subject: 'Félicitations — votre bien est vendu !', body: custom_message || `Bonjour ${seller.first_name || ''},\n\nToute l'équipe Vendu Par Moi vous félicite pour la vente de votre bien !\n\nMerci pour votre confiance.\n\nL'équipe Vendu Par Moi` });
+      ok = await sendSoldCongrats({ email: seller.email, firstName: seller.first_name, address: prop?.address, price: prop?.price });
     } else {
       // Fallback générique pour les types non encore implémentés
       ok = await sendAdminDirectEmail({ to: seller.email, subject: `Vendu Par Moi — ${email_type}`, body: custom_message || `Bonjour ${seller.first_name || ''},\n\nMessage de l'équipe Vendu Par Moi.\n\nL'équipe Vendu Par Moi` });
@@ -2001,13 +2037,23 @@ router.get('/api/test-all-emails', requireAdmin, async (req, res) => {
   const fromEmail = process.env.SENDGRID_FROM_EMAIL || 'contact@venduparmoi.fr';
 
   const templates = [
-    'welcome_v2', 'password_reset', 'invoice', 'published',
-    'visit_confirmation', 'new_visit_request', 'visit_reminder_seller',
-    'dossier', 'prospect_nudge', 'no_property', 'no_photos', 'not_published',
-    'missing_doc', 'post_first_visit', 'check_in_no_offer',
-    'contract_renewal', 'post_visit_buyer',
-    'price_drop', 'first_meeting', 'review_request',
-    'sold_congrats',
+    // E-01 à E-08
+    'prospect_nudge', 'welcome_v2', 'invoice', 'invoice_serenite', 'first_meeting', 'new_client_admin_notif',
+    'password_reset', 'login_code',
+    // E-09 suspendu — déclencheur désactivé
+    // E-10 à E-15
+    'no_photos', 'missing_doc', 'not_published',
+    'mission_confirmed', 'mission_reminder_client', 'mission_reminder_photographer',
+    // E-16 à E-23
+    'published', 'new_visit_request', 'visit_confirmation', 'first_visit_reminder',
+    'visit_reminder_seller', 'visit_reminder_buyer', 'visit_cancellation', 'dossier', 'post_first_visit',
+    // E-24 à E-31
+    'post_visit_buyer', 'check_in_no_offer', 'price_drop',
+    'offer_notification', 'offer_receipt_buyer', 'compromis_milestone',
+    'sold_congrats', 'sold_to_buyer',
+    // E-32 à E-35
+    'review_request', 'contract_renewal', 'dossier_notaire', 'contact_notification',
+    // E-36 (custom / admin_direct) non prévisualisable — exclu du test en masse
   ];
 
   const results = {};

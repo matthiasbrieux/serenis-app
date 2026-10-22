@@ -149,10 +149,10 @@ router.post('/api/dossier/acheteur/:token/reserver', publicActionLimit, async (r
       if (conflict) return { error: 'Ce créneau est déjà pris. Choisissez un autre horaire.', status: 409 };
       const emailConflict = db.prepare("SELECT id FROM visits WHERE property_id=? AND buyer_email=? AND status != 'cancelled'").get(prop.id, buyer_email.trim().toLowerCase());
       if (emailConflict) return { error: 'Une visite est déjà enregistrée pour cette adresse email.', status: 409 };
-      db.prepare("INSERT INTO visits (property_id, seller_id, buyer_name, buyer_email, buyer_phone, visit_date, visit_time, status, buyer_budget, buyer_financing, buyer_timeline) VALUES (?,?,?,?,?,?,?,'confirmed',?,?,?)")
+      const visitInsert = db.prepare("INSERT INTO visits (property_id, seller_id, buyer_name, buyer_email, buyer_phone, visit_date, visit_time, status, buyer_budget, buyer_financing, buyer_timeline) VALUES (?,?,?,?,?,?,?,'confirmed',?,?,?)")
         .run(prop.id, prop.seller_id, buyer_name, buyer_email.trim().toLowerCase(), buyer_phone || '', visit_date, visit_time, buyer_budget || null, buyer_financing || null, buyer_timeline || null);
-      db.prepare("INSERT INTO notifications (seller_id, type, title, body) VALUES (?,?,?,?)")
-        .run(prop.seller_id, 'visit_confirmed', 'Nouvelle visite confirmée', `${buyer_name} (${buyer_phone || buyer_email}) — ${visit_date} à ${visit_time}`);
+      db.prepare("INSERT INTO notifications (seller_id, type, title, body, visit_id) VALUES (?,?,?,?,?)")
+        .run(prop.seller_id, 'visit_confirmed', 'Nouvelle visite confirmée', `${buyer_name} (${buyer_phone || buyer_email}) — ${visit_date} à ${visit_time}`, visitInsert.lastInsertRowid);
       return { success: true };
     });
     const bookResult = bookVisit.immediate();
@@ -162,7 +162,7 @@ router.post('/api/dossier/acheteur/:token/reserver', publicActionLimit, async (r
     try {
       const { sendVisitConfirmation, sendNewVisitRequest } = require('../services/email');
       confirmationSent=(await sendVisitConfirmation(buyer_email, buyer_name, prop, visit_date, visit_time, false))===true;
-      await sendNewVisitRequest({ sellerEmail: prop.seller_email, buyerName: buyer_name, visitDate: `${visit_date} à ${visit_time}`, notes: buyer_phone ? `📞 ${buyer_phone}` : buyer_email });
+      await sendNewVisitRequest({ sellerEmail: prop.seller_email, buyerName: buyer_name, buyerEmail: buyer_email, buyerPhone: buyer_phone || '', visitDate: visit_date, visitTime: visit_time, propertyAddress: prop.address ? `${prop.address}${prop.city ? ', ' + prop.city : ''}` : '' });
       if (prop.seller_phone) {
         const { sendSmsNotification } = require('../services/twilio');
         await sendSmsNotification(prop.seller_phone,
@@ -254,7 +254,7 @@ router.get('/api/soumettre-offre/:token/info', (req, res) => {
 router.post('/api/soumettre-offre/:token', publicActionLimit, express.json(), async (req, res) => {
   try {
     const prop = db.prepare(`
-      SELECT p.id, p.seller_id, p.address, p.city, p.price, s.phone as seller_phone, s.email as seller_email, s.first_name as seller_first_name
+      SELECT p.id, p.seller_id, p.address, p.city, p.type, p.price, s.phone as seller_phone, s.email as seller_email, s.first_name as seller_first_name
       FROM properties p
       JOIN sellers s ON s.id = p.seller_id
       WHERE p.acheteur_token = ?
@@ -319,6 +319,20 @@ router.post('/api/soumettre-offre/:token', publicActionLimit, express.json(), as
         }).catch(() => {});
       } catch(e) {}
     }
+
+    // Email de confirmation à l'acheteur
+    try {
+      const { sendOfferReceiptBuyer } = require('../services/email');
+      const { deliverOnce } = require('../services/delivery');
+      await deliverOnce(`offer-receipt-buyer:${result.lastInsertRowid}`, () =>
+        sendOfferReceiptBuyer({
+          buyerEmail: email.trim().toLowerCase(),
+          buyerName: buyer_name,
+          propertyCity: prop.city || null,
+          propertyType: prop.type || null,
+        })
+      );
+    } catch(e) {}
 
     res.json({ success: true, id: result.lastInsertRowid });
   } catch(e) {

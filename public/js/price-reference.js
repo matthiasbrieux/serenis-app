@@ -75,7 +75,7 @@
       + "<div class=\"pr-bench-header\">"
       + "<div class=\"pr-bench-icon-box\">" + I_RULER + "</div>"
       + "<div class=\"pr-bench-header-text\">"
-      + "<h3 class=\"pr-bench-title\">Le prix au m² dans " + escHtml(data.commune || data.city || "votre commune") + "</h3>"
+      + "<h3 class=\"pr-bench-title\">Le prix au m² à " + escHtml(data.commune || data.city || "votre commune") + "</h3>"
       + "<p class=\"pr-bench-sub\">Toutes maisons vendues · " + escHtml(countLabel) + (period ? " · " + escHtml(period) : "") + "</p>"
       + "</div>"
       + "</div>"
@@ -96,10 +96,10 @@
     const meanRaw = ratios.reduce((s, r) => s + r, 0) / ratios.length;
     const surface = (data && data.surface != null) ? Number(data.surface) : null;
     const surfaceLbl = surface ? "Soit pour votre bien (" + surface + " m²)" : "Surface non renseignée";
-    const I_DOWN = "<svg width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.5\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><line x1=\"12\" y1=\"5\" x2=\"12\" y2=\"19\"/><polyline points=\"19 12 12 19 5 12\"/></svg>";
-    const I_BARS = "<svg width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.5\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><line x1=\"18\" y1=\"20\" x2=\"18\" y2=\"10\"/><line x1=\"12\" y1=\"20\" x2=\"12\" y2=\"4\"/><line x1=\"6\" y1=\"20\" x2=\"6\" y2=\"14\"/></svg>";
-    const I_UP = "<svg width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.5\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><line x1=\"12\" y1=\"19\" x2=\"12\" y2=\"5\"/><polyline points=\"5 12 12 5 19 12\"/></svg>";
-    const I_RULER = "<svg width=\"20\" height=\"20\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><rect x=\"4\" y=\"2\" width=\"16\" height=\"20\" rx=\"2\"/><line x1=\"8\" y1=\"6\" x2=\"16\" y2=\"6\"/><line x1=\"8\" y1=\"10\" x2=\"16\" y2=\"10\"/><line x1=\"8\" y1=\"14\" x2=\"12\" y2=\"14\"/><line x1=\"8\" y1=\"18\" x2=\"12\" y2=\"18\"/></svg>";
+    const I_DOWN = '<img src="/images/formation/reperes/pr-bench-icon-low-symbol.png" alt="" width="73" height="72" decoding="async">';
+    const I_BARS = '<img src="/images/formation/reperes/pr-bench-icon-mid-symbol.png" alt="" width="73" height="72" decoding="async">';
+    const I_UP = '<img src="/images/formation/reperes/pr-bench-icon-high-symbol.png" alt="" width="73" height="72" decoding="async">';
+    const I_RULER = '<img src="/images/formation/reperes/header-symbol.png" alt="" width="87" height="85" decoding="async">';
     const card = (icon, mod, lbl, raw) => {
       const priceDisp = Math.round(raw);
       const indic = surface ? Math.round(raw * surface) : null;
@@ -109,18 +109,21 @@
         + "<div class=\"pr-bench-card-icon " + mod + "\">" + icon + "</div>"
         + "<span class=\"pr-bench-card-lbl\">" + escHtml(lbl) + "</span>"
         + "</div>"
+        + "<div class=\"pr-sector-price-row\">"
         + "<div class=\"pr-bench-card-pm2\">" + euro(priceDisp) + "/m²</div>"
+        + "<img class=\"pr-sector-illustration\" src=\"/images/formation/reperes/" + mod + ".png\" alt=\"\" width=\"" + (mod === "pr-bench-icon-high" ? 216 : 210) + "\" height=\"" + (mod === "pr-bench-icon-high" ? 169 : 164) + "\" decoding=\"async\">"
+        + "</div>"
         + "<div class=\"pr-bench-card-indic\">"
         + "<div class=\"pr-bench-card-indic-lbl\">" + escHtml(surfaceLbl) + "</div>"
         + "<div class=\"pr-bench-card-indic-val\">" + indicHtml + "</div>"
         + "</div>"
         + "</div>";
     };
-    return "<div class=\"pr-bench-wrap\">"
+    return "<div class=\"pr-bench-wrap pr-sector-benchmarks\">"
       + "<div class=\"pr-bench-header\">"
       + "<div class=\"pr-bench-icon-box\">" + I_RULER + "</div>"
       + "<div class=\"pr-bench-header-text\">"
-      + "<h3 class=\"pr-bench-title\">Vos trois repères de prix selon les ventes du secteur</h3>"
+      + "<h3 class=\"pr-bench-title\">Vos <span class=\"pr-sector-title-accent\">trois repères de prix</span> selon les ventes du secteur</h3>"
       + "<p class=\"pr-bench-sub\">À partir des prix au m² observés autour de votre bien et de la surface habitable renseignée dans Mon bien, voici une fourchette de valeurs indicatives.</p>"
       + "</div>"
       + "</div>"
@@ -157,6 +160,9 @@
       ? `<p class="pr-addr-note">${I_PIN_SM} Les adresses exactes ne sont pas disponibles dans DVF+ pour ces transactions. La commune est indiquée à la place.</p>`
       : hasCommune
       ? `<p class="pr-addr-note">${I_PIN_SM} Certaines adresses de rue sont indisponibles dans DVF+ et ont été remplacées par la commune.</p>`
+      : "";
+    const locationNoteHtml = (data && data.locationPrecision === "street")
+      ? `<p class="pr-addr-note">${I_PIN_SM} Localisation approximative à la voie — les distances indiquées sont estimées depuis le centre de votre rue, pas depuis votre numéro exact.</p>`
       : "";
 
     const countLabel = count > 1 ? `${count} ventes retenues` : `${count} vente retenue`;
@@ -204,29 +210,36 @@
 
     const surfaceHtml = surface ? `${surface} m²` : "Non renseignée";
     const indicativeHtml = indicativeValue ? euro(indicativeValue) : "—";
+    const calculationBars = "<svg width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.5\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><line x1=\"18\" y1=\"20\" x2=\"18\" y2=\"10\"/><line x1=\"12\" y1=\"20\" x2=\"12\" y2=\"4\"/><line x1=\"6\" y1=\"20\" x2=\"6\" y2=\"14\"/></svg>";
     const calcBoxHtml = `
-      <div class="pr-calc-box">
+      <div class="pr-calc-box pr-value-panel">
         <div class="pr-calc-left">
           <span class="pr-calc-icon">${I_CALC}</span>
           <span class="pr-calc-title">Votre valeur indicative selon les ventes du secteur</span>
         </div>
         <div class="pr-calc-formula">
           <div class="pr-calc-item">
+            <span class="pr-value-icon" aria-hidden="true">${calculationBars}</span>
             <span class="pr-calc-label">Prix moyen au m²<br>(de ces ${count} ventes)</span>
             <span class="pr-calc-val">${euro(meanPriceM2Display)} / m²</span>
           </div>
           <span class="pr-calc-op">×</span>
           <div class="pr-calc-item">
+            <span class="pr-value-icon" aria-hidden="true">${I_HOUSE_SM}</span>
             <span class="pr-calc-label">Surface de votre bien<br>(renseignée dans Mon bien)</span>
             <span class="pr-calc-val">${surfaceHtml}</span>
           </div>
           <span class="pr-calc-op">=</span>
           <div class="pr-calc-item">
+            <span class="pr-value-icon" aria-hidden="true">${I_CALC}</span>
             <span class="pr-calc-label">Valeur indicative</span>
             <span class="pr-calc-result">${indicativeHtml}</span>
           </div>
         </div>
+        <div class="pr-value-map-column">
         <p class="pr-calc-note">Calcul basé sur des surfaces bâties DVF+, qui peuvent différer de votre surface habitable. Premier repère indicatif, non une estimation définitive.</p>
+          <figure class="pr-value-map"><img src="/images/formation/valeur/carte-satellite.png" alt="Illustration pédagogique d’un quartier avec périmètre terracotta et repères de maisons, sans localisation réelle des ventes." width="672" height="592" decoding="async"><figcaption>Illustration pédagogique, sans localisation réelle des ventes.</figcaption></figure>
+        </div>
       </div>`;
 
     const html = `
@@ -242,6 +255,7 @@
         ${badgeHtml}
       </div>
       ${addrNoteHtml}
+      ${locationNoteHtml}
       <div class="pr-desktop-table">
         <div class="pr-table-wrap">
           <table class="pr-table">
@@ -325,75 +339,47 @@
     });
   };
 
-  const I_CLOCK = "<svg width=\"20\" height=\"20\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><circle cx=\"12\" cy=\"12\" r=\"10\"/><polyline points=\"12 6 12 12 16 14\"/></svg>";
   const I_CHECK_CIRC = "<svg width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M22 11.08V12a10 10 0 1 1-5.93-9.14\"/><polyline points=\"22 4 12 14.01 9 11.01\"/></svg>";
   const I_LAYERS = "<svg width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><polygon points=\"12 2 2 7 12 12 22 7 12 2\"/><polyline points=\"2 17 12 22 22 17\"/><polyline points=\"2 12 12 17 22 12\"/></svg>";
   const I_ALERT = "<svg width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z\"/><line x1=\"12\" y1=\"9\" x2=\"12\" y2=\"13\"/><line x1=\"12\" y1=\"17\" x2=\"12.01\" y2=\"17\"/></svg>";
-  const I_PLUS = "<svg width=\"13\" height=\"13\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.5\" stroke-linecap=\"round\"><line x1=\"12\" y1=\"5\" x2=\"12\" y2=\"19\"/><line x1=\"5\" y1=\"12\" x2=\"19\" y2=\"12\"/></svg>";
 
-  function buildAnnoncesTable(annonces) {
-    if (!annonces.length) {
-      return "<p class=\"pt-ann-empty\">Aucune annonce ajoutée. Cliquez sur « Ajouter une annonce » pour renseigner des biens comparables trouvés sur les portails ci-dessus.</p>";
+  function buildAnnoncesBloc(data, num) {
+    const typeLbl = (data && data.typeLabel) ? data.typeLabel.toLowerCase() + "s" : "biens";
+    const communeLbl = data && data.commune ? data.commune : "votre commune";
+    let inner;
+    if (!data || data.status === "error") {
+      inner = "<div class=\"pt-ann-result\"><p class=\"pt-ann-text\">Données en cours de chargement…</p></div>";
+    } else if (data.status === "ok") {
+      const pm2Fmt = new Intl.NumberFormat("fr-FR", {maximumFractionDigits: 0}).format(data.avgPm2);
+      inner = "<div class=\"pt-ann-result\">"
+        + "<div class=\"pt-ann-pm2-box\">"
+        + "<span class=\"pt-ann-pm2-val\">" + escHtml(pm2Fmt) + " €/m²</span>"
+        + "<span class=\"pt-ann-pm2-sub\">Prix moyen des annonces actives</span>"
+        + "</div>"
+        + "<p class=\"pt-ann-text\">Prix moyen demandé pour les " + escHtml(typeLbl) + " actuellement proposés à la vente à " + escHtml(communeLbl) + ".</p>"
+        + "<p class=\"pt-ann-count\">Calculé à partir de " + escHtml(String(data.count)) + " annonce" + (data.count > 1 ? "s" : "") + " comparable" + (data.count > 1 ? "s" : "") + ".</p>"
+        + "<div class=\"pt-ann-divider\"></div>"
+        + "<div class=\"pt-ann-cta-wrap\">"
+        + "<p class=\"pt-ann-cta-head\">Comparez votre bien aux annonces du marché</p>"
+        + "<p class=\"pt-ann-cta-body\">Consultez les annonces actuellement en vente sur Leboncoin, SeLoger ou Bien'ici pour affiner votre positionnement tarifaire.</p>"
+        + "</div>"
+        + "<p class=\"pt-ann-disclaimer\">Les prix affichés correspondent aux montants demandés par les vendeurs, et non nécessairement aux prix auxquels les biens seront vendus.</p>"
+        + "</div>";
+    } else if (data.status === "insufficient") {
+      const c = data.count || 0;
+      inner = "<div class=\"pt-ann-result\"><p class=\"pt-ann-text\">Données insuffisantes — " + escHtml(String(c)) + " annonce" + (c > 1 ? "s" : "") + " comparable" + (c > 1 ? "s" : "") + " trouvée" + (c > 1 ? "s" : "") + " à " + escHtml(communeLbl) + " (minimum 5 requis).</p></div>";
+    } else if (data.status === "quota_exceeded") {
+      inner = "<div class=\"pt-ann-result\"><p class=\"pt-ann-text\">Le quota mensuel d'annonces est atteint. Cet indicateur sera disponible le mois prochain.</p></div>";
+    } else {
+      inner = "<div class=\"pt-ann-result\"><p class=\"pt-ann-text\">Indicateur indisponible pour votre commune.</p></div>";
     }
-    const rows = annonces.map(function(a, i) {
-      const pm2 = (a.surface > 0 && a.prix > 0) ? Math.round(a.prix / a.surface) : null;
-      return "<tr>"
-        + "<td>" + escHtml(a.type || "—") + "</td>"
-        + "<td>" + escHtml(a.commune || "—") + "</td>"
-        + "<td>" + (a.surface ? escHtml(a.surface + " m²") : "<span class=\"pt-na\">—</span>") + "</td>"
-        + "<td>" + (a.prix ? euro(a.prix) : "<span class=\"pt-na\">—</span>") + "</td>"
-        + "<td class=\"pt-ann-pm2\">" + (pm2 ? euro(pm2) + "/m²" : "<span class=\"pt-na\">—</span>") + "</td>"
-        + "<td>" + (a.url ? "<a href=\"" + escHtml(a.url) + "\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"pt-ann-link\">Voir →</a>" : "<span class=\"pt-na\">—</span>") + "</td>"
-        + "<td><button type=\"button\" class=\"pt-ann-del\" data-idx=\"" + i + "\" aria-label=\"Supprimer\">×</button></td>"
-        + "</tr>";
-    }).join("");
-    return "<div class=\"pt-ann-table-scroll\"><table class=\"pt-ann-table\"><thead><tr>"
-      + "<th>Type</th><th>Commune</th><th>Surface</th><th>Prix affiché</th><th>Prix/m²</th><th>Lien</th><th></th>"
-      + "</tr></thead><tbody>" + rows + "</tbody></table></div>";
+    return "<div class=\"pt-bloc\">"
+      + "<div class=\"pt-bloc-header\"><div class=\"pt-bloc-num\">" + escHtml(String(num)) + "</div>"
+      + "<h4 class=\"pt-bloc-title\">Le prix moyen au m² des biens en vente dans votre commune</h4></div>"
+      + inner + "</div>";
   }
 
-  function buildAnnoncesBloc(annonces, cityHint, typeHint, surfaceHint) {
-    const typeLabel = typeHint === "Appartement" ? "appartements" : "maisons";
-    const lbcUrl = "https://www.leboncoin.fr/recherche?category=9" + (cityHint ? "&text=" + encodeURIComponent(cityHint) : "");
-    const papUrl = "https://www.pap.fr/annonce/ventes-" + typeLabel;
-    const surfaceNote = surfaceHint ? " (votre bien : " + Math.round(surfaceHint) + " m²)" : "";
-    const typeOpts = ["Maison","Appartement","Villa","Terrain"].map(function(t) {
-      return "<option value=\"" + t + "\"" + (t === typeHint ? " selected" : "") + ">" + t + "</option>";
-    }).join("");
-    return "<div class=\"pt-bloc\" id=\"pt-ann-bloc\">"
-      + "<div class=\"pt-bloc-header\"><div class=\"pt-bloc-num\">1</div>"
-      + "<h4 class=\"pt-bloc-title\">Annonces actuellement en vente dans votre commune</h4></div>"
-      + "<div class=\"pt-unavail\">" + I_INFO
-      + "<span class=\"pt-unavail-msg\">Aucune API publique ne donne accès aux annonces immobilières en temps réel en France. Consultez les portails ci-dessous pour trouver des biens comparables" + escHtml(surfaceNote) + " et ajoutez-les manuellement dans le tableau.</span>"
-      + "</div>"
-      + "<div class=\"pt-ann-portals\">"
-      + "<a href=\"" + lbcUrl + "\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"pt-ann-portal\">" + (cityHint ? escHtml(cityHint) + " — " : "") + "Leboncoin</a>"
-      + "<a href=\"" + papUrl + "\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"pt-ann-portal\">PAP.fr — " + escHtml(typeLabel) + "</a>"
-      + "<a href=\"https://www.seloger.com/\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"pt-ann-portal\">SeLoger</a>"
-      + "</div>"
-      + "<div id=\"pt-ann-table-wrap\">" + buildAnnoncesTable(annonces) + "</div>"
-      + "<div class=\"pt-ann-foot\">"
-      + "<button type=\"button\" class=\"pt-ann-add-btn\" id=\"pt-ann-add-btn\">" + I_PLUS + " Ajouter une annonce</button>"
-      + "<span class=\"pt-save-status\" id=\"pt-ann-status\" aria-live=\"polite\"></span>"
-      + "</div>"
-      + "<form class=\"pt-ann-form\" id=\"pt-ann-form\" novalidate>"
-      + "<div class=\"pt-ann-form-row\">"
-      + "<div class=\"pt-ann-fg\"><label for=\"pt-ann-type\">Type</label><select id=\"pt-ann-type\">" + typeOpts + "</select></div>"
-      + "<div class=\"pt-ann-fg\"><label for=\"pt-ann-commune\">Commune</label><input type=\"text\" id=\"pt-ann-commune\" value=\"" + escHtml(cityHint || "") + "\" autocomplete=\"off\"></div>"
-      + "<div class=\"pt-ann-fg\"><label for=\"pt-ann-surface\">Surface (m²) *</label><input type=\"number\" id=\"pt-ann-surface\" min=\"1\" max=\"5000\" step=\"1\" placeholder=\"100\" autocomplete=\"off\"></div>"
-      + "<div class=\"pt-ann-fg\"><label for=\"pt-ann-prix\">Prix affiché (€) *</label><input type=\"number\" id=\"pt-ann-prix\" min=\"1000\" max=\"100000000\" step=\"1000\" placeholder=\"250000\" autocomplete=\"off\"></div>"
-      + "<div class=\"pt-ann-fg pt-ann-fg-url\"><label for=\"pt-ann-url\">Lien <span class=\"pt-ann-opt\">(optionnel)</span></label><input type=\"url\" id=\"pt-ann-url\" placeholder=\"https://www.leboncoin.fr/…\" autocomplete=\"off\"></div>"
-      + "</div>"
-      + "<div class=\"pt-ann-form-actions\">"
-      + "<button type=\"button\" class=\"pt-ann-submit\" id=\"pt-ann-submit\">Ajouter</button>"
-      + "<button type=\"button\" class=\"pt-ann-cancel\" id=\"pt-ann-cancel\">Annuler</button>"
-      + "<span class=\"pt-ann-err\" id=\"pt-ann-err\"></span>"
-      + "</div>"
-      + "</form>"
-      + "</div>";
-  }
-
-  function renderPriceTarget(box, dvf, commune, savedPrice, savedAnnonces) {
+  function renderPriceTarget(box, dvf, commune, marcheData, savedPrice) {
     const output = box.querySelector("[data-price-target-output]");
     if (!output) return;
 
@@ -405,49 +391,49 @@
     const communePm2 = communeOk ? commune.priceMed : null;
     const communeIndic = communeOk && commune.indicMed ? commune.indicMed : null;
 
+    const annoncesOk = !!(marcheData && marcheData.status === "ok" && marcheData.avgPm2 > 0);
+    const announcePm2 = annoncesOk ? marcheData.avgPm2 : null;
+    const showAnn = !!(marcheData && marcheData.status !== "unconfigured" && marcheData.status !== "no_property" && marcheData.status !== "no_location");
+
     const surface = dvf?.surface != null ? Number(dvf.surface) : (commune?.surface != null ? Number(commune.surface) : null);
     const hasSurface = surface != null && surface > 0 && Number.isFinite(surface);
-
-    const cityHint = dvf?.city || commune?.city || commune?.commune || "";
-    const typeHint = dvf?.type || commune?.type || "";
-    const bloc1 = buildAnnoncesBloc(Array.isArray(savedAnnonces) ? savedAnnonces : [], cityHint, typeHint, surface);
-
     const communePm2Cell = communeOk ? escHtml(euro(communePm2) + "/m²") : "<span class=\"pt-na\">Indisponible</span>";
     const communeIndicCell = communeIndic ? escHtml(euro(communeIndic)) : "<span class=\"pt-na\">—</span>";
     const dvfPm2Cell = dvfOk ? escHtml(euro(dvfPm2) + "/m²") : "<span class=\"pt-na\">Indisponible</span>";
     const dvfIndicCell = dvfIndic ? escHtml(euro(dvfIndic)) : "<span class=\"pt-na\">—</span>";
+    const annIndic = (annoncesOk && hasSurface) ? Math.round(announcePm2 * surface / 1000) * 1000 : null;
+    const annoncesPm2Cell = annoncesOk ? escHtml(euro(announcePm2) + "/m²") : "<span class=\"pt-na\">Indisponible</span>";
+    const annoncesIndicCell = annIndic ? escHtml(euro(annIndic)) : "<span class=\"pt-na\">—</span>";
 
-    const bloc2 = "<div class=\"pt-bloc\">"
-      + "<div class=\"pt-bloc-header\"><div class=\"pt-bloc-num\">2</div>"
+    const bn2 = showAnn ? 2 : 1;
+    const bn3 = showAnn ? 3 : 2;
+    const bn4 = showAnn ? 4 : 3;
+    const bn5 = showAnn ? 5 : 4;
+    const bloc2 = "<div class=\"pt-bloc pt-recap\">"
+      + "<div class=\"pt-bloc-header\"><div class=\"pt-bloc-num\">" + bn2 + "</div>"
       + "<h4 class=\"pt-bloc-title\">Récapitulatif des repères de prix</h4></div>"
       + "<div class=\"pt-table-wrap\"><table class=\"pt-table\"><thead><tr>"
       + "<th>Source</th><th>Prix médian / m²</th><th>Pour votre bien</th>"
       + "</tr></thead><tbody>"
       + "<tr><td>1. DVF — Ventes à l'échelle de la commune</td><td>" + communePm2Cell + "</td><td>" + communeIndicCell + "</td></tr>"
       + "<tr><td>2. DVF — Ventes comparables du secteur</td><td>" + dvfPm2Cell + "</td><td>" + dvfIndicCell + "</td></tr>"
-      + "<tr><td>3. Annonces en ligne (concurrence actuelle)</td><td><span class=\"pt-na\">Non disponible — source non publique</span></td><td><span class=\"pt-na\">—</span></td></tr>"
+      + (showAnn ? "<tr><td>3. Annonces — Marché actif de la commune</td><td>" + annoncesPm2Cell + "</td><td>" + annoncesIndicCell + "</td></tr>" : "")
       + "</tbody></table></div></div>";
 
     let meanPm2 = null, meanIndic = null, overlapWarning = false, availCount = 0;
     if (communeOk) availCount++;
     if (dvfOk) availCount++;
-    if (communeOk && dvfOk) {
-      meanPm2 = Math.round((communePm2 + dvfPm2) / 2);
+    if (annoncesOk) availCount++;
+    if (availCount > 0) {
+      const prices = [communeOk ? communePm2 : null, dvfOk ? dvfPm2 : null, annoncesOk ? announcePm2 : null].filter(function(p) { return p != null; });
+      meanPm2 = Math.round(prices.reduce(function(a, b) { return a + b; }, 0) / prices.length);
       meanIndic = hasSurface ? Math.round(meanPm2 * surface / 1000) * 1000 : null;
-      overlapWarning = true;
-    } else if (communeOk) {
-      meanPm2 = communePm2;
-      meanIndic = communeIndic;
-    } else if (dvfOk) {
-      meanPm2 = dvfPm2;
-      meanIndic = dvfIndic;
+      overlapWarning = communeOk && dvfOk;
     }
 
     let bloc3Html;
     if (meanPm2 != null) {
-      const sourcesLbl = availCount === 2
-        ? "2 sources sur 3 disponibles (annonces indisponibles)"
-        : "1 source sur 3 disponible";
+      const sourcesLbl = availCount + " source" + (availCount > 1 ? "s" : "") + " disponible" + (availCount > 1 ? "s" : "");
       bloc3Html = "<div class=\"pt-mean-box\">"
         + "<div class=\"pt-mean-row\"><span class=\"pt-mean-lbl\">" + escHtml(sourcesLbl) + "</span></div>"
         + "<div class=\"pt-mean-val\">" + escHtml(euro(meanPm2)) + "/m²</div>"
@@ -457,15 +443,15 @@
     } else {
       bloc3Html = "<div class=\"pt-calc-na-wrap\"><p class=\"pt-calc-na\">Calcul indisponible — les données DVF sont inaccessibles pour cette estimation.</p></div>";
     }
-    const bloc3 = "<div class=\"pt-bloc\">"
-      + "<div class=\"pt-bloc-header\"><div class=\"pt-bloc-num\">3</div>"
+    const bloc3 = "<div class=\"pt-bloc pt-synthesis\">"
+      + "<div class=\"pt-bloc-header\"><div class=\"pt-bloc-num\">" + bn3 + "</div>"
       + "<h4 class=\"pt-bloc-title\">Moyenne des repères de marché</h4></div>"
       + bloc3Html + "</div>";
 
     const savedVal = (savedPrice != null && Number.isFinite(Number(savedPrice))) ? Math.round(Number(savedPrice)) : null;
     const savedStr = savedVal != null ? String(savedVal) : "";
-    const bloc4 = "<div class=\"pt-bloc\">"
-      + "<div class=\"pt-bloc-header\"><div class=\"pt-bloc-num\">4</div>"
+    const bloc4 = "<div class=\"pt-bloc pt-desired\">"
+      + "<div class=\"pt-bloc-header\"><div class=\"pt-bloc-num\">" + bn4 + "</div>"
       + "<h4 class=\"pt-bloc-title\">Votre prix de vente souhaité</h4></div>"
       + "<div class=\"pt-price-input-wrap\">"
       + "<label for=\"pt-price-input\" class=\"pt-price-label\">Entrez le prix auquel vous souhaitez vendre votre bien</label>"
@@ -486,8 +472,8 @@
       + "<div class=\"pt-advice-icon\">" + icon + "</div>"
       + "<div class=\"pt-advice-body\"><strong>" + escHtml(title) + "</strong><p>" + escHtml(body) + "</p></div>"
       + "</div>";
-    const bloc5 = "<div class=\"pt-bloc\">"
-      + "<div class=\"pt-bloc-header\"><div class=\"pt-bloc-num\">5</div>"
+    const bloc5 = "<div class=\"pt-bloc pt-advice\">"
+      + "<div class=\"pt-bloc-header\"><div class=\"pt-bloc-num\">" + bn5 + "</div>"
       + "<h4 class=\"pt-bloc-title\">Conseils pour fixer votre prix</h4></div>"
       + "<div class=\"pt-advice-grid\">"
       + advice("pt-advice-green", I_CHECK_CIRC, "Privilégiez un prix cohérent avec le marché", "Un prix trop élevé allonge les délais et signale un bien difficile à vendre. Un prix cohérent génère davantage de visites et d'offres sérieuses.")
@@ -495,7 +481,16 @@
       + advice("pt-advice-warn", I_ALERT, "Revoyez votre prix après 45 jours sans offre", "Si votre bien ne génère pas d'offres après 45 jours, une réévaluation à la baisse est souvent nécessaire pour relancer les contacts.")
       + "</div></div>";
 
-    output.innerHTML = "<div class=\"pt-wrap\">" + bloc1 + bloc2 + bloc3 + bloc4 + bloc5 + "</div>";
+    const annBloc = showAnn ? buildAnnoncesBloc(marcheData, 1) : "";
+    const pedagogy = box.querySelector("template[data-price-pedagogy]");
+    if (pedagogy) {
+      // Insert existing results into the approved prose; calculations and events stay unchanged.
+      const blocks = {ANNONCES: annBloc, RECAP: bloc2, SYNTHESIS: bloc3, DESIRED: bloc4};
+      output.innerHTML = pedagogy.innerHTML.replace(/<!--PRICE_(ANNONCES|RECAP|SYNTHESIS|DESIRED)-->/g, (_, name) => blocks[name]);
+      if (typeof window.prepareLessonPresentation === "function") window.prepareLessonPresentation(output);
+    } else {
+    output.innerHTML = "<div class=\"pt-wrap\">" + annBloc + "<p class=\"pt-transition\">Grâce à Vendu Par Moi, vous disposez maintenant de trois repères de prix complémentaires : les ventes réalisées dans votre commune, les ventes comparables autour de votre bien et les prix actuellement demandés sur le marché. En les confrontant, vous obtenez une vision plus complète pour définir votre prix de vente.</p>" + bloc2 + bloc3 + bloc4 + bloc5 + "</div>";
+    }
 
     const input = output.querySelector("#pt-price-input");
     const statusEl = output.querySelector("#pt-save-status");
@@ -514,7 +509,7 @@
       const gapPct = Math.round((priceVal - refPrice) / refPrice * 100);
       const gapStr = (gapPct > 0 ? "+" : "") + gapPct + "%";
       const gapClass = Math.abs(gapPct) <= 10 ? "pt-formula-gap pt-formula-ok" : Math.abs(gapPct) <= 20 ? "pt-formula-gap pt-formula-warn" : "pt-formula-gap pt-formula-alert";
-      const sourceLabel = availCount === 2 ? "Réf. DVF (moy. 2 sources)" : (communeOk ? "Réf. DVF commune" : "Réf. DVF secteur");
+      const sourceLabel = availCount === 3 ? "Réf. moyennée (3 sources)" : availCount === 2 ? "Réf. moyennée (2 sources)" : communeOk ? "Réf. DVF commune" : dvfOk ? "Réf. DVF secteur" : "Réf. annonces";
       formulaEl.innerHTML =
         "<div class=\"pt-formula-row\">"
         + "<div class=\"pt-formula-item\"><span class=\"pt-formula-lbl\">Votre prix</span><span class=\"pt-formula-num\">" + euro(Math.round(priceVal)) + "</span></div>"
@@ -561,88 +556,6 @@
       }, 800);
     });
 
-    // ── Annonces comparables ──────────────────────────────────────
-    let _annonces = Array.isArray(savedAnnonces) ? savedAnnonces.slice() : [];
-    const annWrap = output.querySelector("#pt-ann-table-wrap");
-    const annStatus = output.querySelector("#pt-ann-status");
-    const annForm = output.querySelector("#pt-ann-form");
-    const annAddBtn = output.querySelector("#pt-ann-add-btn");
-    const annErr = output.querySelector("#pt-ann-err");
-
-    function wireAnnDel() {
-      annWrap && annWrap.querySelectorAll(".pt-ann-del").forEach(function(btn) {
-        btn.addEventListener("click", function() {
-          _annonces.splice(Number(btn.dataset.idx), 1);
-          if (annWrap) annWrap.innerHTML = buildAnnoncesTable(_annonces);
-          wireAnnDel();
-          saveAnn();
-        });
-      });
-    }
-    wireAnnDel();
-
-    async function saveAnn() {
-      if (!annStatus) return;
-      annStatus.textContent = "Enregistrement…";
-      annStatus.className = "pt-save-status pt-save-saving";
-      try {
-        const r = await fetch("/api/formation/annonces-comparables", {
-          method: "POST", credentials: "same-origin",
-          headers: {"Content-Type": "application/json", Accept: "application/json"},
-          body: JSON.stringify({annonces: _annonces})
-        });
-        if (r.ok) {
-          annStatus.textContent = "✓ Enregistré";
-          annStatus.className = "pt-save-status pt-save-ok";
-          setTimeout(function() { if (annStatus) { annStatus.textContent = ""; annStatus.className = "pt-save-status"; } }, 2500);
-        } else {
-          annStatus.textContent = "Erreur d'enregistrement";
-          annStatus.className = "pt-save-status pt-save-error";
-        }
-      } catch {
-        annStatus.textContent = "Erreur de connexion";
-        annStatus.className = "pt-save-status pt-save-error";
-      }
-    }
-
-    annAddBtn && annAddBtn.addEventListener("click", function() {
-      if (!annForm) return;
-      const open = annForm.style.display !== "none";
-      annForm.style.display = open ? "none" : "block";
-      if (!open) { const el = output.querySelector("#pt-ann-surface"); if (el) el.focus(); }
-    });
-
-    output.querySelector("#pt-ann-cancel") && output.querySelector("#pt-ann-cancel").addEventListener("click", function() {
-      if (annForm) annForm.style.display = "none";
-      if (annErr) annErr.textContent = "";
-    });
-
-    output.querySelector("#pt-ann-submit") && output.querySelector("#pt-ann-submit").addEventListener("click", function() {
-      const type = (output.querySelector("#pt-ann-type") || {}).value || "Maison";
-      const commune = ((output.querySelector("#pt-ann-commune") || {}).value || "").trim();
-      const surface = Math.round(Number((output.querySelector("#pt-ann-surface") || {}).value));
-      const prix = Math.round(Number((output.querySelector("#pt-ann-prix") || {}).value));
-      const url = ((output.querySelector("#pt-ann-url") || {}).value || "").trim();
-      if (!(surface > 0 && prix > 0)) {
-        if (annErr) annErr.textContent = "Surface et prix sont requis.";
-        return;
-      }
-      if (annErr) annErr.textContent = "";
-      _annonces.push({
-        type: type,
-        commune: commune || cityHint,
-        surface: surface,
-        prix: prix,
-        url: (url && /^https?:\/\//.test(url)) ? url : null
-      });
-      ["#pt-ann-surface","#pt-ann-prix","#pt-ann-url"].forEach(function(sel) {
-        const el = output.querySelector(sel); if (el) el.value = "";
-      });
-      if (annForm) annForm.style.display = "none";
-      if (annWrap) annWrap.innerHTML = buildAnnoncesTable(_annonces);
-      wireAnnDel();
-      saveAnn();
-    });
   }
 
   window.initPriceTarget = () => {
@@ -657,13 +570,12 @@
       fetch("/api/formation/prix-souhaite", {credentials: "same-origin", headers: {Accept: "application/json"}})
         .then(r => r.ok ? r.json() : {prix_souhaite: null})
         .catch(() => ({prix_souhaite: null})),
-      fetch("/api/formation/annonces-comparables", {credentials: "same-origin", headers: {Accept: "application/json"}})
-        .then(r => r.ok ? r.json() : {annonces: []})
-        .catch(() => ({annonces: []}))
-    ]).then(([dvf, commune, priceData, annoncesData]) => {
-      renderPriceTarget(box, dvf, commune,
-        priceData && priceData.prix_souhaite != null ? priceData.prix_souhaite : null,
-        annoncesData && Array.isArray(annoncesData.annonces) ? annoncesData.annonces : []);
+      fetch("/api/formation/annonces-marche", {credentials: "same-origin", headers: {Accept: "application/json"}})
+        .then(r => r.ok ? r.json() : {status: "error"})
+        .catch(() => ({status: "error"})),
+    ]).then(([dvf, commune, priceData, marcheData]) => {
+      renderPriceTarget(box, dvf, commune, marcheData,
+        priceData && priceData.prix_souhaite != null ? priceData.prix_souhaite : null);
     });
   };
 

@@ -992,6 +992,7 @@ if("scrollRestoration"in history)history.scrollRestoration="manual";</script>
   </style>
   <link rel="stylesheet" href="/css/seller-reference.css?v=1">
   <link rel="stylesheet" href="/css/seller-navigation.css?v=2">
+<link rel="stylesheet" href="/css/agenda-premium.css?v=5">
 </head>
 <body class="vpm-seller-reference vpm-agenda-page vpm-header-typography">
 <!-- En-tête mobile : logo complet + bouton menu -->
@@ -1325,41 +1326,44 @@ if("scrollRestoration"in history)history.scrollRestoration="manual";</script>
         </button>
       </div>
 
+      <!-- Nudge compromis — visible quand status=compromis et dates non encore renseignées (R4) -->
+      <div id="compromisNudge" style="display:none;background:#fff8f0;border:1.5px solid #f0d5b8;border-radius:12px;padding:14px 18px;margin-bottom:14px;align-items:center;gap:12px;flex-wrap:wrap;">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#C4603A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        <span style="font-size:0.87rem;color:#5a3a1a;line-height:1.4;flex:1;">Pensez à renseigner les échéances de votre compromis pour recevoir vos rappels.</span>
+        <button onclick="document.getElementById('compromis-vente').scrollIntoView({behavior:'smooth'});document.querySelector('.ap-compromis-toggle')?.click();" style="background:#C4603A;color:#fff;border:none;border-radius:8px;padding:8px 14px;font-size:0.83rem;font-family:'DM Sans',sans-serif;cursor:pointer;white-space:nowrap;">Renseigner mes dates</button>
+      </div>
+
       <div class="compromis-bar" id="compromis-vente">
         <div class="compromis-bar-hdr">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
           <h3>Du compromis à la signature</h3>
         </div>
         <div class="compromis-bar-body">
-          <p style="font-size:0.81rem;color:#888;margin:0 0 16px;line-height:1.5;">Renseignez la date de signature pour générer automatiquement les 3 dates clés jusqu'à la vente de votre bien dans votre agenda.</p>
+          <p style="font-size:0.81rem;color:#888;margin:0 0 16px;line-height:1.5;">Renseignez les dates utiles figurant dans votre dossier pour afficher les échéances correspondantes dans votre agenda.</p>
           <div class="compromis-form">
             <div style="display:flex;flex-direction:column;gap:4px;flex:1;min-width:140px;">
               <label style="font-size:0.75rem;font-weight:700;color:#555;text-transform:uppercase;letter-spacing:0.06em;">Date du compromis</label>
               <input type="date" id="compromisDateInput" style="padding:9px 12px;border:1.5px solid #e0d8ce;border-radius:9px;font-family:'DM Sans',sans-serif;font-size:0.88rem;color:#1A1A16;background:#fafaf8;outline:none;width:100%;box-sizing:border-box;">
             </div>
-            <div class="compromis-form-delay" style="display:flex;flex-direction:column;gap:4px;">
-              <label style="font-size:0.75rem;font-weight:700;color:#555;text-transform:uppercase;letter-spacing:0.06em;">Délai prêt</label>
-              <select id="compromisDelayInput" style="padding:9px 12px;border:1.5px solid #e0d8ce;border-radius:9px;font-family:'DM Sans',sans-serif;font-size:0.88rem;color:#1A1A16;background:#fafaf8;outline:none;">
-                <option value="45">45 jours</option>
-                <option value="60">60 jours</option>
-              </select>
-            </div>
+            <div class="compromis-date-field"><label for="compromisRetractionInput">Fin du délai de rétractation</label><input type="date" id="compromisRetractionInput"></div>
+            <div class="compromis-date-field"><label for="compromisConditionsInput">Date limite de la condition suspensive</label><input type="date" id="compromisConditionsInput"></div>
+            <div class="compromis-date-field"><label for="compromisActeInput">Date de signature prévue</label><input type="date" id="compromisActeInput"></div>
             <button onclick="saveCompromis()" class="btn-primary compromis-form-btn" style="padding:10px 18px;font-size:0.85rem;border-radius:9px;white-space:nowrap;height:40px;">Enregistrer</button>
           </div>
           <div id="compromisMilestones" style="display:none;margin-top:18px;border-top:1px solid #f0ebe4;padding-top:14px;">
             <div class="compromis-milestone">
               <span class="compromis-milestone-dot" style="background:#D32F2F;"></span>
-              <span class="compromis-milestone-label">Fin délai de rétractation <span style="color:#aaa;">(J+10)</span></span>
+              <span class="compromis-milestone-label">Fin délai de rétractation</span>
               <span class="compromis-milestone-date" id="milestoneSru">—</span>
             </div>
             <div class="compromis-milestone">
               <span class="compromis-milestone-dot" style="background:#1565C0;"></span>
-              <span class="compromis-milestone-label">Limite condition suspensive prêt <span id="milestoneConditionsLabel" style="color:#aaa;">(J+45)</span></span>
+              <span class="compromis-milestone-label">Limite condition suspensive prêt</span>
               <span class="compromis-milestone-date" id="milestoneConditions">—</span>
             </div>
             <div class="compromis-milestone">
               <span class="compromis-milestone-dot" style="background:var(--terracotta);"></span>
-              <span class="compromis-milestone-label">Signature acte authentique <span style="color:#aaa;">(J+90)</span></span>
+              <span class="compromis-milestone-label">Signature acte authentique</span>
               <span class="compromis-milestone-date" id="milestoneActe">—</span>
             </div>
           </div>
@@ -1530,7 +1534,7 @@ let _data = null;
 let allVisits = [];
 let calDate = new Date();
 let calSelected = null;
-let compromisData = { compromis_date: null, compromis_conditions_delay: 45 };
+let compromisData = { compromis_date: null, compromis_conditions_delay: null, compromis_retraction_date: null, compromis_conditions_date: null, compromis_acte_date: null, compromis_dates_explicit: 0 };
 let _mcAcheteurUrl = '';
 let _propertyAddress = '';
 
@@ -2185,7 +2189,13 @@ async function saveNotes(id) {
 const MONTHS_FR=['Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août','Septembre','Octobre','Novembre','Décembre'];
 
 function getMilestoneDates() {
-  if (!compromisData || !compromisData.compromis_date) return {};
+  if (!compromisData) return {};
+  if (Number(compromisData.compromis_dates_explicit) === 1) return {
+    sru: compromisData.compromis_retraction_date || null,
+    conditions: compromisData.compromis_conditions_date || null,
+    acte: compromisData.compromis_acte_date || null
+  };
+  if (!compromisData.compromis_date) return {};
   const delay = Number(compromisData.compromis_conditions_delay) || 45;
   const add = (n) => { const d=new Date(compromisData.compromis_date+'T12:00:00'); d.setDate(d.getDate()+n); return d.toISOString().split('T')[0]; };
   return { sru: add(10), conditions: add(delay), acte: add(90) };
@@ -2797,7 +2807,7 @@ async function loadData() {
     // Booking link — toujours disponible via acheteur_token (indépendant de la publication)
     if (_data.property?.acheteur_token) {
       const url=`${window.location.origin}/dossier/acheteur/${_data.property.acheteur_token}#reservation`;
-      document.getElementById('bookingLinkBox').style.display='block';
+      const shareBox=document.getElementById('bookingLinkBox');shareBox.dataset.available='true';shareBox.style.display='none';
       document.getElementById('bookingLink').value=url;
       document.getElementById('noLinkMsg').style.display='none';
     } else {
@@ -2863,26 +2873,34 @@ function formatDateFR(dateStr) {
 
 function updateCompromisMilestones() {
   const m = getMilestoneDates();
-  const delay = Number(compromisData.compromis_conditions_delay) || 45;
   const block = document.getElementById('compromisMilestones');
-  const show = v => v && (v.style.display = 'inline-flex');
-  const hide = v => v && (v.style.display = 'none');
-  if (!m.sru) {
+  const hasAny=Boolean(m.sru||m.conditions||m.acte);
+  const show = (el, value) => { if(!el)return;el.style.display=value?'inline-flex':'none'; };
+  if (!hasAny) {
     block.style.display = 'none';
-    hide(document.getElementById('legendSru'));
-    hide(document.getElementById('legendConditions'));
-    hide(document.getElementById('legendActe'));
+    show(document.getElementById('legendSru'),false);
+    show(document.getElementById('legendConditions'),false);
+    show(document.getElementById('legendActe'),false);
+    renderCalendar();
     return;
   }
   block.style.display = 'block';
-  show(document.getElementById('legendSru'));
-  show(document.getElementById('legendConditions'));
-  show(document.getElementById('legendActe'));
-  document.getElementById('milestoneSru').textContent = formatDateFR(m.sru);
-  document.getElementById('milestoneConditions').textContent = formatDateFR(m.conditions);
-  document.getElementById('milestoneConditionsLabel').textContent = `(J+${delay})`;
-  document.getElementById('milestoneActe').textContent = formatDateFR(m.acte);
+  show(document.getElementById('legendSru'),m.sru);
+  show(document.getElementById('legendConditions'),m.conditions);
+  show(document.getElementById('legendActe'),m.acte);
+  document.getElementById('milestoneSru').textContent = m.sru?formatDateFR(m.sru):'—';
+  document.getElementById('milestoneConditions').textContent = m.conditions?formatDateFR(m.conditions):'—';
+  document.getElementById('milestoneActe').textContent = m.acte?formatDateFR(m.acte):'—';
+  document.querySelectorAll('#compromisMilestones .compromis-milestone').forEach((row,index)=>row.style.display=[m.sru,m.conditions,m.acte][index]?'flex':'none');
   renderCalendar();
+}
+
+function updateCompromisNudge() {
+  const nudge = document.getElementById('compromisNudge');
+  if (!nudge) return;
+  const isCompromis = _data?.property?.status === 'compromis';
+  const datesSet = compromisData.compromis_dates_explicit === 1;
+  nudge.style.display = (isCompromis && !datesSet) ? 'flex' : 'none';
 }
 
 async function loadCompromis() {
@@ -2890,37 +2908,37 @@ async function loadCompromis() {
     const r = await fetch('/api/compromis');
     if (!r.ok) return;
     compromisData = await r.json();
-    if (compromisData.compromis_date) {
-      document.getElementById('compromisDateInput').value = compromisData.compromis_date;
-      document.getElementById('compromisDelayInput').value = compromisData.compromis_conditions_delay || 45;
-    }
+    document.getElementById('compromisDateInput').value = compromisData.compromis_date || '';
+    const dates=getMilestoneDates();
+    document.getElementById('compromisRetractionInput').value = compromisData.compromis_retraction_date || dates.sru || '';
+    document.getElementById('compromisConditionsInput').value = compromisData.compromis_conditions_date || dates.conditions || '';
+    document.getElementById('compromisActeInput').value = compromisData.compromis_acte_date || dates.acte || '';
     updateCompromisMilestones();
+    updateCompromisNudge();
   } catch(e) {}
 }
 
 async function saveCompromis() {
   const date = document.getElementById('compromisDateInput').value;
-  const delay = document.getElementById('compromisDelayInput').value;
+  const dates={compromis_retraction_date:document.getElementById('compromisRetractionInput').value||null,compromis_conditions_date:document.getElementById('compromisConditionsInput').value||null,compromis_acte_date:document.getElementById('compromisActeInput').value||null};
   try {
     const r = await fetch('/api/compromis', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ compromis_date: date || null, compromis_conditions_delay: Number(delay) || 45 })
+      body: JSON.stringify({ compromis_date: date || null, ...dates, dates_explicit:true })
     });
     if (r.ok) {
-      compromisData = { compromis_date: date || null, compromis_conditions_delay: Number(delay) || 45 };
+      compromisData = { compromis_date: date || null, ...dates, compromis_dates_explicit:1 };
       updateCompromisMilestones();
+      updateCompromisNudge();
+      document.querySelector('.ap-compromis-panel .compromis-bar-body')?.setAttribute('hidden','');
+      document.querySelector('.ap-compromis-toggle')?.setAttribute('aria-expanded','false');
       showToast('Compromis enregistré ✓');
     }
   } catch(e) { showToast('Erreur de sauvegarde', 'error'); }
 }
 
 // Auto-marquer les notifs visite comme lues dès l'ouverture de l'agenda
-fetch('/api/notifications/read-by-type', {
-  method: 'POST', headers: {'Content-Type':'application/json'},
-  body: JSON.stringify({ types: ['visit_request','visit_confirmed','visit_reminder'] })
-}).catch(() => {});
-
 /* ── Toggle formulaire ajout disponibilité ─────────── */
 function toggleDispoForm(forceOpen) {
   const form = document.getElementById('dispoAddForm');
@@ -2993,5 +3011,6 @@ loadData().then(() => {
 </script>
 
 <link rel="stylesheet" href="/css/seller-header-typography.css?v=1">
+<script src="/js/agenda-premium.js?v=5"></script>
 </body>
 </html>

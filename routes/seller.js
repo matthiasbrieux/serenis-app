@@ -6,6 +6,7 @@ const bcrypt = require('bcryptjs');
 const { v4: uuidv4 } = require('uuid');
 const db = require('../database');
 const { requireAuth } = require('../middleware/auth');
+const { sellerUploadLimiter } = require('../middleware/rate-limits');
 const { uploadPhoto, uploadDocument } = require('../services/upload');
 const { sendSoldCongrats, sendPropertySoldToBuyer, sendVisitConfirmation } = require('../services/email');
 const { isPasswordPwned } = require('../services/passwordCheck');
@@ -36,6 +37,7 @@ router.get('/mon-bien', requireAuth, (req, res) => {
   res.setHeader('Content-Type', 'text/html');
   res.send(html);
 });
+router.use('/ma-formation/documents', requireAuth, require('./formation-documents'));
 router.get('/ma-formation', requireAuth, (req, res) => res.sendFile('library.html', { root: './views/seller' }));
 router.get('/ma-formation/plaquette', requireAuth, (req, res) => res.sendFile('plaquette.html', { root: './views/seller' }));
 router.get('/coaching-vpm', requireAuth, (req, res) => res.sendFile('coaching-vpm.html', { root: './views/seller' }));
@@ -51,7 +53,7 @@ router.get('/onboarding', requireAuth, (req, res) => {
 router.get('/contrat', requireAuth, (req, res) => res.sendFile('contrat.html', { root: './views/seller' }));
 
 // Signature électronique du contrat
-const contratSignLimit = require('express-rate-limit')({ windowMs: 15 * 60 * 1000, max: 5, keyGenerator: (req) => req.ip });
+const contratSignLimit = require('express-rate-limit')({ windowMs: 15 * 60 * 1000, max: 5, keyGenerator: (req) => req.ip, handler: (req, res) => res.status(429).json({ error: 'Trop de tentatives. Réessayez dans 15 minutes.' }) });
 router.post('/api/contrat/sign', requireAuth, contratSignLimit, express.json(), (req, res) => {
   const ip = req.headers['x-forwarded-for']?.split(',')[0]?.trim() || req.socket.remoteAddress || '';
   db.prepare('UPDATE sellers SET contrat_signe=1, contrat_signe_at=CURRENT_TIMESTAMP, contrat_ip=? WHERE id=?').run(ip, req.seller.id);
@@ -213,32 +215,105 @@ router.post('/api/formation/prix-souhaite', requireAuth, express.json(), (req, r
   }
 });
 
-router.get('/api/formation/annonces-comparables', requireAuth, (req, res) => {
-  try {
-    const row = db.prepare('SELECT annonces_comparables FROM properties WHERE seller_id = ?').get(req.seller.id);
-    const annonces = row?.annonces_comparables ? JSON.parse(row.annonces_comparables) : [];
-    res.json({ annonces: Array.isArray(annonces) ? annonces : [] });
-  } catch {
-    res.status(500).json({ error: 'Erreur serveur' });
-  }
-});
+router.get('/api/formation/annonces-marche', requireAuth, async (req, res) => {
+  const apiKey = process.env.CHERCHER_TROUVER_API_KEY;
+  if (!apiKey) return res.json({ status: 'unconfigured' });
 
-router.post('/api/formation/annonces-comparables', requireAuth, express.json(), (req, res) => {
   try {
-    const input = req.body?.annonces;
-    if (!Array.isArray(input)) return res.status(400).json({ error: 'Format invalide' });
-    const clean = input.slice(0, 20).map(a => ({
-      type: ['Maison','Appartement','Villa','Terrain'].includes(String(a.type)) ? String(a.type) : 'Maison',
-      commune: String(a.commune || '').slice(0, 100).trim(),
-      surface: Number(a.surface) > 0 ? Math.round(Number(a.surface)) : null,
-      prix: Number(a.prix) > 0 ? Math.round(Number(a.prix)) : null,
-      url: (typeof a.url === 'string' && /^https?:\/\//.test(a.url)) ? a.url.slice(0, 500) : null
-    })).filter(a => a.surface > 0 && a.prix > 0);
-    db.prepare('UPDATE properties SET annonces_comparables = ?, updated_at = CURRENT_TIMESTAMP WHERE seller_id = ?')
-      .run(JSON.stringify(clean), req.seller.id);
-    res.json({ ok: true, count: clean.length });
-  } catch {
-    res.status(500).json({ error: 'Erreur serveur' });
+    const prop = db.prepare(
+      'SELECT type, surface_habitable, postal_code, city FROM properties WHERE seller_id = ?'
+    ).get(req.seller.id);
+
+    if (!prop) return res.json({ status: 'no_property' });
+
+    const city = (prop.city || '').trim();
+    const cp = (prop.postal_code || '').trim();
+    if (!city && !cp) return res.json({ status: 'no_location' });
+
+    const surface = Number(prop.surface_habitable);
+    if (!(surface > 0)) return res.json({ status: 'incomplete' });
+
+    const typeRaw = (prop.type || '').toLowerCase();
+    const typeLabel = typeRaw.includes('appartement') ? 'Appartement' : 'Maison';
+    const cacheKey = `${(city || cp).toLowerCase().replace(/\s+/g, '_')}_${typeLabel.toLowerCase()}`;
+
+    // Serve shared commune+type cache if fresh (< 7 days)
+    const cached = db.prepare('SELECT data, cached_at FROM commune_annonces_cache WHERE cache_key = ?').get(cacheKey);
+    if (cached) {
+      const ageMs = Date.now() - new Date(cached.cached_at).getTime();
+      if (ageMs < 7 * 24 * 60 * 60 * 1000) {
+        try { return res.json(JSON.parse(cached.data)); } catch {}
+      }
+    }
+
+    const surfaceMin = Math.round(surface * 0.6);
+    const surfaceMax = Math.round(surface * 1.4);
+    const params = new URLSearchParams({
+      transaction: 'vente',
+      type: typeLabel,
+      surface_min: surfaceMin,
+      surface_max: surfaceMax,
+      page_size: 15,
+      fresh: 'true',
+      sort: 'recent',
+    });
+    if (cp) params.set('cp', cp);
+    else params.set('ville', city);
+
+    const apiUrl = `https://cherchertrouver.immo/api/v1/annonces?${params.toString()}`;
+    const apiRes = await fetch(apiUrl, {
+      headers: { 'X-Api-Key': apiKey, 'Accept': 'application/json' }
+    });
+
+    if (apiRes.status === 402) return res.json({ status: 'quota_exceeded' });
+    if (!apiRes.ok) {
+      console.error('[annonces-marche] ChercherTrouver', apiRes.status, await apiRes.text().catch(() => '').then(t => t.slice(0, 200)));
+      return res.status(502).json({ status: 'api_error', code: apiRes.status });
+    }
+
+    const json = await apiRes.json();
+    const raw = json.items || json.annonces || json.results || json.data
+      || Object.values(json).find(v => Array.isArray(v)) || [];
+
+    const valid = raw.filter(l => {
+      const p = Number(l.price ?? l.prix);
+      const s = Number(l.surface);
+      return p > 50000 && p < 50000000 && s > 9 && s < 2000;
+    });
+
+    let result;
+    if (valid.length < 5) {
+      result = { status: 'insufficient', count: valid.length, commune: city || cp };
+    } else {
+      const pm2s = valid.map(l => {
+        const pm2 = Number(l.price_per_m2 ?? l.prix_m2);
+        if (pm2 > 100 && pm2 < 30000) return pm2;
+        const p = Number(l.price ?? l.prix);
+        const s = Number(l.surface);
+        const computed = Math.round(p / s);
+        return computed > 100 && computed < 30000 ? computed : null;
+      }).filter(v => v !== null);
+
+      if (pm2s.length < 5) {
+        result = { status: 'insufficient', count: pm2s.length, commune: city || cp };
+      } else {
+        const avgPm2 = Math.round(pm2s.reduce((a, b) => a + b, 0) / pm2s.length);
+        result = {
+          status: 'ok',
+          count: pm2s.length,
+          avgPm2,
+          commune: city || cp,
+          typeLabel,
+        };
+      }
+    }
+
+    db.prepare('INSERT OR REPLACE INTO commune_annonces_cache (cache_key, data, cached_at) VALUES (?, ?, CURRENT_TIMESTAMP)')
+      .run(cacheKey, JSON.stringify(result));
+    res.json(result);
+  } catch (err) {
+    console.error('[annonces-marche]', err.message);
+    res.status(500).json({ status: 'error' });
   }
 });
 
@@ -304,7 +379,7 @@ router.post('/api/property', requireAuth, express.json(), (req, res) => {
 // Photo upload
 const MAX_PHOTOS_PER_PROPERTY = 150;
 
-router.post('/api/property/photos', requireAuth, uploadPhoto.array('photos', 150), async (req, res) => {
+router.post('/api/property/photos', requireAuth, sellerUploadLimiter, uploadPhoto.array('photos', 150), async (req, res) => {
   const property = db.prepare('SELECT id FROM properties WHERE seller_id = ?').get(req.seller.id);
   if (!property) return res.json({ error: 'Créez d\'abord la fiche du bien' });
 
@@ -365,7 +440,7 @@ router.put('/api/property/photos/move-category', requireAuth, express.json(), (r
 });
 
 // Document upload
-router.post('/api/property/documents', requireAuth, (req, res, next) => {
+router.post('/api/property/documents', requireAuth, sellerUploadLimiter, (req, res, next) => {
   uploadDocument.single('document')(req, res, (err) => {
     if (err) return res.json({ error: err.message || 'Erreur lors de l\'upload du fichier' });
     next();
@@ -417,12 +492,20 @@ router.post('/api/property/publish', requireAuth, async (req, res) => {
   db.prepare('UPDATE properties SET published=1, published_at=CURRENT_TIMESTAMP, status=? WHERE seller_id=?')
     .run('en-ligne', req.seller.id);
 
-  // Email confirmation to seller on publish
+  // Email confirmation to seller on publish — une seule fois (A4)
   try {
     const { sendPublishedConfirmation } = require('../services/email');
     const seller = db.prepare('SELECT email FROM sellers WHERE id=?').get(req.seller.id);
     if (seller) {
-      await sendPublishedConfirmation({ email: seller.email, propertySlug: property.slug });
+      const alreadySentPublish = db.prepare(
+        "SELECT id FROM email_log WHERE recipient_email=? AND trigger_type='published_confirmation'"
+      ).get(seller.email);
+      if (!alreadySentPublish) {
+        const agendaCheck = db.prepare("SELECT COUNT(*) as cnt FROM agenda_slots WHERE seller_id=? AND active=1").get(req.seller.id);
+        const hasActiveSlots = (agendaCheck?.cnt || 0) > 0;
+        await sendPublishedConfirmation({ email: seller.email, propertySlug: property.slug, hasActiveSlots });
+        db.prepare("INSERT INTO email_log (recipient_email, trigger_type) VALUES (?,?)").run(seller.email, 'published_confirmation');
+      }
     }
   } catch (e) {
     console.error('[EMAIL] sendPublishedConfirmation error:', e.message);
@@ -435,6 +518,61 @@ router.post('/api/property/publish', requireAuth, async (req, res) => {
 router.get('/api/agenda', requireAuth, (req, res) => {
   const slots = db.prepare('SELECT * FROM agenda_slots WHERE seller_id = ? AND active = 1').all(req.seller.id);
   res.json({ slots });
+});
+
+function agendaParisToday() {
+  return new Intl.DateTimeFormat('en-CA', { timeZone: 'Europe/Paris', year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date());
+}
+function agendaDateOffset(value, offset) {
+  const date = new Date(`${value}T12:00:00Z`);
+  date.setUTCDate(date.getUTCDate() + offset);
+  return date.toISOString().slice(0, 10);
+}
+function syncSellerAgendaActions(sellerId) {
+  const today = agendaParisToday();
+  const visits = db.prepare('SELECT id, status, visit_date, created_at FROM visits WHERE seller_id=?').all(sellerId);
+  const sync = db.transaction(() => {
+    const upsert = db.prepare(`INSERT INTO agenda_actions(seller_id,visit_id,kind,source_due_date,due_date,status,active)
+      VALUES(?,?,?,?,?,'open',1)
+      ON CONFLICT(seller_id,visit_id,kind) DO UPDATE SET
+        due_date=CASE WHEN agenda_actions.source_due_date<>excluded.source_due_date THEN excluded.due_date ELSE agenda_actions.due_date END,
+        status=CASE WHEN agenda_actions.source_due_date<>excluded.source_due_date AND agenda_actions.kind='visit_reminder' THEN 'open' ELSE agenda_actions.status END,
+        source_due_date=excluded.source_due_date,
+        active=1, updated_at=CURRENT_TIMESTAMP`);
+    const activeKeys = new Set();
+    const ensure = (visit, kind, dueDate) => { activeKeys.add(`${visit.id}:${kind}`); upsert.run(sellerId, visit.id, kind, dueDate, dueDate); };
+    for (const visit of visits) {
+      if (visit.status === 'pending') ensure(visit, 'pending_visit', (visit.created_at || today).slice(0, 10));
+      if (visit.status === 'confirmed' && visit.visit_date >= today) ensure(visit, 'visit_reminder', agendaDateOffset(visit.visit_date, -1));
+      if (visit.status === 'done' || (visit.status === 'confirmed' && visit.visit_date < today)) ensure(visit, 'visit_followup', visit.visit_date);
+    }
+    const existing = db.prepare('SELECT id,visit_id,kind,status FROM agenda_actions WHERE seller_id=? AND active=1').all(sellerId);
+    const deactivate = db.prepare("UPDATE agenda_actions SET active=0,updated_at=CURRENT_TIMESTAMP WHERE id=? AND status!='done'");
+    for (const action of existing) if (!activeKeys.has(`${action.visit_id}:${action.kind}`)) deactivate.run(action.id);
+  });
+  sync();
+}
+
+router.get('/api/agenda/actions', requireAuth, (req, res) => {
+  syncSellerAgendaActions(req.seller.id);
+  const actions = db.prepare(`SELECT a.id,a.visit_id,a.kind,a.due_date,a.status,
+      v.buyer_name,v.buyer_phone,v.buyer_email,v.visit_date,v.visit_time,v.status AS visit_status
+    FROM agenda_actions a JOIN visits v ON v.id=a.visit_id
+    WHERE a.seller_id=? AND a.active=1 AND a.status='open'
+    ORDER BY a.due_date, v.visit_time`).all(req.seller.id);
+  res.json({ actions });
+});
+
+router.patch('/api/agenda/actions/:id', requireAuth, express.json(), (req, res) => {
+  const action = db.prepare('SELECT * FROM agenda_actions WHERE id=? AND seller_id=? AND active=1').get(req.params.id, req.seller.id);
+  if (!action) return res.status(404).json({ error: 'Action introuvable' });
+  const { status, due_date } = req.body;
+  if (status === 'done') {
+    db.prepare("UPDATE agenda_actions SET status='done',updated_at=CURRENT_TIMESTAMP WHERE id=? AND seller_id=?").run(action.id, req.seller.id);
+  } else if (status === 'open' && action.kind === 'visit_followup' && /^\d{4}-\d{2}-\d{2}$/.test(due_date || '') && due_date >= agendaParisToday()) {
+    db.prepare("UPDATE agenda_actions SET status='open',due_date=?,updated_at=CURRENT_TIMESTAMP WHERE id=? AND seller_id=?").run(due_date, action.id, req.seller.id);
+  } else return res.status(400).json({ error: 'Action invalide' });
+  res.json({ success: true });
 });
 
 router.post('/api/agenda', requireAuth, express.json(), (req, res) => {
@@ -474,17 +612,28 @@ router.get('/api/visits', requireAuth, (req, res) => {
 // Status update
 // Compromis de vente — jalons calendrier
 router.get('/api/compromis', requireAuth, (req, res) => {
-  const prop = db.prepare('SELECT compromis_date, compromis_conditions_delay FROM properties WHERE seller_id=?').get(req.seller.id);
-  res.json(prop || { compromis_date: null, compromis_conditions_delay: 45 });
+  const prop = db.prepare('SELECT compromis_date, compromis_conditions_delay, compromis_retraction_date, compromis_conditions_date, compromis_acte_date, compromis_dates_explicit FROM properties WHERE seller_id=?').get(req.seller.id);
+  res.json(prop || { compromis_date: null, compromis_conditions_delay: null, compromis_retraction_date: null, compromis_conditions_date: null, compromis_acte_date: null, compromis_dates_explicit: 0 });
 });
 
 router.post('/api/compromis', requireAuth, express.json(), (req, res) => {
-  const { compromis_date, compromis_conditions_delay } = req.body;
-  if (compromis_date && !validation.date(compromis_date) || compromis_conditions_delay != null && !validation.number(compromis_conditions_delay,1,3650,true)) return res.status(400).json({error:'Date ou délai de compromis invalide'});
+  const { compromis_date, compromis_conditions_delay, compromis_retraction_date, compromis_conditions_date, compromis_acte_date, dates_explicit } = req.body;
+  const exactDates=[compromis_retraction_date,compromis_conditions_date,compromis_acte_date];
+  if ((compromis_date && !validation.date(compromis_date)) || (compromis_conditions_delay != null && !validation.number(compromis_conditions_delay,1,3650,true)) || exactDates.some(value=>value && !validation.date(value))) return res.status(400).json({error:'Date ou délai de compromis invalide'});
   const prop = db.prepare('SELECT id FROM properties WHERE seller_id=?').get(req.seller.id);
   if (!prop) return res.status(404).json({ error: 'Aucun bien enregistré' });
-  db.prepare('UPDATE properties SET compromis_date=?, compromis_conditions_delay=? WHERE seller_id=?')
-    .run(compromis_date || null, Number(compromis_conditions_delay) || 45, req.seller.id);
+  if (dates_explicit) {
+    db.prepare('UPDATE properties SET compromis_date=?, compromis_retraction_date=?, compromis_conditions_date=?, compromis_acte_date=?, compromis_dates_explicit=1 WHERE seller_id=?')
+      .run(compromis_date || null, compromis_retraction_date || null, compromis_conditions_date || null, compromis_acte_date || null, req.seller.id);
+    // Invalider les relances périmées (R4): supprime les events delivery liés aux anciennes dates
+    // pour que les nouvelles dates puissent déclencher leurs propres rappels
+    db.prepare("DELETE FROM delivery_events WHERE event_key LIKE ?").run(`compromis-milestone:${req.seller.id}:%`);
+    // Marquer les notifications de rappel compromis comme lues (elles référencent les anciennes dates)
+    db.prepare("UPDATE notifications SET read_at=CURRENT_TIMESTAMP WHERE seller_id=? AND type='compromis_reminder' AND read_at IS NULL").run(req.seller.id);
+  } else {
+    db.prepare('UPDATE properties SET compromis_date=?, compromis_conditions_delay=? WHERE seller_id=?')
+      .run(compromis_date || null, Number(compromis_conditions_delay) || 45, req.seller.id);
+  }
   res.json({ success: true });
 });
 
@@ -527,6 +676,9 @@ router.post('/api/property/generate-description', requireAuth, aiRateLimit, expr
     property.year_built && `Construit en ${property.year_built}`,
     property.heating_type && `Chauffage : ${property.heating_type}${property.heating_year ? ' (chaudière ' + property.heating_year + ')' : ''}`,
     property.dpe_class && `Classe DPE : ${property.dpe_class}`,
+    property.ges_class && `Classe GES : ${property.ges_class}`,
+    property.dpe_ges && `Émissions GES : ${property.dpe_ges} kg CO₂eq/m²/an`,
+    property.dpe_conso_energie && `Consommation énergétique : ${property.dpe_conso_energie} kWhEP/m²/an`,
     property.exposition && `Exposition : ${property.exposition}`,
     property.garden == 1 && 'Jardin',
     property.terrace == 1 && 'Terrasse',
@@ -534,6 +686,7 @@ router.post('/api/property/generate-description', requireAuth, aiRateLimit, expr
     property.train_station && `Transport : ${property.train_station}`,
     property.equipment && `Équipements inclus : ${property.equipment}`,
     property.taxe_fonciere && `Taxe foncière : ${property.taxe_fonciere} €/an`,
+    (() => { try { const tw = JSON.parse(property.travaux_recents || '[]').filter(t => t.year); return tw.length ? 'Travaux récents : ' + tw.map(t => t.type + ' (' + t.year + ')').join(', ') : null; } catch(e) { return null; } })(),
   ].filter(Boolean).join('\n');
 
   try {
@@ -899,7 +1052,7 @@ function scoreBuyerContact(contact, visits, offers) {
 
 router.get('/api/connect/overview', requireAuth, (req, res) => {
   const seller = db.prepare('SELECT id, uuid, email, first_name, last_name, phone, pack, twilio_number FROM sellers WHERE id = ?').get(req.seller.id);
-  const property = db.prepare('SELECT id, slug, published, type, address, city, postal_code, price, rooms, bedrooms, surface_habitable, acheteur_token, notaire_token FROM properties WHERE seller_id = ?').get(req.seller.id);
+  const property = db.prepare('SELECT id, slug, published, status, type, address, city, postal_code, price, rooms, bedrooms, surface_habitable, acheteur_token, notaire_token FROM properties WHERE seller_id = ?').get(req.seller.id);
   const visits = property
     ? db.prepare('SELECT * FROM visits WHERE seller_id = ? ORDER BY visit_date ASC, visit_time ASC').all(req.seller.id)
     : [];
@@ -925,7 +1078,7 @@ router.get('/api/connect/overview', requireAuth, (req, res) => {
 });
 
 router.post('/api/visits', requireAuth, express.json(), async (req, res) => {
-  const property = db.prepare('SELECT id FROM properties WHERE seller_id = ?').get(req.seller.id);
+  const property = db.prepare('SELECT id, address, city FROM properties WHERE seller_id = ?').get(req.seller.id);
   if (!property) return res.status(400).json({ error: 'Créez d\'abord votre bien' });
   const { buyer_name, buyer_phone, buyer_email, visit_date, visit_time, notes } = req.body;
   if (!validation.date(visit_date)||!validation.time(visit_time)||validation.parisInstant(visit_date,visit_time)<=new Date()||buyer_email&&!validation.email(buyer_email)) return res.status(400).json({error:'Date, heure ou email invalide'});
@@ -933,8 +1086,8 @@ router.post('/api/visits', requireAuth, express.json(), async (req, res) => {
   const result = db.prepare(
     'INSERT INTO visits (property_id, seller_id, buyer_name, buyer_phone, buyer_email, visit_date, visit_time, status, notes) VALUES (?,?,?,?,?,?,?,\'confirmed\',?)'
   ).run(property.id, req.seller.id, buyer_name || 'Acquéreur', buyer_phone || '', buyer_email || '', visit_date, visit_time, notes || '');
-  db.prepare('INSERT INTO notifications (seller_id, type, title, body) VALUES (?,\'visit_request\',?,?)')
-    .run(req.seller.id, 'Nouvelle visite programmée', `${buyer_name || 'Acquéreur'} — ${visit_date} à ${visit_time}`);
+  db.prepare('INSERT INTO notifications (seller_id, type, title, body, visit_id) VALUES (?,\'visit_request\',?,?,?)')
+    .run(req.seller.id, 'Nouvelle visite programmée', `${buyer_name || 'Acquéreur'} — ${visit_date} à ${visit_time}`, result.lastInsertRowid);
 
   // Email notification to seller on new visit request
   try {
@@ -944,12 +1097,25 @@ router.post('/api/visits', requireAuth, express.json(), async (req, res) => {
       await sendNewVisitRequest({
         sellerEmail: seller.email,
         buyerName: buyer_name || 'Acquéreur',
-        visitDate: `${visit_date} à ${visit_time}`,
-        notes: notes || '',
+        buyerEmail: buyer_email || '',
+        buyerPhone: buyer_phone || '',
+        visitDate: visit_date,
+        visitTime: visit_time,
+        propertyAddress: property.address ? `${property.address}${property.city ? ', ' + property.city : ''}` : '',
       });
     }
   } catch (e) {
     console.error('[EMAIL] sendNewVisitRequest error:', e.message);
+  }
+
+  // Confirmation to buyer when seller creates a visit (directly confirmed — no status transition fires)
+  if (buyer_email) {
+    try {
+      const prop = db.prepare('SELECT type, address, city, slug FROM properties WHERE id=?').get(property.id);
+      if (prop) await sendVisitConfirmation(buyer_email, buyer_name || 'Acquéreur', prop, visit_date, visit_time, false).catch(() => {});
+    } catch (e) {
+      console.error('[EMAIL] sendVisitConfirmation (manual) error:', e.message);
+    }
   }
 
   res.json({ success: true, id: result.lastInsertRowid });
@@ -965,10 +1131,13 @@ router.put('/api/visits/:id/status', requireAuth, express.json(), async (req, re
   if (!changed.changes) return res.status(409).json({error:'La visite vient de changer. Actualisez la page.'});
   let notification_sent = null;
   if (status === 'confirmed') {
-    db.prepare('INSERT INTO notifications (seller_id,type,title,body) VALUES (?,?,?,?)').run(req.seller.id,'visit_confirmed','Visite confirmée',`${visit.buyer_name} — ${visit.visit_date} à ${visit.visit_time}`);
+    db.prepare('INSERT INTO notifications (seller_id,type,title,body,visit_id) VALUES (?,?,?,?,?)').run(req.seller.id,'visit_confirmed','Visite confirmée',`${visit.buyer_name} — ${visit.visit_date} à ${visit.visit_time}`,visit.id);
     if (visit.buyer_email) notification_sent = await sendVisitConfirmation(visit.buyer_email,visit.buyer_name,visit,visit.visit_date,visit.visit_time,false).catch(()=>false);
   }
-  if (status === 'cancelled' && visit.buyer_email) notification_sent = await require('../services/email').sendVisitCancellation(visit.buyer_email,visit.buyer_name,visit,visit.visit_date,visit.visit_time).catch(()=>false);
+  if (status === 'cancelled') {
+    db.prepare("UPDATE notifications SET read_at=CURRENT_TIMESTAMP WHERE seller_id=? AND visit_id=? AND type IN ('visit_confirmed','visit_reminder','visit_request') AND read_at IS NULL").run(req.seller.id, visit.id);
+    if (visit.buyer_email) notification_sent = await require('../services/email').sendVisitCancellation(visit.buyer_email,visit.buyer_name,visit,visit.visit_date,visit.visit_time).catch(()=>false);
+  }
   res.json({success:true,notification_sent,warning:notification_sent===false?'La visite est enregistrée mais le message n’a pas été envoyé.':undefined});
 
 });
@@ -1334,6 +1503,11 @@ router.post('/api/notifications/read-all', requireAuth, (req, res) => {
   res.json({ success: true });
 });
 
+router.post('/api/notifications/:id/read', requireAuth, (req, res) => {
+  const result = db.prepare('UPDATE notifications SET read_at=CURRENT_TIMESTAMP WHERE id=? AND seller_id=? AND read_at IS NULL').run(req.params.id, req.seller.id);
+  res.json({ success: true, changed: result.changes > 0 });
+});
+
 // Marquer comme lues uniquement certains types (ex: visites quand on ouvre l'agenda)
 router.post('/api/notifications/read-by-type', requireAuth, express.json(), (req, res) => {
   const { types } = req.body;
@@ -1444,13 +1618,13 @@ router.post('/api/offers/:id/counter', requireAuth, express.json(), (req, res) =
 
 // Mise à jour statut (acceptée / refusée)
 router.put('/api/offers/:id/status', requireAuth, express.json(), (req, res) => {
-  const { status } = req.body;
+  const { status, seller_response } = req.body;
   if (!['accepted', 'refused', 'pending'].includes(status)) return res.status(400).json({ error: 'Statut invalide' });
   const offer = db.prepare('SELECT o.* FROM offers o JOIN properties p ON p.id = o.property_id WHERE o.id = ? AND p.seller_id = ?').get(req.params.id, req.seller.id);
   if (!offer) return res.status(403).json({ error: 'Offre introuvable' });
   const transition = db.transaction(() => {
     if (status === 'accepted' && db.prepare("SELECT id FROM offers WHERE property_id=? AND status='accepted' AND id!=?").get(offer.property_id,offer.id)) return false;
-    db.prepare('UPDATE offers SET status=?, responded_at=CURRENT_TIMESTAMP WHERE id=?').run(status,offer.id);
+    db.prepare('UPDATE offers SET status=?, seller_response=?, responded_at=CURRENT_TIMESTAMP WHERE id=?').run(status, seller_response||null, offer.id);
     if(status==='accepted')db.prepare("UPDATE properties SET status='offre' WHERE id=? AND status NOT IN ('compromis','vendu')").run(offer.property_id);
     return true;
   });
@@ -1554,6 +1728,44 @@ router.delete('/api/seller/rgpd/account', requireAuth, async (req, res) => {
   await require('../services/media-cleanup').cleanupMedia();
   res.clearCookie('token');
   res.json({ success: true });
+});
+
+// A5 — Envoi du dossier acheteur par email depuis l'espace vendeur
+router.post('/api/dossier/send-email', requireAuth, express.json(), async (req, res) => {
+  const sellerId = req.seller.id;
+  const { email: rawEmail, buyerName } = req.body;
+  const email = typeof rawEmail === 'string' ? rawEmail.trim().toLowerCase() : '';
+  if (!require('../services/validation').email(email)) return res.status(400).json({ error: 'Email invalide.' });
+
+  const property = db.prepare(
+    'SELECT id, acheteur_token, type, city FROM properties WHERE seller_id = ? LIMIT 1'
+  ).get(sellerId);
+  if (!property || !property.acheteur_token) return res.status(404).json({ error: 'Aucun dossier disponible.' });
+
+  const already = db.prepare(
+    'SELECT id FROM email_log WHERE recipient_email=? AND trigger_type=?'
+  ).get(email, `dossier_sent:${property.id}`);
+  if (already) return res.status(409).json({ alreadySent: true, error: 'Ce dossier a déjà été envoyé à cette adresse.' });
+
+  const base = process.env.BASE_URL || 'https://venduparmoi.fr';
+  const dossierUrl = `${base}/dossier/acheteur/${property.acheteur_token}`;
+
+  try {
+    const { sendDossierEmail } = require('../services/email');
+    await sendDossierEmail({ to: email, buyerName: buyerName || '', dossierUrl, propertyCity: property.city, propertyType: property.type });
+    db.prepare('INSERT INTO email_log (trigger_type, recipient_email) VALUES (?,?)').run(`dossier_sent:${property.id}`, email);
+    const existing = db.prepare('SELECT id FROM buyer_contacts WHERE property_id=? AND buyer_email=?').get(property.id, email);
+    if (existing) {
+      db.prepare('UPDATE buyer_contacts SET dossier_sent=1, dossier_sent_at=CURRENT_TIMESTAMP WHERE id=?').run(existing.id);
+    } else {
+      db.prepare('INSERT INTO buyer_contacts (property_id, seller_id, buyer_email, buyer_name, source, dossier_sent, dossier_sent_at) VALUES (?,?,?,?,?,1,CURRENT_TIMESTAMP)')
+        .run(property.id, sellerId, email, buyerName || '', 'email_manual');
+    }
+    res.json({ success: true });
+  } catch (e) {
+    console.error('[DOSSIER EMAIL] Send error:', e.message);
+    res.status(500).json({ error: 'Envoi impossible. Réessayez ou contactez le support.' });
+  }
 });
 
 module.exports = router;

@@ -10,6 +10,10 @@ const fs = require('fs');
 ['JWT_SECRET', 'STRIPE_SECRET_KEY', 'RESEND_API_KEY', 'ANTHROPIC_API_KEY'].forEach(k => {
   if (!process.env[k]) console.warn(`⚠️  ${k} non défini — fonctionnalité associée désactivée.`);
 });
+if (!process.env.STRIPE_WEBHOOK_SECRET) console.error('🚨 STRIPE_WEBHOOK_SECRET non défini — tous les webhooks Stripe seront rejetés (aucune activation de compte ne peut être traitée).');
+if (!process.env.SENDGRID_FROM_EMAIL) console.warn('⚠️  SENDGRID_FROM_EMAIL non défini — les emails partiront de contact@venduparmoi.fr (vérifier que ce domaine est autorisé dans Resend).');
+if (!process.env.LEGAL_SIREN || !process.env.LEGAL_RAISON_SOCIALE) console.error('🚨 Mentions légales manquantes (LEGAL_SIREN / LEGAL_RAISON_SOCIALE) — les factures automatiques ne seront PAS envoyées avant configuration.');
+if (!process.env.BACKUP_ENCRYPTION_KEY) console.warn('⚠️  BACKUP_ENCRYPTION_KEY non défini — seules les sauvegardes locales sont actives (risque de perte en cas de panne disque VPS).');
 if (!process.env.CLOUDINARY_URL) console.warn('⚠️  CLOUDINARY_URL non défini — les photos seront stockées localement (non persistant sur Render).');
 
 // Créer les dossiers d'upload s'ils n'existent pas
@@ -32,17 +36,17 @@ app.use(helmet({
       styleSrc: ["'self'", "'unsafe-inline'", "fonts.googleapis.com", "fonts.gstatic.com"],
       fontSrc: ["'self'", "fonts.gstatic.com"],
       imgSrc: ["'self'", "data:", "*.cloudinary.com", "res.cloudinary.com", "images.unsplash.com", "images.pexels.com", "api.qrserver.com"],
-      connectSrc: ["'self'", "api.stripe.com", "https://nominatim.openstreetmap.org", "https://overpass-api.de", "https://overpass.kumi.systems"],
+      connectSrc: ["'self'", "api.stripe.com", "https://nominatim.openstreetmap.org", "https://overpass.osm.ch", "https://overpass-api.de", "https://overpass.kumi.systems", "https://api-adresse.data.gouv.fr"],
       frameSrc: ["'self'", "js.stripe.com"],
       mediaSrc: ["'self'"],
     }
   }
 }));
 
-app.use(rateLimit({ windowMs: 15 * 60 * 1000, max: 300, standardHeaders: true, legacyHeaders: false }));
+app.use(require('./middleware/rate-limits').requestLimiter);
 
 // Rate limit ciblé sur le webhook SMS (anti-spam)
-const smsLimit = rateLimit({ windowMs: 60 * 1000, max: 20, keyGenerator: (req) => req.body?.From || req.ip });
+const smsLimit = rateLimit({ windowMs: 60 * 1000, max: 20, keyGenerator: (req) => req.body?.From || req.ip, handler: (req, res) => res.status(429).send('Too many requests') });
 app.use(cookieParser());
 app.use(require('./middleware/csrf'));
 
@@ -77,10 +81,18 @@ app.get('/fiche-fondateurs', require('./middleware/auth').requireAdmin, (req, re
 app.get('/hoguet-defense', require('./middleware/auth').requireAdmin, (req, res) => { res.set('Cache-Control', 'no-store, no-cache, must-revalidate'); res.sendFile(path.join(__dirname, 'public', 'hoguet-defense.html')); });
 app.get('/dossier-conviction', require('./middleware/auth').requireAdmin, (req, res) => { res.set('Cache-Control', 'no-store, no-cache, must-revalidate'); res.sendFile(path.join(__dirname, 'public', 'dossier-conviction.html')); });
 app.get('/dossier', require('./middleware/auth').requireAdmin, (req, res) => { res.set('Cache-Control', 'no-store, no-cache, must-revalidate'); res.sendFile(path.join(__dirname, 'public', 'dossier.html')); });
-app.get('/flyer', (req, res) => { res.set('Cache-Control', 'no-store, no-cache, must-revalidate'); res.sendFile(path.join(__dirname, 'public', 'flyer.html')); });
-app.get('/pdf-objections', (req, res) => { res.set('Cache-Control', 'no-store, no-cache, must-revalidate'); res.sendFile(path.join(__dirname, 'public', 'pdf-objections.html')); });
-app.get('/pdf-sms', (req, res) => { res.set('Cache-Control', 'no-store, no-cache, must-revalidate'); res.sendFile(path.join(__dirname, 'public', 'pdf-sms.html')); });
-app.get('/pdf-email', (req, res) => { res.set('Cache-Control', 'no-store, no-cache, must-revalidate'); res.sendFile(path.join(__dirname, 'public', 'pdf-email.html')); });
+// Vendeur connecté OU admin (seller token OU admin token)
+function requireAuthOrAdmin(req, res, next) {
+  const token = req.cookies?.token;
+  if (token) {
+    try { require('./services/session').verify(token, 'seller', require('./database')); return next(); } catch {}
+  }
+  return require('./middleware/auth').requireAdmin(req, res, next);
+}
+app.get('/flyer', require('./middleware/auth').requireAdmin, (req, res) => { res.set('Cache-Control', 'no-store, no-cache, must-revalidate'); res.sendFile(path.join(__dirname, 'public', 'flyer.html')); });
+app.get('/pdf-objections', requireAuthOrAdmin, (req, res) => { res.set('Cache-Control', 'no-store, no-cache, must-revalidate'); res.sendFile(path.join(__dirname, 'public', 'pdf-objections.html')); });
+app.get('/pdf-sms', requireAuthOrAdmin, (req, res) => { res.set('Cache-Control', 'no-store, no-cache, must-revalidate'); res.sendFile(path.join(__dirname, 'public', 'pdf-sms.html')); });
+app.get('/pdf-email', requireAuthOrAdmin, (req, res) => { res.set('Cache-Control', 'no-store, no-cache, must-revalidate'); res.sendFile(path.join(__dirname, 'public', 'pdf-email.html')); });
 app.get('/pdf-presentation', (req, res) => { res.set('Cache-Control', 'no-store, no-cache, must-revalidate'); res.sendFile(path.join(__dirname, 'public', 'pdf-presentation.html')); });
 app.get('/guide-diagnostics', (req, res) => { res.set('Cache-Control', 'no-store, no-cache, must-revalidate'); res.sendFile(path.join(__dirname, 'public', 'guide-diagnostics.html')); });
 app.get('/fiche-estimation', (req, res) => { res.set('Cache-Control', 'no-store, no-cache, must-revalidate'); res.sendFile(path.join(__dirname, 'public', 'fiche-estimation.html')); });
@@ -88,18 +100,18 @@ app.get('/questionnaire-satisfaction', (req, res) => { res.set('Cache-Control', 
 app.get('/kit-bienvenue', (req, res) => { res.set('Cache-Control', 'no-store, no-cache, must-revalidate'); res.sendFile(path.join(__dirname, 'public', 'kit-bienvenue.html')); });
 app.get('/flyer-demarchage', (req, res) => { res.set('Cache-Control', 'no-store, no-cache, must-revalidate'); res.sendFile(path.join(__dirname, 'public', 'flyer-demarchage.html')); });
 app.get('/simulateur-economies', (req, res) => { res.set('Cache-Control', 'no-store, no-cache, must-revalidate'); res.sendFile(path.join(__dirname, 'public', 'simulateur-economies.html')); });
-app.get('/facture-vpm', (req, res) => { res.set('Cache-Control', 'no-store, no-cache, must-revalidate'); res.sendFile(path.join(__dirname, 'public', 'facture-vpm.html')); });
-app.get('/devis-vpm', (req, res) => { res.set('Cache-Control', 'no-store, no-cache, must-revalidate'); res.sendFile(path.join(__dirname, 'public', 'devis-vpm.html')); });
-app.get('/attestation-formation', (req, res) => { res.set('Cache-Control', 'no-store, no-cache, must-revalidate'); res.sendFile(path.join(__dirname, 'public', 'attestation-formation.html')); });
-app.get('/recu-paiement', (req, res) => { res.set('Cache-Control', 'no-store, no-cache, must-revalidate'); res.sendFile(path.join(__dirname, 'public', 'recu-paiement.html')); });
-app.get('/planning-mise-en-vente', (req, res) => { res.set('Cache-Control', 'no-store, no-cache, must-revalidate'); res.sendFile(path.join(__dirname, 'public', 'planning-mise-en-vente.html')); });
-app.get('/planning-fin-de-vente', (req, res) => { res.set('Cache-Control', 'no-store, no-cache, must-revalidate'); res.sendFile(path.join(__dirname, 'public', 'planning-fin-de-vente.html')); });
-app.get('/notice-utilisation', (req, res) => { res.set('Cache-Control', 'no-store, no-cache, must-revalidate'); res.sendFile(path.join(__dirname, 'public', 'notice-utilisation.html')); });
-app.get('/cheques-parrainage', (req, res) => { res.set('Cache-Control', 'no-store, no-cache, must-revalidate'); res.sendFile(path.join(__dirname, 'public', 'cheques-parrainage.html')); });
-app.get('/script-appel-acheteur', (req, res) => { res.set('Cache-Control', 'no-store, no-cache, must-revalidate'); res.sendFile(path.join(__dirname, 'public', 'script-appel-acheteur.html')); });
-app.get('/presentation-commerciale', (req, res) => { res.set('Cache-Control', 'no-store, no-cache, must-revalidate'); res.sendFile(path.join(__dirname, 'public', 'presentation-commerciale.html')); });
-app.get('/fiche-visite', (req, res) => { res.set('Cache-Control', 'no-store, no-cache, must-revalidate'); res.sendFile(path.join(__dirname, 'public', 'fiche-visite.html')); });
-app.get('/fiche-acces-emails', (req, res) => { res.set('Cache-Control', 'no-store, no-cache, must-revalidate'); res.sendFile(path.join(__dirname, 'public', 'fiche-acces-emails.html')); });
+app.get('/facture-vpm', require('./middleware/auth').requireAdmin, (req, res) => { res.set('Cache-Control', 'no-store, no-cache, must-revalidate'); res.sendFile(path.join(__dirname, 'public', 'facture-vpm.html')); });
+app.get('/devis-vpm', require('./middleware/auth').requireAdmin, (req, res) => { res.set('Cache-Control', 'no-store, no-cache, must-revalidate'); res.sendFile(path.join(__dirname, 'public', 'devis-vpm.html')); });
+app.get('/attestation-formation', require('./middleware/auth').requireAdmin, (req, res) => { res.set('Cache-Control', 'no-store, no-cache, must-revalidate'); res.sendFile(path.join(__dirname, 'public', 'attestation-formation.html')); });
+app.get('/recu-paiement', require('./middleware/auth').requireAdmin, (req, res) => { res.set('Cache-Control', 'no-store, no-cache, must-revalidate'); res.sendFile(path.join(__dirname, 'public', 'recu-paiement.html')); });
+app.get('/planning-mise-en-vente', require('./middleware/auth').requireAdmin, (req, res) => { res.set('Cache-Control', 'no-store, no-cache, must-revalidate'); res.sendFile(path.join(__dirname, 'public', 'planning-mise-en-vente.html')); });
+app.get('/planning-fin-de-vente', require('./middleware/auth').requireAdmin, (req, res) => { res.set('Cache-Control', 'no-store, no-cache, must-revalidate'); res.sendFile(path.join(__dirname, 'public', 'planning-fin-de-vente.html')); });
+app.get('/notice-utilisation', require('./middleware/auth').requireAdmin, (req, res) => { res.set('Cache-Control', 'no-store, no-cache, must-revalidate'); res.sendFile(path.join(__dirname, 'public', 'notice-utilisation.html')); });
+app.get('/cheques-parrainage', require('./middleware/auth').requireAdmin, (req, res) => { res.set('Cache-Control', 'no-store, no-cache, must-revalidate'); res.sendFile(path.join(__dirname, 'public', 'cheques-parrainage.html')); });
+app.get('/script-appel-acheteur', require('./middleware/auth').requireAdmin, (req, res) => { res.set('Cache-Control', 'no-store, no-cache, must-revalidate'); res.sendFile(path.join(__dirname, 'public', 'script-appel-acheteur.html')); });
+app.get('/presentation-commerciale', require('./middleware/auth').requireAdmin, (req, res) => { res.set('Cache-Control', 'no-store, no-cache, must-revalidate'); res.sendFile(path.join(__dirname, 'public', 'presentation-commerciale.html')); });
+app.get('/fiche-visite', require('./middleware/auth').requireAdmin, (req, res) => { res.set('Cache-Control', 'no-store, no-cache, must-revalidate'); res.sendFile(path.join(__dirname, 'public', 'fiche-visite.html')); });
+app.get('/fiche-acces-emails', require('./middleware/auth').requireAdmin, (req, res) => { res.set('Cache-Control', 'no-store, no-cache, must-revalidate'); res.sendFile(path.join(__dirname, 'public', 'fiche-acces-emails.html')); });
 
 
 app.use('/uploads/documents', require('./services/documents').guardLegacyDocument);
@@ -273,11 +285,12 @@ app.listen(PORT, () => {
   backupDatabase().catch(e => console.error('Backup failed:', e.message)); // premier backup au démarrage
   setInterval(() => backupDatabase().catch(e => console.error('Backup failed:', e.message)), 24 * 60 * 60 * 1000); // backup quotidien
 
-  const { sendVisitReminders, sendMissionReminders, sendAutomatedNudges, sendContractExpiryReminders, sendPostVisitBuyerNudges, sendPostFirstVisitFeedbackNudges, sendCheckInNoOfferNudges, sendPriceDropNudges } = require('./services/reminders');
+  const { sendVisitReminders, sendMissionReminders, sendAutomatedNudges, sendContractExpiryReminders, sendPostVisitBuyerNudges, sendPostFirstVisitFeedbackNudges, sendCheckInNoOfferNudges, sendPriceDropNudges, sendFirstVisitReminderNudges, sendCompromisMilestoneReminders, sendReviewRequestNudges } = require('./services/reminders');
 
-  const jobs={sendVisitReminders,sendMissionReminders,sendAutomatedNudges,sendContractExpiryReminders,sendPostVisitBuyerNudges,sendPostFirstVisitFeedbackNudges,sendCheckInNoOfferNudges,sendPriceDropNudges,
+  const jobs={sendVisitReminders,sendMissionReminders,sendAutomatedNudges,sendContractExpiryReminders,sendPostVisitBuyerNudges,sendPostFirstVisitFeedbackNudges,sendCheckInNoOfferNudges,sendPriceDropNudges,sendFirstVisitReminderNudges,sendCompromisMilestoneReminders,sendReviewRequestNudges,
     cleanupMedia:()=>require('./services/media-cleanup').cleanupMedia(),
-    cleanupNotifications:()=>require('./database').prepare("DELETE FROM notifications WHERE read_at IS NOT NULL AND created_at < datetime('now', '-60 days')").run()
+    cleanupNotifications:()=>require('./database').prepare("DELETE FROM notifications WHERE read_at IS NOT NULL AND created_at < datetime('now', '-60 days')").run(),
+    cleanupDeliveryEvents:()=>{const d=require('./database');d.prepare("DELETE FROM delivery_events WHERE state='sent' AND sent_at < datetime('now','-90 days')").run();d.prepare("DELETE FROM delivery_events WHERE state='failed' AND lease_until < ?").run(Date.now()-30*24*60*60*1000);}
   };
   // Durable daily keys and leases prevent two processes from running the same job.
   // Polling catches a same-day restart after 18:00 Paris, including DST changes.
