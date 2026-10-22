@@ -94,9 +94,13 @@
   const availabilityHeading=make('h2','ap-lower-heading','Mes disponibilités');
   availabilityPanel.append(availabilityHeading,registered);
   listCol.append(availabilityPanel);
-  const actionsPanel=make('section','ap-actions-todo-panel');
+  const actionsPanel=make('section','ap-actions-todo-panel ap-actions-collapsed');
   const actionsHeading=make('h2','ap-lower-heading','Mes actions à effectuer');
-  const todoList=make('div','ap-todo-list');actionsPanel.append(actionsHeading,todoList);listCol.append(actionsPanel);
+  actionsHeading.setAttribute('role','button');actionsHeading.tabIndex=0;
+  const toggleActions=()=>actionsPanel.classList.toggle('ap-actions-collapsed');
+  actionsHeading.addEventListener('click',toggleActions);
+  actionsHeading.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();toggleActions();}});
+  const todoList=make('div','ap-todo-list');actionsPanel.append(actionsHeading,todoList);
   const visitsPanel=make('section','ap-visits-panel');
   visitsPanel.hidden=true;
   const visitsHeading=make('h2','ap-lower-heading','Mes visites');visitsPanel.append(visitsHeading);
@@ -176,6 +180,7 @@
     if(content){const more=button('Voir toutes les notifications',()=>{showAllNotifications=!showAllNotifications;renderNotificationsPanel();},'ap-notifications-more');content.after(more);}
     rightRail.append(notificationPanel);notificationPanel.classList.add('ap-notifications-panel','ap-notifications-collapsed');
   }
+  rightRail.append(actionsPanel);
   let showAllNotifications=false;
   const extra=make('div','ap-timeline');calendar.querySelector('#calGrid').after(extra);
   const monthHeader=calendar.querySelector('.cal-grid:not(#calGrid)');
