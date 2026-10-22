@@ -130,28 +130,13 @@
   window.setStatFilter=function(value){oldSetFilter(value);pendingPanel.hidden=Boolean(value)||!allVisits.some(v=>v.status==='pending'&&!isPastVisit(v));};
   main.querySelectorAll('.stat-card-agenda[data-filter]').forEach(el=>{el.tabIndex=0;el.setAttribute('role','button');el.addEventListener('keydown',event=>{if(event.key==='Enter'||event.key===' '){event.preventDefault();setStatFilter(el.dataset.filter);}});});
   const oldRenderVisits=window.renderVisits;
-  window.renderVisits=function(){oldRenderVisits();renderHistory(); const pending=allVisits.filter(v=>v.status==='pending'&&!isPastVisit(v));pendingPanel.hidden=Boolean(activeStatFilter)||!pending.length;pendingEmpty.hidden=pending.length>0;pendingList.innerHTML=pending.map(buildVisitCompact).join('');pendingTabCount.textContent=String(pending.length);renderDashboardPanels();renderAppointments();renderNotificationsPanel();};
+  window.renderVisits=function(){oldRenderVisits();renderHistory(); const pending=allVisits.filter(v=>v.status==='pending'&&!isPastVisit(v));pendingPanel.hidden=Boolean(activeStatFilter)||!pending.length;pendingEmpty.hidden=pending.length>0;pendingList.innerHTML=pending.map(buildVisitCompact).join('');pendingTabCount.textContent=String(pending.length);renderDashboardPanels();renderAppointments();};
   const calendar=main.querySelector('.calendar-card'), header=calendar.querySelector('.cal-header');
   const switcher=make('div','ap-view-switch');switcher.setAttribute('role','group');switcher.setAttribute('aria-label','Vue du calendrier');
   const views={month:'Mois',week:'Semaine',day:'Jour'};
   for(const [key,label] of Object.entries(views)){const b=button(label,()=>{view=key;renderCalendar();});b.dataset.view=key;switcher.append(b);}
   header.append(switcher,button('+ Ajouter une disponibilité',openAvailability,'ap-calendar-add'));
   const mini=make('aside','ap-mini'),rightRail=make('aside','ap-right-rail');layout.append(rightRail);rightRail.append(mini);
-  const notificationPanel=main.querySelector('#notifSidebarContent')?.closest('.agenda-panel');
-  if(notificationPanel){
-    const heading=notificationPanel.querySelector('.agenda-panel-title');
-    if(heading){
-      heading.textContent='Mes notifications';
-      heading.setAttribute('role','button');heading.tabIndex=0;
-      const toggle=()=>notificationPanel.classList.toggle('ap-notifications-collapsed');
-      heading.addEventListener('click',toggle);
-      heading.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();toggle();}});
-    }
-    const content=notificationPanel.querySelector('#notifSidebarContent');
-    if(content){const more=button('Voir toutes les notifications',()=>{showAllNotifications=!showAllNotifications;renderNotificationsPanel();},'ap-notifications-more');content.after(more);}
-    rightRail.append(notificationPanel);notificationPanel.classList.add('ap-notifications-panel','ap-notifications-collapsed');
-  }
-  let showAllNotifications=false;
   const extra=make('div','ap-timeline');calendar.querySelector('#calGrid').after(extra);
   const monthHeader=calendar.querySelector('.cal-grid:not(#calGrid)');
   const originalCalendar=window.renderCalendar;
@@ -230,6 +215,8 @@
     if(kind==='followup'){
       const action=agendaActions.find(a=>a.id===selectedEvent.actionId);
       if(action){
+        const visitId=data.visit_id||data.id;
+        if(typeof window.sendDossierSerieux==='function')detailBody.append(button('Dossier Acheteur Sérieux',()=>window.sendDossierSerieux(visitId),'ap-dashboard-action'));
         detailBody.append(button('Marquer le suivi comme effectué',()=>updateAgendaAction(action,'done'),'ap-dashboard-action'));
         const next=parseDate(action.due_date);next.setDate(next.getDate()+1);
         detailBody.append(button('Reporter à demain',()=>updateAgendaAction(action,'open',dateKey(next)),'ap-dashboard-action'));
@@ -268,56 +255,12 @@
       },'ap-appointment-action');row.append(action);appointmentList.append(row);
     }
   }
-  function taskText(action){
-    if(action.kind==='pending_visit')return ['Nouvelle demande de visite à confirmer',action.buyer_name||'Acquéreur'];
-    if(action.kind==='visit_reminder')return [`Rappel : visite demain à ${timeLabel(action.visit_time)}`,action.buyer_name||'Acquéreur'];
-    return ['Faire le suivi après la visite',action.buyer_name||'Acquéreur'];
-  }
   async function updateAgendaAction(action,status,dueDate){
     const response=await fetch(`/api/agenda/actions/${action.id}`,{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({status,due_date:dueDate})});
     if(!response.ok){showToast('Impossible de mettre à jour ce rappel','error');return;}
     await refreshAgendaActions();
     if(status==='done'){selectedEvent=null;renderDashboardPanels();}
   }
-  function renderNotificationsPanel(){
-    const content=document.getElementById('notifSidebarContent');if(!content)return;
-    const generic=(_data?.notifications||[]).filter(n=>['visit_request','visit_confirmed','visit_reminder'].includes(n.type));
-    const taskRows=agendaActions.slice(0,showAllNotifications?100:4);
-    const header=notificationPanel?.querySelector('.agenda-panel-title');
-    if(header){let badge=header.querySelector('.ap-notification-count');if(!badge){badge=make('span','ap-notification-count');header.append(badge);}badge.textContent=String(taskRows.length+generic.filter(n=>!n.read_at).length);badge.hidden=Number(badge.textContent)===0;}
-    content.replaceChildren();
-    if(!taskRows.length&&!generic.some(n=>!n.read_at)){content.append(make('p','ap-appointments-empty','Aucune action à traiter pour le moment.'));}
-    taskRows.forEach(action=>{
-      const [title,sub]=taskText(action),row=button('',()=>{
-        selectedEvent={kind:action.kind==='visit_reminder'?'reminder':action.kind==='pending_visit'?'pending':'followup',label:title,data:action,date:action.due_date,actionId:action.id};
-        if(action.kind==='visit_reminder')showDate(action.due_date,true);else{renderDashboardPanels();document.getElementById(`vcard-${action.visit_id}`)?.scrollIntoView({behavior:'smooth',block:'center'});}
-      },'ap-notification-row');
-      const icon=make('span','ap-notification-icon');icon.innerHTML=action.kind==='pending_visit'?eventIcons.pending:bellSvg;
-      const copy=make('span','ap-notification-copy');copy.append(make('strong','',title),make('small','',sub),make('time','',appointmentDate(action.due_date)));
-      row.append(icon,copy);content.append(row);
-      if(action.kind==='pending_visit')content.append(button('Traiter la demande',()=>selectAgendaTab('pending'),'ap-notification-complete'));
-      else content.append(button(action.kind==='visit_followup'?'Marquer le suivi comme effectué':'Marquer la préparation comme effectuée',()=>updateAgendaAction(action,'done'),'ap-notification-complete'));
-      if(action.kind==='visit_followup')content.append(button('Reporter à demain',()=>updateAgendaAction(action,'open',dateKey(new Date(new Date(action.due_date+'T12:00:00').getTime()+86400000))),'ap-notification-snooze'));
-    });
-    generic.filter(n=>showAllNotifications||!n.read_at).slice(0,showAllNotifications?100:3).forEach(notification=>{
-      const row=button('',async()=>{
-        await fetch(`/api/notifications/${notification.id}/read`,{method:'POST'});
-        notification.read_at=new Date().toISOString();
-        const visit=allVisits.find(v=>notification.body?.includes(v.buyer_name||'\u0000')&&notification.body?.includes(v.visit_date));
-        if(visit){selectedEvent={kind:visit.status,label:statusText[visit.status]||'Visite',data:visit,date:visit.visit_date};renderDashboardPanels();}
-        renderNotificationsPanel();
-      },'ap-notification-row ap-notification-legacy');
-      const icon=make('span','ap-notification-icon');icon.innerHTML=bellSvg;const copy=make('span','ap-notification-copy');copy.append(make('strong','',notification.title||'Notification'),make('small','',notification.body||''));row.append(icon,copy);content.append(row);
-    });
-    const more=notificationPanel?.querySelector('.ap-notifications-more');if(more)more.textContent=showAllNotifications?'Réduire':'Voir toutes les notifications';
-  }
-  async function refreshAgendaActions(){
-    try{const response=await fetch('/api/agenda/actions');if(!response.ok)return;agendaActions=(await response.json()).actions||[];
-      pendingTabCount.textContent=String(allVisits.filter(v=>v.status==='pending'&&!isPastVisit(v)).length);
-      renderNotificationsPanel();renderAppointments();renderCalendar();
-    }catch(_error){}
-  }
-  window.renderNotifSidebar=renderNotificationsPanel;
   function renderMini(){
     mini.replaceChildren();const nav=make('div','ap-mini-nav');nav.append(button('‹',()=>navigateMonth(-1)),make('strong','',cursor.toLocaleDateString('fr-FR',{month:'long',year:'numeric'})),button('›',()=>navigateMonth(1)));nav.firstChild.setAttribute('aria-label','Mois précédent du calendrier miniature');nav.lastChild.setAttribute('aria-label','Mois suivant du calendrier miniature');mini.append(nav);
     const grid=make('div','ap-mini-grid');for(const l of ['L','M','M','J','V','S','D'])grid.append(make('span','',l));

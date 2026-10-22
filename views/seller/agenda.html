@@ -992,7 +992,7 @@ if("scrollRestoration"in history)history.scrollRestoration="manual";</script>
   </style>
   <link rel="stylesheet" href="/css/seller-reference.css?v=1">
   <link rel="stylesheet" href="/css/seller-navigation.css?v=2">
-<link rel="stylesheet" href="/css/agenda-premium.css?v=10">
+<link rel="stylesheet" href="/css/agenda-premium.css?v=11">
 </head>
 <body class="vpm-seller-reference vpm-agenda-page vpm-header-typography">
 <!-- En-tête mobile : logo complet + bouton menu -->
@@ -1860,6 +1860,7 @@ function buildPastCard(v) {
       </div>
       ${statusBadge}
     </div>
+    ${!isCancelled?`<div style="margin-top:10px;"><button class="ap-dashboard-action" onclick="sendDossierSerieux(${v.id})" style="font-size:0.78rem;">Dossier Acheteur Sérieux</button></div>`:''}
   </div>`;
 }
 
@@ -2126,6 +2127,35 @@ function sendRappelRdv(id) {
   const smsText = `Bonjour ${prenom},\n\nPetit message pour vous rappeler notre visite prévue ${isReallyTomorrow?'demain':`le ${dateLabel}`} à ${time}.\nL'adresse est : ${adresse}.\nN'hésitez pas à me prévenir si vous avez un empêchement.\n\nÀ bientôt,\n${sellerNom||'[Votre prénom]'}`;
   const titleEl = document.getElementById('rappelSmsTitle');
   if (titleEl) titleEl.textContent = 'Rappel du rendez-vous';
+  document.getElementById('rappelSmsBuyerAvatar').textContent = initiales;
+  document.getElementById('rappelSmsBuyerName').textContent = v.buyer_name || '—';
+  const phoneEl = document.getElementById('rappelSmsBuyerPhone');
+  if (v.buyer_phone) { phoneEl.className='confirm-sms-buyer-phone'; phoneEl.textContent=v.buyer_phone; }
+  else { phoneEl.className='confirm-sms-buyer-nophone'; phoneEl.textContent='Téléphone non renseigné'; }
+  document.getElementById('rappelSmsText').textContent = smsText;
+  const sendBtn = document.getElementById('rappelSmsSendBtn');
+  if (v.buyer_phone) { sendBtn.href=`sms:${v.buyer_phone}?&body=${encodeURIComponent(smsText)}`; sendBtn.style.display=''; }
+  else { sendBtn.style.display='none'; }
+  const qualifPanel = document.getElementById('qualifPanel');
+  const qualifToggle = document.getElementById('qualifToggle');
+  const qualifArrow = document.getElementById('qualifArrow');
+  if (qualifPanel) qualifPanel.classList.remove('open');
+  if (qualifToggle) qualifToggle.classList.remove('open');
+  if (qualifArrow) qualifArrow.style.transform='';
+  document.getElementById('rappelSmsOverlay')._visitId = id;
+  openModal('rappelSmsOverlay');
+}
+
+function sendDossierSerieux(id) {
+  const v = allVisits.find(v=>v.id===id);
+  if (!v) return;
+  const prenom = (v.buyer_name||'').split(' ')[0] || 'Madame/Monsieur';
+  const initiales = (v.buyer_name||'?').split(' ').map(n=>n[0]).join('').toUpperCase().slice(0,2);
+  const sellerNom = [_data?.seller?.first_name, _data?.seller?.last_name].filter(Boolean).join(' ');
+  const lien = _mcAcheteurUrl || '[lien dossier]';
+  const smsText = `Bonjour ${prenom},\n\nSuite à notre visite, je vous transmets le lien vers votre espace acheteur. Vous y trouverez toutes les informations sur le bien et pourrez, si vous le souhaitez, nous transmettre vos documents :\n\n${lien}\n\nÀ bientôt,\n${sellerNom||'[Votre prénom]'}`;
+  const titleEl = document.getElementById('rappelSmsTitle');
+  if (titleEl) titleEl.textContent = 'Dossier Acheteur Sérieux';
   document.getElementById('rappelSmsBuyerAvatar').textContent = initiales;
   document.getElementById('rappelSmsBuyerName').textContent = v.buyer_name || '—';
   const phoneEl = document.getElementById('rappelSmsBuyerPhone');
@@ -3104,6 +3134,6 @@ loadData().then(() => {
 </script>
 
 <link rel="stylesheet" href="/css/seller-header-typography.css?v=1">
-<script src="/js/agenda-premium.js?v=13"></script>
+<script src="/js/agenda-premium.js?v=14"></script>
 </body>
 </html>
