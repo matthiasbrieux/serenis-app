@@ -1302,7 +1302,8 @@ function initStepLinks() {
       const parsed = new URL(url);
       if (['https:', 'http:'].includes(parsed.protocol) && !parsed.username && !parsed.password && /^\/(dossier\/(acheteur|notaire)|soumettre-offre)\/[^/]+$/.test(parsed.pathname)) {
         // Preview the token against the database of the seller's current environment.
-        el.href = new URL(parsed.pathname + parsed.search + parsed.hash, window.location.origin).href;
+        const sep = parsed.search ? '&' : '?';
+        el.href = new URL(parsed.pathname + parsed.search + sep + 'preview=1' + parsed.hash, window.location.origin).href;
         el.removeAttribute('aria-disabled');
       }
     } catch (_) {}
