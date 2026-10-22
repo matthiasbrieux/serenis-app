@@ -93,7 +93,6 @@
   const availabilityPanel=make('section','ap-availability-panel');
   const availabilityHeading=make('h2','ap-lower-heading','Mes disponibilités');
   availabilityPanel.append(availabilityHeading,registered);
-  listCol.append(availabilityPanel);
   const actionsPanel=make('section','ap-actions-todo-panel ap-actions-collapsed');
   const actionsHeading=make('h2','ap-lower-heading','Mes actions à effectuer');
   actionsHeading.setAttribute('role','button');actionsHeading.tabIndex=0;
@@ -107,7 +106,7 @@
   const visitsFilters=make('div','ap-visits-filters');
   const visitsFilterButtons={};
   for(const [key,label] of [['upcoming','À venir'],['pending','À confirmer'],['past','Passées'],['all','Toutes']]){const b=button(label,()=>setVisitsFilter(key),'ap-visits-filter');b.dataset.filter=key;visitsFilters.append(b);visitsFilterButtons[key]=b;}
-  visitsPanel.append(visitsFilters);listCol.append(visitsPanel);visitsPanel.append(visits);
+  visitsPanel.append(visitsFilters);listCol.append(visitsPanel);visitsPanel.append(visits);listCol.append(availabilityPanel);
   const compromisPanel=main.querySelector('#compromis-vente'),compromisHeader=compromisPanel?.querySelector('.compromis-bar-hdr'),compromisBody=compromisPanel?.querySelector('.compromis-bar-body');
   if(compromisPanel&&compromisHeader&&compromisBody){
     const toggle=button('Renseigner mon compromis',()=>{compromisBody.hidden=!compromisBody.hidden;toggle.setAttribute('aria-expanded',String(!compromisBody.hidden));},'ap-compromis-toggle');
