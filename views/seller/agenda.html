@@ -1698,12 +1698,10 @@ function buildVisitCardHtml(v) {
         ${v.buyer_financing?`<div style="font-size:0.8rem;color:var(--noir);margin-bottom:3px;display:flex;align-items:center;gap:5px;"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg> Financement : <strong>${escapeHtml(v.buyer_financing)}</strong></div>`:''}
         ${v.buyer_timeline?`<div style="font-size:0.8rem;color:var(--noir);display:flex;align-items:center;gap:5px;"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Délai : <strong>${escapeHtml(v.buyer_timeline)}</strong></div>`:''}
       </div>`:''}
-      ${v.status!=='cancelled'?`<div style="display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;">
-        <button class="btn-sms-reminder${v.sms_copied_at?' sent':''}" id="btn-reminder-${v.id}" onclick="sendReminder(${v.id})">${svgPhone} ${v.sms_copied_at?'Rappel copié':'Rappel SMS'}</button>
-        <div style="display:flex;gap:6px;">
-          <a href="/api/visits/${v.id}/calendar.ics" download title="Ajouter à mon calendrier" style="display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:8px;background:rgba(158,58,24,0.04);color:var(--terracotta);border:1px solid rgba(158,58,24,0.12);text-decoration:none;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></a>
-          <button class="btn-cancel-sm" onclick="openCancelSmsModal(${v.id})">Annuler</button>
-        </div>
+      ${v.status!=='cancelled'?`<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+        <button class="btn-sms-reminder${v.sms_copied_at?' sent':''}" id="btn-reminder-${v.id}" onclick="sendReminder(${v.id})">${svgPhone} ${v.sms_copied_at?'Rappel copié':'Confirmation de visite'}</button>
+        <button class="btn-sms-reminder" onclick="sendRappelRdv(${v.id})">${svgPhone} Rappel du rdv</button>
+        <button class="btn-cancel-sm" onclick="openCancelSmsModal(${v.id})">Annuler</button>
       </div>
       <div id="sms-badge-${v.id}">${smsCopiedBadge(v.sms_copied_at)}</div>`:''}
       <div class="visit-notes-wrap">
@@ -1749,8 +1747,8 @@ function buildVisitConfirmedCard(v) {
     </div>
     ${profileHtml}
     <div class="vcc2-actions">
-      <button class="vcc2-btn-sms${v.sms_copied_at?' sent':''}" id="btn-reminder-${v.id}" onclick="sendReminder(${v.id})">${svgPhone} ${v.sms_copied_at?'Rappel copié':'Rappel SMS'}</button>
-      <a class="vcc2-btn-ics" href="/api/visits/${v.id}/calendar.ics" download title="Ajouter à mon calendrier">${svgCalIcs}</a>
+      <button class="vcc2-btn-sms${v.sms_copied_at?' sent':''}" id="btn-reminder-${v.id}" onclick="sendReminder(${v.id})">${svgPhone} ${v.sms_copied_at?'Rappel copié':'Confirmation de visite'}</button>
+      <button class="vcc2-btn-sms" onclick="sendRappelRdv(${v.id})">${svgPhone} Rappel du rdv</button>
       <button class="vcc2-btn-cancel" onclick="openCancelSmsModal(${v.id})">Annuler</button>
     </div>
     ${v.sms_copied_at?`<div class="vcc2-sms-badge" id="sms-badge-${v.id}">${smsCopiedBadge(v.sms_copied_at)}</div>`:`<div id="sms-badge-${v.id}" class="vcc2-sms-badge"></div>`}
@@ -2062,7 +2060,7 @@ function sendReminder(id) {
       ? `Bonjour ${prenom},\n\nJe vous confirme notre rendez-vous pour la visite du bien situé à ${adresse}, demain ${dateLabel} à ${time}.\n\nÀ votre arrivée, n'hésitez pas à m'envoyer un SMS ou à m'appeler directement.\n\nSi vous avez la moindre question d'ici là ou si un imprévu survient, n'hésitez pas à me contacter.\n\nAu plaisir de vous rencontrer,\n${sellerNom || 'Votre vendeur'}${sellerPhone ? '\n' + sellerPhone : ''}`
       : `Bonjour ${prenom},\n\nJe vous confirme notre rendez-vous pour la visite du bien situé à ${adresse}, le ${dateLabel} à ${time}.\n\nÀ votre arrivée, n'hésitez pas à m'envoyer un SMS ou à m'appeler directement.\n\nSi vous avez la moindre question d'ici là ou si un imprévu survient, n'hésitez pas à me contacter.\n\nAu plaisir de vous rencontrer,\n${sellerNom || 'Votre vendeur'}${sellerPhone ? '\n' + sellerPhone : ''}`;
   const titleEl = document.getElementById('rappelSmsTitle');
-  if (titleEl) titleEl.textContent = isPast ? 'Relance après visite' : 'Rappel de visite';
+  if (titleEl) titleEl.textContent = isPast ? 'Relance après visite' : 'Confirmation de visite';
 
   document.getElementById('rappelSmsBuyerAvatar').textContent = initiales;
   document.getElementById('rappelSmsBuyerName').textContent = v.buyer_name || '—';
@@ -2104,6 +2102,45 @@ function sendReminder(id) {
   const qualifCopyBtn = document.getElementById('qualifCopyBtn');
   if (qualifCopyBtn) { qualifCopyBtn.textContent = 'Copier ce message'; qualifCopyBtn.classList.remove('copied'); }
 
+  document.getElementById('rappelSmsOverlay')._visitId = id;
+  openModal('rappelSmsOverlay');
+}
+
+function sendRappelRdv(id) {
+  const v = allVisits.find(v=>v.id===id);
+  if (!v) return;
+  const prenom = (v.buyer_name||'').split(' ')[0] || 'Madame/Monsieur';
+  const initiales = (v.buyer_name||'?').split(' ').map(n=>n[0]).join('').toUpperCase().slice(0,2);
+  const [yr,mo,dy] = (v.visit_date||'').split('-');
+  const d = yr ? new Date(Number(yr),Number(mo)-1,Number(dy)) : null;
+  const JOURS=['dimanche','lundi','mardi','mercredi','jeudi','vendredi','samedi'];
+  const MOIS=['janvier','février','mars','avril','mai','juin','juillet','août','septembre','octobre','novembre','décembre'];
+  const dateLabel = d ? `${JOURS[d.getDay()]} ${Number(dy)} ${MOIS[d.getMonth()]}` : v.visit_date;
+  const [h,m] = (v.visit_time||'').split(':');
+  const time = m&&m!=='00' ? `${h}h${m}` : `${h}h`;
+  const adresse = _propertyAddress || '[adresse]';
+  const sellerNom = [_data?.seller?.first_name, _data?.seller?.last_name].filter(Boolean).join(' ');
+  const _n2=new Date(); const _tomorrow=new Date(_n2); _tomorrow.setDate(_tomorrow.getDate()+1);
+  const _tomorrowStr=`${_tomorrow.getFullYear()}-${String(_tomorrow.getMonth()+1).padStart(2,'0')}-${String(_tomorrow.getDate()).padStart(2,'0')}`;
+  const isReallyTomorrow = v.visit_date === _tomorrowStr;
+  const smsText = `Bonjour ${prenom},\n\nPetit message pour vous rappeler notre visite prévue ${isReallyTomorrow?'demain':`le ${dateLabel}`} à ${time}.\nL'adresse est : ${adresse}.\nN'hésitez pas à me prévenir si vous avez un empêchement.\n\nÀ bientôt,\n${sellerNom||'[Votre prénom]'}`;
+  const titleEl = document.getElementById('rappelSmsTitle');
+  if (titleEl) titleEl.textContent = 'Rappel du rendez-vous';
+  document.getElementById('rappelSmsBuyerAvatar').textContent = initiales;
+  document.getElementById('rappelSmsBuyerName').textContent = v.buyer_name || '—';
+  const phoneEl = document.getElementById('rappelSmsBuyerPhone');
+  if (v.buyer_phone) { phoneEl.className='confirm-sms-buyer-phone'; phoneEl.textContent=v.buyer_phone; }
+  else { phoneEl.className='confirm-sms-buyer-nophone'; phoneEl.textContent='Téléphone non renseigné'; }
+  document.getElementById('rappelSmsText').textContent = smsText;
+  const sendBtn = document.getElementById('rappelSmsSendBtn');
+  if (v.buyer_phone) { sendBtn.href=`sms:${v.buyer_phone}?&body=${encodeURIComponent(smsText)}`; sendBtn.style.display=''; }
+  else { sendBtn.style.display='none'; }
+  const qualifPanel = document.getElementById('qualifPanel');
+  const qualifToggle = document.getElementById('qualifToggle');
+  const qualifArrow = document.getElementById('qualifArrow');
+  if (qualifPanel) qualifPanel.classList.remove('open');
+  if (qualifToggle) qualifToggle.classList.remove('open');
+  if (qualifArrow) qualifArrow.style.transform='';
   document.getElementById('rappelSmsOverlay')._visitId = id;
   openModal('rappelSmsOverlay');
 }
