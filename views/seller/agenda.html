@@ -2975,6 +2975,42 @@ loadData().then(() => {
     if (target) setTimeout(() => target.scrollIntoView({ behavior: 'smooth', block: 'start' }), 200);
   }
 });
+
+// Rafraîchissement automatique — mode "écran d'accueil" iOS
+(function() {
+  let lastRefresh = 0;
+  async function refreshVisits() {
+    const now = Date.now();
+    if (now - lastRefresh < 5000) return;
+    lastRefresh = now;
+    try {
+      const r = await fetch('/api/connect/overview', { cache: 'no-store' });
+      if (!r.ok) return;
+      const data = await r.json();
+      const newVisits = data.visits || [];
+      const oldSig = allVisits.map(v => `${v.id}:${v.status}`).sort().join(',');
+      const newSig = newVisits.map(v => `${v.id}:${v.status}`).sort().join(',');
+      if (oldSig !== newSig) {
+        const added = newVisits.filter(v => !allVisits.some(o => o.id === v.id));
+        allVisits = newVisits;
+        renderVisits();
+        updateStats();
+        renderCalendar();
+        if (added.length) {
+          const hasPending = added.some(v => v.status === 'pending');
+          showToast(added.length === 1
+            ? `Nouvelle demande de visite${added[0].buyer_name ? ' — ' + added[0].buyer_name : ''}`
+            : `${added.length} nouvelles demandes de visite`);
+          if (hasPending && typeof selectAgendaTab === 'function') selectAgendaTab('pending');
+        }
+      }
+    } catch (_) {}
+  }
+  // Reprendre au premier plan (iOS standalone)
+  document.addEventListener('visibilitychange', () => { if (!document.hidden) refreshVisits(); });
+  // Polling toutes les 60 secondes
+  setInterval(() => { if (!document.hidden) refreshVisits(); }, 60000);
+})();
 </script>
 <script src="/js/transitions.js"></script>
 <script src="/js/seller-nav.js?v=2"></script>
