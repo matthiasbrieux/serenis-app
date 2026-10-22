@@ -1861,7 +1861,7 @@ function buildPastCard(v) {
       </div>
       ${statusBadge}
     </div>
-    ${!isCancelled?`<div style="margin-top:10px;"><button class="ap-dashboard-action" onclick="sendDossierSerieux(${v.id})" style="font-size:0.78rem;">Dossier Acheteur Sérieux</button></div>`:''}
+    ${!isCancelled?(()=>{const hasFollowup=(window.agendaActionsData||[]).some(a=>a.visit_id===v.id&&a.kind==='visit_followup');return`<div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap;"><button class="ap-dashboard-action" onclick="sendDossierSerieux(${v.id})" style="font-size:0.78rem;">Dossier Acheteur Sérieux</button>${hasFollowup?`<button class="ap-dashboard-action" onclick="skipFollowup(${v.id})" style="font-size:0.78rem;background:#f8f4f0;color:#888;border-color:#e0d8cc;">Ne donnera pas suite</button>`:''}</div>`})():''}
   </div>`;
 }
 
@@ -2154,7 +2154,7 @@ function sendDossierSerieux(id) {
   const initiales = (v.buyer_name||'?').split(' ').map(n=>n[0]).join('').toUpperCase().slice(0,2);
   const sellerNom = [_data?.seller?.first_name, _data?.seller?.last_name].filter(Boolean).join(' ');
   const lien = _mcAcheteurUrl || '[lien dossier]';
-  const smsText = `Bonjour ${prenom},\n\nSuite à notre visite, je vous transmets le lien vers votre espace acheteur. Vous y trouverez toutes les informations sur le bien et pourrez, si vous le souhaitez, nous transmettre vos documents :\n\n${lien}\n\nÀ bientôt,\n${sellerNom||'[Votre prénom]'}`;
+  const smsText = `Bonjour ${prenom},\n\nSuite à votre visite et afin de vous accompagner dans votre réflexion, je vous transmets mes documents complémentaires (entretien chaudière, ramonage, travaux réalisés...) :\n\n${lien}#documents\n\nN'hésitez pas à me contacter si vous avez des questions 🙂\n\nCordialement,\n${sellerNom||'[Votre prénom]'}`;
   const titleEl = document.getElementById('rappelSmsTitle');
   if (titleEl) titleEl.textContent = 'Dossier Acheteur Sérieux';
   document.getElementById('rappelSmsBuyerAvatar').textContent = initiales;
@@ -2174,6 +2174,13 @@ function sendDossierSerieux(id) {
   if (qualifArrow) qualifArrow.style.transform='';
   document.getElementById('rappelSmsOverlay')._visitId = id;
   openModal('rappelSmsOverlay');
+}
+
+async function skipFollowup(id) {
+  if (typeof window.dismissFollowup === 'function') {
+    await window.dismissFollowup(id);
+    showToast('Suivi clôturé');
+  }
 }
 
 function copyRappelSms(btn) {
@@ -3135,6 +3142,6 @@ loadData().then(() => {
 </script>
 
 <link rel="stylesheet" href="/css/seller-header-typography.css?v=1">
-<script src="/js/agenda-premium.js?v=14"></script>
+<script src="/js/agenda-premium.js?v=15"></script>
 </body>
 </html>

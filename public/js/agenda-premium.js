@@ -255,12 +255,26 @@
       },'ap-appointment-action');row.append(action);appointmentList.append(row);
     }
   }
+  async function refreshAgendaActions(){
+    try{
+      const res=await fetch('/api/agenda/actions');if(!res.ok)return;
+      const data=await res.json();agendaActions=data.actions||[];
+      renderCalendar();renderDashboardPanels();
+      if(window.renderVisits)window.renderVisits();
+    }catch(e){}
+  }
   async function updateAgendaAction(action,status,dueDate){
     const response=await fetch(`/api/agenda/actions/${action.id}`,{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({status,due_date:dueDate})});
     if(!response.ok){showToast('Impossible de mettre à jour ce rappel','error');return;}
     await refreshAgendaActions();
-    if(status==='done'){selectedEvent=null;renderDashboardPanels();}
+    if(status==='done'){selectedEvent=null;}
   }
+  Object.defineProperty(window,'agendaActionsData',{get:()=>agendaActions});
+  window.dismissFollowup=async function(visitId){
+    const action=agendaActions.find(a=>a.visit_id==visitId&&a.kind==='visit_followup');
+    if(!action){showToast('Aucun suivi en attente pour cette visite');return;}
+    await updateAgendaAction(action,'done');
+  };
   function renderMini(){
     mini.replaceChildren();const nav=make('div','ap-mini-nav');nav.append(button('‹',()=>navigateMonth(-1)),make('strong','',cursor.toLocaleDateString('fr-FR',{month:'long',year:'numeric'})),button('›',()=>navigateMonth(1)));nav.firstChild.setAttribute('aria-label','Mois précédent du calendrier miniature');nav.lastChild.setAttribute('aria-label','Mois suivant du calendrier miniature');mini.append(nav);
     const grid=make('div','ap-mini-grid');for(const l of ['L','M','M','J','V','S','D'])grid.append(make('span','',l));
