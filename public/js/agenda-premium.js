@@ -93,13 +93,6 @@
   const availabilityPanel=make('section','ap-availability-panel');
   const availabilityHeading=make('h2','ap-lower-heading','Mes disponibilités');
   availabilityPanel.append(availabilityHeading,registered);
-  const actionsPanel=make('section','ap-actions-todo-panel ap-actions-collapsed');
-  const actionsHeading=make('h2','ap-lower-heading','Mes actions à effectuer');
-  actionsHeading.setAttribute('role','button');actionsHeading.tabIndex=0;
-  const toggleActions=()=>actionsPanel.classList.toggle('ap-actions-collapsed');
-  actionsHeading.addEventListener('click',toggleActions);
-  actionsHeading.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();toggleActions();}});
-  const todoList=make('div','ap-todo-list');actionsPanel.append(actionsHeading,todoList);
   const visitsPanel=make('section','ap-visits-panel');
   visitsPanel.hidden=false;
   const visitsHeading=make('h2','ap-lower-heading','Mes visites');visitsPanel.append(visitsHeading);
@@ -133,32 +126,11 @@
     if(contacts)contacts.style.display=key==='all'?'block':'none';
     const empty=document.getElementById('visitsEmpty');if(empty)empty.style.display='none';
   }
-  function renderTodo(){
-    todoList.replaceChildren();const open=agendaActions.filter(a=>a.status==='open');
-    if(!open.length){todoList.append(make('p','ap-todo-empty','Aucune action à effectuer pour le moment.'));return;}
-    open.slice(0,8).forEach(action=>{
-      const row=make('article','ap-todo-row'),icon=make('span','ap-todo-icon');icon.innerHTML=action.kind==='pending_visit'?eventIcons.pending:bellSvg;row.append(icon);
-      const copy=make('div','ap-todo-copy'),title=action.kind==='pending_visit'?'Confirmer la demande de '+(action.buyer_name||'l’acheteur'):action.kind==='visit_reminder'?'Préparer la visite avec '+(action.buyer_name||'l’acheteur'):'Rappeler '+(action.buyer_name||'l’acheteur');
-      copy.append(make('strong','',title),make('span','',`${appointmentDate(action.due_date)}${action.visit_time?' · '+timeLabel(action.visit_time):''}`));row.append(copy);
-      const rowActions=make('div','ap-todo-actions');
-      rowActions.append(button(action.kind==='pending_visit'?'Traiter':'Voir la visite',()=>{
-        if(action.kind==='pending_visit'){selectAgendaTab('pending');document.getElementById(`vcard-${action.visit_id}`)?.scrollIntoView({behavior:'smooth',block:'center'});return;}
-        selectedEvent={kind:action.kind==='visit_reminder'?'reminder':'followup',label:title,data:action,date:action.due_date,actionId:action.id};detailPanel.hidden=false;renderDashboardPanels();
-      },'ap-todo-view'));
-      if(action.kind==='visit_followup'){
-        rowActions.append(button('Effectué',()=>updateAgendaAction(action,'done'),'ap-todo-done'));
-        const tomorrow=parseDate(action.due_date);tomorrow.setDate(tomorrow.getDate()+1);
-        rowActions.append(button('Reporter à demain',()=>updateAgendaAction(action,'open',dateKey(tomorrow)),'ap-todo-done'));
-      }
-      row.append(rowActions);
-      todoList.append(row);
-    });
-  }
   const oldSetFilter=window.setStatFilter;
   window.setStatFilter=function(value){oldSetFilter(value);pendingPanel.hidden=Boolean(value)||!allVisits.some(v=>v.status==='pending'&&!isPastVisit(v));};
   main.querySelectorAll('.stat-card-agenda[data-filter]').forEach(el=>{el.tabIndex=0;el.setAttribute('role','button');el.addEventListener('keydown',event=>{if(event.key==='Enter'||event.key===' '){event.preventDefault();setStatFilter(el.dataset.filter);}});});
   const oldRenderVisits=window.renderVisits;
-  window.renderVisits=function(){oldRenderVisits();renderHistory(); const pending=allVisits.filter(v=>v.status==='pending'&&!isPastVisit(v));pendingPanel.hidden=Boolean(activeStatFilter)||!pending.length;pendingEmpty.hidden=pending.length>0;pendingList.innerHTML=pending.map(buildVisitCompact).join('');pendingTabCount.textContent=String(pending.length);renderDashboardPanels();renderAppointments();renderTodo();renderNotificationsPanel();};
+  window.renderVisits=function(){oldRenderVisits();renderHistory(); const pending=allVisits.filter(v=>v.status==='pending'&&!isPastVisit(v));pendingPanel.hidden=Boolean(activeStatFilter)||!pending.length;pendingEmpty.hidden=pending.length>0;pendingList.innerHTML=pending.map(buildVisitCompact).join('');pendingTabCount.textContent=String(pending.length);renderDashboardPanels();renderAppointments();renderNotificationsPanel();};
   const calendar=main.querySelector('.calendar-card'), header=calendar.querySelector('.cal-header');
   const switcher=make('div','ap-view-switch');switcher.setAttribute('role','group');switcher.setAttribute('aria-label','Vue du calendrier');
   const views={month:'Mois',week:'Semaine',day:'Jour'};
@@ -179,7 +151,6 @@
     if(content){const more=button('Voir toutes les notifications',()=>{showAllNotifications=!showAllNotifications;renderNotificationsPanel();},'ap-notifications-more');content.after(more);}
     rightRail.append(notificationPanel);notificationPanel.classList.add('ap-notifications-panel','ap-notifications-collapsed');
   }
-  rightRail.append(actionsPanel);
   let showAllNotifications=false;
   const extra=make('div','ap-timeline');calendar.querySelector('#calGrid').after(extra);
   const monthHeader=calendar.querySelector('.cal-grid:not(#calGrid)');
@@ -343,7 +314,7 @@
   async function refreshAgendaActions(){
     try{const response=await fetch('/api/agenda/actions');if(!response.ok)return;agendaActions=(await response.json()).actions||[];
       pendingTabCount.textContent=String(allVisits.filter(v=>v.status==='pending'&&!isPastVisit(v)).length);
-      renderNotificationsPanel();renderAppointments();renderTodo();renderCalendar();
+      renderNotificationsPanel();renderAppointments();renderCalendar();
     }catch(_error){}
   }
   window.renderNotifSidebar=renderNotificationsPanel;
