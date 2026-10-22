@@ -2958,8 +2958,17 @@ loadData().then(() => {
     const [yr, mo, dy] = _urlDate.split('-').map(Number);
     calDate = new Date(yr, mo - 1, 1);
     calSelected = _urlDate;
+    renderCalendar();
+  } else {
+    // Aller sur la première visite confirmée à venir, sinon première dispo
+    const _todayKey = new Intl.DateTimeFormat('en-CA', {timeZone:'Europe/Paris',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date());
+    const _firstVisit = allVisits.filter(v => v.status === 'confirmed' && v.visit_date >= _todayKey).sort((a,b) => a.visit_date.localeCompare(b.visit_date))[0];
+    const _firstSlot  = availSlots.filter(s => s.date >= _todayKey).sort((a,b) => a.date.localeCompare(b.date))[0];
+    const _target = _firstVisit?.visit_date || _firstSlot?.date;
+    if (_target && typeof window.apShowDate === 'function') { window.apShowDate(_target); }
+    else { renderCalendar(); }
   }
-  renderCalendar();
+
   renderAvailMonth();
   /* Ouvrir le formulaire d'ajout si aucun créneau n'existe encore */
   if (availSlots.length === 0) toggleDispoForm(true);

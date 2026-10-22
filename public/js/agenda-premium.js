@@ -214,6 +214,7 @@
     return el;
   }
   function showDate(key,preserveSelection=false){if(!preserveSelection)selectedEvent=null;cursor=parseDate(key);calDate=new Date(cursor.getFullYear(),cursor.getMonth(),1);calSelected=key;view='day';renderCalendar();}
+  window.apShowDate=showDate;
   function renderDashboardPanels(){
     const today=todayKey();
     const due=agendaActions.filter(a=>a.due_date===today&&['visit_reminder','visit_followup'].includes(a.kind));
