@@ -112,7 +112,7 @@
   right.remove();
   const pendingPanel=make('div','agenda-panel ap-pending');
   pendingPanel.append(make('h2','ap-panel-title','Demandes en attente')); const pendingList=make('div','ap-pending-list');pendingPanel.append(pendingList);visits.prepend(pendingPanel);
-  const pendingEmpty=make('p','ap-pending-empty','Aucune demande à confirmer pour le moment.');visits.prepend(pendingEmpty);
+  const pendingEmpty={hidden:true};
   function setVisitsFilter(key){
     visitsPanel.hidden=false;
     Object.entries(visitsFilterButtons).forEach(([name,el])=>el.setAttribute('aria-pressed',String(name===key)));
