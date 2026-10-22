@@ -164,10 +164,17 @@
   const mini=make('aside','ap-mini'),rightRail=make('aside','ap-right-rail');layout.append(rightRail);rightRail.append(mini);
   const notificationPanel=main.querySelector('#notifSidebarContent')?.closest('.agenda-panel');
   if(notificationPanel){
-    const heading=notificationPanel.querySelector('.agenda-panel-title');if(heading)heading.textContent='Mes notifications';
+    const heading=notificationPanel.querySelector('.agenda-panel-title');
+    if(heading){
+      heading.textContent='Mes notifications';
+      heading.setAttribute('role','button');heading.tabIndex=0;
+      const toggle=()=>notificationPanel.classList.toggle('ap-notifications-collapsed');
+      heading.addEventListener('click',toggle);
+      heading.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();toggle();}});
+    }
     const content=notificationPanel.querySelector('#notifSidebarContent');
     if(content){const more=button('Voir toutes les notifications',()=>{showAllNotifications=!showAllNotifications;renderNotificationsPanel();},'ap-notifications-more');content.after(more);}
-    rightRail.append(notificationPanel);notificationPanel.classList.add('ap-notifications-panel');
+    rightRail.append(notificationPanel);notificationPanel.classList.add('ap-notifications-panel','ap-notifications-collapsed');
   }
   let showAllNotifications=false;
   const extra=make('div','ap-timeline');calendar.querySelector('#calGrid').after(extra);
