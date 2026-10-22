@@ -105,7 +105,7 @@
   const visitsHeading=make('h2','ap-lower-heading','Mes visites');visitsPanel.append(visitsHeading);
   const visitsFilters=make('div','ap-visits-filters');
   const visitsFilterButtons={};
-  for(const [key,label] of [['upcoming','À venir'],['pending','À confirmer'],['past','Passées'],['all','Toutes']]){const b=button(label,()=>setVisitsFilter(key),'ap-visits-filter');b.dataset.filter=key;visitsFilters.append(b);visitsFilterButtons[key]=b;}
+  for(const [key,label] of [['upcoming','À venir'],['past','Passées'],['all','Toutes']]){const b=button(label,()=>setVisitsFilter(key),'ap-visits-filter');b.dataset.filter=key;visitsFilters.append(b);visitsFilterButtons[key]=b;}
   visitsPanel.append(visitsFilters);listCol.append(visitsPanel);visitsPanel.append(visits);listCol.append(availabilityPanel);
   const compromisPanel=main.querySelector('#compromis-vente'),compromisHeader=compromisPanel?.querySelector('.compromis-bar-hdr'),compromisBody=compromisPanel?.querySelector('.compromis-bar-body');
   if(compromisPanel&&compromisHeader&&compromisBody){
