@@ -1407,7 +1407,7 @@ if("scrollRestoration"in history)history.scrollRestoration="manual";</script>
     </div>
     <button class="qualif-toggle" id="qualifToggle" onclick="toggleQualifPanel()">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-      Qualifier l'acheteur avant la visite
+      <span id="qualifToggleLabel">Qualifier l'acheteur avant la visite</span>
       <span class="qualif-arrow" id="qualifArrow">+</span>
     </button>
     <div class="qualif-panel" id="qualifPanel">
@@ -2095,6 +2095,8 @@ function sendReminder(id) {
       qualifSendBtn.style.display = 'none';
     }
   }
+  const qualifLabelEl = document.getElementById('qualifToggleLabel');
+  if (qualifLabelEl) qualifLabelEl.textContent = "Qualifier l'acheteur avant la visite";
   const qualifPanel = document.getElementById('qualifPanel');
   const qualifToggle = document.getElementById('qualifToggle');
   const qualifArrow = document.getElementById('qualifArrow');
@@ -2166,6 +2168,18 @@ function sendDossierSerieux(id) {
   const sendBtn = document.getElementById('rappelSmsSendBtn');
   if (v.buyer_phone) { sendBtn.href=`sms:${v.buyer_phone}?&body=${encodeURIComponent(smsText)}`; sendBtn.style.display=''; }
   else { sendBtn.style.display='none'; }
+  const sellerPrenom = _data?.seller?.first_name || 'Votre prénom';
+  const qualifText = `Bonjour ${prenom},\n\npourriez-vous me dire où vous en êtes dans votre projet d'achat ? Et, si vous le souhaitez, me préciser si vous avez déjà avancé sur la partie financement avec votre banque ou un courtier.\n\nCordialement,\n${sellerPrenom}`;
+  document.getElementById('qualifSmsText').textContent = qualifText;
+  const qualifSendBtn = document.getElementById('qualifSmsSendBtn');
+  if (qualifSendBtn) {
+    if (v.buyer_phone) { qualifSendBtn.href=`sms:${v.buyer_phone}?&body=${encodeURIComponent(qualifText)}`; qualifSendBtn.style.display=''; }
+    else { qualifSendBtn.style.display='none'; }
+  }
+  const qualifLabelEl = document.getElementById('qualifToggleLabel');
+  if (qualifLabelEl) qualifLabelEl.textContent = "Qualifier l'acheteur après la visite";
+  const qualifCopyBtn = document.getElementById('qualifCopyBtn');
+  if (qualifCopyBtn) { qualifCopyBtn.textContent='Copier ce message'; qualifCopyBtn.classList.remove('copied'); }
   const qualifPanel = document.getElementById('qualifPanel');
   const qualifToggle = document.getElementById('qualifToggle');
   const qualifArrow = document.getElementById('qualifArrow');
