@@ -242,7 +242,7 @@
     const status=kind==='reminder'?'Visite confirmée':kind==='followup'?'Visite effectuée':(statusText[data.visit_status||data.status]||data.visit_status||data.status);
     info.append(make('span','',status),make('strong','',data.buyer_name||'Acquéreur'),make('span','',`Visite ${fullDate(data.visit_date)} à ${timeLabel(data.visit_time)}`));detailBody.append(info);
     const visitId=data.visit_id||data.id;
-    const visitButton=button('Consulter la fiche de visite',()=>{document.getElementById(`vcard-${visitId}`)?.scrollIntoView({behavior:'smooth',block:'center'});},'ap-dashboard-action');detailBody.append(visitButton);
+    const visitButton=button('Consulter la fiche de visite',()=>{if(kind==='pending')selectAgendaTab('pending');else selectAgendaTab('visits');setTimeout(()=>{document.getElementById(`vcard-${visitId}`)?.scrollIntoView({behavior:'smooth',block:'center'});},80);},'ap-dashboard-action');detailBody.append(visitButton);
     if(kind==='reminder'){const advice=document.createElement('a');advice.className='ap-dashboard-action';advice.href='/ma-formation#formation/lecon/4/1';advice.textContent='Conseils pour préparer la visite';detailBody.append(advice);const action=agendaActions.find(a=>a.id===selectedEvent.actionId);if(action)detailBody.append(button('Marquer la préparation comme effectuée',()=>updateAgendaAction(action,'done'),'ap-dashboard-action'));}
     if(kind==='followup'){
       const action=agendaActions.find(a=>a.id===selectedEvent.actionId);
