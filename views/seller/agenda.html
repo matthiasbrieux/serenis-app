@@ -199,6 +199,8 @@ if("scrollRestoration"in history)history.scrollRestoration="manual";</script>
     .vbadge::before { content:''; width:6px; height:6px; border-radius:50%; display:inline-block; }
     .vbadge-confirmed { background:#e8f5e9; color:#2e7d32; }
     .vbadge-confirmed::before { background:#2e7d32; }
+    .vbadge-scheduled { background:#eef2ff; color:#3d5db0; }
+    .vbadge-scheduled::before { background:#3d5db0; }
     .vbadge-pending { background:#fff8e1; color:#f57f17; }
     .vbadge-pending::before { background:#f57f17; }
     .vbadge-cancelled { background:#f5f5f5; color:#888; }
@@ -721,6 +723,7 @@ if("scrollRestoration"in history)history.scrollRestoration="manual";</script>
     /* ── Badges statut améliorés ─────────────────────────── */
     .vbadge { padding: 4px 12px; border-radius: 20px; font-size: 0.73rem; font-weight: 700; letter-spacing: 0.03em; }
     .vbadge-confirmed { background: #e8f5e9; color: #2e7d32; border: 1px solid #c8e6c9; }
+    .vbadge-scheduled { background: #eef2ff; color: #3d5db0; border: 1px solid #c5d3f0; }
     .vbadge-pending   { background: #fff3e0; color: #e65100; border: 1px solid #ffe0b2; }
     .vbadge-cancelled { background: #f5f5f5; color: #757575; border: 1px solid #e0e0e0; }
     .vbadge-done      { background: #e3f2fd; color: #1565c0; border: 1px solid #bbdefb; }
@@ -1633,9 +1636,13 @@ function renderVisitsFiltered() {
 
 // ── Visit rendering ───────────────────────────────────
 function initials(name) { return (name||'?').split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2); }
-function badgeHtml(status) {
+function badgeHtml(status, sms_copied_at) {
+  if (status === 'confirmed') {
+    return sms_copied_at
+      ? `<span class="vbadge vbadge-confirmed">✓ Confirmée</span>`
+      : `<span class="vbadge vbadge-scheduled">◉ Programmée</span>`;
+  }
   const map = {
-    confirmed: ['vbadge-confirmed', '✓ Confirmée'],
     pending:   ['vbadge-pending',   'En attente'],
     cancelled: ['vbadge-cancelled', 'Annulée'],
     done:      ['vbadge-done',      '✔ Faite'],
@@ -1687,7 +1694,7 @@ function buildVisitCardHtml(v) {
         <div class="vc-id-name">${escapeHtml(v.buyer_name||'Acquéreur')}</div>
         <div class="vc-id-row2">
           <span class="vc-id-time" style="background:${acc.timeBg};color:${acc.timeColor};border:1.5px solid ${acc.timeBorder};">⏰ ${heureStr}</span>
-          ${badgeHtml(v.status)}
+          ${badgeHtml(v.status, v.sms_copied_at)}
         </div>
         ${v.buyer_phone?`<div class="vc-id-phone">${phoneLinkHtml}</div>`:''}
       </div>
@@ -3156,6 +3163,6 @@ loadData().then(() => {
 </script>
 
 <link rel="stylesheet" href="/css/seller-header-typography.css?v=1">
-<script src="/js/agenda-premium.js?v=15"></script>
+<script src="/js/agenda-premium.js?v=16"></script>
 </body>
 </html>

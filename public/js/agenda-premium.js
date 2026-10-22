@@ -148,7 +148,7 @@
   function previousDate(value){const d=parseDate(value);d.setDate(d.getDate()-1);return dateKey(d);}
   function eventsFor(key) {
     const items=availSlots.filter(s=>s.date===key).map(s=>({kind:'availability',time:(s.start||'').slice(0,5),end:(s.end||'').slice(0,5),label:'Disponible',data:s}));
-    for(const v of allVisits.filter(v=>v.visit_date===key).filter(v=>!activeStatFilter || (v.status!=='cancelled' && (activeStatFilter==='avenir'?!isPastVisit(v):activeStatFilter==='passees'?isPastVisit(v):v.visit_date===todayKey()))))items.push({kind:v.status,time:(v.visit_time||'').slice(0,5),label:statusText[v.status]||v.status,data:v});
+    for(const v of allVisits.filter(v=>v.visit_date===key).filter(v=>!activeStatFilter || (v.status!=='cancelled' && (activeStatFilter==='avenir'?!isPastVisit(v):activeStatFilter==='passees'?isPastVisit(v):v.visit_date===todayKey()))))items.push({kind:v.status,time:(v.visit_time||'').slice(0,5),label:v.status==='confirmed'?(v.sms_copied_at?'Visite confirmée':'Visite programmée'):statusText[v.status]||v.status,data:v});
     const m=getMilestoneDates();for(const [id,label] of [['sru','Rétractation'],['conditions','Cond. suspensive'],['acte','Acte authentique']])if(m[id]===key)items.push({kind:'milestone',time:'',label});
     for(const action of agendaActions.filter(a=>a.kind==='visit_reminder'&&a.due_date===key))items.push({kind:'reminder',time:REMINDER_TIME,label:`Rappel — visite demain à ${timeLabel(action.visit_time)}`,data:action,actionId:action.id});
     for(const action of agendaActions.filter(a=>a.kind==='visit_followup'&&a.due_date===key))items.push({kind:'followup',time:REMINDER_TIME,label:'Faire le suivi après la visite',data:action,actionId:action.id});
@@ -190,7 +190,7 @@
     todayItems.replaceChildren();
     if(!todays.length)todayItems.append(make('p','ap-dashboard-empty','Aucune visite prévue aujourd’hui.'));
     todays.forEach(visit=>{
-      const label=statusText[visit.status]||visit.status;
+      const label=visit.status==='confirmed'?(visit.sms_copied_at?'Visite confirmée':'Visite programmée'):statusText[visit.status]||visit.status;
       const row=button('',()=>chooseEvent({kind:visit.status,label,data:visit},today),'ap-dashboard-row ap-dashboard-visit ap-event-'+visit.status);
       row.append(make('strong','ap-dashboard-time',timeLabel(visit.visit_time)));
       const copy=make('span','ap-dashboard-row-copy');copy.append(make('strong','',label),make('small','',visit.buyer_name||'Acquéreur'));row.append(copy,make('span','ap-dashboard-open','›'));todayItems.append(row);
@@ -207,7 +207,7 @@
       if(slotRow){const manage=button('Gérer ce créneau',()=>{slotRow.scrollIntoView({behavior:'smooth',block:'center'});slotRow.querySelector('.dispo-slot-del')?.focus();},'ap-dashboard-action');detailBody.append(manage);}
       return;
     }
-    const status=kind==='reminder'?'Visite confirmée':kind==='followup'?'Visite effectuée':(statusText[data.visit_status||data.status]||data.visit_status||data.status);
+    const status=kind==='reminder'?'Visite confirmée':kind==='followup'?'Visite effectuée':kind==='confirmed'?(data?.sms_copied_at?'Visite confirmée':'Visite programmée'):(statusText[data?.visit_status||data?.status]||data?.visit_status||data?.status);
     info.append(make('span','',status),make('strong','',data.buyer_name||'Acquéreur'),make('span','',`Visite ${fullDate(data.visit_date)} à ${timeLabel(data.visit_time)}`));detailBody.append(info);
     const visitId=data.visit_id||data.id;
     const visitButton=button('Consulter la fiche de visite',()=>{if(kind==='pending')selectAgendaTab('pending');else selectAgendaTab('visits');setTimeout(()=>{document.getElementById(`vcard-${visitId}`)?.scrollIntoView({behavior:'smooth',block:'center'});},80);},'ap-dashboard-action');detailBody.append(visitButton);
@@ -246,7 +246,7 @@
       const icon=make('span','ap-appointment-icon');icon.innerHTML=visit.status==='pending'?eventIcons.pending:calendarSvg;row.append(icon);
       const info=make('div','ap-appointment-info');
       info.append(make('strong','',visit.status==='pending'?'Demande à confirmer':visit.status==='done'?'Visite passée':'Visite avec '+(visit.buyer_name||'Acquéreur')));
-      info.append(make('span','',`${timeLabel(visit.visit_time)}${visit.status==='done'?' · Effectuée':visit.status==='pending'?' · À confirmer':' · Visite confirmée'}`));
+      info.append(make('span','',`${timeLabel(visit.visit_time)}${visit.status==='done'?' · Effectuée':visit.status==='pending'?' · À confirmer':visit.sms_copied_at?' · Confirmée':' · Programmée'}`));
       row.append(info);
       const action=button(visit.status==='pending'?'Gérer la demande':'Voir les détails',()=>{
         selectedEvent={kind:visit.status==='pending'?'pending':visit.status==='done'?'done':'confirmed',label:statusText[visit.status]||'Visite',data:visit,date:visit.visit_date};
