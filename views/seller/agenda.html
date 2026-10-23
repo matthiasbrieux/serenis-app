@@ -2267,7 +2267,9 @@ async function skipFollowup(id) {
 
 function copyRappelSms(btn) {
   const text = document.getElementById('rappelSmsText').textContent;
-  const id = document.getElementById('rappelSmsOverlay')._visitId;
+  const overlay = document.getElementById('rappelSmsOverlay');
+  const id = overlay._visitId;
+  const mode = overlay._mode || 'confirm';
   function onCopied() {
     btn.textContent = '✓ SMS copié !';
     btn.classList.add('copied');
@@ -2277,18 +2279,35 @@ function copyRappelSms(btn) {
     }, 2500);
     if (id) {
       const v = allVisits.find(v=>v.id===id);
-      if (v) v.sms_copied_at = new Date().toISOString();
-      const reminderBtn = document.getElementById('btn-reminder-'+id);
-      if (reminderBtn) {
-        const baseClass = reminderBtn.classList.contains('vcc2-btn-sms') ? 'vcc2-btn-sms' : reminderBtn.classList.contains('vcc-sms') ? 'vcc-sms' : 'btn-sms-reminder';
-        reminderBtn.className = baseClass + ' sent';
-        reminderBtn.innerHTML = '✓ Rappel copié';
+      if (mode === 'rappel') {
+        if (v) v.reminder_sent = 1;
+        const rappelBtn = document.getElementById('btn-rappel-' + id);
+        if (rappelBtn) {
+          const baseClass = rappelBtn.classList.contains('vcc2-btn-sms') ? 'vcc2-btn-sms' : 'btn-sms-reminder';
+          rappelBtn.className = baseClass + ' sent';
+          rappelBtn.innerHTML = '✓ Rappel effectué';
+        }
+        const vcardRappel = document.getElementById('vcard-' + id);
+        if (vcardRappel) { vcardRappel.classList.remove('vcc2-rappel'); vcardRappel.classList.add('vcc2-confirmed'); }
+        const statusBadgeRappel = document.getElementById('status-badge-' + id);
+        if (statusBadgeRappel) { statusBadgeRappel.className = 'vcc2-banner vcc2-banner-confirmed'; statusBadgeRappel.textContent = '✓ Visite confirmée'; }
+        fetch(`/api/visits/${id}/rappel-rdv`, {method:'POST'}).catch(()=>{});
+      } else {
+        if (v) v.sms_copied_at = new Date().toISOString();
+        const reminderBtn = document.getElementById('btn-reminder-' + id);
+        if (reminderBtn) {
+          const baseClass = reminderBtn.classList.contains('vcc2-btn-sms') ? 'vcc2-btn-sms' : 'btn-sms-reminder';
+          reminderBtn.className = baseClass + ' sent';
+          reminderBtn.innerHTML = '✓ Confirmation effectuée';
+        }
+        const badge = document.getElementById('sms-badge-' + id);
+        if (badge) badge.innerHTML = smsCopiedBadge(v?.sms_copied_at);
+        const vcardEl = document.getElementById('vcard-' + id);
+        if (vcardEl) { vcardEl.classList.remove('vcc2-confirmed'); vcardEl.classList.add('vcc2-rappel'); }
+        const statusBadge = document.getElementById('status-badge-' + id);
+        if (statusBadge) { statusBadge.className = 'vcc2-banner vcc2-banner-rappel'; statusBadge.textContent = '● Rappel J-1 à envoyer'; }
+        fetch(`/api/visits/${id}/reminder`, {method:'POST'}).catch(()=>{});
       }
-      const card = document.getElementById('vcard-'+id);
-      if (card) card.classList.add('reminder-done');
-      const badge = document.getElementById('badge-'+id);
-      if (badge) badge.style.display = v?.reminder_sent ? '' : 'none';
-      fetch(`/api/visits/${id}/reminder`,{method:'POST'}).catch(()=>{});
     }
   }
   if (navigator.clipboard && window.isSecureContext) {
@@ -3261,6 +3280,6 @@ loadData().then(() => {
 </script>
 
 <link rel="stylesheet" href="/css/seller-header-typography.css?v=1">
-<script src="/js/agenda-premium.js?v=28"></script>
+<script src="/js/agenda-premium.js?v=29"></script>
 </body>
 </html>
