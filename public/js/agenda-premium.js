@@ -178,14 +178,15 @@
     return items.sort((a,b)=>a.time.localeCompare(b.time));
   }
   function chooseEvent(event,key,openVisitDay=false){
-    const visitKinds=['confirmed','pending','done'];
+    const visitKinds=['confirmed','pending','done','reminder'];
     if(visitKinds.includes(event.kind)){
-      const visitId=event.data?.id;
+      const visitId=event.kind==='reminder'?(event.data?.visit_id||event.data?.id):event.data?.id;
       Object.entries(tabButtons).forEach(([name,el])=>el.setAttribute('aria-current',String(name==='visits'?'page':'false')));
       visitsPanel.hidden=false;
       if(activeStatFilter)setStatFilter(null);
       if(event.kind==='pending')setVisitsFilter('pending');
       else if(event.kind==='done')setVisitsFilter('past');
+      else if(event.kind==='reminder')setVisitsFilter('rappel');
       else setVisitsFilter('upcoming');
       visitsPanel.scrollIntoView({behavior:'smooth',block:'start'});
       setTimeout(()=>{
