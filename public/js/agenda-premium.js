@@ -153,30 +153,25 @@
     }
     const empty=document.getElementById('visitsEmpty');if(empty)empty.style.display='none';
     const titleEl=document.getElementById('upcomingSectionTitle');
-    if(titleEl){
-      if(key==='scheduled')titleEl.textContent='Mes visites programmées';
-      else if(key==='confirmed')titleEl.textContent='Mes visites confirmées';
-      else if(key==='rappel')titleEl.textContent='Mes rappels de visite J-1';
-      else titleEl.textContent='Mes visites';
-    }
+    const header=document.getElementById('upcomingPanelHeader');
+    const states={
+      scheduled:{title:'Mes visites programmées',bg:'linear-gradient(135deg,#7a2f0e,#C4603A)'},
+      confirmed:{title:'Mes visites confirmées',bg:'#1B5E20'},
+      rappel:{title:'Mes rappels de visite J-1',bg:'#1D5EC9'},
+    };
+    const s=states[key]||{title:'Mes visites',bg:'linear-gradient(135deg,#7a2f0e,#C4603A)'};
+    if(titleEl)titleEl.textContent=s.title;
+    if(header)header.style.background=s.bg;
     const hint=document.getElementById('visitsBannerHint');
     if(hint){
       const hints={
-        scheduled:{titleBg:null,bg:'rgba(196,96,58,0.10)',color:'#7a2f0e',border:'rgba(196,96,58,0.25)',text:'Des acheteurs ont sélectionné un créneau sur vos disponibilités. Confirmez en un clic pour passer chaque visite en statut <strong>Confirmée</strong>.'},
-        confirmed:{titleBg:'#1B5E20',titleText:'MES VISITES CONFIRMÉES',bg:'rgba(27,94,32,0.06)',color:'#1B5E20',border:'rgba(27,94,32,0.25)',text:'Vous avez confirmé votre visite auprès de l\'acheteur. Il ne vous reste plus qu\'à lui envoyer votre rappel la veille pour valider la visite à <strong>100 %</strong>.'},
-        rappel:{titleBg:'#1D5EC9',titleText:'MES RAPPELS DE VISITE J-1',bg:'rgba(29,94,201,0.06)',color:'#1D5EC9',border:'rgba(29,94,201,0.25)',text:'En 1 clic, rappelez votre acheteur la veille de sa visite pour confirmer à <strong>100 %</strong>.'},
+        scheduled:{bg:'rgba(196,96,58,0.10)',color:'#7a2f0e',border:'rgba(196,96,58,0.25)',text:'Des acheteurs ont sélectionné un créneau sur vos disponibilités. Confirmez en un clic pour passer chaque visite en statut <strong>Confirmée</strong>.'},
+        confirmed:{bg:'rgba(27,94,32,0.08)',color:'#1B5E20',border:'rgba(27,94,32,0.25)',text:'Vous avez confirmé votre visite auprès de l\'acheteur. Il ne vous reste plus qu\'à lui envoyer votre rappel la veille pour valider la visite à <strong>100 %</strong>.'},
+        rappel:{bg:'rgba(29,94,201,0.08)',color:'#1D5EC9',border:'rgba(29,94,201,0.25)',text:'En 1 clic, rappelez votre acheteur la veille de sa visite pour confirmer à <strong>100 %</strong>.'},
       };
       const h=hints[key];
-      if(h){
-        hint.style.display='block';hint.style.borderBottom=`1px solid ${h.border}`;
-        if(h.titleBg){
-          hint.style.padding='0';hint.style.background='';hint.style.color='';
-          hint.innerHTML=`<div style="background:${h.titleBg};color:#fff;padding:10px 18px;font-size:0.74rem;font-weight:800;text-transform:uppercase;letter-spacing:0.08em;font-style:normal;">${h.titleText}</div><div style="padding:11px 18px;background:${h.bg};color:${h.color};font-size:0.84rem;line-height:1.5;font-style:italic;">${h.text}</div>`;
-        } else {
-          hint.style.padding='13px 18px';hint.style.background=h.bg;hint.style.color=h.color;
-          hint.innerHTML=h.text;
-        }
-      } else {hint.style.display='none';}
+      if(h){hint.style.display='block';hint.style.padding='13px 18px';hint.style.background=h.bg;hint.style.color=h.color;hint.style.borderBottom=`1px solid ${h.border}`;hint.innerHTML=h.text;}
+      else{hint.style.display='none';}
     }
     if(key==='last'){
       setTimeout(()=>{
