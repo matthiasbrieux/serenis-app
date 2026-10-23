@@ -372,19 +372,9 @@
     scroll.append(grid);extra.append(scroll);
     if(!data.flat().some(e=>['availability','confirmed','pending','done','cancelled'].includes(e.kind)))extra.prepend(make('p','ap-calendar-empty','Aucune disponibilité ni visite sur cette période.'));
   }
-  function addAvailabilityDateLinks(){
-    const base=new Date(cursor);if(view==='week')base.setDate(base.getDate()-(base.getDay()+6)%7);
-    document.querySelectorAll('#availSlotList .dispo-slot-row').forEach(row=>{
-      const slot=availSlots[Number(row.dataset.slotIdx)];if(!slot||row.querySelector('[data-jump-date]'))return;
-      const day=parseDate(slot.date),outside=view==='day'?slot.date!==dateKey(cursor):view==='week'?day<base||day>=new Date(base.getFullYear(),base.getMonth(),base.getDate()+7):day.getMonth()!==cursor.getMonth()||day.getFullYear()!==cursor.getFullYear();
-      if(!outside)return;
-      const jump=button('Voir la date',()=>showDate(slot.date),'ap-slot-jump');jump.dataset.jumpDate=slot.date;row.append(jump);
-    });
-  }
   window.renderCalendar=function(){
     // Keep the legacy renderer for the month, day detail, availability list and milestones.
     originalCalendar();
-    addAvailabilityDateLinks();
     const isMonth=view==='month';calendar.querySelector('#calGrid').hidden=!isMonth;monthHeader.hidden=!isMonth;extra.hidden=isMonth;
     switcher.querySelectorAll('button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.view===view)));
     const label=document.getElementById('calMonthLabel');
