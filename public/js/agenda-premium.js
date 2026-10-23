@@ -163,7 +163,25 @@
     for(const action of agendaActions.filter(a=>a.kind==='visit_followup'&&a.due_date===key))items.push({kind:'followup',time:REMINDER_TIME,label:'Faire le suivi après la visite',data:action,actionId:action.id});
     return items.sort((a,b)=>a.time.localeCompare(b.time));
   }
-  function chooseEvent(event,key,openVisitDay=false){selectedEvent={...event,date:key};if(openVisitDay&&event.data?.visit_date)showDate(event.data.visit_date,true);else renderDashboardPanels();}
+  function chooseEvent(event,key,openVisitDay=false){
+    const visitKinds=['confirmed','pending','done'];
+    if(visitKinds.includes(event.kind)){
+      const visitId=event.data?.id;
+      Object.entries(tabButtons).forEach(([name,el])=>el.setAttribute('aria-current',String(name==='visits'?'page':'false')));
+      visitsPanel.hidden=false;
+      if(activeStatFilter)setStatFilter(null);
+      if(event.kind==='pending')setVisitsFilter('pending');
+      else if(event.kind==='done')setVisitsFilter('past');
+      else setVisitsFilter('upcoming');
+      visitsPanel.scrollIntoView({behavior:'smooth',block:'start'});
+      setTimeout(()=>{
+        const card=document.getElementById(`vcard-${visitId}`);
+        if(card){card.scrollIntoView({behavior:'smooth',block:'center'});card.classList.add('ap-highlight-card');setTimeout(()=>card.classList.remove('ap-highlight-card'),2500);}
+      },120);
+      return;
+    }
+    selectedEvent={...event,date:key};if(openVisitDay&&event.data?.visit_date)showDate(event.data.visit_date,true);else renderDashboardPanels();
+  }
   function eventNode(event,key,compact=false){
     const el=make(event.kind==='reminder'?'button':'div','ap-event ap-event-'+event.kind);
     if(event.kind==='confirmed'&&!event.data?.sms_copied_at)el.classList.replace('ap-event-confirmed','ap-event-scheduled');
