@@ -793,6 +793,17 @@ if("scrollRestoration"in history)history.scrollRestoration="manual";</script>
     .vcc2-btn-cancel:hover { border-color:#e74c3c; color:#e74c3c; background:#fdf2f2; }
     .vcc2-sms-badge { padding:0 15px 10px; }
     .vcc2-conseil { margin:0 15px 12px; padding:8px 12px; background:#e8f5e9; color:#2e7d32; border-radius:8px; font-size:0.78rem; font-style:italic; }
+    .vcc2-rappel-note { display:none; margin:0 15px 12px; padding:8px 12px; background:#E5F0FF; color:#1D5EC9; border-radius:8px; font-size:0.78rem; font-style:italic; }
+    .banner-confirmed-text { display:none; }
+    /* Vue "Confirmée" : cartes bleues rendues en vert */
+    .ap-confirmed-view .vcc2.vcc2-rappel { border-color:#a5d6a7 !important; border-left-color:#2e7d32 !important; }
+    .ap-confirmed-view .vcc2.vcc2-rappel .vcc2-datecol { background:#e8f5e9 !important; color:#2e7d32 !important; }
+    .ap-confirmed-view .vcc2.vcc2-rappel .vcc2-time-pill { background:#e8f5e9 !important; color:#2e7d32 !important; }
+    .ap-confirmed-view .vcc2.vcc2-rappel .vcc2-banner-rappel { background:#e8f5e9 !important; color:#2e7d32 !important; border-bottom-color:#a5d6a7 !important; }
+    .ap-confirmed-view .vcc2.vcc2-rappel .banner-rappel-text { display:none; }
+    .ap-confirmed-view .vcc2.vcc2-rappel .banner-confirmed-text { display:inline; }
+    .ap-confirmed-view .vcc2.vcc2-rappel .vcc2-btn-rappel-action { display:none !important; }
+    .ap-confirmed-view .vcc2.vcc2-rappel .vcc2-rappel-note { display:block; }
     .vcc2-banner { padding:7px 15px; font-size:0.67rem; font-weight:800; letter-spacing:0.07em; text-transform:uppercase; border-bottom:1px solid transparent; border-radius:14px 14px 0 0; }
     .vcc2-banner-confirmed { background:#e8f5e9; color:#2e7d32; border-bottom-color:#a5d6a7; }
     .vcc2-banner-rappel    { background:#E5F0FF; color:#1D5EC9; border-bottom-color:#B9D5FF; }
@@ -1764,16 +1775,18 @@ function buildVisitConfirmedCard(v) {
   const isRappel    = v.sms_copied_at && !v.reminder_sent;
   const isConfirmed = v.sms_copied_at && v.reminder_sent;
   const bannerClass = isConfirmed ? 'vcc2-banner vcc2-banner-confirmed' : isRappel ? 'vcc2-banner vcc2-banner-rappel' : 'vcc2-banner vcc2-banner-scheduled';
-  const bannerText  = isConfirmed ? '✓ Visite confirmée' : isRappel ? '● Rappel J-1 à envoyer' : '◉ Visite programmée';
+  const bannerInner = isRappel
+    ? `<span class="banner-rappel-text">● Rappel J-1 à envoyer</span><span class="banner-confirmed-text">✓ Visite confirmée</span>`
+    : isConfirmed ? '✓ Visite confirmée' : '◉ Visite programmée';
   const cardState   = isConfirmed ? ' vcc2-confirmed' : isRappel ? ' vcc2-rappel' : '';
   const rappelBtnHtml = isRappel
-    ? `<button class="vcc2-btn-sms" id="btn-rappel-${v.id}" onclick="sendRappelRdv(${v.id})">${svgPhone} Rappel du rdv</button>`
+    ? `<button class="vcc2-btn-sms vcc2-btn-rappel-action" id="btn-rappel-${v.id}" onclick="sendRappelRdv(${v.id})">${svgPhone} Rappel du rdv</button>`
     : isConfirmed
       ? `<button class="vcc2-btn-sms sent" id="btn-rappel-${v.id}">${svgPhone} Rappel effectué</button>`
-      : `<button class="vcc2-btn-sms" id="btn-rappel-${v.id}" onclick="sendRappelRdv(${v.id})" style="display:none;">${svgPhone} Rappel du rdv</button>`;
-  const conseilHtml = '';
+      : `<button class="vcc2-btn-sms vcc2-btn-rappel-action" id="btn-rappel-${v.id}" onclick="sendRappelRdv(${v.id})" style="display:none;">${svgPhone} Rappel du rdv</button>`;
+  const conseilHtml = isRappel ? `<div class="vcc2-rappel-note">N'oubliez pas de rappeler l'acheteur la veille de la visite</div>` : '';
   return `<div class="vcc2${cardState}" id="vcard-${v.id}">
-    <div id="status-badge-${v.id}" class="${bannerClass}">${bannerText}</div>
+    <div id="status-badge-${v.id}" class="${bannerClass}">${bannerInner}</div>
     <div class="vcc2-head">
       <div class="vcc2-datecol">
         <div class="vcc2-month">${monthStr}</div>
@@ -3292,6 +3305,6 @@ loadData().then(() => {
 </script>
 
 <link rel="stylesheet" href="/css/seller-header-typography.css?v=1">
-<script src="/js/agenda-premium.js?v=33"></script>
+<script src="/js/agenda-premium.js?v=34"></script>
 </body>
 </html>
