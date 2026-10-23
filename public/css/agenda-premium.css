@@ -112,7 +112,7 @@ body.vpm-agenda-page .ap-agenda .ap-month-cell{height:auto;min-height:88px;justi
 /* Page organization, notifications and real next appointments. */
 .ap-agenda .ap-agenda-tabs{display:flex;gap:8px;margin:0 0 16px;overflow-x:auto;scrollbar-width:none;padding:2px 1px 4px}
 .ap-agenda .ap-agenda-tabs::-webkit-scrollbar{display:none}
-.ap-agenda .ap-agenda-tab{display:inline-flex;align-items:center;justify-content:center;gap:7px;min-height:44px;flex:1 0 auto;padding:10px 16px;border:1px solid #E9D8CA;border-radius:9px;background:#FFFEFC;color:#3e3935;font:500 13px/1.3 Inter,sans-serif;white-space:nowrap;cursor:pointer}
+.ap-agenda .ap-agenda-tab{display:inline-flex;align-items:center;justify-content:center;gap:7px;min-height:44px;flex:1 1 0;min-width:0;padding:10px 16px;border:1px solid #E9D8CA;border-radius:9px;background:#FFFEFC;color:#3e3935;font:500 13px/1.3 Inter,sans-serif;white-space:nowrap;cursor:pointer}
 .ap-agenda .ap-agenda-tab[aria-current="page"]{background:var(--terracotta);border-color:var(--terracotta);color:#fff}
 .ap-agenda .ap-tab-count{display:grid;place-items:center;min-width:20px;height:20px;padding:0 5px;border-radius:20px;background:#D5443C;color:#fff;font-size:11px;font-weight:700}
 .ap-agenda .ap-agenda-tab[aria-current="page"] .ap-tab-count{background:#fff;color:var(--terracotta)}
@@ -146,8 +146,8 @@ body.vpm-agenda-page .ap-agenda .ap-month-cell{height:auto;min-height:88px;justi
 .ap-agenda .ap-dashboard-panel{min-width:0}
 @media(max-width:1280px){.ap-agenda .ap-right-rail{grid-template-columns:repeat(2,minmax(0,1fr));align-items:start}.ap-agenda .ap-right-rail .ap-mini{grid-column:1/-1}}
 @media(max-width:767px){
-  .ap-agenda .ap-agenda-tabs{margin-right:-12px;padding-right:12px}
-  .ap-agenda .ap-agenda-tab{flex:0 0 auto;padding:9px 12px}
+  .ap-agenda .ap-agenda-tabs{margin-right:0;padding-right:0}
+  .ap-agenda .ap-agenda-tab{flex:1 1 0;min-width:0;padding:9px 12px}
   .ap-agenda .ap-add-appointment{width:100%}
   .ap-agenda .ap-right-rail{grid-template-columns:minmax(0,1fr)}
   .ap-agenda .ap-right-rail .ap-mini{grid-column:auto}
@@ -262,7 +262,7 @@ body.vpm-agenda-page .ap-agenda .ap-right-rail{grid-column:2;grid-row:1 / span 2
 
 /* Simplified seller workflow: three destinations, two clear calendar actions, compact follow-up panels. */
 .ap-agenda .ap-agenda-tabs{grid-template-columns:repeat(3,minmax(0,1fr))}
-.ap-agenda .ap-calendar-actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:0 0 12px}
+.ap-agenda .ap-calendar-actions{display:flex;flex-direction:column;gap:14px;margin:0 0 14px}
 .ap-agenda .ap-calendar-action{display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:10px 16px;border:1px solid #DCA68C;border-radius:8px;background:#fff;color:var(--terracotta);font:600 13px/1.35 Inter,sans-serif;text-decoration:none;cursor:pointer}
 .ap-agenda .ap-calendar-action-primary{background:var(--terracotta);border-color:var(--terracotta);color:#fff}
 .ap-agenda .ap-calendar-action-primary:hover{background:#873818}
@@ -363,3 +363,11 @@ body.vpm-agenda-page .ap-agenda .aph-actions{display:none!important}
 .ap-agenda .ap-tab-ico{display:flex;align-items:center}
 @media(max-width:767px){body.vpm-agenda-page .ap-agenda .aph{grid-template-columns:1fr}.ap-agenda .ap-teal-share-btn{padding:11px 16px;font-size:13px}}
 @media(max-width:540px){body.vpm-agenda-page .ap-agenda .aph-photo{display:none}.ap-agenda .ap-action-grid{grid-template-columns:1fr}}
+/* Mobile calendar header: date always on its own row, nav+switcher on next row */
+@media(max-width:600px){
+  .ap-agenda .cal-header{gap:8px 10px}
+  .ap-agenda .cal-header-left{flex:0 0 100%}
+  .ap-agenda .cal-nav-group{flex:0 0 auto}
+  .ap-agenda .ap-view-switch{flex:1;min-width:0}
+  .ap-agenda .cal-month{font-size:1.15rem}
+}
