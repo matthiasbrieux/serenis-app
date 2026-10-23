@@ -96,7 +96,7 @@
   const appointmentsHeading=appointmentsPanel.querySelector('.ap-appointments-heading');
   appointmentsHeading.textContent='Mes prochaines visites';
   const availabilityPanel=make('section','ap-availability-panel');
-  const availabilityHeading=make('h2','ap-lower-heading','Mes disponibilités');
+  const availabilityHeading=make('h2','ap-lower-heading','Mes disponibilités de visite');
   availabilityPanel.append(availabilityHeading,availBtn,tealShareBtn,availabilityFormHost,registered);
   const visitsPanel=make('section','ap-visits-panel');
   visitsPanel.hidden=false;
