@@ -30,24 +30,6 @@ if("scrollRestoration"in history)history.scrollRestoration="manual";</script>
       --shadow-terracotta:0 4px 16px rgba(158,58,24,0.15);
     }
     /* ── Stats ────────────────────────────────────────── */
-    .agenda-stats { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-bottom:24px; }
-    @media(max-width:1100px){ .agenda-stats { grid-template-columns:repeat(3,1fr); } }
-    @media(max-width:600px){ .agenda-stats { grid-template-columns:repeat(3,1fr); } }
-    .stat-card-agenda { background:linear-gradient(135deg,#fff,#fafaf8); border-radius:14px; padding:16px 14px; border:1px solid #e4ddd4; display:flex; align-items:center; gap:10px; cursor:pointer; transition:transform 0.22s ease, box-shadow 0.22s ease, border-color 0.22s ease, background 0.22s ease; position:relative; overflow:hidden; user-select:none; box-shadow:0 2px 8px rgba(0,0,0,0.04); }
-    .stat-card-agenda::after { content:''; position:absolute; bottom:0; left:14px; right:14px; height:2.5px; border-radius:2px; background:transparent; transition:background 0.22s ease, opacity 0.22s ease; opacity:0; }
-    .stat-card-agenda:hover { transform:translateY(-3px); box-shadow:0 8px 28px rgba(158,58,24,0.1); border-color:rgba(158,58,24,0.22); }
-    .stat-card-agenda:hover::after { opacity:1; }
-    .stat-card-agenda[data-filter="avenir"]:hover::after    { background:var(--terracotta); }
-    .stat-card-agenda[data-filter="passees"]:hover::after { background:var(--terracotta); }
-    .stat-card-agenda[data-filter="aujourd_hui"]:hover::after { background:var(--terracotta); }
-    .stat-card-agenda.active { transform:translateY(-3px); }
-    .stat-card-agenda.active::after { opacity:1; }
-    .stat-card-agenda.active { border-color:var(--terracotta); background:linear-gradient(135deg,#FDF5EF,#FBF1E9); box-shadow:0 8px 28px rgba(158,58,24,0.12); }
-    .stat-card-agenda.active::after { background:var(--terracotta); }
-    .stat-card-agenda.active .stat-val { color:var(--terracotta); }
-    .stat-card-agenda.urgent { border-color:#ffe082; background:#fffdf5; }
-    .stat-card-agenda .stat-val { font-family:'Inter',sans-serif; font-size:1.6rem; font-weight:600; color:#1A1A16; line-height:1; transition:color 0.22s; }
-    .stat-card-agenda .stat-lbl { font-size:0.71rem; color:#888; margin-top:3px; font-weight:500; line-height:1.3; }
     .stat-icon { width:40px; height:40px; border-radius:10px; background:#F8F1E7; border:1px solid #E8D9CC; display:flex; align-items:center; justify-content:center; flex-shrink:0; color:var(--terracotta); }
     /* Filtre actif — section filtrée dans la sidebar */
     .filtered-section-title { border-radius:10px 10px 0 0; }
@@ -591,10 +573,6 @@ if("scrollRestoration"in history)history.scrollRestoration="manual";</script>
 
     /* ── AMÉLIORATIONS MOBILE 375px ─────────────────────── */
     @media (max-width:480px) {
-      /* Stats en 2 colonnes serrées */
-      .agenda-stats { grid-template-columns: repeat(2,1fr); gap: 8px; }
-      .stat-card-agenda { padding: 12px 10px; gap: 8px; }
-      .stat-card-agenda .stat-val { font-size: 1.6rem; }
 
       /* Calendrier : cellules minimum 44px */
       .cal-cell { min-height: 44px; font-size: 0.82rem; }
@@ -1116,35 +1094,6 @@ if("scrollRestoration"in history)history.scrollRestoration="manual";</script>
       <p id="noLinkMsg" style="display:none;"></p>
     </div>
 
-    <div class="agenda-stats">
-      <div class="stat-card-agenda" data-filter="avenir" onclick="setStatFilter('avenir')" title="Voir les visites à venir">
-        <div class="stat-icon">
-          <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><path d="M8 14h.01M12 14h.01M16 14h.01"/></svg>
-        </div>
-        <div>
-          <div class="stat-val" id="statPending">0</div>
-          <div class="stat-lbl">À venir</div>
-        </div>
-      </div>
-      <div class="stat-card-agenda" data-filter="passees" onclick="setStatFilter('passees')" title="Voir les visites passées">
-        <div class="stat-icon">
-          <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 8 14"/></svg>
-        </div>
-        <div>
-          <div class="stat-val" id="statPast">0</div>
-          <div class="stat-lbl">Passées</div>
-        </div>
-      </div>
-      <div class="stat-card-agenda" data-filter="aujourd_hui" onclick="setStatFilter('aujourd_hui')" title="Voir les visites d'aujourd'hui">
-        <div class="stat-icon">
-          <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 14"/><line x1="12" y1="2" x2="12" y2="4"/><line x1="12" y1="20" x2="12" y2="22"/><line x1="2" y1="12" x2="4" y2="12"/><line x1="20" y1="12" x2="22" y2="12"/></svg>
-        </div>
-        <div>
-          <div class="stat-val" id="statToday">0</div>
-          <div class="stat-lbl">Aujourd'hui</div>
-        </div>
-      </div>
-    </div>
 
     <!-- Partage de l'agenda -->
     <!-- Layout 2 colonnes : calendrier + panneau droit -->
@@ -1647,15 +1596,7 @@ function isPastVisit(v) {
 }
 
 // ── Stats ─────────────────────────────────────────────
-function updateStats() {
-  const today = new Intl.DateTimeFormat('en-CA', {timeZone:'Europe/Paris',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date());
-  const upcoming = allVisits.filter(v => v.status !== 'cancelled' && !isPastVisit(v));
-  const past     = allVisits.filter(v => v.status !== 'cancelled' && isPastVisit(v));
-  const todayV   = allVisits.filter(v => v.visit_date === today && v.status !== 'cancelled');
-  document.getElementById('statPending').textContent = upcoming.length;
-  document.getElementById('statPast').textContent    = past.length;
-  document.getElementById('statToday').textContent   = todayV.length;
-}
+function updateStats() {}
 
 // ── Stat cards filtres interactifs ────────────────────
 let activeStatFilter = null;
@@ -3412,6 +3353,6 @@ loadData().then(() => {
 </script>
 
 <link rel="stylesheet" href="/css/seller-header-typography.css?v=1">
-<script src="/js/agenda-premium.js?v=45"></script>
+<script src="/js/agenda-premium.js?v=46"></script>
 </body>
 </html>

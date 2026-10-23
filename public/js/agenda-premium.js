@@ -13,11 +13,10 @@
   let view=mobile.matches?'day':'week', cursor=parseDate(todayKey());
   let agendaActions=[];
   const statRow=main.querySelector('.agenda-stats');
-  if(statRow){const order={avenir:0,aujourd_hui:1,passees:2};[...statRow.querySelectorAll('.stat-card-agenda[data-filter]')].sort((a,b)=>order[a.dataset.filter]-order[b.dataset.filter]).forEach(card=>statRow.append(card));}
   // Move existing nodes rather than recreate inputs, forms or business actions.
   const hero=main.querySelector('.aph'), share=main.querySelector('#bookingLinkBox');
   const top=make('div','ap-top'); hero.before(top); top.append(hero);
-  main.insertBefore(statRow,top);
+  if(statRow)main.insertBefore(statRow,top);
   const agendaTabs=make('nav','ap-agenda-tabs');agendaTabs.setAttribute('aria-label','Rubriques de l’agenda');
   main.insertBefore(agendaTabs,top);
   const pendingTabCount=make('span','ap-tab-count','0'),tabButtons={};
@@ -26,7 +25,7 @@
     if(key==='pending')b.append(pendingTabCount);
     agendaTabs.append(b);tabButtons[key]=b;
   }
-  top.after(statRow);statRow.after(agendaTabs);
+  if(statRow){top.after(statRow);statRow.after(agendaTabs);}else{top.after(agendaTabs);}
   tabButtons.agenda.setAttribute('aria-current','page');
   const layout=main.querySelector('.agenda-layout');
   const right=main.querySelector('.agenda-right-col'), visits=main.querySelector('.visits-below');
