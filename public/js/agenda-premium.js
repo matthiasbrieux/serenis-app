@@ -61,7 +61,7 @@
   // Move the original saved-slots block, preserving its nodes and handlers.
   const registered=right.querySelector('.dispo-registered-block');
   visits.querySelector('#upcomingSection').after(registered);
-  function openAvailability() { const block=document.getElementById('dispoAddBlock');if(block){block.style.display='';const sec=block.closest('.dispo-section');if(sec)sec.style.display='';}toggleDispoForm(true); const form=document.getElementById('dispoAddForm'); form.scrollIntoView({behavior:matchMedia('(prefers-reduced-motion:reduce)').matches?'auto':'smooth',block:'center'}); document.getElementById('availDate').focus({preventScroll:true}); }
+  function openAvailability() { const block=document.getElementById('dispoAddBlock');if(block){block.style.display='';const sec=block.closest('.dispo-section');if(sec)sec.style.display='';}toggleDispoForm(true);if(typeof renderAvailMonth==='function')renderAvailMonth(); const form=document.getElementById('dispoAddForm'); form.scrollIntoView({behavior:matchMedia('(prefers-reduced-motion:reduce)').matches?'auto':'smooth',block:'center'}); document.getElementById('availDate').focus({preventScroll:true}); }
   window.openAvailability=openAvailability;
   const subtitle=hero.querySelector('.aph-sub');if(subtitle)subtitle.textContent='Organisez vos visites et suivez vos échanges avec les acheteurs';
   if(manual)manual.remove();
