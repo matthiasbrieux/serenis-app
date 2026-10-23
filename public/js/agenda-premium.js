@@ -53,16 +53,16 @@
   // Move the original saved-slots block, preserving its nodes and handlers.
   const registered=right.querySelector('.dispo-registered-block');
   visits.querySelector('#upcomingSection').after(registered);
-  function openAvailability() { availabilityFormHost.hidden=false; toggleDispoForm(true); const form=document.getElementById('dispoAddForm'); form.scrollIntoView({behavior:matchMedia('(prefers-reduced-motion:reduce)').matches?'auto':'smooth',block:'center'}); document.getElementById('availDate').focus({preventScroll:true}); }
+  function openAvailability() { toggleDispoForm(true); const form=document.getElementById('dispoAddForm'); form.scrollIntoView({behavior:matchMedia('(prefers-reduced-motion:reduce)').matches?'auto':'smooth',block:'center'}); document.getElementById('availDate').focus({preventScroll:true}); }
   window.openAvailability=openAvailability;
   const subtitle=hero.querySelector('.aph-sub');if(subtitle)subtitle.textContent='Organisez vos visites et suivez vos échanges avec les acheteurs';
   // Reuse the existing manual-visit button and form; move it above the calendar.
   const manualButton=manual.querySelector('.btn-outline-manual');
   if(manualButton){manualButton.textContent='+ Ajouter une visite manuellement';manualButton.classList.add('ap-calendar-action','ap-calendar-action-secondary');calendarActions.insertBefore(manualButton,shareButton);}
   manual.remove();
-  // Keep the existing availability form, but show it only on request.
+  // Move the availability section below the calendar actions; keep the add form closed.
   const availabilityFormHost=right.querySelector('.dispo-section');
-  calendarActions.append(availabilityFormHost);availabilityFormHost.hidden=true;
+  calendarActions.append(availabilityFormHost);
   document.getElementById('dispoAddHdr').hidden=true;
   // Relocate the existing history panel; preserve its list and toggle behavior.
   const history=document.getElementById('pastSection');
