@@ -787,6 +787,10 @@ if("scrollRestoration"in history)history.scrollRestoration="manual";</script>
     .vcc2-btn-sms { flex:1; display:flex; align-items:center; justify-content:center; gap:6px; padding:9px 12px; border-radius:10px; background:var(--terracotta-dark); color:#fff; border:none; font-family:'Inter',sans-serif; font-size:0.81rem; font-weight:700; cursor:pointer; transition:background 0.15s; min-height:40px; touch-action:manipulation; }
     .vcc2-btn-sms:hover { background:#152d1f; }
     .vcc2-btn-sms.sent { background:#e8f5e9; color:#2e7d32; border:1.5px solid #c8e6c9; }
+    .vcc2-btn-rappel-action:not(.sent) { background:#1D5EC9!important; }
+    .vcc2-btn-rappel-action:not(.sent):hover { background:#1550B0!important; }
+    .btn-sms-reminder.btn-rappel-rdv:not(.sent) { background:#1D5EC9; color:#fff; border-color:#1D5EC9; }
+    .btn-sms-reminder.btn-rappel-rdv:not(.sent):hover { background:#1550B0; border-color:#1550B0; }
     .vcc2-btn-ics { display:inline-flex; align-items:center; justify-content:center; width:40px; height:40px; border-radius:9px; background:rgba(158,58,24,0.06); color:var(--terracotta); border:1.5px solid rgba(158,58,24,0.12); text-decoration:none; flex-shrink:0; transition:background 0.15s,color 0.15s; }
     .vcc2-btn-ics:hover { background:var(--terracotta); color:#fff; border-color:var(--terracotta); }
     .vcc2-btn-cancel { padding:9px 12px; border-radius:9px; background:#fff; color:#999; border:1px solid #e0d8ce; font-family:'Inter',sans-serif; font-size:0.78rem; font-weight:600; cursor:pointer; transition:all 0.15s; min-height:38px; flex-shrink:0; touch-action:manipulation; }
@@ -1805,7 +1809,7 @@ function buildVisitCardHtml(v) {
       </div>`:''}
       ${v.status!=='cancelled'?`<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
         <button class="btn-sms-reminder${v.sms_copied_at?' sent':''}" id="btn-reminder-${v.id}" onclick="sendReminder(${v.id})">${svgPhone} ${v.sms_copied_at?'Confirmation effectuée':'Confirmation de visite'}</button>
-        <button class="btn-sms-reminder${v.reminder_sent?' sent':''}" id="btn-rappel-${v.id}" onclick="sendRappelRdv(${v.id})">${svgPhone} ${v.reminder_sent?'Rappel effectué':'Rappel du rdv'}</button>
+        <button class="btn-sms-reminder btn-rappel-rdv${v.reminder_sent?' sent':''}" id="btn-rappel-${v.id}" onclick="sendRappelRdv(${v.id})">${svgPhone} ${v.reminder_sent?'Rappel effectué':'Rappel du rdv'}</button>
         <button class="btn-cancel-sm" onclick="openCancelSmsModal(${v.id})">Annuler</button>
       </div>
       <div id="sms-badge-${v.id}">${smsCopiedBadge(v.sms_copied_at)}</div>`:''}
