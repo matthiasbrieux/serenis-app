@@ -798,7 +798,9 @@ if("scrollRestoration"in history)history.scrollRestoration="manual";</script>
     .vcc2-banner-scheduled { background:#fef3ee; color:#C4603A; border-bottom-color:#f0c5a0; }
     .vcc2-banner-done      { background:#f0f0f0; color:#757575; border-bottom-color:#d4d4d4; }
     .vcc2-done .vcc2-datecol { background:linear-gradient(160deg,#7a7a7a 0%,#9e9e9e 100%); }
-    .vcc2-done { opacity:0.85; }
+    .vcc2-done { opacity:0.85; border-color:#d4d4d4; }
+    .vcc2-done .vcc2-time-pill { background:#f0f0f0 !important; color:#757575 !important; border-color:#d4d4d4 !important; }
+    .vcc2-done .vcc2-dow, .vcc2-done .vcc2-day, .vcc2-done .vcc2-month { color:#fff; }
     .vcc2-banner-cancelled { background:#f5f5f5; color:#757575; border-bottom-color:#e0e0e0; }
     .vcc2-btn-past { flex:1; display:flex; align-items:center; justify-content:center; gap:6px; padding:9px 12px; border-radius:10px; background:rgba(158,58,24,0.05); color:var(--terracotta); border:1.5px solid rgba(158,58,24,0.15); font-family:'Inter',sans-serif; font-size:0.81rem; font-weight:600; cursor:pointer; transition:background 0.15s; min-height:40px; }
     .vcc2-btn-past:hover { background:var(--terracotta); color:#fff; }
@@ -1958,13 +1960,10 @@ function buildPastCard(v) {
       ${v.buyer_financing?`<div class="vcc2-profile-row">Financement : <strong>${escapeHtml(v.buyer_financing)}</strong></div>`:''}
       ${v.buyer_timeline?`<div class="vcc2-profile-row">Délai : <strong>${escapeHtml(v.buyer_timeline)}</strong></div>`:''}
     </div>` : '';
-  const buttonsHtml = !isCancelled ? (()=>{
-    const hasFollowup=(window.agendaActionsData||[]).some(a=>a.visit_id===v.id&&a.kind==='visit_followup');
-    return `<div class="vcc2-actions">
+  const buttonsHtml = !isCancelled ? `<div class="vcc2-actions">
       <button class="vcc2-btn-past" onclick="sendDossierSerieux(${v.id})">Dossier Acheteur Sérieux</button>
-      ${hasFollowup?`<button class="vcc2-btn-past vcc2-btn-past-skip" onclick="skipFollowup(${v.id})">Ne donnera pas suite</button>`:''}
-    </div>`;
-  })() : '';
+      <button class="vcc2-btn-past vcc2-btn-past-skip" onclick="skipFollowup(${v.id})">Ne donnera pas suite</button>
+    </div>` : '';
   return `<div class="vcc2 ${isCancelled?'vcc2-cancelled':'vcc2-done'}">
     <div class="${pastBannerClass}">${pastBannerText}</div>
     <div class="vcc2-head">
