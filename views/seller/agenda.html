@@ -1019,6 +1019,7 @@ if("scrollRestoration"in history)history.scrollRestoration="manual";</script>
   /* ── VCC2 État 4 : Visite confirmée à 100% ── */
   .vcc2.vcc2-full{border-color:#1B5E20!important;border-width:2px!important;box-shadow:0 4px 24px rgba(27,94,32,0.20)!important}
   .vcc2.vcc2-full .vcc2-datecol{background:linear-gradient(160deg,#1B5E20 0%,#2E7D32 100%)!important}
+  .vcc2.vcc2-full .vcc2-datecol .vcc2-dow,.vcc2.vcc2-full .vcc2-datecol .vcc2-day,.vcc2.vcc2-full .vcc2-datecol .vcc2-month{color:#fff!important}
   .vcc2-banner-full{background:linear-gradient(135deg,#1B5E20,#2E7D32);color:#fff!important;border-bottom-color:#1B5E20!important;display:flex;align-items:center;gap:7px}
   .vcc2-banner-full .vcc2-banner-logo{height:16px;margin-left:auto;flex-shrink:0;opacity:0.85}
   .vcc2-full-footer{margin:0 15px 12px;padding:8px 12px;background:#E8F5E9;color:#1B5E20;border-radius:8px;font-size:0.79rem;display:flex;align-items:flex-start;gap:8px;border:1px solid #A5D6A7;font-style:italic;line-height:1.45}
@@ -1054,7 +1055,7 @@ if("scrollRestoration"in history)history.scrollRestoration="manual";</script>
   </style>
   <link rel="stylesheet" href="/css/seller-reference.css?v=1">
   <link rel="stylesheet" href="/css/seller-navigation.css?v=2">
-<link rel="stylesheet" href="/css/agenda-premium.css?v=27">
+<link rel="stylesheet" href="/css/agenda-premium.css?v=28">
 </head>
 <body class="vpm-seller-reference vpm-agenda-page vpm-header-typography">
 <!-- En-tête mobile : logo complet + bouton menu -->
@@ -3321,8 +3322,8 @@ loadData().then(() => {
       if (!r.ok) return;
       const data = await r.json();
       const newVisits = data.visits || [];
-      const oldSig = allVisits.map(v => `${v.id}:${v.status}`).sort().join(',');
-      const newSig = newVisits.map(v => `${v.id}:${v.status}`).sort().join(',');
+      const oldSig = allVisits.map(v => `${v.id}:${v.status}:${v.sms_copied_at||''}:${v.reminder_sent||''}`).sort().join(',');
+      const newSig = newVisits.map(v => `${v.id}:${v.status}:${v.sms_copied_at||''}:${v.reminder_sent||''}`).sort().join(',');
       if (oldSig !== newSig) {
         const added = newVisits.filter(v => !allVisits.some(o => o.id === v.id));
         allVisits = newVisits;
@@ -3391,6 +3392,6 @@ loadData().then(() => {
 </script>
 
 <link rel="stylesheet" href="/css/seller-header-typography.css?v=1">
-<script src="/js/agenda-premium.js?v=50"></script>
+<script src="/js/agenda-premium.js?v=51"></script>
 </body>
 </html>
