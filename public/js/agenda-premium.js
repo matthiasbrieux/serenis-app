@@ -30,7 +30,7 @@
     agendaTabs.append(b);tabButtons[key]=b;
   }
   if(statRow){top.after(statRow);statRow.after(agendaTabs);}else{top.after(agendaTabs);}
-  const tealShareBtn=make('button','ap-teal-share-btn');tealShareBtn.type='button';tealShareBtn.innerHTML='<span class="ap-tsh-left"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg><span>Partager mes disponibilités de visite</span></span><span class="ap-tsh-chevron">›</span>';tealShareBtn.addEventListener('click',()=>copyBookingLink());top.after(tealShareBtn);
+  const tealShareBtn=make('button','ap-teal-share-btn');tealShareBtn.type='button';tealShareBtn.innerHTML='<span class="ap-tsh-left"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg><span>Partager mes disponibilités de visite</span></span><span class="ap-tsh-chevron">›</span>';tealShareBtn.addEventListener('click',()=>copyBookingLink());agendaTabs.after(tealShareBtn);
   tabButtons.agenda.setAttribute('aria-current','page');
   const layout=main.querySelector('.agenda-layout');
   const right=main.querySelector('.agenda-right-col'), visits=main.querySelector('.visits-below');
