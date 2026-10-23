@@ -61,6 +61,7 @@
   const availabilityFormHost=right.querySelector('.dispo-section');
   calendarActions.append(availabilityFormHost);
   document.getElementById('dispoAddHdr').hidden=true;
+  const _dispoForm=document.getElementById('dispoAddForm');if(_dispoForm)_dispoForm.style.display='none';
   // Relocate the existing history panel; preserve its list and toggle behavior.
   const history=document.getElementById('pastSection');
   availabilityFormHost.after(history);history.classList.add('ap-history','dispo-add-block');
