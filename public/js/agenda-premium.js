@@ -41,7 +41,7 @@
   const actionGrid=make('div','ap-action-grid');
   const availBtn=make('button','ap-action-btn ap-action-btn-primary');availBtn.type='button';availBtn.innerHTML='<span class="ap-ab-inner"><span class="ap-ab-ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><line x1="12" y1="14" x2="12" y2="18"/><line x1="10" y1="16" x2="14" y2="16"/></svg></span><span class="ap-ab-text">Ajouter une disponibilité de visite</span></span><span class="ap-ab-chevron">›</span>';availBtn.addEventListener('click',openAvailability);
   const manualBtn=make('button','ap-action-btn ap-action-btn-secondary');manualBtn.type='button';manualBtn.innerHTML='<span class="ap-ab-inner"><span class="ap-ab-ico ap-ab-ico-plus">+</span><span class="ap-ab-text">Ajouter une visite manuellement</span></span><span class="ap-ab-chevron">›</span>';manualBtn.addEventListener('click',()=>(window.openModal||function(){})('addVisitOverlay'));
-  actionGrid.append(manualBtn);calendarActions.append(actionGrid);
+  calendarActions.append(actionGrid);calendarActions.style.display='none';
   const appointmentsPanel=make('section','ap-appointments-panel');
   appointmentsPanel.append(make('h2','ap-appointments-heading','Mes prochains rendez-vous'));
   const appointmentList=make('div','ap-appointments-list');appointmentsPanel.append(appointmentList);layout.append(appointmentsPanel);
@@ -110,7 +110,7 @@
   const _arrHtml='<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#C8B9AE" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>';
   for(const [key,label,ico] of [['scheduled','Programmée',_icoS],['confirmed','Confirmée',_icoC],['rappel','Rappel J-1',_icoR]]){if(vfStepsRow.children.length){const arr=make('span','ap-vf-arrow');arr.innerHTML=_arrHtml;vfStepsRow.append(arr);}const b=button('',()=>setVisitsFilter(key),'ap-visits-filter ap-vf-step ap-vf-step-'+key);b.innerHTML=ico+'<span>'+label+'</span>';b.dataset.filter=key;vfStepsRow.append(b);visitsFilterButtons[key]=b;}
   visitsFilters.append(vfStepsRow);
-  visitsPanel.append(visitsFilters);listCol.append(visitsPanel);visitsPanel.append(visits);listCol.append(availabilityPanel);
+  visitsPanel.append(visitsFilters);listCol.append(visitsPanel);visitsPanel.append(visits);listCol.append(manualBtn);listCol.append(availabilityPanel);
   const pastSec=document.getElementById('pastSection');if(pastSec)listCol.append(pastSec);
   const compromisPanel=main.querySelector('#compromis-vente'),compromisHeader=compromisPanel?.querySelector('.compromis-bar-hdr'),compromisBody=compromisPanel?.querySelector('.compromis-bar-body');
   if(compromisPanel&&compromisHeader&&compromisBody){
