@@ -34,7 +34,6 @@
   layout.after(bottom); bottom.append(listCol,actionCol); listCol.append(visits);
   const calendarActions=make('div','ap-calendar-actions');main.insertBefore(calendarActions,layout);
   const availabilityButton=button('+ Ajouter une disponibilité',openAvailability,'ap-calendar-action ap-calendar-action-primary');calendarActions.append(availabilityButton);
-  const shareButton=button('Partager mon agenda',()=>{share.style.display=share.style.display==='none'?'flex':'none';if(share.style.display!=='none')share.scrollIntoView({behavior:'smooth',block:'center'});},'ap-share-compact');calendarActions.append(shareButton);
   const appointmentsPanel=make('section','ap-appointments-panel');
   appointmentsPanel.append(make('h2','ap-appointments-heading','Mes prochains rendez-vous'));
   const appointmentList=make('div','ap-appointments-list');appointmentsPanel.append(appointmentList);layout.append(appointmentsPanel);
