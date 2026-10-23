@@ -80,7 +80,7 @@
   const historyLabel=historyHeading.firstElementChild;
   const calendarIcon=make('span','dispo-add-hdr-icon');
   calendarIcon.innerHTML='<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M7 3v4M17 3v4M3 10h18M8 14h3M8 17h6"/></svg>';
-  historyLabel.replaceChildren(calendarIcon,make('span','dispo-add-hdr-title','Mes visites passées'));
+  historyLabel.replaceChildren(make('span','dispo-add-hdr-title','Mes visites passées'));
   const oldTogglePast=window.togglePastSection;
   window.togglePastSection=function(){oldTogglePast();historyHeading.setAttribute('aria-expanded',String(_pastOpen));};
   historyHeading.addEventListener('keydown',event=>{if(event.key==='Enter'||event.key===' '){event.preventDefault();togglePastSection();}});
