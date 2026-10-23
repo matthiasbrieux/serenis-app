@@ -184,7 +184,7 @@
   function previousDate(value){const d=parseDate(value);d.setDate(d.getDate()-1);return dateKey(d);}
   function eventsFor(key) {
     const items=availSlots.filter(s=>s.date===key).map(s=>({kind:'availability',time:(s.start||'').slice(0,5),end:(s.end||'').slice(0,5),label:'Disponible',data:s}));
-    for(const v of allVisits.filter(v=>v.visit_date===key).filter(v=>!activeStatFilter || (v.status!=='cancelled' && (activeStatFilter==='avenir'?!isPastVisit(v):activeStatFilter==='passees'?isPastVisit(v):v.visit_date===todayKey()))))items.push({kind:v.status,time:(v.visit_time||'').slice(0,5),label:v.status==='confirmed'?(v.sms_copied_at&&v.reminder_sent?'Visite confirmée ✓':v.sms_copied_at?'Rappel J-1':'Visite programmée'):statusText[v.status]||v.status,data:v});
+    for(const v of allVisits.filter(v=>v.visit_date===key).filter(v=>!activeStatFilter || (v.status!=='cancelled' && (activeStatFilter==='avenir'?!isPastVisit(v):activeStatFilter==='passees'?isPastVisit(v):v.visit_date===todayKey()))))items.push({kind:v.status,time:(v.visit_time||'').slice(0,5),label:v.status==='confirmed'?(v.sms_copied_at&&v.reminder_sent?'Visite confirmée ★':v.sms_copied_at?'Visite confirmée':'Visite programmée'):statusText[v.status]||v.status,data:v});
     const m=getMilestoneDates();for(const [id,label] of [['sru','Rétractation'],['conditions','Cond. suspensive'],['acte','Acte authentique']])if(m[id]===key)items.push({kind:'milestone',time:'',label});
     for(const action of agendaActions.filter(a=>a.kind==='visit_reminder'&&a.due_date===key))items.push({kind:'reminder',time:REMINDER_TIME,label:`Rappel — visite demain à ${timeLabel(action.visit_time)}`,data:action,actionId:action.id});
     for(const action of agendaActions.filter(a=>a.kind==='visit_followup'&&a.due_date===key))items.push({kind:'followup',time:REMINDER_TIME,label:'Faire le suivi après la visite',data:action,actionId:action.id});
@@ -212,7 +212,7 @@
   }
   function eventNode(event,key,compact=false){
     const el=make(event.kind==='reminder'?'button':'div','ap-event ap-event-'+event.kind);
-    if(event.kind==='confirmed'){const d=event.data;if(d?.sms_copied_at&&d?.reminder_sent)el.classList.add('ap-event-confirmed-full');else if(d?.sms_copied_at&&!d?.reminder_sent)el.classList.replace('ap-event-confirmed','ap-event-rappel');else if(!d?.sms_copied_at)el.classList.replace('ap-event-confirmed','ap-event-scheduled');}
+    if(event.kind==='confirmed'){const d=event.data;if(d?.sms_copied_at&&d?.reminder_sent){el.classList.add('ap-event-confirmed-full');}else if(!d?.sms_copied_at)el.classList.replace('ap-event-confirmed','ap-event-scheduled');}
     if(['confirmed','pending','done','cancelled'].includes(event.kind)&&key<todayKey())el.classList.add('ap-event-timing-past');
     if(['availability','confirmed','scheduled','pending','reminder','followup'].includes(event.kind)){
       if(event.kind!=='reminder'){el.tabIndex=0;el.setAttribute('role','button');}
