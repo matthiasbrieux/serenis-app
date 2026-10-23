@@ -20,12 +20,17 @@
   const agendaTabs=make('nav','ap-agenda-tabs');agendaTabs.setAttribute('aria-label','Rubriques de l’agenda');
   main.insertBefore(agendaTabs,top);
   const pendingTabCount=make('span','ap-tab-count','0'),tabButtons={};
-  for(const [key,label] of [['agenda','Agenda'],['visits','Mes visites']]){
-    const b=button('',()=>selectAgendaTab(key),'ap-agenda-tab');b.dataset.tab=key;b.append(make('span','',label));
+  const _tabIcoAgenda='<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>';
+  const _tabIcoVisits='<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>';
+  for(const [key,label,ico] of [['agenda','Agenda',_tabIcoAgenda],['visits','Mes visites',_tabIcoVisits]]){
+    const b=button('',()=>selectAgendaTab(key),'ap-agenda-tab');b.dataset.tab=key;
+    const iconSpan=make('span','ap-tab-ico');iconSpan.innerHTML=ico;
+    b.append(iconSpan,make('span','',label));
     if(key==='pending')b.append(pendingTabCount);
     agendaTabs.append(b);tabButtons[key]=b;
   }
   if(statRow){top.after(statRow);statRow.after(agendaTabs);}else{top.after(agendaTabs);}
+  const tealShareBtn=make('button','ap-teal-share-btn');tealShareBtn.type='button';tealShareBtn.innerHTML='<span class="ap-tsh-left"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg><span>Partager mes créneaux de visite</span></span><span class="ap-tsh-chevron">›</span>';tealShareBtn.addEventListener('click',()=>copyBookingLink());top.after(tealShareBtn);
   tabButtons.agenda.setAttribute('aria-current','page');
   const layout=main.querySelector('.agenda-layout');
   const right=main.querySelector('.agenda-right-col'), visits=main.querySelector('.visits-below');
@@ -33,7 +38,10 @@
   const bottom=make('div','ap-bottom'), actionCol=make('div','ap-actions'), listCol=make('div','ap-lists');
   layout.after(bottom); bottom.append(listCol,actionCol); listCol.append(visits);
   const calendarActions=make('div','ap-calendar-actions');main.insertBefore(calendarActions,layout);
-  const availabilityButton=button('+ Ajouter une disponibilité',openAvailability,'ap-calendar-action ap-calendar-action-primary');calendarActions.append(availabilityButton);
+  const actionGrid=make('div','ap-action-grid');
+  const availBtn=make('button','ap-action-btn ap-action-btn-primary');availBtn.type='button';availBtn.innerHTML='<span class="ap-ab-inner"><span class="ap-ab-ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><line x1="12" y1="14" x2="12" y2="18"/><line x1="10" y1="16" x2="14" y2="16"/></svg></span><span class="ap-ab-text">Ajouter une disponibilité</span></span><span class="ap-ab-chevron">›</span>';availBtn.addEventListener('click',openAvailability);
+  const manualBtn=make('button','ap-action-btn ap-action-btn-secondary');manualBtn.type='button';manualBtn.innerHTML='<span class="ap-ab-inner"><span class="ap-ab-ico ap-ab-ico-plus">+</span><span class="ap-ab-text">Ajouter une visite manuellement</span></span><span class="ap-ab-chevron">›</span>';manualBtn.addEventListener('click',()=>(window.openModal||function(){})('addVisitOverlay'));
+  actionGrid.append(availBtn,manualBtn);calendarActions.append(actionGrid);
   const appointmentsPanel=make('section','ap-appointments-panel');
   appointmentsPanel.append(make('h2','ap-appointments-heading','Mes prochains rendez-vous'));
   const appointmentList=make('div','ap-appointments-list');appointmentsPanel.append(appointmentList);layout.append(appointmentsPanel);
