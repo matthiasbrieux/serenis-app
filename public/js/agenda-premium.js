@@ -166,7 +166,8 @@
   function chooseEvent(event,key,openVisitDay=false){selectedEvent={...event,date:key};if(openVisitDay&&event.data?.visit_date)showDate(event.data.visit_date,true);else renderDashboardPanels();}
   function eventNode(event,key,compact=false){
     const el=make(event.kind==='reminder'?'button':'div','ap-event ap-event-'+event.kind);
-    if(['availability','confirmed','pending','reminder','followup'].includes(event.kind)){
+    if(event.kind==='confirmed'&&!event.data?.sms_copied_at)el.classList.replace('ap-event-confirmed','ap-event-scheduled');
+    if(['availability','confirmed','scheduled','pending','reminder','followup'].includes(event.kind)){
       if(event.kind!=='reminder'){el.tabIndex=0;el.setAttribute('role','button');}
       el.addEventListener('click',click=>{click.stopPropagation();chooseEvent(event,key,event.kind==='reminder');});
       if(event.kind!=='reminder')el.addEventListener('keydown',keyEvent=>{if(keyEvent.key==='Enter'||keyEvent.key===' '){keyEvent.preventDefault();chooseEvent(event,key);}});
