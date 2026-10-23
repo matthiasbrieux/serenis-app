@@ -129,7 +129,7 @@
     pendingEmpty.hidden=hasPending||key!=='pending';
     const showUpcoming=['upcoming','confirmed','scheduled','rappel','last','all'].includes(key);
     if(upcoming)upcoming.style.display=showUpcoming?'block':'none';
-    if(pastSection){pastSection.style.display=['past','all'].includes(key)?'block':'none';if(['past','all'].includes(key)&&!_pastOpen)togglePastSection();}
+    if(pastSection){pastSection.style.display='block';}
     if(cancelled)cancelled.style.display=['past','all'].includes(key)?'block':'none';
     if(contacts)contacts.style.display=key==='all'?'block':'none';
     if(upcoming){
