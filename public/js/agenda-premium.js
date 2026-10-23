@@ -23,7 +23,9 @@
     if(key===’pending’)b.append(pendingTabCount);
     agendaTabs.append(b);tabButtons[key]=b;
   }
+  const statRow=main.querySelector('.agenda-stats');
   top.after(agendaTabs);
+  if(statRow)agendaTabs.after(statRow);
   tabButtons.agenda.setAttribute('aria-current','page');
   const layout=main.querySelector('.agenda-layout');
   const right=main.querySelector('.agenda-right-col'), visits=main.querySelector('.visits-below');
