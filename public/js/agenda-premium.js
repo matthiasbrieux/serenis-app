@@ -147,6 +147,10 @@
         rappel.forEach(c=>parent.append(c));
         confirmed.forEach(c=>parent.insertBefore(c,rappel[0]||null));
       }
+      let scheduledEmpty=upcoming.querySelector('.ap-scheduled-empty');
+      if(!scheduledEmpty){scheduledEmpty=make('p','ap-scheduled-empty','Aucune demande de visite pour le moment sur vos disponibilités proposées.');upcoming.append(scheduledEmpty);}
+      if(key==='scheduled'){const anyVisible=[...upcoming.querySelectorAll('.vcc2')].some(c=>c.style.display!=='none');scheduledEmpty.hidden=anyVisible;}
+      else{scheduledEmpty.hidden=true;}
     }
     const empty=document.getElementById('visitsEmpty');if(empty)empty.style.display='none';
     if(key==='last'){
