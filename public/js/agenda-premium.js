@@ -110,7 +110,7 @@
   const _arrHtml='<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#C8B9AE" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>';
   for(const [key,label,ico] of [['scheduled','Programmée',_icoS],['confirmed','Confirmée',_icoC],['rappel','Rappel J-1',_icoR]]){if(vfStepsRow.children.length){const arr=make('span','ap-vf-arrow');arr.innerHTML=_arrHtml;vfStepsRow.append(arr);}const b=button('',()=>setVisitsFilter(key),'ap-visits-filter ap-vf-step ap-vf-step-'+key);b.innerHTML=ico+'<span>'+label+'</span>';b.dataset.filter=key;vfStepsRow.append(b);visitsFilterButtons[key]=b;}
   visitsFilters.append(vfStepsRow);
-  visitsPanel.append(visitsFilters);listCol.append(visitsPanel);visitsPanel.append(visits);listCol.append(manualBtn);listCol.append(availabilityPanel);
+  visitsPanel.append(visitsFilters);listCol.append(visitsPanel);visitsPanel.append(visits);listCol.append(manualBtn);agendaTabs.after(availabilityPanel);
   const pastSec=document.getElementById('pastSection');if(pastSec)listCol.append(pastSec);
   const compromisPanel=main.querySelector('#compromis-vente'),compromisHeader=compromisPanel?.querySelector('.compromis-bar-hdr'),compromisBody=compromisPanel?.querySelector('.compromis-bar-body');
   if(compromisPanel&&compromisHeader&&compromisBody){
