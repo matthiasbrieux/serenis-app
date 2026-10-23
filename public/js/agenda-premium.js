@@ -368,7 +368,7 @@
     const minute=value=>{const [h='0',m='0']=(value||'').slice(0,5).split(':');return Number(h)*60+Number(m);};
     const startMinutes=timed.flat().map(e=>minute(e.time));
     const endMinutes=timed.flat().map(e=>minute(e.end||'')||minute(e.time)+60);
-    const minHour=Math.min(8,...startMinutes.map(n=>Math.floor(n/60)));
+    const minHour=startMinutes.length?Math.max(7,Math.floor(Math.min(...startMinutes)/60)-1):8;
     const maxHour=Math.max(18,...endMinutes.map(n=>Math.ceil(n/60)));
     const hourHeight=50,trackHeight=Math.max(1,maxHour-minHour)*hourHeight;
     grid.style.setProperty('--ap-hour-height',hourHeight+'px');
