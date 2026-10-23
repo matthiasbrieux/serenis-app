@@ -63,7 +63,7 @@
   document.getElementById('dispoAddHdr').hidden=true;
   // Relocate the existing history panel; preserve its list and toggle behavior.
   const history=document.getElementById('pastSection');
-  manual.after(history);history.classList.add('ap-history','dispo-add-block');
+  availabilityFormHost.after(history);history.classList.add('ap-history','dispo-add-block');
   const historyHeading=history.querySelector('.agenda-panel-title');
   historyHeading.className='dispo-add-hdr';historyHeading.removeAttribute('style');
   historyHeading.setAttribute('role','button');historyHeading.tabIndex=0;
