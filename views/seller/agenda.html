@@ -3083,9 +3083,14 @@ window.showToast=showToast;
 
 // ── Copy booking link ─────────────────────────────────
 function copyBookingLink() {
-  const input=document.getElementById('bookingLink');
-  navigator.clipboard.writeText(input.value).catch(()=>{ input.select(); document.execCommand('copy'); });
-  showToast('Lien copié !');
+  const url = (document.getElementById('bookingLink')||{}).value || '';
+  if (!url) return;
+  const firstName = _data?.seller?.first_name || '';
+  const msg = `Bonjour, voici le lien pour réserver directement une date de visite selon mes disponibilités : ${url}\n\nCordialement,\n${firstName}`;
+  navigator.clipboard.writeText(msg).catch(()=>{
+    const tmp=document.createElement('textarea');tmp.value=msg;document.body.appendChild(tmp);tmp.select();document.execCommand('copy');document.body.removeChild(tmp);
+  });
+  showToast('Message copié !');
 }
 
 function copyCalFeed() {
