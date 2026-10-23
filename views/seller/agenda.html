@@ -1718,8 +1718,8 @@ function buildVisitCardHtml(v) {
         ${v.buyer_timeline?`<div style="font-size:0.8rem;color:var(--noir);display:flex;align-items:center;gap:5px;"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Délai : <strong>${escapeHtml(v.buyer_timeline)}</strong></div>`:''}
       </div>`:''}
       ${v.status!=='cancelled'?`<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
-        <button class="btn-sms-reminder${v.sms_copied_at?' sent':''}" id="btn-reminder-${v.id}" onclick="sendReminder(${v.id})">${svgPhone} ${v.sms_copied_at?'Rappel copié':'Confirmation de visite'}</button>
-        <button class="btn-sms-reminder" onclick="sendRappelRdv(${v.id})">${svgPhone} Rappel du rdv</button>
+        <button class="btn-sms-reminder${v.sms_copied_at?' sent':''}" id="btn-reminder-${v.id}" onclick="sendReminder(${v.id})">${svgPhone} ${v.sms_copied_at?'Confirmation effectuée':'Confirmation de visite'}</button>
+        <button class="btn-sms-reminder${v.reminder_sent?' sent':''}" id="btn-rappel-${v.id}" onclick="sendRappelRdv(${v.id})">${svgPhone} ${v.reminder_sent?'Rappel effectué':'Rappel du rdv'}</button>
         <button class="btn-cancel-sm" onclick="openCancelSmsModal(${v.id})">Annuler</button>
       </div>
       <div id="sms-badge-${v.id}">${smsCopiedBadge(v.sms_copied_at)}</div>`:''}
@@ -1768,8 +1768,8 @@ function buildVisitConfirmedCard(v) {
     </div>
     ${profileHtml}
     <div class="vcc2-actions">
-      <button class="vcc2-btn-sms${v.sms_copied_at?' sent':''}" id="btn-reminder-${v.id}" onclick="sendReminder(${v.id})">${svgPhone} ${v.sms_copied_at?'Rappel copié':'Confirmation de visite'}</button>
-      <button class="vcc2-btn-sms" onclick="sendRappelRdv(${v.id})">${svgPhone} Rappel du rdv</button>
+      <button class="vcc2-btn-sms${v.sms_copied_at?' sent':''}" id="btn-reminder-${v.id}" onclick="sendReminder(${v.id})">${svgPhone} ${v.sms_copied_at?'Confirmation effectuée':'Confirmation de visite'}</button>
+      <button class="vcc2-btn-sms${v.reminder_sent?' sent':''}" id="btn-rappel-${v.id}" onclick="sendRappelRdv(${v.id})">${svgPhone} ${v.reminder_sent?'Rappel effectué':'Rappel du rdv'}</button>
       <button class="vcc2-btn-cancel" onclick="openCancelSmsModal(${v.id})">Annuler</button>
     </div>
     ${v.sms_copied_at?`<div class="vcc2-sms-badge" id="sms-badge-${v.id}">${smsCopiedBadge(v.sms_copied_at)}</div>`:`<div id="sms-badge-${v.id}" class="vcc2-sms-badge"></div>`}
@@ -2133,7 +2133,9 @@ function sendReminder(id) {
   const qualifCopyBtn = document.getElementById('qualifCopyBtn');
   if (qualifCopyBtn) { qualifCopyBtn.textContent = 'Copier ce message'; qualifCopyBtn.classList.remove('copied'); }
 
-  document.getElementById('rappelSmsOverlay')._visitId = id;
+  const overlay = document.getElementById('rappelSmsOverlay');
+  overlay._visitId = id;
+  overlay._mode = 'confirm';
   openModal('rappelSmsOverlay');
 }
 
@@ -2172,7 +2174,9 @@ function sendRappelRdv(id) {
   if (qualifPanel) qualifPanel.classList.remove('open');
   if (qualifToggle) qualifToggle.classList.remove('open');
   if (qualifArrow) qualifArrow.style.transform='';
-  document.getElementById('rappelSmsOverlay')._visitId = id;
+  const overlayRdv = document.getElementById('rappelSmsOverlay');
+  overlayRdv._visitId = id;
+  overlayRdv._mode = 'rappel';
   openModal('rappelSmsOverlay');
 }
 
@@ -2260,23 +2264,36 @@ function copyRappelSms(btn) {
 }
 
 function markRappelSmsSent() {
-  const id = document.getElementById('rappelSmsOverlay')._visitId;
+  const overlay = document.getElementById('rappelSmsOverlay');
+  const id = overlay._visitId;
+  const mode = overlay._mode || 'confirm';
   if (!id) return;
   const v = allVisits.find(v => v.id === id);
-  if (v) v.sms_copied_at = new Date().toISOString();
-  const reminderBtn = document.getElementById('btn-reminder-' + id);
-  if (reminderBtn) {
-    const baseClass = reminderBtn.classList.contains('vcc2-btn-sms') ? 'vcc2-btn-sms' : 'btn-sms-reminder';
-    reminderBtn.className = baseClass + ' sent';
-    reminderBtn.innerHTML = '✓ Message envoyé';
+  if (mode === 'rappel') {
+    if (v) v.reminder_sent = 1;
+    const rappelBtn = document.getElementById('btn-rappel-' + id);
+    if (rappelBtn) {
+      const baseClass = rappelBtn.classList.contains('vcc2-btn-sms') ? 'vcc2-btn-sms' : 'btn-sms-reminder';
+      rappelBtn.className = baseClass + ' sent';
+      rappelBtn.innerHTML = '✓ Rappel effectué';
+    }
+    fetch(`/api/visits/${id}/rappel-rdv`, {method:'POST'}).catch(()=>{});
+  } else {
+    if (v) v.sms_copied_at = new Date().toISOString();
+    const reminderBtn = document.getElementById('btn-reminder-' + id);
+    if (reminderBtn) {
+      const baseClass = reminderBtn.classList.contains('vcc2-btn-sms') ? 'vcc2-btn-sms' : 'btn-sms-reminder';
+      reminderBtn.className = baseClass + ' sent';
+      reminderBtn.innerHTML = '✓ Confirmation effectuée';
+    }
+    const badge = document.getElementById('sms-badge-' + id);
+    if (badge) badge.innerHTML = smsCopiedBadge(v?.sms_copied_at);
+    const vcardEl = document.getElementById('vcard-' + id);
+    if (vcardEl) vcardEl.classList.add('vcc2-confirmed');
+    const statusBadge = document.getElementById('status-badge-' + id);
+    if (statusBadge) statusBadge.innerHTML = badgeHtml('confirmed', new Date().toISOString());
+    fetch(`/api/visits/${id}/reminder`, {method:'POST'}).catch(()=>{});
   }
-  const badge = document.getElementById('sms-badge-' + id);
-  if (badge) badge.innerHTML = smsCopiedBadge(v?.sms_copied_at);
-  const vcardEl = document.getElementById('vcard-' + id);
-  if (vcardEl) vcardEl.classList.add('vcc2-confirmed');
-  const statusBadge = document.getElementById('status-badge-' + id);
-  if (statusBadge) statusBadge.innerHTML = badgeHtml('confirmed', new Date().toISOString());
-  fetch(`/api/visits/${id}/reminder`, {method:'POST'}).catch(()=>{});
 }
 
 function toggleQualifPanel() {
@@ -3203,6 +3220,6 @@ loadData().then(() => {
 </script>
 
 <link rel="stylesheet" href="/css/seller-header-typography.css?v=1">
-<script src="/js/agenda-premium.js?v=22"></script>
+<script src="/js/agenda-premium.js?v=23"></script>
 </body>
 </html>

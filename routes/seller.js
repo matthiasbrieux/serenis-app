@@ -1210,6 +1210,13 @@ router.post('/api/visits/:id/reminder', requireAuth, (req, res) => {
   res.json({ success: true });
 });
 
+router.post('/api/visits/:id/rappel-rdv', requireAuth, (req, res) => {
+  const visit = db.prepare('SELECT id FROM visits WHERE id=? AND seller_id=?').get(req.params.id, req.seller.id);
+  if (!visit) return res.status(404).json({ error: 'Visite introuvable' });
+  db.prepare('UPDATE visits SET reminder_sent=1 WHERE id=?').run(visit.id);
+  res.json({ success: true });
+});
+
 // ── Feed calendrier (webcal) — public via token ───────────────
 router.get('/api/agenda/feed.ics', (req, res) => {
   const { token } = req.query;
