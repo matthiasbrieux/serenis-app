@@ -140,6 +140,13 @@
         else if(key==='rappel')card.style.display=card.classList.contains('vcc2-rappel')?'':'none';
         else card.style.display='';
       });
+      if(key==='confirmed'){
+        const parent=upcoming;
+        const confirmed=[...parent.querySelectorAll('.vcc2.vcc2-confirmed')];
+        const rappel=[...parent.querySelectorAll('.vcc2.vcc2-rappel')];
+        rappel.forEach(c=>parent.append(c));
+        confirmed.forEach(c=>parent.insertBefore(c,rappel[0]||null));
+      }
     }
     const empty=document.getElementById('visitsEmpty');if(empty)empty.style.display='none';
     if(key==='last'){
