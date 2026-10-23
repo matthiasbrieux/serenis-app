@@ -293,6 +293,39 @@ if("scrollRestoration"in history)history.scrollRestoration="manual";</script>
       .compromis-form .compromis-form-delay select { width:100%; box-sizing:border-box; }
       .compromis-form-btn { width:100%; justify-content:center; }
     }
+    /* ── Compromis reminders timeline ── */
+    .cr-timeline{margin-top:20px;border-top:1px solid #f0ebe4;padding-top:16px;display:flex;flex-direction:column;gap:0}
+    .cr-item{display:flex;gap:12px;padding:14px 0;border-bottom:1px solid #f8f2ec}
+    .cr-item:last-child{border-bottom:none}
+    .cr-track{display:flex;flex-direction:column;align-items:center;flex-shrink:0;width:14px;margin-top:2px}
+    .cr-dot{width:12px;height:12px;border-radius:50%;flex-shrink:0}
+    .cr-dot.open{background:#fff;border:2px solid #C4603A}
+    .cr-dot.info{background:#fff;border:2px solid #bbb}
+    .cr-dot.done{background:#2e7d32;border:2px solid #2e7d32}
+    .cr-line{width:1px;flex:1;background:#e8ddd5;margin-top:4px;min-height:8px}
+    .cr-body{flex:1;min-width:0}
+    .cr-title{font-family:'DM Sans',sans-serif;font-size:0.87rem;font-weight:700;color:#1A1A16;line-height:1.3}
+    .cr-item.done .cr-title{color:#999;text-decoration:line-through}
+    .cr-step{font-size:0.72rem;font-weight:700;color:#C4603A;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:2px}
+    .cr-date-line{font-size:0.79rem;color:#C4603A;font-weight:600;margin-top:3px}
+    .cr-date-line.info{color:#999;font-weight:400;font-style:italic}
+    .cr-desc{font-size:0.79rem;color:#777;line-height:1.55;margin:6px 0 10px}
+    .cr-msg{font-size:0.77rem;color:#555;line-height:1.65;background:#f9f6f2;border:1px solid #e8e0d6;border-radius:8px;padding:10px 12px;margin:8px 0;font-family:'DM Sans',sans-serif;white-space:pre-wrap;display:none}
+    .cr-actions{display:flex;flex-wrap:wrap;gap:7px;margin-top:6px}
+    .cr-btn{padding:7px 13px;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:0.78rem;font-weight:600;cursor:pointer;transition:all 0.15s;display:inline-flex;align-items:center;gap:5px;text-decoration:none;border:1.5px solid;white-space:nowrap}
+    .cr-btn-copy{background:#fff;color:#C4603A;border-color:#C4603A}
+    .cr-btn-copy:hover{background:#fef3ee}
+    .cr-btn-sms{background:linear-gradient(135deg,#C4603A,#d4724c);color:#fff;border-color:#C4603A}
+    .cr-btn-sms:hover{background:linear-gradient(135deg,#b35534,#c46540)}
+    .cr-btn-done{background:#f5f5f5;color:#777;border-color:#ddd}
+    .cr-btn-done:hover{background:#eee}
+    .cr-btn-done.done{background:#e8f5e9;color:#2e7d32;border-color:#c8e6c9}
+    .cr-btn-pdf{background:#f5f0e8;color:#5a3a1a;border-color:#d4c4a8}
+    .cr-btn-pdf:hover{background:#ede5d4}
+    .cr-confirm-form{display:flex;gap:7px;margin-top:8px;align-items:center;flex-wrap:wrap}
+    .cr-confirm-input{padding:7px 10px;border:1.5px solid #e0d8ce;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:0.83rem;color:#1A1A16;background:#fafaf8}
+    .cr-confirm-btn{padding:7px 13px;background:#C4603A;color:#fff;border:none;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:0.8rem;font-weight:600;cursor:pointer}
+    @media(max-width:540px){.cr-btn{padding:8px 11px;font-size:0.77rem}}
     /* Filter dimmed */
     .cal-filter-dimmed { opacity:0.15; pointer-events:none; }
     /* Legend */
@@ -1355,34 +1388,29 @@ if("scrollRestoration"in history)history.scrollRestoration="manual";</script>
           <h3>Du compromis à la signature</h3>
         </div>
         <div class="compromis-bar-body">
-          <p style="font-size:0.81rem;color:#888;margin:0 0 16px;line-height:1.5;">Renseignez les dates utiles figurant dans votre dossier pour afficher les échéances correspondantes dans votre agenda.</p>
+          <p style="font-size:0.81rem;color:#888;margin:0 0 16px;line-height:1.5;">Renseignez la date de signature de votre compromis. Les rappels de suivi sont générés automatiquement.</p>
           <div class="compromis-form">
             <div style="display:flex;flex-direction:column;gap:4px;flex:1;min-width:140px;">
-              <label style="font-size:0.75rem;font-weight:700;color:#555;text-transform:uppercase;letter-spacing:0.06em;">Date du compromis</label>
+              <label style="font-size:0.75rem;font-weight:700;color:#555;text-transform:uppercase;letter-spacing:0.06em;">Date du compromis <span style="color:#C4603A">*</span></label>
               <input type="date" id="compromisDateInput" style="padding:9px 12px;border:1.5px solid #e0d8ce;border-radius:9px;font-family:'DM Sans',sans-serif;font-size:0.88rem;color:#1A1A16;background:#fafaf8;outline:none;width:100%;box-sizing:border-box;">
             </div>
-            <div class="compromis-date-field"><label for="compromisRetractionInput">Fin du délai de rétractation</label><input type="date" id="compromisRetractionInput"></div>
-            <div class="compromis-date-field"><label for="compromisConditionsInput">Date limite de la condition suspensive</label><input type="date" id="compromisConditionsInput"></div>
-            <div class="compromis-date-field"><label for="compromisActeInput">Date de signature prévue</label><input type="date" id="compromisActeInput"></div>
+            <div style="display:flex;flex-direction:column;gap:4px;flex:1;min-width:140px;">
+              <label style="font-size:0.75rem;font-weight:700;color:#555;text-transform:uppercase;letter-spacing:0.06em;">Signature chez le notaire <span style="font-weight:400;text-transform:none;letter-spacing:0;font-size:0.73rem;color:#aaa;">(à compléter quand fixée)</span></label>
+              <input type="date" id="compromisActeInput" style="padding:9px 12px;border:1.5px solid #e0d8ce;border-radius:9px;font-family:'DM Sans',sans-serif;font-size:0.88rem;color:#1A1A16;background:#fafaf8;outline:none;width:100%;box-sizing:border-box;">
+            </div>
+            <!-- Champs conservés pour compatibilité JS — non affichés -->
+            <input type="hidden" id="compromisRetractionInput">
+            <input type="hidden" id="compromisConditionsInput">
             <button onclick="saveCompromis()" class="btn-primary compromis-form-btn" style="padding:10px 18px;font-size:0.85rem;border-radius:9px;white-space:nowrap;height:40px;">Enregistrer</button>
           </div>
-          <div id="compromisMilestones" style="display:none;margin-top:18px;border-top:1px solid #f0ebe4;padding-top:14px;">
-            <div class="compromis-milestone">
-              <span class="compromis-milestone-dot" style="background:#D32F2F;"></span>
-              <span class="compromis-milestone-label">Fin délai de rétractation</span>
-              <span class="compromis-milestone-date" id="milestoneSru">—</span>
-            </div>
-            <div class="compromis-milestone">
-              <span class="compromis-milestone-dot" style="background:#1565C0;"></span>
-              <span class="compromis-milestone-label">Limite condition suspensive prêt</span>
-              <span class="compromis-milestone-date" id="milestoneConditions">—</span>
-            </div>
-            <div class="compromis-milestone">
-              <span class="compromis-milestone-dot" style="background:var(--terracotta);"></span>
-              <span class="compromis-milestone-label">Signature acte authentique</span>
-              <span class="compromis-milestone-date" id="milestoneActe">—</span>
-            </div>
+          <!-- Jalons conservés pour la légende calendrier — masqués visuellement -->
+          <div id="compromisMilestones" style="display:none;">
+            <span class="compromis-milestone-date" id="milestoneSru" style="display:none;"></span>
+            <span class="compromis-milestone-date" id="milestoneConditions" style="display:none;"></span>
+            <span class="compromis-milestone-date" id="milestoneActe" style="display:none;"></span>
           </div>
+          <!-- Timeline de suivi compromis -->
+          <div id="crTimeline"></div>
         </div>
       </div>
 
@@ -3280,11 +3308,141 @@ async function saveCompromis() {
       compromisData = { compromis_date: date || null, ...dates, compromis_dates_explicit:1 };
       updateCompromisMilestones();
       updateCompromisNudge();
+      await loadCompromisReminders();
       document.querySelector('.ap-compromis-panel .compromis-bar-body')?.setAttribute('hidden','');
       document.querySelector('.ap-compromis-toggle')?.setAttribute('aria-expanded','false');
       showToast('Compromis enregistré ✓');
     }
   } catch(e) { showToast('Erreur de sauvegarde', 'error'); }
+}
+
+let _crBuyer = null;
+async function loadCompromisReminders() {
+  try {
+    const r = await fetch('/api/compromis/reminders');
+    if (!r.ok) return;
+    const { reminders, buyer } = await r.json();
+    _crBuyer = buyer;
+    renderCRTimeline(reminders);
+  } catch(e) {}
+}
+function _crFmt(dateStr) {
+  if (!dateStr) return null;
+  const [y,m,d] = dateStr.split('-');
+  return new Date(Number(y),Number(m)-1,Number(d)).toLocaleDateString('fr-FR',{day:'numeric',month:'long',year:'numeric'});
+}
+function _crSmsMsg(kind, buyerFirstName, sellerFirstName) {
+  const bn = buyerFirstName || '[Prénom]';
+  const sn = sellerFirstName || '[Votre prénom]';
+  if (kind==='j20') return `Bonjour ${bn},\n\nJ'espère que vous allez bien.\n\nJe me permets de prendre quelques nouvelles concernant l'avancement de votre dossier de financement.\n\nAvez-vous pu transmettre les éléments nécessaires à votre banque ou à votre courtier ?\n\nBonne journée,\n${sn}`;
+  if (kind==='j45') return `Bonjour ${bn},\n\nJ'espère que tout va bien.\n\nJe souhaitais simplement savoir où en était votre financement et si vous aviez eu un retour de votre banque.\n\nN'hésitez pas à me tenir informé afin que nous puissions suivre sereinement les prochaines étapes avec le notaire.\n\nBonne journée,\n${sn}`;
+  if (kind==='etat_lieux') return `Bonjour ${bn},\n\nEn prévision de notre signature définitive chez le notaire, je vous propose d'organiser une dernière visite du logement afin de vérifier ensemble son état général et de relever les différents compteurs.\n\nSeriez-vous disponible quelques jours avant la signature pour convenir d'un rendez-vous ?\n\nBonne journée,\n${sn}`;
+  return '';
+}
+function copyCompromisMsg(kind) {
+  const sn = _data?.seller?.first_name || '';
+  const bn = _crBuyer ? (_crBuyer.buyer_name||'').split(' ')[0] : '';
+  const msg = _crSmsMsg(kind, bn, sn);
+  if (!msg) return;
+  navigator.clipboard.writeText(msg).then(() => showToast('Message copié ✓')).catch(() => {
+    const el = document.createElement('textarea'); el.value = msg; document.body.appendChild(el); el.select(); document.execCommand('copy'); document.body.removeChild(el); showToast('Message copié ✓');
+  });
+}
+async function markCRDone(kind, isDone) {
+  try {
+    const r = await fetch(`/api/compromis/reminders/${kind}`, { method:'PATCH', headers:{'Content-Type':'application/json'}, body: JSON.stringify({status: isDone?'done':'open'}) });
+    if (r.ok) { await loadCompromisReminders(); showToast(isDone ? 'Étape marquée comme effectuée ✓' : 'Étape réouverte'); }
+  } catch(e) { showToast('Erreur réseau','error'); }
+}
+async function confirmRetractionDate() {
+  const inp = document.getElementById('crRetractionInput');
+  if (!inp || !inp.value) return;
+  document.getElementById('compromisRetractionInput').value = inp.value;
+  await saveCompromis();
+}
+function renderCRTimeline(reminders) {
+  const el = document.getElementById('crTimeline');
+  if (!el) return;
+  if (!reminders || !reminders.length) { el.innerHTML = ''; return; }
+  const map = {}; reminders.forEach(r => { map[r.kind] = r; });
+  const sn = _data?.seller?.first_name || '[Votre prénom]';
+  const bn = _crBuyer ? (_crBuyer.buyer_name||'').split(' ')[0] : null;
+  const bphone = _crBuyer?.buyer_phone || '';
+  const svgDone = `<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>`;
+  const svgCopy = `<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>`;
+  const svgSms = `<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.41a2 2 0 0 1 2-2.18h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>`;
+  const svgPdf = `<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>`;
+  const items = [];
+  const mkItem = (kind, step, title, dateLine, desc, actions, dotClass) => {
+    const r = map[kind]; const isDone = r?.status === 'done';
+    return `<div class="cr-item${isDone?' done':''}" data-kind="${kind}">
+      <div class="cr-track"><div class="cr-dot ${isDone?'done':dotClass}"></div><div class="cr-line"></div></div>
+      <div class="cr-body">
+        ${step?`<div class="cr-step">${step}</div>`:''}
+        <div class="cr-title">${title}</div>
+        <div class="cr-date-line ${dotClass==='info'&&!isDone?'info':''}">${dateLine}</div>
+        <div class="cr-desc">${desc}</div>
+        <div class="cr-actions">${actions}</div>
+      </div>
+    </div>`;
+  };
+  // 1 — Rétractation
+  if (map['retraction']||map['j20']) {
+    const ret = map['retraction'];
+    const dateLine = ret?.due_date ? _crFmt(ret.due_date) : 'Date à confirmer avec votre notaire';
+    const dotC = ret?.due_date ? 'open' : 'info';
+    let acts = '';
+    if (!ret?.due_date) {
+      acts += `<div class="cr-confirm-form"><input type="date" id="crRetractionInput" class="cr-confirm-input" placeholder="Date confirmée"><button class="cr-confirm-btn" onclick="confirmRetractionDate()">Confirmer la date</button></div>`;
+    } else {
+      const doneBtn = ret.status==='done'
+        ? `<button class="cr-btn cr-btn-done done" onclick="markCRDone('retraction',false)">${svgDone} Délai écoulé</button>`
+        : `<button class="cr-btn cr-btn-done" onclick="markCRDone('retraction',true)">Marquer comme écoulé</button>`;
+      acts = doneBtn;
+    }
+    items.push(mkItem('retraction','Étape 1','Fin du délai de rétractation', dateLine,
+      'Le délai commence selon la date de notification de l\'avant-contrat et non le jour de la signature. Votre notaire vous communique la date exacte.',
+      acts, dotC));
+  }
+  // 2 — J+20
+  if (map['j20']) {
+    const r = map['j20']; const isDone = r.status==='done';
+    const msg = _crSmsMsg('j20', bn||'[Prénom]', sn);
+    const smsHref = bphone ? `sms:${bphone}?body=${encodeURIComponent(msg)}` : '';
+    const smsBtn = smsHref ? `<a class="cr-btn cr-btn-sms" href="${smsHref}">${svgSms} Envoyer au client</a>` : '';
+    let acts = `<button class="cr-btn cr-btn-copy" onclick="copyCompromisMsg('j20')">${svgCopy} Copier le message</button>${smsBtn}<button class="cr-btn cr-btn-done${isDone?' done':''}" onclick="markCRDone('j20',${!isDone})">${isDone?svgDone+' Effectué':'Marquer comme effectué'}</button>`;
+    items.push(mkItem('j20','Étape 2 · Repère J+20','Suivi du financement — 1ᵉʳ contact', r.due_date?_crFmt(r.due_date):'—',
+      'Prenez des nouvelles de l\'avancement du dossier de financement. Repère pédagogique Vendu Par Moi — pas une échéance juridique.', acts, 'open'));
+  }
+  // 3 — J+45
+  if (map['j45']) {
+    const r = map['j45']; const isDone = r.status==='done';
+    const msg = _crSmsMsg('j45', bn||'[Prénom]', sn);
+    const smsHref = bphone ? `sms:${bphone}?body=${encodeURIComponent(msg)}` : '';
+    const smsBtn = smsHref ? `<a class="cr-btn cr-btn-sms" href="${smsHref}">${svgSms} Envoyer au client</a>` : '';
+    let acts = `<button class="cr-btn cr-btn-copy" onclick="copyCompromisMsg('j45')">${svgCopy} Copier le message</button>${smsBtn}<button class="cr-btn cr-btn-done${isDone?' done':''}" onclick="markCRDone('j45',${!isDone})">${isDone?svgDone+' Effectué':'Marquer comme effectué'}</button>`;
+    items.push(mkItem('j45','Étape 3 · Repère J+45','Suivi du financement — 2ᵉ contact', r.due_date?_crFmt(r.due_date):'—',
+      'Faites le point sur l\'avancement du financement. Repère pédagogique Vendu Par Moi — pas une échéance juridique.', acts, 'open'));
+  }
+  // 4 — État des lieux (avant signature)
+  if (map['etat_lieux']) {
+    const r = map['etat_lieux']; const isDone = r.status==='done';
+    const msg = _crSmsMsg('etat_lieux', bn||'[Prénom]', sn);
+    const smsHref = bphone ? `sms:${bphone}?body=${encodeURIComponent(msg)}` : '';
+    const smsBtn = smsHref ? `<a class="cr-btn cr-btn-sms" href="${smsHref}">${svgSms} Envoyer au client</a>` : '';
+    let acts = `<a class="cr-btn cr-btn-pdf" href="/ma-formation/documents/etat-des-lieux" target="_blank">${svgPdf} Fiche d'état des lieux</a><button class="cr-btn cr-btn-copy" onclick="copyCompromisMsg('etat_lieux')">${svgCopy} Copier le message</button>${smsBtn}<button class="cr-btn cr-btn-done${isDone?' done':''}" onclick="markCRDone('etat_lieux',${!isDone})">${isDone?svgDone+' Effectué':'Marquer comme effectué'}</button>`;
+    items.push(mkItem('etat_lieux','Étape 4','Préparez votre dernière visite', r.due_date?_crFmt(r.due_date):'—',
+      'Avant la signature chez le notaire, organisez une dernière visite pour vérifier l\'état du logement, relever les compteurs et préparer la remise des clés avec l\'acheteur.', acts, 'open'));
+  }
+  // 5 — Signature définitive
+  if (map['signature']) {
+    const r = map['signature']; const isDone = r.status==='done';
+    let acts = `<button class="cr-btn cr-btn-done${isDone?' done':''}" onclick="markCRDone('signature',${!isDone})">${isDone?svgDone+' Vente finalisée ✓':'Confirmer la signature'}</button>`;
+    items.push(mkItem('signature','Étape 5','Signature définitive chez le notaire', r.due_date?_crFmt(r.due_date):'—',
+      'Le rendez-vous chez le notaire pour signer l\'acte authentique et finaliser votre vente.', acts, 'open'));
+  }
+  if (!items.length) { el.innerHTML = ''; return; }
+  el.innerHTML = `<div class="cr-timeline">${items.join('')}</div>`;
 }
 
 // Auto-marquer les notifs visite comme lues dès l'ouverture de l'agenda
@@ -3320,6 +3478,7 @@ loadData().then(() => {
   renderAvailMonth();
   loadNotifications();
   loadCompromis();
+  loadCompromisReminders();
   if (_urlDate) {
     setTimeout(() => {
       const cal = document.querySelector('.cal-panel');
@@ -3413,6 +3572,6 @@ loadData().then(() => {
 </script>
 
 <link rel="stylesheet" href="/css/seller-header-typography.css?v=1">
-<script src="/js/agenda-premium.js?v=74"></script>
+<script src="/js/agenda-premium.js?v=75"></script>
 </body>
 </html>

@@ -528,6 +528,19 @@ function agendaDateOffset(value, offset) {
   date.setUTCDate(date.getUTCDate() + offset);
   return date.toISOString().slice(0, 10);
 }
+function syncCompromisReminders(sellerId, compromisDate, retractionDate, acteDate) {
+  const addDays = (d, n) => { const dt = new Date(d+'T12:00:00Z'); dt.setUTCDate(dt.getUTCDate()+n); return dt.toISOString().slice(0,10); };
+  const upsert = db.prepare(`INSERT INTO compromis_reminders(seller_id,kind,due_date,status) VALUES(?,?,?,'open')
+    ON CONFLICT(seller_id,kind) DO UPDATE SET
+      status=CASE WHEN compromis_reminders.due_date IS NOT excluded.due_date THEN 'open' ELSE compromis_reminders.status END,
+      due_date=excluded.due_date, updated_at=CURRENT_TIMESTAMP`);
+  const tx = db.transaction(() => {
+    if (compromisDate) { upsert.run(sellerId,'j20',addDays(compromisDate,20)); upsert.run(sellerId,'j45',addDays(compromisDate,45)); }
+    if (retractionDate) upsert.run(sellerId,'retraction',retractionDate);
+    if (acteDate) { upsert.run(sellerId,'signature',acteDate); upsert.run(sellerId,'etat_lieux',addDays(acteDate,-7)); }
+  });
+  tx();
+}
 function syncSellerAgendaActions(sellerId) {
   const today = agendaParisToday();
   const visits = db.prepare('SELECT id, status, visit_date, created_at FROM visits WHERE seller_id=?').all(sellerId);
@@ -625,15 +638,32 @@ router.post('/api/compromis', requireAuth, express.json(), (req, res) => {
   if (dates_explicit) {
     db.prepare('UPDATE properties SET compromis_date=?, compromis_retraction_date=?, compromis_conditions_date=?, compromis_acte_date=?, compromis_dates_explicit=1 WHERE seller_id=?')
       .run(compromis_date || null, compromis_retraction_date || null, compromis_conditions_date || null, compromis_acte_date || null, req.seller.id);
-    // Invalider les relances périmées (R4): supprime les events delivery liés aux anciennes dates
-    // pour que les nouvelles dates puissent déclencher leurs propres rappels
     db.prepare("DELETE FROM delivery_events WHERE event_key LIKE ?").run(`compromis-milestone:${req.seller.id}:%`);
-    // Marquer les notifications de rappel compromis comme lues (elles référencent les anciennes dates)
     db.prepare("UPDATE notifications SET read_at=CURRENT_TIMESTAMP WHERE seller_id=? AND type='compromis_reminder' AND read_at IS NULL").run(req.seller.id);
+    syncCompromisReminders(req.seller.id, compromis_date||null, compromis_retraction_date||null, compromis_acte_date||null);
   } else {
     db.prepare('UPDATE properties SET compromis_date=?, compromis_conditions_delay=? WHERE seller_id=?')
       .run(compromis_date || null, Number(compromis_conditions_delay) || 45, req.seller.id);
+    syncCompromisReminders(req.seller.id, compromis_date||null, null, null);
   }
+  res.json({ success: true });
+});
+
+router.get('/api/compromis/reminders', requireAuth, (req, res) => {
+  const reminders = db.prepare('SELECT kind,due_date,status FROM compromis_reminders WHERE seller_id=? ORDER BY due_date NULLS LAST').all(req.seller.id);
+  const buyer = db.prepare(`SELECT buyer_name,buyer_phone FROM offers WHERE seller_id=? AND status='accepted' ORDER BY responded_at DESC LIMIT 1`).get(req.seller.id)
+    || db.prepare(`SELECT buyer_name,buyer_phone FROM visits WHERE seller_id=? AND status IN ('done','confirmed') ORDER BY visit_date DESC LIMIT 1`).get(req.seller.id);
+  res.json({ reminders, buyer: buyer||null });
+});
+
+router.patch('/api/compromis/reminders/:kind', requireAuth, express.json(), (req, res) => {
+  const { kind } = req.params;
+  if (!['retraction','j20','j45','etat_lieux','signature'].includes(kind)) return res.status(400).json({ error: 'Type invalide' });
+  const { status, due_date } = req.body;
+  if (!['open','done'].includes(status||'')) return res.status(400).json({ error: 'Statut invalide' });
+  db.prepare(`INSERT INTO compromis_reminders(seller_id,kind,due_date,status) VALUES(?,?,?,?)
+    ON CONFLICT(seller_id,kind) DO UPDATE SET status=excluded.status, due_date=COALESCE(excluded.due_date,due_date), updated_at=CURRENT_TIMESTAMP`)
+    .run(req.seller.id, kind, due_date||null, status);
   res.json({ success: true });
 });
 

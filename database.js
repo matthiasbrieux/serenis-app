@@ -594,6 +594,18 @@ try { db.exec("ALTER TABLE properties ADD COLUMN compromis_retraction_date DATE"
 try { db.exec("ALTER TABLE properties ADD COLUMN compromis_conditions_date DATE"); } catch(e) {}
 try { db.exec("ALTER TABLE properties ADD COLUMN compromis_acte_date DATE"); } catch(e) {}
 try { db.exec("ALTER TABLE properties ADD COLUMN compromis_dates_explicit INTEGER DEFAULT 0"); } catch(e) {}
+try { db.exec(`
+  CREATE TABLE IF NOT EXISTS compromis_reminders (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    seller_id INTEGER NOT NULL REFERENCES sellers(id) ON DELETE CASCADE,
+    kind TEXT NOT NULL CHECK(kind IN ('retraction','j20','j45','etat_lieux','signature')),
+    due_date TEXT,
+    status TEXT NOT NULL DEFAULT 'open' CHECK(status IN ('open','done')),
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE(seller_id, kind)
+  )
+`); } catch(e) {}
 
 // ── Registre chèques parrainage ─────────────────────────────────
 db.exec(`
