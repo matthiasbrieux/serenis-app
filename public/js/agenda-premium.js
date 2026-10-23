@@ -208,7 +208,9 @@
     detailBody.replaceChildren();
     detailPanel.hidden=!selectedEvent;
     if(!selectedEvent)return;
-    const {kind,data,date}=selectedEvent,info=make('div','ap-selected-event ap-event-'+kind);
+    const {kind,data,date}=selectedEvent;
+    const eventClass=kind==='confirmed'&&!data?.sms_copied_at?'scheduled':kind;
+    const info=make('div','ap-selected-event ap-event-'+eventClass);
     info.append(make('strong','ap-selected-date',fullDate(['reminder','followup'].includes(kind)?data.visit_date:date)));
     if(kind==='availability'){
       info.append(make('span','','Créneau disponible'),make('span','',`${timeLabel(data.start)} – ${timeLabel(data.end)}`));
