@@ -98,7 +98,7 @@
   const visitsHeading=make('h2','ap-lower-heading','Mes visites');visitsPanel.append(visitsHeading);
   const visitsFilters=make('div','ap-visits-filters');
   const visitsFilterButtons={};
-  for(const [key,label] of [['last','Dernière réservée'],['confirmed','Confirmée'],['scheduled','Programmée'],['all','Toutes']]){const b=button(label,()=>setVisitsFilter(key),'ap-visits-filter');b.dataset.filter=key;visitsFilters.append(b);visitsFilterButtons[key]=b;}
+  for(const [key,label] of [['last','Dernière réservée'],['confirmed','Confirmée'],['scheduled','Programmée'],['rappel','Rappel J-1'],['all','Toutes']]){const b=button(label,()=>setVisitsFilter(key),'ap-visits-filter');b.dataset.filter=key;visitsFilters.append(b);visitsFilterButtons[key]=b;}
   visitsPanel.append(visitsFilters);listCol.append(visitsPanel);visitsPanel.append(visits);listCol.append(availabilityPanel);
   const compromisPanel=main.querySelector('#compromis-vente'),compromisHeader=compromisPanel?.querySelector('.compromis-bar-hdr'),compromisBody=compromisPanel?.querySelector('.compromis-bar-body');
   if(compromisPanel&&compromisHeader&&compromisBody){
@@ -118,9 +118,9 @@
     Object.entries(visitsFilterButtons).forEach(([name,el])=>el.setAttribute('aria-pressed',String(name===key)));
     const upcoming=document.getElementById('upcomingSection'),pastSection=document.getElementById('pastSection'),cancelled=document.getElementById('cancelledSection'),contacts=document.getElementById('contactsSection');
     const hasPending=allVisits.some(v=>v.status==='pending'&&!isPastVisit(v));
-    pendingPanel.hidden=!hasPending||!['upcoming','confirmed','scheduled','last','pending','all'].includes(key);
+    pendingPanel.hidden=!hasPending||!['upcoming','confirmed','scheduled','rappel','last','pending','all'].includes(key);
     pendingEmpty.hidden=hasPending||key!=='pending';
-    const showUpcoming=['upcoming','confirmed','scheduled','last','all'].includes(key);
+    const showUpcoming=['upcoming','confirmed','scheduled','rappel','last','all'].includes(key);
     if(upcoming)upcoming.style.display=showUpcoming?'block':'none';
     if(pastSection){pastSection.style.display=['past','all'].includes(key)?'block':'none';if(['past','all'].includes(key)&&!_pastOpen)togglePastSection();}
     if(cancelled)cancelled.style.display=['past','all'].includes(key)?'block':'none';
@@ -129,6 +129,12 @@
       upcoming.querySelectorAll('.vcc2').forEach(card=>{
         if(key==='confirmed')card.style.display=card.classList.contains('vcc2-confirmed')?'':'none';
         else if(key==='scheduled')card.style.display=card.classList.contains('vcc2-confirmed')?'none':'';
+        else if(key==='rappel'){
+          const isConfirmed=card.classList.contains('vcc2-confirmed');
+          const rappelBtn=card.querySelector('[id^="btn-rappel-"]');
+          const rappelDone=rappelBtn&&rappelBtn.classList.contains('sent');
+          card.style.display=(isConfirmed&&!rappelDone)?'':'none';
+        }
         else card.style.display='';
       });
     }
