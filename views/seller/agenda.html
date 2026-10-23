@@ -199,8 +199,8 @@ if("scrollRestoration"in history)history.scrollRestoration="manual";</script>
     .vbadge::before { content:''; width:6px; height:6px; border-radius:50%; display:inline-block; }
     .vbadge-confirmed { background:#e8f5e9; color:#2e7d32; }
     .vbadge-confirmed::before { background:#2e7d32; }
-    .vbadge-scheduled { background:#eef2ff; color:#3d5db0; }
-    .vbadge-scheduled::before { background:#3d5db0; }
+    .vbadge-scheduled { background:var(--terracotta-light,#fef3ee); color:var(--terracotta,#C4603A); }
+    .vbadge-scheduled::before { background:var(--terracotta,#C4603A); }
     .vbadge-pending { background:#fff8e1; color:#f57f17; }
     .vbadge-pending::before { background:#f57f17; }
     .vbadge-cancelled { background:#f5f5f5; color:#888; }
@@ -723,7 +723,7 @@ if("scrollRestoration"in history)history.scrollRestoration="manual";</script>
     /* ── Badges statut améliorés ─────────────────────────── */
     .vbadge { padding: 4px 12px; border-radius: 20px; font-size: 0.73rem; font-weight: 700; letter-spacing: 0.03em; }
     .vbadge-confirmed { background: #e8f5e9; color: #2e7d32; border: 1px solid #c8e6c9; }
-    .vbadge-scheduled { background: #eef2ff; color: #3d5db0; border: 1px solid #c5d3f0; }
+    .vbadge-scheduled { background: #fef3ee; color: #C4603A; border: 1px solid #f0c5a0; }
     .vbadge-pending   { background: #fff3e0; color: #e65100; border: 1px solid #ffe0b2; }
     .vbadge-cancelled { background: #f5f5f5; color: #757575; border: 1px solid #e0e0e0; }
     .vbadge-done      { background: #e3f2fd; color: #1565c0; border: 1px solid #bbdefb; }
@@ -1759,6 +1759,7 @@ function buildVisitConfirmedCard(v) {
         <div class="vcc2-name">${escapeHtml(v.buyer_name||'Acquéreur')}</div>
         <div class="vcc2-pills">
           <span class="vcc2-time-pill">${svgClock} ${heureStr}</span>
+          <span id="status-badge-${v.id}">${badgeHtml('confirmed', v.sms_copied_at)}</span>
         </div>
         <span id="badge-${v.id}" class="vcc2-reminder-sent"${v.reminder_sent?'':' style="display:none;"'}>✓ Rappel envoyé</span>
         ${v.buyer_phone?`<a class="vcc2-phone" href="tel:${escapeHtml(v.buyer_phone)}">${escapeHtml(v.buyer_phone)}</a>`:''}
@@ -2273,6 +2274,8 @@ function markRappelSmsSent() {
   if (badge) badge.innerHTML = smsCopiedBadge(v?.sms_copied_at);
   const vcardEl = document.getElementById('vcard-' + id);
   if (vcardEl) vcardEl.classList.add('vcc2-confirmed');
+  const statusBadge = document.getElementById('status-badge-' + id);
+  if (statusBadge) statusBadge.innerHTML = badgeHtml('confirmed', new Date().toISOString());
   fetch(`/api/visits/${id}/reminder`, {method:'POST'}).catch(()=>{});
 }
 
@@ -3200,6 +3203,6 @@ loadData().then(() => {
 </script>
 
 <link rel="stylesheet" href="/css/seller-header-typography.css?v=1">
-<script src="/js/agenda-premium.js?v=21"></script>
+<script src="/js/agenda-premium.js?v=22"></script>
 </body>
 </html>
