@@ -786,7 +786,11 @@ if("scrollRestoration"in history)history.scrollRestoration="manual";</script>
     .vcc2-countdown-today { background:#FCE4EC; color:#C62828; border-color:#EF9A9A; }
     .vcc2-sms-badge { padding:0 14px 10px; }
     .vcc2-conseil { margin:0 14px 12px; padding:9px 13px; background:#e8f5e9; color:#2e7d32; border-radius:8px; font-size:0.78rem; font-style:italic; }
-    .vcc2-rappel-note { display:none; margin:0 14px 12px; padding:10px 13px; background:#EEF4FF; color:#1D5EC9; border-radius:10px; font-size:0.79rem; font-style:italic; align-items:center; gap:9px; line-height:1.4; }
+    .vcc2-rappel-note { display:none; margin:0 14px 12px; padding:10px 13px; background:#EEF4FF; color:#1D5EC9; border-radius:10px; font-size:0.79rem; align-items:center; gap:9px; line-height:1.4; }
+    .vcc2-rappel-note-content { display:flex; align-items:center; gap:8px; flex:1; font-style:italic; }
+    .vcc2-btn-rappel-badge { display:inline-flex; align-items:center; justify-content:center; gap:5px; padding:7px 13px; border-radius:10px; background:#1D5EC9; color:#fff; border:none; font-family:'DM Sans',sans-serif; font-size:0.82rem; font-weight:700; cursor:pointer; white-space:nowrap; flex-shrink:0; touch-action:manipulation; }
+    .vcc2-btn-rappel-badge:hover { background:#1550B0; }
+    .vcc2-btn-rappel-badge.sent { background:#e8f5e9; color:#2e7d32; border:1.5px solid #a5d6a7; }
     .vcc2.vcc2-rappel .vcc2-rappel-note { display:flex; }
     .banner-confirmed-text { display:none; }
     /* Vue "Confirmée" : cartes rappel rendues en vert */
@@ -796,8 +800,6 @@ if("scrollRestoration"in history)history.scrollRestoration="manual";</script>
     .ap-confirmed-view .vcc2.vcc2-rappel .vcc2-banner-rappel { background:#e8f5e9 !important; color:#2e7d32 !important; border-bottom-color:#a5d6a7 !important; }
     .ap-confirmed-view .vcc2.vcc2-rappel .banner-rappel-text { display:none; }
     .ap-confirmed-view .vcc2.vcc2-rappel .banner-confirmed-text { display:inline; }
-    .ap-confirmed-view .vcc2.vcc2-rappel .vcc2-btn-rappel-action { display:none !important; }
-    .ap-confirmed-view .vcc2.vcc2-rappel .vcc2-rappel-note { display:none !important; }
     .vcc2-banner { padding:8px 16px; font-size:0.68rem; font-weight:800; letter-spacing:0.07em; text-transform:uppercase; border-bottom:1px solid transparent; border-radius:14px 14px 0 0; display:flex; align-items:center; gap:7px; }
     .vcc2-banner-full     { background:#e8f5e9; color:#1a7a35; border-bottom-color:#a5d6a7; }
     .vcc2-banner-confirmed { background:#e8f5e9; color:#1a7a35; border-bottom-color:#a5d6a7; }
@@ -1815,22 +1817,21 @@ function buildVisitConfirmedCard(v) {
     ? `${svgStar} VISITE CONFIRMÉE À 100 %<img src="/logo-vpm.png" class="vcc2-banner-logo" alt="">`
     : '◉ Visite programmée';
   const cardState   = isConfirmed ? ' vcc2-confirmed vcc2-full' : isRappel ? ' vcc2-rappel' : '';
-  let countdownLabel = 'Rappel du rdv';
-  let countdownHtml = '';
+  let countdownBadgeLabel = 'J - ?';
   if (isRappel && d) {
     const todayNoon = new Date(); todayNoon.setHours(12,0,0,0);
     const dNoon = new Date(d); dNoon.setHours(12,0,0,0);
     const daysUntil = Math.round((dNoon - todayNoon) / (1000*60*60*24));
-    if (daysUntil <= 0)       { countdownLabel = "Rappel — Aujourd'hui !"; countdownHtml = `<div class="vcc2-countdown vcc2-countdown-today">${countdownLabel}</div>`; }
-    else if (daysUntil === 1) { countdownLabel = 'Rappel — J-1';            countdownHtml = `<div class="vcc2-countdown vcc2-countdown-j1">${countdownLabel}</div>`; }
-    else                      { countdownLabel = `Rappel — J-${daysUntil}`; countdownHtml = `<div class="vcc2-countdown${daysUntil <= 3 ? ' vcc2-countdown-soon' : ''}">${countdownLabel}</div>`; }
+    if (daysUntil <= 0)       countdownBadgeLabel = "Aujourd'hui !";
+    else if (daysUntil === 1) countdownBadgeLabel = 'J - 1';
+    else                      countdownBadgeLabel = `J - ${daysUntil}`;
   }
   const rappelBtnHtml = isRappel
-    ? `<button class="vcc2-btn-sms vcc2-btn-rappel-action" id="btn-rappel-${v.id}" onclick="sendRappelRdv(${v.id})">${svgCalIcs} ${countdownLabel}</button>`
+    ? ''
     : isConfirmed
       ? `<button class="vcc2-btn-sms sent" id="btn-rappel-${v.id}">✓ Rappel envoyé</button>`
       : `<button class="vcc2-btn-sms vcc2-btn-rappel-action" id="btn-rappel-${v.id}" onclick="sendRappelRdv(${v.id})" style="display:none;">${svgCalIcs} Rappel du rdv</button>`;
-  const conseilHtml = isRappel ? `<div class="vcc2-rappel-note">${svgBell}<span>N'oubliez pas d'envoyer le rappel de visite la veille du rendez-vous.</span></div>` : '';
+  const conseilHtml = isRappel ? `<div class="vcc2-rappel-note"><div class="vcc2-rappel-note-content">${svgBell}<span>N'oubliez pas de rappeler l'acheteur la veille de la visite.</span></div><button class="vcc2-btn-rappel-badge vcc2-btn-rappel-action" id="btn-rappel-${v.id}" onclick="sendRappelRdv(${v.id})">${svgCalIcs} ${countdownBadgeLabel}</button></div>` : '';
   const fullFooterHtml = `<div class="vcc2-full-footer" id="full-footer-${v.id}"${isConfirmed ? '' : ' style="display:none;"'}>${svgStar} Tout est prêt ! La visite est confirmée et le rappel a été envoyé.</div>`;
   return `<div class="vcc2${cardState}" id="vcard-${v.id}">
     <div id="status-badge-${v.id}" class="${bannerClass}">${bannerInner}</div>
