@@ -792,6 +792,7 @@ if("scrollRestoration"in history)history.scrollRestoration="manual";</script>
     .vcc2-btn-cancel { padding:9px 12px; border-radius:9px; background:#fff; color:#999; border:1px solid #e0d8ce; font-family:'Inter',sans-serif; font-size:0.78rem; font-weight:600; cursor:pointer; transition:all 0.15s; min-height:38px; flex-shrink:0; touch-action:manipulation; }
     .vcc2-btn-cancel:hover { border-color:#e74c3c; color:#e74c3c; background:#fdf2f2; }
     .vcc2-sms-badge { padding:0 15px 10px; }
+    .vcc2-conseil { margin:0 15px 12px; padding:8px 12px; background:#e8f5e9; color:#2e7d32; border-radius:8px; font-size:0.78rem; font-style:italic; }
     .vcc2-banner { padding:7px 15px; font-size:0.67rem; font-weight:800; letter-spacing:0.07em; text-transform:uppercase; border-bottom:1px solid transparent; border-radius:14px 14px 0 0; }
     .vcc2-banner-confirmed { background:#e8f5e9; color:#2e7d32; border-bottom-color:#a5d6a7; }
     .vcc2-banner-rappel    { background:#E5F0FF; color:#1D5EC9; border-bottom-color:#B9D5FF; }
@@ -1760,11 +1761,16 @@ function buildVisitConfirmedCard(v) {
       ${v.buyer_financing?`<div class="vcc2-profile-row">Financement : <strong>${escapeHtml(v.buyer_financing)}</strong></div>`:''}
       ${v.buyer_timeline?`<div class="vcc2-profile-row">Délai : <strong>${escapeHtml(v.buyer_timeline)}</strong></div>`:''}
     </div>` : '';
-  const isRappel    = v.sms_copied_at && !v.reminder_sent;
-  const isConfirmed = v.sms_copied_at && v.reminder_sent;
+  const tomorrowParis = (() => { const d = new Date(); d.setDate(d.getDate()+1); return new Intl.DateTimeFormat('en-CA',{timeZone:'Europe/Paris',year:'numeric',month:'2-digit',day:'2-digit'}).format(d); })();
+  const isRappel    = v.sms_copied_at && !v.reminder_sent && v.visit_date === tomorrowParis;
+  const isConfirmed = v.sms_copied_at && !isRappel;
   const bannerClass = isConfirmed ? 'vcc2-banner vcc2-banner-confirmed' : isRappel ? 'vcc2-banner vcc2-banner-rappel' : 'vcc2-banner vcc2-banner-scheduled';
   const bannerText  = isConfirmed ? '✓ Visite confirmée' : isRappel ? '● Rappel J-1 à envoyer' : '◉ Visite programmée';
   const cardState   = isConfirmed ? ' vcc2-confirmed' : isRappel ? ' vcc2-rappel' : '';
+  const rappelBtnHtml = isRappel
+    ? `<button class="vcc2-btn-sms${v.reminder_sent?' sent':''}" id="btn-rappel-${v.id}" onclick="sendRappelRdv(${v.id})">${svgPhone} ${v.reminder_sent?'Rappel effectué':'Rappel du rdv'}</button>`
+    : `<button class="vcc2-btn-sms" id="btn-rappel-${v.id}" onclick="sendRappelRdv(${v.id})" style="display:none;">${svgPhone} Rappel du rdv</button>`;
+  const conseilHtml = isConfirmed ? `<div class="vcc2-conseil">Pensez à rappeler l'acheteur la veille de la visite</div>` : '';
   return `<div class="vcc2${cardState}" id="vcard-${v.id}">
     <div id="status-badge-${v.id}" class="${bannerClass}">${bannerText}</div>
     <div class="vcc2-head">
@@ -1785,9 +1791,10 @@ function buildVisitConfirmedCard(v) {
     ${profileHtml}
     <div class="vcc2-actions">
       <button class="vcc2-btn-sms${v.sms_copied_at?' sent':''}" id="btn-reminder-${v.id}" onclick="sendReminder(${v.id})">${svgPhone} ${v.sms_copied_at?'Confirmation effectuée':'Confirmation de visite'}</button>
-      <button class="vcc2-btn-sms${v.reminder_sent?' sent':''}" id="btn-rappel-${v.id}" onclick="sendRappelRdv(${v.id})">${svgPhone} ${v.reminder_sent?'Rappel effectué':'Rappel du rdv'}</button>
+      ${rappelBtnHtml}
       <button class="vcc2-btn-cancel" onclick="openCancelSmsModal(${v.id})">Annuler</button>
     </div>
+    ${conseilHtml}
     ${v.sms_copied_at?`<div class="vcc2-sms-badge" id="sms-badge-${v.id}">${smsCopiedBadge(v.sms_copied_at)}</div>`:`<div id="sms-badge-${v.id}" class="vcc2-sms-badge"></div>`}
   </div>`;
 }
@@ -2302,10 +2309,19 @@ function copyRappelSms(btn) {
         }
         const badge = document.getElementById('sms-badge-' + id);
         if (badge) badge.innerHTML = smsCopiedBadge(v?.sms_copied_at);
+        const tomorrowParis2 = (() => { const d = new Date(); d.setDate(d.getDate()+1); return new Intl.DateTimeFormat('en-CA',{timeZone:'Europe/Paris',year:'numeric',month:'2-digit',day:'2-digit'}).format(d); })();
+        const isJMinus1 = v && v.visit_date === tomorrowParis2;
         const vcardEl = document.getElementById('vcard-' + id);
-        if (vcardEl) { vcardEl.classList.remove('vcc2-confirmed'); vcardEl.classList.add('vcc2-rappel'); }
         const statusBadge = document.getElementById('status-badge-' + id);
-        if (statusBadge) { statusBadge.className = 'vcc2-banner vcc2-banner-rappel'; statusBadge.textContent = '● Rappel J-1 à envoyer'; }
+        if (isJMinus1) {
+          if (vcardEl) { vcardEl.classList.remove('vcc2-confirmed'); vcardEl.classList.add('vcc2-rappel'); }
+          if (statusBadge) { statusBadge.className = 'vcc2-banner vcc2-banner-rappel'; statusBadge.textContent = '● Rappel J-1 à envoyer'; }
+          const rappelBtn = document.getElementById('btn-rappel-' + id);
+          if (rappelBtn) rappelBtn.style.display = '';
+        } else {
+          if (vcardEl) { vcardEl.classList.remove('vcc2-rappel'); vcardEl.classList.add('vcc2-confirmed'); }
+          if (statusBadge) { statusBadge.className = 'vcc2-banner vcc2-banner-confirmed'; statusBadge.textContent = '✓ Visite confirmée'; }
+        }
         fetch(`/api/visits/${id}/reminder`, {method:'POST'}).catch(()=>{});
       }
     }
@@ -2348,10 +2364,19 @@ function markRappelSmsSent() {
     }
     const badge = document.getElementById('sms-badge-' + id);
     if (badge) badge.innerHTML = smsCopiedBadge(v?.sms_copied_at);
+    const tomorrowParis = (() => { const d = new Date(); d.setDate(d.getDate()+1); return new Intl.DateTimeFormat('en-CA',{timeZone:'Europe/Paris',year:'numeric',month:'2-digit',day:'2-digit'}).format(d); })();
+    const isJMinus1 = v && v.visit_date === tomorrowParis;
     const vcardEl = document.getElementById('vcard-' + id);
-    if (vcardEl) { vcardEl.classList.remove('vcc2-confirmed'); vcardEl.classList.add('vcc2-rappel'); }
     const statusBadge = document.getElementById('status-badge-' + id);
-    if (statusBadge) { statusBadge.className = 'vcc2-banner vcc2-banner-rappel'; statusBadge.textContent = '● Rappel J-1 à envoyer'; }
+    if (isJMinus1) {
+      if (vcardEl) { vcardEl.classList.remove('vcc2-confirmed'); vcardEl.classList.add('vcc2-rappel'); }
+      if (statusBadge) { statusBadge.className = 'vcc2-banner vcc2-banner-rappel'; statusBadge.textContent = '● Rappel J-1 à envoyer'; }
+      const rappelBtn = document.getElementById('btn-rappel-' + id);
+      if (rappelBtn) rappelBtn.style.display = '';
+    } else {
+      if (vcardEl) { vcardEl.classList.remove('vcc2-rappel'); vcardEl.classList.add('vcc2-confirmed'); }
+      if (statusBadge) { statusBadge.className = 'vcc2-banner vcc2-banner-confirmed'; statusBadge.textContent = '✓ Visite confirmée'; }
+    }
     fetch(`/api/visits/${id}/reminder`, {method:'POST'}).catch(()=>{});
   }
 }
@@ -3280,6 +3305,6 @@ loadData().then(() => {
 </script>
 
 <link rel="stylesheet" href="/css/seller-header-typography.css?v=1">
-<script src="/js/agenda-premium.js?v=30"></script>
+<script src="/js/agenda-premium.js?v=31"></script>
 </body>
 </html>

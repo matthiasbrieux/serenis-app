@@ -127,7 +127,7 @@
     if(contacts)contacts.style.display=key==='all'?'block':'none';
     if(upcoming){
       upcoming.querySelectorAll('.vcc2').forEach(card=>{
-        if(key==='confirmed')card.style.display=(card.classList.contains('vcc2-confirmed')||card.classList.contains('vcc2-rappel'))?'':'none';
+        if(key==='confirmed')card.style.display=card.classList.contains('vcc2-confirmed')?'':'none';
         else if(key==='scheduled')card.style.display=(!card.classList.contains('vcc2-confirmed')&&!card.classList.contains('vcc2-rappel'))?'':'none';
         else if(key==='rappel')card.style.display=card.classList.contains('vcc2-rappel')?'':'none';
         else card.style.display='';
