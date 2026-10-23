@@ -53,7 +53,7 @@
   // Move the original saved-slots block, preserving its nodes and handlers.
   const registered=right.querySelector('.dispo-registered-block');
   visits.querySelector('#upcomingSection').after(registered);
-  function openAvailability() { toggleDispoForm(true); const form=document.getElementById('dispoAddForm'); form.scrollIntoView({behavior:matchMedia('(prefers-reduced-motion:reduce)').matches?'auto':'smooth',block:'center'}); document.getElementById('availDate').focus({preventScroll:true}); }
+  function openAvailability() { const block=document.getElementById('dispoAddBlock');if(block)block.style.display='';toggleDispoForm(true); const form=document.getElementById('dispoAddForm'); form.scrollIntoView({behavior:matchMedia('(prefers-reduced-motion:reduce)').matches?'auto':'smooth',block:'center'}); document.getElementById('availDate').focus({preventScroll:true}); }
   window.openAvailability=openAvailability;
   const subtitle=hero.querySelector('.aph-sub');if(subtitle)subtitle.textContent='Organisez vos visites et suivez vos échanges avec les acheteurs';
   if(manual)manual.remove();
@@ -61,7 +61,6 @@
   const availabilityFormHost=right.querySelector('.dispo-section');
   calendarActions.append(availabilityFormHost);
   document.getElementById('dispoAddHdr').hidden=true;
-  const _dispoForm=document.getElementById('dispoAddForm');if(_dispoForm)_dispoForm.style.display='none';
   // Relocate the existing history panel; preserve its list and toggle behavior.
   const history=document.getElementById('pastSection');
   availabilityFormHost.after(history);history.classList.add('ap-history','dispo-add-block');
