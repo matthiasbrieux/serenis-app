@@ -792,6 +792,11 @@ if("scrollRestoration"in history)history.scrollRestoration="manual";</script>
     .vcc2-btn-cancel { padding:9px 12px; border-radius:9px; background:#fff; color:#999; border:1px solid #e0d8ce; font-family:'Inter',sans-serif; font-size:0.78rem; font-weight:600; cursor:pointer; transition:all 0.15s; min-height:38px; flex-shrink:0; touch-action:manipulation; }
     .vcc2-btn-cancel:hover { border-color:#e74c3c; color:#e74c3c; background:#fdf2f2; }
     .vcc2-sms-badge { padding:0 15px 10px; }
+    .vcc2-banner { padding:7px 15px; font-size:0.67rem; font-weight:800; letter-spacing:0.07em; text-transform:uppercase; border-bottom:1px solid transparent; border-radius:14px 14px 0 0; }
+    .vcc2-banner-confirmed { background:#e8f5e9; color:#2e7d32; border-bottom-color:#a5d6a7; }
+    .vcc2-banner-scheduled { background:#fef3ee; color:#C4603A; border-bottom-color:#f0c5a0; }
+    .vcc2-banner-done      { background:#e8f5e9; color:#2e7d32; border-bottom-color:#a5d6a7; }
+    .vcc2-banner-cancelled { background:#f5f5f5; color:#757575; border-bottom-color:#e0e0e0; }
     .vcc2-btn-past { flex:1; display:flex; align-items:center; justify-content:center; gap:6px; padding:9px 12px; border-radius:10px; background:rgba(158,58,24,0.05); color:var(--terracotta); border:1.5px solid rgba(158,58,24,0.15); font-family:'Inter',sans-serif; font-size:0.81rem; font-weight:600; cursor:pointer; transition:background 0.15s; min-height:40px; }
     .vcc2-btn-past:hover { background:var(--terracotta); color:#fff; }
     .vcc2-btn-past-skip { background:#f8f4f0; color:#888; border-color:#e0d8cc; }
@@ -1754,7 +1759,10 @@ function buildVisitConfirmedCard(v) {
       ${v.buyer_financing?`<div class="vcc2-profile-row">Financement : <strong>${escapeHtml(v.buyer_financing)}</strong></div>`:''}
       ${v.buyer_timeline?`<div class="vcc2-profile-row">Délai : <strong>${escapeHtml(v.buyer_timeline)}</strong></div>`:''}
     </div>` : '';
+  const bannerClass = v.sms_copied_at ? 'vcc2-banner vcc2-banner-confirmed' : 'vcc2-banner vcc2-banner-scheduled';
+  const bannerText = v.sms_copied_at ? '✓ Visite confirmée' : '◉ Visite programmée';
   return `<div class="vcc2${v.reminder_sent?' reminder-done':''}${v.sms_copied_at?' vcc2-confirmed':''}" id="vcard-${v.id}">
+    <div id="status-badge-${v.id}" class="${bannerClass}">${bannerText}</div>
     <div class="vcc2-head">
       <div class="vcc2-datecol">
         <div class="vcc2-month">${monthStr}</div>
@@ -1764,7 +1772,6 @@ function buildVisitConfirmedCard(v) {
         <div class="vcc2-name">${escapeHtml(v.buyer_name||'Acquéreur')}</div>
         <div class="vcc2-pills">
           <span class="vcc2-time-pill">${svgClock} ${heureStr}</span>
-          <span id="status-badge-${v.id}">${badgeHtml('confirmed', v.sms_copied_at)}</span>
         </div>
         <span id="badge-${v.id}" class="vcc2-reminder-sent"${v.reminder_sent?'':' style="display:none;"'}>✓ Rappel envoyé</span>
         ${v.buyer_phone?`<a class="vcc2-phone" href="tel:${escapeHtml(v.buyer_phone)}">${escapeHtml(v.buyer_phone)}</a>`:''}
@@ -1882,9 +1889,8 @@ function buildPastCard(v) {
   const isCancelled = v.status === 'cancelled';
   const svgClock = `<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>`;
   const heureStr = v.visit_time ? v.visit_time.slice(0,5).replace(':','h') : '—';
-  const statusBadge = isCancelled
-    ? `<span class="vbadge vbadge-cancelled">× Annulée</span>`
-    : `<span class="vbadge vbadge-done">✔ Effectuée</span>`;
+  const pastBannerClass = isCancelled ? 'vcc2-banner vcc2-banner-cancelled' : 'vcc2-banner vcc2-banner-done';
+  const pastBannerText = isCancelled ? '× Visite annulée' : '✔ Visite effectuée';
   const profileHtml = (v.buyer_budget||v.buyer_financing||v.buyer_timeline) ? `<div class="vcc2-profile">
       <div class="vcc2-profile-title">Profil acheteur</div>
       ${v.buyer_budget?`<div class="vcc2-profile-row">Budget : <strong>${escapeHtml(v.buyer_budget)}</strong></div>`:''}
@@ -1899,6 +1905,7 @@ function buildPastCard(v) {
     </div>`;
   })() : '';
   return `<div class="vcc2 ${isCancelled?'vcc2-cancelled':'vcc2-done'}">
+    <div class="${pastBannerClass}">${pastBannerText}</div>
     <div class="vcc2-head">
       <div class="vcc2-datecol">
         <div class="vcc2-month">${monthStr}</div>
@@ -1908,7 +1915,6 @@ function buildPastCard(v) {
         <div class="vcc2-name">${escapeHtml(v.buyer_name||'Acquéreur')}</div>
         <div class="vcc2-pills">
           <span class="vcc2-time-pill">${svgClock} ${heureStr}</span>
-          ${statusBadge}
         </div>
         ${v.buyer_phone?`<a class="vcc2-phone" href="tel:${escapeHtml(v.buyer_phone)}">${escapeHtml(v.buyer_phone)}</a>`:''}
         ${v.buyer_email?`<div style="font-size:0.75rem;color:#888;margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"><a href="mailto:${escapeHtml(v.buyer_email)}" style="color:#888;text-decoration:none;">${escapeHtml(v.buyer_email)}</a></div>`:''}
@@ -2318,7 +2324,7 @@ function markRappelSmsSent() {
     const vcardEl = document.getElementById('vcard-' + id);
     if (vcardEl) vcardEl.classList.add('vcc2-confirmed');
     const statusBadge = document.getElementById('status-badge-' + id);
-    if (statusBadge) statusBadge.innerHTML = badgeHtml('confirmed', new Date().toISOString());
+    if (statusBadge) { statusBadge.className = 'vcc2-banner vcc2-banner-confirmed'; statusBadge.textContent = '✓ Visite confirmée'; }
     fetch(`/api/visits/${id}/reminder`, {method:'POST'}).catch(()=>{});
   }
 }
@@ -3247,6 +3253,6 @@ loadData().then(() => {
 </script>
 
 <link rel="stylesheet" href="/css/seller-header-typography.css?v=1">
-<script src="/js/agenda-premium.js?v=25"></script>
+<script src="/js/agenda-premium.js?v=26"></script>
 </body>
 </html>
