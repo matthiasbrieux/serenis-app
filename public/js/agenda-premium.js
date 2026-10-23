@@ -106,6 +106,7 @@
   for(const [key,label,ico] of [['scheduled','Programmée',_icoS],['confirmed','Confirmée',_icoC],['rappel','Rappel J-1',_icoR]]){if(vfStepsRow.children.length){const arr=make('span','ap-vf-arrow');arr.innerHTML=_arrHtml;vfStepsRow.append(arr);}const b=button('',()=>setVisitsFilter(key),'ap-visits-filter ap-vf-step ap-vf-step-'+key);b.innerHTML=ico+'<span>'+label+'</span>';b.dataset.filter=key;vfStepsRow.append(b);visitsFilterButtons[key]=b;}
   visitsFilters.append(vfStepsRow);
   visitsPanel.append(visitsFilters);listCol.append(visitsPanel);visitsPanel.append(visits);listCol.append(availabilityPanel);
+  const pastSec=document.getElementById('pastSection');if(pastSec)listCol.append(pastSec);
   const compromisPanel=main.querySelector('#compromis-vente'),compromisHeader=compromisPanel?.querySelector('.compromis-bar-hdr'),compromisBody=compromisPanel?.querySelector('.compromis-bar-body');
   if(compromisPanel&&compromisHeader&&compromisBody){
     const toggle=button('Renseigner mon compromis',()=>{compromisBody.hidden=!compromisBody.hidden;toggle.setAttribute('aria-expanded',String(!compromisBody.hidden));},'ap-compromis-toggle');
@@ -116,7 +117,6 @@
   const calSync=right.querySelector('#calSyncBox');
   if(calSync){const syncBtn=make('button','ap-sync-trigger');syncBtn.innerHTML='<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg><span>Synchroniser mon agenda</span><span class="ap-sync-chevron">›</span>';syncBtn.onclick=()=>(window.openSyncModal||function(){})();listCol.append(syncBtn);}
   right.remove();
-  const pastSec=document.getElementById('pastSection');if(pastSec)listCol.append(pastSec);
   const pendingPanel=make('div','agenda-panel ap-pending');
   pendingPanel.append(make('h2','ap-panel-title','Demandes en attente')); const pendingList=make('div','ap-pending-list');pendingPanel.append(pendingList);visits.prepend(pendingPanel);
   const pendingEmpty={hidden:true};
