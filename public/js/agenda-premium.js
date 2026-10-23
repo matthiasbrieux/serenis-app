@@ -41,7 +41,7 @@
   const actionGrid=make('div','ap-action-grid');
   const availBtn=make('button','ap-action-btn ap-action-btn-primary');availBtn.type='button';availBtn.innerHTML='<span class="ap-ab-inner"><span class="ap-ab-ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><line x1="12" y1="14" x2="12" y2="18"/><line x1="10" y1="16" x2="14" y2="16"/></svg></span><span class="ap-ab-text">Ajouter une disponibilité de visite</span></span><span class="ap-ab-chevron">›</span>';availBtn.addEventListener('click',openAvailability);
   const manualBtn=make('button','ap-action-btn ap-action-btn-secondary');manualBtn.type='button';manualBtn.innerHTML='<span class="ap-ab-inner"><span class="ap-ab-ico ap-ab-ico-plus">+</span><span class="ap-ab-text">Ajouter une visite manuellement</span></span><span class="ap-ab-chevron">›</span>';manualBtn.addEventListener('click',()=>(window.openModal||function(){})('addVisitOverlay'));
-  actionGrid.append(availBtn,manualBtn);calendarActions.append(actionGrid);
+  actionGrid.append(manualBtn);calendarActions.append(actionGrid);
   const appointmentsPanel=make('section','ap-appointments-panel');
   appointmentsPanel.append(make('h2','ap-appointments-heading','Mes prochains rendez-vous'));
   const appointmentList=make('div','ap-appointments-list');appointmentsPanel.append(appointmentList);layout.append(appointmentsPanel);
@@ -97,7 +97,7 @@
   appointmentsHeading.textContent='Mes prochaines visites';
   const availabilityPanel=make('section','ap-availability-panel');
   const availabilityHeading=make('h2','ap-lower-heading','Mes disponibilités');
-  availabilityPanel.append(availabilityHeading,registered);
+  availabilityPanel.append(availabilityHeading,availBtn,availabilityFormHost,registered);
   const visitsPanel=make('section','ap-visits-panel');
   visitsPanel.hidden=false;
   const visitsHeading=make('h2','ap-lower-heading','Mes visites');visitsPanel.append(visitsHeading);
