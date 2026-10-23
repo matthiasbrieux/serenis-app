@@ -1731,7 +1731,7 @@ function renderVisitsFiltered() {
   if (!count) {
     list.innerHTML = `<div style="text-align:center;padding:28px 20px;color:#aaa;font-size:0.84rem;line-height:1.6;">Aucune visite dans cette catégorie</div>`;
   } else {
-    list.innerHTML = filtered.map(v => v.status === 'confirmed' ? buildVisitConfirmedCard(v) : buildVisitCompact(v)).join('');
+    list.innerHTML = filtered.map(v => isPastVisit(v) ? buildPastCard(v) : (v.status === 'confirmed' ? buildVisitConfirmedCard(v) : buildVisitCompact(v))).join('');
   }
 
   filteredSection.scrollIntoView({ behavior:'smooth', block:'nearest' });
