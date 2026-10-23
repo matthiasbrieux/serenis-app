@@ -1107,7 +1107,7 @@ if("scrollRestoration"in history)history.scrollRestoration="manual";</script>
   </style>
   <link rel="stylesheet" href="/css/seller-reference.css?v=1">
   <link rel="stylesheet" href="/css/seller-navigation.css?v=2">
-<link rel="stylesheet" href="/css/agenda-premium.css?v=35">
+<link rel="stylesheet" href="/css/agenda-premium.css?v=36">
 </head>
 <body class="vpm-seller-reference vpm-agenda-page vpm-header-typography">
 <!-- En-tête mobile : logo complet + bouton menu -->
@@ -1989,6 +1989,7 @@ function buildPastCard(v) {
   const [yr,mo,dy] = (v.visit_date||'').split('-');
   const d = yr ? new Date(Number(yr),Number(mo)-1,Number(dy)) : null;
   const MOIS_COURT = ['JAN','FÉV','MAR','AVR','MAI','JUN','JUL','AOÛ','SEP','OCT','NOV','DÉC'];
+  const MOIS_LONG  = ['janvier','février','mars','avril','mai','juin','juillet','août','septembre','octobre','novembre','décembre'];
   const JOURS_COURT = ['DIM','LUN','MAR','MER','JEU','VEN','SAM'];
   const monthStr = d ? MOIS_COURT[d.getMonth()] : '—';
   const dayOfWeek = d ? JOURS_COURT[d.getDay()] : '';
@@ -2003,15 +2004,26 @@ function buildPastCard(v) {
   const svgCalSmall=`<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>`;
   const svgDoc    = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>`;
   const svgStop   = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg>`;
+  const svgCheck  = `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="12" cy="12" r="11" fill="#757575"/><polyline points="6 12 10 16 18 8" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>`;
+  const svgSend   = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>`;
+  const svgBulb   = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6"/><path d="M10 22h4"/><path d="M15.09 14c.18-.98.65-1.74 1.41-2.5A4.65 4.65 0 0 0 18 8 6 6 0 0 0 6 8c0 1 .23 2.23 1.5 3.5A4.61 4.61 0 0 1 8.91 14"/></svg>`;
   const heureStr = v.visit_time ? v.visit_time.slice(0,5).replace(':','h') : '—';
   const pastBannerClass = isCancelled ? 'vcc2-banner vcc2-banner-cancelled' : 'vcc2-banner vcc2-banner-done';
   const pastBannerText  = isCancelled ? `${svgStop} VISITE ANNULÉE` : `${svgClock} VISITE PASSÉE`;
   const profileHtml = (v.buyer_budget||v.buyer_financing||v.buyer_timeline) ? `
     <div class="vcc2-profile">
-      <div class="vcc2-profile-title">${svgPerson} Profil acheteur</div>
-      ${v.buyer_budget?`<div class="vcc2-profile-row">${svgCoins} <span class="vcc2-past-label">Budget</span><strong>${escapeHtml(v.buyer_budget)}</strong></div>`:''}
-      ${v.buyer_financing?`<div class="vcc2-profile-row">${svgCard} <span class="vcc2-past-label">Financement</span><strong>${escapeHtml(v.buyer_financing)}</strong></div>`:''}
-      ${v.buyer_timeline?`<div class="vcc2-profile-row">${svgCalSmall} <span class="vcc2-past-label">Délai</span><strong>${escapeHtml(v.buyer_timeline)}</strong></div>`:''}
+      <div class="vcc2-profile-title">${svgPerson} PROFIL ACHETEUR</div>
+      ${v.buyer_budget?`<div class="vcc2-profile-row">${svgCoins} <span class="vcc2-past-label">Budget :</span><strong>${escapeHtml(v.buyer_budget)}</strong></div>`:''}
+      ${v.buyer_financing?`<div class="vcc2-profile-row">${svgCard} <span class="vcc2-past-label">Financement :</span><strong>${escapeHtml(v.buyer_financing)}</strong></div>`:''}
+      ${v.buyer_timeline?`<div class="vcc2-profile-row">${svgCalSmall} <span class="vcc2-past-label">Délai :</span><strong>${escapeHtml(v.buyer_timeline)}</strong></div>`:''}
+    </div>` : '';
+  const confirmBoxHtml = !isCancelled ? `
+    <div class="vcc2-confirm-box">
+      <span class="vcc2-confirm-check">${svgCheck}</span>
+      <div>
+        <div class="vcc2-confirm-text">Visite réalisée le ${d ? `${dayNum} ${MOIS_LONG[d.getMonth()]} à ${heureStr}` : heureStr}.</div>
+        <div class="vcc2-confirm-sub">Pensez à faire un suivi de votre acheteur pour connaître son retour et poursuivre les échanges.</div>
+      </div>
     </div>` : '';
   const buttonsHtml = !isCancelled ? `<div class="vcc2-actions">
       <button class="vcc2-btn-past" onclick="sendDossierSerieux(${v.id})">
@@ -2019,10 +2031,15 @@ function buildPastCard(v) {
         <span class="vcc2-bp-text">Dossier Acheteur<br>Sérieux</span>
         <span class="vcc2-bp-chev">›</span>
       </button>
-      <button class="vcc2-btn-past vcc2-btn-past-skip" onclick="skipFollowup(${v.id})">
-        <span class="vcc2-bp-ico">${svgStop}</span>
-        <span class="vcc2-bp-text">Ne donnera pas<br>suite</span>
+      <button class="vcc2-btn-past vcc2-btn-past-followup" onclick="openSuiviMessage(${v.id})">
+        <span class="vcc2-bp-ico">${svgSend}</span>
+        <span class="vcc2-bp-text">Envoyer un<br>message de suivi</span>
       </button>
+    </div>` : '';
+  const conseilsHtml = !isCancelled ? `
+    <div class="vcc2-past-conseils">
+      <div class="vcc2-past-conseils-title">${svgBulb} NOS CONSEILS</div>
+      <div class="vcc2-past-conseils-text">Après chaque visite, transmettez vos documents complémentaires (entretien chaudière, factures, travaux...) ou demandez où en est votre acheteur dans sa réflexion.</div>
     </div>` : '';
   return `<div class="vcc2 ${isCancelled?'vcc2-cancelled':'vcc2-done'}">
     <div class="${pastBannerClass}">${pastBannerText}</div>
@@ -2042,7 +2059,9 @@ function buildPastCard(v) {
       </div>
     </div>
     ${profileHtml}
+    ${confirmBoxHtml}
     ${buttonsHtml}
+    ${conseilsHtml}
   </div>`;
 }
 
@@ -2379,6 +2398,18 @@ async function skipFollowup(id) {
   if (typeof window.dismissFollowup === 'function') {
     await window.dismissFollowup(id);
     showToast('Suivi clôturé');
+  }
+}
+
+function openSuiviMessage(id) {
+  const v = allVisits.find(v => v.id === id);
+  if (!v) return;
+  if (v.buyer_phone) {
+    window.location.href = 'sms:' + v.buyer_phone;
+  } else if (v.buyer_email) {
+    window.location.href = 'mailto:' + encodeURIComponent(v.buyer_email);
+  } else {
+    showToast('Aucune coordonnée disponible pour cet acheteur.', 'info');
   }
 }
 
