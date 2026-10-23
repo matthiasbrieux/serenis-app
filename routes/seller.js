@@ -1051,7 +1051,7 @@ function scoreBuyerContact(contact, visits, offers) {
 }
 
 router.get('/api/connect/overview', requireAuth, (req, res) => {
-  const seller = db.prepare('SELECT id, uuid, email, first_name, last_name, phone, pack, twilio_number FROM sellers WHERE id = ?').get(req.seller.id);
+  const seller = db.prepare('SELECT id, uuid, email, first_name, last_name, phone, pack, twilio_number, calendar_token FROM sellers WHERE id = ?').get(req.seller.id);
   const property = db.prepare('SELECT id, slug, published, status, type, address, city, postal_code, price, rooms, bedrooms, surface_habitable, acheteur_token, notaire_token FROM properties WHERE seller_id = ?').get(req.seller.id);
   const visits = property
     ? db.prepare('SELECT * FROM visits WHERE seller_id = ? ORDER BY visit_date ASC, visit_time ASC').all(req.seller.id)
