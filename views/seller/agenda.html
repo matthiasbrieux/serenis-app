@@ -1015,10 +1015,45 @@ if("scrollRestoration"in history)history.scrollRestoration="manual";</script>
       .main-content { margin-left: 0; }
     }
 
+  /* ── VCC2 État 4 : Visite confirmée à 100% ── */
+  .vcc2.vcc2-full{border-color:#1B5E20!important;border-width:2px!important;box-shadow:0 4px 24px rgba(27,94,32,0.20)!important}
+  .vcc2.vcc2-full .vcc2-datecol{background:linear-gradient(160deg,#1B5E20 0%,#2E7D32 100%)!important}
+  .vcc2-banner-full{background:linear-gradient(135deg,#1B5E20,#2E7D32);color:#fff!important;border-bottom-color:#1B5E20!important;display:flex;align-items:center;gap:7px}
+  .vcc2-banner-full .vcc2-banner-logo{height:16px;margin-left:auto;flex-shrink:0;opacity:0.85}
+  .vcc2-full-footer{margin:0 15px 12px;padding:8px 12px;background:#E8F5E9;color:#1B5E20;border-radius:8px;font-size:0.79rem;display:flex;align-items:flex-start;gap:8px;border:1px solid #A5D6A7;font-style:italic;line-height:1.45}
+  .vcc2-full-star-ico{flex-shrink:0;margin-top:1px}
+  /* ── Modal: Synchronisation Calendrier ── */
+  .cal-sync-overlay{align-items:flex-end;justify-content:center;padding:0}
+  @media(min-width:600px){.cal-sync-overlay{align-items:center}}
+  .cal-sync-sheet{background:#fff;width:100%;max-width:480px;border-radius:20px 20px 0 0;max-height:92vh;overflow-y:auto;padding:24px 20px 0;box-shadow:0 -8px 40px rgba(0,0,0,0.18)}
+  @media(min-width:600px){.cal-sync-sheet{border-radius:20px;max-height:88vh}}
+  .cal-sync-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:16px}
+  .cal-sync-title-wrap{display:flex;align-items:center;gap:12px}
+  .cal-sync-icon-circle{width:48px;height:48px;background:#FFF0EA;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+  .cal-sync-title{font-family:'Cormorant Garamond',serif;font-size:1.6rem;font-weight:700;color:#1A1A16;line-height:1.2;margin:0}
+  .cal-sync-title span{color:var(--terracotta)}
+  .cal-sync-close{width:36px;height:36px;background:#F5F0E8;border:none;border-radius:50%;font-size:1.5rem;color:#777;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;line-height:1}
+  .cal-sync-desc{color:#666;font-size:0.84rem;line-height:1.55;margin:0 0 20px}
+  .cal-sync-apps{display:flex;flex-direction:column;border:1px solid #EDE8E2;border-radius:14px;overflow:hidden;margin-bottom:20px}
+  .cal-sync-app-row{display:flex;align-items:center;gap:14px;padding:14px 16px;text-decoration:none;color:#1A1A16;background:#fff;border-bottom:1px solid #EDE8E2;font-size:0.9rem;font-weight:500;transition:background 0.15s;-webkit-tap-highlight-color:transparent}
+  .cal-sync-app-row:last-child{border-bottom:none}
+  .cal-sync-app-row:active{background:#F5F0E8}
+  .cal-sync-app-logo{width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;overflow:hidden;flex-shrink:0;box-shadow:0 1px 4px rgba(0,0,0,0.1)}
+  .cal-sync-row-chevron{margin-left:auto;color:#bbb;flex-shrink:0}
+  .cal-sync-divider{display:flex;align-items:center;gap:12px;color:#bbb;font-size:0.8rem;margin-bottom:20px}
+  .cal-sync-divider::before,.cal-sync-divider::after{content:'';flex:1;height:1px;background:#EDE8E2}
+  .cal-sync-manual{display:flex;flex-direction:column;gap:8px}
+  .cal-sync-label{font-size:0.82rem;font-weight:600;color:#555}
+  .cal-sync-input-row{display:flex;gap:8px}
+  .cal-sync-url-input{flex:1;background:#F5F0E8;font-size:0.75rem;padding:11px 12px;border:1.5px solid #E0D8D0;border-radius:10px;color:#444;min-width:0}
+  .cal-sync-copy-btn{background:var(--terracotta);color:#fff;border:none;border-radius:10px;padding:11px 18px;font-size:0.82rem;font-weight:600;cursor:pointer;white-space:nowrap;flex-shrink:0}
+  .cal-sync-open-app{display:inline-flex;align-items:center;gap:6px;color:var(--terracotta);font-size:0.82rem;text-decoration:none;font-weight:500;align-self:flex-start}
+  .cal-sync-private{font-size:0.72rem;color:#bbb;margin:4px 0 0}
+  .cal-sync-safe-bottom{height:calc(20px + env(safe-area-inset-bottom,0px))}
   </style>
   <link rel="stylesheet" href="/css/seller-reference.css?v=1">
   <link rel="stylesheet" href="/css/seller-navigation.css?v=2">
-<link rel="stylesheet" href="/css/agenda-premium.css?v=17">
+<link rel="stylesheet" href="/css/agenda-premium.css?v=23">
 </head>
 <body class="vpm-seller-reference vpm-agenda-page vpm-header-typography">
 <!-- En-tête mobile : logo complet + bouton menu -->
@@ -1238,24 +1273,7 @@ if("scrollRestoration"in history)history.scrollRestoration="manual";</script>
           </div>
         </div>
 
-        <div id="calSyncBox" style="display:none;background:#fff;border:1px solid #e8e0d6;border-radius:14px;padding:20px;">
-          <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#9E3A18" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-            <strong style="font-size:0.9rem;color:#1A1A16;">Synchronisation calendrier</strong>
-          </div>
-          <p style="color:#666;font-size:0.82rem;margin-bottom:10px;">Abonnez-vous à votre agenda de visites depuis Google Calendar, Apple Calendar ou Outlook — vos visites s'y affichent automatiquement.</p>
-          <div style="display:flex;gap:8px;align-items:center;margin-bottom:8px;">
-            <input type="text" id="calFeedUrl" readonly style="flex:1;background:#F5F0E8;font-size:0.75rem;padding:9px 12px;border:1.5px solid #e8e0d6;border-radius:8px;">
-            <button onclick="copyCalFeed()" class="btn-primary" style="white-space:nowrap;padding:9px 14px;font-size:0.81rem;">Copier</button>
-          </div>
-          <div style="display:flex;gap:8px;flex-wrap:wrap;">
-            <a id="calWebcalLink" href="#" style="font-size:0.75rem;color:var(--terracotta);text-decoration:none;display:inline-flex;align-items:center;gap:4px;background:rgba(158,58,24,0.06);padding:5px 10px;border-radius:6px;">
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
-              Ouvrir dans l'app calendrier
-            </a>
-          </div>
-          <p style="font-size:0.72rem;color:#bbb;margin-top:8px;margin-bottom:0;">Ce lien est privé — ne le partagez pas.</p>
-        </div>
+        <div id="calSyncBox"></div>
 
       </div><!-- end agenda-right-col -->
 
@@ -1404,6 +1422,58 @@ if("scrollRestoration"in history)history.scrollRestoration="manual";</script>
   </main>
 </div>
 <!-- ── Modal: Programmer une visite ── -->
+<!-- ── Modal: Synchronisation Calendrier ── -->
+<div class="modal-overlay cal-sync-overlay" id="calSyncModal" onclick="if(event.target===this)closeSyncModal()">
+  <div class="cal-sync-sheet">
+    <div class="cal-sync-header">
+      <div class="cal-sync-title-wrap">
+        <div class="cal-sync-icon-circle">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#9E3A18" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        </div>
+        <h2 class="cal-sync-title">Synchronisation<br><span>calendrier</span></h2>
+      </div>
+      <button class="cal-sync-close" onclick="closeSyncModal()">×</button>
+    </div>
+    <p class="cal-sync-desc">Abonnez-vous à votre agenda de visites depuis votre application calendrier préférée — vos visites s'y affichent automatiquement.</p>
+    <div class="cal-sync-apps">
+      <a href="#" class="cal-sync-app-row" id="calSyncGcalLink" target="_blank" rel="noopener">
+        <div class="cal-sync-app-logo">
+          <svg width="26" height="26" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.87 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.1c-.22-.66-.35-1.36-.35-2.1s.13-1.44.35-2.1V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l3.66-2.84z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.13 2.18 6.25l3.66 2.84c.87-2.6 3.3-4.71 6.16-4.71z" fill="#EA4335"/></svg>
+        </div>
+        <span>Google Calendar</span>
+        <svg class="cal-sync-row-chevron" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+      </a>
+      <a href="#" class="cal-sync-app-row" id="calSyncAppleLink">
+        <div class="cal-sync-app-logo" style="background:#F8F8F8;border:1px solid #e5e5e5;">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M17.04 12.58c-.02-2.13 1.74-3.16 1.82-3.21-1-1.46-2.55-1.66-3.09-1.68-1.31-.13-2.57.77-3.24.77-.67 0-1.7-.75-2.8-.73-1.44.02-2.77.84-3.51 2.12-1.5 2.6-.38 6.44 1.07 8.55.71 1.03 1.56 2.18 2.67 2.14 1.08-.04 1.48-.7 2.79-.7 1.3 0 1.66.7 2.79.68 1.15-.02 1.89-1.05 2.59-2.08.82-1.18 1.16-2.34 1.18-2.4-.03-.01-2.26-.87-2.27-3.46z" fill="#555"/><path d="M14.84 6.09c.59-.72.99-1.72.88-2.72-.85.03-1.88.57-2.49 1.27-.55.63-1.02 1.64-.89 2.6.94.07 1.9-.48 2.5-1.15z" fill="#555"/></svg>
+        </div>
+        <span>Apple Calendar</span>
+        <svg class="cal-sync-row-chevron" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+      </a>
+      <a href="#" class="cal-sync-app-row" id="calSyncOutlookLink" target="_blank" rel="noopener">
+        <div class="cal-sync-app-logo" style="background:#0078D4;">
+          <svg width="22" height="22" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M13 5v14l8-3V8l-8-3z" fill="#fff" opacity=".9"/><rect x="3" y="8" width="10" height="8" rx="1" fill="#fff"/><rect x="4" y="9" width="8" height="6" rx="1" fill="#0078D4"/></svg>
+        </div>
+        <span>Outlook</span>
+        <svg class="cal-sync-row-chevron" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+      </a>
+    </div>
+    <div class="cal-sync-divider"><span>ou</span></div>
+    <div class="cal-sync-manual">
+      <label class="cal-sync-label">Lien de synchronisation (privé)</label>
+      <div class="cal-sync-input-row">
+        <input type="text" id="calFeedUrl" readonly class="cal-sync-url-input">
+        <button class="cal-sync-copy-btn" onclick="copyCalFeedModal()">Copier</button>
+      </div>
+      <a id="calWebcalLink" href="#" class="cal-sync-open-app">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+        Ouvrir dans l'app calendrier
+      </a>
+      <p class="cal-sync-private">Ce lien est privé — ne le partagez pas.</p>
+    </div>
+    <div class="cal-sync-safe-bottom"></div>
+  </div>
+</div>
 <!-- ── Modal: Rappel SMS ── -->
 <div class="modal-overlay" id="rappelSmsOverlay">
   <div class="modal confirm-sms-modal" style="position:relative;">
@@ -1629,17 +1699,17 @@ function renderVisitsFiltered() {
     filtered = allVisits.filter(v => v.status !== 'cancelled' && !isPastVisit(v))
       .sort((a,b) => (a.visit_date+a.visit_time).localeCompare(b.visit_date+b.visit_time));
     filterLabel = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:4px;"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg> Visites à venir';
-    gradientColors = '#2c4f85, #3d6498';
+    gradientColors = '#7B35CC, #9650E0';
   } else if (activeStatFilter === 'passees') {
     filtered = allVisits.filter(v => v.status !== 'cancelled' && isPastVisit(v))
       .sort((a,b) => b.visit_date.localeCompare(a.visit_date));
     filterLabel = '🕐 Visites passées';
-    gradientColors = '#5b1490, #7b1fa2';
+    gradientColors = '#616161, #757575';
   } else {
     filtered = allVisits.filter(v => v.visit_date === today && v.status !== 'cancelled')
       .sort((a,b) => (a.visit_time||'').localeCompare(b.visit_time||''));
     filterLabel = "📍 Aujourd'hui";
-    gradientColors = '#a31048, #c2185b';
+    gradientColors = '#A07800, #C09000';
   }
 
   if (upcomingSection) upcomingSection.style.display = 'none';
@@ -1774,17 +1844,21 @@ function buildVisitConfirmedCard(v) {
     </div>` : '';
   const isRappel    = v.sms_copied_at && !v.reminder_sent;
   const isConfirmed = v.sms_copied_at && v.reminder_sent;
-  const bannerClass = isConfirmed ? 'vcc2-banner vcc2-banner-confirmed' : isRappel ? 'vcc2-banner vcc2-banner-rappel' : 'vcc2-banner vcc2-banner-scheduled';
+  const svgStar     = `<svg class="vcc2-full-star-ico" viewBox="0 0 24 24" width="13" height="13" fill="#F5C842" stroke="#D4A800" stroke-width="0.5"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>`;
+  const bannerClass = isConfirmed ? 'vcc2-banner vcc2-banner-full' : isRappel ? 'vcc2-banner vcc2-banner-rappel' : 'vcc2-banner vcc2-banner-scheduled';
   const bannerInner = isRappel
     ? `<span class="banner-rappel-text">● Rappel J-1 à envoyer</span><span class="banner-confirmed-text">✓ Visite confirmée</span>`
-    : isConfirmed ? '✓ Visite confirmée' : '◉ Visite programmée';
-  const cardState   = isConfirmed ? ' vcc2-confirmed' : isRappel ? ' vcc2-rappel' : '';
+    : isConfirmed
+    ? `${svgStar} VISITE CONFIRMÉE À 100 %<img src="/logo-vpm.png" class="vcc2-banner-logo" alt="">`
+    : '◉ Visite programmée';
+  const cardState   = isConfirmed ? ' vcc2-confirmed vcc2-full' : isRappel ? ' vcc2-rappel' : '';
   const rappelBtnHtml = isRappel
     ? `<button class="vcc2-btn-sms vcc2-btn-rappel-action" id="btn-rappel-${v.id}" onclick="sendRappelRdv(${v.id})">${svgPhone} Rappel du rdv</button>`
     : isConfirmed
       ? `<button class="vcc2-btn-sms sent" id="btn-rappel-${v.id}">${svgPhone} Rappel effectué</button>`
       : `<button class="vcc2-btn-sms vcc2-btn-rappel-action" id="btn-rappel-${v.id}" onclick="sendRappelRdv(${v.id})" style="display:none;">${svgPhone} Rappel du rdv</button>`;
   const conseilHtml = isRappel ? `<div class="vcc2-rappel-note">N'oubliez pas de rappeler l'acheteur la veille de la visite</div>` : '';
+  const fullFooterHtml = `<div class="vcc2-full-footer" id="full-footer-${v.id}"${isConfirmed ? '' : ' style="display:none;"'}>${svgStar} Tout est prêt ! La visite est confirmée et le rappel a été envoyé.</div>`;
   return `<div class="vcc2${cardState}" id="vcard-${v.id}">
     <div id="status-badge-${v.id}" class="${bannerClass}">${bannerInner}</div>
     <div class="vcc2-head">
@@ -1809,6 +1883,7 @@ function buildVisitConfirmedCard(v) {
       <button class="vcc2-btn-cancel" onclick="openCancelSmsModal(${v.id})">Annuler</button>
     </div>
     ${conseilHtml}
+    ${fullFooterHtml}
     ${v.sms_copied_at?`<div class="vcc2-sms-badge" id="sms-badge-${v.id}">${smsCopiedBadge(v.sms_copied_at)}</div>`:`<div id="sms-badge-${v.id}" class="vcc2-sms-badge"></div>`}
   </div>`;
 }
@@ -2309,9 +2384,11 @@ function copyRappelSms(btn) {
           rappelBtn.innerHTML = '✓ Rappel effectué';
         }
         const vcardRappel = document.getElementById('vcard-' + id);
-        if (vcardRappel) { vcardRappel.classList.remove('vcc2-rappel'); vcardRappel.classList.add('vcc2-confirmed'); }
+        if (vcardRappel) { vcardRappel.classList.remove('vcc2-rappel'); vcardRappel.classList.add('vcc2-confirmed','vcc2-full'); const rNote=vcardRappel.querySelector('.vcc2-rappel-note'); if(rNote) rNote.style.display='none'; }
         const statusBadgeRappel = document.getElementById('status-badge-' + id);
-        if (statusBadgeRappel) { statusBadgeRappel.className = 'vcc2-banner vcc2-banner-confirmed'; statusBadgeRappel.textContent = '✓ Visite confirmée'; }
+        if (statusBadgeRappel) { statusBadgeRappel.className = 'vcc2-banner vcc2-banner-full'; statusBadgeRappel.innerHTML = '<svg class="vcc2-full-star-ico" viewBox="0 0 24 24" width="13" height="13" fill="#F5C842" stroke="#D4A800" stroke-width="0.5"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg> VISITE CONFIRMÉE À 100 %<img src="/logo-vpm.png" class="vcc2-banner-logo" alt="">'; }
+        const fullFooter = document.getElementById('full-footer-' + id);
+        if (fullFooter) fullFooter.style.display = '';
         fetch(`/api/visits/${id}/rappel-rdv`, {method:'POST'}).catch(()=>{});
       } else {
         if (v) v.sms_copied_at = new Date().toISOString();
@@ -2357,9 +2434,11 @@ function markRappelSmsSent() {
       rappelBtn.innerHTML = '✓ Rappel effectué';
     }
     const vcardRappel = document.getElementById('vcard-' + id);
-    if (vcardRappel) { vcardRappel.classList.remove('vcc2-rappel'); vcardRappel.classList.add('vcc2-confirmed'); }
+    if (vcardRappel) { vcardRappel.classList.remove('vcc2-rappel'); vcardRappel.classList.add('vcc2-confirmed','vcc2-full'); const rNote=vcardRappel.querySelector('.vcc2-rappel-note'); if(rNote) rNote.style.display='none'; }
     const statusBadgeRappel = document.getElementById('status-badge-' + id);
-    if (statusBadgeRappel) { statusBadgeRappel.className = 'vcc2-banner vcc2-banner-confirmed'; statusBadgeRappel.textContent = '✓ Visite confirmée'; }
+    if (statusBadgeRappel) { statusBadgeRappel.className = 'vcc2-banner vcc2-banner-full'; statusBadgeRappel.innerHTML = '<svg class="vcc2-full-star-ico" viewBox="0 0 24 24" width="13" height="13" fill="#F5C842" stroke="#D4A800" stroke-width="0.5"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg> VISITE CONFIRMÉE À 100 %<img src="/logo-vpm.png" class="vcc2-banner-logo" alt="">'; }
+    const fullFooter = document.getElementById('full-footer-' + id);
+    if (fullFooter) fullFooter.style.display = '';
     fetch(`/api/visits/${id}/rappel-rdv`, {method:'POST'}).catch(()=>{});
   } else {
     if (v) v.sms_copied_at = new Date().toISOString();
@@ -3018,7 +3097,39 @@ function copyBookingLink() {
 
 function copyCalFeed() {
   const input=document.getElementById('calFeedUrl');
+  if(!input||!input.value) return;
   navigator.clipboard.writeText(input.value).catch(()=>{ input.select(); document.execCommand('copy'); });
+  showToast('Lien calendrier copié !');
+}
+
+window.openSyncModal = function() {
+  const modal = document.getElementById('calSyncModal');
+  if (!modal) return;
+  const feedUrl = (document.getElementById('calFeedUrl')||{}).value || '';
+  const webcalUrl = (document.getElementById('calWebcalLink')||{}).href || '';
+  const gcalLink = document.getElementById('calSyncGcalLink');
+  const appleLink = document.getElementById('calSyncAppleLink');
+  const outlookLink = document.getElementById('calSyncOutlookLink');
+  if (gcalLink && feedUrl) {
+    const webcal = feedUrl.replace(/^https?:/, 'webcal:');
+    gcalLink.href = 'https://calendar.google.com/calendar/r?cid=' + encodeURIComponent(webcal);
+  }
+  if (appleLink && webcalUrl && webcalUrl !== window.location.href) appleLink.href = webcalUrl;
+  if (outlookLink && feedUrl) {
+    outlookLink.href = 'https://outlook.live.com/calendar/0/addfromweb?url=' + encodeURIComponent(feedUrl);
+  }
+  modal.classList.add('open');
+  document.body.style.overflow = 'hidden';
+};
+window.closeSyncModal = function() {
+  const modal = document.getElementById('calSyncModal');
+  if (modal) modal.classList.remove('open');
+  document.body.style.overflow = '';
+};
+function copyCalFeedModal() {
+  const input = document.getElementById('calFeedUrl');
+  if (!input || !input.value) return;
+  navigator.clipboard.writeText(input.value).catch(() => { input.select(); document.execCommand('copy'); });
   showToast('Lien calendrier copié !');
 }
 
@@ -3305,6 +3416,6 @@ loadData().then(() => {
 </script>
 
 <link rel="stylesheet" href="/css/seller-header-typography.css?v=1">
-<script src="/js/agenda-premium.js?v=35"></script>
+<script src="/js/agenda-premium.js?v=37"></script>
 </body>
 </html>

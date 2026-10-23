@@ -98,7 +98,15 @@
   const visitsHeading=make('h2','ap-lower-heading','Mes visites');visitsPanel.append(visitsHeading);
   const visitsFilters=make('div','ap-visits-filters');
   const visitsFilterButtons={};
-  for(const [key,label] of [['last','Dernière réservée'],['scheduled','Programmée'],['confirmed','Confirmée'],['rappel','Rappel J-1'],['all','Toutes']]){const b=button(label,()=>setVisitsFilter(key),'ap-visits-filter');b.dataset.filter=key;visitsFilters.append(b);visitsFilterButtons[key]=b;}
+  const vfSecRow=make('div','ap-vf-sec-row');
+  for(const [key,label] of [['last','Dernière réservée'],['all','Toutes']]){const b=button(label,()=>setVisitsFilter(key),'ap-visits-filter ap-vf-sec');b.dataset.filter=key;vfSecRow.append(b);visitsFilterButtons[key]=b;}
+  const vfStepsRow=make('div','ap-vf-steps-row');
+  const _icoS='<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>';
+  const _icoC='<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>';
+  const _icoR='<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>';
+  const _arrHtml='<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#C8B9AE" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>';
+  for(const [key,label,ico] of [['scheduled','Programmée',_icoS],['confirmed','Confirmée',_icoC],['rappel','Rappel J-1',_icoR]]){if(vfStepsRow.children.length){const arr=make('span','ap-vf-arrow');arr.innerHTML=_arrHtml;vfStepsRow.append(arr);}const b=button('',()=>setVisitsFilter(key),'ap-visits-filter ap-vf-step ap-vf-step-'+key);b.innerHTML=ico+'<span>'+label+'</span>';b.dataset.filter=key;vfStepsRow.append(b);visitsFilterButtons[key]=b;}
+  visitsFilters.append(vfSecRow,vfStepsRow);
   visitsPanel.append(visitsFilters);listCol.append(visitsPanel);visitsPanel.append(visits);listCol.append(availabilityPanel);
   const compromisPanel=main.querySelector('#compromis-vente'),compromisHeader=compromisPanel?.querySelector('.compromis-bar-hdr'),compromisBody=compromisPanel?.querySelector('.compromis-bar-body');
   if(compromisPanel&&compromisHeader&&compromisBody){
@@ -108,7 +116,7 @@
   // Sharing remains available through a discreet link above the calendar.
   actionCol.append(share);
   const calSync=right.querySelector('#calSyncBox');
-  if(calSync){const syncDetails=make('details','ap-sync-details');const syncSummary=make('summary','','Synchroniser mon agenda');syncDetails.append(syncSummary,calSync);actionCol.append(syncDetails);}
+  if(calSync){const syncBtn=make('button','ap-sync-trigger');syncBtn.innerHTML='<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg><span>Synchroniser mon agenda</span><span class="ap-sync-chevron">›</span>';syncBtn.onclick=()=>(window.openSyncModal||function(){})();listCol.append(syncBtn);}
   right.remove();
   const pendingPanel=make('div','agenda-panel ap-pending');
   pendingPanel.append(make('h2','ap-panel-title','Demandes en attente')); const pendingList=make('div','ap-pending-list');pendingPanel.append(pendingList);visits.prepend(pendingPanel);
@@ -196,6 +204,7 @@
   function eventNode(event,key,compact=false){
     const el=make(event.kind==='reminder'?'button':'div','ap-event ap-event-'+event.kind);
     if(event.kind==='confirmed'&&!event.data?.sms_copied_at)el.classList.replace('ap-event-confirmed','ap-event-scheduled');
+    if(['confirmed','pending','done','cancelled'].includes(event.kind)){const t=todayKey();el.classList.add(key<t?'ap-event-timing-past':key===t?'ap-event-timing-today':'ap-event-timing-future');}
     if(['availability','confirmed','scheduled','pending','reminder','followup'].includes(event.kind)){
       if(event.kind!=='reminder'){el.tabIndex=0;el.setAttribute('role','button');}
       el.addEventListener('click',click=>{click.stopPropagation();chooseEvent(event,key,event.kind==='reminder');});
