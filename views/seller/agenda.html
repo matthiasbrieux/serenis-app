@@ -726,7 +726,7 @@ if("scrollRestoration"in history)history.scrollRestoration="manual";</script>
     .vbadge-scheduled { background: #fef3ee; color: #C4603A; border: 1px solid #f0c5a0; }
     .vbadge-pending   { background: #fff3e0; color: #e65100; border: 1px solid #ffe0b2; }
     .vbadge-cancelled { background: #f5f5f5; color: #757575; border: 1px solid #e0e0e0; }
-    .vbadge-done      { background: #e3f2fd; color: #1565c0; border: 1px solid #bbdefb; }
+    .vbadge-done      { background: #e8f5e9; color: #2e7d32; border: 1px solid #c8e6c9; }
 
     /* ── Créneaux : visuels récurrents vs ponctuels ──────── */
     .avail-slot-item.recurrent {
@@ -792,6 +792,10 @@ if("scrollRestoration"in history)history.scrollRestoration="manual";</script>
     .vcc2-btn-cancel { padding:9px 12px; border-radius:9px; background:#fff; color:#999; border:1px solid #e0d8ce; font-family:'Inter',sans-serif; font-size:0.78rem; font-weight:600; cursor:pointer; transition:all 0.15s; min-height:38px; flex-shrink:0; touch-action:manipulation; }
     .vcc2-btn-cancel:hover { border-color:#e74c3c; color:#e74c3c; background:#fdf2f2; }
     .vcc2-sms-badge { padding:0 15px 10px; }
+    .vcc2-btn-past { flex:1; display:flex; align-items:center; justify-content:center; gap:6px; padding:9px 12px; border-radius:10px; background:rgba(158,58,24,0.05); color:var(--terracotta); border:1.5px solid rgba(158,58,24,0.15); font-family:'Inter',sans-serif; font-size:0.81rem; font-weight:600; cursor:pointer; transition:background 0.15s; min-height:40px; }
+    .vcc2-btn-past:hover { background:var(--terracotta); color:#fff; }
+    .vcc2-btn-past-skip { background:#f8f4f0; color:#888; border-color:#e0d8cc; }
+    .vcc2-btn-past-skip:hover { background:#999; color:#fff; border-color:#999; }
 
     /* ── PREMIUM v2 : Carte visite en attente ───────────── */
     .vcc-pending2 { background:#fff; border:1.5px solid #ffe0b2; border-left:4px solid #f57f17; border-radius:14px; padding:14px 16px; transition:box-shadow 0.18s; }
@@ -996,7 +1000,7 @@ if("scrollRestoration"in history)history.scrollRestoration="manual";</script>
   </style>
   <link rel="stylesheet" href="/css/seller-reference.css?v=1">
   <link rel="stylesheet" href="/css/seller-navigation.css?v=2">
-<link rel="stylesheet" href="/css/agenda-premium.css?v=15">
+<link rel="stylesheet" href="/css/agenda-premium.css?v=16">
 </head>
 <body class="vpm-seller-reference vpm-agenda-page vpm-header-typography">
 <!-- En-tête mobile : logo complet + bouton menu -->
@@ -1872,24 +1876,46 @@ function togglePastSection() {
 function buildPastCard(v) {
   const [yr,mo,dy] = (v.visit_date||'').split('-');
   const d = yr ? new Date(Number(yr),Number(mo)-1,Number(dy)) : null;
-  const MOIS_COURT2 = ['jan','fév','mar','avr','mai','juin','juil','août','sep','oct','nov','déc'];
-  const dateStr = d ? `${String(Number(dy))} ${MOIS_COURT2[d.getMonth()]} ${yr}` : '—';
-  const time = v.visit_time ? ' · '+v.visit_time.slice(0,5) : '';
+  const MOIS_COURT = ['JAN','FÉV','MAR','AVR','MAI','JUN','JUL','AOÛ','SEP','OCT','NOV','DÉC'];
+  const monthStr = d ? MOIS_COURT[d.getMonth()] : '—';
+  const dayNum = d ? String(Number(dy)) : '—';
   const isCancelled = v.status === 'cancelled';
+  const svgClock = `<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>`;
+  const heureStr = v.visit_time ? v.visit_time.slice(0,5).replace(':','h') : '—';
   const statusBadge = isCancelled
-    ? `<span style="font-size:0.6rem;font-weight:800;color:#c0392b;background:#fdf2f2;padding:2px 8px;border-radius:10px;border:1px solid #ffd5d5;flex-shrink:0;text-transform:uppercase;letter-spacing:0.04em;">Annulée</span>`
-    : `<span style="font-size:0.6rem;font-weight:800;color:#2e7d32;background:#e8f5e9;padding:2px 8px;border-radius:10px;border:1px solid rgba(158,58,24,0.12);flex-shrink:0;text-transform:uppercase;letter-spacing:0.04em;">Effectuée</span>`;
-  const contact = [v.buyer_phone, v.buyer_email].filter(Boolean).join(' · ');
-  return `<div style="background:#fafaf8;border:1px solid #e8e0d6;border-radius:11px;padding:11px 14px;opacity:${isCancelled?'0.65':'1'};">
-    <div style="display:flex;align-items:center;gap:10px;">
-      <div style="flex:1;min-width:0;">
-        <div style="font-size:0.9rem;font-weight:700;color:#1A1A16;margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${escapeHtml(v.buyer_name||'Acquéreur')}</div>
-        <div style="font-size:0.75rem;color:#888;">${dateStr}${time}</div>
-        ${contact?`<div style="font-size:0.7rem;color:#aaa;margin-top:1px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${contact}</div>`:''}
+    ? `<span class="vbadge vbadge-cancelled">× Annulée</span>`
+    : `<span class="vbadge vbadge-done">✔ Effectuée</span>`;
+  const profileHtml = (v.buyer_budget||v.buyer_financing||v.buyer_timeline) ? `<div class="vcc2-profile">
+      <div class="vcc2-profile-title">Profil acheteur</div>
+      ${v.buyer_budget?`<div class="vcc2-profile-row">Budget : <strong>${escapeHtml(v.buyer_budget)}</strong></div>`:''}
+      ${v.buyer_financing?`<div class="vcc2-profile-row">Financement : <strong>${escapeHtml(v.buyer_financing)}</strong></div>`:''}
+      ${v.buyer_timeline?`<div class="vcc2-profile-row">Délai : <strong>${escapeHtml(v.buyer_timeline)}</strong></div>`:''}
+    </div>` : '';
+  const buttonsHtml = !isCancelled ? (()=>{
+    const hasFollowup=(window.agendaActionsData||[]).some(a=>a.visit_id===v.id&&a.kind==='visit_followup');
+    return `<div class="vcc2-actions">
+      <button class="vcc2-btn-past" onclick="sendDossierSerieux(${v.id})">Dossier Acheteur Sérieux</button>
+      ${hasFollowup?`<button class="vcc2-btn-past vcc2-btn-past-skip" onclick="skipFollowup(${v.id})">Ne donnera pas suite</button>`:''}
+    </div>`;
+  })() : '';
+  return `<div class="vcc2 ${isCancelled?'vcc2-cancelled':'vcc2-done'}">
+    <div class="vcc2-head">
+      <div class="vcc2-datecol">
+        <div class="vcc2-month">${monthStr}</div>
+        <div class="vcc2-day">${dayNum}</div>
       </div>
-      ${statusBadge}
+      <div class="vcc2-body">
+        <div class="vcc2-name">${escapeHtml(v.buyer_name||'Acquéreur')}</div>
+        <div class="vcc2-pills">
+          <span class="vcc2-time-pill">${svgClock} ${heureStr}</span>
+          ${statusBadge}
+        </div>
+        ${v.buyer_phone?`<a class="vcc2-phone" href="tel:${escapeHtml(v.buyer_phone)}">${escapeHtml(v.buyer_phone)}</a>`:''}
+        ${v.buyer_email?`<div style="font-size:0.75rem;color:#888;margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"><a href="mailto:${escapeHtml(v.buyer_email)}" style="color:#888;text-decoration:none;">${escapeHtml(v.buyer_email)}</a></div>`:''}
+      </div>
     </div>
-    ${!isCancelled?(()=>{const hasFollowup=(window.agendaActionsData||[]).some(a=>a.visit_id===v.id&&a.kind==='visit_followup');return`<div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap;"><button class="ap-dashboard-action" onclick="sendDossierSerieux(${v.id})" style="font-size:0.78rem;">Dossier Acheteur Sérieux</button>${hasFollowup?`<button class="ap-dashboard-action" onclick="skipFollowup(${v.id})" style="font-size:0.78rem;background:#f8f4f0;color:#888;border-color:#e0d8cc;">Ne donnera pas suite</button>`:''}</div>`})():''}
+    ${profileHtml}
+    ${buttonsHtml}
   </div>`;
 }
 
