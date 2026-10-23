@@ -310,7 +310,8 @@
     if(kind==='pending')detailBody.append(make('small','ap-dashboard-hint','Les actions de gestion de la demande sont disponibles dans sa fiche ci-dessous.'));
   }
   function selectAgendaTab(key){
-    Object.entries(tabButtons).forEach(([name,el])=>el.setAttribute('aria-current',String(name===key?'page':'false')));
+    const highlightKey=tabButtons[key]?key:key==='agenda'?'agenda':'visits';
+    Object.entries(tabButtons).forEach(([name,el])=>el.setAttribute('aria-current',String(name===highlightKey?'page':'false')));
     visitsPanel.hidden=key==='agenda';
     if(activeStatFilter)setStatFilter(null);
     if(key==='agenda'){calendar.scrollIntoView({behavior:'smooth',block:'start'});return;}
