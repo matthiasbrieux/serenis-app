@@ -152,6 +152,17 @@
       else{scheduledEmpty.hidden=true;}
     }
     const empty=document.getElementById('visitsEmpty');if(empty)empty.style.display='none';
+    const hint=document.getElementById('visitsBannerHint');
+    if(hint){
+      const hints={
+        scheduled:{bg:'rgba(196,96,58,0.10)',color:'#7a2f0e',border:'rgba(196,96,58,0.25)',text:'Mes visites programmées : des acheteurs ont sélectionné un créneau sur vos disponibilités. Confirmez en un clic pour passer chaque visite en statut <strong>Confirmée</strong>.'},
+        confirmed:{bg:'rgba(27,94,32,0.10)',color:'#1B5E20',border:'rgba(27,94,32,0.25)',text:'Vous avez confirmé votre visite auprès de l\'acheteur. Il ne vous reste plus qu\'à lui envoyer votre rappel la veille pour valider la visite à <strong>100 %</strong>.'},
+        rappel:{bg:'rgba(29,94,201,0.10)',color:'#1D5EC9',border:'rgba(29,94,201,0.25)',text:'Mes rappels J-1 — en 1 clic, rappelez votre acheteur la veille de sa visite pour confirmer à <strong>100 %</strong>.'},
+      };
+      const h=hints[key];
+      if(h){hint.style.display='block';hint.style.background=h.bg;hint.style.color=h.color;hint.style.borderBottom=`1px solid ${h.border}`;hint.innerHTML=h.text;}
+      else{hint.style.display='none';}
+    }
     if(key==='last'){
       setTimeout(()=>{
         const upcomingVisits=allVisits.filter(v=>v.status==='confirmed'&&!isPastVisit(v));
