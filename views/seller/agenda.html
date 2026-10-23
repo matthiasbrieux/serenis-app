@@ -823,10 +823,13 @@ if("scrollRestoration"in history)history.scrollRestoration="manual";</script>
     .vcc2-done .vcc2-profile-row { color:#888; }
     .vcc2-done .vcc2-profile-row strong { color:#333; }
     .vcc2-past-label { flex:1; }
-    .vcc2-btn-past { flex:1; display:flex; align-items:center; justify-content:center; gap:7px; padding:10px 12px; border-radius:10px; background:#f5f5f5; color:#888; border:1.5px solid #e0e0e0; font-family:'DM Sans',sans-serif; font-size:0.82rem; font-weight:600; cursor:pointer; transition:background 0.15s; min-height:44px; text-align:center; flex-direction:column; }
-    .vcc2-btn-past:hover { background:#e5e5e5; color:#555; border-color:#ccc; }
-    .vcc2-btn-past-skip { flex-direction:row; }
-    .vcc2-btn-past-skip:hover { background:#e5e5e5; color:#555; border-color:#ccc; }
+    .vcc2-btn-past { flex:1; display:flex; align-items:center; justify-content:space-between; gap:8px; padding:12px 14px; border-radius:12px; background:linear-gradient(135deg,#7a2f0e,#C4603A); color:#fff; border:1.5px solid #C4603A; font-family:'DM Sans',sans-serif; font-size:0.82rem; font-weight:600; cursor:pointer; transition:background 0.15s; min-height:52px; text-align:left; flex-direction:row; }
+    .vcc2-btn-past:hover { background:linear-gradient(135deg,#6b2a0c,#b35534); color:#fff; border-color:#b35534; }
+    .vcc2-btn-past-skip { background:#fff; color:#C4603A; border-color:#C4603A; flex-direction:row; justify-content:flex-start; }
+    .vcc2-btn-past-skip:hover { background:#fef3ee; color:#C4603A; border-color:#C4603A; }
+    .vcc2-bp-ico { display:flex; align-items:center; flex-shrink:0; }
+    .vcc2-bp-text { flex:1; line-height:1.35; }
+    .vcc2-bp-chev { font-size:18px; font-weight:400; line-height:1; flex-shrink:0; opacity:0.75; }
     .vcc2-banner-cancelled { background:#f5f5f5; color:#757575; border-bottom-color:#e0e0e0; }
 
     /* ── PREMIUM v2 : Carte visite en attente ───────────── */
@@ -1986,8 +1989,15 @@ function buildPastCard(v) {
       ${v.buyer_timeline?`<div class="vcc2-profile-row">${svgCalSmall} <span class="vcc2-past-label">Délai</span><strong>${escapeHtml(v.buyer_timeline)}</strong></div>`:''}
     </div>` : '';
   const buttonsHtml = !isCancelled ? `<div class="vcc2-actions">
-      <button class="vcc2-btn-past" onclick="sendDossierSerieux(${v.id})">${svgDoc} <span>Dossier Acheteur<br>Sérieux</span></button>
-      <button class="vcc2-btn-past vcc2-btn-past-skip" onclick="skipFollowup(${v.id})">${svgStop} Ne donnera pas suite</button>
+      <button class="vcc2-btn-past" onclick="sendDossierSerieux(${v.id})">
+        <span class="vcc2-bp-ico">${svgDoc}</span>
+        <span class="vcc2-bp-text">Dossier Acheteur<br>Sérieux</span>
+        <span class="vcc2-bp-chev">›</span>
+      </button>
+      <button class="vcc2-btn-past vcc2-btn-past-skip" onclick="skipFollowup(${v.id})">
+        <span class="vcc2-bp-ico">${svgStop}</span>
+        <span class="vcc2-bp-text">Ne donnera pas<br>suite</span>
+      </button>
     </div>` : '';
   return `<div class="vcc2 ${isCancelled?'vcc2-cancelled':'vcc2-done'}">
     <div class="${pastBannerClass}">${pastBannerText}</div>
