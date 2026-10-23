@@ -55,6 +55,7 @@
   const registered=right.querySelector('.dispo-registered-block');
   visits.querySelector('#upcomingSection').after(registered);
   function openAvailability() { availabilityFormHost.hidden=false; toggleDispoForm(true); const form=document.getElementById('dispoAddForm'); form.scrollIntoView({behavior:matchMedia('(prefers-reduced-motion:reduce)').matches?'auto':'smooth',block:'center'}); document.getElementById('availDate').focus({preventScroll:true}); }
+  window.openAvailability=openAvailability;
   const subtitle=hero.querySelector('.aph-sub');if(subtitle)subtitle.textContent='Organisez vos visites et suivez vos échanges avec les acheteurs';
   // Reuse the existing manual-visit button and form; move it above the calendar.
   const manualButton=manual.querySelector('.btn-outline-manual');
