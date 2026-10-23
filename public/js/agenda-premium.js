@@ -128,13 +128,8 @@
     if(upcoming){
       upcoming.querySelectorAll('.vcc2').forEach(card=>{
         if(key==='confirmed')card.style.display=card.classList.contains('vcc2-confirmed')?'':'none';
-        else if(key==='scheduled')card.style.display=card.classList.contains('vcc2-confirmed')?'none':'';
-        else if(key==='rappel'){
-          const isConfirmed=card.classList.contains('vcc2-confirmed');
-          const rappelBtn=card.querySelector('[id^="btn-rappel-"]');
-          const rappelDone=rappelBtn&&rappelBtn.classList.contains('sent');
-          card.style.display=(isConfirmed&&!rappelDone)?'':'none';
-        }
+        else if(key==='scheduled')card.style.display=(!card.classList.contains('vcc2-confirmed')&&!card.classList.contains('vcc2-rappel'))?'':'none';
+        else if(key==='rappel')card.style.display=card.classList.contains('vcc2-rappel')?'':'none';
         else card.style.display='';
       });
     }

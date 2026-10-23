@@ -794,6 +794,7 @@ if("scrollRestoration"in history)history.scrollRestoration="manual";</script>
     .vcc2-sms-badge { padding:0 15px 10px; }
     .vcc2-banner { padding:7px 15px; font-size:0.67rem; font-weight:800; letter-spacing:0.07em; text-transform:uppercase; border-bottom:1px solid transparent; border-radius:14px 14px 0 0; }
     .vcc2-banner-confirmed { background:#e8f5e9; color:#2e7d32; border-bottom-color:#a5d6a7; }
+    .vcc2-banner-rappel    { background:#E5F0FF; color:#1D5EC9; border-bottom-color:#B9D5FF; }
     .vcc2-banner-scheduled { background:#fef3ee; color:#C4603A; border-bottom-color:#f0c5a0; }
     .vcc2-banner-done      { background:#e8f5e9; color:#2e7d32; border-bottom-color:#a5d6a7; }
     .vcc2-banner-cancelled { background:#f5f5f5; color:#757575; border-bottom-color:#e0e0e0; }
@@ -1005,7 +1006,7 @@ if("scrollRestoration"in history)history.scrollRestoration="manual";</script>
   </style>
   <link rel="stylesheet" href="/css/seller-reference.css?v=1">
   <link rel="stylesheet" href="/css/seller-navigation.css?v=2">
-<link rel="stylesheet" href="/css/agenda-premium.css?v=16">
+<link rel="stylesheet" href="/css/agenda-premium.css?v=17">
 </head>
 <body class="vpm-seller-reference vpm-agenda-page vpm-header-typography">
 <!-- En-tête mobile : logo complet + bouton menu -->
@@ -1759,9 +1760,12 @@ function buildVisitConfirmedCard(v) {
       ${v.buyer_financing?`<div class="vcc2-profile-row">Financement : <strong>${escapeHtml(v.buyer_financing)}</strong></div>`:''}
       ${v.buyer_timeline?`<div class="vcc2-profile-row">Délai : <strong>${escapeHtml(v.buyer_timeline)}</strong></div>`:''}
     </div>` : '';
-  const bannerClass = v.sms_copied_at ? 'vcc2-banner vcc2-banner-confirmed' : 'vcc2-banner vcc2-banner-scheduled';
-  const bannerText = v.sms_copied_at ? '✓ Visite confirmée' : '◉ Visite programmée';
-  return `<div class="vcc2${v.reminder_sent?' reminder-done':''}${v.sms_copied_at?' vcc2-confirmed':''}" id="vcard-${v.id}">
+  const isRappel    = v.sms_copied_at && !v.reminder_sent;
+  const isConfirmed = v.sms_copied_at && v.reminder_sent;
+  const bannerClass = isConfirmed ? 'vcc2-banner vcc2-banner-confirmed' : isRappel ? 'vcc2-banner vcc2-banner-rappel' : 'vcc2-banner vcc2-banner-scheduled';
+  const bannerText  = isConfirmed ? '✓ Visite confirmée' : isRappel ? '● Rappel J-1 à envoyer' : '◉ Visite programmée';
+  const cardState   = isConfirmed ? ' vcc2-confirmed' : isRappel ? ' vcc2-rappel' : '';
+  return `<div class="vcc2${cardState}" id="vcard-${v.id}">
     <div id="status-badge-${v.id}" class="${bannerClass}">${bannerText}</div>
     <div class="vcc2-head">
       <div class="vcc2-datecol">
@@ -2310,6 +2314,10 @@ function markRappelSmsSent() {
       rappelBtn.className = baseClass + ' sent';
       rappelBtn.innerHTML = '✓ Rappel effectué';
     }
+    const vcardRappel = document.getElementById('vcard-' + id);
+    if (vcardRappel) { vcardRappel.classList.remove('vcc2-rappel'); vcardRappel.classList.add('vcc2-confirmed'); }
+    const statusBadgeRappel = document.getElementById('status-badge-' + id);
+    if (statusBadgeRappel) { statusBadgeRappel.className = 'vcc2-banner vcc2-banner-confirmed'; statusBadgeRappel.textContent = '✓ Visite confirmée'; }
     fetch(`/api/visits/${id}/rappel-rdv`, {method:'POST'}).catch(()=>{});
   } else {
     if (v) v.sms_copied_at = new Date().toISOString();
@@ -2322,9 +2330,9 @@ function markRappelSmsSent() {
     const badge = document.getElementById('sms-badge-' + id);
     if (badge) badge.innerHTML = smsCopiedBadge(v?.sms_copied_at);
     const vcardEl = document.getElementById('vcard-' + id);
-    if (vcardEl) vcardEl.classList.add('vcc2-confirmed');
+    if (vcardEl) { vcardEl.classList.remove('vcc2-confirmed'); vcardEl.classList.add('vcc2-rappel'); }
     const statusBadge = document.getElementById('status-badge-' + id);
-    if (statusBadge) { statusBadge.className = 'vcc2-banner vcc2-banner-confirmed'; statusBadge.textContent = '✓ Visite confirmée'; }
+    if (statusBadge) { statusBadge.className = 'vcc2-banner vcc2-banner-rappel'; statusBadge.textContent = '● Rappel J-1 à envoyer'; }
     fetch(`/api/visits/${id}/reminder`, {method:'POST'}).catch(()=>{});
   }
 }
@@ -3253,6 +3261,6 @@ loadData().then(() => {
 </script>
 
 <link rel="stylesheet" href="/css/seller-header-typography.css?v=1">
-<script src="/js/agenda-premium.js?v=27"></script>
+<script src="/js/agenda-premium.js?v=28"></script>
 </body>
 </html>
