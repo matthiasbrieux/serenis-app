@@ -166,7 +166,7 @@
   window.setStatFilter=function(value){oldSetFilter(value);pendingPanel.hidden=Boolean(value)||!allVisits.some(v=>v.status==='pending'&&!isPastVisit(v));};
   main.querySelectorAll('.stat-card-agenda[data-filter]').forEach(el=>{el.tabIndex=0;el.setAttribute('role','button');el.addEventListener('keydown',event=>{if(event.key==='Enter'||event.key===' '){event.preventDefault();setStatFilter(el.dataset.filter);}});});
   const oldRenderVisits=window.renderVisits;
-  window.renderVisits=function(){oldRenderVisits();renderHistory(); const pending=allVisits.filter(v=>v.status==='pending'&&!isPastVisit(v));pendingPanel.hidden=Boolean(activeStatFilter)||!pending.length;pendingEmpty.hidden=pending.length>0;pendingList.innerHTML=pending.map(buildVisitCompact).join('');pendingTabCount.textContent=String(pending.length);renderDashboardPanels();renderAppointments();};
+  window.renderVisits=function(){oldRenderVisits();renderHistory(); const pending=allVisits.filter(v=>v.status==='pending'&&!isPastVisit(v));pendingPanel.hidden=Boolean(activeStatFilter)||!pending.length;pendingEmpty.hidden=pending.length>0;pendingList.innerHTML=pending.map(buildVisitCompact).join('');pendingTabCount.textContent=String(pending.length);renderDashboardPanels();renderAppointments();const activeFilter=Object.entries(visitsFilterButtons).find(([,b])=>b.getAttribute('aria-pressed')==='true')?.[0];if(activeFilter)setVisitsFilter(activeFilter);};
   const calendar=main.querySelector('.calendar-card'), header=calendar.querySelector('.cal-header');
   const switcher=make('div','ap-view-switch');switcher.setAttribute('role','group');switcher.setAttribute('aria-label','Vue du calendrier');
   const views={month:'Mois',week:'Semaine',day:'Jour'};
@@ -184,7 +184,7 @@
   function previousDate(value){const d=parseDate(value);d.setDate(d.getDate()-1);return dateKey(d);}
   function eventsFor(key) {
     const items=availSlots.filter(s=>s.date===key).map(s=>({kind:'availability',time:(s.start||'').slice(0,5),end:(s.end||'').slice(0,5),label:'Disponible',data:s}));
-    for(const v of allVisits.filter(v=>v.visit_date===key).filter(v=>!activeStatFilter || (v.status!=='cancelled' && (activeStatFilter==='avenir'?!isPastVisit(v):activeStatFilter==='passees'?isPastVisit(v):v.visit_date===todayKey()))))items.push({kind:v.status,time:(v.visit_time||'').slice(0,5),label:v.status==='confirmed'?(v.sms_copied_at?'Visite confirmée':'Visite programmée'):statusText[v.status]||v.status,data:v});
+    for(const v of allVisits.filter(v=>v.visit_date===key).filter(v=>!activeStatFilter || (v.status!=='cancelled' && (activeStatFilter==='avenir'?!isPastVisit(v):activeStatFilter==='passees'?isPastVisit(v):v.visit_date===todayKey()))))items.push({kind:v.status,time:(v.visit_time||'').slice(0,5),label:v.status==='confirmed'?'Visite confirmée':statusText[v.status]||v.status,data:v});
     const m=getMilestoneDates();for(const [id,label] of [['sru','Rétractation'],['conditions','Cond. suspensive'],['acte','Acte authentique']])if(m[id]===key)items.push({kind:'milestone',time:'',label});
     for(const action of agendaActions.filter(a=>a.kind==='visit_reminder'&&a.due_date===key))items.push({kind:'reminder',time:REMINDER_TIME,label:`Rappel — visite demain à ${timeLabel(action.visit_time)}`,data:action,actionId:action.id});
     for(const action of agendaActions.filter(a=>a.kind==='visit_followup'&&a.due_date===key))items.push({kind:'followup',time:REMINDER_TIME,label:'Faire le suivi après la visite',data:action,actionId:action.id});
@@ -212,7 +212,7 @@
   }
   function eventNode(event,key,compact=false){
     const el=make(event.kind==='reminder'?'button':'div','ap-event ap-event-'+event.kind);
-    if(event.kind==='confirmed'){const d=event.data;if(d?.sms_copied_at&&d?.reminder_sent)el.classList.add('ap-event-confirmed-full');else if(!d?.sms_copied_at)el.classList.replace('ap-event-confirmed','ap-event-scheduled');}
+    if(event.kind==='confirmed'){const d=event.data;if(d?.sms_copied_at&&d?.reminder_sent)el.classList.add('ap-event-confirmed-full');}
     if(['confirmed','pending','done','cancelled'].includes(event.kind)&&key<todayKey())el.classList.add('ap-event-timing-past');
     if(['availability','confirmed','scheduled','pending','reminder','followup'].includes(event.kind)){
       if(event.kind!=='reminder'){el.tabIndex=0;el.setAttribute('role','button');}
@@ -247,7 +247,7 @@
     todayItems.replaceChildren();
     if(!todays.length)todayItems.append(make('p','ap-dashboard-empty','Aucune visite prévue aujourd’hui.'));
     todays.forEach(visit=>{
-      const label=visit.status==='confirmed'?(visit.sms_copied_at?'Visite confirmée':'Visite programmée'):statusText[visit.status]||visit.status;
+      const label=visit.status==='confirmed'?'Visite confirmée':statusText[visit.status]||visit.status;
       const row=button('',()=>chooseEvent({kind:visit.status,label,data:visit},today),'ap-dashboard-row ap-dashboard-visit ap-event-'+visit.status);
       row.append(make('strong','ap-dashboard-time',timeLabel(visit.visit_time)));
       const copy=make('span','ap-dashboard-row-copy');copy.append(make('strong','',label),make('small','',visit.buyer_name||'Acquéreur'));row.append(copy,make('span','ap-dashboard-open','›'));todayItems.append(row);
@@ -266,7 +266,7 @@
       if(slotRow){const manage=button('Gérer ce créneau',()=>{slotRow.scrollIntoView({behavior:'smooth',block:'center'});slotRow.querySelector('.dispo-slot-del')?.focus();},'ap-dashboard-action');detailBody.append(manage);}
       return;
     }
-    const status=kind==='reminder'?'Visite confirmée':kind==='followup'?'Visite effectuée':kind==='confirmed'?(data?.sms_copied_at?'Visite confirmée':'Visite programmée'):(statusText[data?.visit_status||data?.status]||data?.visit_status||data?.status);
+    const status=kind==='reminder'?'Visite confirmée':kind==='followup'?'Visite effectuée':kind==='confirmed'?'Visite confirmée':(statusText[data?.visit_status||data?.status]||data?.visit_status||data?.status);
     info.append(make('span','',status),make('strong','',data.buyer_name||'Acquéreur'),make('span','',`Visite ${fullDate(data.visit_date)} à ${timeLabel(data.visit_time)}`));detailBody.append(info);
     const visitId=data.visit_id||data.id;
     const visitButton=button('Consulter la fiche de visite',()=>{if(kind==='pending')selectAgendaTab('pending');else selectAgendaTab('visits');setTimeout(()=>{document.getElementById(`vcard-${visitId}`)?.scrollIntoView({behavior:'smooth',block:'center'});},80);},'ap-dashboard-action');detailBody.append(visitButton);
@@ -414,5 +414,5 @@
   calDate=new Date(cursor.getFullYear(),cursor.getMonth(),1);
   const hdr=document.getElementById('dispoAddHdr');hdr.tabIndex=0;hdr.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();toggleDispoForm();}});
   for(const [id,label]of [['availDate','Date'],['availStart','De'],['availEnd','À']]){const input=document.getElementById(id);const lab=input.closest('div').querySelector('label');if(lab)lab.htmlFor=id;input.setAttribute('aria-label',label);}
-  renderVisits();renderCalendar();refreshAgendaActions();setVisitsFilter('upcoming');
+  renderVisits();renderCalendar();refreshAgendaActions();setVisitsFilter('scheduled');
 })();
