@@ -12,21 +12,18 @@
   const mobile = matchMedia('(max-width:767px)');
   let view=mobile.matches?'day':'week', cursor=parseDate(todayKey());
   let agendaActions=[];
-  const statRow=main.querySelector('.agenda-stats');
-  if(statRow){const order={avenir:0,aujourd_hui:1,passees:2};[...statRow.querySelectorAll('.stat-card-agenda[data-filter]')].sort((a,b)=>order[a.dataset.filter]-order[b.dataset.filter]).forEach(card=>statRow.append(card));}
   // Move existing nodes rather than recreate inputs, forms or business actions.
-  const hero=main.querySelector('.aph'), share=main.querySelector('#bookingLinkBox');
-  const top=make('div','ap-top'); hero.before(top); top.append(hero);
-  main.insertBefore(statRow,top);
-  const agendaTabs=make('nav','ap-agenda-tabs');agendaTabs.setAttribute('aria-label','Rubriques de l’agenda');
+  const hero=main.querySelector(‘.aph’), share=main.querySelector(‘#bookingLinkBox’);
+  const top=make(‘div’,’ap-top’); hero.before(top); top.append(hero);
+  const agendaTabs=make(‘nav’,’ap-agenda-tabs’);agendaTabs.setAttribute(‘aria-label’,’Rubriques de l’agenda’);
   main.insertBefore(agendaTabs,top);
-  const pendingTabCount=make('span','ap-tab-count','0'),tabButtons={};
-  for(const [key,label] of [['agenda','Agenda'],['visits','Mes visites']]){
-    const b=button('',()=>selectAgendaTab(key),'ap-agenda-tab');b.dataset.tab=key;b.append(make('span','',label));
-    if(key==='pending')b.append(pendingTabCount);
+  const pendingTabCount=make(‘span’,’ap-tab-count’,’0’),tabButtons={};
+  for(const [key,label] of [[‘agenda’,’Agenda’],[‘visits’,’Mes visites’]]){
+    const b=button(‘’,()=>selectAgendaTab(key),’ap-agenda-tab’);b.dataset.tab=key;b.append(make(‘span’,’’,label));
+    if(key===’pending’)b.append(pendingTabCount);
     agendaTabs.append(b);tabButtons[key]=b;
   }
-  top.after(statRow);statRow.after(agendaTabs);
+  top.after(agendaTabs);
   tabButtons.agenda.setAttribute('aria-current','page');
   const layout=main.querySelector('.agenda-layout');
   const right=main.querySelector('.agenda-right-col'), visits=main.querySelector('.visits-below');
@@ -116,6 +113,9 @@
   const calSync=right.querySelector('#calSyncBox');
   if(calSync){const syncBtn=make('button','ap-sync-trigger');syncBtn.innerHTML='<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg><span>Synchroniser mon agenda</span><span class="ap-sync-chevron">›</span>';syncBtn.onclick=()=>(window.openSyncModal||function(){})();listCol.append(syncBtn);}
   right.remove();
+  // Visites passées toujours visibles après les disponibilités
+  const pastSec=document.getElementById('pastSection');
+  if(pastSec)listCol.append(pastSec);
   const pendingPanel=make('div','agenda-panel ap-pending');
   pendingPanel.append(make('h2','ap-panel-title','Demandes en attente')); const pendingList=make('div','ap-pending-list');pendingPanel.append(pendingList);visits.prepend(pendingPanel);
   const pendingEmpty={hidden:true};

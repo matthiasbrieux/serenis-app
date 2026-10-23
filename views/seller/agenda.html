@@ -1112,39 +1112,10 @@ if("scrollRestoration"in history)history.scrollRestoration="manual";</script>
       <p id="noLinkMsg" style="display:none;"></p>
     </div>
 
-    <!-- Stats filtrables -->
-    <div class="agenda-stats">
-      <div class="stat-card-agenda" data-filter="avenir" onclick="setStatFilter('avenir')" title="Voir les visites à venir">
-        <div class="stat-icon">
-          <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><path d="M8 14h.01M12 14h.01M16 14h.01"/></svg>
-        </div>
-        <div>
-          <div class="stat-val" id="statPending">0</div>
-          <div class="stat-lbl">À venir</div>
-          <div class="stat-filter-hint" style="display:none;" id="hint-avenir">
-            <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>Cliquez pour filtrer
-          </div>
-        </div>
-      </div>
-      <div class="stat-card-agenda" data-filter="passees" onclick="setStatFilter('passees')" title="Voir les visites passées">
-        <div class="stat-icon">
-          <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 8 14"/></svg>
-        </div>
-        <div>
-          <div class="stat-val" id="statPast">0</div>
-          <div class="stat-lbl">Passées</div>
-        </div>
-      </div>
-      <div class="stat-card-agenda" data-filter="aujourd_hui" onclick="setStatFilter('aujourd_hui')" title="Voir les visites d'aujourd'hui">
-        <div class="stat-icon">
-          <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 14"/><line x1="12" y1="2" x2="12" y2="4"/><line x1="12" y1="20" x2="12" y2="22"/><line x1="2" y1="12" x2="4" y2="12"/><line x1="20" y1="12" x2="22" y2="12"/></svg>
-        </div>
-        <div>
-          <div class="stat-val" id="statToday">0</div>
-          <div class="stat-lbl">Aujourd'hui</div>
-        </div>
-      </div>
-    </div>
+    <!-- Compteurs cachés (utilisés par updateStats) -->
+    <span id="statPending" style="display:none;">0</span>
+    <span id="statPast" style="display:none;">0</span>
+    <span id="statToday" style="display:none;">0</span>
 
     <!-- Partage de l'agenda -->
     <!-- Layout 2 colonnes : calendrier + panneau droit -->
@@ -1316,17 +1287,14 @@ if("scrollRestoration"in history)history.scrollRestoration="manual";</script>
 
         <!-- Historique / dossier visites passées -->
         <div class="agenda-panel" id="pastSection" style="display:none;">
-          <div class="agenda-panel-title" onclick="togglePastSection()" style="cursor:pointer;user-select:none;">
+          <div class="agenda-panel-title">
             <span style="display:flex;align-items:center;gap:7px;">
               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
               Visites passées
             </span>
-            <span style="display:flex;align-items:center;gap:8px;">
-              <span id="pastCountBadge" style="background:#e8e3db;color:#666;padding:1px 8px;border-radius:12px;font-size:0.72rem;font-weight:700;"></span>
-              <svg id="pastChevron" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="transition:transform 0.2s;color:#aaa;"><polyline points="9 18 15 12 9 6"/></svg>
-            </span>
+            <span id="pastCountBadge" style="background:#e8e3db;color:#666;padding:1px 8px;border-radius:12px;font-size:0.72rem;font-weight:700;"></span>
           </div>
-          <div class="sidebar-body" id="pastList" style="display:none;max-height:none;"></div>
+          <div class="sidebar-body" id="pastList" style="display:flex;flex-direction:column;gap:8px;padding:12px 0 0;max-height:none;"></div>
         </div>
 
         <!-- Visites annulées -->
@@ -1972,7 +1940,7 @@ function renderVisits() {
   if (activeStatFilter) { renderCalendar(); renderVisitsFiltered(); }
 }
 
-let _pastOpen = false;
+let _pastOpen = true;
 function togglePastSection() {
   _pastOpen = !_pastOpen;
   document.getElementById('pastList').style.display = _pastOpen ? 'flex' : 'none';
