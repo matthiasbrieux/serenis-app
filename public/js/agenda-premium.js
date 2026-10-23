@@ -56,10 +56,7 @@
   function openAvailability() { toggleDispoForm(true); const form=document.getElementById('dispoAddForm'); form.scrollIntoView({behavior:matchMedia('(prefers-reduced-motion:reduce)').matches?'auto':'smooth',block:'center'}); document.getElementById('availDate').focus({preventScroll:true}); }
   window.openAvailability=openAvailability;
   const subtitle=hero.querySelector('.aph-sub');if(subtitle)subtitle.textContent='Organisez vos visites et suivez vos échanges avec les acheteurs';
-  // Reuse the existing manual-visit button and form; move it above the calendar.
-  const manualButton=manual.querySelector('.btn-outline-manual');
-  if(manualButton){manualButton.textContent='+ Ajouter une visite manuellement';manualButton.classList.add('ap-calendar-action','ap-calendar-action-secondary');calendarActions.insertBefore(manualButton,shareButton);}
-  manual.remove();
+  if(manual)manual.remove();
   // Move the availability section below the calendar actions; keep the add form closed.
   const availabilityFormHost=right.querySelector('.dispo-section');
   calendarActions.append(availabilityFormHost);
