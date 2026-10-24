@@ -1,4 +1,4 @@
-const CACHE = 'vpm-v1';
+const CACHE = 'vpm-v2';
 const PRECACHE = ['/favicon.ico', '/icons/icon-192.png', '/icons/icon-512.png'];
 
 self.addEventListener('install', e => {
@@ -13,13 +13,10 @@ self.addEventListener('activate', e => {
   self.clients.claim();
 });
 
-// Network-first : toujours la version fraîche du serveur
-// Les requêtes cross-origin (Cloudinary, Stripe, fonts…) ne sont pas interceptées —
-// elles ont leurs propres CDN et caches, et caches.match() retournerait undefined.
 self.addEventListener('fetch', e => {
   if (e.request.method !== 'GET') return;
   if (!e.request.url.startsWith(self.location.origin)) return;
   e.respondWith(
-    fetch(e.request).catch(() => caches.match(e.request))
+    fetch(e.request, { cache: 'no-store' }).catch(() => caches.match(e.request))
   );
 });
