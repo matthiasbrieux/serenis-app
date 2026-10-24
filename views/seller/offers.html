@@ -241,6 +241,11 @@ if("scrollRestoration"in history)history.scrollRestoration="manual";</script>
       .sms-modal-btn-send, .sms-modal-btn-close, .btn-copy-accept, .btn-close-accept { min-height: 52px; touch-action: manipulation; }
     }
   
+    #loadingOverlay{position:fixed;inset:0;background:#FCFAF7;z-index:500;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:16px}
+    #loadingOverlay .lo-spinner{width:36px;height:36px;border:3px solid #e0e0d8;border-top-color:#9E3A18;border-radius:50%;animation:spin .8s linear infinite}
+    @keyframes spin{to{transform:rotate(360deg)}}
+    #loadingOverlay .lo-text{font-size:.82rem;color:#999}
+
     /* Mobile menu button — géré par .mobile-header (style.css) */
     .mobile-menu-btn { display: none; }
     @media (max-width: 900px) {
@@ -327,6 +332,8 @@ if("scrollRestoration"in history)history.scrollRestoration="manual";</script>
         </div>
       </div>
     </div>
+
+    <div id="loadingOverlay"><div class="lo-spinner"></div><span class="lo-text">Chargement…</span></div>
 
     <!-- Stats row -->
     <div class="stats-row" id="statsRow" style="display:none;">
@@ -626,6 +633,7 @@ async function load() {
     const data = await r.json();
     allOffers = data.offers || [];
     document.getElementById('loadingState').style.display = 'none';
+    document.getElementById('loadingOverlay').style.display = 'none';
     renderOffers();
   } catch(e) {
     document.getElementById('loadingState').innerHTML =
