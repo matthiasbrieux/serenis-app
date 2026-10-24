@@ -1107,7 +1107,7 @@ if("scrollRestoration"in history)history.scrollRestoration="manual";</script>
   </style>
   <link rel="stylesheet" href="/css/seller-reference.css?v=1">
   <link rel="stylesheet" href="/css/seller-navigation.css?v=2">
-<link rel="stylesheet" href="/css/agenda-premium.css?v=39">
+<link rel="stylesheet" href="/css/agenda-premium.css?v=40">
 </head>
 <body class="vpm-seller-reference vpm-agenda-page vpm-header-typography">
 <!-- En-tête mobile : logo complet + bouton menu -->
@@ -3395,6 +3395,7 @@ function _crSmsMsg(kind, buyerFirstName, sellerFirstName) {
   if (kind==='j20') return `Bonjour ${bn},\n\nJ'espère que vous allez bien.\n\nJe me permets de prendre quelques nouvelles concernant l'avancement de votre dossier de financement.\n\nAvez-vous pu transmettre les éléments nécessaires à votre banque ou à votre courtier ?\n\nBonne journée,\n${sn}`;
   if (kind==='j45') return `Bonjour ${bn},\n\nJ'espère que tout va bien.\n\nJe souhaitais simplement savoir où en était votre financement et si vous aviez eu un retour de votre banque.\n\nN'hésitez pas à me tenir informé afin que nous puissions suivre sereinement les prochaines étapes avec le notaire.\n\nBonne journée,\n${sn}`;
   if (kind==='etat_lieux') return `Bonjour ${bn},\n\nEn prévision de notre signature définitive chez le notaire, je vous propose d'organiser une dernière visite du logement afin de vérifier ensemble son état général et de relever les différents compteurs.\n\nSeriez-vous disponible quelques jours avant la signature pour convenir d'un rendez-vous ?\n\nBonne journée,\n${sn}`;
+  if (kind==='etat_lieux_veille') return `Bonjour ${bn},\n\nJe vous contacte pour confirmer notre rendez-vous d'état des lieux prévu demain avant notre signature définitive chez le notaire.\n\nPourriez-vous me confirmer que vous serez bien présent ?\n\nBonne journée,\n${sn}`;
   return '';
 }
 function copyCompromisMsg(kind) {
@@ -3509,9 +3510,17 @@ function renderCRTimeline(reminders) {
     const pdfLink=`<a class="cr2-pdf-link" href="/ma-formation/documents/etat-des-lieux" target="_blank">${svgPdf} Fiche d'état des lieux <span style="font-size:0.72rem;color:#aaa;margin-left:3px;">(à imprimer)</span></a>`;
     items.push(mkItem('etat_lieux','Préparez votre dernière visite','Organisez une dernière visite avec votre acheteur pour réaliser l\'état des lieux du logement avant la signature.',mkActions('etat_lieux',msg,smsHref,pdfLink),false));
   }
-  // 5 — Signature
+  // 5 — État des lieux veille
+  if (map['etat_lieux_veille']) {
+    const r=map['etat_lieux_veille']; const msg=_crSmsMsg('etat_lieux_veille',bn||'[Prénom]',sn);
+    const smsHref=bphone?`sms:${bphone}?body=${encodeURIComponent(msg)}`:'';
+    items.push(mkItem('etat_lieux_veille','État des lieux — demain','Votre état des lieux est prévu demain. Confirmez le rendez-vous avec votre acheteur et assurez-vous que le logement est prêt.',mkActions('etat_lieux_veille',msg,smsHref),false));
+  }
+  // 6 — Signature
   if (map['signature']) {
-    items.push(mkItem('signature','Signature définitive chez le notaire','Dernier rendez-vous pour finaliser la vente. Pensez à prendre tous les documents demandés par votre notaire.','',true));
+    const isDoneSignature = map['signature']?.status === 'done';
+    const congratsHtml = isDoneSignature ? `<div class="cr2-congrats"><div class="cr2-congrats-text">Merci, vous avez réussi à vendre ! Vous avez économisé du temps et de l'argent.</div><a class="cr2-avis-btn" href="https://venduparmoi.fr" target="_blank">Laisser un avis</a></div>` : '';
+    items.push(mkItem('signature','Signature définitive chez le notaire',`Dernier rendez-vous pour finaliser la vente. Pensez à prendre tous les documents demandés par votre notaire.${congratsHtml}`,'',true));
   }
   if (!items.length) { el.innerHTML=''; return; }
   el.innerHTML = `<div class="cr2-timeline">${items.join('')}</div>`;

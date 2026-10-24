@@ -537,7 +537,7 @@ function syncCompromisReminders(sellerId, compromisDate, retractionDate, acteDat
   const tx = db.transaction(() => {
     if (compromisDate) { upsert.run(sellerId,'j20',addDays(compromisDate,20)); upsert.run(sellerId,'j45',addDays(compromisDate,45)); }
     if (retractionDate) upsert.run(sellerId,'retraction',retractionDate);
-    if (acteDate) { upsert.run(sellerId,'signature',acteDate); upsert.run(sellerId,'etat_lieux',addDays(acteDate,-7)); }
+    if (acteDate) { upsert.run(sellerId,'signature',acteDate); upsert.run(sellerId,'etat_lieux',addDays(acteDate,-7)); upsert.run(sellerId,'etat_lieux_veille',addDays(acteDate,-1)); }
   });
   tx();
 }
@@ -658,7 +658,7 @@ router.get('/api/compromis/reminders', requireAuth, (req, res) => {
 
 router.patch('/api/compromis/reminders/:kind', requireAuth, express.json(), (req, res) => {
   const { kind } = req.params;
-  if (!['retraction','j20','j45','etat_lieux','signature'].includes(kind)) return res.status(400).json({ error: 'Type invalide' });
+  if (!['retraction','j20','j45','etat_lieux','etat_lieux_veille','signature'].includes(kind)) return res.status(400).json({ error: 'Type invalide' });
   const { status, due_date } = req.body;
   if (!['open','done'].includes(status||'')) return res.status(400).json({ error: 'Statut invalide' });
   db.prepare(`INSERT INTO compromis_reminders(seller_id,kind,due_date,status) VALUES(?,?,?,?)

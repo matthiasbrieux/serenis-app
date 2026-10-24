@@ -598,13 +598,27 @@ try { db.exec(`
   CREATE TABLE IF NOT EXISTS compromis_reminders (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     seller_id INTEGER NOT NULL REFERENCES sellers(id) ON DELETE CASCADE,
-    kind TEXT NOT NULL CHECK(kind IN ('retraction','j20','j45','etat_lieux','signature')),
+    kind TEXT NOT NULL CHECK(kind IN ('retraction','j20','j45','etat_lieux','etat_lieux_veille','signature')),
     due_date TEXT,
     status TEXT NOT NULL DEFAULT 'open' CHECK(status IN ('open','done')),
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     UNIQUE(seller_id, kind)
-  )
+  );
+  CREATE TABLE IF NOT EXISTS compromis_reminders_new (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    seller_id INTEGER NOT NULL REFERENCES sellers(id) ON DELETE CASCADE,
+    kind TEXT NOT NULL CHECK(kind IN ('retraction','j20','j45','etat_lieux','etat_lieux_veille','signature')),
+    due_date TEXT,
+    status TEXT NOT NULL DEFAULT 'open' CHECK(status IN ('open','done')),
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE(seller_id, kind)
+  );
+  INSERT OR IGNORE INTO compromis_reminders_new(id,seller_id,kind,due_date,status,created_at,updated_at)
+    SELECT id,seller_id,kind,due_date,status,created_at,updated_at FROM compromis_reminders;
+  DROP TABLE compromis_reminders;
+  ALTER TABLE compromis_reminders_new RENAME TO compromis_reminders;
 `); } catch(e) {}
 
 // ── Registre chèques parrainage ─────────────────────────────────
