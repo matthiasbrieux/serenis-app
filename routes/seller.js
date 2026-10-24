@@ -1247,6 +1247,26 @@ router.post('/api/visits/:id/rappel-rdv', requireAuth, (req, res) => {
   res.json({ success: true });
 });
 
+const SKIP_REASONS = ['Chambres trop petites','Surface insuffisante','Travaux trop importants','Prix trop élevé','Environnement / emplacement','Autre raison'];
+
+router.post('/api/visits/:id/skip-followup', requireAuth, express.json(), (req, res) => {
+  const visit = db.prepare('SELECT id FROM visits WHERE id=? AND seller_id=?').get(req.params.id, req.seller.id);
+  if (!visit) return res.status(404).json({ error: 'Visite introuvable' });
+  const { reason, comment } = req.body || {};
+  if (!reason || !SKIP_REASONS.includes(reason)) return res.status(400).json({ error: 'Raison invalide' });
+  if (comment && typeof comment !== 'string') return res.status(400).json({ error: 'Commentaire invalide' });
+  db.prepare('UPDATE visits SET skip_reason=?, skip_comment=?, skipped_at=? WHERE id=?')
+    .run(reason, (comment || '').trim() || null, new Date().toISOString(), visit.id);
+  res.json({ success: true });
+});
+
+router.post('/api/visits/:id/reactivate-followup', requireAuth, (req, res) => {
+  const visit = db.prepare('SELECT id FROM visits WHERE id=? AND seller_id=?').get(req.params.id, req.seller.id);
+  if (!visit) return res.status(404).json({ error: 'Visite introuvable' });
+  db.prepare('UPDATE visits SET skip_reason=NULL, skip_comment=NULL, skipped_at=NULL WHERE id=?').run(visit.id);
+  res.json({ success: true });
+});
+
 // ── Feed calendrier (webcal) — public via token ───────────────
 router.get('/api/agenda/feed.ics', (req, res) => {
   const { token } = req.query;

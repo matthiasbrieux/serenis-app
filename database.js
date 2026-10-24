@@ -680,6 +680,11 @@ db.exec(`
 // Administrators are provisioned explicitly by scripts/provision-admin.js.
 // Existing credentials are never reset or replaced at startup.
 
+// ── Retour post-visite (Ne donnera pas suite) ─────────────────
+try { db.exec("ALTER TABLE visits ADD COLUMN skip_reason TEXT"); } catch(e) {}
+try { db.exec("ALTER TABLE visits ADD COLUMN skip_comment TEXT"); } catch(e) {}
+try { db.exec("ALTER TABLE visits ADD COLUMN skipped_at TEXT"); } catch(e) {}
+
 // ── Anti-bruteforce par compte : compte les échecs de mot de passe
 // pour déclencher une vérification par email seulement après plusieurs
 // tentatives ratées, plutôt qu'à chaque connexion (voir routes/auth.js).
