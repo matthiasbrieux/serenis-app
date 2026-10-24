@@ -684,6 +684,7 @@ db.exec(`
 try { db.exec("ALTER TABLE visits ADD COLUMN skip_reason TEXT"); } catch(e) {}
 try { db.exec("ALTER TABLE visits ADD COLUMN skip_comment TEXT"); } catch(e) {}
 try { db.exec("ALTER TABLE visits ADD COLUMN skipped_at TEXT"); } catch(e) {}
+try { db.exec("ALTER TABLE visits ADD COLUMN followup_sent_at TEXT"); } catch(e) {}
 
 // ── Anti-bruteforce par compte : compte les échecs de mot de passe
 // pour déclencher une vérification par email seulement après plusieurs

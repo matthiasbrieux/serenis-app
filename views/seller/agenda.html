@@ -860,6 +860,8 @@ if("scrollRestoration"in history)history.scrollRestoration="manual";</script>
     .vcc2-btn-past:hover { background:linear-gradient(135deg,#b35534,#c46540); color:#fff; border-color:#b35534; }
     .vcc2-btn-past-skip { background:#fff; color:#C4603A; border-color:#C4603A; flex-direction:row; justify-content:flex-start; }
     .vcc2-btn-past-skip:hover { background:#fef3ee; color:#C4603A; border-color:#C4603A; }
+    .vcc2-btn-past-followup.sent { background:#e8f5e9; color:#2e7d32; border-color:#a5d6a7; }
+    .vcc2-btn-past-followup.sent:hover { background:#d7eedd; }
     .vcc2-bp-ico { display:flex; align-items:center; flex-shrink:0; }
     .vcc2-bp-text { flex:1; line-height:1.35; }
     .vcc2-bp-chev { font-size:18px; font-weight:400; line-height:1; flex-shrink:0; opacity:0.75; }
@@ -1598,7 +1600,7 @@ if("scrollRestoration"in history)history.scrollRestoration="manual";</script>
     <button onclick="closeModal('suiviOverlay')" style="position:absolute;top:14px;right:16px;background:none;border:none;font-size:1.4rem;color:#aaa;cursor:pointer;line-height:1;padding:0 4px;z-index:2;" title="Fermer">×</button>
     <div class="confirm-sms-title">Message de suivi</div>
     <div class="suivi-bubble" id="suiviBubbleText"></div>
-    <a class="confirm-sms-btn-sms" id="suiviSendBtn" href="#" style="background:linear-gradient(135deg,#b45309,var(--terracotta));box-shadow:0 4px 14px rgba(158,58,24,0.3);display:none;">
+    <a class="confirm-sms-btn-sms" id="suiviSendBtn" href="#" style="background:linear-gradient(135deg,#b45309,var(--terracotta));box-shadow:0 4px 14px rgba(158,58,24,0.3);display:none;" onclick="const _ov=document.getElementById('suiviOverlay');if(_ov._visitId)_markFollowupSent(_ov._visitId);">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
       Envoyer directement
     </a>
@@ -2154,9 +2156,9 @@ function buildPastCard(v) {
         <span class="vcc2-bp-text">Dossier Acheteur<br>Sérieux</span>
         <span class="vcc2-bp-chev">›</span>
       </button>
-      <button class="vcc2-btn-past vcc2-btn-past-followup" onclick="openSuiviMessage(${v.id})">
-        <span class="vcc2-bp-ico">${svgSend}</span>
-        <span class="vcc2-bp-text">Envoyer un<br>message de suivi</span>
+      <button class="vcc2-btn-past vcc2-btn-past-followup${v.followup_sent_at ? ' sent' : ''}" id="btn-followup-${v.id}" onclick="openSuiviMessage(${v.id})">
+        <span class="vcc2-bp-ico">${v.followup_sent_at ? svgCheck : svgSend}</span>
+        <span class="vcc2-bp-text">${v.followup_sent_at ? '✓ Suivi<br>envoyé' : 'Envoyer un<br>message de suivi'}</span>
       </button>
     </div>
     <div class="vcc2-skip-row">
@@ -2583,16 +2585,33 @@ function openSuiviMessage(id) {
   } else {
     sendBtn.style.display = 'none';
   }
-  document.getElementById('suiviOverlay')._msg = msg;
+  const overlay = document.getElementById('suiviOverlay');
+  overlay._msg = msg;
+  overlay._visitId = id;
   openModal('suiviOverlay');
 }
+
+function _markFollowupSent(id) {
+  const v = allVisits.find(v => v.id === id);
+  if (!v || v.followup_sent_at) return;
+  v.followup_sent_at = new Date().toISOString();
+  const btn = document.getElementById('btn-followup-' + id);
+  if (btn) {
+    btn.classList.add('sent');
+    btn.innerHTML = '<span class="vcc2-bp-ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="11" fill="#757575"/><polyline points="6 12 10 16 18 8" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg></span><span class="vcc2-bp-text">✓ Suivi<br>envoyé</span>';
+  }
+  fetch('/api/visits/' + id + '/followup-sent', { method: 'PUT' }).catch(() => {});
+}
+
 function copySuiviMsg(btn) {
-  const msg = document.getElementById('suiviOverlay')._msg || '';
+  const overlay = document.getElementById('suiviOverlay');
+  const msg = overlay._msg || '';
+  const id = overlay._visitId;
   const svgCopy = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:middle;margin-right:5px;"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>';
   const reset = () => { btn.innerHTML = svgCopy + 'Copier le message'; btn.classList.remove('copied'); };
-  navigator.clipboard.writeText(msg).then(() => { btn.textContent = '✓ Copié !'; btn.classList.add('copied'); setTimeout(reset, 2000); }).catch(() => {
+  navigator.clipboard.writeText(msg).then(() => { btn.textContent = '✓ Copié !'; btn.classList.add('copied'); setTimeout(reset, 2000); if (id) _markFollowupSent(id); }).catch(() => {
     const el = document.createElement('textarea'); el.value = msg; document.body.appendChild(el); el.select(); document.execCommand('copy'); document.body.removeChild(el);
-    btn.textContent = '✓ Copié !'; btn.classList.add('copied'); setTimeout(reset, 2000);
+    btn.textContent = '✓ Copié !'; btn.classList.add('copied'); setTimeout(reset, 2000); if (id) _markFollowupSent(id);
   });
 }
 

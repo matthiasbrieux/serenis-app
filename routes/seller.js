@@ -1267,6 +1267,12 @@ router.post('/api/visits/:id/reactivate-followup', requireAuth, (req, res) => {
   res.json({ success: true });
 });
 
+router.put('/api/visits/:id/followup-sent', requireAuth, (req, res) => {
+  db.prepare('UPDATE visits SET followup_sent_at=? WHERE id=? AND seller_id=?')
+    .run(new Date().toISOString(), req.params.id, req.seller.id);
+  res.json({ success: true });
+});
+
 // ── Feed calendrier (webcal) — public via token ───────────────
 router.get('/api/agenda/feed.ics', (req, res) => {
   const { token } = req.query;
