@@ -62,7 +62,24 @@
   // Move the original saved-slots block, preserving its nodes and handlers.
   const registered=right.querySelector('.dispo-registered-block');
   visits.querySelector('#upcomingSection').after(registered);
-  function openAvailability() { const block=document.getElementById('dispoAddBlock');if(block){block.style.display='';const sec=block.closest('.dispo-section');if(sec)sec.style.display='';}toggleDispoForm(true);if(typeof renderAvailMonth==='function')renderAvailMonth(); const form=document.getElementById('dispoAddForm'); form.scrollIntoView({behavior:matchMedia('(prefers-reduced-motion:reduce)').matches?'auto':'smooth',block:'center'}); document.getElementById('availDate').focus({preventScroll:true}); }
+  function openAvailability() {
+    const block=document.getElementById('dispoAddBlock');
+    if(block){block.style.display='';const sec=block.closest('.dispo-section');if(sec)sec.style.display='';}
+    toggleDispoForm(true);
+    if(typeof renderAvailMonth==='function')renderAvailMonth();
+    // Pre-fill date input with today if empty
+    const dateInput=document.getElementById('availDate');
+    if(dateInput&&!dateInput.value){const td=new Intl.DateTimeFormat('en-CA',{timeZone:'Europe/Paris',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date());dateInput.value=td;}
+    // Scroll to form without triggering iOS native picker (don't focus date input on touch devices)
+    requestAnimationFrame(()=>{
+      const form=document.getElementById('dispoAddForm');
+      if(!form)return;
+      const rect=form.getBoundingClientRect();
+      const scrollTop=window.pageYOffset+rect.top-80;
+      window.scrollTo({top:Math.max(0,scrollTop),behavior:matchMedia('(prefers-reduced-motion:reduce)').matches?'auto':'smooth'});
+      if(!matchMedia('(pointer:coarse)').matches)dateInput.focus({preventScroll:true});
+    });
+  }
   window.openAvailability=openAvailability;
   const subtitle=hero.querySelector('.aph-sub');if(subtitle)subtitle.textContent='Organisez vos visites et suivez vos échanges avec les acheteurs';
   if(manual)manual.remove();
