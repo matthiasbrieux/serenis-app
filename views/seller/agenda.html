@@ -1107,7 +1107,7 @@ if("scrollRestoration"in history)history.scrollRestoration="manual";</script>
   </style>
   <link rel="stylesheet" href="/css/seller-reference.css?v=1">
   <link rel="stylesheet" href="/css/seller-navigation.css?v=2">
-<link rel="stylesheet" href="/css/agenda-premium.css?v=42">
+<link rel="stylesheet" href="/css/agenda-premium.css?v=43">
 </head>
 <body class="vpm-seller-reference vpm-agenda-page vpm-header-typography">
 <!-- En-tête mobile : logo complet + bouton menu -->
@@ -2068,6 +2068,8 @@ function buildPastCard(v) {
   const svgSend   = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>`;
   const svgBulb   = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6"/><path d="M10 22h4"/><path d="M15.09 14c.18-.98.65-1.74 1.41-2.5A4.65 4.65 0 0 0 18 8 6 6 0 0 0 6 8c0 1 .23 2.23 1.5 3.5A4.61 4.61 0 0 1 8.91 14"/></svg>`;
   const heureStr = v.visit_time ? v.visit_time.slice(0,5).replace(':','h') : '—';
+  const _today = new Date(); _today.setHours(0,0,0,0);
+  const daysSince = d ? Math.floor((_today - d) / 86400000) : -1;
   const pastBannerClass = isCancelled ? 'vcc2-banner vcc2-banner-cancelled' : 'vcc2-banner vcc2-banner-done';
   const pastBannerText  = isCancelled ? `${svgStop} VISITE ANNULÉE` : `${svgClock} VISITE PASSÉE`;
   const profileHtml = (v.buyer_budget||v.buyer_financing||v.buyer_timeline) ? `
@@ -2080,10 +2082,11 @@ function buildPastCard(v) {
   const confirmBoxHtml = !isCancelled ? `
     <div class="vcc2-confirm-box">
       <span class="vcc2-confirm-check">${svgCheck}</span>
-      <div>
+      <div class="vcc2-confirm-content">
         <div class="vcc2-confirm-text">Visite réalisée le ${d ? `${dayNum} ${MOIS_LONG[d.getMonth()]} à ${heureStr}` : heureStr}.</div>
         <div class="vcc2-confirm-sub">Pensez à faire un suivi de votre acheteur pour connaître son retour et poursuivre les échanges.</div>
       </div>
+      ${daysSince >= 0 ? `<span class="vcc2-jpast-badge">${svgCalSmall} J + ${daysSince}</span>` : ''}
     </div>` : '';
   const buttonsHtml = !isCancelled ? `<div class="vcc2-actions">
       <button class="vcc2-btn-past" onclick="sendDossierSerieux(${v.id})">
