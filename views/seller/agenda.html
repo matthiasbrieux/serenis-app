@@ -1107,7 +1107,7 @@ if("scrollRestoration"in history)history.scrollRestoration="manual";</script>
   </style>
   <link rel="stylesheet" href="/css/seller-reference.css?v=1">
   <link rel="stylesheet" href="/css/seller-navigation.css?v=2">
-<link rel="stylesheet" href="/css/agenda-premium.css?v=43">
+<link rel="stylesheet" href="/css/agenda-premium.css?v=44">
 </head>
 <body class="vpm-seller-reference vpm-agenda-page vpm-header-typography">
 <!-- En-tête mobile : logo complet + bouton menu -->
@@ -1583,6 +1583,23 @@ if("scrollRestoration"in history)history.scrollRestoration="manual";</script>
     </div>
 
     <button class="confirm-sms-close" onclick="closeModal('rappelSmsOverlay')">Fermer</button>
+  </div>
+</div>
+
+<!-- ── Modal: Message de suivi visite passée ── -->
+<div class="modal-overlay" id="suiviOverlay">
+  <div class="modal confirm-sms-modal" style="position:relative;">
+    <button onclick="closeModal('suiviOverlay')" style="position:absolute;top:14px;right:16px;background:none;border:none;font-size:1.4rem;color:#aaa;cursor:pointer;line-height:1;padding:0 4px;z-index:2;" title="Fermer">×</button>
+    <div class="confirm-sms-title">Message de suivi</div>
+    <div class="suivi-bubble" id="suiviBubbleText"></div>
+    <a class="confirm-sms-btn-sms" id="suiviSendBtn" href="#" style="background:linear-gradient(135deg,#b45309,var(--terracotta));box-shadow:0 4px 14px rgba(158,58,24,0.3);display:none;">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+      Envoyer directement
+    </a>
+    <button class="confirm-sms-copy" id="suiviCopyBtn" onclick="copySuiviMsg(this)">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:middle;margin-right:5px;"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>Copier le message
+    </button>
+    <button class="confirm-sms-close" onclick="closeModal('suiviOverlay')">Fermer</button>
   </div>
 </div>
 
@@ -2467,13 +2484,31 @@ async function skipFollowup(id) {
 function openSuiviMessage(id) {
   const v = allVisits.find(v => v.id === id);
   if (!v) return;
+  const bn = (v.buyer_name || '').split(' ')[0] || '[Prénom]';
+  const sn = _data?.seller?.first_name || '[Votre prénom]';
+  const msg = `Bonjour ${bn},\n\nMerci d'avoir pris le temps de visiter notre maison.\n\nJ'espère que la visite vous a permis de mieux découvrir le logement.\n\nSi vous avez des questions complémentaires ou souhaitez obtenir davantage d'informations, n'hésitez pas à me contacter.\n\nBonne journée,\n${sn}`;
+  document.getElementById('suiviBubbleText').textContent = '« ' + msg + ' »';
+  const sendBtn = document.getElementById('suiviSendBtn');
   if (v.buyer_phone) {
-    window.location.href = 'sms:' + v.buyer_phone;
+    sendBtn.href = 'sms:' + v.buyer_phone + '?body=' + encodeURIComponent(msg);
+    sendBtn.style.display = '';
   } else if (v.buyer_email) {
-    window.location.href = 'mailto:' + encodeURIComponent(v.buyer_email);
+    sendBtn.href = 'mailto:' + encodeURIComponent(v.buyer_email) + '?subject=' + encodeURIComponent('Suivi de votre visite') + '&body=' + encodeURIComponent(msg);
+    sendBtn.style.display = '';
   } else {
-    showToast('Aucune coordonnée disponible pour cet acheteur.', 'info');
+    sendBtn.style.display = 'none';
   }
+  document.getElementById('suiviOverlay')._msg = msg;
+  openModal('suiviOverlay');
+}
+function copySuiviMsg(btn) {
+  const msg = document.getElementById('suiviOverlay')._msg || '';
+  const svgCopy = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:middle;margin-right:5px;"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>';
+  const reset = () => { btn.innerHTML = svgCopy + 'Copier le message'; btn.classList.remove('copied'); };
+  navigator.clipboard.writeText(msg).then(() => { btn.textContent = '✓ Copié !'; btn.classList.add('copied'); setTimeout(reset, 2000); }).catch(() => {
+    const el = document.createElement('textarea'); el.value = msg; document.body.appendChild(el); el.select(); document.execCommand('copy'); document.body.removeChild(el);
+    btn.textContent = '✓ Copié !'; btn.classList.add('copied'); setTimeout(reset, 2000);
+  });
 }
 
 function copyRappelSms(btn) {
