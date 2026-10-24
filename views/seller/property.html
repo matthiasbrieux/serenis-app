@@ -454,7 +454,7 @@ if("scrollRestoration"in history)history.scrollRestoration="manual";</script>
     @keyframes slideInCard { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:none} }
     .room-card {
       background:#fff;border:1.5px solid #e8e0d6;border-radius:12px;
-      padding:14px 16px;margin-bottom:8px;animation:slideInCard 0.2s;
+      padding:14px 16px;margin-bottom:8px;
     }
     .room-card-header { display:flex;align-items:center;justify-content:space-between;margin-bottom:10px; }
     .room-card-title { display:flex;align-items:center;gap:8px;font-size:0.9rem;font-weight:700;color:#222; }
@@ -822,7 +822,7 @@ if("scrollRestoration"in history)history.scrollRestoration="manual";</script>
 
     /* ── View / Edit mode system ────────────────────── */
     @keyframes previewFadeIn { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:none} }
-    #viewModeWrapper { animation:previewFadeIn 0.3s; }
+    /* #viewModeWrapper animation triggered only on explicit user return from edit mode */
     .preview-mode-bar {
       display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;
       gap:12px;margin-bottom:20px;padding:14px 20px;
@@ -2596,7 +2596,8 @@ if("scrollRestoration"in history)history.scrollRestoration="manual";</script>
         .docs-drop.uploading .docs-drop-bar { transform:scaleX(0.85); }
 
         /* Uploaded other-docs file cards */
-        .docs-card { display:flex;align-items:center;gap:12px;padding:12px 14px;background:#fff;border:1px solid #e8e0d6;border-radius:10px;transition:border-color 0.12s;animation:docCardIn 0.22s; }
+        .docs-card { display:flex;align-items:center;gap:12px;padding:12px 14px;background:#fff;border:1px solid #e8e0d6;border-radius:10px;transition:border-color 0.12s; }
+        .docs-card.card-new { animation:docCardIn 0.22s; }
         .docs-card:hover { border-color:rgba(158,58,24,0.12); }
         .docs-card-ico { width:42px;height:42px;border-radius:10px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:1.2rem; }
         .docs-card-info { flex:1;min-width:0; }
@@ -3235,8 +3236,11 @@ if("scrollRestoration"in history)history.scrollRestoration="manual";</script>
 <script>
 // ── Tab system ────────────────────────────────────────
 function forceReloadPhotoImages() {
+  // Only reload images that failed to load (naturalWidth === 0 means not loaded)
   document.querySelectorAll('#tab-photos .photo-folder:not(.collapsed) img').forEach(function(img) {
-    if (img.src) { var s = img.src; img.src = ''; img.src = s; }
+    if (img.src && img.naturalWidth === 0 && !img.complete) {
+      var s = img.src; img.src = ''; img.src = s;
+    }
   });
 }
 
@@ -3527,7 +3531,10 @@ async function loadProperty() {
   const [configRes, propRes] = await Promise.all([fetch('/api/config'), fetch('/api/property')]);
   try { const c = await configRes.json(); if (c.base_url) _baseUrl = c.base_url; } catch(e) {}
   const data = await propRes.json();
-  if (!data.property) return;
+  if (!data.property) {
+    if (window._wizardInit) window._wizardInit(false); // fiche vide — lancer le wizard
+    return;
+  }
   _propertyData = data;
   const p = data.property;
   const form = document.getElementById('propertyForm');
@@ -3733,10 +3740,16 @@ async function loadProperty() {
   updatePrixCoach();
   updateCompletion();
 
-  // Switch to view mode automatically — the property record exists so it has been saved at least once
+  // First load → switch to view mode. Subsequent calls (after photo/doc upload) → preserve current mode.
   var emb = document.getElementById('editModeBar');
   if (emb) emb.style.display = 'flex';
-  enterViewMode();
+  if (_isFirstLoad) {
+    _isFirstLoad = false;
+    enterViewMode(false); // no animation on initial load
+  } else if (!_isEditMode) {
+    refreshPreview(); // already in view mode — just refresh the preview
+  }
+  // If _isEditMode is true and !_isFirstLoad → user was editing; stay in edit mode
 }
 
 // ── Form save ─────────────────────────────────────────
@@ -3795,7 +3808,7 @@ document.getElementById('propertyForm').addEventListener('submit', async (e) => 
       if (badge) { const t = new Date().toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'}); badge.textContent = '✓ Sauvegardé à ' + t; badge.className = 'autosave-badge saved'; }
       var emb = document.getElementById('editModeBar');
       if (emb) emb.style.display = 'flex';
-      enterViewMode();
+      enterViewMode(false); // no animation after save — toast provides feedback
     } else {
       btn.classList.remove('saving');
       if (saveTextEl) saveTextEl.textContent = origTxt;
@@ -4957,10 +4970,10 @@ async function deleteDocument(id) {
   }
 }
 
-function _docsCard(d) {
+function _docsCard(d, isNew) {
   var m = DOC_META[d.doc_type] || DOC_META.autre;
   var div = document.createElement('div');
-  div.className = 'docs-card';
+  div.className = isNew ? 'docs-card card-new' : 'docs-card';
 
   var ico = document.createElement('div');
   ico.className = 'docs-card-ico';
@@ -7060,24 +7073,26 @@ document.addEventListener('click', function(e) {
 // VIEW / EDIT MODE SYSTEM
 // ═══════════════════════════════════════════════════════
 var _isEditMode = true;
+var _isFirstLoad = true; // true until loadProperty() has completed once
 
 function _escHtml(s) {
   return String(s == null ? '' : s)
     .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 
-function enterViewMode() {
+function enterViewMode(withAnim) {
   _isEditMode = false;
   refreshPreview();
   var vm = document.getElementById('viewModeWrapper');
   var em = document.getElementById('editModeWrapper');
   em.style.display = 'none';
   vm.style.display = 'block';
-  // Re-trigger animation
-  vm.style.animation = 'none';
-  vm.offsetHeight;
-  vm.style.animation = '';
-  // Scroll to top so the tabs and title are visible on mobile
+  // Animate only when user explicitly returns from edit mode
+  if (withAnim) {
+    vm.style.animation = 'none';
+    vm.offsetHeight;
+    vm.style.animation = 'previewFadeIn 0.3s';
+  }
   window.scrollTo({ top: 0, behavior: 'instant' });
 }
 
@@ -7129,7 +7144,7 @@ function refreshPreview() {
 // Wire up buttons
 document.getElementById('btnEnterEditMode').addEventListener('click', enterEditMode);
 document.getElementById('btnBackToView').addEventListener('click', function() {
-  enterViewMode();
+  enterViewMode(true); // animate when user explicitly clicks back
   showToast('Fiche consultée ✓');
 });
 
@@ -7690,14 +7705,10 @@ initRoomPanel();
   window._wizardInit = function(hasProperty) { if (!hasProperty) showWizard(); };
 })();
 
-// Patch loadProperty — détecter fiche vide et lancer le wizard
+// Wrapper loadProperty — gestion d'erreur réseau globale (wizard check intégré dans loadProperty)
 const _origLoad = loadProperty;
 loadProperty = async function() {
   try {
-    const res = await fetch('/api/property');
-    const data = await res.json();
-    if(!res.ok || data.error)throw Error(data.error || 'Chargement du bien impossible');
-    if (!data.property && window._wizardInit) { window._wizardInit(false); return; }
     return await _origLoad.apply(this, arguments);
   } catch(e) { showToast(e.message || 'Erreur réseau : actualisez pour réessayer.', 'error'); }
 };
