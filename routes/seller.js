@@ -1,4 +1,6 @@
 function icsEscape(v){return String(v||'').replace(/\\/g,'\\\\').replace(/\r?\n/g,'\\n').replace(/;/g,'\\;').replace(/,/g,'\\,');}
+const fs = require('fs');
+const path = require('path');
 const validation = require('../services/validation');
 const express = require('express');
 const router = express.Router();
@@ -1650,7 +1652,19 @@ Réponds de façon concise, pratique et directe. Utilise des listes quand c'est 
 });
 
 // ── Offres d'achat (vue vendeur) ──────────────────────────────
-router.get('/mes-offres', requireAuth, (req, res) => res.sendFile('offers.html', { root: './views/seller' }));
+router.get('/mes-offres', requireAuth, (req, res) => {
+  try {
+    const property = db.prepare('SELECT id, acheteur_token FROM properties WHERE seller_id = ?').get(req.seller.id);
+    const offers = property ? db.prepare('SELECT * FROM offers WHERE property_id = ? ORDER BY created_at DESC').all(property.id) : [];
+    const base = process.env.BASE_URL || `${req.protocol}://${req.get('host')}`;
+    const offreLinkUrl = property?.acheteur_token ? `${base}/soumettre-offre/${property.acheteur_token}` : null;
+    const ssr = JSON.stringify({ offers, offreLinkUrl }).replace(/<\/script>/gi, '<\\/script>');
+    const html = fs.readFileSync(path.join(__dirname, '../views/seller/offers.html'), 'utf8');
+    res.send(html.replace('</head>', `<script>window.__OFFERS_SSR__=${ssr};</script></head>`));
+  } catch(e) {
+    res.sendFile('offers.html', { root: './views/seller' });
+  }
+});
 
 router.get('/api/mes-offres', requireAuth, (req, res) => {
   const property = db.prepare('SELECT id FROM properties WHERE seller_id = ?').get(req.seller.id);

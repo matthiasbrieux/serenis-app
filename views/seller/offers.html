@@ -617,24 +617,46 @@ async function copyBuyerDossier(button) {
 /* VPM buyer dossier — end */
 
 async function load() {
-  try {
-    try {
-      const [propRes, meRes] = await Promise.all([fetch('/api/property'), fetch('/api/me')]);
-      const propData = await propRes.json();
-      listingPrice = propData.property?.price || propData.price || propData.asking_price || 0;
-      const meData = await meRes.json();
-      _sellerFirstName = meData.seller?.first_name || '';
-      _sellerFullName = [meData.seller?.first_name, meData.seller?.last_name].filter(Boolean).join(' ');
-      setupBuyerDossier(propData.property || {}, propData.documents || []);
-    } catch(e) {}
+  const ssr = window.__OFFERS_SSR__;
 
+  // Données buyer-dossier (non critiques pour l'ordre)
+  try {
+    const [propRes, meRes] = await Promise.all([fetch('/api/property'), fetch('/api/me')]);
+    const propData = await propRes.json();
+    listingPrice = propData.property?.price || propData.price || propData.asking_price || 0;
+    const meData = await meRes.json();
+    _sellerFirstName = meData.seller?.first_name || '';
+    _sellerFullName = [meData.seller?.first_name, meData.seller?.last_name].filter(Boolean).join(' ');
+    setupBuyerDossier(propData.property || {}, propData.documents || []);
+  } catch(e) {}
+
+  if (ssr) {
+    // Données injectées server-side — aucun appel réseau nécessaire
+    allOffers = ssr.offers || [];
+    if (ssr.offreLinkUrl) {
+      offreLinkUrl = ssr.offreLinkUrl;
+      document.getElementById('offreLinkInput').value = ssr.offreLinkUrl;
+      const signature = `\n\nCordialement,\n${_sellerFullName || _sellerFirstName || 'Le propriétaire'}`;
+      const smsText = `Bonjour, suite à votre visite de mon bien, voici le lien pour soumettre votre offre d'achat en ligne : ${ssr.offreLinkUrl} — Je la traiterai dans les meilleurs délais.${signature}`;
+      document.getElementById('smsPreview').textContent = smsText;
+      const sendBtn = document.getElementById('smsSendBtn');
+      if (sendBtn) sendBtn.href = `sms:?body=${encodeURIComponent(smsText)}`;
+    }
+    document.getElementById('loadingState').style.display = 'none';
+    document.getElementById('loadingOverlay').style.display = 'none';
+    renderOffers();
+    if (offreLinkUrl) document.getElementById('offreLinkCard').style.display = 'block';
+    return;
+  }
+
+  // Fallback : appels API classiques
+  try {
     const [offresRes, linkRes] = await Promise.all([
       fetch('/api/offers'),
       fetch('/api/offre-link').catch(() => null)
     ]);
     const data = await offresRes.json();
     allOffers = data.offers || [];
-
     if (linkRes) {
       try {
         const linkData = await linkRes.json();
@@ -649,7 +671,6 @@ async function load() {
         }
       } catch(e) {}
     }
-
     document.getElementById('loadingState').style.display = 'none';
     document.getElementById('loadingOverlay').style.display = 'none';
     renderOffers();
