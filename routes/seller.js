@@ -31,13 +31,31 @@ const aiRateLimit = require('express-rate-limit')({
 // Pages vendeur (toutes protégées)
 router.get('/dashboard', requireAuth, (req, res) => res.sendFile('dashboard.html', { root: './views/seller' }));
 router.get('/mon-bien', requireAuth, (req, res) => {
-  const base = process.env.BASE_URL || `${req.protocol}://${req.get('host')}`;
-  const fs = require('fs');
-  const path = require('path');
-  let html = fs.readFileSync(path.join(__dirname, '../views/seller/property.html'), 'utf8');
-  html = html.replace('let _baseUrl = window.location.origin;', `let _baseUrl = ${JSON.stringify(base)};`);
-  res.setHeader('Content-Type', 'text/html');
-  res.send(html);
+  try {
+    const base = process.env.BASE_URL || `${req.protocol}://${req.get('host')}`;
+    const property = db.prepare('SELECT * FROM properties WHERE seller_id = ?').get(req.seller.id);
+    let ssrData = { property: null, photos: [], documents: [] };
+    if (property) {
+      const photos = db.prepare('SELECT * FROM property_photos WHERE property_id = ? ORDER BY order_index').all(property.id);
+      const documents = db.prepare('SELECT * FROM property_documents WHERE property_id = ?').all(property.id);
+      property.acheteur_url = property.acheteur_token ? `${base}/dossier/acheteur/${property.acheteur_token}` : null;
+      property.notaire_url  = property.notaire_token  ? `${base}/dossier/notaire/${property.notaire_token}`   : null;
+      property.bien_url     = property.slug            ? `${base}/bien/${property.slug}`                       : null;
+      ssrData = { property, photos, documents: documents.map(d => ({ ...d, url: '/api/property/document/' + d.id })) };
+    }
+    const ssr = JSON.stringify(ssrData).replace(/<\/script>/gi, '<\\/script>');
+    let html = fs.readFileSync(path.join(__dirname, '../views/seller/property.html'), 'utf8');
+    html = html.replace('let _baseUrl = window.location.origin;', `let _baseUrl = ${JSON.stringify(base)};`);
+    html = html.replace('</head>', `<script>window.__PROPERTY_SSR__=${ssr};</script></head>`);
+    res.setHeader('Content-Type', 'text/html');
+    res.send(html);
+  } catch(e) {
+    const base = process.env.BASE_URL || `${req.protocol}://${req.get('host')}`;
+    let html = fs.readFileSync(path.join(__dirname, '../views/seller/property.html'), 'utf8');
+    html = html.replace('let _baseUrl = window.location.origin;', `let _baseUrl = ${JSON.stringify(base)};`);
+    res.setHeader('Content-Type', 'text/html');
+    res.send(html);
+  }
 });
 router.use('/ma-formation/documents', requireAuth, require('./formation-documents'));
 router.get('/ma-formation', requireAuth, (req, res) => res.sendFile('library.html', { root: './views/seller' }));

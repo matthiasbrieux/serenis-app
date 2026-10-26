@@ -3528,9 +3528,16 @@ let _propertyData = null;
 let _baseUrl = window.location.origin;
 
 async function loadProperty() {
-  const [configRes, propRes] = await Promise.all([fetch('/api/config'), fetch('/api/property')]);
-  try { const c = await configRes.json(); if (c.base_url) _baseUrl = c.base_url; } catch(e) {}
-  const data = await propRes.json();
+  let data;
+  if (window.__PROPERTY_SSR__) {
+    data = window.__PROPERTY_SSR__;
+    // Fetch config in background (non-bloquant)
+    fetch('/api/config').then(r => r.json()).then(c => { if (c.base_url) _baseUrl = c.base_url; }).catch(() => {});
+  } else {
+    const [configRes, propRes] = await Promise.all([fetch('/api/config'), fetch('/api/property')]);
+    try { const c = await configRes.json(); if (c.base_url) _baseUrl = c.base_url; } catch(e) {}
+    data = await propRes.json();
+  }
   if (!data.property) {
     if (window._wizardInit) window._wizardInit(false); // fiche vide — lancer le wizard
     return;
