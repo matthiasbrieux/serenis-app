@@ -619,25 +619,13 @@ async function copyBuyerDossier(button) {
 async function load() {
   const ssr = window.__OFFERS_SSR__;
 
-  // Données buyer-dossier (non critiques pour l'ordre)
-  try {
-    const [propRes, meRes] = await Promise.all([fetch('/api/property'), fetch('/api/me')]);
-    const propData = await propRes.json();
-    listingPrice = propData.property?.price || propData.price || propData.asking_price || 0;
-    const meData = await meRes.json();
-    _sellerFirstName = meData.seller?.first_name || '';
-    _sellerFullName = [meData.seller?.first_name, meData.seller?.last_name].filter(Boolean).join(' ');
-    setupBuyerDossier(propData.property || {}, propData.documents || []);
-  } catch(e) {}
-
   if (ssr) {
-    // Données injectées server-side — aucun appel réseau nécessaire
+    // Données injectées server-side — rendu immédiat, pas d'attente réseau
     allOffers = ssr.offers || [];
     if (ssr.offreLinkUrl) {
       offreLinkUrl = ssr.offreLinkUrl;
       document.getElementById('offreLinkInput').value = ssr.offreLinkUrl;
-      const signature = `\n\nCordialement,\n${_sellerFullName || _sellerFirstName || 'Le propriétaire'}`;
-      const smsText = `Bonjour, suite à votre visite de mon bien, voici le lien pour soumettre votre offre d'achat en ligne : ${ssr.offreLinkUrl} — Je la traiterai dans les meilleurs délais.${signature}`;
+      const smsText = `Bonjour, suite à votre visite de mon bien, voici le lien pour soumettre votre offre d'achat en ligne : ${ssr.offreLinkUrl} — Je la traiterai dans les meilleurs délais.\n\nCordialement,\nLe propriétaire`;
       document.getElementById('smsPreview').textContent = smsText;
       const sendBtn = document.getElementById('smsSendBtn');
       if (sendBtn) sendBtn.href = `sms:?body=${encodeURIComponent(smsText)}`;
@@ -646,14 +634,25 @@ async function load() {
     document.getElementById('loadingOverlay').style.display = 'none';
     renderOffers();
     if (offreLinkUrl) document.getElementById('offreLinkCard').style.display = 'block';
+
+    // Données buyer-dossier en arrière-plan (non bloquant)
+    fetch('/api/property').then(r => r.json()).then(propData => {
+      listingPrice = propData.property?.price || propData.price || propData.asking_price || 0;
+      setupBuyerDossier(propData.property || {}, propData.documents || []);
+    }).catch(() => {});
+    fetch('/api/me').then(r => r.json()).then(meData => {
+      _sellerFirstName = meData.seller?.first_name || '';
+      _sellerFullName = [meData.seller?.first_name, meData.seller?.last_name].filter(Boolean).join(' ');
+    }).catch(() => {});
     return;
   }
 
-  // Fallback : appels API classiques
+  // Fallback : appels API classiques avec timeout 5s
+  const tout = ms => new Promise((_, r) => setTimeout(() => r(new Error('timeout')), ms));
   try {
-    const [offresRes, linkRes] = await Promise.all([
-      fetch('/api/offers'),
-      fetch('/api/offre-link').catch(() => null)
+    const [offresRes, linkRes] = await Promise.race([
+      Promise.all([fetch('/api/offers'), fetch('/api/offre-link').catch(() => null)]),
+      tout(5000).then(() => { throw new Error('timeout'); })
     ]);
     const data = await offresRes.json();
     allOffers = data.offers || [];
