@@ -628,12 +628,32 @@ async function load() {
       setupBuyerDossier(propData.property || {}, propData.documents || []);
     } catch(e) {}
 
-    const r = await fetch('/api/offers');
-    const data = await r.json();
+    const [offresRes, linkRes] = await Promise.all([
+      fetch('/api/offers'),
+      fetch('/api/offre-link').catch(() => null)
+    ]);
+    const data = await offresRes.json();
     allOffers = data.offers || [];
+
+    if (linkRes) {
+      try {
+        const linkData = await linkRes.json();
+        if (linkData.url) {
+          offreLinkUrl = linkData.url;
+          document.getElementById('offreLinkInput').value = linkData.url;
+          const signature = `\n\nCordialement,\n${_sellerFullName || _sellerFirstName || 'Le propriétaire'}`;
+          const smsText = `Bonjour, suite à votre visite de mon bien, voici le lien pour soumettre votre offre d'achat en ligne : ${linkData.url} — Je la traiterai dans les meilleurs délais.${signature}`;
+          document.getElementById('smsPreview').textContent = smsText;
+          const sendBtn = document.getElementById('smsSendBtn');
+          if (sendBtn) sendBtn.href = `sms:?body=${encodeURIComponent(smsText)}`;
+        }
+      } catch(e) {}
+    }
+
     document.getElementById('loadingState').style.display = 'none';
     document.getElementById('loadingOverlay').style.display = 'none';
     renderOffers();
+    if (offreLinkUrl) document.getElementById('offreLinkCard').style.display = 'block';
   } catch(e) {
     document.getElementById('loadingOverlay').style.display = 'none';
     document.getElementById('notaireCard').style.display = 'block';
@@ -1002,7 +1022,7 @@ fetch('/api/notifications/read-by-type', {
   body: JSON.stringify({ types: ['offer'] })
 }).catch(() => {});
 
-load().then(() => loadOffreLink());
+load();
 </script>
 
 <script>
