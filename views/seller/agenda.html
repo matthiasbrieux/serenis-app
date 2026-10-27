@@ -1108,13 +1108,11 @@ if("scrollRestoration"in history)history.scrollRestoration="manual";</script>
   .cal-sync-private{font-size:0.72rem;color:#bbb;margin:4px 0 0}
   .cal-sync-safe-bottom{height:calc(20px + env(safe-area-inset-bottom,0px))}
   /* ── Carousel visite ── */
-  .vc-carousel-nav{display:flex;align-items:center;justify-content:space-between;padding:12px 16px 6px;gap:8px;}
+  .vc-nav{display:flex;align-items:center;justify-content:space-between;padding:10px 12px 14px;gap:8px;}
   .vc-carousel-btn{background:#fff;border:1.5px solid #E0D8D0;border-radius:8px;padding:7px 14px;font-size:0.78rem;font-family:'DM Sans',sans-serif;color:#555;cursor:pointer;transition:background 0.15s,border-color 0.15s;white-space:nowrap;touch-action:manipulation;}
   .vc-carousel-btn:hover:not(:disabled){background:#f5f0e8;border-color:#C4A882;color:#222;}
   .vc-carousel-btn:disabled{opacity:0.3;cursor:default;}
   .vc-carousel-counter{font-size:0.82rem;color:#888;font-weight:600;flex:1;text-align:center;white-space:nowrap;}
-  .vc-carousel-hint{display:none;text-align:center;font-size:0.72rem;color:#bbb;padding:2px 0 8px;font-style:italic;}
-  @media(max-width:640px){.vc-carousel-hint{display:block;}}
   </style>
   <link rel="stylesheet" href="/css/seller-reference.css?v=1">
   <link rel="stylesheet" href="/css/seller-navigation.css?v=2">
@@ -1386,6 +1384,11 @@ if("scrollRestoration"in history)history.scrollRestoration="manual";</script>
           </div>
           <div id="visitsBannerHint" style="display:none;padding:13px 18px;font-size:0.84rem;line-height:1.5;font-style:italic;"></div>
           <div class="sidebar-body no-max" id="upcomingList"></div>
+          <div class="vc-nav" id="cr-nav-upcoming" style="display:none;">
+            <button class="vc-carousel-btn" id="cr-prev-upcoming" onclick="carouselNav('upcoming',-1)">&#8592; Précédente</button>
+            <span class="vc-carousel-counter" id="cr-ctr-upcoming"></span>
+            <button class="vc-carousel-btn" id="cr-next-upcoming" onclick="carouselNav('upcoming',1)">Suivante &#8594;</button>
+          </div>
         </div>
 
         <!-- Historique / dossier visites passées -->
@@ -1399,6 +1402,11 @@ if("scrollRestoration"in history)history.scrollRestoration="manual";</script>
           </div>
           <div id="pastBannerHint" style="padding:13px 18px;font-size:0.84rem;line-height:1.5;font-style:italic;background:rgba(120,120,120,0.07);color:#6b6b6b;border-bottom:1px solid rgba(120,120,120,0.18);">Après chaque visite, gardez le contact avec vos acheteurs : transmettez vos documents complémentaires ou indiquez si vous souhaitez poursuivre les échanges.</div>
           <div class="sidebar-body" id="pastList" style="display:flex;flex-direction:column;gap:8px;padding:12px 0 0;max-height:none;"></div>
+          <div class="vc-nav" id="cr-nav-past" style="display:none;">
+            <button class="vc-carousel-btn" id="cr-prev-past" onclick="carouselNav('past',-1)">&#8592; Précédente</button>
+            <span class="vc-carousel-counter" id="cr-ctr-past"></span>
+            <button class="vc-carousel-btn" id="cr-next-past" onclick="carouselNav('past',1)">Suivante &#8594;</button>
+          </div>
         </div>
 
         <!-- Visites annulées -->
@@ -2045,35 +2053,51 @@ function _crSet(key, visits, fn) {
   _cr[key].visits = visits;
   if (_cr[key].idx >= visits.length) _cr[key].idx = Math.max(0, visits.length - 1);
 }
-function _crHtml(key) {
-  const { idx, visits, fn } = _cr[key];
-  if (!visits.length) return '';
-  const n = visits.length;
-  const nav = n > 1 ? `<div class="vc-carousel-nav">
-    <button class="vc-carousel-btn" onclick="carouselNav('${key}',-1)"${idx===0?' disabled':''}>&#8592; Précédente</button>
-    <span class="vc-carousel-counter">${idx+1} sur ${n}</span>
-    <button class="vc-carousel-btn" onclick="carouselNav('${key}',1)"${idx===n-1?' disabled':''}>Suivante &#8594;</button>
-  </div><div class="vc-carousel-hint">Glissez pour changer de visite</div>` : '';
-  return `<div class="vc-carousel">${fn(visits[idx])}${nav}</div>`;
+function _crRender(key) {
+  const c = _cr[key];
+  const listId = key === 'upcoming' ? 'upcomingList' : 'pastList';
+  const listEl = document.getElementById(listId);
+  if (!listEl || !c.visits.length) return;
+  listEl.innerHTML = c.fn(c.visits[c.idx]);
+  const n = c.visits.length;
+  const navEl = document.getElementById('cr-nav-' + key);
+  if (!navEl) return;
+  if (n > 1) {
+    navEl.style.display = 'flex';
+    document.getElementById('cr-prev-' + key).disabled = c.idx === 0;
+    document.getElementById('cr-next-' + key).disabled = c.idx === n - 1;
+    document.getElementById('cr-ctr-' + key).textContent = (c.idx + 1) + ' sur ' + n;
+  } else {
+    navEl.style.display = 'none';
+  }
 }
 function carouselNav(key, dir) {
   const c = _cr[key];
   const ni = c.idx + dir;
   if (ni < 0 || ni >= c.visits.length) return;
   c.idx = ni;
-  const listId = key === 'upcoming' ? 'upcomingList' : 'pastList';
-  document.getElementById(listId).innerHTML = _crHtml(key);
+  _crRender(key);
 }
 document.addEventListener('DOMContentLoaded', function() {
   [['upcomingList','upcoming'],['pastList','past']].forEach(([listId, key]) => {
     const el = document.getElementById(listId);
     if (!el) return;
-    let sx = 0, sy = 0;
-    el.addEventListener('touchstart', e => { sx = e.touches[0].clientX; sy = e.touches[0].clientY; }, { passive: true });
+    let sx = 0, sy = 0, active = false;
+    el.addEventListener('touchstart', e => {
+      sx = e.touches[0].clientX; sy = e.touches[0].clientY; active = true;
+    }, { passive: true });
+    el.addEventListener('touchmove', e => {
+      if (!active) return;
+      const dx = Math.abs(e.touches[0].clientX - sx);
+      const dy = Math.abs(e.touches[0].clientY - sy);
+      if (dy > dx + 5) active = false;
+    }, { passive: true });
     el.addEventListener('touchend', e => {
+      if (!active) return;
+      active = false;
       const dx = e.changedTouches[0].clientX - sx;
       const dy = e.changedTouches[0].clientY - sy;
-      if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 40) carouselNav(key, dx < 0 ? 1 : -1);
+      if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 30) carouselNav(key, dx < 0 ? 1 : -1);
     }, { passive: true });
   });
 });
@@ -2109,7 +2133,7 @@ function renderVisits() {
     const upBadge = document.getElementById('upcomingCountBadge');
     if (upBadge) upBadge.textContent = upcoming.length;
     _crSet('upcoming', upcoming, buildVisitConfirmedCard);
-    document.getElementById('upcomingList').innerHTML = _crHtml('upcoming');
+    _crRender('upcoming');
   } else {
     upcomingSection.style.display='none';
   }
@@ -2120,7 +2144,7 @@ function renderVisits() {
     const badge = document.getElementById('pastCountBadge');
     if (badge) badge.textContent = past.length;
     _crSet('past', past, buildPastCard);
-    document.getElementById('pastList').innerHTML = _crHtml('past');
+    _crRender('past');
   } else {
     pastSection.style.display='none';
   }
