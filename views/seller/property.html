@@ -2939,6 +2939,13 @@ if("scrollRestoration"in history)history.scrollRestoration="manual";</script>
           .ev-msg-bubble { margin:0; border-radius:0 0 12px 12px; }
           .ev-msg-copy-btn { min-height:44px; font-size:0.88rem; }
         }
+        /* ── Carte message compacte (remplace simulation iPhone) ── */
+        .ev-msg-card { border:1.5px solid #ede8e1; border-radius:14px; overflow:hidden; margin-bottom:4px; }
+        .ev-msg-card .ev-msg-bubble { margin:0; border-radius:0; padding:16px 18px; background:#F8F1E7; }
+        /* ── Bouton principal copie photos ── */
+        .ev-copy-photos-btn { display:flex; align-items:center; justify-content:center; gap:8px; width:100%; padding:11px 16px; background:#fff; color:var(--terracotta); border:1.5px solid rgba(158,58,24,0.28); border-radius:10px; font-size:0.87rem; font-weight:700; cursor:pointer; font-family:inherit; margin-bottom:14px; transition:background 0.15s,border-color 0.15s; min-height:44px; }
+        .ev-copy-photos-btn:hover { background:rgba(158,58,24,0.05); border-color:rgba(158,58,24,0.5); }
+        @media(max-width:640px) { .ev-copy-photos-btn { font-size:0.82rem; } }
       </style>
 <div id="unpublished-notice" style="display:none;background:#fffbf0;border:1.5px solid #f0c040;border-radius:12px;padding:14px 18px;margin-bottom:20px;display:none;align-items:center;gap:12px;font-size:0.88rem;color:#7a5a00;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#c4a020" stroke-width="2" style="flex-shrink:0"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg><span>Votre annonce n'est pas encore publiée. <a href="/mes-publications" style="color:#9E3A18;font-weight:600;text-decoration:underline;">Publiez votre bien</a> pour activer son lien public.</span></div>
 <div class="vpm-share-layout"><header class="vpm-section-heading"><h2>Prêt à envoyer</h2><p>Choisissez le dossier à transmettre à votre acheteur.</p></header><div class="ev-card vpm-featured" id="ev-card-fiche">
@@ -3011,110 +3018,90 @@ if("scrollRestoration"in history)history.scrollRestoration="manual";</script>
 </div>
 </div>
 </div><div class="ev-card" id="ev-card-pro">
-<div class="vpm-card-actions"><button class="vpm-copy-action" onclick="evCopyLink('ev-link-pro',this)" type="button">Copier le lien</button></div><button aria-controls="ev-body-pro" aria-expanded="false" class="ev-card-btn" onclick="toggleEvCard('pro')" type="button">
+<button aria-controls="ev-body-pro" aria-expanded="false" class="ev-card-btn" onclick="toggleEvCard('pro')" type="button">
 <div class="ev-card-ico"><svg fill="none" height="16" stroke="#9E3A18" stroke-width="1.8" viewbox="0 0 24 24" width="16"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg></div>
 <div class="ev-card-info"><div class="ev-card-ttl">Photos professionnelles</div><div class="ev-card-sub">Photos HD reçues de votre photographe</div></div>
 <span class="ev-card-count" id="ev-count-pro"></span>
 <svg class="ev-chev" fill="none" height="14" stroke="#bbb" stroke-width="2" viewbox="0 0 24 24" width="14"><polyline points="6 9 12 15 18 9"></polyline></svg>
 </button>
 <div class="ev-card-body" id="ev-body-pro">
-<div class="ev-link-row">
-<input class="ev-link-input" id="ev-link-pro" onclick="this.select()" placeholder="Chargement du lien..." readonly="" type="text"/>
-<button class="ev-copy-btn" onclick="evCopyLink('ev-link-pro',this)" type="button">Copier le lien</button>
-</div>
+<input class="ev-link-input" id="ev-link-pro" onclick="this.select()" placeholder="Chargement du lien..." readonly="" type="text" style="display:none"/>
+<button class="ev-copy-photos-btn" onclick="evCopyLink('ev-link-pro',this)" type="button"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>Copier mes photos professionnelles</button>
 <div class="ev-msg-wrap">
 <div class="ev-msg-header">
   <div class="ev-msg-header-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--terracotta)" stroke-width="1.8"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><polyline points="9 16 11 18 15 14"/></svg></div>
   <div><div class="ev-msg-header-label">Message prêt à l'envoi</div><div class="ev-msg-header-sub">Photos professionnelles</div></div>
 </div>
-<div class="ev-msg-phone">
-  <div class="ev-msg-phone-handle"></div>
-  <div class="ev-msg-screen-hdr"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--terracotta)" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><polyline points="9 16 11 18 15 14"/></svg><span class="ev-msg-screen-hdr-txt">Votre message à l'acheteur</span></div>
+<div class="ev-msg-card">
   <div class="ev-msg-bubble">Bonjour,<br><br>Je vous transmets le lien vers les photos professionnelles de mon bien. N'hésitez pas à les consulter avant notre rendez-vous.<br><br><span id="ev-sms-pro">Chargement...</span><br><br>Cordialement,<br><span class="ev-msg-var">Votre prénom</span></div>
-  <div class="ev-msg-phone-handle-bot"></div>
 </div>
-<button class="ev-msg-copy-btn" onclick="evCopyMsg('pro',this)" type="button">Copier le message</button>
+<button class="ev-msg-copy-btn" onclick="evCopyMsg('pro',this)" type="button">Copier le message et mes photos professionnelles</button>
 <p class="ev-msg-note">Aperçu · aucun message n'est envoyé.</p>
 </div>
 </div>
 </div><div class="ev-card" id="ev-card-decouverte">
-<div class="vpm-card-actions"><button class="vpm-copy-action" onclick="evCopyLink('ev-link-decouverte',this)" type="button">Copier le lien</button></div><button aria-controls="ev-body-decouverte" aria-expanded="false" class="ev-card-btn" onclick="toggleEvCard('decouverte')" type="button">
+<button aria-controls="ev-body-decouverte" aria-expanded="false" class="ev-card-btn" onclick="toggleEvCard('decouverte')" type="button">
 <div class="ev-card-ico"><svg fill="none" height="16" stroke="#9E3A18" stroke-width="1.8" viewbox="0 0 24 24" width="16"><rect height="18" rx="2" width="18" x="3" y="3"></rect><path d="M3 9h18"></path><path d="M9 21V9"></path></svg></div>
 <div class="ev-card-info"><div class="ev-card-ttl">Photos immersives</div><div class="ev-card-sub">Pièces de vie, cuisine, salle de bain, couloirs</div></div>
 <span class="ev-card-count" id="ev-count-decouverte"></span>
 <svg class="ev-chev" fill="none" height="14" stroke="#bbb" stroke-width="2" viewbox="0 0 24 24" width="14"><polyline points="6 9 12 15 18 9"></polyline></svg>
 </button>
 <div class="ev-card-body" id="ev-body-decouverte">
-<div class="ev-link-row">
-<input class="ev-link-input" id="ev-link-decouverte" onclick="this.select()" placeholder="Chargement du lien..." readonly="" type="text"/>
-<button class="ev-copy-btn" onclick="evCopyLink('ev-link-decouverte',this)" type="button">Copier le lien</button>
-</div>
+<input class="ev-link-input" id="ev-link-decouverte" onclick="this.select()" placeholder="Chargement du lien..." readonly="" type="text" style="display:none"/>
+<button class="ev-copy-photos-btn" onclick="evCopyLink('ev-link-decouverte',this)" type="button"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>Copier mes photos immersives</button>
 <div class="ev-msg-wrap">
 <div class="ev-msg-header">
   <div class="ev-msg-header-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--terracotta)" stroke-width="1.8"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><polyline points="9 16 11 18 15 14"/></svg></div>
   <div><div class="ev-msg-header-label">Message prêt à l'envoi</div><div class="ev-msg-header-sub">Photos immersives</div></div>
 </div>
-<div class="ev-msg-phone">
-  <div class="ev-msg-phone-handle"></div>
-  <div class="ev-msg-screen-hdr"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--terracotta)" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><polyline points="9 16 11 18 15 14"/></svg><span class="ev-msg-screen-hdr-txt">Votre message à l'acheteur</span></div>
+<div class="ev-msg-card">
   <div class="ev-msg-bubble">Bonjour,<br><br>Je vous transmets le lien vers les photos immersives de mon bien (séjour, cuisine, chambres, salle de bain...). N'hésitez pas à les consulter avant notre rendez-vous.<br><br><span id="ev-sms-decouverte">Chargement...</span><br><br>Cordialement,<br><span class="ev-msg-var">Votre prénom</span></div>
-  <div class="ev-msg-phone-handle-bot"></div>
 </div>
-<button class="ev-msg-copy-btn" onclick="evCopyMsg('decouverte',this)" type="button">Copier le message</button>
+<button class="ev-msg-copy-btn" onclick="evCopyMsg('decouverte',this)" type="button">Copier le message et mes photos immersives</button>
 <p class="ev-msg-note">Aperçu · aucun message n'est envoyé.</p>
 </div>
 </div>
 </div><div class="ev-card" id="ev-card-exterieur">
-<div class="vpm-card-actions"><button class="vpm-copy-action" onclick="evCopyLink('ev-link-exterieur',this)" type="button">Copier le lien</button></div><button aria-controls="ev-body-exterieur" aria-expanded="false" class="ev-card-btn" onclick="toggleEvCard('exterieur')" type="button">
+<button aria-controls="ev-body-exterieur" aria-expanded="false" class="ev-card-btn" onclick="toggleEvCard('exterieur')" type="button">
 <div class="ev-card-ico"><svg fill="none" height="16" stroke="#4A72A8" stroke-width="1.8" viewbox="0 0 24 24" width="16"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg></div>
 <div class="ev-card-info"><div class="ev-card-ttl">Photos extérieur &amp; façade</div><div class="ev-card-sub">Façade, jardin, terrasse, vue de rue</div></div>
 <span class="ev-card-count" id="ev-count-exterieur"></span>
 <svg class="ev-chev" fill="none" height="14" stroke="#bbb" stroke-width="2" viewbox="0 0 24 24" width="14"><polyline points="6 9 12 15 18 9"></polyline></svg>
 </button>
 <div class="ev-card-body" id="ev-body-exterieur">
-<div class="ev-link-row">
-<input class="ev-link-input" id="ev-link-exterieur" onclick="this.select()" placeholder="Chargement du lien..." readonly="" type="text"/>
-<button class="ev-copy-btn" onclick="evCopyLink('ev-link-exterieur',this)" type="button">Copier le lien</button>
-</div>
+<input class="ev-link-input" id="ev-link-exterieur" onclick="this.select()" placeholder="Chargement du lien..." readonly="" type="text" style="display:none"/>
+<button class="ev-copy-photos-btn" onclick="evCopyLink('ev-link-exterieur',this)" type="button"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>Copier mes photos extérieur</button>
 <div class="ev-msg-wrap">
 <div class="ev-msg-header">
   <div class="ev-msg-header-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--terracotta)" stroke-width="1.8"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><polyline points="9 16 11 18 15 14"/></svg></div>
   <div><div class="ev-msg-header-label">Message prêt à l'envoi</div><div class="ev-msg-header-sub">Photos extérieur et façade</div></div>
 </div>
-<div class="ev-msg-phone">
-  <div class="ev-msg-phone-handle"></div>
-  <div class="ev-msg-screen-hdr"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--terracotta)" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><polyline points="9 16 11 18 15 14"/></svg><span class="ev-msg-screen-hdr-txt">Votre message à l'acheteur</span></div>
+<div class="ev-msg-card">
   <div class="ev-msg-bubble">Bonjour,<br><br>Je vous transmets le lien vers les photos de la façade et de l'extérieur de mon bien. Vous pourrez ainsi visualiser l'environnement avant notre visite.<br><br><span id="ev-sms-exterieur">Chargement...</span><br><br>Cordialement,<br><span class="ev-msg-var">Votre prénom</span></div>
-  <div class="ev-msg-phone-handle-bot"></div>
 </div>
-<button class="ev-msg-copy-btn" onclick="evCopyMsg('exterieur',this)" type="button">Copier le message</button>
+<button class="ev-msg-copy-btn" onclick="evCopyMsg('exterieur',this)" type="button">Copier le message et mes photos extérieur</button>
 <p class="ev-msg-note">Aperçu · aucun message n'est envoyé.</p>
 </div>
 </div>
 </div><div class="ev-card" id="ev-card-details">
-<div class="vpm-card-actions"><button class="vpm-copy-action" onclick="evCopyLink('ev-link-details',this)" type="button">Copier le lien</button></div><button aria-controls="ev-body-details" aria-expanded="false" class="ev-card-btn" onclick="toggleEvCard('details')" type="button">
+<button aria-controls="ev-body-details" aria-expanded="false" class="ev-card-btn" onclick="toggleEvCard('details')" type="button">
 <div class="ev-card-ico"><svg fill="none" height="16" stroke="#666" stroke-width="1.8" viewbox="0 0 24 24" width="16"><circle cx="11" cy="11" r="7"></circle><line x1="21" x2="15.65" y1="21" y2="15.65"></line></svg></div>
 <div class="ev-card-info"><div class="ev-card-ttl">Photos des détails techniques</div><div class="ev-card-sub">Chaudière, compteur, tableau électrique, fissures</div></div>
 <span class="ev-card-count" id="ev-count-details"></span>
 <svg class="ev-chev" fill="none" height="14" stroke="#bbb" stroke-width="2" viewbox="0 0 24 24" width="14"><polyline points="6 9 12 15 18 9"></polyline></svg>
 </button>
 <div class="ev-card-body" id="ev-body-details">
-<div class="ev-link-row">
-<input class="ev-link-input" id="ev-link-details" onclick="this.select()" placeholder="Chargement du lien..." readonly="" type="text"/>
-<button class="ev-copy-btn" onclick="evCopyLink('ev-link-details',this)" type="button">Copier le lien</button>
-</div>
+<input class="ev-link-input" id="ev-link-details" onclick="this.select()" placeholder="Chargement du lien..." readonly="" type="text" style="display:none"/>
+<button class="ev-copy-photos-btn" onclick="evCopyLink('ev-link-details',this)" type="button"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>Copier mes photos techniques</button>
 <div class="ev-msg-wrap">
 <div class="ev-msg-header">
   <div class="ev-msg-header-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--terracotta)" stroke-width="1.8"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><polyline points="9 16 11 18 15 14"/></svg></div>
   <div><div class="ev-msg-header-label">Message prêt à l'envoi</div><div class="ev-msg-header-sub">Photos des détails techniques</div></div>
 </div>
-<div class="ev-msg-phone">
-  <div class="ev-msg-phone-handle"></div>
-  <div class="ev-msg-screen-hdr"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--terracotta)" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><polyline points="9 16 11 18 15 14"/></svg><span class="ev-msg-screen-hdr-txt">Votre message à l'acheteur</span></div>
+<div class="ev-msg-card">
   <div class="ev-msg-bubble">Bonjour,<br><br>Avant notre visite, je vous transmets les photos techniques du bien (chaudière, compteur, installation électrique...) pour que vous puissiez en prendre connaissance.<br><br><span id="ev-sms-details">Chargement...</span><br><br>Cordialement,<br><span class="ev-msg-var">Votre prénom</span></div>
-  <div class="ev-msg-phone-handle-bot"></div>
 </div>
-<button class="ev-msg-copy-btn" onclick="evCopyMsg('details',this)" type="button">Copier le message</button>
+<button class="ev-msg-copy-btn" onclick="evCopyMsg('details',this)" type="button">Copier le message et mes photos techniques</button>
 <p class="ev-msg-note">Aperçu · aucun message n'est envoyé.</p>
 </div>
 </div>
