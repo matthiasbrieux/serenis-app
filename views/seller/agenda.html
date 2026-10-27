@@ -1107,6 +1107,14 @@ if("scrollRestoration"in history)history.scrollRestoration="manual";</script>
   .cal-sync-open-app{display:inline-flex;align-items:center;gap:6px;color:var(--terracotta);font-size:0.82rem;text-decoration:none;font-weight:500;align-self:flex-start}
   .cal-sync-private{font-size:0.72rem;color:#bbb;margin:4px 0 0}
   .cal-sync-safe-bottom{height:calc(20px + env(safe-area-inset-bottom,0px))}
+  /* ── Carousel visite ── */
+  .vc-carousel-nav{display:flex;align-items:center;justify-content:space-between;padding:12px 16px 6px;gap:8px;}
+  .vc-carousel-btn{background:#fff;border:1.5px solid #E0D8D0;border-radius:8px;padding:7px 14px;font-size:0.78rem;font-family:'DM Sans',sans-serif;color:#555;cursor:pointer;transition:background 0.15s,border-color 0.15s;white-space:nowrap;touch-action:manipulation;}
+  .vc-carousel-btn:hover:not(:disabled){background:#f5f0e8;border-color:#C4A882;color:#222;}
+  .vc-carousel-btn:disabled{opacity:0.3;cursor:default;}
+  .vc-carousel-counter{font-size:0.82rem;color:#888;font-weight:600;flex:1;text-align:center;white-space:nowrap;}
+  .vc-carousel-hint{display:none;text-align:center;font-size:0.72rem;color:#bbb;padding:2px 0 8px;font-style:italic;}
+  @media(max-width:640px){.vc-carousel-hint{display:block;}}
   </style>
   <link rel="stylesheet" href="/css/seller-reference.css?v=1">
   <link rel="stylesheet" href="/css/seller-navigation.css?v=2">
@@ -2027,6 +2035,50 @@ function buildVisitCompact(v) {
   </div>`;
 }
 
+// ── Carousel navigation ─────────────────────────────────────────────────────
+const _cr = {
+  upcoming: { idx: 0, visits: [], fn: null },
+  past:     { idx: 0, visits: [], fn: null }
+};
+function _crSet(key, visits, fn) {
+  _cr[key].fn = fn;
+  _cr[key].visits = visits;
+  if (_cr[key].idx >= visits.length) _cr[key].idx = Math.max(0, visits.length - 1);
+}
+function _crHtml(key) {
+  const { idx, visits, fn } = _cr[key];
+  if (!visits.length) return '';
+  const n = visits.length;
+  const nav = n > 1 ? `<div class="vc-carousel-nav">
+    <button class="vc-carousel-btn" onclick="carouselNav('${key}',-1)"${idx===0?' disabled':''}>&#8592; Précédente</button>
+    <span class="vc-carousel-counter">${idx+1} sur ${n}</span>
+    <button class="vc-carousel-btn" onclick="carouselNav('${key}',1)"${idx===n-1?' disabled':''}>Suivante &#8594;</button>
+  </div><div class="vc-carousel-hint">Glissez pour changer de visite</div>` : '';
+  return `<div class="vc-carousel">${fn(visits[idx])}${nav}</div>`;
+}
+function carouselNav(key, dir) {
+  const c = _cr[key];
+  const ni = c.idx + dir;
+  if (ni < 0 || ni >= c.visits.length) return;
+  c.idx = ni;
+  const listId = key === 'upcoming' ? 'upcomingList' : 'pastList';
+  document.getElementById(listId).innerHTML = _crHtml(key);
+}
+document.addEventListener('DOMContentLoaded', function() {
+  [['upcomingList','upcoming'],['pastList','past']].forEach(([listId, key]) => {
+    const el = document.getElementById(listId);
+    if (!el) return;
+    let sx = 0, sy = 0;
+    el.addEventListener('touchstart', e => { sx = e.touches[0].clientX; sy = e.touches[0].clientY; }, { passive: true });
+    el.addEventListener('touchend', e => {
+      const dx = e.changedTouches[0].clientX - sx;
+      const dy = e.changedTouches[0].clientY - sy;
+      if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 40) carouselNav(key, dx < 0 ? 1 : -1);
+    }, { passive: true });
+  });
+});
+// ─────────────────────────────────────────────────────────────────────────────
+
 function renderVisits() {
   const today = new Intl.DateTimeFormat('en-CA', {timeZone:'Europe/Paris',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date());
   const upcoming = allVisits.filter(v => v.status==='confirmed' && !isPastVisit(v)).sort((a,b)=>{
@@ -2056,7 +2108,8 @@ function renderVisits() {
     upcomingSection.style.display='block';
     const upBadge = document.getElementById('upcomingCountBadge');
     if (upBadge) upBadge.textContent = upcoming.length;
-    document.getElementById('upcomingList').innerHTML = upcoming.map(buildVisitConfirmedCard).join('');
+    _crSet('upcoming', upcoming, buildVisitConfirmedCard);
+    document.getElementById('upcomingList').innerHTML = _crHtml('upcoming');
   } else {
     upcomingSection.style.display='none';
   }
@@ -2066,7 +2119,8 @@ function renderVisits() {
     pastSection.style.display='block';
     const badge = document.getElementById('pastCountBadge');
     if (badge) badge.textContent = past.length;
-    document.getElementById('pastList').innerHTML = past.map(buildPastCard).join('');
+    _crSet('past', past, buildPastCard);
+    document.getElementById('pastList').innerHTML = _crHtml('past');
   } else {
     pastSection.style.display='none';
   }
