@@ -103,12 +103,11 @@
   window.togglePastSection=function(){oldTogglePast();historyHeading.setAttribute('aria-expanded',String(_pastOpen));};
   historyHeading.addEventListener('keydown',event=>{if(event.key==='Enter'||event.key===' '){event.preventDefault();togglePastSection();}});
   function renderHistory(){
-    const past=allVisits.filter(v=>v.status==='done'||(v.status==='confirmed'&&isPastVisit(v))||(v.status==='pending'&&isPastVisit(v))).sort((a,b)=>(b.visit_date+(b.visit_time||'')).localeCompare(a.visit_date+(a.visit_time||'')));
-    history.style.display='block';
-    document.getElementById('pastCountBadge').textContent=String(past.length);
-    const list=document.getElementById('pastList');
-    if(past.length)list.innerHTML=past.map(buildPastCard).join('');
-    else list.replaceChildren(make('p','ap-history-empty','Aucune visite passée pour le moment'));
+    const past=allVisits.filter(v=>v.status==='done'||(v.status==='confirmed'&&isPastVisit(v))||(v.status==='pending'&&isPastVisit(v)));
+    history.style.display=past.length?'block':'none';
+    const badge=document.getElementById('pastCountBadge');if(badge)badge.textContent=String(past.length);
+    // Le carousel pastList est géré par _crSet/'past' dans oldRenderVisits — ne pas écraser ici.
+    if(!past.length){const list=document.getElementById('pastList');if(list)list.replaceChildren(make('p','ap-history-empty','Aucune visite passée pour le moment'));}
   }
 
   const appointmentsHeading=appointmentsPanel.querySelector('.ap-appointments-heading');
@@ -126,10 +125,11 @@
   const _icoC='<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>';
   const _icoR='<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>';
   const _arrHtml='<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#C8B9AE" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>';
-  for(const [key,label,ico] of [['scheduled','Programmée',_icoS],['confirmed','Confirmée',_icoC],['rappel','Rappel J-1',_icoR]]){if(vfStepsRow.children.length){const arr=make('span','ap-vf-arrow');arr.innerHTML=_arrHtml;vfStepsRow.append(arr);}const b=button('',()=>setVisitsFilter(key),'ap-visits-filter ap-vf-step ap-vf-step-'+key);b.innerHTML=ico+'<span>'+label+'</span>';b.dataset.filter=key;vfStepsRow.append(b);visitsFilterButtons[key]=b;}
+  const vfSubs={scheduled:'Visites à confirmer',confirmed:'Visites validées',rappel:'Rappels à effectuer'};
+  for(const [key,label,ico] of [['scheduled','Programmée',_icoS],['confirmed','Confirmée',_icoC],['rappel','Rappel J-1',_icoR]]){if(vfStepsRow.children.length){const arr=make('span','ap-vf-arrow');arr.innerHTML=_arrHtml;vfStepsRow.append(arr);}const b=button('',()=>setVisitsFilter(key),'ap-visits-filter ap-vf-step ap-vf-step-'+key);b.innerHTML=ico+'<span class="ap-vf-label"><span class="ap-vf-title">'+label+'</span><span class="ap-tab-count ap-vf-count">0</span><span class="ap-vf-sub">'+vfSubs[key]+'</span></span>';b.dataset.filter=key;vfStepsRow.append(b);visitsFilterButtons[key]=b;}
   visitsFilters.append(vfStepsRow);
   visitsPanel.append(visitsFilters);listCol.append(visitsPanel);visitsPanel.append(visits);listCol.append(manualBtn);agendaTabs.after(availabilityPanel);
-  const pastSec=document.getElementById('pastSection');if(pastSec)listCol.append(pastSec);
+  const pastSec=document.getElementById('pastSection');if(pastSec)actionCol.prepend(pastSec);
   const compromisPanel=main.querySelector('#compromis-vente');
   if(compromisPanel){compromisPanel.classList.add('ap-compromis-panel');listCol.append(compromisPanel);}
   if(share)actionCol.append(share);
@@ -159,17 +159,14 @@
         else if(key==='rappel')card.style.display=card.classList.contains('vcc2-rappel')?'':'none';
         else card.style.display='';
       });
-      if(key==='confirmed'){
-        const parent=upcoming;
-        const confirmed=[...parent.querySelectorAll('.vcc2.vcc2-confirmed')];
-        const rappel=[...parent.querySelectorAll('.vcc2.vcc2-rappel')];
-        rappel.forEach(c=>parent.append(c));
-        confirmed.forEach(c=>parent.insertBefore(c,rappel[0]||null));
-      }
-      let scheduledEmpty=upcoming.querySelector('.ap-scheduled-empty');
-      if(!scheduledEmpty){scheduledEmpty=make('p','ap-scheduled-empty','Aucune demande de visite pour le moment sur vos disponibilités proposées.');upcoming.append(scheduledEmpty);}
-      if(key==='scheduled'){const anyVisible=[...upcoming.querySelectorAll('.vcc2')].some(c=>c.style.display!=='none');scheduledEmpty.hidden=anyVisible;}
-      else{scheduledEmpty.hidden=true;}
+      if(key==='confirmed'){const parent=upcoming;const confirmed=[...parent.querySelectorAll('.vcc2.vcc2-confirmed')];const rappel=[...parent.querySelectorAll('.vcc2.vcc2-rappel')];rappel.forEach(c=>parent.append(c));confirmed.forEach(c=>parent.insertBefore(c,rappel[0]||null));}
+      const emptyMsgs={scheduled:'Aucune visite à confirmer pour le moment.',confirmed:'Aucune visite confirmée (SMS envoyé) pour le moment.',rappel:'Aucun rappel J-1 à effectuer pour le moment.'};
+      ['scheduled','confirmed','rappel'].forEach(k=>{
+        let el=upcoming.querySelector('.ap-filter-empty-'+k);
+        if(!el){el=make('p','ap-scheduled-empty ap-filter-empty-'+k,emptyMsgs[k]);upcoming.append(el);}
+        if(key===k){const anyVisible=[...upcoming.querySelectorAll('.vcc2')].some(c=>c.style.display!=='none');el.hidden=anyVisible;}
+        else{el.hidden=true;}
+      });
     }
     const empty=document.getElementById('visitsEmpty');if(empty)empty.style.display='none';
     const titleEl=document.getElementById('upcomingSectionTitle');
@@ -207,7 +204,8 @@
   window.setStatFilter=function(value){oldSetFilter(value);pendingPanel.hidden=Boolean(value)||!allVisits.some(v=>v.status==='pending'&&!isPastVisit(v));};
   main.querySelectorAll('.stat-card-agenda[data-filter]').forEach(el=>{el.tabIndex=0;el.setAttribute('role','button');el.addEventListener('keydown',event=>{if(event.key==='Enter'||event.key===' '){event.preventDefault();setStatFilter(el.dataset.filter);}});});
   const oldRenderVisits=window.renderVisits;
-  window.renderVisits=function(){oldRenderVisits();renderHistory(); const pending=allVisits.filter(v=>v.status==='pending'&&!isPastVisit(v));pendingPanel.hidden=Boolean(activeStatFilter)||!pending.length;pendingEmpty.hidden=pending.length>0;pendingList.innerHTML=pending.map(buildVisitCompact).join('');pendingTabCount.textContent=String(pending.length);renderDashboardPanels();renderAppointments();const activeFilter=Object.entries(visitsFilterButtons).find(([,b])=>b.getAttribute('aria-pressed')==='true')?.[0];if(activeFilter)setVisitsFilter(activeFilter);};
+  function updateFilterCounts(){const t=todayKey();const conf=allVisits.filter(v=>v.status==='confirmed'&&v.visit_date>=t);const pend=allVisits.filter(v=>v.status==='pending'&&!isPastVisit(v)).length;const sc=conf.filter(v=>!v.sms_copied_at).length+pend;const co=conf.filter(v=>v.sms_copied_at&&v.reminder_sent).length;const ra=conf.filter(v=>v.sms_copied_at&&!v.reminder_sent).length;const setC=(key,n)=>{const b=visitsFilterButtons[key];if(!b)return;const el=b.querySelector('.ap-vf-count');if(el)el.textContent=String(n);};setC('scheduled',sc);setC('confirmed',co);setC('rappel',ra);}
+  window.renderVisits=function(){oldRenderVisits();renderHistory(); const pending=allVisits.filter(v=>v.status==='pending'&&!isPastVisit(v));pendingPanel.hidden=Boolean(activeStatFilter)||!pending.length;pendingEmpty.hidden=pending.length>0;pendingList.innerHTML=pending.map(buildVisitCompact).join('');pendingTabCount.textContent=String(pending.length);updateFilterCounts();renderDashboardPanels();renderAppointments();const activeFilter=Object.entries(visitsFilterButtons).find(([,b])=>b.getAttribute('aria-pressed')==='true')?.[0];if(activeFilter)setVisitsFilter(activeFilter);};
   const calendar=main.querySelector('.calendar-card'), header=calendar.querySelector('.cal-header');
   const switcher=make('div','ap-view-switch');switcher.setAttribute('role','group');switcher.setAttribute('aria-label','Vue du calendrier');
   const views={month:'Mois',week:'Semaine',day:'Jour'};

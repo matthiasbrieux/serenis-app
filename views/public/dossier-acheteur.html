@@ -302,8 +302,9 @@
   </div>
   <div id="content" style="display:none;"></div>
   <div id="error" class="error-box" style="display:none;">
-    <h2>Dossier introuvable</h2>
-    <p>Ce lien est invalide ou l'annonce n'est plus disponible.</p>
+    <h2 id="errorTitle">Dossier introuvable</h2>
+    <p id="errorMsg">Ce lien est invalide ou l'annonce n'est plus disponible.</p>
+    <button id="retryBtn" onclick="retryLoad()" style="margin-top:14px;padding:10px 22px;background:#9E3A18;color:#fff;border:none;border-radius:8px;font-size:0.92rem;cursor:pointer;display:none;">Réessayer</button>
   </div>
 </div>
 
@@ -352,9 +353,11 @@ function svgIcon(name, size=18, color='currentColor') {
 }
 
 async function load() {
+  let _httpStatus = 0;
   try {
     const r = await fetch(`/api/dossier/acheteur/${token}`);
-    if (!r.ok) throw new Error();
+    _httpStatus = r.status;
+    if (!r.ok) throw new Error('http');
     const { property: p, photos: ph, documents: docs } = await r.json();
     photos = ph;
     document.getElementById('loading').style.display = 'none';
@@ -369,7 +372,18 @@ async function load() {
   } catch(e) {
     document.getElementById('loading').style.display = 'none';
     document.getElementById('error').style.display = 'block';
+    const isTransient = _httpStatus === 0 || _httpStatus >= 500;
+    if (isTransient) {
+      document.getElementById('errorTitle').textContent = 'Chargement impossible';
+      document.getElementById('errorMsg').textContent = 'Une erreur temporaire empêche le chargement du dossier. Réessayez dans quelques instants.';
+      document.getElementById('retryBtn').style.display = 'inline-block';
+    }
   }
+}
+function retryLoad() {
+  document.getElementById('error').style.display = 'none';
+  document.getElementById('loading').style.display = 'block';
+  load();
 }
 
 function escapeHtml(str) {
