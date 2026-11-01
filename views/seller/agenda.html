@@ -1117,14 +1117,11 @@ if("scrollRestoration"in history)history.scrollRestoration="manual";</script>
   .vc-carousel-counter{font-size:0.82rem;color:#888;font-weight:600;flex:1;text-align:center;white-space:nowrap;}
 
   /* ── Ma vente en 5 clics — bloc dépliable ─────────── */
-  .five-clicks-panel { margin-bottom: 20px; }
-  .five-clicks-panel > summary { display:flex; align-items:center; gap:10px; padding:13px 18px; background:#fff; border:1px solid rgba(0,0,0,0.07); border-radius:14px; cursor:pointer; font-family:'DM Sans','Inter',sans-serif; font-size:0.88rem; font-weight:700; color:#1A1A16; list-style:none; user-select:none; box-shadow:0 2px 8px rgba(0,0,0,0.04); transition:background 0.15s; }
-  .five-clicks-panel > summary::-webkit-details-marker { display:none; }
-  .five-clicks-panel > summary:hover { background:#faf7f3; }
-  .five-clicks-chevron { margin-left:auto; width:26px; height:26px; border-radius:50%; background:#f5f0e8; display:flex; align-items:center; justify-content:center; transition:transform 0.2s; font-size:0.72rem; color:#888; }
-  .five-clicks-panel[open] > summary .five-clicks-chevron { transform:rotate(180deg); }
-  .five-clicks-panel > summary svg { color:var(--terracotta); flex-shrink:0; }
-  .five-clicks-panel > .vpm-dashboard { padding-top:12px; }
+  #fiveClicksWrapper { margin-bottom: 20px; }
+  #fiveClicksWrapper .vpm-dashboard { padding: 0; max-width: none; }
+  .five-clicks-chevron { flex-shrink:0; width:32px; height:32px; border-radius:50%; background:rgba(255,255,255,0.18); border:1.5px solid rgba(255,255,255,0.35); display:flex; align-items:center; justify-content:center; transition:transform 0.22s; color:#fff; cursor:pointer; padding:0; }
+  #fiveClicksWrapper.five-closed .five-clicks-chevron { transform:rotate(180deg); }
+  #fiveClicksToggle { cursor: pointer; user-select: none; }
   </style>
   <link rel="stylesheet" href="/css/seller-reference.css?v=1">
   <link rel="stylesheet" href="/css/seller-navigation.css?v=2">
@@ -1245,19 +1242,15 @@ if("scrollRestoration"in history)history.scrollRestoration="manual";</script>
 
 
     <!-- ── Ma vente en 5 clics ───────────────────────────────── -->
-    <details id="fiveClicksDetails" class="five-clicks-panel" open>
-      <summary>
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
-        Ma vente en 5 clics
-        <span class="five-clicks-chevron" aria-hidden="true">▾</span>
-      </summary>
+    <div id="fiveClicksWrapper">
       <div class="vpm-dashboard">
 <section class="db-process-card five-clicks" aria-label="Ma vente en 5 clics">
-<header class="five-header"><img class="five-logo" src="/images/vendu-par-moi.svg" alt="Vendu Par Moi"><div><h2>Ma vente en 5 clics</h2><p>Les 5 liens essentiels à utiliser au bon moment pour une vente simple et bien organisée.</p></div><a href="/toolbox/formation/guide-complet.pdf" target="_blank" rel="noopener noreferrer" class="five-guide">Voir le guide complet →</a></header>
+<header class="five-header" id="fiveClicksToggle"><img class="five-logo" src="/images/vendu-par-moi.svg" alt="Vendu Par Moi"><div><h2>Ma vente en 5 clics</h2><p>Les 5 liens essentiels à utiliser au bon moment pour une vente simple et bien organisée.</p></div><a href="/toolbox/formation/guide-complet.pdf" target="_blank" rel="noopener noreferrer" class="five-guide" onclick="event.stopPropagation()">Voir le guide complet →</a><button type="button" class="five-clicks-chevron" aria-label="Réduire Ma vente en 5 clics" aria-expanded="true" onclick="event.stopPropagation(); toggleFiveClicks();"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="18 15 12 9 6 15"/></svg></button></header>
+<div id="fiveClicksBody">
 <div class="db-process-steps" id="fiveCards"><article class="db-process-step" aria-label="1 — Mon dossier complet"><div class="five-photo-frame"><img class="five-photo" src="/images/ma-vente-5-clics/hd/01_mon_dossier_complet.png" alt="" width="699" height="347"><span class="five-number" aria-hidden="true">1</span></div><div class="db-step-body"><h3 class="db-step-label">Mon dossier complet</h3><p class="five-note"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="m3 10 9-7 9 7M5 9v12h5v-7h4v7h5V9"/></svg>Comprend également vos créneaux de visite.</p><p class="db-step-sub">Envoyez avant la visite un dossier complet de votre bien à l'acheteur.</p><button type="button" class="db-step-btn-link" onclick="copyStepMsg(1, this)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="m3 10 9-7 9 7M5 9v12h5v-7h4v7h5V9"/></svg><span class="db-step-btn-lbl">Copier pour partager</span></button><a class="db-step-preview-link vpm-dossier-preview" id="vpmDossierPreview" data-step="1" aria-disabled="true" target="_blank" rel="noopener noreferrer"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/></svg><span>Voir ce que reçoit l’acheteur</span><span aria-hidden="true">→</span></a></div></article><article class="db-process-step" aria-label="2 — Réservation de visite"><div class="five-photo-frame"><img class="five-photo" src="/images/ma-vente-5-clics/hd/02_reservation_de_visite.png" alt="" width="695" height="347"><span class="five-number" aria-hidden="true">2</span></div><div class="db-step-body"><h3 class="db-step-label">Réservation de visite</h3><p class="db-step-sub">L'acquéreur choisit un créneau dans votre agenda pour une visite de votre bien.</p><button type="button" class="db-step-btn-link" onclick="copyStepMsg(2, this)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="m3 10 9-7 9 7M5 9v12h5v-7h4v7h5V9"/></svg><span class="db-step-btn-lbl">Copier pour partager</span></button><a class="db-step-preview-link" data-step="2" aria-disabled="true" target="_blank" rel="noopener noreferrer"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/></svg><span>Voir ce que reçoit l’acheteur</span><span aria-hidden="true">→</span></a></div></article><article class="db-process-step" aria-label="3 — Dossier acheteur sérieux"><div class="five-photo-frame"><img class="five-photo" src="/images/ma-vente-5-clics/hd/03_dossier_acheteur_serieux.png" alt="" width="758" height="347"><span class="five-number" aria-hidden="true">3</span></div><div class="db-step-body"><h3 class="db-step-label">Dossier acheteur sérieux</h3><p class="db-step-sub">Après la visite, partagez les documents complémentaires aux acheteurs réellement intéressés.</p><button type="button" class="db-step-btn-link" onclick="copyStepMsg(3, this)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="m3 10 9-7 9 7M5 9v12h5v-7h4v7h5V9"/></svg><span class="db-step-btn-lbl">Copier pour partager</span></button><a class="db-step-preview-link" data-step="3" aria-disabled="true" target="_blank" rel="noopener noreferrer"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/></svg><span>Voir ce que reçoit l’acheteur</span><span aria-hidden="true">→</span></a></div></article><article class="db-process-step" aria-label="4 — Soumission d'offre"><div class="five-photo-frame"><img class="five-photo" src="/images/ma-vente-5-clics/hd/04_soumission_offre.png" alt="" width="1051" height="367"><span class="five-number" aria-hidden="true">4</span></div><div class="db-step-body"><h3 class="db-step-label">Soumission d'offre</h3><p class="db-step-sub">L’acheteur soumet son offre — elle apparaît dans “Mes offres”.</p><button type="button" class="db-step-btn-link" onclick="copyStepMsg(4, this)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="m3 10 9-7 9 7M5 9v12h5v-7h4v7h5V9"/></svg><span class="db-step-btn-lbl">Copier pour partager</span></button><a class="db-step-preview-link" data-step="4" aria-disabled="true" target="_blank" rel="noopener noreferrer"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/></svg><span>Voir ce que reçoit l’acheteur</span><span aria-hidden="true">→</span></a></div></article><article class="db-process-step" aria-label="5 — Dossier notaire et suivi"><div class="five-photo-frame"><img class="five-photo" src="/images/ma-vente-5-clics/hd/05_dossier_notaire_suivi.png" alt="" width="1110" height="367"><span class="five-number" aria-hidden="true">5</span></div><div class="db-step-body"><h3 class="db-step-label">Dossier notaire et suivi</h3><p class="db-step-sub">Transmettez les documents demandés au notaire et suivez les étapes jusqu'au compromis.</p><button type="button" class="db-step-btn-link" onclick="copyStepMsg(5, this)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="m3 10 9-7 9 7M5 9v12h5v-7h4v7h5V9"/></svg><span class="db-step-btn-lbl">Copier pour partager</span></button><a class="db-step-preview-link" data-step="5" aria-disabled="true" target="_blank" rel="noopener noreferrer"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/></svg><span>Voir ce que reçoit l’acheteur</span><span aria-hidden="true">→</span></a></div></article></div>
-<nav class="five-controls" aria-label="Navigation des cinq liens"><button type="button" data-five-prev aria-label="Carte précédente" disabled>←</button><div class="five-dots"><button type="button" data-five-index="0" aria-label="Afficher la carte 1" aria-current="true"></button><button type="button" data-five-index="1" aria-label="Afficher la carte 2" aria-current="false"></button><button type="button" data-five-index="2" aria-label="Afficher la carte 3" aria-current="false"></button><button type="button" data-five-index="3" aria-label="Afficher la carte 4" aria-current="false"></button><button type="button" data-five-index="4" aria-label="Afficher la carte 5" aria-current="false"></button></div><button type="button" data-five-next aria-label="Carte suivante">→</button></nav></section>
+<nav class="five-controls" aria-label="Navigation des cinq liens"><button type="button" data-five-prev aria-label="Carte précédente" disabled>←</button><div class="five-dots"><button type="button" data-five-index="0" aria-label="Afficher la carte 1" aria-current="true"></button><button type="button" data-five-index="1" aria-label="Afficher la carte 2" aria-current="false"></button><button type="button" data-five-index="2" aria-label="Afficher la carte 3" aria-current="false"></button><button type="button" data-five-index="3" aria-label="Afficher la carte 4" aria-current="false"></button><button type="button" data-five-index="4" aria-label="Afficher la carte 5" aria-current="false"></button></div><button type="button" data-five-next aria-label="Carte suivante">→</button></nav></div></section>
       </div>
-    </details>
+    </div>
 
     <!-- Partage de l'agenda -->
     <!-- Layout 2 colonnes : calendrier + panneau droit -->
@@ -4119,13 +4112,27 @@ loadOffreLink();
 })();
 </script>
 <script>
-/* Persistance état dépliable Ma vente en 5 clics */
+/* Ma vente en 5 clics — toggle bandeau terracotta */
 (function() {
-  const el = document.getElementById('fiveClicksDetails');
-  if (!el) return;
-  if (localStorage.getItem('fiveClicksOpen') === '0') el.removeAttribute('open');
-  el.addEventListener('toggle', function() {
-    localStorage.setItem('fiveClicksOpen', el.open ? '1' : '0');
+  const wrapper = document.getElementById('fiveClicksWrapper');
+  const body = document.getElementById('fiveClicksBody');
+  const header = document.getElementById('fiveClicksToggle');
+  const btn = wrapper ? wrapper.querySelector('.five-clicks-chevron') : null;
+  if (!wrapper || !body || !header) return;
+  function applyState(open) {
+    wrapper.classList.toggle('five-closed', !open);
+    body.style.display = open ? '' : 'none';
+    if (btn) btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+  }
+  window.toggleFiveClicks = function() {
+    const nowOpen = wrapper.classList.contains('five-closed');
+    applyState(nowOpen);
+    localStorage.setItem('fiveClicksOpen', nowOpen ? '1' : '0');
+  };
+  applyState(localStorage.getItem('fiveClicksOpen') !== '0');
+  header.addEventListener('click', function(e) {
+    if (e.target.closest('a[href]')) return;
+    toggleFiveClicks();
   });
 })();
 </script>
@@ -4248,5 +4255,13 @@ document.getElementById('stepMsgModal').addEventListener('click', function(e) {
 
 <link rel="stylesheet" href="/css/seller-header-typography.css?v=1">
 <script src="/js/agenda-premium.js?v=96"></script>
+<script>
+/* Repositionnement Ma vente en 5 clics — avant les onglets agenda */
+(function() {
+  var block = document.getElementById('fiveClicksWrapper');
+  var tabs = document.querySelector('.ap-agenda-tabs');
+  if (block && tabs) tabs.before(block);
+})();
+</script>
 </body>
 </html>
