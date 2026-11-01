@@ -1193,8 +1193,15 @@ router.put('/api/visits/:id/status', requireAuth, express.json(), async (req, re
 });
 
 router.delete('/api/visits/:id', requireAuth, (req, res) => {
-  db.prepare('DELETE FROM visits WHERE id=? AND seller_id=?').run(req.params.id, req.seller.id);
-  res.json({ success: true });
+  try {
+    db.transaction(() => {
+      db.prepare('UPDATE notifications SET visit_id=NULL WHERE visit_id=?').run(req.params.id);
+      db.prepare('DELETE FROM visits WHERE id=? AND seller_id=?').run(req.params.id, req.seller.id);
+    })();
+    res.json({ success: true });
+  } catch (e) {
+    res.status(500).json({ error: 'Impossible de supprimer cette visite' });
+  }
 });
 
 router.put('/api/visits/:id/notes', requireAuth, express.json(), (req, res) => {

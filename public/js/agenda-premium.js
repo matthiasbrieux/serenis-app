@@ -31,6 +31,7 @@
   }
   if(statRow){top.after(statRow);statRow.after(agendaTabs);}else{top.after(agendaTabs);}
   const tealShareBtn=make('button','ap-teal-share-btn');tealShareBtn.type='button';tealShareBtn.innerHTML='<span class="ap-tsh-left"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg><span>Partager mes disponibilités de visite</span></span><span class="ap-tsh-chevron">›</span>';tealShareBtn.addEventListener('click',()=>copyBookingLink());
+  const msgAccordion=make('details','agd-dispo-msg-details');msgAccordion.innerHTML='<summary class="agd-dispo-msg-hdr"><span class="ap-tsh-left"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg><span>Message prêt à envoyer</span></span><svg class="agd-msg-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg></summary><div class="agd-dispo-msg-body"><div class="pub-msg-bubble-wrap"><div class="pub-msg-bubble" id="dispoMsgBubble"></div></div><button class="vpm-pub-contact-copy-btn" id="dispoMsgCopyBtn" onclick="copyDispoMsg(this)"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Copier le message</button><p class="pub-msg-note">Aperçu · aucun message n\'est envoyé.</p></div>';
   tabButtons.agenda.setAttribute('aria-current','page');
   const layout=main.querySelector('.agenda-layout');
   const right=main.querySelector('.agenda-right-col'), visits=main.querySelector('.visits-below');
@@ -85,6 +86,7 @@
   if(manual)manual.remove();
   // Move the availability section below the calendar actions; keep the add form closed.
   const availabilityFormHost=right.querySelector('.dispo-section');
+  const _staticDispoActions=availabilityFormHost.querySelector('.agd-dispo-actions');if(_staticDispoActions)_staticDispoActions.remove();
   calendarActions.append(availabilityFormHost);
   availabilityFormHost.style.display='none';
   document.getElementById('dispoAddHdr').hidden=true;
@@ -114,7 +116,7 @@
   appointmentsHeading.textContent='Mes prochaines visites';
   const availabilityPanel=make('section','ap-availability-panel');
   const availabilityHeading=make('h2','ap-lower-heading','Mes disponibilités de visite');
-  availabilityPanel.append(availabilityHeading,availBtn,tealShareBtn,availabilityFormHost,registered);
+  availabilityPanel.append(availabilityHeading,availBtn,tealShareBtn,msgAccordion,availabilityFormHost,registered);
   const visitsPanel=make('section','ap-visits-panel');
   visitsPanel.hidden=false;
   const visitsHeading=make('h2','ap-lower-heading','Mes visites');visitsPanel.append(visitsHeading);
@@ -153,18 +155,19 @@
     if(contacts)contacts.style.display=key==='all'?'block':'none';
     if(upcoming){
       upcoming.classList.toggle('ap-confirmed-view', key==='confirmed');
-      upcoming.querySelectorAll('.vcc2').forEach(card=>{
-        if(key==='confirmed')card.style.display=(card.classList.contains('vcc2-confirmed')||card.classList.contains('vcc2-rappel'))?'':'none';
-        else if(key==='scheduled')card.style.display=(!card.classList.contains('vcc2-confirmed')&&!card.classList.contains('vcc2-rappel'))?'':'none';
-        else if(key==='rappel')card.style.display=card.classList.contains('vcc2-rappel')?'':'none';
-        else card.style.display='';
-      });
-      if(key==='confirmed'){const parent=upcoming;const confirmed=[...parent.querySelectorAll('.vcc2.vcc2-confirmed')];const rappel=[...parent.querySelectorAll('.vcc2.vcc2-rappel')];rappel.forEach(c=>parent.append(c));confirmed.forEach(c=>parent.insertBefore(c,rappel[0]||null));}
+      upcoming.dataset.state=key;
+      const allUpcoming=allVisits.filter(v=>v.status==='confirmed'&&!isPastVisit(v)).sort((a,b)=>((a.visit_date+(a.visit_time||'')).localeCompare(b.visit_date+(b.visit_time||''))));
+      let crFiltered;
+      if(key==='confirmed')crFiltered=allUpcoming.filter(v=>v.sms_copied_at&&v.reminder_sent);
+      else if(key==='scheduled')crFiltered=allUpcoming.filter(v=>!v.sms_copied_at);
+      else if(key==='rappel')crFiltered=allUpcoming.filter(v=>v.sms_copied_at&&!v.reminder_sent);
+      else crFiltered=allUpcoming;
+      if(window._crSet&&window._crRender){window._crSet('upcoming',crFiltered,buildVisitConfirmedCard);window._crRender('upcoming');}
       const emptyMsgs={scheduled:'Aucune visite à confirmer pour le moment.',confirmed:'Aucune visite confirmée (SMS envoyé) pour le moment.',rappel:'Aucun rappel J-1 à effectuer pour le moment.'};
       ['scheduled','confirmed','rappel'].forEach(k=>{
         let el=upcoming.querySelector('.ap-filter-empty-'+k);
         if(!el){el=make('p','ap-scheduled-empty ap-filter-empty-'+k,emptyMsgs[k]);upcoming.append(el);}
-        if(key===k){const anyVisible=[...upcoming.querySelectorAll('.vcc2')].some(c=>c.style.display!=='none');el.hidden=anyVisible;}
+        if(key===k){el.hidden=crFiltered.length>0;}
         else{el.hidden=true;}
       });
     }
@@ -172,17 +175,17 @@
     const titleEl=document.getElementById('upcomingSectionTitle');
     const header=document.getElementById('upcomingPanelHeader');
     const states={
-      scheduled:{title:'Mes visites programmées',bg:'linear-gradient(135deg,#7a2f0e,#C4603A)'},
-      confirmed:{title:'Mes visites confirmées',bg:'#1B5E20'},
-      rappel:{title:'Mes rappels de visite J-1',bg:'#1D5EC9'},
+      scheduled:{title:'Mes visites programmées'},
+      confirmed:{title:'Mes visites confirmées'},
+      rappel:{title:'Mes rappels J-1'},
     };
-    const s=states[key]||{title:'Mes visites',bg:'linear-gradient(135deg,#7a2f0e,#C4603A)'};
+    const s=states[key]||{title:'Mes visites'};
     if(titleEl)titleEl.textContent=s.title;
-    if(header)header.style.background=s.bg;
+    if(header)header.style.background='';
     const hint=document.getElementById('visitsBannerHint');
     if(hint){
       const hints={
-        scheduled:{bg:'rgba(196,96,58,0.10)',color:'#7a2f0e',border:'rgba(196,96,58,0.25)',text:'Un acheteur a réservé un créneau. Confirmez sa visite en un clic.'},
+        scheduled:{bg:'rgba(22,139,131,0.10)',color:'#0e5f5a',border:'rgba(22,139,131,0.25)',text:'Un acheteur a réservé un créneau. Confirmez sa visite en un clic.'},
         confirmed:{bg:'rgba(27,94,32,0.08)',color:'#1B5E20',border:'rgba(27,94,32,0.25)',text:'Votre visite est confirmée ! Pensez à envoyer un rappel la veille pour la finaliser.'},
         rappel:{bg:'rgba(29,94,201,0.08)',color:'#1D5EC9',border:'rgba(29,94,201,0.25)',text:'La visite approche ! Envoyez votre rappel en un clic pour la confirmer à <strong>100 %</strong>.'},
       };
@@ -199,13 +202,31 @@
         if(card){card.scrollIntoView({behavior:'smooth',block:'center'});card.classList.add('ap-highlight-card');setTimeout(()=>card.classList.remove('ap-highlight-card'),2500);}
       },120);
     }
+    _syncCardsTop();
   }
+  function _syncCardsTop(){
+    requestAnimationFrame(()=>{
+      if(window.innerWidth<=1000)return;
+      const lFilters=document.querySelector('.ap-visits-filters');
+      const rTitle=document.querySelector('.ap-history .dispo-add-hdr');
+      const rNav=document.getElementById('vcr-past-nav');
+      const lCard=document.getElementById('upcomingList');
+      const rCard=document.getElementById('pastList');
+      if(!lFilters||!rTitle||!rNav||!lCard||!rCard)return;
+      rTitle.style.paddingBottom='';rCard.style.marginTop='';
+      const navDiff=lFilters.getBoundingClientRect().top-rNav.getBoundingClientRect().top;
+      if(navDiff>2){const pb=parseFloat(getComputedStyle(rTitle).paddingBottom)||0;rTitle.style.paddingBottom=(pb+navDiff)+'px';}
+      const cardDiff=lCard.getBoundingClientRect().top-rCard.getBoundingClientRect().top;
+      if(cardDiff>2)rCard.style.marginTop=cardDiff+'px';
+    });
+  }
+  window.addEventListener('resize',_syncCardsTop);
   const oldSetFilter=window.setStatFilter;
   window.setStatFilter=function(value){oldSetFilter(value);pendingPanel.hidden=Boolean(value)||!allVisits.some(v=>v.status==='pending'&&!isPastVisit(v));};
   main.querySelectorAll('.stat-card-agenda[data-filter]').forEach(el=>{el.tabIndex=0;el.setAttribute('role','button');el.addEventListener('keydown',event=>{if(event.key==='Enter'||event.key===' '){event.preventDefault();setStatFilter(el.dataset.filter);}});});
   const oldRenderVisits=window.renderVisits;
-  function updateFilterCounts(){const t=todayKey();const conf=allVisits.filter(v=>v.status==='confirmed'&&v.visit_date>=t);const pend=allVisits.filter(v=>v.status==='pending'&&!isPastVisit(v)).length;const sc=conf.filter(v=>!v.sms_copied_at).length+pend;const co=conf.filter(v=>v.sms_copied_at&&v.reminder_sent).length;const ra=conf.filter(v=>v.sms_copied_at&&!v.reminder_sent).length;const setC=(key,n)=>{const b=visitsFilterButtons[key];if(!b)return;const el=b.querySelector('.ap-vf-count');if(el)el.textContent=String(n);};setC('scheduled',sc);setC('confirmed',co);setC('rappel',ra);}
-  window.renderVisits=function(){oldRenderVisits();renderHistory(); const pending=allVisits.filter(v=>v.status==='pending'&&!isPastVisit(v));pendingPanel.hidden=Boolean(activeStatFilter)||!pending.length;pendingEmpty.hidden=pending.length>0;pendingList.innerHTML=pending.map(buildVisitCompact).join('');pendingTabCount.textContent=String(pending.length);updateFilterCounts();renderDashboardPanels();renderAppointments();const activeFilter=Object.entries(visitsFilterButtons).find(([,b])=>b.getAttribute('aria-pressed')==='true')?.[0];if(activeFilter)setVisitsFilter(activeFilter);};
+  function updateFilterCounts(){const conf=allVisits.filter(v=>v.status==='confirmed'&&!isPastVisit(v));const pend=allVisits.filter(v=>v.status==='pending'&&!isPastVisit(v)).length;const sc=conf.filter(v=>!v.sms_copied_at).length+pend;const co=conf.filter(v=>v.sms_copied_at&&v.reminder_sent).length;const ra=conf.filter(v=>v.sms_copied_at&&!v.reminder_sent).length;const setC=(key,n)=>{const b=visitsFilterButtons[key];if(!b)return;const el=b.querySelector('.ap-vf-count');if(el)el.textContent=String(n);};setC('scheduled',sc);setC('confirmed',co);setC('rappel',ra);}
+  window.renderVisits=function(){oldRenderVisits();renderHistory(); const pending=allVisits.filter(v=>v.status==='pending'&&!isPastVisit(v));pendingPanel.hidden=Boolean(activeStatFilter)||!pending.length;pendingEmpty.hidden=pending.length>0;pendingList.innerHTML=pending.map(buildVisitCompact).join('');pendingTabCount.textContent=String(pending.length);updateFilterCounts();renderDashboardPanels();renderAppointments();const activeFilter=Object.entries(visitsFilterButtons).find(([,b])=>b.getAttribute('aria-pressed')==='true')?.[0]||'scheduled';const allUp=allVisits.filter(v=>v.status==='confirmed'&&!isPastVisit(v));const fHas={scheduled:allUp.some(v=>!v.sms_copied_at),rappel:allUp.some(v=>v.sms_copied_at&&!v.reminder_sent),confirmed:allUp.some(v=>v.sms_copied_at&&v.reminder_sent)};setVisitsFilter(fHas[activeFilter]?activeFilter:(['scheduled','rappel','confirmed'].find(k=>fHas[k])||'scheduled'));};
   const calendar=main.querySelector('.calendar-card'), header=calendar.querySelector('.cal-header');
   const switcher=make('div','ap-view-switch');switcher.setAttribute('role','group');switcher.setAttribute('aria-label','Vue du calendrier');
   const views={month:'Mois',week:'Semaine',day:'Jour'};

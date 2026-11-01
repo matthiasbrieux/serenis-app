@@ -2181,7 +2181,7 @@ if("scrollRestoration"in history)history.scrollRestoration="manual";</script>
             <span>Les acheteurs posent toujours la question. Avoir une réponse claire et honnête rassure et évite la méfiance.</span>
           </div>
         </div>
-        <div class="form-group" style="margin-top:16px;">
+        <div class="form-group" id="section-description" style="margin-top:16px;">
           <label>Description libre du bien</label>
           <textarea name="description" rows="5" placeholder="Décrivez votre bien : atouts, rénovations récentes, ambiance du quartier, luminosité, calme, vie de voisinage..." oninput="updateDescWordCount(this)"></textarea>
           <div style="text-align:right;font-size:0.78rem;color:#888;margin-top:3px;"><span id="descWordCount">0</span> mot(s)</div>
@@ -2946,10 +2946,10 @@ if("scrollRestoration"in history)history.scrollRestoration="manual";</script>
         @media(max-width:640px) { .ev-copy-photos-btn { font-size:0.82rem; } }
       </style>
 <div id="unpublished-notice" style="display:none;background:#fffbf0;border:1.5px solid #f0c040;border-radius:12px;padding:14px 18px;margin-bottom:20px;display:none;align-items:center;gap:12px;font-size:0.88rem;color:#7a5a00;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#c4a020" stroke-width="2" style="flex-shrink:0"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg><span>Votre annonce n'est pas encore publiée. <a href="/mes-publications" style="color:#9E3A18;font-weight:600;text-decoration:underline;">Publiez votre bien</a> pour activer son lien public.</span></div>
-<div class="vpm-share-layout"><header class="vpm-section-heading"><h2>Prêt à envoyer</h2><p>Choisissez le dossier à transmettre à votre acheteur.</p></header><div class="ev-card vpm-featured" id="ev-card-fiche">
-<div class="vpm-card-actions"><button class="vpm-preview-action" onclick="vpmOpenDossier('fiche')" type="button">Voir le dossier acheteur →</button></div><button aria-controls="ev-body-fiche" aria-expanded="false" class="ev-card-btn" onclick="toggleEvCard('fiche')" type="button">
+<div class="vpm-share-layout"><header class="vpm-section-heading"><h2>Prêt à envoyer</h2><p>Choisissez le dossier à transmettre à votre acheteur.</p></header><div class="ev-card" id="ev-card-fiche">
+<button aria-controls="ev-body-fiche" aria-expanded="false" class="ev-card-btn" onclick="toggleEvCard('fiche')" type="button">
 <div class="ev-card-ico"><svg fill="none" height="16" stroke="#fff" stroke-width="1.8" viewbox="0 0 24 24" width="16"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path><rect height="4" rx="1" width="8" x="8" y="2"></rect><line x1="8" x2="16" y1="13" y2="13"></line><line x1="8" x2="13" y1="17" y2="17"></line></svg></div>
-<div class="ev-card-info"><div class="ev-card-ttl">Votre dossier complet</div><div class="ev-card-sub">Fiche descriptive, photos, DPE et diagnostics : les informations essentielles réunies dans un seul lien.</div><span class="vpm-message-hint">Afficher le message prêt à envoyer</span></div>
+<div class="ev-card-info"><div class="ev-card-ttl">Votre dossier complet</div><div class="ev-card-sub">Fiche descriptive, photos, DPE et diagnostics : les informations essentielles réunies dans un seul lien.</div></div>
 <span>1ère info</span>
 <svg class="ev-chev" fill="none" height="14" stroke="#9E3A18" stroke-width="2" viewbox="0 0 24 24" width="14"><polyline points="6 9 12 15 18 9"></polyline></svg>
 </button>
@@ -2966,22 +2966,7 @@ if("scrollRestoration"in history)history.scrollRestoration="manual";</script>
 <p class="ev-msg-note">Aperçu · aucun message n'est envoyé.</p>
 </div>
 </div>
-<div class="ev-send-dossier-section">
-  <div class="ev-send-dossier-header">
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--terracotta)" stroke-width="1.8"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
-    <span>Envoyer le dossier par e-mail</span>
-  </div>
-  <p class="ev-send-dossier-desc">Envoyez directement le lien du dossier acheteur à un contact. Il recevra un e-mail avec le lien vers votre dossier complet.</p>
-  <form class="ev-send-dossier-form" onsubmit="submitSendDossierEmail(event)" novalidate>
-    <div class="ev-send-dossier-fields">
-      <input class="ev-send-dossier-input" id="ev-dossier-buyer-name" placeholder="Prénom de l'acheteur (optionnel)" type="text" autocomplete="off"/>
-      <input class="ev-send-dossier-input" id="ev-dossier-buyer-email" placeholder="Email de l'acheteur" required type="email" autocomplete="off"/>
-    </div>
-    <button class="ev-send-dossier-btn" type="submit">Envoyer le dossier</button>
-  </form>
-  <div class="ev-send-dossier-feedback" id="ev-dossier-feedback" style="display:none;"></div>
-</div>
-<div class="vpm-feature-chips"><span>Fiche descriptive</span><span>Photos</span><span>Diagnostics</span><span>Visites</span></div></div><div class="vpm-share-middle"><section class="vpm-separate"><h3>Partager un élément séparément</h3><p>Un lien pour chaque élément, à partager selon vos besoins.</p><div class="ev-card" id="ev-card-dpe">
+</div><div class="vpm-share-middle"><section class="vpm-separate"><h3>Partager un élément séparément</h3><p>Un lien pour chaque élément, à partager selon vos besoins.</p><div class="ev-card" id="ev-card-dpe">
 <button aria-controls="ev-body-dpe" aria-expanded="false" class="ev-card-btn" onclick="toggleEvCard('dpe')" type="button">
 <div class="ev-card-ico"><svg fill="none" height="16" stroke="#D4821A" stroke-width="1.8" viewbox="0 0 24 24" width="16"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg></div>
 <div class="ev-card-info"><div class="ev-card-ttl">DPE et diagnostics</div><div class="ev-card-sub">Performance énergétique, amiante, plomb, électricité, gaz…</div></div>
@@ -3222,6 +3207,11 @@ document.querySelectorAll('.tab-btn').forEach(btn => {
       }
       if (el) el.scrollIntoView({ behavior:'smooth', block:'start' });
     }, 250);
+  } else if (s) {
+    setTimeout(() => {
+      const el = document.getElementById(s);
+      if (el) el.scrollIntoView({ behavior:'smooth', block:'start' });
+    }, 400);
   }
 })();
 
@@ -7877,7 +7867,7 @@ fetchSellerForFiche();
 
 <link rel="stylesheet" href="/css/seller-header-typography.css?v=1">
 <link rel="stylesheet" href="/css/property-send-premium.css?v=1">
-<script src="/js/property-send-premium.js?v=1"></script>
+<script src="/js/property-send-premium.js?v=2"></script>
 
 <style>
 .ev-send-dossier-section{border-top:1px solid rgba(200,190,178,0.25);margin-top:20px;padding-top:18px;}

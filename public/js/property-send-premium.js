@@ -50,6 +50,7 @@
   formation.href = '/ma-formation#formation/lecon/2/4';
   formation.textContent = 'Revoir cette étape dans ma formation';
   buyerBody.querySelector('.send-pedagogy').after(formation);
+  retainMessage('acheteur');
 
   const exteriorBody = document.getElementById('ev-body-exterieur');
   const approvedMessage = document.createElement('div');

@@ -925,7 +925,7 @@ if("scrollRestoration"in history)history.scrollRestoration="manual";</script>
     /* ── APH flat header ──────────────────────────────── */
     .aph { display:flex; justify-content:space-between; align-items:flex-start; gap:16px; margin-bottom:24px; padding:24px 0 16px; border-bottom:1.5px solid #e8e0d6; flex-wrap:wrap; }
     .aph-left { flex:1; min-width:0; }
-    .aph-badge { display:inline-flex; align-items:center; gap:6px; padding:3px 12px; border-radius:100px; background:rgba(158,58,24,0.06); border:1px solid rgba(158,58,24,0.12); color:var(--terracotta); font-size:0.67rem; font-weight:700; letter-spacing:0.09em; text-transform:uppercase; margin-bottom:10px; }
+    .aph-badge { display:inline-flex; align-items:center; gap:6px; padding:5px 13px; border-radius:100px; background:transparent; border:1.5px solid rgba(134,65,42,0.28); color:#86412A; font-size:0.625rem; font-weight:700; letter-spacing:0.11em; text-transform:uppercase; margin-bottom:10px; font-family:'Inter',sans-serif; }
     .aph-title { font-family:'Cormorant Garamond',serif; font-size:42px; font-weight:500; letter-spacing:-0.7px; line-height:1.07; color:#1A1A16; margin:12px 0 15px; }
     .aph-title em { font-style:italic; color:var(--terracotta); }
     .aph-sub { font-size:0.83rem; color:#888; line-height:1.6; margin:0; max-width:520px; }
@@ -1116,7 +1116,7 @@ if("scrollRestoration"in history)history.scrollRestoration="manual";</script>
   </style>
   <link rel="stylesheet" href="/css/seller-reference.css?v=1">
   <link rel="stylesheet" href="/css/seller-navigation.css?v=2">
-<link rel="stylesheet" href="/css/agenda-premium.css?v=48">
+<link rel="stylesheet" href="/css/agenda-premium.css?v=62">
 </head>
 <body class="vpm-seller-reference vpm-agenda-page vpm-header-typography">
 <!-- En-tête mobile : logo complet + bouton menu -->
@@ -1161,7 +1161,7 @@ if("scrollRestoration"in history)history.scrollRestoration="manual";</script>
           Mon agenda
         </div>
         <h1 class="aph-title vpm-header-title">Mon <em>agenda</em></h1>
-        <p class="aph-sub vpm-header-subtitle">Centralisez vos rendez-vous, laissez les acheteurs réserver leurs créneaux et gardez une vision claire de votre planning jusqu'au compromis.</p>
+        <p class="aph-sub vpm-header-subtitle">Organisez vos visites et suivez vos échanges avec les acheteurs.</p>
       </div>
       <div class="aph-actions" style="display:none;">
         <div class="serenis-number-pill" id="serenisNumberPill" style="display:none;">
@@ -1260,7 +1260,7 @@ if("scrollRestoration"in history)history.scrollRestoration="manual";</script>
           </div>
           <div class="cal-grid" id="calGrid" style="margin-top:4px;"></div>
           <div class="cal-legend">
-            <span class="cal-legend-item"><span style="display:inline-block;width:12px;height:12px;border-radius:3px;background:#C4603A;flex-shrink:0;"></span>Programmée</span>
+            <span class="cal-legend-item"><span style="display:inline-block;width:12px;height:12px;border-radius:3px;background:#168B83;flex-shrink:0;"></span>Programmée</span>
             <span class="cal-legend-item"><span style="display:inline-block;width:12px;height:12px;border-radius:3px;background:#2e7d32;flex-shrink:0;"></span>Confirmée</span>
             <span class="cal-legend-item"><span style="display:inline-block;width:12px;height:12px;border-radius:3px;background:#1D5EC9;flex-shrink:0;"></span>Rappel J-1</span>
             <span class="cal-legend-item"><span style="display:inline-flex;align-items:center;justify-content:center;width:14px;height:14px;border-radius:3px;background:#1B5E20;flex-shrink:0;font-size:8px;color:#fff;line-height:1;">★</span>Confirmée à 100 %</span>
@@ -1284,6 +1284,55 @@ if("scrollRestoration"in history)history.scrollRestoration="manual";</script>
       <div class="agenda-right-col" style="position:static;">
         <div id="nextVisitMini" style="display:none;"></div>
         <div class="dispo-section">
+
+          <!-- Section heading Mes disponibilités de visite -->
+          <div class="agd-dispo-heading">
+            <div class="agd-dispo-rule" aria-hidden="true"></div>
+            <h2 class="agd-dispo-title">Mes disponibilités de <em>visite</em></h2>
+            <p class="agd-dispo-sub">Ajoutez vos créneaux et partagez votre agenda avec les acheteurs.</p>
+          </div>
+
+          <!-- CTA buttons -->
+          <div class="agd-dispo-actions">
+            <button class="agd-dispo-btn-primary" onclick="openAvailability()">
+              <span class="agd-btn-inner">
+                <span class="agd-btn-ico">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><line x1="12" y1="14" x2="12" y2="18"/><line x1="10" y1="16" x2="14" y2="16"/></svg>
+                </span>
+                <span class="agd-btn-text">Ajouter une disponibilité de visite</span>
+              </span>
+              <span class="agd-btn-chevron">›</span>
+            </button>
+            <details class="agd-dispo-msg-details">
+              <summary onclick="populateDispoMsg()">
+                <span class="agd-btn-ico">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                </span>
+                <span class="agd-btn-text">Message prêt à envoyer</span>
+                <span class="agd-dispo-msg-chevron">›</span>
+              </summary>
+              <div class="agd-dispo-msg-body">
+                <div class="pub-msg-bubble-wrap">
+                  <div class="pub-msg-bubble" id="dispoMsgBubble"></div>
+                </div>
+                <button class="vpm-pub-contact-copy-btn" id="dispoMsgCopyBtn" onclick="copyDispoMsg(this)">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                  Copier le message
+                </button>
+                <p class="pub-msg-note">Aperçu · aucun message n'est envoyé.</p>
+              </div>
+            </details>
+            <button class="agd-dispo-btn-sms" onclick="openSmsAvail()">
+              <span class="agd-btn-inner">
+                <span class="agd-btn-ico">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                </span>
+                <span class="agd-btn-text">Message SMS à envoyer</span>
+              </span>
+              <span class="agd-btn-chevron" style="color:#9E3A18;">›</span>
+            </button>
+          </div>
+
           <!-- Bloc A : Disponibilités enregistrées (fond crème) -->
           <div class="dispo-registered-block">
             <div class="dispo-section-hdr">
@@ -1375,38 +1424,42 @@ if("scrollRestoration"in history)history.scrollRestoration="manual";</script>
         </div>
 
         <!-- Prochaines visites -->
-        <div class="agenda-panel" id="upcomingSection" style="display:none;">
-          <div class="agenda-panel-title confirmed-section-title" id="upcomingPanelHeader" style="flex-wrap:wrap;gap:6px;">
-            <span style="display:flex;align-items:center;gap:6px;">
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-              <span id="upcomingSectionTitle">Mes visites à venir</span>
-            </span>
+        <div class="agenda-panel" id="upcomingSection" style="display:none;" data-state="scheduled">
+          <div class="vcr-section-hdr" id="upcomingPanelHeader">
+            <div class="vcr-hdr-left">
+              <span class="vcr-hdr-ico">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+              </span>
+              <span class="vcr-hdr-title" id="upcomingSectionTitle">Mes visites programmées</span>
+            </div>
+            <div class="vcr-hdr-nav">
+              <span class="vcr-hdr-counter" id="cr-ctr-upcoming"></span>
+              <button class="vcr-hdr-btn" id="cr-prev-upcoming" onclick="carouselNav('upcoming',-1)">&#8249;</button>
+              <button class="vcr-hdr-btn" id="cr-next-upcoming" onclick="carouselNav('upcoming',1)">&#8250;</button>
+            </div>
           </div>
           <div id="visitsBannerHint" style="display:none;padding:13px 18px;font-size:0.84rem;line-height:1.5;font-style:italic;"></div>
-          <div class="sidebar-body no-max" id="upcomingList"></div>
-          <div class="vc-nav" id="cr-nav-upcoming" style="display:none;">
-            <button class="vc-carousel-btn" id="cr-prev-upcoming" onclick="carouselNav('upcoming',-1)">&#8592; Précédente</button>
-            <span class="vc-carousel-counter" id="cr-ctr-upcoming"></span>
-            <button class="vc-carousel-btn" id="cr-next-upcoming" onclick="carouselNav('upcoming',1)">Suivante &#8594;</button>
-          </div>
+          <div class="vcr-card-wrap" id="upcomingList"></div>
+          <div class="vcr-dots" id="vcr-dots-upcoming" style="display:none;"></div>
         </div>
 
         <!-- Historique / dossier visites passées -->
         <div class="agenda-panel" id="pastSection" style="display:none;">
-          <div class="agenda-panel-title">
+          <div class="agenda-panel-title" onclick="togglePastSection()" style="cursor:pointer;user-select:none;">
             <span style="display:flex;align-items:center;gap:7px;">
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
-              Visites passées
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+              Mes visites passées
             </span>
-            <span id="pastCountBadge" style="background:#e8e3db;color:#666;padding:1px 8px;border-radius:12px;font-size:0.72rem;font-weight:700;"></span>
+            <span id="pastCountBadge" style="background:#e8e3db;color:#666;padding:2px 9px;border-radius:12px;font-size:0.72rem;font-weight:700;"></span>
+          </div>
+          <div class="vcr-past-nav" id="vcr-past-nav">
+            <span class="vcr-hdr-counter" id="cr-ctr-past"></span>
+            <button class="vcr-hdr-btn" id="cr-prev-past" onclick="event.stopPropagation();carouselNav('past',-1)">&#8249;</button>
+            <button class="vcr-hdr-btn" id="cr-next-past" onclick="event.stopPropagation();carouselNav('past',1)">&#8250;</button>
           </div>
           <div id="pastBannerHint" style="padding:13px 18px;font-size:0.84rem;line-height:1.5;font-style:italic;background:rgba(120,120,120,0.07);color:#6b6b6b;border-bottom:1px solid rgba(120,120,120,0.18);">Après chaque visite, gardez le contact avec vos acheteurs : transmettez vos documents complémentaires ou indiquez si vous souhaitez poursuivre les échanges.</div>
-          <div class="sidebar-body" id="pastList" style="display:flex;flex-direction:column;gap:8px;padding:12px 0 0;max-height:none;"></div>
-          <div class="vc-nav" id="cr-nav-past" style="display:none;">
-            <button class="vc-carousel-btn" id="cr-prev-past" onclick="carouselNav('past',-1)">&#8592; Précédente</button>
-            <span class="vc-carousel-counter" id="cr-ctr-past"></span>
-            <button class="vc-carousel-btn" id="cr-next-past" onclick="carouselNav('past',1)">Suivante &#8594;</button>
-          </div>
+          <div class="vcr-card-wrap" id="pastList"></div>
+          <div class="vcr-dots" id="vcr-dots-past" style="display:none;"></div>
         </div>
 
         <!-- Visites annulées -->
@@ -1610,6 +1663,26 @@ if("scrollRestoration"in history)history.scrollRestoration="manual";</script>
   </div>
 </div>
 
+<!-- ── Modal: Message SMS disponibilités ── -->
+<div class="modal-overlay" id="smsAvailOverlay">
+  <div class="modal confirm-sms-modal" style="position:relative;">
+    <button onclick="closeModal('smsAvailOverlay')" style="position:absolute;top:14px;right:16px;background:none;border:none;font-size:1.4rem;color:#aaa;cursor:pointer;line-height:1;padding:0 4px;z-index:2;" title="Fermer">×</button>
+    <div class="confirm-sms-check" style="background:linear-gradient(135deg,#9E3A18,#C4603A);">
+      <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+    </div>
+    <div class="confirm-sms-title">Message SMS à envoyer</div>
+    <div class="suivi-bubble" id="smsAvailBubble"></div>
+    <a class="confirm-sms-btn-sms" id="smsAvailSendBtn" href="#" style="display:none;">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.41a2 2 0 0 1 2-2.18h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+      Ouvrir dans SMS
+    </a>
+    <button class="confirm-sms-copy" id="smsAvailCopyBtn" onclick="copySmsAvail(this)">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:middle;margin-right:5px;"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>Copier le message
+    </button>
+    <button class="confirm-sms-close" onclick="closeModal('smsAvailOverlay')">Fermer</button>
+  </div>
+</div>
+
 <!-- ── Modal: Message de suivi visite passée ── -->
 <div class="modal-overlay" id="suiviOverlay">
   <div class="modal confirm-sms-modal" style="position:relative;">
@@ -1698,6 +1771,7 @@ if("scrollRestoration"in history)history.scrollRestoration="manual";</script>
       <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:middle;margin-right:5px;"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>Copier le SMS
     </button>
     <button id="cancelSmsNoSmsBtn" style="width:100%;padding:10px;background:none;border:1px solid #e0d5d5;border-radius:11px;font-family:'DM Sans',sans-serif;font-size:0.82rem;font-weight:600;color:#c0392b;cursor:pointer;margin-bottom:8px;">Annuler la visite sans envoyer de SMS</button>
+    <button id="cancelSmsDeleteBtn" style="width:100%;padding:9px;background:none;border:1px solid #e8e8e8;border-radius:11px;font-family:'DM Sans',sans-serif;font-size:0.78rem;font-weight:500;color:#bbb;cursor:pointer;margin-bottom:8px;">Supprimer définitivement la visite</button>
     <button class="confirm-sms-close" onclick="closeModal('cancelSmsOverlay')">Ne pas annuler</button>
   </div>
 </div>
@@ -2057,20 +2131,39 @@ function _crRender(key) {
   const c = _cr[key];
   const listId = key === 'upcoming' ? 'upcomingList' : 'pastList';
   const listEl = document.getElementById(listId);
-  if (!listEl || !c.visits.length) return;
+  if (!listEl) return;
+  if (!c.visits.length) {
+    listEl.innerHTML = '';
+    const dotsEl2 = document.getElementById('vcr-dots-' + key);
+    if (dotsEl2) { dotsEl2.innerHTML = ''; dotsEl2.style.display = 'none'; }
+    const ctr2 = document.getElementById('cr-ctr-' + key);
+    if (ctr2) ctr2.textContent = '';
+    const pEl = document.getElementById('cr-prev-' + key);
+    const nEl = document.getElementById('cr-next-' + key);
+    if (pEl) pEl.disabled = true;
+    if (nEl) nEl.disabled = true;
+    return;
+  }
   listEl.innerHTML = c.fn(c.visits[c.idx]);
   const n = c.visits.length;
-  const navEl = document.getElementById('cr-nav-' + key);
-  if (!navEl) return;
-  if (n > 1) {
-    navEl.style.display = 'flex';
-    document.getElementById('cr-prev-' + key).disabled = c.idx === 0;
-    document.getElementById('cr-next-' + key).disabled = c.idx === n - 1;
-    document.getElementById('cr-ctr-' + key).textContent = (c.idx + 1) + ' sur ' + n;
-  } else {
-    navEl.style.display = 'none';
+  const ctrEl = document.getElementById('cr-ctr-' + key);
+  if (ctrEl) ctrEl.textContent = n > 1 ? (c.idx + 1) + ' / ' + n : '';
+  const prevEl = document.getElementById('cr-prev-' + key);
+  const nextEl = document.getElementById('cr-next-' + key);
+  if (prevEl) prevEl.disabled = c.idx === 0;
+  if (nextEl) nextEl.disabled = c.idx === n - 1;
+  const dotsEl = document.getElementById('vcr-dots-' + key);
+  if (dotsEl) {
+    if (n > 1) {
+      const sp = key === 'past' ? 'event.stopPropagation();' : '';
+      const dots = Array.from({length: n}, (_, i) => `<span class="vcr-dot${i === c.idx ? ' vcr-dot-active' : ''}"></span>`).join('');
+      dotsEl.innerHTML = `<button class="vcr-hdr-btn vcr-dot-nav"${c.idx===0?' disabled':''} onclick="${sp}carouselNav('${key}',-1)">&#8249;</button>${dots}<button class="vcr-hdr-btn vcr-dot-nav"${c.idx===n-1?' disabled':''} onclick="${sp}carouselNav('${key}',1)">&#8250;</button>`;
+      dotsEl.style.display = 'flex';
+    } else { dotsEl.innerHTML = ''; dotsEl.style.display = 'none'; }
   }
 }
+window._crSet = _crSet;
+window._crRender = _crRender;
 function carouselNav(key, dir) {
   const c = _cr[key];
   const ni = c.idx + dir;
@@ -2127,26 +2220,24 @@ function renderVisits() {
   }
   emptyEl.style.display='none';
 
-  // Upcoming confirmed — liste complète (pas carousel)
+  // Upcoming confirmed — carousel (une fiche à la fois)
   if (upcoming.length) {
     upcomingSection.style.display='block';
     const upBadge = document.getElementById('upcomingCountBadge');
     if (upBadge) upBadge.textContent = upcoming.length;
-    document.getElementById('upcomingList').innerHTML = upcoming.map(buildVisitConfirmedCard).join('');
-    const nav = document.getElementById('cr-nav-upcoming');
-    if (nav) nav.style.display = 'none';
+    _crSet('upcoming', upcoming, buildVisitConfirmedCard);
+    _crRender('upcoming');
   } else {
     upcomingSection.style.display='none';
   }
 
-  // Visites passées — liste complète (pas carousel)
+  // Visites passées — carousel (une fiche à la fois)
   if (past.length) {
     pastSection.style.display='block';
     const badge = document.getElementById('pastCountBadge');
     if (badge) badge.textContent = past.length;
-    document.getElementById('pastList').innerHTML = past.map(buildPastCard).join('');
-    const nav = document.getElementById('cr-nav-past');
-    if (nav) nav.style.display = 'none';
+    _crSet('past', past, buildPastCard);
+    _crRender('past');
   } else {
     pastSection.style.display='none';
   }
@@ -2168,7 +2259,7 @@ function renderVisits() {
 let _pastOpen = true;
 function togglePastSection() {
   _pastOpen = !_pastOpen;
-  document.getElementById('pastList').style.display = _pastOpen ? 'flex' : 'none';
+  document.getElementById('pastList').style.display = _pastOpen ? 'block' : 'none';
   const ch = document.getElementById('pastChevron');
   if (ch) ch.style.transform = _pastOpen ? 'rotate(90deg)' : '';
 }
@@ -2252,6 +2343,8 @@ function buildPastCard(v) {
       <div class="vcc2-past-conseils-title">${svgBulb} NOS CONSEILS</div>
       <div class="vcc2-past-conseils-text">Après chaque visite, transmettez vos documents complémentaires (entretien chaudière, factures, travaux...) ou demandez où en est votre acheteur dans sa réflexion.</div>
     </div>` : '';
+  const svgTrash2 = `<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>`;
+  const deleteRowHtml = `<div style="text-align:center;padding:6px 0 10px;"><button onclick="deleteVisitHard(${v.id})" style="background:none;border:none;color:#ccc;font-family:'DM Sans',sans-serif;font-size:0.72rem;cursor:pointer;display:inline-flex;align-items:center;gap:4px;">${svgTrash2} Supprimer définitivement</button></div>`;
   return `<div class="vcc2 ${isCancelled?'vcc2-cancelled':'vcc2-done'}">
     <div class="${pastBannerClass}">${pastBannerText}</div>
     <div class="vcc2-head">
@@ -2273,6 +2366,7 @@ function buildPastCard(v) {
     ${confirmBoxHtml}
     ${buttonsHtml}
     ${conseilsHtml}
+    ${deleteRowHtml}
   </div>`;
 }
 
@@ -2358,9 +2452,7 @@ function copyConfirmSms(btn) {
     fetch(`/api/visits/${visitId}/sms-copied`, { method:'PUT' }).then(() => {
       const v = allVisits.find(v => v.id === visitId);
       if (v) { v.sms_copied_at = new Date().toISOString(); }
-      // Mettre à jour le badge sur la carte sans re-render complet
-      const badge = document.getElementById(`sms-badge-${visitId}`);
-      if (badge) badge.innerHTML = smsCopiedBadge(v?.sms_copied_at);
+      renderVisits();
     }).catch(() => {});
   });
 }
@@ -2399,6 +2491,14 @@ function openCancelSmsModal(id) {
   sendBtn.href = phone ? `sms:${phone}?body=${encoded}` : `sms:?body=${encoded}`;
   sendBtn.onclick = () => { changeVisitStatus(id, 'cancelled'); };
   document.getElementById('cancelSmsNoSmsBtn').onclick = () => { changeVisitStatus(id, 'cancelled'); closeModal('cancelSmsOverlay'); };
+  document.getElementById('cancelSmsDeleteBtn').onclick = async () => {
+    if (!confirm('Supprimer définitivement cette visite ? Cette action est irréversible.')) return;
+    const res = await fetch(`/api/visits/${id}`, { method: 'DELETE' });
+    if (!res.ok) { showToast('Erreur lors de la suppression', 'error'); console.error('DELETE visit failed', id, res.status); return; }
+    allVisits = allVisits.filter(v => String(v.id) !== String(id));
+    closeModal('cancelSmsOverlay');
+    renderVisits(); renderCalendar(); showToast('Visite supprimée');
+  };
   openModal('cancelSmsOverlay');
 }
 
@@ -2637,6 +2737,14 @@ async function confirmSkipFollowup() {
   } catch(e) { showToast('Erreur réseau', 'error'); }
 }
 
+async function deleteVisitHard(id) {
+  if (!confirm('Supprimer définitivement cette visite ? Cette action est irréversible.')) return;
+  const res = await fetch(`/api/visits/${id}`, { method: 'DELETE' });
+  if (!res.ok) { showToast('Erreur lors de la suppression', 'error'); console.error('DELETE visit failed', id, res.status); return; }
+  allVisits = allVisits.filter(v => String(v.id) !== String(id));
+  renderVisits(); renderCalendar();
+  showToast('Visite supprimée');
+}
 async function reactivateFollowup(id) {
   try {
     const res = await fetch(`/api/visits/${id}/reactivate-followup`, { method: 'POST' });
@@ -2711,37 +2819,12 @@ function copyRappelSms(btn) {
       const v = allVisits.find(v=>v.id===id);
       if (mode === 'rappel') {
         if (v) v.reminder_sent = 1;
-        const rappelBtn = document.getElementById('btn-rappel-' + id);
-        if (rappelBtn) {
-          const baseClass = rappelBtn.classList.contains('vcc2-btn-sms') ? 'vcc2-btn-sms' : 'btn-sms-reminder';
-          rappelBtn.className = baseClass + ' sent';
-          rappelBtn.innerHTML = '✓ Rappel effectué';
-        }
-        const vcardRappel = document.getElementById('vcard-' + id);
-        if (vcardRappel) { vcardRappel.classList.remove('vcc2-rappel'); vcardRappel.classList.add('vcc2-confirmed','vcc2-full'); const rNote=vcardRappel.querySelector('.vcc2-rappel-note'); if(rNote) rNote.style.display='none'; }
-        const statusBadgeRappel = document.getElementById('status-badge-' + id);
-        if (statusBadgeRappel) { statusBadgeRappel.className = 'vcc2-banner vcc2-banner-full'; statusBadgeRappel.innerHTML = '<svg class="vcc2-full-star-ico" viewBox="0 0 24 24" width="13" height="13" fill="#F5C842" stroke="#D4A800" stroke-width="0.5"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg> VISITE CONFIRMÉE À 100 %<img src="/logo-vpm.png" class="vcc2-banner-logo" alt="">'; }
-        const fullFooter = document.getElementById('full-footer-' + id);
-        if (fullFooter) fullFooter.style.display = '';
         fetch(`/api/visits/${id}/rappel-rdv`, {method:'POST'}).catch(()=>{});
       } else {
         if (v) v.sms_copied_at = new Date().toISOString();
-        const reminderBtn = document.getElementById('btn-reminder-' + id);
-        if (reminderBtn) {
-          const baseClass = reminderBtn.classList.contains('vcc2-btn-sms') ? 'vcc2-btn-sms' : 'btn-sms-reminder';
-          reminderBtn.className = baseClass + ' sent';
-          reminderBtn.innerHTML = '✓ Confirmation effectuée';
-        }
-        const badge = document.getElementById('sms-badge-' + id);
-        if (badge) badge.innerHTML = smsCopiedBadge(v?.sms_copied_at);
-        const vcardEl = document.getElementById('vcard-' + id);
-        if (vcardEl) { vcardEl.classList.remove('vcc2-confirmed'); vcardEl.classList.add('vcc2-rappel'); }
-        const statusBadge = document.getElementById('status-badge-' + id);
-        if (statusBadge) { statusBadge.className = 'vcc2-banner vcc2-banner-rappel'; statusBadge.textContent = '● Rappel J-1 à envoyer'; }
-        const rappelBtn = document.getElementById('btn-rappel-' + id);
-        if (rappelBtn) rappelBtn.style.display = '';
         fetch(`/api/visits/${id}/reminder`, {method:'POST'}).catch(()=>{});
       }
+      renderVisits();
     }
   }
   if (navigator.clipboard && window.isSecureContext) {
@@ -2774,23 +2857,11 @@ function markRappelSmsSent() {
     const fullFooter = document.getElementById('full-footer-' + id);
     if (fullFooter) fullFooter.style.display = '';
     fetch(`/api/visits/${id}/rappel-rdv`, {method:'POST'}).catch(()=>{});
+    renderVisits();
   } else {
     if (v) v.sms_copied_at = new Date().toISOString();
-    const reminderBtn = document.getElementById('btn-reminder-' + id);
-    if (reminderBtn) {
-      const baseClass = reminderBtn.classList.contains('vcc2-btn-sms') ? 'vcc2-btn-sms' : 'btn-sms-reminder';
-      reminderBtn.className = baseClass + ' sent';
-      reminderBtn.innerHTML = '✓ Confirmation effectuée';
-    }
-    const badge = document.getElementById('sms-badge-' + id);
-    if (badge) badge.innerHTML = smsCopiedBadge(v?.sms_copied_at);
-    const vcardEl = document.getElementById('vcard-' + id);
-    if (vcardEl) { vcardEl.classList.remove('vcc2-confirmed'); vcardEl.classList.add('vcc2-rappel'); }
-    const statusBadge = document.getElementById('status-badge-' + id);
-    if (statusBadge) { statusBadge.className = 'vcc2-banner vcc2-banner-rappel'; statusBadge.textContent = '● Rappel J-1 à envoyer'; }
-    const rappelBtn = document.getElementById('btn-rappel-' + id);
-    if (rappelBtn) rappelBtn.style.display = '';
     fetch(`/api/visits/${id}/reminder`, {method:'POST'}).catch(()=>{});
+    renderVisits();
   }
 }
 
@@ -3072,9 +3143,9 @@ function renderAvailMonth() {
   const monthSlots=availSlots.filter(s=>s.date.startsWith(key)&&s.date>=todayKey).sort((a,b)=>a.date.localeCompare(b.date)||a.start.localeCompare(b.start));
   const list=document.getElementById('availSlotList');
 
-  // Update count badge
+  // Update count badge — affiche le total de créneaux futurs (tous mois)
   const badge=document.getElementById('dispoCountBadge');
-  if(badge){ const n=availSlots.length; badge.textContent=n+' créneau'+(n>1?'x':''); }
+  if(badge){ const n=availSlots.length; const nm=monthSlots.length; badge.textContent=n+' créneau'+(n>1?'x':'')+(nm<n?' ('+nm+' ce mois)':''); }
 
   const svgX=`<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>`;
   const svgClock=`<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>`;
@@ -3112,8 +3183,8 @@ document.getElementById('availSlotList').addEventListener('click',function(e) {
   const itemEl=btn.closest('.avail-slot-item,.avail-slot2,.dispo-slot-row');
   if (itemEl) {
     itemEl.classList.add('removing');
-    itemEl.addEventListener('animationend',()=>{ availSlots.splice(idx,1); persistAvail('Créneau supprimé'); renderAvailMonth(); },{once:true});
-  } else { availSlots.splice(idx,1); persistAvail('Créneau supprimé'); renderAvailMonth(); }
+    itemEl.addEventListener('animationend',()=>{ availSlots.splice(idx,1); persistAvail('Créneau supprimé'); renderCalendar(); },{once:true});
+  } else { availSlots.splice(idx,1); persistAvail('Créneau supprimé'); renderCalendar(); }
 });
 
 // availPrev/availNext redirigent vers la navigation du calendrier (navigation unifiée)
@@ -3131,8 +3202,8 @@ document.getElementById('addAvailSlot').addEventListener('click',()=>{
   if (start>=end) { showToast('L\'heure de fin doit être après le début','error'); return; }
   availSlots.push({date,start,end});
   const d=new Date(date+'T00:00:00');
-  availMonth=new Date(d.getFullYear(),d.getMonth(),1);
-  persistAvail('Créneau ajouté ✓'); renderAvailMonth();
+  calDate=new Date(d.getFullYear(),d.getMonth(),1);
+  persistAvail('Créneau ajouté ✓'); renderCalendar();
 });
 
 function persistAvail(msg) {
@@ -3434,6 +3505,58 @@ function copyBookingLink() {
   });
   showToast('Message copié !');
 }
+function populateDispoMsg() {
+  const url = (document.getElementById('bookingLink')||{}).value || '';
+  const firstName = _data?.seller?.first_name || '';
+  const lastName = _data?.seller?.last_name || '';
+  const name = [firstName, lastName].filter(Boolean).join(' ') || 'Votre vendeur';
+  const msg = `Bonjour, voici le lien pour réserver directement une date de visite selon mes disponibilités : ${url}\n\nCordialement,\n${name}`;
+  const bubble = document.getElementById('dispoMsgBubble');
+  if (bubble) bubble.textContent = msg;
+}
+function copyDispoMsg(btn) {
+  const bubble = document.getElementById('dispoMsgBubble');
+  const msg = bubble?.textContent || '';
+  if (!msg) return;
+  navigator.clipboard.writeText(msg).catch(()=>{
+    const tmp=document.createElement('textarea');tmp.value=msg;document.body.appendChild(tmp);tmp.select();document.execCommand('copy');document.body.removeChild(tmp);
+  });
+  btn.innerHTML = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Copié !';
+  btn.classList.add('copied');
+  setTimeout(()=>{ btn.innerHTML = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Copier le message'; btn.classList.remove('copied'); }, 2500);
+}
+
+function openSmsAvail() {
+  const url = (document.getElementById('bookingLink')||{}).value || '';
+  const firstName = _data?.seller?.first_name || '';
+  const adresse = _data?.property?.address || 'mon bien';
+  const msg = `Bonjour,\n\nJe suis en train de vendre mon bien (${adresse}) et je propose des creneaux de visite.\n\nVous pouvez reserver directement le creneau qui vous convient ici : ${url}\n\nCordialement,\n${firstName}`;
+  document.getElementById('smsAvailBubble').textContent = msg;
+  document.getElementById('smsAvailBubble')._msg = msg;
+  const sendBtn = document.getElementById('smsAvailSendBtn');
+  if (url) {
+    sendBtn.href = 'sms:?body=' + encodeURIComponent(msg);
+    sendBtn.style.display = 'flex';
+  } else {
+    sendBtn.style.display = 'none';
+  }
+  const copyBtn = document.getElementById('smsAvailCopyBtn');
+  copyBtn.textContent = 'Copier le message';
+  copyBtn.classList.remove('copied');
+  const ov = document.getElementById('smsAvailOverlay');
+  ov.classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function copySmsAvail(btn) {
+  const msg = document.getElementById('smsAvailBubble')._msg || document.getElementById('smsAvailBubble').textContent;
+  navigator.clipboard.writeText(msg).catch(()=>{
+    const tmp=document.createElement('textarea');tmp.value=msg;document.body.appendChild(tmp);tmp.select();document.execCommand('copy');document.body.removeChild(tmp);
+  });
+  btn.innerHTML = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:5px;"><polyline points="20 6 9 17 4 12"/></svg>Copié !';
+  btn.classList.add('copied');
+  setTimeout(()=>{ btn.innerHTML='<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:middle;margin-right:5px;"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>Copier le message'; btn.classList.remove('copied'); }, 2500);
+}
 
 function copyCalFeed() {
   const input=document.getElementById('calFeedUrl');
@@ -3549,6 +3672,7 @@ async function loadData() {
     availSlots = availSlots.filter(s => s.date >= _today);
     if (availSlots.length < _before) persistAvail();
     renderAvailMonth();
+    if (typeof populateDispoMsg === 'function') populateDispoMsg();
 
   } catch(e) { showToast('Erreur de chargement','error'); }
 }
@@ -3928,6 +4052,6 @@ loadData().then(() => {
 </script>
 
 <link rel="stylesheet" href="/css/seller-header-typography.css?v=1">
-<script src="/js/agenda-premium.js?v=91"></script>
+<script src="/js/agenda-premium.js?v=96"></script>
 </body>
 </html>

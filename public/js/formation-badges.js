@@ -23,8 +23,8 @@
         ? '/images/formation/valeur/badge-outil-transparent.png'
         : '/images/formation/badges/' + files[kind];
       badge.alt = kind === 'outil' ? 'Votre outil Vendu Par Moi' : 'Votre avantage Vendu Par Moi';
-      badge.width = 989;
-      badge.height = 419;
+      badge.width = kind === 'avantage' ? 1854 : 1986;
+      badge.height = kind === 'avantage' ? 848 : 792;
       badge.decoding = 'async';
     }
     let header = target.parentElement;

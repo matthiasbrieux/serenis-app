@@ -40,30 +40,49 @@ if("scrollRestoration"in history)history.scrollRestoration="manual";</script>
     .stat-label { font-size: 0.78rem; color: #999; margin-top: 6px; font-weight: 500; }
     .stat-sub { font-size: 0.72rem; color: #bbb; margin-top: 3px; }
 
-    /* ── Invite card ─────────────────────────────────────── */
-    .invite-card { background: #fff; border-radius: 20px; border: 1px solid #ebe6df; overflow: hidden; margin-bottom: 32px; box-shadow: 0 4px 24px rgba(0,0,0,0.06); }
-    .invite-hdr { background: linear-gradient(135deg, var(--terracotta-dark) 0%, var(--terracotta) 100%); padding: 20px 28px; display: flex; align-items: center; gap: 12px; }
-    .invite-hdr-icon { width: 36px; height: 36px; border-radius: 10px; background: rgba(255,255,255,0.12); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-    .invite-hdr-text { flex: 1; }
-    .invite-hdr-title { font-size: 0.9rem; font-weight: 700; color: #fff; letter-spacing: 0.02em; }
-    .invite-hdr-sub { font-size: 0.76rem; color: rgba(255,255,255,0.6); margin-top: 2px; }
-    .invite-body { padding: 28px; display: grid; grid-template-columns: 1fr 1fr; gap: 28px; }
-    @media(max-width:700px) { .invite-body { grid-template-columns: 1fr; } }
-    .invite-section-label { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: #bbb; margin-bottom: 10px; }
-    .invite-link-row { display: flex; gap: 10px; align-items: stretch; }
-    .invite-link-input { flex: 1; background: #F5F0E8; font-size: 0.82rem; padding: 12px 14px; border: 1.5px solid #e0d8cc; border-radius: 10px; font-family: 'Inter', sans-serif; color: var(--terracotta); outline: none; font-weight: 500; min-width: 0; }
-    .invite-link-input:focus { border-color: var(--terracotta); }
-    .btn-copy-link { padding: 12px 20px; background: var(--terracotta); color: #fff; border: none; border-radius: 10px; font-size: 0.84rem; font-weight: 700; cursor: pointer; font-family: 'Inter', sans-serif; white-space: nowrap; transition: background 0.15s; display: flex; align-items: center; gap: 6px; }
-    .btn-copy-link:hover { background: #2a4030; }
-    .btn-copy-link.copied { background: #059669; }
-    .invite-link-hint { font-size: 0.75rem; color: #bbb; margin-top: 8px; line-height: 1.5; }
-    .invite-sms-preview { background: #F5F0E8; border: 1.5px solid #e0d8cc; border-radius: 10px; padding: 14px; font-size: 0.82rem; color: #444; line-height: 1.65; min-height: 72px; margin-bottom: 12px; }
-    .invite-sms-actions { display: flex; gap: 8px; }
-    .btn-copy-sms { padding: 10px 18px; background: #F5F0E8; color: var(--terracotta); border: 1.5px solid rgba(158,58,24,0.12); border-radius: 10px; font-size: 0.82rem; font-weight: 600; cursor: pointer; font-family: 'Inter', sans-serif; transition: all 0.15s; display: flex; align-items: center; gap: 6px; }
-    .btn-copy-sms:hover { background: rgba(158,58,24,0.06); }
-    .btn-copy-sms.copied { background: #ecfdf5; color: #059669; border-color: #a7f3d0; }
-    .btn-send-sms-link { padding: 10px 16px; background: #fff; color: #555; border: 1.5px solid #e8e3db; border-radius: 10px; font-size: 0.82rem; font-weight: 600; cursor: pointer; font-family: 'Inter', sans-serif; transition: all 0.15s; display: flex; align-items: center; gap: 6px; text-decoration: none; }
-    .btn-send-sms-link:hover { border-color: var(--terracotta); color: var(--terracotta); }
+    /* ── Invite card (premium) ───────────────────────────── */
+    .oic-card{background:linear-gradient(135deg,#FDF7F2 0%,#F8EDE3 100%);border-radius:20px;padding:36px 40px 32px;position:relative;overflow:hidden;border:1px solid rgba(196,96,58,0.12);}
+    .oic-badge{width:52px;height:52px;background:#9E3A18;border-radius:14px;display:flex;align-items:center;justify-content:center;color:#fff;margin-bottom:18px;}
+    .oic-title{font-family:'Cormorant Garamond',serif;font-size:2.2rem;font-weight:700;color:#1a1a1a;margin:0 0 10px;line-height:1.15;max-width:500px;}
+    .oic-accent{color:#C4603A;}
+    .oic-sub{font-size:0.88rem;color:#777;line-height:1.65;margin:0 0 26px;max-width:480px;}
+    .oic-link-label{font-size:0.68rem;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:#bbb;margin-bottom:10px;}
+    .oic-link-row{display:flex;gap:10px;align-items:stretch;margin-bottom:10px;}
+    .oic-link-input-wrap{flex:1;position:relative;display:flex;align-items:center;min-width:0;}
+    .oic-link-input-wrap svg{position:absolute;left:13px;color:#bbb;pointer-events:none;flex-shrink:0;}
+    .oic-link-input{width:100%;padding:13px 14px 13px 38px;background:rgba(255,255,255,0.85);border:1.5px solid #e0d8cc;border-radius:12px;font-size:0.82rem;color:#555;font-family:'Inter',sans-serif;font-weight:500;outline:none;min-width:0;}
+    .oic-link-input:focus{border-color:var(--terracotta);}
+    .oic-btn-copy{padding:13px 24px;background:#7a2f0e;color:#fff;border:none;border-radius:12px;font-size:0.875rem;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;white-space:nowrap;transition:background 0.15s;}
+    .oic-btn-copy:hover{background:#5e2409;}
+    .oic-btn-copy.copied{background:#059669;}
+    .oic-link-hint{display:flex;align-items:flex-start;gap:7px;font-size:0.76rem;color:#999;line-height:1.5;margin-bottom:22px;}
+    .oic-link-hint svg{flex-shrink:0;margin-top:1px;color:#C4603A;}
+    .oic-sms-details{border-top:1px solid rgba(196,96,58,0.15);padding-top:18px;}
+    .oic-sms-summary{display:flex;align-items:center;gap:9px;font-size:0.875rem;font-weight:600;color:#444;cursor:pointer;list-style:none;user-select:none;}
+    .oic-sms-summary::-webkit-details-marker{display:none;}
+    .oic-sms-chevron{margin-left:auto;color:#bbb;font-size:1.1rem;transition:transform 0.2s;font-family:sans-serif;}
+    .oic-sms-details[open] .oic-sms-chevron{transform:rotate(90deg);}
+    .oic-sms-body{padding-top:16px;}
+    .oic-msg-badge{display:inline-flex;align-items:center;gap:6px;padding:3px 11px 3px 8px;border-radius:100px;background:rgba(158,58,24,0.08);border:1px solid rgba(158,58,24,0.16);color:var(--terracotta);font-size:.67rem;font-weight:700;letter-spacing:.09em;text-transform:uppercase;margin-bottom:10px;}
+    .oic-msg-title{font-size:.82rem;font-weight:600;color:#302A26;margin:0 0 10px;}
+    .oic-msg-bubble-wrap{border:1.5px solid #d8cdc3;border-radius:14px;overflow:hidden;margin-bottom:12px;}
+    .oic-msg-bubble{background:#1a56db;padding:16px 18px;font-size:.82rem;color:#fff;line-height:1.7;white-space:pre-wrap;max-height:220px;overflow-y:auto;}
+    .oic-msg-copy-btn{background:var(--terracotta);border:0;border-radius:10px;min-height:46px;padding:12px;color:#fff;font:700 .875rem/1.5 'DM Sans',Arial,sans-serif;cursor:pointer;width:100%;text-align:center;transition:background .15s;margin-bottom:8px;}
+    .oic-msg-copy-btn:hover{background:#7d2e12;}
+    .oic-msg-copy-btn.copied{background:#2e7d32;}
+    .oic-msg-note{font-size:.72rem;color:#aaa;text-align:center;margin:0;}
+    /* invite card illustration */
+    .oic-illus{position:absolute;right:24px;top:16px;width:200px;height:185px;pointer-events:none;}
+    @media(max-width:900px){.oic-illus{display:none;} .oic-card{padding:26px 20px 26px;} .oic-title{font-size:1.7rem;}}
+    .oic-illus-card{position:absolute;top:18px;left:18px;width:128px;background:#fff;border-radius:16px;padding:14px 12px 12px;box-shadow:0 10px 32px rgba(48,42,38,0.14),0 2px 8px rgba(48,42,38,0.06);transform:rotate(-7deg);}
+    .oic-illus-plane{width:32px;height:32px;background:rgba(196,96,58,0.12);border-radius:9px;display:flex;align-items:center;justify-content:center;color:#C4603A;margin-bottom:10px;}
+    .oic-illus-line{height:6px;background:#F0E8DF;border-radius:4px;margin-bottom:6px;}
+    .oic-illus-line:last-child{margin-bottom:0;}
+    .oic-illus-dashes{position:absolute;top:6px;right:4px;display:flex;flex-direction:column;gap:5px;transform:rotate(-35deg);}
+    .oic-illus-dashes span{display:block;height:3px;background:#D96040;border-radius:2px;opacity:0.65;}
+    .oic-illus-dashes span:nth-child(1){width:20px;}
+    .oic-illus-dashes span:nth-child(2){width:13px;}
+    .oic-illus-dashes span:nth-child(3){width:8px;}
 
     /* ── Section headers ─────────────────────────────────── */
     .section-hdr { display: flex; align-items: center; gap: 12px; margin: 36px 0 16px; }
@@ -189,7 +208,8 @@ if("scrollRestoration"in history)history.scrollRestoration="manual";</script>
     /* Step cards */
     .oes-steps{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;}
     @media(max-width:700px){.oes-steps{grid-template-columns:1fr;}}
-    .oes-step{background:#fff;border:1px solid #EBE5DF;border-radius:16px;padding:18px 16px;display:flex;align-items:flex-start;gap:14px;}
+    .oes-step{background:#fff;border:1px solid #EBE5DF;border-radius:16px;padding:18px 16px;display:flex;align-items:flex-start;gap:14px;text-decoration:none;color:inherit;cursor:pointer;transition:border-color .15s,box-shadow .15s;}
+    .oes-step:hover{border-color:#C4603A;box-shadow:0 4px 16px rgba(196,96,58,0.10);}
     .oes-step-ico-wrap{position:relative;flex-shrink:0;}
     .oes-step-ico{width:44px;height:44px;background:rgba(196,96,58,0.10);border-radius:12px;display:flex;align-items:center;justify-content:center;color:#C4603A;}
     .oes-step-num{position:absolute;top:-5px;right:-5px;width:18px;height:18px;background:#9E3A18;border-radius:5px;color:#fff;font-size:0.68rem;font-weight:700;display:flex;align-items:center;justify-content:center;font-family:'DM Sans',sans-serif;line-height:1;}
@@ -259,7 +279,7 @@ if("scrollRestoration"in history)history.scrollRestoration="manual";</script>
     }
     @media (pointer: coarse) {
       .btn-accept, .btn-counter, .btn-refuse, .btn-delete { min-height: 52px; touch-action: manipulation; }
-      .btn-copy-link, .btn-copy-sms, .btn-send-sms-link { min-height: 52px; touch-action: manipulation; }
+      .oic-btn-copy, .btn-copy-sms, .btn-send-sms-link { min-height: 52px; touch-action: manipulation; }
       .invite-link-input, .counter-input, .accept-textarea { font-size: 1rem !important; }
       .sms-modal-btn-send, .sms-modal-btn-close, .btn-copy-accept, .btn-close-accept { min-height: 52px; touch-action: manipulation; }
     }
@@ -329,17 +349,29 @@ if("scrollRestoration"in history)history.scrollRestoration="manual";</script>
     .offr-hero-title em { font-style: italic; color: #9E3A18; }
     .offr-hero-sub { font-family:'Inter',sans-serif; font-size: 0.8125rem; color: #71645B; line-height: 1.8; margin: 0; max-width: 660px; }
 
-    /* ── Notaire card ─────────────────────────────────────── */
-    .notaire-card { background: #fff; border-radius: 20px; border: 1px solid #ebe6df; padding: 28px 32px; margin-bottom: 32px; box-shadow: 0 2px 12px rgba(0,0,0,0.04); }
-    .notaire-card-header { display: flex; align-items: center; gap: 14px; margin-bottom: 16px; }
-    .notaire-card-icon { width: 44px; height: 44px; border-radius: 12px; background: #F5F0E8; border: 1px solid #e8e3db; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-    .notaire-card-title { font-family: 'Inter', sans-serif; font-size: 1rem; font-weight: 700; color: var(--terracotta); line-height: 1.3; }
-    .notaire-card-text { font-size: 0.85rem; color: #555; line-height: 1.7; margin: 0 0 10px; }
-    .notaire-card-btn { display: flex; align-items: center; justify-content: space-between; gap: 10px; width: 100%; padding: 14px 20px; margin: 20px 0 14px; background: #7a2f0e; color: #fff; border: none; border-radius: 12px; font-size: 0.875rem; font-weight: 700; font-family: 'Inter', sans-serif; cursor: pointer; text-decoration: none; transition: background 0.15s; }
-    .notaire-card-btn:hover { background: #5e2409; }
-    .notaire-card-btn-left { display: flex; align-items: center; gap: 9px; }
-    .notaire-card-note { display: flex; align-items: flex-start; gap: 8px; font-size: 0.75rem; color: #999; line-height: 1.55; }
-    .notaire-card-note svg { flex-shrink: 0; margin-top: 1px; }
+    /* ── Notaire card (premium) ────────────────────────────── */
+    .onc-card{background:linear-gradient(135deg,#FDF7F2 0%,#F8EDE3 100%);border-radius:20px;padding:36px 40px 32px;position:relative;overflow:hidden;border:1px solid rgba(196,96,58,0.12);}
+    .onc-badge{width:52px;height:52px;background:rgba(196,96,58,0.12);border-radius:14px;display:flex;align-items:center;justify-content:center;color:#C4603A;margin-bottom:18px;}
+    .onc-title{font-family:'Cormorant Garamond',serif;font-size:2.2rem;font-weight:700;color:#1a1a1a;margin:0 0 20px;line-height:1.15;max-width:500px;}
+    .onc-accent{color:#C4603A;}
+    .onc-text{font-size:0.875rem;color:#666;line-height:1.75;margin:0 0 12px;max-width:520px;}
+    .onc-btn{display:flex;align-items:center;justify-content:space-between;gap:10px;width:100%;max-width:520px;padding:15px 22px;margin:24px 0 14px;background:#7a2f0e;color:#fff;border:none;border-radius:14px;font-size:0.9rem;font-weight:700;font-family:'Inter',sans-serif;cursor:pointer;text-decoration:none;transition:background 0.15s;}
+    .onc-btn:hover{background:#5e2409;}
+    .onc-btn-left{display:flex;align-items:center;gap:10px;}
+    .onc-note{display:flex;align-items:flex-start;gap:7px;font-size:0.74rem;color:#999;line-height:1.55;max-width:520px;}
+    .onc-note svg{flex-shrink:0;margin-top:1px;}
+    /* notaire card illustration */
+    .onc-illus{position:absolute;right:24px;top:16px;width:200px;height:185px;pointer-events:none;}
+    @media(max-width:900px){.onc-illus{display:none;} .onc-card{padding:26px 20px 26px;} .onc-title{font-size:1.7rem;}}
+    .onc-illus-card{position:absolute;top:18px;left:18px;width:128px;background:#fff;border-radius:16px;padding:14px 12px 12px;box-shadow:0 10px 32px rgba(48,42,38,0.14),0 2px 8px rgba(48,42,38,0.06);transform:rotate(-7deg);}
+    .onc-illus-icon{width:32px;height:32px;background:rgba(196,96,58,0.12);border-radius:9px;display:flex;align-items:center;justify-content:center;color:#C4603A;margin-bottom:10px;}
+    .onc-illus-line{height:6px;background:#F0E8DF;border-radius:4px;margin-bottom:6px;}
+    .onc-illus-line:last-child{margin-bottom:0;}
+    .onc-illus-dashes{position:absolute;top:6px;right:4px;display:flex;flex-direction:column;gap:5px;transform:rotate(-35deg);}
+    .onc-illus-dashes span{display:block;height:3px;background:#D96040;border-radius:2px;opacity:0.65;}
+    .onc-illus-dashes span:nth-child(1){width:20px;}
+    .onc-illus-dashes span:nth-child(2){width:13px;}
+    .onc-illus-dashes span:nth-child(3){width:8px;}
     </style>
     <div class="offr-hero">
       <div class="offr-hero-top">
@@ -407,88 +439,98 @@ if("scrollRestoration"in history)history.scrollRestoration="manual";</script>
       </div>
       <!-- 3 step cards -->
       <div class="oes-steps">
-        <div class="oes-step">
+        <a href="/mon-agenda" class="oes-step">
           <div class="oes-step-ico-wrap">
             <div class="oes-step-ico">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
             </div>
             <span class="oes-step-num">1</span>
           </div>
           <div class="oes-step-body">
-            <div class="oes-step-title">Partagez le lien d’offre</div>
-            <div class="oes-step-sub">Envoyez le lien ci-dessus à vos visiteurs dans les 48h après la visite.</div>
+            <div class="oes-step-title">Suivez vos visites</div>
+            <div class="oes-step-sub">Retrouvez toutes vos visites passées dans votre agenda pour ne perdre aucun contact.</div>
           </div>
           <span class="oes-step-chevron">›</span>
-        </div>
-        <div class="oes-step">
+        </a>
+        <a href="/mon-agenda" class="oes-step">
           <div class="oes-step-ico-wrap">
             <div class="oes-step-ico">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z"/><path d="m9 13 2 2 4-4"/></svg>
             </div>
             <span class="oes-step-num">2</span>
           </div>
           <div class="oes-step-body">
-            <div class="oes-step-title">Qualifiez vos acheteurs</div>
-            <div class="oes-step-sub">Avant la visite — financement, budget, délai.</div>
+            <div class="oes-step-title">Envoyez votre dossier acheteur</div>
+            <div class="oes-step-sub">Transmettez vos documents pour rassurer l’acheteur et l’encourager à formaliser son offre.</div>
           </div>
           <span class="oes-step-chevron">›</span>
-        </div>
-        <div class="oes-step">
+        </a>
+        <a href="#offreLinkCard" class="oes-step" onclick="openSmsSection(event)">
           <div class="oes-step-ico-wrap">
             <div class="oes-step-ico">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/><line x1="9" y1="11" x2="9.01" y2="11"/><line x1="12" y1="11" x2="12.01" y2="11"/><line x1="15" y1="11" x2="15.01" y2="11"/></svg>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
             </div>
             <span class="oes-step-num">3</span>
           </div>
           <div class="oes-step-body">
-            <div class="oes-step-title">Relancez avec un message</div>
-            <div class="oes-step-sub">Utilisez un message de votre bibliothèque pour déclencher une décision.</div>
+            <div class="oes-step-title">Partagez votre lien d’offre</div>
+            <div class="oes-step-sub">Envoyez ce lien pour centraliser toutes les propositions directement ici.</div>
           </div>
           <span class="oes-step-chevron">›</span>
-        </div>
+        </a>
       </div>
     </div>
 
-    <!-- Invite card -->
-    <div class="invite-card" id="offreLinkCard" style="display:none;">
-      <div class="invite-hdr">
-        <div class="invite-hdr-icon">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.8)" stroke-width="2" stroke-linecap="round"><polyline points="22 2 11 13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
-        </div>
-        <div class="invite-hdr-text">
-          <div class="invite-hdr-title">Invitez vos acheteurs à soumettre une offre</div>
-          <div class="invite-hdr-sub">Partagez ce lien après chaque visite — l’offre apparaît ici automatiquement</div>
+    <!-- Invite card (premium) -->
+    <div class="oic-card" id="offreLinkCard" style="display:none;">
+      <!-- Illustration top-right -->
+      <div class="oic-illus" aria-hidden="true">
+        <div class="oic-illus-dashes"><span></span><span></span><span></span></div>
+        <div class="oic-illus-card">
+          <div class="oic-illus-plane">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.24 12.24a6 6 0 0 0-8.49-8.49L5 10.5V19h8.5z"/><line x1="16" y1="8" x2="2" y2="22"/><line x1="17.5" y1="15" x2="9" y2="15"/></svg>
+          </div>
+          <div class="oic-illus-line" style="width:100%"></div>
+          <div class="oic-illus-line" style="width:78%"></div>
+          <div class="oic-illus-line" style="width:55%"></div>
         </div>
       </div>
-      <div class="invite-body">
-        <!-- Lien -->
-        <div>
-          <div class="invite-section-label">Votre lien d’offre</div>
-          <div class="invite-link-row">
-            <input type="text" id="offreLinkInput" readonly class="invite-link-input" placeholder="Chargement…">
-            <button class="btn-copy-link" id="btnCopyLink" onclick="copyOffreLink()">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
-              Copier
-            </button>
-          </div>
-          <div class="invite-link-hint">L’acheteur remplit le formulaire en ligne — aucune action de votre part requise.</div>
+      <h2 class="oic-title">Invitez vos acheteurs à soumettre <span class="oic-accent">une offre</span></h2>
+      <p class="oic-sub">Partagez ce lien après chaque visite — l’offre apparaît ici automatiquement</p>
+      <!-- Link -->
+      <div class="oic-link-label">Votre lien d’offre</div>
+      <div class="oic-link-row">
+        <div class="oic-link-input-wrap">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+          <input type="text" id="offreLinkInput" readonly class="oic-link-input" placeholder="Chargement…">
         </div>
-        <!-- SMS -->
-        <details class="vpm-sms-details">
-          <summary class="invite-section-label">Message SMS à envoyer</summary>
-          <div class="invite-sms-preview" id="smsPreview">Chargement…</div>
-          <div class="invite-sms-actions">
-            <button class="btn-copy-sms" id="btnCopySms" onclick="copySmsText()">
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
-              Copier le SMS
-            </button>
-            <a class="btn-send-sms-link" id="smsSendBtn" href="#">
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.41a2 2 0 0 1 2-2.18h3a2 2 0 0 1 2 1.72 12.13 12.13 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.13 12.13 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
-              Ouvrir SMS
-            </a>
-          </div>
-        </details>
+        <button class="oic-btn-copy" id="btnCopyLink" onclick="copyOffreLink()">Copier le lien</button>
       </div>
+      <div class="oic-link-hint">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        L’acheteur remplit le formulaire en ligne — aucune action de votre part requise.
+      </div>
+      <!-- SMS -->
+      <details class="oic-sms-details vpm-sms-details">
+        <summary class="oic-sms-summary">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+          Message SMS à envoyer
+          <span class="oic-sms-chevron">›</span>
+        </summary>
+        <div class="oic-sms-body">
+          <div class="oic-msg-badge">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><polyline points="9 16 11 18 15 14"/></svg>
+            Message prêt à l'envoi
+          </div>
+          <div class="oic-msg-title">Lien d'offre — soumettre une proposition</div>
+          <div class="oic-msg-bubble-wrap">
+            <div class="oic-msg-bubble" id="smsPreview">Chargement…</div>
+          </div>
+          <button class="oic-msg-copy-btn" id="btnCopySms" onclick="copySmsText()">Copier le message</button>
+          <p class="oic-msg-note">Aperçu · aucun message n'est envoyé.</p>
+          <a id="smsSendBtn" href="#" style="display:none;" aria-hidden="true"></a>
+        </div>
+      </details>
     </div>
 
     <!-- Offres actives -->
@@ -510,42 +552,94 @@ if("scrollRestoration"in history)history.scrollRestoration="manual";</script>
       <div class="offers-list" id="pastOffers"></div>
     </div>
 
-    <!-- Notaire card -->
-    <div class="notaire-card" id="notaireCard" style="display:none;">
-      <div class="notaire-card-header">
-        <div class="notaire-card-icon">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#9E3A18" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+    <!-- Notaire card (premium) -->
+    <div class="onc-card" id="notaireCard" style="display:none;">
+      <!-- Illustration top-right -->
+      <div class="onc-illus" aria-hidden="true">
+        <div class="onc-illus-dashes"><span></span><span></span><span></span></div>
+        <div class="onc-illus-card">
+          <div class="onc-illus-icon">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m16 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"/><path d="m2 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"/><path d="M7 21h10"/><path d="M12 3v18"/><path d="M3 7h2c2 0 5-1 7-2 2 1 5 2 7 2h2"/></svg>
+          </div>
+          <div class="onc-illus-line" style="width:100%"></div>
+          <div class="onc-illus-line" style="width:78%"></div>
+          <div class="onc-illus-line" style="width:55%"></div>
         </div>
-        <div class="notaire-card-title">Anticipez les démarches<br>chez le notaire</div>
       </div>
-      <p class="notaire-card-text">Votre offre est acceptée&nbsp;? Pour faciliter la préparation du compromis de vente, Vendu Par Moi met à votre disposition une fiche de renseignements d’état civil à compléter par vous et votre acheteur.</p>
-      <p class="notaire-card-text">Elle pourra ensuite être transmise à votre notaire afin d’anticiper les formalités et d’éviter des délais inutiles.</p>
-      <a class="notaire-card-btn" href="/ma-formation">
-        <span class="notaire-card-btn-left">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+      <h2 class="onc-title">Anticipez les démarches <span class="onc-accent">chez le notaire</span></h2>
+      <p class="onc-text">Votre offre est acceptée&nbsp;? Pour faciliter la préparation du compromis de vente, Vendu Par Moi met à votre disposition une fiche de renseignements d’état civil à compléter par vous et votre acheteur.</p>
+      <p class="onc-text">Elle pourra ensuite être transmise à votre notaire afin d’anticiper les formalités et d’éviter des délais inutiles.</p>
+      <a class="onc-btn" href="/ma-formation/documents/etat-civil" target="_blank">
+        <span class="onc-btn-left">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
           Consulter la fiche de renseignements
         </span>
         <span style="font-size:1.1rem;opacity:0.8;">›</span>
       </a>
-      <div class="notaire-card-note">
+      <div class="onc-note">
         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#999" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
         Les données personnelles doivent être transmises de manière sécurisée, directement à l’acheteur et à son notaire.
       </div>
+      <!-- SMS notaire -->
+      <details class="oic-sms-details" style="margin-top:20px;max-width:520px;">
+        <summary class="oic-sms-summary">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+          Message SMS à envoyer
+          <span class="oic-sms-chevron">›</span>
+        </summary>
+        <div class="oic-sms-body">
+          <div class="oic-msg-badge">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><polyline points="9 16 11 18 15 14"/></svg>
+            Message prêt à l’envoi
+          </div>
+          <div class="oic-msg-title">Fiche de renseignements — après acceptation</div>
+          <div class="oic-msg-bubble-wrap">
+            <div class="oic-msg-bubble" id="notaireSmsPreview">Chargement…</div>
+          </div>
+          <button class="oic-msg-copy-btn" id="btnCopyNotaireSms" onclick="copyNotaireSmsText()">Copier le message</button>
+          <p class="oic-msg-note">Aperçu · aucun message n’est envoyé.</p>
+        </div>
+      </details>
     </div>
 
     <section class="vpm-buyer-dossier" id="buyerDossierSection" style="display:none;" aria-labelledby="buyerDossierTitle">
-      <div class="vpm-buyer-art" aria-hidden="true"><svg viewBox="0 0 80 80" fill="none"><rect x="24" y="8" width="40" height="53" rx="5" fill="white" stroke="currentColor"/><path d="m34 29 10-8 10 8m-18-2v18h16V27m-13 18V34h6v11M34 51h19" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><path d="M9 38h24l7 7h30l-4 25H14L9 38Z" fill="#F0E3D5" stroke="currentColor" stroke-width="1.5"/><path d="M32 57h16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></div>
+      <div class="onc-illus" aria-hidden="true">
+        <div class="onc-illus-dashes"><span></span><span></span><span></span></div>
+        <div class="onc-illus-card">
+          <div class="onc-illus-icon">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z"/><path d="m9 13 2 2 4-4"/></svg>
+          </div>
+          <div class="onc-illus-line" style="width:100%"></div>
+          <div class="onc-illus-line" style="width:78%"></div>
+          <div class="onc-illus-line" style="width:55%"></div>
+        </div>
+      </div>
       <div class="vpm-buyer-copy">
         <span class="vpm-buyer-eyebrow">Conseil après la visite</span>
-        <h2 id="buyerDossierTitle">Envoyez votre dossier acheteur sérieux</h2>
+        <h2 id="buyerDossierTitle">Envoyez votre dossier <span style="color:#C4603A;">acheteur sérieux</span></h2>
         <p>Transmettez vos documents complémentaires pour répondre aux dernières questions, rassurer l’acheteur et l’aider à préparer son offre.</p>
         <span class="vpm-buyer-note" id="buyerDossierNote" aria-live="polite">Chargement du dossier…</span>
       </div>
-      <div class="vpm-buyer-actions">
-        <button type="button" id="buyerDossierCopy" onclick="copyBuyerDossier(this)" disabled>Copier le message et le lien</button>
-        <a id="buyerDossierPreview" target="_blank" rel="noopener noreferrer" aria-disabled="true">Voir le dossier acheteur ↗</a>
-        <a href="/mon-bien">Gérer mes documents →</a>
-      </div>
+      <details class="oic-sms-details" style="margin-top:16px;max-width:520px;">
+        <summary class="oic-sms-summary">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+          Message prêt à envoyer
+          <span class="oic-sms-chevron">›</span>
+        </summary>
+        <div class="oic-sms-body">
+          <div class="vbd-msg-header">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><polyline points="9 16 11 18 15 14"/></svg>
+            Message prêt à l’envoi
+          </div>
+          <div class="vbd-msg-title">Mon dossier complet</div>
+          <div class="vbd-msg-card">
+            <div class="vbd-msg-bubble" id="buyerDossierBubble"></div>
+          </div>
+          <button type="button" class="vbd-msg-copy-btn" id="buyerDossierCopy" onclick="copyBuyerDossier(this)" disabled>Copier le message et le lien</button>
+          <p class="vbd-msg-note">Aperçu · aucun message n’est envoyé.</p>
+          <a href="/mon-bien" class="vpm-buyer-actions-link" style="margin-top:4px;">Gérer mes documents →</a>
+        </div>
+      </details>
     </section>
 
     <!-- Chargement -->
@@ -658,13 +752,14 @@ function progressPct(offer, listing) {
 
 /* VPM buyer dossier — start */
 let buyerDossierUrl = '';
+let buyerDossierMsg = '';
 function setupBuyerDossier(property, documents) {
   buyerDossierUrl = '';
-  const preview = document.getElementById('buyerDossierPreview');
+  buyerDossierMsg = '';
   const button = document.getElementById('buyerDossierCopy');
   const note = document.getElementById('buyerDossierNote');
-  preview.removeAttribute('href');
-  preview.setAttribute('aria-disabled', 'true');
+  const bubble = document.getElementById('buyerDossierBubble');
+  if (!button) return;
   button.disabled = true;
   const docs = (Array.isArray(documents) ? documents : []).filter(doc => doc.folder === 'acheteur_serieux');
   note.textContent = property.acheteur_docs_visible !== 1
@@ -677,19 +772,19 @@ function setupBuyerDossier(property, documents) {
     url.hash = 'documents';
     if (property.acheteur_docs_visible !== 1 || !docs.length) return;
     buyerDossierUrl = url.href;
-    preview.href = buyerDossierUrl;
-    preview.removeAttribute('aria-disabled');
+    const signature = _sellerFullName || _sellerFirstName || 'Le propriétaire';
+    buyerDossierMsg = `Bonjour,\n\nSuite à votre visite, je vous transmets mes documents complémentaires pour vous accompagner dans votre réflexion et répondre à vos dernières questions :\n\n${buyerDossierUrl}\n\nN'hésitez pas à me contacter si vous souhaitez échanger.\n\nCordialement,\n${signature}`;
+    if (bubble) bubble.textContent = buyerDossierMsg;
     button.disabled = false;
   } catch (_) {}
 }
 async function copyBuyerDossier(button) {
-  if (!buyerDossierUrl) return;
-  const signature = _sellerFullName || _sellerFirstName || 'Le propriétaire';
-  const message = `Bonjour,\n\nSuite à votre visite, je vous transmets mes documents complémentaires pour vous accompagner dans votre réflexion et répondre à vos dernières questions :\n\n${buyerDossierUrl}\n\nN’hésitez pas à me contacter si vous souhaitez échanger.\n\nCordialement,\n${signature}`;
+  if (!buyerDossierMsg) return;
   try {
-    await navigator.clipboard.writeText(message);
+    await navigator.clipboard.writeText(buyerDossierMsg);
     button.textContent = 'Message et lien copiés !';
-    setTimeout(() => { button.textContent = 'Copier le message et le lien'; }, 2200);
+    button.classList.add('copied');
+    setTimeout(() => { button.textContent = 'Copier le message et le lien'; button.classList.remove('copied'); }, 2200);
     showToast('Message et lien copiés !', 'success');
   } catch (_) { showToast('Copie impossible. Consultez votre dossier dans Mon bien.', 'error'); }
 }
@@ -722,6 +817,7 @@ async function load() {
     fetch('/api/me').then(r => r.json()).then(meData => {
       _sellerFirstName = meData.seller?.first_name || '';
       _sellerFullName = [meData.seller?.first_name, meData.seller?.last_name].filter(Boolean).join(' ');
+      initNotaireSms();
     }).catch(() => {});
     return;
   }
@@ -1102,19 +1198,57 @@ function copyOffreLink() {
   });
 }
 
+function updateSmsPhone(phone) {
+  const smsText = document.getElementById('smsPreview')?.textContent || '';
+  const sendBtn = document.getElementById('smsSendBtn');
+  if (!sendBtn) return;
+  const ph = phone.replace(/\s/g, '');
+  sendBtn.href = ph ? `sms:${ph}?body=${encodeURIComponent(smsText)}` : `sms:?body=${encodeURIComponent(smsText)}`;
+}
+
 function copySmsText() {
   const text = document.getElementById('smsPreview')?.textContent;
   if (!text || text === 'Chargement…') return;
   const btn = document.getElementById('btnCopySms');
   navigator.clipboard.writeText(text).then(() => {
     if (btn) {
-      const orig = btn.innerHTML;
-      btn.innerHTML = SVG_CHECK + ' Copié !';
+      btn.textContent = 'Message copié !';
       btn.classList.add('copied');
-      setTimeout(() => { btn.innerHTML = orig; btn.classList.remove('copied'); }, 2200);
+      setTimeout(() => { btn.textContent = 'Copier le message'; btn.classList.remove('copied'); }, 2200);
     }
     showToast('Message copié !', 'success');
   });
+}
+
+let notaireSmsMsg = '';
+function initNotaireSms() {
+  const ficheUrl = window.location.origin + '/ma-formation/documents/etat-civil';
+  const signature = _sellerFullName || _sellerFirstName || '';
+  notaireSmsMsg = 'Bonjour,\n\nSuite à l\'acceptation de votre offre, voici la fiche de renseignements d\'état civil à compléter pour préparer le compromis de vente :\n\n' + ficheUrl + '\n\nMerci de la compléter et de la transmettre à votre notaire pour anticiper les formalités.\n\nCordialement,' + (signature ? '\n' + signature : '');
+  const el = document.getElementById('notaireSmsPreview');
+  if (el) el.textContent = notaireSmsMsg;
+}
+initNotaireSms();
+function copyNotaireSmsText() {
+  if (!notaireSmsMsg) return;
+  const btn = document.getElementById('btnCopyNotaireSms');
+  navigator.clipboard.writeText(notaireSmsMsg).then(() => {
+    if (btn) {
+      btn.textContent = 'Message copié !';
+      btn.classList.add('copied');
+      setTimeout(() => { btn.textContent = 'Copier le message'; btn.classList.remove('copied'); }, 2200);
+    }
+    showToast('Message copié !', 'success');
+  });
+}
+
+function openSmsSection(e) {
+  e.preventDefault();
+  const card = document.getElementById('offreLinkCard');
+  if (!card || card.style.display === 'none') return;
+  const details = card.querySelector('.oic-sms-details');
+  if (details) details.open = true;
+  card.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
 // Auto-marquer les notifs offre comme lues dès l'ouverture de la page
