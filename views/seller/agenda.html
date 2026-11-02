@@ -1566,6 +1566,40 @@ if("scrollRestoration"in history)history.scrollRestoration="manual";</script>
           <div class="vcr-dots" id="vcr-dots-past" style="display:none;"></div>
         </div>
 
+        <!-- Mes offres d'achat -->
+        <div id="agendaOffersSection" class="vpm-dashboard" style="padding:0;max-width:none;margin-bottom:0;">
+          <section class="mv-track-card" style="margin:0 0 14px;" aria-label="Mes offres d'achat">
+            <header>
+              <span class="mv-track-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2H5v20h14V8zM13 2v6h6M8 12h4M8 16h3M15 15l2 2 4-4"/></svg>
+              </span>
+              <div>
+                <h2>Mes offres d'achat</h2>
+                <p>Consultez et gérez les propositions reçues par les acheteurs.</p>
+              </div>
+            </header>
+            <div class="mv-counters">
+              <a href="/mes-offres" class="mv-counter">
+                <strong id="agendaOffers0">—</strong>
+                <span>En attente</span>
+              </a>
+              <a href="/mes-offres" class="mv-counter">
+                <strong id="agendaOffers1">—</strong>
+                <span>Acceptées</span>
+              </a>
+              <a href="/mes-offres" class="mv-counter">
+                <strong id="agendaOffers2">—</strong>
+                <span>Refusées</span>
+              </a>
+            </div>
+            <details class="mv-details">
+              <summary>Examiner les offres reçues</summary>
+              <div id="agendaOffersList"></div>
+            </details>
+            <a class="mv-primary" href="/mes-offres">Voir mes offres →</a>
+          </section>
+        </div>
+
         <!-- Visites annulées -->
         <div class="agenda-panel" id="cancelledSection" style="display:none;">
           <div class="agenda-panel-title" onclick="toggleCancelledSection()" style="cursor:pointer;user-select:none;">
@@ -3816,10 +3850,42 @@ function renderAgendaHero(seller, property) {
   }
 }
 
+function renderAgendaOffers(offers) {
+  const pending = offers.filter(o => o.status === 'pending').length;
+  const accepted = offers.filter(o => o.status === 'accepted').length;
+  const refused = offers.filter(o => o.status === 'refused').length;
+  const el = id => document.getElementById(id);
+  if (el('agendaOffers0')) el('agendaOffers0').textContent = pending;
+  if (el('agendaOffers1')) el('agendaOffers1').textContent = accepted;
+  if (el('agendaOffers2')) el('agendaOffers2').textContent = refused;
+  const list = el('agendaOffersList');
+  if (!list) return;
+  if (!offers.length) {
+    list.innerHTML = '<p style="font-size:0.83rem;color:#888;padding:4px 0 8px;">Aucune offre reçue pour le moment.</p>';
+    return;
+  }
+  list.replaceChildren();
+  const statusLabel = {pending:'En attente',accepted:'Acceptée',refused:'Refusée'};
+  const statusColor = {pending:'#C4603A',accepted:'#3D7A4A',refused:'#888'};
+  offers.slice(0, 5).forEach(o => {
+    const row = document.createElement('div');
+    row.style.cssText = 'display:flex;justify-content:space-between;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid #f0e8df;font-size:0.83rem;';
+    const price = o.amount ? new Intl.NumberFormat('fr-FR').format(o.amount) + ' €' : '—';
+    row.innerHTML = `<span style="color:#3a3530;">${price}</span><span style="font-weight:700;color:${statusColor[o.status]||'#888'};">${statusLabel[o.status]||o.status}</span>`;
+    list.append(row);
+  });
+  if (offers.length > 5) {
+    const more = document.createElement('p');
+    more.style.cssText = 'font-size:0.78rem;color:#888;margin:8px 0 0;text-align:center;';
+    more.textContent = `+ ${offers.length - 5} autre${offers.length - 5 > 1 ? 's' : ''} offre${offers.length - 5 > 1 ? 's' : ''}`;
+    list.append(more);
+  }
+}
+
 // ── Data loading ──────────────────────────────────────
 async function loadData() {
   try {
-    const [overviewRes,agendaRes]=await Promise.all([fetch('/api/connect/overview'),fetch('/api/agenda')]);
+    const [overviewRes,agendaRes,offersRes]=await Promise.all([fetch('/api/connect/overview'),fetch('/api/agenda'),fetch('/api/mes-offres')]);
     _data=await overviewRes.json();
     allVisits=_data.visits||[];
     // ── Ma vente en 5 clics — données ──────────────────────────
@@ -3866,6 +3932,8 @@ async function loadData() {
     renderVisits();
     renderContacts();
     renderNotifSidebar();
+    const offersData = await offersRes.json();
+    renderAgendaOffers(offersData.offers || []);
     renderMcTabs();
     renderMcCards();
 
