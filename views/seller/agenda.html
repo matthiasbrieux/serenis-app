@@ -1169,6 +1169,10 @@ if("scrollRestoration"in history)history.scrollRestoration="manual";</script>
       background: var(--terracotta); width: 10px; height: 10px;
     }
   }
+  /* Fusion ap-top + ap-calendar-section */
+  .ap-agenda .ap-calendar-section { padding-top: 0; overflow: visible; }
+  .ap-agenda .ap-calendar-section .ap-top { margin: 0; padding: 0; }
+  body.vpm-agenda-page .ap-agenda .ap-calendar-section .aph { border-bottom: 1px solid #E8D9CC !important; padding: 20px 18px 20px !important; margin-bottom: 0 !important; }
   /* Corrige le sticky de #pastSection qui couvre #agendaOffersSection */
   .ap-agenda #pastSection { position: static; }
   /* Carte Mes offres d'achat — design premium */
@@ -4469,10 +4473,12 @@ document.getElementById('stepMsgModal').addEventListener('click', function(e) {
   var block = document.getElementById('fiveClicksWrapper');
   var tabs = document.querySelector('.ap-agenda-tabs');
   if (block && tabs) tabs.before(block);
-  /* Bandeau .aph (Mon agenda + illustration) entre Mes disponibilités et Mon agenda */
+  /* Fusionne ap-top (.aph) avec ap-calendar-section — supprime le doublon h2 */
   var apTop = document.querySelector('.ap-top');
   var calSection = document.querySelector('.ap-calendar-section');
-  if (apTop && calSection) calSection.before(apTop);
+  if (apTop && calSection) calSection.prepend(apTop);
+  var calHeading = calSection && calSection.querySelector('.ap-calendar-heading');
+  if (calHeading) calHeading.hidden = true;
   /* agenda-premium.js déplace #pastSection dans actionCol — y placer la carte offres juste après */
   var offers = document.getElementById('agendaOffersSection');
   var past = document.getElementById('pastSection');
