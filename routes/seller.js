@@ -61,7 +61,7 @@ router.use('/ma-formation/documents', requireAuth, require('./formation-document
 router.get('/ma-formation', requireAuth, (req, res) => res.sendFile('library.html', { root: './views/seller' }));
 router.get('/ma-formation/plaquette', requireAuth, (req, res) => res.sendFile('plaquette.html', { root: './views/seller' }));
 router.get('/coaching-vpm', requireAuth, (req, res) => res.sendFile('coaching-vpm.html', { root: './views/seller' }));
-router.get('/mon-agenda', requireAuth, (req, res) => res.sendFile('agenda.html', { root: './views/seller' }));
+router.get('/mon-agenda', requireAuth, (req, res) => { res.set('Cache-Control', 'no-store, no-cache, must-revalidate'); res.sendFile('agenda.html', { root: './views/seller' }); });
 router.get('/ma-bibliotheque', requireAuth, (req, res) => res.sendFile('biblio.html', { root: './views/seller' }));
 router.get('/onboarding', requireAuth, (req, res) => {
   const row = db.prepare('SELECT onboarding_done FROM sellers WHERE id=?').get(req.seller.id);
