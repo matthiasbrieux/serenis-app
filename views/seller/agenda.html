@@ -1126,7 +1126,11 @@ if("scrollRestoration"in history)history.scrollRestoration="manual";</script>
   /* Aligne le rendu exact du tableau de bord — fond transparent, carte utilisateur en left-border */
   /* Police gérée par seller-header-typography.css (même règles !important que le tableau de bord) */
   #agendaHero .dash-hero { background: transparent !important; border: 0 !important; border-radius: 0 !important; padding: 0 0 18px !important; }
-  #agendaHero .dash-hero-title { margin: 12px 0 !important; }
+  /* dashboard-premium.css impose font-weight:600 sur .vpm-dashboard .dash-hero-title
+     mais Cormorant Garamond n'existe qu'en 500 → synthèse artificielle = texte trop gras.
+     On force explicitement les mêmes valeurs que seller-header-typography.css. */
+  #agendaHero .dash-hero-title { font-family:'Cormorant Garamond',serif !important; font-weight:500 !important; font-size:clamp(2.25rem,4.5vw,4.5rem) !important; font-style:normal !important; line-height:1.07 !important; letter-spacing:-.025em !important; color:#111111 !important; margin: 12px 0 !important; }
+  #agendaHero .dash-hero-title em { font-family:'Cormorant Garamond',serif !important; font-weight:500 !important; font-style:italic !important; color:#9E3A18 !important; }
   #agendaHero .dash-hero-welcome { margin: 0 !important; }
   #agendaHero #dbUserCard { background: transparent !important; border: 0 !important; border-left: 1px solid rgba(158,58,24,0.15) !important; border-radius: 0 !important; padding: 8px 16px !important; min-width: 220px !important; max-width: 300px !important; }
   @media (max-width: 768px) {
