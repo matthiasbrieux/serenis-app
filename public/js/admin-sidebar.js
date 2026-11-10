@@ -12,44 +12,55 @@
     key:       '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 11-7.778 7.778 5.5 5.5 0 017.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg>',
     vrp:       '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="3"/><path d="M6 20v-1a6 6 0 0112 0v1"/><path d="M18 8h3M18 12h3"/></svg>',
     logout:    '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/></svg>',
-    chevron:   '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>',
-    house:     '<svg width="20" height="20" viewBox="0 0 32 32"><path d="M16 2L3 13v17h8v-8h10v8h8V13L16 2z" fill="rgba(255,255,255,0.9)"/></svg>',
+    chevron:   '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>',
     settings:  '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>',
     users2:    '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>',
+    external:  '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>',
+    menu:      '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>',
+    close:     '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>',
   };
 
-  // ── Navigation groupée en 5 sections ───────────────────────────────────
-  var NAV_GROUPS = [
+  // ── 5 rubriques principales ──────────────────────────────────
+  var SECTIONS = [
     {
-      label: 'Cockpit',
+      label: 'Tableau de bord',
+      href: '/admin',
+      icon: 'dashboard',
+      exact: true,
+    },
+    {
+      label: 'Suivi vendeurs',
+      icon: 'crm',
+      id: 'vendeurs',
       items: [
-        { label: 'Tableau de bord', href: '/admin', icon: 'dashboard', exact: true },
+        { label: 'Dossiers vendeurs',  href: '/admin/crm',          icon: 'users2'  },
+        { label: 'Photos & missions',  href: '/admin/photographers', icon: 'camera'  },
+        { label: 'Rappels',            href: '/admin/rappels',       icon: 'phone'   },
       ]
     },
     {
-      label: 'Vendeurs',
+      label: 'Emails & auto',
+      icon: 'mail',
+      id: 'emails',
       items: [
-        { label: 'Suivi vendeurs',    href: '/admin/crm',          icon: 'crm'    },
-        { label: 'Photos & missions', href: '/admin/photographers', icon: 'camera' },
-        { label: 'Rappels',           href: '/admin/rappels',       icon: 'phone'  },
-      ]
-    },
-    {
-      label: 'Communications',
-      items: [
-        { label: 'Emails & auto',  href: '/admin/emails',    icon: 'mail'      },
-        { label: 'Marketing',      href: '/admin/marketing', icon: 'marketing' },
+        { label: 'Emails',    href: '/admin/emails',    icon: 'mail'      },
+        { label: 'Marketing', href: '/admin/marketing', icon: 'marketing' },
       ]
     },
     {
       label: 'Réseau VRP',
+      icon: 'vrp',
+      id: 'vrp',
       items: [
-        { label: 'VRP & commissions', href: '/admin/vrp',         icon: 'vrp'    },
-        { label: 'Prospection',       href: '/admin/prospection',  icon: 'target' },
+        { label: 'VRP & commissions', href: '/admin/vrp',         icon: 'vrp'      },
+        { label: 'Prospection',       href: '/admin/prospection',  icon: 'target'   },
+        { label: 'Espace VRP',        href: '/vrp',               icon: 'external' },
       ]
     },
     {
       label: 'Finances',
+      icon: 'finance',
+      id: 'finances',
       items: [
         { label: 'Finance',    href: '/admin/finance',    icon: 'finance' },
         { label: 'Parrainage', href: '/admin/parrainage', icon: 'gift'    },
@@ -57,71 +68,137 @@
     },
   ];
 
-  // ── Liens secondaires dans le pied de sidebar ──────────────────────────
   var FOOTER_ITEMS = [
-    { label: 'Numéros IA',   href: '/admin/numbers',     icon: 'settings' },
-    { label: 'Espace VRP',   href: '/vrp',               icon: 'vrp'      },
-    { label: 'Mon compte',   href: '/admin/mon-compte',  icon: 'key'      },
-    { label: 'Déconnexion',  href: '/admin/logout',      icon: 'logout'   },
+    { label: 'Paramètres',  href: '/admin/mon-compte', icon: 'settings' },
+    { label: 'Déconnexion', href: '/admin/logout',     icon: 'logout'   },
   ];
 
+  // ── Helpers ───────────────────────────────────────────────────
   function isActive(href, exact) {
-    if (href.includes('#')) return false;
+    if (!href || href.includes('#') || href === '/vrp') return false;
     var path = window.location.pathname;
     if (exact || href === '/admin') return path === href;
     return path === href || path.startsWith(href + '/');
   }
 
-  function navLink(item) {
-    var active = isActive(item.href, item.exact) ? ' active' : '';
-    return '<a href="' + item.href + '" class="' + active + '" data-label="' + item.label + '">'
-      + ICONS[item.icon]
-      + '<span class="adm-label">' + item.label + '</span>'
-      + '</a>';
+  function isSectionActive(section) {
+    if (section.href) return isActive(section.href, section.exact);
+    return (section.items || []).some(function (item) { return isActive(item.href); });
+  }
+
+  // ── Build HTML ────────────────────────────────────────────────
+  function buildSection(section) {
+    // Direct link (Tableau de bord)
+    if (!section.items) {
+      var active = isActive(section.href, section.exact) ? ' active' : '';
+      return '<a href="' + section.href + '" class="adm-section-link' + active + '" data-label="' + section.label + '">'
+        + ICONS[section.icon]
+        + '<span class="adm-label">' + section.label + '</span>'
+        + '</a>';
+    }
+
+    var open = isSectionActive(section) ? ' open' : '';
+    var subItems = section.items.map(function (item) {
+      var active = isActive(item.href) ? ' active' : '';
+      var ext = item.href === '/vrp' ? ' <span class="adm-ext">' + ICONS.external + '</span>' : '';
+      return '<a href="' + item.href + '" class="adm-subitem' + active + '" data-label="' + item.label + '">'
+        + ICONS[item.icon]
+        + '<span class="adm-sublabel">' + item.label + ext + '</span>'
+        + '</a>';
+    }).join('');
+
+    return '<div class="adm-section' + open + '" id="adm-sec-' + section.id + '">'
+      + '<button class="adm-section-btn" data-label="' + section.label + '" onclick="admToggleSection(\'' + section.id + '\')">'
+      + ICONS[section.icon]
+      + '<span class="adm-label">' + section.label + '</span>'
+      + '<span class="adm-chevron-wrap">' + ICONS.chevron + '</span>'
+      + '</button>'
+      + '<div class="adm-subnav">' + subItems + '</div>'
+      + '</div>';
   }
 
   function buildSidebar() {
-    var navHtml = '';
-    NAV_GROUPS.forEach(function(group) {
-      navHtml += '<div class="adm-group-title">' + group.label + '</div>';
-      group.items.forEach(function(item) {
-        navHtml += navLink(item);
-      });
-    });
-
-    var footerHtml = FOOTER_ITEMS.map(navLink).join('');
+    var navHtml = SECTIONS.map(buildSection).join('');
+    var footerHtml = FOOTER_ITEMS.map(function (item) {
+      return '<a href="' + item.href + '" class="adm-section-link" data-label="' + item.label + '">'
+        + ICONS[item.icon]
+        + '<span class="adm-label">' + item.label + '</span>'
+        + '</a>';
+    }).join('');
 
     return ''
+      + '<div class="adm-mobile-overlay" id="adm-mobile-overlay"></div>'
+      + '<button class="adm-mobile-btn" id="adm-mobile-btn" aria-label="Menu">' + ICONS.menu + '</button>'
       + '<aside class="admin-sidebar" id="admin-sidebar">'
       + '  <div class="adm-logo">'
       + '    <img src="/images/vendu-par-moi.svg" alt="Vendu Par Moi" class="adm-logo-img">'
       + '    <span class="adm-logo-sub">Administration</span>'
       + '  </div>'
       + '  <div class="adm-toggle">'
-      + '    <button class="adm-toggle-btn" id="adm-toggle-btn" title="Réduire la sidebar">' + ICONS.chevron + '</button>'
+      + '    <button class="adm-toggle-btn" id="adm-toggle-btn" title="Réduire">' + ICONS.chevron + '</button>'
       + '  </div>'
       + '  <nav class="adm-nav" id="adm-main-nav">' + navHtml + '</nav>'
       + '  <div class="adm-footer"><nav class="adm-nav">' + footerHtml + '</nav></div>'
       + '</aside>';
   }
 
+  // ── Toggle section ────────────────────────────────────────────
+  window.admToggleSection = function (id) {
+    var sidebar = document.getElementById('admin-sidebar');
+    // If collapsed → expand first
+    if (sidebar && sidebar.classList.contains('collapsed')) {
+      sidebar.classList.remove('collapsed');
+      localStorage.setItem('adm-sidebar-collapsed', '0');
+    }
+    var el = document.getElementById('adm-sec-' + id);
+    if (!el) return;
+    var isOpen = el.classList.contains('open');
+    // Close all sections
+    document.querySelectorAll('.adm-section').forEach(function (s) { s.classList.remove('open'); });
+    if (!isOpen) el.classList.add('open');
+  };
+
+  // ── Init ──────────────────────────────────────────────────────
   function init() {
     var slot = document.getElementById('admin-sidebar-slot');
     if (!slot) return;
     slot.outerHTML = buildSidebar();
 
-    var sidebar = document.getElementById('admin-sidebar');
-    var btn = document.getElementById('adm-toggle-btn');
-    if (!sidebar || !btn) return;
+    var sidebar  = document.getElementById('admin-sidebar');
+    var toggleBtn = document.getElementById('adm-toggle-btn');
+    var mobileBtn = document.getElementById('adm-mobile-btn');
+    var overlay   = document.getElementById('adm-mobile-overlay');
 
+    // Persist collapsed state
     if (localStorage.getItem('adm-sidebar-collapsed') === '1') {
       sidebar.classList.add('collapsed');
     }
 
-    btn.addEventListener('click', function () {
-      var collapsed = sidebar.classList.toggle('collapsed');
-      localStorage.setItem('adm-sidebar-collapsed', collapsed ? '1' : '0');
-    });
+    // Desktop collapse toggle
+    if (toggleBtn) {
+      toggleBtn.addEventListener('click', function () {
+        var collapsed = sidebar.classList.toggle('collapsed');
+        localStorage.setItem('adm-sidebar-collapsed', collapsed ? '1' : '0');
+        // On re-expand: re-open the active section
+        if (!collapsed) {
+          document.querySelectorAll('.adm-section').forEach(function (s) {
+            if (s.querySelector('.adm-subitem.active')) s.classList.add('open');
+          });
+        }
+      });
+    }
+
+    // Mobile toggle
+    if (mobileBtn && overlay) {
+      mobileBtn.addEventListener('click', function () {
+        sidebar.classList.toggle('mobile-open');
+        overlay.classList.toggle('show');
+      });
+      overlay.addEventListener('click', function () {
+        sidebar.classList.remove('mobile-open');
+        overlay.classList.remove('show');
+      });
+    }
   }
 
   if (document.readyState === 'loading') {
