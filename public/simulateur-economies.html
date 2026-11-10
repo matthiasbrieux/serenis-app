@@ -1,444 +1,452 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="fr" data-vpm-vitrine>
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Simulateur d'Économies — Vendu Par Moi</title>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<title>Simulateur d'économies — Vendu Par Moi</title>
+<link rel="icon" href="/favicon.ico" sizes="any"/>
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png"/>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
-*, *::before, *::after {
-  margin: 0; padding: 0; box-sizing: border-box;
-  -webkit-print-color-adjust: exact !important;
-  print-color-adjust: exact !important;
-  color-adjust: exact !important;
+@font-face { font-family: 'VPM Why Inter'; font-style: normal; font-weight: 400; font-display: swap; src: url('/fonts/inter-0.woff2') format('woff2'); }
+@font-face { font-family: 'VPM Why Inter'; font-style: normal; font-weight: 500; font-display: swap; src: url('/fonts/inter-1.woff2') format('woff2'); }
+@font-face { font-family: 'VPM Why Inter'; font-style: normal; font-weight: 600 900; font-display: swap; src: url('/fonts/inter-2.woff2') format('woff2'); }
+
+:root {
+  --terracotta: #9E3A18;
+  --sable-dore: #E8C39E;
+  --beige-logo: #E8C39E;
+  --blanc: #FFFFFF;
+  --noir: #1C0804;
+  --font-sans: 'VPM Why Inter', 'Inter', 'DM Sans', system-ui, sans-serif;
+  --font-serif: 'Cormorant Garamond', serif;
+  --section-px: clamp(16px, 4vw, 64px);
 }
 
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
 body {
-  font-family: 'DM Sans', sans-serif;
-  font-weight: 300;
-  background: #E8E4DC;
+  font-family: var(--font-sans);
+  background: var(--blanc);
+  color: var(--noir);
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 2rem 1rem;
-  gap: 16px;
-}
-
-.no-print {
-  background: #1D3A28; color: #fff; border: none;
-  padding: 10px 24px; border-radius: 8px;
-  font-family: 'DM Sans', sans-serif; font-size: .85rem; font-weight: 600;
-  cursor: pointer;
-}
-.no-print:hover { background: #3D5A47; }
-
-@media print {
-  body { background: #E8E4DC; padding: 1rem; }
-  .no-print { display: none; }
-  @page { margin: 0; size: A4 portrait; }
-}
-
-/* ── WIDGET ── */
-.widget {
-  width: 100%; max-width: 560px;
-  background: #FAFAF8;
-  box-shadow: 0 20px 60px rgba(0,0,0,.18);
-  overflow: hidden;
 }
 
 /* ── HEADER ── */
-.w-header {
-  background: linear-gradient(160deg, #0C1910 0%, #1D3A28 60%, #2d5040 100%);
-  padding: 2rem 2.5rem 1.8rem;
-  position: relative; overflow: hidden;
-  -webkit-print-color-adjust: exact !important;
-  print-color-adjust: exact !important;
+.page-header {
+  background: var(--terracotta);
+  padding: 14px 32px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
 }
-.w-header-deco1 {
-  position: absolute;
-  width: 300px; height: 300px; border-radius: 50%;
-  background: radial-gradient(circle, rgba(196,96,58,.15) 0%, transparent 70%);
-  top: -100px; right: -80px; pointer-events: none; z-index: 0;
-  -webkit-print-color-adjust: exact !important;
-  print-color-adjust: exact !important;
+.page-header a {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  text-decoration: none;
 }
-.w-header-deco2 {
-  position: absolute;
-  width: 200px; height: 200px; border-radius: 50%;
-  background: radial-gradient(circle, rgba(107,191,130,.08) 0%, transparent 70%);
-  bottom: -80px; left: -60px; pointer-events: none; z-index: 0;
-  -webkit-print-color-adjust: exact !important;
-  print-color-adjust: exact !important;
-}
-.w-brand {
-  position: relative; z-index: 1;
-  display: flex; align-items: center; gap: 8px;
-  margin-bottom: 1.2rem;
-}
-.w-brand-icon { width: 18px; height: 18px; opacity: .5; }
-.w-kicker {
-  font-size: .65rem; font-weight: 700; letter-spacing: .2em;
-  text-transform: uppercase;
-  color: #C4603A;
-  display: inline-block;
-  border: 1px solid rgba(196,96,58,.35);
-  padding: 3px 10px; border-radius: 20px;
-}
-.w-titre {
-  font-family: 'Cormorant Garamond', serif;
-  font-size: 1.7rem; font-weight: 700; color: #F5F0E8;
-  line-height: 1.15; margin-top: .7rem; margin-bottom: .5rem;
-  position: relative; z-index: 1;
-}
-.w-titre em { font-style: italic; color: #f0b89a; }
-.w-sous {
-  font-family: 'Cormorant Garamond', serif;
-  font-style: italic; font-size: .9rem;
-  color: rgba(245,240,232,.45); line-height: 1.65;
-  position: relative; z-index: 1;
-}
+.page-header img { width: 160px; height: auto; }
+.breadcrumb { font-size: 0.82rem; color: rgba(255,255,255,0.75); }
+.header-sep { color: rgba(255,255,255,0.4); font-size: 0.9rem; }
 
-/* ── BODY ── */
-.w-body { padding: 2rem 2.5rem; }
+/* ── SIMULATOR SECTION ── */
+.simulator {
+  background: var(--blanc);
+  color: var(--noir);
+  padding: 40px var(--section-px) 48px;
+  flex: 1;
+  font-family: var(--font-sans);
+}
+.simulator-inner { max-width: 1280px; margin: 0 auto; text-align: center; }
 
-/* ── SLIDER ── */
-.slider-label {
-  display: flex; justify-content: space-between; align-items: baseline;
-  margin-bottom: .8rem;
+.simulator .section-eyebrow {
+  display: flex; align-items: center; justify-content: center;
+  gap: 32px; color: var(--terracotta);
+  font-size: 14px; font-weight: 600; letter-spacing: .18em; line-height: 1.4;
+  margin: 0 0 12px;
 }
-.sl-txt {
-  font-size: .72rem; font-weight: 600; color: #888;
-  letter-spacing: .07em; text-transform: uppercase;
+.simulator .section-eyebrow::before,
+.simulator .section-eyebrow::after {
+  content: ''; width: 76px; height: 1px; background: var(--terracotta); flex-shrink: 0;
 }
-.sl-val {
-  font-family: 'Cormorant Garamond', serif;
-  font-size: 1.8rem; font-weight: 700; color: #1D3A28;
-  line-height: 1; transition: all .15s;
+.simulator .section-title {
+  color: var(--terracotta); font-family: var(--font-serif);
+  font-size: clamp(34px, 3vw, 42px); font-style: italic; font-weight: 600;
+  line-height: 1.04; letter-spacing: -.02em; margin-bottom: 10px;
 }
+.simulator .section-title span {
+  display: inline-block; max-width: 100%; text-wrap: balance;
+  font-style: normal; font-weight: 700;
+}
+.sim-intro { font-size: 16px; color: #443B34; line-height: 1.5; max-width: 1140px; margin: 0 auto 12px; }
 
-input[type=range] {
-  -webkit-appearance: none; appearance: none;
-  width: 100%; height: 4px;
-  background: linear-gradient(to right, #3D5A47 0%, #3D5A47 var(--pct, 20%), #E8E4DC var(--pct, 20%), #E8E4DC 100%);
-  border-radius: 2px; outline: none; cursor: pointer;
-  margin-bottom: 1.4rem;
+.sim-price-label {
+  display: block; padding: 0; margin: 0 0 2px; border-radius: 0; background: transparent;
+  font-size: 13px; font-weight: 700; line-height: 1.3; color: var(--noir);
+  text-transform: uppercase; letter-spacing: .04em;
 }
-input[type=range]::-webkit-slider-thumb {
-  -webkit-appearance: none; appearance: none;
-  width: 22px; height: 22px; border-radius: 50%;
-  background: #1D3A28; border: 3px solid #C4603A;
-  box-shadow: 0 2px 8px rgba(0,0,0,.25);
-  cursor: pointer; transition: transform .15s;
+.sim-price-display {
+  display: table; max-width: 100%; box-sizing: border-box; padding: 0; margin: 0;
+  border-radius: 60px; background: transparent;
+  font-family: var(--font-sans); font-variant-numeric: lining-nums tabular-nums;
+  letter-spacing: -.025em; font-size: clamp(38px, 3.5vw, 48px); font-weight: 700;
+  color: var(--terracotta); line-height: 1; white-space: nowrap;
 }
-input[type=range]::-webkit-slider-thumb:hover { transform: scale(1.15); }
-input[type=range]::-moz-range-thumb {
-  width: 22px; height: 22px; border-radius: 50%;
-  background: #1D3A28; border: 3px solid #C4603A; cursor: pointer;
+.sim-price-pill {
+  display: flex; align-items: center; justify-content: center; gap: 18px;
+  width: max-content; max-width: 100%; margin: 18px auto 6px; padding: 8px 20px;
+  border-radius: 20px; background: var(--blanc); color: var(--terracotta);
+  border: 1.5px solid var(--terracotta);
 }
+.sim-price-pill > svg { width: 56px; height: 48px; flex-shrink: 0; padding-right: 16px; border-right: 1px solid var(--terracotta); }
+.sim-price-copy { min-width: 0; text-align: left; }
 
-.range-scale {
-  display: flex; justify-content: space-between;
-  font-size: .62rem; color: #BBB;
-  margin-top: -.6rem; margin-bottom: 1.8rem;
+.sim-slider {
+  appearance: none; -webkit-appearance: none; width: 100%; height: 44px; padding: 0;
+  border-radius: 0;
+  background: linear-gradient(to right, var(--terracotta) 0%, var(--terracotta) var(--pct, 22%), var(--sable-dore) var(--pct, 22%), var(--sable-dore) 100%);
+  margin: 0; cursor: pointer;
+  background-size: 100% 4px; background-repeat: no-repeat; background-position: center;
+  display: block;
 }
+.sim-slider::-webkit-slider-thumb {
+  appearance: none; -webkit-appearance: none; width: 34px; height: 34px; border-radius: 50%;
+  background: var(--terracotta); border: 5px solid var(--blanc);
+  box-shadow: 0 3px 9px rgba(28,8,4,0.19); box-sizing: border-box;
+}
+.sim-slider::-moz-range-thumb {
+  width: 34px; height: 34px; border-radius: 50%;
+  background: var(--terracotta); border: 5px solid var(--blanc);
+  box-shadow: 0 3px 9px rgba(28,8,4,0.19); box-sizing: border-box;
+}
+.sim-slider:focus-visible { outline: 2px solid var(--terracotta); outline-offset: 12px; }
+.sim-range-labels { display: flex; justify-content: space-between; font-size: 14px; color: #62574E; line-height: 1.4; margin-bottom: 10px; }
 
-/* ── RÉSULTATS ── */
-.resultats { display: flex; flex-direction: column; gap: .7rem; margin-bottom: 1.6rem; }
+.sim-results {
+  display: grid; grid-template-columns: minmax(0, .95fr) 0 minmax(0, 1.15fr);
+  align-items: stretch; border: 0; border-radius: 0; column-gap: 12px;
+}
+.sim-result-col {
+  min-width: 0; padding: 16px 24px; text-align: center;
+  display: grid; grid-template-columns: 64px minmax(0, 1fr); align-items: center; gap: 18px;
+}
+.sim-comparison-icon {
+  display: grid; place-items: center; width: 64px; height: 64px; border-radius: 50%;
+  color: var(--terracotta); background: transparent;
+}
+.sim-comparison-icon svg { width: 40px; height: 40px; }
+.vpm-col .sim-comparison-icon { color: var(--blanc); background: transparent; display: none; }
+.sim-comparison-copy { min-width: 0; border-left: 1px solid var(--terracotta); padding-left: 18px; }
+.vpm-col .sim-comparison-copy { border-color: rgba(232,195,158,0.5); border-left: 0; padding-left: 0; }
 
-.result-item {
-  display: flex; justify-content: space-between; align-items: center;
-  padding: .95rem 1.2rem;
-  border-left: 3px solid #E8E4DC;
-  background: #F8F5F0;
-  transition: all .3s;
+.sim-result-col.agency { grid-column: 1; background: var(--blanc); border-radius: 23px; border: 1.5px solid var(--terracotta); }
+.sim-result-col.vpm-col { grid-column: 3; background: var(--terracotta); border-radius: 23px; grid-template-columns: minmax(0, 1fr); gap: 0; }
+.sim-result-col.vs-col {
+  grid-column: 2; align-self: center; position: relative; z-index: 1;
+  display: grid; grid-template-columns: none; place-items: center; left: -19px;
+  width: 38px; height: 38px; padding: 0; border-radius: 50%;
+  background: var(--blanc); color: var(--terracotta);
+  font-size: 13px; font-weight: 700; line-height: 1; text-transform: uppercase;
+  box-shadow: 0 3px 7px rgba(158,58,24,0.1);
 }
-.result-item.highlight {
-  border-left-color: #C4603A;
-  background: #FEF5F2;
+.sim-result-label { font-size: 13px; font-weight: 600; line-height: 1.4; letter-spacing: .1em; text-transform: uppercase; margin: 0; }
+.sim-result-col.agency .sim-result-label { color: var(--terracotta); }
+.sim-result-col.vpm-col .sim-result-label { color: var(--blanc); }
+.sim-result-amount {
+  font-family: var(--font-sans); font-variant-numeric: lining-nums tabular-nums;
+  letter-spacing: -.025em; font-size: 38px; font-weight: 600; line-height: 1; white-space: nowrap; margin: 0;
 }
-.result-item.winner {
-  border-left-color: #3D5A47;
-  background: #F0F5F1;
+#simAgency { position: relative; display: table; margin: 4px auto; }
+.sim-result-col.agency .sim-result-amount { color: var(--noir); }
+.sim-result-col.vpm-col .sim-result-amount {
+  position: relative; display: table; color: var(--sable-dore); margin: 4px auto 8px; padding-bottom: 7px;
+  font-size: clamp(28px, 2.78vw, 40px); font-weight: 700;
 }
-.ri-label { font-size: .76rem; color: #777; line-height: 1.4; }
-.ri-label strong { color: #1a1a16; font-weight: 600; display: block; margin-bottom: .1rem; font-size: .8rem; }
-.ri-val {
-  font-family: 'Cormorant Garamond', serif;
-  font-size: 1.4rem; font-weight: 700; color: #1a1a16;
-  text-align: right; white-space: nowrap;
+.sim-result-col.vpm-col .sim-result-amount::after {
+  content: ''; position: absolute; left: 0; right: 0; bottom: 0; height: 1px; background: var(--sable-dore);
 }
-.ri-val.rouge { color: #C4603A; }
-.ri-val.terra { color: #C4603A; }
-.ri-val.vert { color: #3D5A47; }
+.sim-pack-prices { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); margin: 8px 0 4px; }
+.sim-pack { min-width: 0; padding: 0 12px; }
+.sim-pack + .sim-pack { border-left: 1px solid var(--beige-logo); }
+.sim-pack-name { color: var(--blanc); font-size: 15px; font-weight: 600; line-height: 1.3; margin: 0 0 4px; }
+.sim-result-col.vpm-col .sim-result-label {
+  display: flex; align-items: center; justify-content: center; gap: 12px;
+}
+.sim-result-col.vpm-col .sim-result-label::before,
+.sim-result-col.vpm-col .sim-result-label::after { content: ""; flex: 1; height: 1px; background: var(--beige-logo); }
+.sim-result-sub { font-size: 15px; line-height: 1.4; margin: 0; }
+.sim-result-col.agency .sim-result-sub { color: #4B4038; }
+.sim-result-col.vpm-col .sim-result-sub { color: var(--blanc); }
 
-/* ── ÉCONOMIE TOTALE ── */
-.eco-total {
-  background: linear-gradient(135deg, #0C1910, #1D3A28);
-  padding: 1.5rem 1.8rem;
-  display: flex; align-items: center; justify-content: space-between;
-  margin-bottom: 1.6rem;
-  position: relative; overflow: hidden;
-  -webkit-print-color-adjust: exact !important;
-  print-color-adjust: exact !important;
+.sim-bar-wrap { display: flex; height: 2px; overflow: hidden; border-radius: 3px; margin: 6px 0 8px; }
+.sim-bar-save { background: var(--terracotta); transition: width .35s ease; }
+.sim-bar-cost { background: var(--sable-dore); flex: 1; }
+.sim-bar-labels {
+  display: flex; justify-content: space-between; gap: 16px; font-size: 13px; line-height: 1.4;
+  color: var(--terracotta); letter-spacing: .06em; text-transform: uppercase; margin-bottom: 12px;
 }
-.eco-total-deco {
-  position: absolute;
-  width: 200px; height: 200px; border-radius: 50%;
-  background: radial-gradient(circle, rgba(196,96,58,.15) 0%, transparent 70%);
-  right: -60px; top: -60px; pointer-events: none;
-  -webkit-print-color-adjust: exact !important;
-  print-color-adjust: exact !important;
-}
-.et-label {
-  font-size: .6rem; font-weight: 600; letter-spacing: .18em;
-  text-transform: uppercase; color: rgba(245,240,232,.35);
-  margin-bottom: .4rem;
-}
-.et-val {
-  font-family: 'Cormorant Garamond', serif;
-  font-size: 2.8rem; font-weight: 700; color: #C4603A;
-  line-height: 1; transition: all .3s;
-}
-.et-note { font-size: .68rem; color: rgba(245,240,232,.3); margin-top: .3rem; }
-.et-right { text-align: center; flex-shrink: 0; }
-.et-roi {
-  font-family: 'Cormorant Garamond', serif;
-  font-size: 2rem; font-weight: 700; color: #6BBF82;
-  line-height: 1; margin-bottom: .2rem;
-}
-.et-roi-label { font-size: .58rem; color: rgba(245,240,232,.3); letter-spacing: .1em; text-transform: uppercase; }
+.sim-bar-labels span:first-child { font-weight: 600; }
 
-/* ── BARRES COMPARAISON ── */
-.compare { margin-bottom: 1.6rem; }
-.compare-label {
-  font-size: .63rem; font-weight: 600; letter-spacing: .14em;
-  text-transform: uppercase; color: #999; margin-bottom: .8rem;
+.sim-savings-banner {
+  background: var(--terracotta); border-radius: 24px; padding: 18px 24px;
+  display: grid; grid-template-columns: 80px minmax(0, 1fr) minmax(0, 1.12fr);
+  align-items: center; gap: 24px; box-shadow: 0 8px 14px rgba(158,58,24,0.06);
 }
-.barre-wrap { display: flex; flex-direction: column; gap: .5rem; }
-.barre-row { display: flex; align-items: center; gap: .8rem; }
-.barre-nom { font-size: .73rem; color: #666; width: 7rem; flex-shrink: 0; }
-.barre-bg { flex: 1; background: #EEECEA; border-radius: 2px; overflow: hidden; height: 6px; }
-.barre-fill { height: 100%; border-radius: 2px; transition: width .5s ease; }
-.barre-agence { background: #C4603A; }
-.barre-vpm { background: #3D5A47; }
-.barre-prix {
-  font-family: 'Cormorant Garamond', serif;
-  font-size: .9rem; font-weight: 700; color: #333;
-  width: 6rem; text-align: right;
+.sim-savings-text { min-width: 0; text-align: center; border-left: 1px solid rgba(232,195,158,0.5); padding-left: 24px; }
+.sim-savings-icon { width: 80px; height: 80px; color: var(--blanc); }
+.sim-savings-icon svg { width: 100%; height: 100%; }
+.sim-savings-benefits {
+  min-width: 0; list-style: none; border-left: 1px solid rgba(232,195,158,0.5);
+  padding-left: 24px; display: grid; gap: 12px; color: var(--blanc); text-align: left;
 }
-.barre-prix.rouge { color: #C4603A; }
+.sim-savings-benefits svg { color: var(--beige-logo); }
+.sim-savings-benefits li { display: flex; align-items: flex-start; gap: 12px; font-size: 16px; line-height: 1.4; }
+.sim-savings-benefits svg { width: 20px; height: 20px; flex-shrink: 0; margin-top: 1px; }
+.sim-savings-label {
+  font-size: 20px; font-weight: 600; line-height: 1.3; letter-spacing: .03em;
+  text-transform: uppercase; color: var(--blanc); margin-bottom: 6px;
+}
+.sim-savings-amount {
+  font-family: var(--font-sans); font-variant-numeric: lining-nums tabular-nums;
+  letter-spacing: -.025em; font-size: clamp(42px, 4.45vw, 64px); font-weight: 700;
+  color: var(--blanc); line-height: 1; white-space: nowrap; margin: 0 auto;
+  display: table; position: relative; background: transparent; padding: 0; border-radius: 0;
+}
+.sim-savings-plan { margin: 0 0 6px; color: var(--blanc); font-size: 14px; line-height: 1.4; }
+.sim-savings-secondary { margin: 10px 0 0; color: var(--blanc); font-size: 14px; line-height: 1.5; }
+.sim-savings-secondary output { font-family: var(--font-sans); font-variant-numeric: lining-nums tabular-nums; font-weight: 600; white-space: nowrap; }
+.sim-savings-context { margin: 6px 0 0; color: var(--blanc); font-size: 14px; line-height: 1.35; font-style: italic; }
 
-.eco-banner {
-  margin-top: .8rem; padding: .7rem 1rem;
-  background: #F0F5F1; border-left: 3px solid #3D5A47;
+.sim-cta-btn {
+  width: min(100%, 740px); margin: 14px auto 0;
+  box-shadow: 0 4px 10px rgba(158,58,24,0.08);
+  background: var(--blanc); color: var(--terracotta);
+  border: 1px solid var(--sable-dore); border-radius: 50px;
+  min-height: 54px; padding: 12px 26px;
+  font-family: var(--font-serif); font-size: 24px; font-weight: 700; line-height: 1.25;
+  cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 12px;
+  text-decoration: none; transition: background .2s;
 }
-.eco-banner-txt { font-size: .76rem; color: #3D5A47; font-weight: 600; }
-.eco-banner-num {
-  font-family: 'Cormorant Garamond', serif;
-  font-size: 1.1rem; font-weight: 700;
-}
+.sim-cta-btn:hover { background: #fdf9f6; }
+.sim-cta-btn svg { width: 24px; height: 24px; flex-shrink: 0; transition: transform 220ms ease; }
+.sim-cta-btn:hover svg { transform: translateX(3.5px); }
+.sim-note { font-size: 13px; line-height: 1.6; color: #655A52; max-width: 1080px; margin: 10px auto 0; text-align: center; }
 
-/* ── CTA ── */
-.w-cta {
-  display: block; text-align: center;
-  background: #1D3A28; color: #F5F0E8;
-  font-size: .75rem; font-weight: 600; letter-spacing: .1em; text-transform: uppercase;
-  padding: 1.1rem 2rem; text-decoration: none;
-  transition: background .2s;
-  margin-bottom: .9rem;
+/* Footer */
+.page-footer {
+  background: #1A1A16; color: rgba(255,255,255,0.4); padding: 20px 32px;
+  font-size: .76rem; text-align: center; line-height: 1.7;
 }
-.w-cta:hover { background: #3D5A47; }
-.w-cta-icon { color: #C4603A; margin-right: .4rem; }
+.page-footer a { color: rgba(255,255,255,0.5); text-decoration: none; }
 
-.w-garantie {
-  text-align: center;
-  font-size: .68rem; color: #AAA; line-height: 1.6;
+/* ── RESPONSIVE ── */
+@media (max-width: 900px) {
+  .simulator .section-eyebrow { font-size: 14px; gap: 18px; }
+  .simulator .section-eyebrow::before, .simulator .section-eyebrow::after { width: 40px; }
+  .sim-result-col { padding: 16px; grid-template-columns: 42px minmax(0, 1fr); gap: 10px; }
+  .sim-comparison-icon { width: 42px; height: 42px; }
+  .sim-comparison-icon svg { width: 32px; height: 32px; }
+  .sim-comparison-copy { padding-left: 10px; }
+  .sim-result-label { font-size: 14px; }
+  .sim-result-amount { font-size: 34px; }
+  .sim-result-sub { font-size: 16px; }
+  .sim-savings-banner { padding: 16px 20px; grid-template-columns: 56px minmax(0, 1fr); gap: 14px; }
+  .sim-savings-icon { width: 56px; height: 56px; }
+  .sim-savings-text { padding-left: 14px; }
+  .sim-savings-benefits {
+    grid-column: 1 / -1; grid-template-columns: repeat(3, minmax(0, 1fr));
+    border-left: 0; border-top: 1px solid rgba(232,195,158,0.5); padding: 14px 0 0;
+  }
+  .sim-savings-benefits li { gap: 8px; font-size: 14px; }
+  .sim-savings-label { font-size: 17px; }
+  .sim-cta-btn { font-size: 23px; padding: 14px 22px; }
 }
-
-/* ── FOOTER ── */
-.w-footer {
-  background: #F5F0E8;
-  padding: .8rem 2.5rem;
-  display: flex; justify-content: space-between; align-items: center;
-  border-top: 1px solid #E8E4DC;
+@media (min-width: 541px) and (max-width: 1100px) {
+  .sim-result-col.vpm-col .sim-result-amount { font-size: 28px; }
+  .sim-pack { padding: 0 7px; }
+  .sim-pack-name { font-size: 12px; }
 }
-.wf-logo {
-  font-family: 'Cormorant Garamond', serif;
-  font-size: .95rem; font-weight: 700;
-  color: #3D5A47;
-  display: flex; align-items: center; gap: 6px;
+@media (max-width: 540px) {
+  .simulator { padding: 22px 16px 26px; }
+  .simulator .section-eyebrow { font-size: 11px; letter-spacing: .1em; gap: 12px; margin-bottom: 12px; }
+  .simulator .section-eyebrow::before, .simulator .section-eyebrow::after { width: 24px; }
+  .simulator .section-title { font-size: 34px; line-height: 1.08; margin-bottom: 12px; }
+  .sim-intro { font-size: 16px; margin-bottom: 16px; }
+  .sim-price-label { font-size: 11px; padding: 0; }
+  .sim-price-pill { padding: 8px 12px; gap: 12px; width: 100%; justify-content: center; }
+  .sim-price-pill > svg { width: 42px; height: 42px; padding-right: 12px; }
+  .sim-price-copy { min-width: 0; }
+  .sim-pack-prices { grid-template-columns: minmax(0, 1fr); gap: 12px; }
+  .sim-pack + .sim-pack { border-left: 0; border-top: 1px solid var(--beige-logo); padding-top: 12px; }
+  .sim-result-col.vpm-col .sim-result-amount { font-size: clamp(30px, 9vw, 38px); }
+  .sim-price-display { font-size: clamp(27px, 8vw, 38px); padding: 0; margin: 0; }
+  .sim-range-labels { font-size: 14px; margin-bottom: 14px; }
+  .sim-slider::-webkit-slider-thumb { width: 34px; height: 34px; border-width: 5px; }
+  .sim-slider::-moz-range-thumb { width: 34px; height: 34px; border-width: 5px; }
+  .sim-results { grid-template-columns: minmax(0, 1fr); grid-template-rows: auto 0 auto; column-gap: 0; row-gap: 12px; }
+  .sim-result-col.agency { grid-column: 1; grid-row: 1; border-radius: 23px; }
+  .sim-result-col.vpm-col { grid-column: 1; grid-row: 3; border-radius: 23px; }
+  .sim-result-col.vs-col { grid-column: 1; grid-row: 2; left: calc(50% - 19px); width: 38px; height: 38px; font-size: 15px; }
+  .sim-result-col { padding: 18px 16px; gap: 10px; }
+  .sim-result-amount { font-size: 34px; }
+  .sim-result-label { font-size: 14px; }
+  .sim-result-sub { font-size: 16px; }
+  .sim-bar-labels { font-size: 12px; gap: 10px; margin-bottom: 12px; }
+  .sim-savings-banner { grid-template-columns: minmax(0, 1fr); justify-items: center; padding: 18px; gap: 14px; }
+  .sim-savings-benefits { grid-template-columns: minmax(0, 1fr); width: 100%; gap: 10px; }
+  .sim-savings-text { text-align: center; width: 100%; padding: 0; border: 0; }
+  .sim-savings-amount { font-size: clamp(36px, 11.8vw, 48px); }
+  .sim-savings-label { font-size: 16px; }
+  .sim-cta-btn { width: 100%; min-height: 54px; font-size: 21px; padding: 12px 10px; flex: none; }
+  .sim-note { font-size: 13px; }
+  .page-header { padding: 12px 16px; }
+  .page-header img { width: 130px; }
 }
-.wf-logo em { color: #C4603A; font-style: italic; }
-.wf-contact { font-size: .7rem; color: #AAA; letter-spacing: .05em; }
-
-@keyframes pop { 0%{transform:scale(1);}50%{transform:scale(1.08);}100%{transform:scale(1);} }
-.pop { animation: pop .25s ease; }
+@media (prefers-reduced-motion: reduce) { .sim-bar-save { transition: none; } .sim-cta-btn:hover svg { transform: none; } }
 </style>
 </head>
 <body>
 
-<button class="no-print" onclick="window.print()">⬇ Télécharger en PDF</button>
+<header class="page-header">
+  <a href="/">
+    <img src="/images/vendu-par-moi.svg" alt="Vendu Par Moi">
+  </a>
+  <span class="header-sep">›</span>
+  <span class="breadcrumb">Simulateur d'économies</span>
+</header>
 
-<div class="widget">
+<section class="simulator" aria-label="Simulateur d'économies">
+  <div class="simulator-inner">
+    <p class="section-eyebrow">Calculez votre économie</p>
+    <h1 class="section-title"><span style="color:var(--noir);">Combien économisez-vous</span><br/>avec Vendu Par Moi&nbsp;?</h1>
+    <p class="sim-intro">
+      Faites glisser le curseur sur le prix estimé de votre bien et voyez ce que vous gardez.
+    </p>
 
-  <!-- HEADER -->
-  <div class="w-header">
-    <div class="w-header-deco1"></div>
-    <div class="w-header-deco2"></div>
-    <div class="w-brand">
-      <svg class="w-brand-icon" viewBox="0 0 24 24" fill="rgba(245,240,232,.5)">
-        <path d="M3 9.5L12 3L21 9.5V20C21 20.55 20.55 21 20 21H15V16H9V21H4C3.45 21 3 20.55 3 20V9.5Z"/>
-      </svg>
-      <span class="w-kicker">Simulateur gratuit</span>
-    </div>
-    <div class="w-titre">Combien allez-vous<br><em>économiser ?</em></div>
-    <p class="w-sous">Entrez le prix estimé de votre bien et voyez instantanément ce que vous gardez dans votre poche en vendant par vous-même.</p>
-  </div>
-
-  <!-- BODY -->
-  <div class="w-body">
-
-    <!-- SLIDER -->
-    <div class="slider-label">
-      <span class="sl-txt">Prix estimé de votre bien</span>
-      <span class="sl-val" id="prixDisplay">200 000 €</span>
-    </div>
-    <input type="range" id="slider" min="50000" max="800000" step="5000" value="200000" style="--pct: 20%;">
-    <div class="range-scale">
-      <span>50 000 €</span>
-      <span>200 000 €</span>
-      <span>400 000 €</span>
-      <span>600 000 €</span>
-      <span>800 000 €</span>
-    </div>
-
-    <!-- RÉSULTATS -->
-    <div class="resultats">
-      <div class="result-item highlight">
-        <div class="ri-label">
-          <strong>Frais d'agence traditionnelle</strong>
-          En moyenne 5 % du prix de vente
-        </div>
-        <div class="ri-val rouge" id="fraisAgence">10 000 €</div>
-      </div>
-      <div class="result-item">
-        <div class="ri-label">
-          <strong>Vendu Par Moi</strong>
-          2 séances · méthode complète · garantie
-        </div>
-        <div class="ri-val terra">999 €</div>
-      </div>
-      <div class="result-item winner">
-        <div class="ri-label">
-          <strong>Vous économisez</strong>
-          Ce qui reste dans votre poche
-        </div>
-        <div class="ri-val vert" id="economie">8 452 €</div>
-      </div>
-    </div>
-
-    <!-- ÉCONOMIE TOTALE -->
-    <div class="eco-total">
-      <div class="eco-total-deco"></div>
-      <div class="et-left">
-        <div class="et-label">Économie nette réalisée</div>
-        <div class="et-val" id="ecoTotal">8 452 €</div>
-        <div class="et-note" id="ecoNote">soit 4.2 % du prix de vente récupérés</div>
-      </div>
-      <div class="et-right">
-        <div class="et-roi" id="roiVal">× 6.5</div>
-        <div class="et-roi-label">retour sur<br>investissement</div>
-      </div>
-    </div>
-
-    <!-- COMPARAISON VISUELLE -->
-    <div class="compare">
-      <div class="compare-label">Ce que vous coûte chaque option</div>
-      <div class="barre-wrap">
-        <div class="barre-row">
-          <span class="barre-nom">Agence (5 %)</span>
-          <div class="barre-bg"><div class="barre-fill barre-agence" id="barreAgence" style="width:100%"></div></div>
-          <span class="barre-prix rouge" id="bpAgence">10 000 €</span>
-        </div>
-        <div class="barre-row">
-          <span class="barre-nom">Vendu Par Moi</span>
-          <div class="barre-bg"><div class="barre-fill barre-vpm" id="barreVpm" style="width:15%"></div></div>
-          <span class="barre-prix" style="color:#3D5A47;">999 €</span>
+    <div>
+      <div class="sim-price-pill">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m3 10 9-7 9 7M5 9v12h14V9M10 21v-7h4v7"/></svg>
+        <div class="sim-price-copy">
+          <p class="sim-price-label">Prix estimé de mon bien</p>
+          <p class="sim-price-display" id="simPriceDisplay">250&nbsp;000&nbsp;€</p>
         </div>
       </div>
-      <div class="eco-banner">
-        <span class="eco-banner-txt">✓ Vous économisez <span class="eco-banner-num" id="bpEco">8 452 €</span> en choisissant Vendu Par Moi</span>
+      <input type="range" class="sim-slider" id="simSlider"
+             min="80000" max="800000" step="5000" value="250000"
+             oninput="updateSim(this.value)"
+             aria-label="Prix estimé du bien">
+      <div class="sim-range-labels">
+        <span>80&nbsp;000&nbsp;€</span>
+        <span>800&nbsp;000&nbsp;€</span>
       </div>
     </div>
 
-    <!-- CTA -->
-    <a href="tel:0684340611" class="w-cta">
-      <span class="w-cta-icon">📞</span> Appel gratuit de 15 min — 06 84 34 06 11
+    <div class="sim-results">
+      <div class="sim-result-col agency">
+        <span class="sim-comparison-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><ellipse cx="15" cy="5" rx="6" ry="3"/><path d="M9 5v10c0 4 12 4 12 0V5M9 9c0 4 12 4 12 0m-12 4c0 4 12 4 12 0"/><ellipse cx="7" cy="17" rx="5" ry="2.5"/><path d="M2 17v3c0 3 10 3 10 0v-3"/></svg>
+        </span>
+        <div class="sim-comparison-copy">
+          <p class="sim-result-label">Hypothèse de frais (5&nbsp;%)</p>
+          <p class="sim-result-amount" id="simAgency">12&nbsp;500&nbsp;€</p>
+          <p class="sim-result-sub">Frais estimés dans cet exemple</p>
+        </div>
+      </div>
+      <div class="sim-result-col vs-col">vs</div>
+      <div class="sim-result-col vpm-col">
+        <div class="sim-comparison-copy">
+          <p class="sim-result-label">Vendu Par Moi</p>
+          <div class="sim-pack-prices">
+            <div class="sim-pack">
+              <p class="sim-pack-name">Pack Autonomie</p>
+              <p class="sim-result-amount">999&nbsp;€ TTC</p>
+            </div>
+            <div class="sim-pack">
+              <p class="sim-pack-name">Pack Coaching Plus</p>
+              <p class="sim-result-amount">1&nbsp;548&nbsp;€ TTC</p>
+            </div>
+          </div>
+          <p class="sim-result-sub">forfait fixe tout compris</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="sim-bar-wrap">
+      <div class="sim-bar-save" id="simBarSave" style="width:92%"></div>
+      <div class="sim-bar-cost"></div>
+    </div>
+    <div class="sim-bar-labels">
+      <span>← Vous économisez</span>
+      <span>Forfait VPM →</span>
+    </div>
+
+    <div class="sim-savings-banner">
+      <div class="sim-savings-icon">
+        <svg viewBox="0 0 28 32" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="5.5" r="4.5"/><path d="M13.5 3.5a2.5 2.5 0 1 0 0 4M9 4.8h3.2M9 6.2h3.2"/><g transform="translate(2 10)"><path d="M11 17h3v2a1 1 0 0 0 1 1h2a1 1 0 0 0 1-1v-3a3.16 3.16 0 0 0 2-2h1a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1h-1a5 5 0 0 0-2-4V3a4 4 0 0 0-3.2 1.6l-.3.4H11a6 6 0 0 0-6 6v1a5 5 0 0 0 2 4v3a1 1 0 0 0 1 1h2a1 1 0 0 0 1-1z"/><path d="M16 10h.01M2 8v1a2 2 0 0 0 2 2h1M9 8h4"/></g></svg>
+      </div>
+      <div class="sim-savings-text">
+        <p class="sim-savings-label">VOUS POURRIEZ ÉCONOMISER</p>
+        <p class="sim-savings-plan">Pack Autonomie</p>
+        <p class="sim-savings-amount" id="simSavings">11&nbsp;501&nbsp;€</p>
+        <p class="sim-savings-secondary"><label for="simSavingsCoaching">Pack Coaching Plus</label> — <output id="simSavingsCoaching">10&nbsp;952&nbsp;€</output></p>
+        <p class="sim-savings-context">sur la vente de votre bien</p>
+      </div>
+      <ul class="sim-savings-benefits">
+        <li>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="m8 12 3 3 5-6"/></svg>
+          <span>Un forfait fixe et transparent</span>
+        </li>
+        <li>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="m8 12 3 3 5-6"/></svg>
+          <span>Une simulation sur l'hypothèse de 5 % de frais</span>
+        </li>
+        <li>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="m8 12 3 3 5-6"/></svg>
+          <span>Tous les outils pour réussir votre vente</span>
+        </li>
+      </ul>
+    </div>
+
+    <p class="sim-note">Simulation indicative basée sur une hypothèse de frais de 5 %, avec le Pack Autonomie à 999 € TTC. Les prestations comparées sont différentes. D'autres frais peuvent exister selon votre situation.</p>
+
+    <a href="/tarifs" class="sim-cta-btn">
+      Découvrir comment économiser sur ma vente
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12h16m-6-6 6 6-6 6"/></svg>
     </a>
-    <p class="w-garantie">🛡️ Satisfait ou remboursé après la 1re séance · Aucun engagement avant de nous avoir rencontrés</p>
 
   </div>
+</section>
 
-  <!-- FOOTER -->
-  <div class="w-footer">
-    <div class="wf-logo">
-      <svg width="15" height="15" viewBox="0 0 24 24" fill="#3D5A47">
-        <path d="M3 9.5L12 3L21 9.5V20C21 20.55 20.55 21 20 21H15V16H9V21H4C3.45 21 3 20.55 3 20V9.5Z"/>
-      </svg>
-      <em>Vendu</em> Par Moi
-    </div>
-    <div class="wf-contact">contact@venduparmoi.fr · venduparmoi.fr</div>
-  </div>
-
-</div>
+<footer class="page-footer">
+  <a href="/">Vendu Par Moi</a> · contact@venduparmoi.fr · venduparmoi.fr
+</footer>
 
 <script>
-const slider = document.getElementById('slider');
-const FORMATION = 999;
-
-function fmt(n) {
-  return new Intl.NumberFormat('fr-FR').format(Math.round(n)) + ' €';
-}
-
-function animPop(el) {
-  el.classList.remove('pop');
-  void el.offsetWidth;
-  el.classList.add('pop');
-}
-
-function update() {
-  const prix = parseInt(slider.value);
-  const pct = (prix - 50000) / (800000 - 50000) * 100;
-
-  slider.style.setProperty('--pct', pct + '%');
-
-  const fraisAgence = prix * 0.05;
-  const eco = fraisAgence - FORMATION;
-  const roi = (fraisAgence / FORMATION).toFixed(1);
-  const pctEco = (eco / prix * 100).toFixed(1);
-
-  document.getElementById('prixDisplay').textContent = fmt(prix);
-  document.getElementById('fraisAgence').textContent = fmt(fraisAgence);
-  document.getElementById('economie').textContent = fmt(eco);
-  document.getElementById('ecoTotal').textContent = fmt(eco);
-  document.getElementById('ecoNote').textContent = `soit ${pctEco} % du prix de vente récupérés`;
-  document.getElementById('roiVal').textContent = '× ' + roi;
-
-  document.getElementById('barreAgence').style.width = '100%';
-  const pctVpm = Math.min((FORMATION / fraisAgence * 100), 100);
-  document.getElementById('barreVpm').style.width = pctVpm + '%';
-
-  document.getElementById('bpAgence').textContent = fmt(fraisAgence);
-  document.getElementById('bpEco').textContent = fmt(eco);
-
-  animPop(document.getElementById('ecoTotal'));
-  animPop(document.getElementById('roiVal'));
-}
-
-slider.addEventListener('input', update);
-update();
+(function () {
+  function fmt(n) {
+    return new Intl.NumberFormat('fr-FR').format(Math.round(n)) + ' €';
+  }
+  window.updateSim = function (val) {
+    val = parseInt(val, 10);
+    var min = 80000, max = 800000;
+    var pct = ((val - min) / (max - min) * 100).toFixed(1);
+    var slider = document.getElementById('simSlider');
+    slider.style.setProperty('--pct', pct + '%');
+    document.getElementById('simPriceDisplay').textContent = fmt(val);
+    var agency = val * 0.05;
+    var savings = Math.max(0, agency - 999);
+    var savingsCoaching = Math.max(0, agency - 1548);
+    document.getElementById('simAgency').textContent = fmt(agency);
+    document.getElementById('simSavings').textContent = fmt(savings);
+    document.getElementById('simSavingsCoaching').textContent = fmt(savingsCoaching);
+    var barPct = agency > 0 ? Math.round((savings / agency) * 100) : 92;
+    document.getElementById('simBarSave').style.width = barPct + '%';
+  };
+  window.updateSim(250000);
+})();
 </script>
 
 </body>
