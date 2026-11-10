@@ -84,11 +84,18 @@ app.get('/fiche-fondateurs', require('./middleware/auth').requireAdmin, (req, re
 app.get('/hoguet-defense', require('./middleware/auth').requireAdmin, (req, res) => { res.set('Cache-Control', 'no-store, no-cache, must-revalidate'); res.sendFile(path.join(__dirname, 'public', 'hoguet-defense.html')); });
 app.get('/dossier-conviction', require('./middleware/auth').requireAdmin, (req, res) => { res.set('Cache-Control', 'no-store, no-cache, must-revalidate'); res.sendFile(path.join(__dirname, 'public', 'dossier-conviction.html')); });
 app.get('/dossier', require('./middleware/auth').requireAdmin, (req, res) => { res.set('Cache-Control', 'no-store, no-cache, must-revalidate'); res.sendFile(path.join(__dirname, 'public', 'dossier.html')); });
-// Vendeur connecté OU admin (seller token OU admin token)
+// Vendeur connecté OU admin OU VRP (seller token OU admin token OU vrp_token)
 function requireAuthOrAdmin(req, res, next) {
   const token = req.cookies?.token;
   if (token) {
     try { require('./services/session').verify(token, 'seller', require('./database')); return next(); } catch {}
+  }
+  const vrpToken = req.cookies?.vrp_token;
+  if (vrpToken) {
+    try {
+      const payload = require('jsonwebtoken').verify(vrpToken, process.env.JWT_SECRET);
+      if (payload.role === 'vrp') return next();
+    } catch {}
   }
   return require('./middleware/auth').requireAdmin(req, res, next);
 }
@@ -111,7 +118,7 @@ app.get('/planning-mise-en-vente', require('./middleware/auth').requireAdmin, (r
 app.get('/planning-fin-de-vente', require('./middleware/auth').requireAdmin, (req, res) => { res.set('Cache-Control', 'no-store, no-cache, must-revalidate'); res.sendFile(path.join(__dirname, 'public', 'planning-fin-de-vente.html')); });
 app.get('/notice-utilisation', require('./middleware/auth').requireAdmin, (req, res) => { res.set('Cache-Control', 'no-store, no-cache, must-revalidate'); res.sendFile(path.join(__dirname, 'public', 'notice-utilisation.html')); });
 app.get('/cheques-parrainage', require('./middleware/auth').requireAdmin, (req, res) => { res.set('Cache-Control', 'no-store, no-cache, must-revalidate'); res.sendFile(path.join(__dirname, 'public', 'cheques-parrainage.html')); });
-app.get('/script-appel-acheteur', require('./middleware/auth').requireAdmin, (req, res) => { res.set('Cache-Control', 'no-store, no-cache, must-revalidate'); res.sendFile(path.join(__dirname, 'public', 'script-appel-acheteur.html')); });
+app.get('/script-appel-acheteur', requireAuthOrAdmin, (req, res) => { res.set('Cache-Control', 'no-store, no-cache, must-revalidate'); res.sendFile(path.join(__dirname, 'public', 'script-appel-acheteur.html')); });
 app.get('/presentation-commerciale', require('./middleware/auth').requireAdmin, (req, res) => { res.set('Cache-Control', 'no-store, no-cache, must-revalidate'); res.sendFile(path.join(__dirname, 'public', 'presentation-commerciale.html')); });
 app.get('/fiche-visite', require('./middleware/auth').requireAdmin, (req, res) => { res.set('Cache-Control', 'no-store, no-cache, must-revalidate'); res.sendFile(path.join(__dirname, 'public', 'fiche-visite.html')); });
 app.get('/fiche-acces-emails', require('./middleware/auth').requireAdmin, (req, res) => { res.set('Cache-Control', 'no-store, no-cache, must-revalidate'); res.sendFile(path.join(__dirname, 'public', 'fiche-acces-emails.html')); });

@@ -426,8 +426,7 @@
       var r = await fetch('/api/vrp/me');
       if (!r.ok) { window.location.href = '/vrp/login'; return; }
       var d = await r.json();
-      var slot = document.getElementById('vrp-sidebar-slot');
-      if (slot) { slot.dataset.name = d.vrp.first_name + ' ' + d.vrp.last_name; slot.dataset.zone = d.vrp.zone || ''; }
+      if (window.vrpSetName) vrpSetName(d.vrp.first_name + ' ' + d.vrp.last_name, d.vrp.zone || '');
     }
     load();
   </script>

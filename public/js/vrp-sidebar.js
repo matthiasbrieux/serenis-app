@@ -26,6 +26,13 @@
     return '<a href="' + item.href + '" class="' + cls + '">' + ICONS[item.icon] + item.label + '</a>';
   }
 
+  function nameHtml(name, zone) {
+    if (!name) return '<div class="vrp-logo-name" id="vrp-logo-name" style="display:none;"></div>';
+    return '<div class="vrp-logo-name" id="vrp-logo-name">' + name
+      + (zone ? '<br><span style="font-weight:400;font-style:normal;opacity:0.7;font-size:0.74rem;">' + zone + '</span>' : '')
+      + '</div>';
+  }
+
   function buildSidebar(vrpName, vrpZone) {
     var navHtml = NAV.map(navLink).join('');
     return ''
@@ -37,7 +44,7 @@
       + '  <div class="vrp-logo">'
       + '    <img src="/images/vendu-par-moi.svg" alt="Vendu Par Moi" class="vrp-logo-img">'
       + '    <span class="vrp-logo-sub">Espace commercial</span>'
-      + (vrpName ? '<div class="vrp-logo-name">' + vrpName + (vrpZone ? '<br><span style="font-weight:400;font-style:normal;opacity:0.7;font-size:0.74rem;">' + vrpZone + '</span>' : '') + '</div>' : '')
+      + nameHtml(vrpName, vrpZone)
       + '  </div>'
       + '  <nav class="vrp-nav">' + navHtml + '</nav>'
       + '  <div class="vrp-footer">'
@@ -48,12 +55,19 @@
       + '</aside>';
   }
 
+  // Callable after sidebar is built (slot is already replaced when async data arrives)
+  window.vrpSetName = function(name, zone) {
+    var el = document.getElementById('vrp-logo-name');
+    if (!el) return;
+    if (!name) { el.style.display = 'none'; return; }
+    el.style.display = '';
+    el.innerHTML = name + (zone ? '<br><span style="font-weight:400;font-style:normal;opacity:0.7;font-size:0.74rem;">' + zone + '</span>' : '');
+  };
+
   function init() {
     var slot = document.getElementById('vrp-sidebar-slot');
     if (!slot) return;
-    var name = slot.dataset.name || '';
-    var zone = slot.dataset.zone || '';
-    slot.outerHTML = buildSidebar(name, zone);
+    slot.outerHTML = buildSidebar('', '');
 
     // Mobile nav toggle
     var btn = document.getElementById('vrp-mobile-nav-btn');

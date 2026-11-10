@@ -166,8 +166,7 @@
       var d = await r.json();
       allProspects = d.prospects || [];
 
-      var sidebarSlot = document.getElementById('vrp-sidebar-slot');
-      if (sidebarSlot) { sidebarSlot.dataset.name = d.vrp.first_name+' '+d.vrp.last_name; sidebarSlot.dataset.zone = d.vrp.zone||''; }
+      if (window.vrpSetName) vrpSetName(d.vrp.first_name + ' ' + d.vrp.last_name, d.vrp.zone || '');
 
       renderTable();
     }
