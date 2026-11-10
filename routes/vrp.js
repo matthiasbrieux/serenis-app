@@ -208,25 +208,25 @@ router.delete('/api/vrp/prospects/:id', requireVRP, (req, res) => {
 });
 
 // ── Mode démonstration ──────────────────────────────────────────────────────
-// Lance une session courte (2h) sur un compte démo vendeur existant.
-// Le VRP ouvre /dashboard dans un nouvel onglet pour présenter la plateforme.
+// Lance une session courte (2h) sur un compte démo vendeur.
+// Initialise automatiquement les données si elles sont absentes (idempotent).
 
 router.post('/api/vrp/demo/start', requireVRP, (req, res) => {
-  const demoSeller = db.prepare(
-    "SELECT * FROM sellers WHERE email LIKE '%@demo.venduparmoi' AND contrat_signe = 1 LIMIT 1"
-  ).get();
+  try {
+    const { getDemoSeller } = require('../services/demo-seed');
+    const demoSeller = getDemoSeller(); // crée les données démo si nécessaire
 
-  if (!demoSeller) {
-    return res.json({
-      success: false,
-      error: "Aucun compte démo disponible. Demandez à l'administration de générer les données de démonstration (Cockpit → Données de démo).",
-    });
+    if (!demoSeller) {
+      return res.json({ success: false, error: "Impossible d'initialiser les données de démonstration. Contactez l'administration." });
+    }
+
+    const demoToken = session.sign(demoSeller, 'seller', '2h');
+    const launchUrl = '/vrp/demo/launch?t=' + encodeURIComponent(demoToken);
+    res.json({ success: true, url: launchUrl });
+  } catch (err) {
+    console.error('[VRP] demo/start error:', err.message);
+    res.json({ success: false, error: "Erreur lors du lancement de la démo. Réessayez." });
   }
-
-  // Créer un token vendeur valide mais court (2h) via session.sign
-  const demoToken = session.sign(demoSeller, 'seller', '2h');
-  const launchUrl = '/vrp/demo/launch?t=' + encodeURIComponent(demoToken);
-  res.json({ success: true, url: launchUrl });
 });
 
 // Point d'entrée de la démo : pose le cookie vendeur et redirige vers le dashboard
