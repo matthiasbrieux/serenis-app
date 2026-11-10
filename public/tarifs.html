@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="fr" data-vpm-vitrine>
 <head>
   <meta charset="UTF-8">
   <link rel="icon" href="/favicon.ico" sizes="any"/>
@@ -7,7 +7,7 @@
   <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16.png"/>
   <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"/>
   <link rel="manifest" href="/manifest.json"/>
-  <meta name="theme-color" content="#3D5A47"/>
+  <meta name="theme-color" content="#9E3A18"/>
   <meta name="apple-mobile-web-app-capable" content="yes"/>
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
   <meta name="apple-mobile-web-app-title" content="VPM"/>
@@ -28,74 +28,73 @@
   <meta name="twitter:description" content="Pack Autonome 999€ ou Pack Coaching Plus 1 548€. Zéro commission sur la vente.">
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/css/style.css?v=3">
+  <link rel="stylesheet" href="/css/palette-vitrine.css"/>
   <style>
-    body { background:#F5F0E8;font-family:'DM Sans',sans-serif;margin:0; }
-    nav { position:fixed;top:0;left:0;right:0;background:rgba(26,26,22,.92);backdrop-filter:blur(12px);z-index:100;padding:14px 32px;display:flex;justify-content:space-between;align-items:center; }
-    nav a.logo { font-family:'Cormorant Garamond',serif;color:#FDFCF8;font-size:1.4rem;text-decoration:none; }
-    nav a.logo em { color:#C4785A;font-style:normal; }
-    nav a.back { color:rgba(253,252,248,.6);font-size:.85rem;text-decoration:none; }
-    nav a.back:hover { color:#FDFCF8; }
-    .hero { padding:120px 32px 64px;text-align:center;max-width:700px;margin:0 auto; }
+    body { background:var(--blanc);font-family:'DM Sans',sans-serif;margin:0; }
+    nav { position:fixed;top:0;left:0;right:0;background:#9E3A18;z-index:100;padding:12px 28px;display:flex;align-items:center;gap:14px; }
+    .nav-logo { display:flex;align-items:center;gap:10px;text-decoration:none; }
+    .nav-logo img { width:150px;height:auto;display:block; }
+    .nav-sep { width:1px;height:28px;background:rgba(255,255,255,0.3); }
+    .nav-label { font-family:'DM Sans',sans-serif;font-size:0.78rem;font-weight:600;color:rgba(255,255,255,0.88);letter-spacing:0.08em;text-transform:uppercase; }
+    .hero { background:var(--blanc); padding:120px 32px 64px;text-align:center;max-width:700px;margin:0 auto; }
     .hero h1 { font-family:'Cormorant Garamond',serif;font-size:3rem;color:#1A1A16;margin:0 0 16px;line-height:1.1; }
     .hero p { font-size:1.05rem;color:#666;line-height:1.7;margin:0 0 12px; }
-    .saving { display:inline-block;background:#D4E4D8;color:#2a4030;font-weight:700;padding:8px 20px;border-radius:20px;font-size:.9rem;margin-top:8px; }
+    .saving { display:inline-block;background:var(--sable-dore);color:var(--terracotta);font-weight:700;padding:8px 20px;border-radius:20px;font-size:.9rem;margin-top:8px; }
     .packs { display:grid;grid-template-columns:1fr 1fr;gap:24px;max-width:860px;margin:0 auto 80px;padding:0 24px; }
     @media(max-width:700px) { .packs { grid-template-columns:1fr; } .hero h1 { font-size:2.2rem; } }
-    .pack-card { background:#FDFCF8;border-radius:20px;overflow:hidden;box-shadow:0 8px 40px rgba(0,0,0,.07);border:2px solid transparent;transition:.2s; }
-    .pack-card.featured { border-color:#3D5A47; }
+    .pack-card { background:var(--blanc);border-radius:20px;overflow:hidden;box-shadow:0 8px 40px rgba(0,0,0,.07);border:2px solid transparent;transition:.2s; }
+    .pack-card.featured { border-color:var(--terracotta); }
     .pack-top { padding:32px 32px 24px; }
-    .pack-badge { display:inline-block;background:#C4785A;color:#fff;font-size:.72rem;font-weight:700;padding:3px 10px;border-radius:10px;margin-bottom:12px; }
+    .pack-badge { display:inline-block;background:var(--terracotta);color:var(--blanc);font-size:.72rem;font-weight:700;padding:3px 10px;border-radius:10px;margin-bottom:12px; }
     .pack-name { font-family:'Cormorant Garamond',serif;font-size:1.7rem;color:#1A1A16;margin:0 0 8px; }
     .pack-price { font-family:'Cormorant Garamond',serif;font-size:3rem;font-weight:700;color:#1A1A16;line-height:1; }
     .pack-price small { font-size:1rem;font-weight:400;color:#888;font-family:'DM Sans',sans-serif; }
     .pack-desc { font-size:.88rem;color:#888;margin:12px 0 0;line-height:1.6; }
-    .pack-features { padding:24px 32px;border-top:1px solid #f0ece6;display:flex;flex-direction:column;gap:10px; }
+    .pack-features { padding:24px 32px;border-top:1px solid var(--blanc);display:flex;flex-direction:column;gap:10px; }
     .feat { display:flex;align-items:flex-start;gap:10px;font-size:.88rem;color:#444;line-height:1.5; }
-    .feat .check { color:#3D5A47;font-weight:700;flex-shrink:0;margin-top:1px; }
+    .feat .check { color:var(--terracotta);font-weight:700;flex-shrink:0;margin-top:1px; }
     .feat .cross { color:#bbb;flex-shrink:0;margin-top:1px; }
     .pack-cta { padding:24px 32px 32px; }
     .btn-pack { display:block;text-align:center;padding:14px 24px;border-radius:10px;font-weight:700;font-size:1rem;text-decoration:none;transition:.2s; }
-    .btn-pack.primary { background:#C4785A;color:#fff; }
-    .btn-pack.primary:hover { background:#b36a4e; }
-    .btn-pack.secondary { background:#f5f0e8;color:#3D5A47;border:1.5px solid #3D5A47; }
-    .btn-pack.secondary:hover { background:#D4E4D8; }
+    .btn-pack.primary { background:var(--terracotta);color:var(--blanc); }
+    .btn-pack.primary:hover { background:var(--terracotta); }
+    .btn-pack.secondary { background:var(--blanc);color:var(--terracotta);border:1.5px solid var(--terracotta); }
+    .btn-pack.secondary:hover { background:var(--sable-dore); }
     .comparison { font-size:.78rem;color:#aaa;text-align:center;margin-top:10px; }
     .guarantee { max-width:720px;margin:0 auto 80px;padding:0 24px; }
-    .guarantee-card { background:#fff;border-radius:16px;padding:32px 36px;display:flex;gap:20px;align-items:flex-start;box-shadow:0 4px 20px rgba(0,0,0,.05); }
+    .guarantee-card { background:var(--blanc);border-radius:16px;padding:32px 36px;display:flex;gap:20px;align-items:flex-start;box-shadow:0 4px 20px rgba(0,0,0,.05); }
     .guarantee-icon { font-size:2rem;flex-shrink:0; }
     .guarantee h3 { font-family:'Cormorant Garamond',serif;font-size:1.4rem;color:#1A1A16;margin:0 0 8px; }
     .guarantee p { font-size:.88rem;color:#666;line-height:1.7;margin:0; }
     .faq-section { max-width:720px;margin:0 auto 80px;padding:0 24px; }
     .faq-section h2 { font-family:'Cormorant Garamond',serif;font-size:1.8rem;color:#1A1A16;margin:0 0 28px;text-align:center; }
-    details { border-bottom:1px solid #e8e0d6;padding:18px 0; }
+    details { border-bottom:1px solid var(--sable-dore);padding:18px 0; }
     summary { font-weight:600;font-size:.95rem;color:#1A1A16;cursor:pointer;list-style:none;display:flex;justify-content:space-between;align-items:center; }
-    summary::after { content:'＋';color:#C4785A;font-size:1.1rem;flex-shrink:0; }
+    summary::after { content:'＋';color:var(--terracotta);font-size:1.1rem;flex-shrink:0; }
     details[open] summary::after { content:'−'; }
     details p { font-size:.88rem;color:#555;line-height:1.75;margin:12px 0 0;padding-left:0; }
-    footer { background:#1A1A16;color:rgba(253,252,248,.4);padding:28px 32px;font-size:.76rem;text-align:center;line-height:1.7; }
-    .btn-callback { display:block;width:100%;margin-top:10px;padding:11px 20px;background:none;border:1.5px solid #C4785A;border-radius:10px;color:#C4785A;font-size:.88rem;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;transition:.2s; }
+    footer { background:#1A1A16;color:color-mix(in srgb, var(--blanc) 40.0%, transparent);padding:28px 32px;font-size:.76rem;text-align:center;line-height:1.7; }
+    .btn-callback { display:block;width:100%;margin-top:10px;padding:11px 20px;background:none;border:1.5px solid var(--terracotta);border-radius:10px;color:var(--terracotta);font-size:.88rem;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;transition:.2s; }
     .btn-callback:hover { background:rgba(196,120,90,.06); }
     .cb-label { display:block;font-size:.82rem;font-weight:600;color:#1A1A16;margin-bottom:6px; }
     .cb-input { width:100%;padding:11px 13px;border:1.5px solid #ddd;border-radius:8px;font-size:.92rem;box-sizing:border-box;font-family:'DM Sans',sans-serif;margin-bottom:12px; }
-    .cb-input:focus { outline:none;border-color:#C4785A; }
+    .cb-input:focus { outline:none;border-color:var(--terracotta); }
     .cb-grid { display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:16px; }
-    .cb-slot { padding:10px 6px;border:1.5px solid #e0d8cf;border-radius:8px;text-align:center;font-size:.82rem;font-weight:500;color:#555;cursor:pointer;transition:.15s;background:#fff; }
-    .cb-slot:hover, .cb-slot.active { border-color:#C4785A;background:#FDF4EF;color:#C4785A; }
+    .cb-slot { padding:10px 6px;border:1.5px solid var(--sable-dore);border-radius:8px;text-align:center;font-size:.82rem;font-weight:500;color:#555;cursor:pointer;transition:.15s;background:var(--blanc); }
+    .cb-slot:hover, .cb-slot.active { border-color:var(--terracotta);background:var(--blanc);color:var(--terracotta); }
   </style>
+<link rel="stylesheet" href="/css/vitrine-actions.css">
 </head>
 <body>
   <nav>
-    <a href="/" class="logo">Vendu Par Moi</a>
-    <a href="/" class="back">← Retour à l'accueil</a>
+    <a href="/" class="nav-logo">
+      <img src="/images/vendu-par-moi.svg" alt="Vendu Par Moi">
+    </a>
+    <span class="nav-sep"></span>
+    <span class="nav-label">Espace collaborateur</span>
   </nav>
 
-  <div class="hero">
-    <h1>Vendez votre bien.<br>Sans commission d'agence.</h1>
-    <p>Économisez en moyenne <strong>15 000 à 25 000 €</strong> par rapport à une agence traditionnelle.</p>
-    <span class="saving">Prix fixe · Pas de surprise · Pas de commission</span>
-  </div>
-
-  <div class="packs">
+  <div class="packs" style="padding-top:120px;">
     <!-- Pack Autonome -->
     <div class="pack-card">
       <div class="pack-top">
@@ -116,9 +115,9 @@
         <div class="feat"><span class="cross">✗</span><span style="color:#bbb;">Retouches et livraison 48h</span></div>
       </div>
       <div class="pack-cta">
-        <button onclick="openCheckout('autonome')" class="btn-pack secondary" style="cursor:pointer;border:none;width:100%;">Choisir le Pack Autonome</button>
+        <button onclick="openCheckout('autonome')" class="btn-pack secondary" style="cursor:pointer;border:none;width:100%;--vpm-rest-bg:rgb(255, 255, 255);--vpm-rest-ink:rgb(158, 58, 24);--vpm-rest-shadow:none;--vpm-rest-image:none;" data-vpm-action="outline">Choisir le Pack Autonome</button>
 
-        <button onclick="openCallback()" class="btn-callback">Une question ? On vous rappelle</button>
+        <button onclick="openCallback()" class="btn-callback" style="--vpm-rest-bg:rgba(0, 0, 0, 0);--vpm-rest-ink:rgb(158, 58, 24);--vpm-rest-shadow:none;--vpm-rest-image:none;" data-vpm-action="outline">Une question ? On vous rappelle</button>
         <p class="comparison">Économisez ~20 000 € vs agence</p>
       </div>
     </div>
@@ -140,12 +139,12 @@
         <div class="feat"><span class="check">✓</span>Publication automatique LeBonCoin, PAP…</div>
         <div class="feat"><span class="check">✓</span>Guide photos immersives pièce par pièce</div>
         <div class="feat"><span class="check">✓</span>Génération de texte d'annonce par IA</div>
-        <div class="feat"><span class="check" style="color:#C4785A;">✓</span><strong>Photographe professionnel Meero</strong></div>
-        <div class="feat"><span class="check" style="color:#C4785A;">✓</span><strong>Retouches et livraison sous 48h</strong></div>
+        <div class="feat"><span class="check" style="color:var(--terracotta);">✓</span><strong>Photographe professionnel Meero</strong></div>
+        <div class="feat"><span class="check" style="color:var(--terracotta);">✓</span><strong>Retouches et livraison sous 48h</strong></div>
       </div>
       <div class="pack-cta">
-        <button onclick="openCheckout('serenite')" class="btn-pack primary" style="cursor:pointer;border:none;width:100%;">Choisir le Pack Coaching Plus</button>
-        <button onclick="openCallback()" class="btn-callback">Une question ? On vous rappelle</button>
+        <button onclick="openCheckout('serenite')" class="btn-pack primary" style="cursor:pointer;border:none;width:100%;--vpm-rest-bg:rgb(158, 58, 24);--vpm-rest-ink:rgb(255, 255, 255);--vpm-rest-shadow:none;--vpm-rest-image:none;" data-vpm-action="solid">Choisir le Pack Coaching Plus</button>
+        <button onclick="openCallback()" class="btn-callback" style="--vpm-rest-bg:rgba(0, 0, 0, 0);--vpm-rest-ink:rgb(158, 58, 24);--vpm-rest-shadow:none;--vpm-rest-image:none;" data-vpm-action="outline">Une question ? On vous rappelle</button>
         <p class="comparison">Économisez ~20 000 € vs frais habituels · Photo pro incluse</p>
       </div>
     </div>
@@ -153,8 +152,8 @@
 
   <!-- Checkout modal -->
   <div id="checkoutModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:1000;align-items:center;justify-content:center;padding:16px;">
-    <div style="background:#FDFCF8;border-radius:20px;padding:36px 32px;max-width:440px;width:100%;position:relative;box-shadow:0 20px 60px rgba(0,0,0,.2);">
-      <button onclick="closeCheckout()" style="position:absolute;top:16px;right:16px;background:none;border:none;font-size:1.4rem;color:#888;cursor:pointer;">×</button>
+    <div style="background:var(--blanc);border-radius:20px;padding:36px 32px;max-width:440px;width:100%;position:relative;box-shadow:0 20px 60px rgba(0,0,0,.2);">
+      <button onclick="closeCheckout()" style="position:absolute;top:16px;right:16px;background:none;border:none;font-size:1.4rem;color:#888;cursor:pointer;--vpm-rest-bg:rgba(0, 0, 0, 0);--vpm-rest-ink:rgb(136, 136, 136);--vpm-rest-shadow:none;--vpm-rest-image:none;" data-vpm-action="control" data-vpm-inline-bg data-vpm-inline-ink>×</button>
       <h2 id="checkoutTitle" style="font-family:'Cormorant Garamond',serif;font-size:1.6rem;color:#1A1A16;margin:0 0 6px;"></h2>
       <p id="checkoutPrice" style="font-family:'Cormorant Garamond',serif;font-size:2.2rem;font-weight:700;color:#1A1A16;margin:0 0 24px;"></p>
       <form id="checkoutForm" onsubmit="submitCheckout(event)">
@@ -172,11 +171,11 @@
         </div>
         <label style="display:flex;gap:10px;align-items:flex-start;font-size:.82rem;color:#555;margin-bottom:20px;cursor:pointer;">
           <input type="checkbox" id="checkoutCgv" required style="margin-top:2px;flex-shrink:0;">
-          J'accepte les <a href="/cgv" target="_blank" style="color:#C4785A;">CGV</a> et le contrat de prestation Vendu Par Moi.
+          J'accepte les <a href="/cgv" target="_blank" style="color:var(--terracotta);--vpm-rest-bg:rgba(0, 0, 0, 0);--vpm-rest-ink:rgb(158, 58, 24);--vpm-rest-shadow:none;--vpm-rest-image:none;" data-vpm-action="text" data-vpm-inline-ink>CGV</a> et le contrat de prestation Vendu Par Moi.
         </label>
         <div id="checkoutError" style="display:none;color:#c0392b;font-size:.85rem;margin-bottom:12px;padding:10px;background:#fdf2f0;border-radius:6px;"></div>
         <button type="submit" id="checkoutBtn"
-          style="width:100%;padding:14px;background:#C4785A;color:#fff;border:none;border-radius:10px;font-weight:700;font-size:1rem;cursor:pointer;font-family:'DM Sans',sans-serif;">
+          style="width:100%;padding:14px;background:var(--terracotta);color:var(--blanc);border:none;border-radius:10px;font-weight:700;font-size:1rem;cursor:pointer;font-family:'DM Sans',sans-serif;--vpm-rest-bg:rgb(158, 58, 24);--vpm-rest-ink:rgb(255, 255, 255);--vpm-rest-shadow:none;--vpm-rest-image:none;" data-vpm-action="solid" data-vpm-inline-bg data-vpm-inline-ink>
           Payer en toute sécurité →
         </button>
         <p style="text-align:center;font-size:.75rem;color:#aaa;margin:12px 0 0;">🔒 Paiement sécurisé par Stripe · Données chiffrées</p>
@@ -291,12 +290,12 @@
   <footer>
     <p>Vendu Par Moi · Vendez votre bien immobilier entre particuliers</p>
     <p>Matthias Brieux — 06 95 44 36 54 — contact@venduparmoi.fr — Douai (59)</p>
-    <p style="margin-top:8px;"><a href="/cgv" style="color:inherit;">CGV</a> · <a href="/mentions-legales" style="color:inherit;">Mentions légales</a> · <a href="/faq" style="color:inherit;">FAQ</a> · <a href="/" style="color:inherit;">Accueil</a></p>
+    <p style="margin-top:8px;"><a href="/cgv" style="color:inherit;--vpm-rest-bg:rgba(0, 0, 0, 0);--vpm-rest-ink:color(srgb 1 1 1 / 0.4);--vpm-rest-shadow:none;--vpm-rest-image:none;" data-vpm-action="text" data-vpm-dark data-vpm-inline-ink>CGV</a> · <a href="/mentions-legales" style="color:inherit;--vpm-rest-bg:rgba(0, 0, 0, 0);--vpm-rest-ink:color(srgb 1 1 1 / 0.4);--vpm-rest-shadow:none;--vpm-rest-image:none;" data-vpm-action="text" data-vpm-dark data-vpm-inline-ink>Mentions légales</a> · <a href="/faq" style="color:inherit;--vpm-rest-bg:rgba(0, 0, 0, 0);--vpm-rest-ink:color(srgb 1 1 1 / 0.4);--vpm-rest-shadow:none;--vpm-rest-image:none;" data-vpm-action="text" data-vpm-dark data-vpm-inline-ink>FAQ</a> · <a href="/" style="color:inherit;--vpm-rest-bg:rgba(0, 0, 0, 0);--vpm-rest-ink:color(srgb 1 1 1 / 0.4);--vpm-rest-shadow:none;--vpm-rest-image:none;" data-vpm-action="text" data-vpm-dark data-vpm-inline-ink>Accueil</a></p>
   </footer>
   <!-- Modal rappel -->
   <div id="callbackModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:2000;align-items:center;justify-content:center;padding:16px;">
-    <div style="background:#FDFCF8;border-radius:20px;padding:36px 32px;max-width:420px;width:100%;position:relative;box-shadow:0 20px 60px rgba(0,0,0,.2);">
-      <button onclick="closeCallback()" style="position:absolute;top:16px;right:16px;background:none;border:none;font-size:1.4rem;color:#888;cursor:pointer;">×</button>
+    <div style="background:var(--blanc);border-radius:20px;padding:36px 32px;max-width:420px;width:100%;position:relative;box-shadow:0 20px 60px rgba(0,0,0,.2);">
+      <button onclick="closeCallback()" style="position:absolute;top:16px;right:16px;background:none;border:none;font-size:1.4rem;color:#888;cursor:pointer;--vpm-rest-bg:rgba(0, 0, 0, 0);--vpm-rest-ink:rgb(136, 136, 136);--vpm-rest-shadow:none;--vpm-rest-image:none;" data-vpm-action="control" data-vpm-inline-bg data-vpm-inline-ink>×</button>
 
       <div id="cbForm">
         <h2 style="font-family:'Cormorant Garamond',serif;font-size:1.6rem;color:#1A1A16;margin:0 0 4px;">Être rappelé</h2>
@@ -319,7 +318,7 @@
         </div>
 
         <div id="cbError" style="display:none;color:#c0392b;font-size:.83rem;margin-bottom:12px;padding:9px 12px;background:#fdf2f0;border-radius:6px;"></div>
-        <button onclick="submitCallback()" id="cbBtn" style="width:100%;padding:13px;background:#C4785A;color:#fff;border:none;border-radius:10px;font-weight:700;font-size:.95rem;cursor:pointer;font-family:'DM Sans',sans-serif;">Demander à être rappelé →</button>
+        <button onclick="submitCallback()" id="cbBtn" style="width:100%;padding:13px;background:var(--terracotta);color:var(--blanc);border:none;border-radius:10px;font-weight:700;font-size:.95rem;cursor:pointer;font-family:'DM Sans',sans-serif;--vpm-rest-bg:rgb(158, 58, 24);--vpm-rest-ink:rgb(255, 255, 255);--vpm-rest-shadow:none;--vpm-rest-image:none;" data-vpm-action="solid" data-vpm-inline-bg data-vpm-inline-ink>Demander à être rappelé →</button>
         <p style="text-align:center;font-size:.73rem;color:#bbb;margin:10px 0 0;">Aucun engagement · Rappel gratuit</p>
       </div>
 
@@ -327,7 +326,7 @@
         <div style="font-size:2.5rem;margin-bottom:16px;">✅</div>
         <h2 style="font-family:'Cormorant Garamond',serif;font-size:1.5rem;color:#1A1A16;margin:0 0 10px;">Demande enregistrée</h2>
         <p style="font-size:.88rem;color:#666;line-height:1.7;margin:0 0 24px;">Merci ! Un membre de notre équipe vous recontacte sous 24h.</p>
-        <button onclick="closeCallback()" style="padding:11px 28px;background:#3D5A47;color:#fff;border:none;border-radius:8px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;">Fermer</button>
+        <button onclick="closeCallback()" style="padding:11px 28px;background:var(--terracotta);color:var(--blanc);border:none;border-radius:8px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;--vpm-rest-bg:rgb(158, 58, 24);--vpm-rest-ink:rgb(255, 255, 255);--vpm-rest-shadow:none;--vpm-rest-image:none;" data-vpm-action="solid" data-vpm-inline-bg data-vpm-inline-ink>Fermer</button>
       </div>
     </div>
   </div>

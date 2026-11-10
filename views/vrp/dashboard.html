@@ -17,8 +17,8 @@
         <p class="vrp-page-sub" id="dateLabel"></p>
       </div>
 
-      <!-- KPIs -->
-      <div class="vrp-stats-row" id="statsRow">
+      <!-- KPIs activité -->
+      <div class="vrp-stats-row">
         <div class="vrp-stat accent">
           <div class="vrp-stat-label">Commissions ce mois</div>
           <div class="vrp-stat-val" id="stat-commissions">—</div>
@@ -42,7 +42,7 @@
       </div>
 
       <div style="display:grid;grid-template-columns:1fr 320px;gap:20px;align-items:start;">
-        <!-- Prospects à rappeler -->
+        <!-- Actions prioritaires -->
         <div class="vrp-card">
           <div class="vrp-card-head">
             <span class="vrp-card-title">Actions prioritaires</span>
@@ -64,15 +64,51 @@
         </div>
       </div>
 
-      <!-- Dernières ventes VRP -->
-      <div class="vrp-card" style="margin-top:20px;">
+      <!-- Séparateur commissions -->
+      <div style="margin-top:32px;margin-bottom:16px;display:flex;align-items:center;gap:14px;">
+        <span style="font-family:'Cormorant Garamond',serif;font-size:1.25rem;font-weight:600;color:#1A1A16;">Mes commissions</span>
+        <div style="flex:1;height:1px;background:#EAE4DC;"></div>
+      </div>
+
+      <!-- KPIs commissions -->
+      <div class="vrp-stats-row">
+        <div class="vrp-stat accent">
+          <div class="vrp-stat-label">Total commissions HT</div>
+          <div class="vrp-stat-val" id="cs-total">—</div>
+          <div class="vrp-stat-sub">Depuis le début</div>
+        </div>
+        <div class="vrp-stat">
+          <div class="vrp-stat-label">Versées</div>
+          <div class="vrp-stat-val" id="cs-paid">—</div>
+          <div class="vrp-stat-sub">Déjà reçues</div>
+        </div>
+        <div class="vrp-stat">
+          <div class="vrp-stat-label">En attente</div>
+          <div class="vrp-stat-val" id="cs-pending">—</div>
+          <div class="vrp-stat-sub">À recevoir</div>
+        </div>
+        <div class="vrp-stat">
+          <div class="vrp-stat-label">Taux</div>
+          <div class="vrp-stat-val" id="cs-rate">—</div>
+          <div class="vrp-stat-sub">De commission</div>
+        </div>
+      </div>
+
+      <!-- Historique complet des ventes -->
+      <div class="vrp-card" style="margin-top:0;">
         <div class="vrp-card-head">
-          <span class="vrp-card-title">Mes dernières ventes</span>
-          <a href="/vrp/commissions" class="vrp-card-action">Toutes les commissions →</a>
+          <span class="vrp-card-title">Historique des ventes</span>
         </div>
-        <div id="salesList">
-          <div style="padding:16px 20px;text-align:center;color:#A09C95;font-size:0.84rem;">Chargement…</div>
+        <div id="salesTable">
+          <div style="padding:30px;text-align:center;color:#A09C95;">Chargement…</div>
         </div>
+      </div>
+
+      <!-- Note calcul -->
+      <div style="background:#fdf9f6;border:1px solid #f0e8df;border-radius:10px;padding:14px 18px;margin-top:16px;font-size:0.8rem;color:#8a7a72;line-height:1.6;">
+        <strong style="color:var(--vrp-dark);">Comment sont calculées vos commissions ?</strong><br>
+        Vos commissions sont calculées selon votre taux personnel convenu avec l'administration, appliqué au montant HT du pack souscrit par le client.
+        Les commissions sont versées après validation administrative. Pour toute question, contactez Guillaume ou Matthias.
       </div>
     </main>
   </div>
@@ -81,17 +117,19 @@
   <script>
     document.getElementById('dateLabel').textContent = new Date().toLocaleDateString('fr-FR', {weekday:'long',day:'numeric',month:'long',year:'numeric'});
 
+    function money(n) { if (!n && n !== 0) return '—'; return Number(n).toLocaleString('fr-FR',{style:'currency',currency:'EUR',minimumFractionDigits:0}); }
+    function esc(s) { return String(s||'').replace(/[&<>"']/g,function(c){return({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]);}); }
+
     async function load() {
       try {
         var r = await fetch('/api/vrp/me');
         if (!r.ok) { window.location.href = '/vrp/login'; return; }
         var d = await r.json();
 
-        // Sidebar name
         var slot = document.getElementById('vrp-sidebar-slot');
         if (slot) { slot.dataset.name = d.vrp.first_name + ' ' + d.vrp.last_name; slot.dataset.zone = d.vrp.zone || ''; }
 
-        // Stats
+        // KPIs activité
         document.getElementById('stat-commissions').textContent = money(d.stats.commissions_month_ht);
         document.getElementById('stat-prospects').textContent = d.stats.prospects_active;
         document.getElementById('stat-sales').textContent = d.stats.sales_total;
@@ -126,32 +164,41 @@
           }).join('');
         }
 
-        // Dernières ventes
-        var sl = document.getElementById('salesList');
-        if (!d.sales || !d.sales.length) {
-          sl.innerHTML = '<div style="padding:20px;text-align:center;color:#A09C95;font-size:0.84rem;font-style:italic;">Aucune vente enregistrée pour le moment.</div>';
+        // KPIs commissions
+        var sales = d.sales || [];
+        var total   = sales.reduce(function(s,x){ return s+(x.commission_amount_ht||0); },0);
+        var paid    = sales.filter(function(x){ return x.commission_paid; }).reduce(function(s,x){ return s+(x.commission_amount_ht||0); },0);
+        var pending = total - paid;
+        document.getElementById('cs-total').textContent   = money(total);
+        document.getElementById('cs-paid').textContent    = money(paid);
+        document.getElementById('cs-pending').textContent = money(pending);
+        document.getElementById('cs-rate').textContent    = d.vrp.commission_rate ? (d.vrp.commission_rate + ' %') : '—';
+
+        // Historique complet
+        var el = document.getElementById('salesTable');
+        if (!sales.length) {
+          el.innerHTML = '<div style="padding:40px;text-align:center;color:#A09C95;font-style:italic;">Aucune vente enregistrée pour le moment.<br>Vos ventes apparaîtront ici après validation par l\'administration.</div>';
         } else {
-          sl.innerHTML = '<table class="vrp-table"><thead><tr><th>Vendeur</th><th>Pack</th><th>Montant HT</th><th>Commission HT</th><th>Date</th><th>Statut</th></tr></thead><tbody>'
-            + d.sales.slice(0,5).map(function(s) {
-              var paid = s.commission_paid ? '<span style="color:#065f46;font-weight:600;">Versée</span>' : '<span style="color:#b45309;">En attente</span>';
-              return '<tr><td style="font-weight:600;">'+esc(s.seller_name||'—')+'</td><td>'+esc(s.pack)+'</td><td>'+money(s.pack_amount_ht)+'</td><td style="font-weight:600;color:var(--vrp-terra);">'+money(s.commission_amount_ht)+'</td><td>'+new Date(s.sale_date).toLocaleDateString('fr-FR')+'</td><td>'+paid+'</td></tr>';
+          el.innerHTML = '<table class="vrp-table"><thead><tr><th>Client</th><th>Pack</th><th>Montant pack HT</th><th>Votre commission HT</th><th>Date de vente</th><th>Statut</th></tr></thead><tbody>'
+            + sales.map(function(s) {
+              var paidStatus = s.commission_paid
+                ? '<span style="color:#065f46;font-weight:600;">✓ Versée</span>'+(s.commission_paid_at ? '<br><small style="color:#A09C95;">'+new Date(s.commission_paid_at).toLocaleDateString('fr-FR')+'</small>' : '')
+                : '<span style="color:#b45309;">En attente</span>';
+              return '<tr>'
+                +'<td style="font-weight:600;">'+esc(s.seller_name||'—')+'</td>'
+                +'<td><span style="font-size:0.78rem;background:rgba(158,58,24,0.1);color:var(--vrp-terra);padding:3px 8px;border-radius:12px;font-weight:600;">'+esc(s.pack)+'</span></td>'
+                +'<td>'+money(s.pack_amount_ht)+'</td>'
+                +'<td style="font-weight:700;color:var(--vrp-terra);font-size:1.05rem;">'+money(s.commission_amount_ht)+'</td>'
+                +'<td>'+new Date(s.sale_date).toLocaleDateString('fr-FR',{day:'numeric',month:'long',year:'numeric'})+'</td>'
+                +'<td>'+paidStatus+'</td>'
+                +'</tr>';
             }).join('')
             + '</tbody></table>';
-        }
-
-        // Re-init sidebar avec les bonnes données
-        var sidebarSlot = document.getElementById('vrp-sidebar-slot');
-        if (sidebarSlot) {
-          sidebarSlot.dataset.name = d.vrp.first_name + ' ' + d.vrp.last_name;
-          sidebarSlot.dataset.zone = d.vrp.zone || '';
         }
       } catch(e) {
         console.error(e);
       }
     }
-
-    function money(n) { if (!n && n !== 0) return '—'; return Number(n).toLocaleString('fr-FR',{style:'currency',currency:'EUR',minimumFractionDigits:0}); }
-    function esc(s) { return String(s||'').replace(/[&<>"']/g,function(c){return({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]);}); }
 
     load();
   </script>

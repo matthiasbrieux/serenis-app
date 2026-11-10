@@ -34,10 +34,7 @@ router.get('/vrp/prospects',   requireVRP, (req, res) => {
   res.sendFile(path.join(__dirname, '../views/vrp/prospects.html'));
 });
 
-router.get('/vrp/commissions', requireVRP, (req, res) => {
-  res.set('Cache-Control', 'no-store, no-cache, must-revalidate');
-  res.sendFile(path.join(__dirname, '../views/vrp/commissions.html'));
-});
+router.get('/vrp/commissions', requireVRP, (req, res) => res.redirect('/vrp/dashboard'));
 
 router.get('/vrp/ressources',  requireVRP, (req, res) => {
   res.set('Cache-Control', 'no-store, no-cache, must-revalidate');

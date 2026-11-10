@@ -11,7 +11,6 @@
   var NAV = [
     { label: 'Mon activité',      href: '/vrp/dashboard',    icon: 'activity'    },
     { label: 'Mes prospects',     href: '/vrp/prospects',    icon: 'prospects'   },
-    { label: 'Mes commissions',   href: '/vrp/commissions',  icon: 'commissions' },
     { label: 'Mes ressources',    href: '/vrp/ressources',   icon: 'ressources'  },
   ];
 
