@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mes prospects — Espace VRP</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/vrp.css">
+  <style>
+    .prospect-row { cursor: pointer; }
+    .prospect-row:hover td { background: #fdfcfa; }
+    .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 500; display: flex; align-items: center; justify-content: center; padding: 20px; }
+    .modal-box { background: #fff; border-radius: 14px; width: 100%; max-width: 580px; max-height: 90vh; overflow-y: auto; padding: 28px 32px; }
+    .modal-title { font-family: 'Cormorant Garamond', serif; font-size: 1.5rem; font-weight: 600; margin: 0 0 20px; }
+    .modal-close { float: right; background: none; border: none; font-size: 1.3rem; cursor: pointer; color: #999; margin-top: -4px; }
+    .status-tabs { display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; }
+    .status-tab { padding: 6px 14px; border-radius: 20px; font-size: 0.78rem; font-weight: 600; cursor: pointer; border: 1.5px solid #E0DAD3; background: #fff; color: #666; transition: all 0.15s; }
+    .status-tab.active { background: var(--vrp-terra); color: #fff; border-color: var(--vrp-terra); }
+  </style>
+</head>
+<body class="vrp-body">
+  <div class="vrp-layout">
+    <div id="vrp-sidebar-slot" data-name="" data-zone=""></div>
+
+    <main class="vrp-main">
+      <div class="vrp-page-header" style="display:flex;align-items:flex-end;justify-content:space-between;">
+        <div>
+          <h1 class="vrp-page-title">Mes prospects</h1>
+          <p class="vrp-page-sub">Gérez votre pipeline commercial</p>
+        </div>
+        <button class="vrp-btn vrp-btn-primary" onclick="openNewProspect()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Nouveau prospect
+        </button>
+      </div>
+
+      <!-- Filtres par statut -->
+      <div class="status-tabs" id="statusTabs">
+        <button class="status-tab active" data-status="all">Tous</button>
+        <button class="status-tab" data-status="nouveau">Nouveau</button>
+        <button class="status-tab" data-status="contacté">Contacté</button>
+        <button class="status-tab" data-status="rdv_planifié">RDV planifié</button>
+        <button class="status-tab" data-status="démo_faite">Démo faite</button>
+        <button class="status-tab" data-status="souscrit">Souscrit</button>
+        <button class="status-tab" data-status="perdu">Perdu</button>
+      </div>
+
+      <div class="vrp-card">
+        <div id="prospectsTable">
+          <div style="padding:30px;text-align:center;color:#A09C95;">Chargement…</div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Modal prospect -->
+  <div class="modal-overlay" id="prospectModal" style="display:none;">
+    <div class="modal-box">
+      <button class="modal-close" onclick="closeModal()">✕</button>
+      <h2 class="modal-title" id="modalTitle">Nouveau prospect</h2>
+      <form id="prospectForm">
+        <input type="hidden" id="prospectId">
+        <div class="vrp-grid-2">
+          <div class="vrp-form-row">
+            <label class="vrp-label">Prénom *</label>
+            <input class="vrp-input" type="text" id="pFirstName" required>
+          </div>
+          <div class="vrp-form-row">
+            <label class="vrp-label">Nom</label>
+            <input class="vrp-input" type="text" id="pLastName">
+          </div>
+        </div>
+        <div class="vrp-grid-2">
+          <div class="vrp-form-row">
+            <label class="vrp-label">Téléphone</label>
+            <input class="vrp-input" type="tel" id="pPhone">
+          </div>
+          <div class="vrp-form-row">
+            <label class="vrp-label">Email</label>
+            <input class="vrp-input" type="email" id="pEmail">
+          </div>
+        </div>
+        <div class="vrp-grid-3">
+          <div class="vrp-form-row">
+            <label class="vrp-label">Ville</label>
+            <input class="vrp-input" type="text" id="pCity">
+          </div>
+          <div class="vrp-form-row">
+            <label class="vrp-label">Type de bien</label>
+            <select class="vrp-select" id="pPropertyType">
+              <option value="">—</option>
+              <option>Maison</option>
+              <option>Appartement</option>
+              <option>Terrain</option>
+              <option>Autre</option>
+            </select>
+          </div>
+          <div class="vrp-form-row">
+            <label class="vrp-label">Surface (m²)</label>
+            <input class="vrp-input" type="number" id="pSurface">
+          </div>
+        </div>
+        <div class="vrp-grid-2">
+          <div class="vrp-form-row">
+            <label class="vrp-label">Prix estimé (€)</label>
+            <input class="vrp-input" type="number" id="pPrice" step="1000">
+          </div>
+          <div class="vrp-form-row">
+            <label class="vrp-label">Statut</label>
+            <select class="vrp-select" id="pStatus">
+              <option value="nouveau">Nouveau</option>
+              <option value="contacté">Contacté</option>
+              <option value="rdv_planifié">RDV planifié</option>
+              <option value="démo_faite">Démo faite</option>
+              <option value="souscrit">Souscrit</option>
+              <option value="perdu">Perdu</option>
+            </select>
+          </div>
+        </div>
+        <div class="vrp-grid-2">
+          <div class="vrp-form-row">
+            <label class="vrp-label">Date RDV</label>
+            <input class="vrp-input" type="date" id="pRdvDate">
+          </div>
+          <div class="vrp-form-row">
+            <label class="vrp-label">Heure RDV</label>
+            <input class="vrp-input" type="time" id="pRdvTime">
+          </div>
+        </div>
+        <div class="vrp-grid-2">
+          <div class="vrp-form-row">
+            <label class="vrp-label">Prochaine action</label>
+            <input class="vrp-input" type="text" id="pNextAction" placeholder="Ex: Rappeler, Envoyer brochure…">
+          </div>
+          <div class="vrp-form-row">
+            <label class="vrp-label">Date prochaine action</label>
+            <input class="vrp-input" type="date" id="pNextActionDate">
+          </div>
+        </div>
+        <div class="vrp-form-row">
+          <label class="vrp-label">Notes</label>
+          <textarea class="vrp-textarea" id="pNotes" rows="3"></textarea>
+        </div>
+        <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:4px;">
+          <button type="button" class="vrp-btn vrp-btn-ghost" onclick="closeModal()">Annuler</button>
+          <button type="submit" class="vrp-btn vrp-btn-primary" id="saveBtn">Enregistrer</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="/js/vrp-sidebar.js"></script>
+  <script>
+    var allProspects = [];
+    var activeStatus = 'all';
+
+    var statusLabels = { nouveau:'Nouveau', contacté:'Contacté', rdv_planifié:'RDV planifié', démo_faite:'Démo faite', souscrit:'Souscrit', perdu:'Perdu' };
+    var statusClasses = { nouveau:'nouveau', contacté:'contacte', rdv_planifié:'rdv', démo_faite:'demo', souscrit:'souscrit', perdu:'perdu' };
+
+    function esc(s) { return String(s||'').replace(/[&<>"']/g,function(c){return({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]);}); }
+    function money(n) { if (!n) return '—'; return (n).toLocaleString('fr-FR',{style:'currency',currency:'EUR',minimumFractionDigits:0}); }
+
+    async function loadProspects() {
+      var r = await fetch('/api/vrp/me');
+      if (!r.ok) { window.location.href='/vrp/login'; return; }
+      var d = await r.json();
+      allProspects = d.prospects || [];
+
+      var sidebarSlot = document.getElementById('vrp-sidebar-slot');
+      if (sidebarSlot) { sidebarSlot.dataset.name = d.vrp.first_name+' '+d.vrp.last_name; sidebarSlot.dataset.zone = d.vrp.zone||''; }
+
+      renderTable();
+    }
+
+    function renderTable() {
+      var filtered = activeStatus === 'all' ? allProspects : allProspects.filter(function(p){ return p.status === activeStatus; });
+      var el = document.getElementById('prospectsTable');
+      if (!filtered.length) {
+        el.innerHTML = '<div style="padding:40px;text-align:center;color:#A09C95;font-style:italic;">Aucun prospect dans cette catégorie.</div>';
+        return;
+      }
+      el.innerHTML = '<table class="vrp-table"><thead><tr><th>Contact</th><th>Localisation</th><th>Bien</th><th>Statut</th><th>Prochain RDV</th><th>Prochaine action</th><th></th></tr></thead><tbody>'
+        + filtered.map(function(p) {
+          var rdv = p.rdv_date ? new Date(p.rdv_date).toLocaleDateString('fr-FR',{day:'numeric',month:'short'}) : '—';
+          var sc = statusClasses[p.status] || 'nouveau';
+          return '<tr class="prospect-row" onclick="editProspect('+p.id+')">'
+            +'<td><div style="font-weight:600;">'+esc(p.first_name)+' '+esc(p.last_name||'')+'</div><div style="font-size:0.76rem;color:#A09C95;">'+esc(p.phone||'')+'</div></td>'
+            +'<td>'+esc(p.city||'—')+'</td>'
+            +'<td style="font-size:0.8rem;">'+esc(p.property_type||'—')+(p.property_surface?' · '+p.property_surface+'m²':'')+'</td>'
+            +'<td><span class="vrp-pill vrp-pill-'+sc+'">'+esc(statusLabels[p.status]||p.status)+'</span></td>'
+            +'<td style="font-size:0.8rem;">'+rdv+'</td>'
+            +'<td style="font-size:0.8rem;color:#b45309;">'+esc(p.next_action||'—')+'</td>'
+            +'<td><button class="vrp-btn vrp-btn-ghost vrp-btn-sm" onclick="event.stopPropagation();editProspect('+p.id+')">Modifier</button></td>'
+            +'</tr>';
+        }).join('')
+        + '</tbody></table>';
+    }
+
+    document.getElementById('statusTabs').addEventListener('click', function(e) {
+      if (!e.target.dataset.status) return;
+      activeStatus = e.target.dataset.status;
+      document.querySelectorAll('.status-tab').forEach(function(t){ t.classList.remove('active'); });
+      e.target.classList.add('active');
+      renderTable();
+    });
+
+    function openNewProspect() {
+      document.getElementById('modalTitle').textContent = 'Nouveau prospect';
+      document.getElementById('prospectForm').reset();
+      document.getElementById('prospectId').value = '';
+      document.getElementById('prospectModal').style.display = 'flex';
+    }
+    function closeModal() { document.getElementById('prospectModal').style.display = 'none'; }
+
+    function editProspect(id) {
+      var p = allProspects.find(function(x){ return x.id === id; });
+      if (!p) return;
+      document.getElementById('modalTitle').textContent = 'Modifier le prospect';
+      document.getElementById('prospectId').value = p.id;
+      document.getElementById('pFirstName').value = p.first_name||'';
+      document.getElementById('pLastName').value = p.last_name||'';
+      document.getElementById('pPhone').value = p.phone||'';
+      document.getElementById('pEmail').value = p.email||'';
+      document.getElementById('pCity').value = p.city||'';
+      document.getElementById('pPropertyType').value = p.property_type||'';
+      document.getElementById('pSurface').value = p.property_surface||'';
+      document.getElementById('pPrice').value = p.estimated_price||'';
+      document.getElementById('pStatus').value = p.status||'nouveau';
+      document.getElementById('pRdvDate').value = p.rdv_date||'';
+      document.getElementById('pRdvTime').value = p.rdv_time||'';
+      document.getElementById('pNextAction').value = p.next_action||'';
+      document.getElementById('pNextActionDate').value = p.next_action_date||'';
+      document.getElementById('pNotes').value = p.notes||'';
+      document.getElementById('prospectModal').style.display = 'flex';
+    }
+
+    document.getElementById('prospectForm').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      var btn = document.getElementById('saveBtn');
+      btn.disabled = true; btn.textContent = 'Enregistrement…';
+      var id = document.getElementById('prospectId').value;
+      var body = {
+        first_name: document.getElementById('pFirstName').value,
+        last_name: document.getElementById('pLastName').value,
+        phone: document.getElementById('pPhone').value,
+        email: document.getElementById('pEmail').value,
+        city: document.getElementById('pCity').value,
+        property_type: document.getElementById('pPropertyType').value,
+        property_surface: document.getElementById('pSurface').value ? parseInt(document.getElementById('pSurface').value) : null,
+        estimated_price: document.getElementById('pPrice').value ? parseInt(document.getElementById('pPrice').value) : null,
+        status: document.getElementById('pStatus').value,
+        rdv_date: document.getElementById('pRdvDate').value,
+        rdv_time: document.getElementById('pRdvTime').value,
+        next_action: document.getElementById('pNextAction').value,
+        next_action_date: document.getElementById('pNextActionDate').value,
+        notes: document.getElementById('pNotes').value,
+      };
+      var url = id ? '/api/vrp/prospects/'+id : '/api/vrp/prospects';
+      var method = id ? 'PUT' : 'POST';
+      var r = await fetch(url, { method: method, headers:{'Content-Type':'application/json'}, body: JSON.stringify(body) });
+      var d = await r.json();
+      if (d.success) { closeModal(); await loadProspects(); }
+      else { alert(d.error || 'Erreur'); }
+      btn.disabled = false; btn.textContent = 'Enregistrer';
+    });
+
+    loadProspects();
+  </script>
+</body>
+</html>

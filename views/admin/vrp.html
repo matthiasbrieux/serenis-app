@@ -593,6 +593,10 @@
         <label>Notes internes</label>
         <textarea id="vrpNotes" rows="2" placeholder="Notes libres…"></textarea>
       </div>
+      <div class="form-row" id="vrpPasswordRow">
+        <label id="vrpPasswordLabel">Mot de passe (laisser vide pour ne pas modifier)</label>
+        <input type="password" id="vrpPassword" placeholder="Nouveau mot de passe…" autocomplete="new-password">
+      </div>
     </div>
     <div class="modal-footer">
       <button class="btn-secondary" onclick="closeModal()">Annuler</button>
@@ -679,8 +683,10 @@ function filterVrps() {
 function openModal() {
   document.getElementById('modalTitle').textContent = 'Nouveau VRP';
   document.getElementById('vrpId').value = '';
-  ['vrpFirstName','vrpLastName','vrpEmail','vrpPhone','vrpZone','vrpNotes','vrpCommission'].forEach(id => document.getElementById(id).value = '');
+  ['vrpFirstName','vrpLastName','vrpEmail','vrpPhone','vrpZone','vrpNotes','vrpCommission','vrpPassword'].forEach(id => document.getElementById(id).value = '');
   document.getElementById('vrpStatus').value = 'actif';
+  document.getElementById('vrpPasswordLabel').textContent = 'Mot de passe *';
+  document.getElementById('vrpPassword').placeholder = 'Choisir un mot de passe…';
   document.getElementById('vrpModal').classList.add('show');
 }
 
@@ -697,13 +703,17 @@ function editVrp(id) {
   document.getElementById('vrpNotes').value = v.notes || '';
   document.getElementById('vrpCommission').value = v.commission_rate || '';
   document.getElementById('vrpStatus').value = v.status || 'actif';
+  document.getElementById('vrpPassword').value = '';
+  document.getElementById('vrpPasswordLabel').textContent = 'Mot de passe (laisser vide pour ne pas modifier)';
+  document.getElementById('vrpPassword').placeholder = 'Nouveau mot de passe…';
   document.getElementById('vrpModal').classList.add('show');
 }
 
 function closeModal() { document.getElementById('vrpModal').classList.remove('show'); }
 
 async function saveVrp() {
-  const id = document.getElementById('vrpId').value;
+  const id  = document.getElementById('vrpId').value;
+  const pwd = document.getElementById('vrpPassword').value.trim();
   const body = {
     first_name:      document.getElementById('vrpFirstName').value.trim(),
     last_name:       document.getElementById('vrpLastName').value.trim(),
@@ -715,11 +725,21 @@ async function saveVrp() {
     commission_rate: document.getElementById('vrpCommission').value ? +document.getElementById('vrpCommission').value : null,
   };
   if (!body.first_name || !body.last_name || !body.email) return alert('Prénom, nom et email sont requis.');
+  if (!id && !pwd) return alert('Un mot de passe est requis pour créer un compte VRP.');
   const url  = id ? `/admin/api/vrp/${id}` : '/admin/api/vrp';
   const meth = id ? 'PATCH' : 'POST';
   const r = await fetch(url, { method: meth, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
   const data = await r.json();
   if (data.error) return alert('Erreur : ' + data.error);
+
+  // Mise à jour du mot de passe si renseigné
+  const newId = id || (data.vrp && data.vrp.id) || null;
+  if (pwd && newId) {
+    const rp = await fetch(`/admin/api/vrp/${newId}/set-password`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ password: pwd }) });
+    const dp = await rp.json();
+    if (!dp.success) return alert('VRP enregistré mais erreur mot de passe : ' + (dp.error || ''));
+  }
+
   closeModal();
   loadVrps();
 }

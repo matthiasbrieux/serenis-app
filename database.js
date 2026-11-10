@@ -685,6 +685,7 @@ try { db.exec("ALTER TABLE visits ADD COLUMN skip_reason TEXT"); } catch(e) {}
 try { db.exec("ALTER TABLE visits ADD COLUMN skip_comment TEXT"); } catch(e) {}
 try { db.exec("ALTER TABLE visits ADD COLUMN skipped_at TEXT"); } catch(e) {}
 try { db.exec("ALTER TABLE visits ADD COLUMN followup_sent_at TEXT"); } catch(e) {}
+try { db.exec("ALTER TABLE visits ADD COLUMN dossier_serieux_sent_at TEXT"); } catch(e) {}
 
 // ── Anti-bruteforce par compte : compte les échecs de mot de passe
 // pour déclencher une vérification par email seulement après plusieurs
@@ -757,4 +758,103 @@ db.exec(`
     created_at TEXT DEFAULT CURRENT_TIMESTAMP
   );
 `);
+// ── Estimation publique — prospects ──────────────────────────
+db.exec(`
+  CREATE TABLE IF NOT EXISTS estimation_requests (
+    id                       INTEGER PRIMARY KEY AUTOINCREMENT,
+    created_at               DATETIME DEFAULT CURRENT_TIMESTAMP,
+    raw_address              TEXT,
+    address                  TEXT,
+    city                     TEXT,
+    postal_code              TEXT,
+    surface                  INTEGER,
+    property_type            TEXT,
+    prenom                   TEXT NOT NULL,
+    email                    TEXT NOT NULL,
+    phone                    TEXT,
+    callback_consent         INTEGER DEFAULT 0,
+    callback_consent_at      DATETIME,
+    callback_consent_version TEXT,
+    estimation_status        TEXT,
+    price_m2                 INTEGER,
+    indicative_value         INTEGER,
+    email_status             TEXT DEFAULT 'pending',
+    notif_status             TEXT DEFAULT 'pending',
+    ip_hash                  TEXT
+  );
+`);
+
+// ── LOT 5 : colonnes consentements + statut commercial ───────────
+try { db.exec("ALTER TABLE estimation_requests ADD COLUMN phone_consent INTEGER DEFAULT 0"); } catch(e) {}
+try { db.exec("ALTER TABLE estimation_requests ADD COLUMN phone_consent_at DATETIME"); } catch(e) {}
+try { db.exec("ALTER TABLE estimation_requests ADD COLUMN phone_consent_version TEXT"); } catch(e) {}
+try { db.exec("ALTER TABLE estimation_requests ADD COLUMN email_consent INTEGER DEFAULT 0"); } catch(e) {}
+try { db.exec("ALTER TABLE estimation_requests ADD COLUMN email_consent_at DATETIME"); } catch(e) {}
+try { db.exec("ALTER TABLE estimation_requests ADD COLUMN email_consent_version TEXT"); } catch(e) {}
+try { db.exec("ALTER TABLE estimation_requests ADD COLUMN commercial_status TEXT DEFAULT 'prospect'"); } catch(e) {}
+// Token non-devinable pour sécuriser le lien CTA e-mail
+try { db.exec("ALTER TABLE estimation_requests ADD COLUMN cta_token TEXT"); } catch(e) {}
+// Téléphone collecté sur /entretien + champs admin pour estimation_callback_requests
+try { db.exec("ALTER TABLE estimation_callback_requests ADD COLUMN phone TEXT"); } catch(e) {}
+try { db.exec("ALTER TABLE estimation_callback_requests ADD COLUMN rappel_prevu_le TEXT"); } catch(e) {}
+try { db.exec("ALTER TABLE estimation_callback_requests ADD COLUMN rdv_prevu_le TEXT"); } catch(e) {}
+try { db.exec("ALTER TABLE estimation_callback_requests ADD COLUMN updated_at TEXT"); } catch(e) {}
+
+// ── Demandes d'entretien liées à une estimation ───────────────────
+db.exec(`
+  CREATE TABLE IF NOT EXISTS estimation_callback_requests (
+    id                   INTEGER PRIMARY KEY AUTOINCREMENT,
+    estimation_request_id INTEGER REFERENCES estimation_requests(id),
+    email                TEXT NOT NULL,
+    sell_horizon         TEXT,
+    source               TEXT DEFAULT 'email_cta',
+    statut               TEXT DEFAULT 'a_contacter',
+    notes                TEXT,
+    created_at           TEXT DEFAULT (datetime('now'))
+  )
+`);
+
+// ── LOT 6 : champs adresse structurée BAN ───────────────────────
+try { db.exec("ALTER TABLE estimation_requests ADD COLUMN insee_code TEXT"); } catch(e) {}
+try { db.exec("ALTER TABLE estimation_requests ADD COLUMN lat REAL"); } catch(e) {}
+try { db.exec("ALTER TABLE estimation_requests ADD COLUMN lon REAL"); } catch(e) {}
+try { db.exec("ALTER TABLE estimation_requests ADD COLUMN address_source TEXT DEFAULT 'form'"); } catch(e) {}
+
+// ── LOT 7 : VRP authentification + espace commercial ────────────
+// Authentification VRP (password, 2FA-ready)
+try { db.exec("ALTER TABLE vrps ADD COLUMN password TEXT"); } catch(e) {}
+try { db.exec("ALTER TABLE vrps ADD COLUMN failed_login_attempts INTEGER DEFAULT 0"); } catch(e) {}
+try { db.exec("ALTER TABLE vrps ADD COLUMN last_login_at DATETIME"); } catch(e) {}
+
+// Prospects VRP (CRM commercial)
+try {
+  db.exec(`
+    CREATE TABLE IF NOT EXISTS vrp_prospects (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      vrp_id INTEGER NOT NULL REFERENCES vrps(id) ON DELETE CASCADE,
+      first_name TEXT NOT NULL,
+      last_name TEXT,
+      email TEXT,
+      phone TEXT,
+      city TEXT,
+      property_type TEXT,
+      property_surface INTEGER,
+      estimated_price INTEGER,
+      status TEXT DEFAULT 'nouveau',
+      notes TEXT,
+      rdv_date TEXT,
+      rdv_time TEXT,
+      next_action TEXT,
+      next_action_date TEXT,
+      source TEXT DEFAULT 'terrain',
+      seller_id INTEGER REFERENCES sellers(id) ON DELETE SET NULL,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    )
+  `);
+} catch(e) { console.error('[DB] vrp_prospects error:', e.message); }
+
+// Mode démonstration (flag sur compte vendeur démo)
+try { db.exec("ALTER TABLE sellers ADD COLUMN is_demo INTEGER DEFAULT 0"); } catch(e) {}
+
 module.exports = db;

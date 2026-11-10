@@ -1,0 +1,476 @@
+/* ═══════════════════════════════════════════════════════════════
+   Espace VRP — Vendu Par Moi
+   Palette : terracotta #9E3A18, crème #F5F0E8, sidebar sombre
+   ═══════════════════════════════════════════════════════════════ */
+
+:root {
+  --vrp-sidebar-w: 230px;
+  --vrp-sidebar-bg: #1A1410;
+  --vrp-sidebar-text: rgba(245,240,232,0.55);
+  --vrp-sidebar-hover: rgba(245,240,232,0.06);
+  --vrp-active-bg: rgba(158,58,24,0.14);
+  --vrp-active-text: #C4603A;
+  --vrp-border: rgba(245,240,232,0.08);
+  --vrp-cream: #F5F0E8;
+  --vrp-dark: #1A1A16;
+  --vrp-terra: #9E3A18;
+  --vrp-terra-lt: #C4603A;
+  --vrp-text2: #68665E;
+  --vrp-text3: #A09C95;
+  --vrp-card-bg: #fff;
+  --vrp-border-card: #E8E3D9;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+
+body.vrp-body {
+  margin: 0;
+  background: var(--vrp-cream);
+  color: var(--vrp-dark);
+  font-family: 'DM Sans', 'Helvetica Neue', Arial, sans-serif;
+  font-size: 14px;
+}
+
+/* ── Layout ─────────────────────────────────────────────────── */
+.vrp-layout { display: flex; min-height: 100vh; }
+
+/* ── Sidebar ─────────────────────────────────────────────────── */
+.vrp-sidebar {
+  width: var(--vrp-sidebar-w);
+  min-width: var(--vrp-sidebar-w);
+  background: var(--vrp-sidebar-bg);
+  display: flex;
+  flex-direction: column;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow: hidden;
+  z-index: 100;
+}
+
+.vrp-logo {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  padding: 18px 20px 15px;
+  border-bottom: 1px solid var(--vrp-border);
+}
+.vrp-logo-img { height: 28px; width: auto; }
+.vrp-logo-sub {
+  font-size: 0.65rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--vrp-terra-lt);
+}
+.vrp-logo-name {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: rgba(245,240,232,0.9);
+  margin-top: 10px;
+  padding: 6px 20px;
+  background: rgba(158,58,24,0.1);
+  border-left: 3px solid var(--vrp-terra);
+  border-radius: 0 6px 6px 0;
+  margin: 10px 10px 0;
+  line-height: 1.3;
+  font-style: italic;
+  font-size: 0.82rem;
+}
+
+.vrp-nav {
+  flex: 1;
+  overflow-y: auto;
+  padding: 8px 0;
+  scrollbar-width: none;
+}
+.vrp-nav::-webkit-scrollbar { display: none; }
+
+.vrp-group-title {
+  font-size: 0.58rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: rgba(245,240,232,0.28);
+  padding: 14px 20px 3px;
+}
+
+.vrp-nav a {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 20px;
+  color: var(--vrp-sidebar-text);
+  text-decoration: none;
+  font-size: 0.84rem;
+  font-weight: 500;
+  transition: background 0.15s, color 0.15s;
+  border-left: 3px solid transparent;
+}
+.vrp-nav a:hover { background: var(--vrp-sidebar-hover); color: rgba(245,240,232,0.85); }
+.vrp-nav a.active {
+  background: var(--vrp-active-bg);
+  color: var(--vrp-active-text);
+  border-left-color: var(--vrp-active-text);
+  font-weight: 600;
+}
+
+.vrp-footer {
+  border-top: 1px solid var(--vrp-border);
+  padding: 8px 0;
+}
+
+/* ── Main ─────────────────────────────────────────────────────── */
+.vrp-main {
+  flex: 1;
+  min-width: 0;
+  padding: 32px;
+  background: var(--vrp-cream);
+  overflow-y: auto;
+}
+
+/* ── Page header ─────────────────────────────────────────────── */
+.vrp-page-header { margin-bottom: 28px; }
+.vrp-page-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 2rem;
+  font-weight: 600;
+  color: var(--vrp-dark);
+  margin: 0 0 4px;
+}
+.vrp-page-sub { font-size: 0.78rem; color: var(--vrp-text3); }
+
+/* ── Stats cards ─────────────────────────────────────────────── */
+.vrp-stats-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+  margin-bottom: 24px;
+}
+.vrp-stat {
+  background: var(--vrp-card-bg);
+  border-radius: 12px;
+  padding: 18px 20px;
+  border: 1px solid var(--vrp-border-card);
+  box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+}
+.vrp-stat-label {
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--vrp-text3);
+  margin-bottom: 6px;
+  font-weight: 600;
+}
+.vrp-stat-val {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 2.2rem;
+  font-weight: 600;
+  color: var(--vrp-dark);
+  line-height: 1;
+}
+.vrp-stat-sub { font-size: 0.72rem; color: var(--vrp-text3); margin-top: 4px; }
+.vrp-stat.accent {
+  background: linear-gradient(135deg, var(--vrp-terra), #7A2C12);
+  border-color: transparent;
+}
+.vrp-stat.accent .vrp-stat-label,
+.vrp-stat.accent .vrp-stat-val,
+.vrp-stat.accent .vrp-stat-sub { color: rgba(255,255,255,0.9); }
+
+/* ── Card ────────────────────────────────────────────────────── */
+.vrp-card {
+  background: var(--vrp-card-bg);
+  border-radius: 12px;
+  border: 1px solid var(--vrp-border-card);
+  box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+  overflow: hidden;
+  margin-bottom: 20px;
+}
+.vrp-card-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--vrp-border-card);
+}
+.vrp-card-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: var(--vrp-dark);
+}
+.vrp-card-action {
+  font-size: 0.78rem;
+  color: var(--vrp-terra-lt);
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+  background: none;
+  border: none;
+  padding: 0;
+}
+.vrp-card-action:hover { color: var(--vrp-terra); }
+.vrp-card-body { padding: 16px 20px; }
+
+/* ── Buttons ─────────────────────────────────────────────────── */
+.vrp-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 9px 18px;
+  border-radius: 8px;
+  font-size: 0.84rem;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  transition: opacity 0.15s, background 0.15s;
+  text-decoration: none;
+  line-height: 1.4;
+}
+.vrp-btn-primary { background: var(--vrp-terra); color: #fff; }
+.vrp-btn-primary:hover { background: #7A2C12; }
+.vrp-btn-outline { background: #fff; color: var(--vrp-terra); border: 1.5px solid var(--vrp-terra); }
+.vrp-btn-outline:hover { background: rgba(158,58,24,0.06); }
+.vrp-btn-ghost { background: transparent; color: var(--vrp-text2); border: 1.5px solid var(--vrp-border-card); }
+.vrp-btn-ghost:hover { background: #f7f4f0; }
+.vrp-btn-sm { padding: 6px 12px; font-size: 0.78rem; }
+
+/* ── Status pills ────────────────────────────────────────────── */
+.vrp-pill {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.vrp-pill-nouveau   { background: #F0F0F0; color: #666; }
+.vrp-pill-contacte  { background: #DBEAFE; color: #1d4ed8; }
+.vrp-pill-rdv       { background: #FEF3C7; color: #b45309; }
+.vrp-pill-demo      { background: #EDE9FE; color: #6d28d9; }
+.vrp-pill-souscrit  { background: #D1FAE5; color: #065f46; }
+.vrp-pill-perdu     { background: #FEE2E2; color: #dc2626; }
+
+/* ── Table ───────────────────────────────────────────────────── */
+.vrp-table { width: 100%; border-collapse: collapse; font-size: 0.82rem; }
+.vrp-table thead th {
+  text-align: left;
+  padding: 9px 14px;
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--vrp-text3);
+  border-bottom: 1px solid var(--vrp-border-card);
+  font-weight: 600;
+}
+.vrp-table tbody td { padding: 11px 14px; border-bottom: 1px solid #F7F5F2; vertical-align: middle; }
+.vrp-table tbody tr:last-child td { border-bottom: none; }
+.vrp-table tbody tr:hover td { background: #fdfcfa; }
+
+/* ── Empty state ─────────────────────────────────────────────── */
+.vrp-empty {
+  text-align: center;
+  padding: 40px 20px;
+  color: var(--vrp-text3);
+  font-size: 0.88rem;
+}
+.vrp-empty-icon { font-size: 2.5rem; margin-bottom: 10px; }
+
+/* ── Form ────────────────────────────────────────────────────── */
+.vrp-form-row { margin-bottom: 16px; }
+.vrp-label { display: block; font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--vrp-text2); margin-bottom: 6px; }
+.vrp-input, .vrp-select, .vrp-textarea {
+  width: 100%;
+  padding: 9px 12px;
+  border: 1.5px solid #E0DAD3;
+  border-radius: 8px;
+  font-size: 0.88rem;
+  font-family: 'DM Sans', sans-serif;
+  color: var(--vrp-dark);
+  background: #fff;
+  outline: none;
+  transition: border-color 0.15s;
+}
+.vrp-input:focus, .vrp-select:focus, .vrp-textarea:focus { border-color: var(--vrp-terra-lt); }
+.vrp-textarea { resize: vertical; min-height: 80px; }
+.vrp-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.vrp-grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; }
+
+/* ── Mode démo banner ────────────────────────────────────────── */
+.vrp-demo-banner {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: #3D1A6E;
+  color: #fff;
+  padding: 10px 20px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  position: sticky;
+  top: 0;
+  z-index: 999;
+}
+.vrp-demo-banner a {
+  margin-left: auto;
+  color: rgba(255,255,255,0.75);
+  text-decoration: underline;
+  font-weight: 400;
+  font-size: 0.78rem;
+  flex-shrink: 0;
+}
+
+/* ── Ressources ──────────────────────────────────────────────── */
+.vrp-resource-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
+.vrp-resource-card {
+  background: var(--vrp-card-bg);
+  border-radius: 12px;
+  border: 1px solid var(--vrp-border-card);
+  padding: 20px 22px;
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+  text-decoration: none;
+  color: inherit;
+  transition: box-shadow 0.15s;
+}
+.vrp-resource-card:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.09); }
+.vrp-resource-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  background: rgba(158,58,24,0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  color: var(--vrp-terra);
+}
+.vrp-resource-title, .vrp-resource-label { font-weight: 600; font-size: 0.9rem; color: var(--vrp-dark); margin-bottom: 4px; }
+.vrp-resource-desc, .vrp-resource-sub   { font-size: 0.78rem; color: var(--vrp-text3); line-height: 1.5; }
+.vrp-resource-soon  { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; color: var(--vrp-terra); margin-top: 6px; }
+
+/* ── Présentation demo card ──────────────────────────────────── */
+.vrp-demo-launch {
+  background: linear-gradient(135deg, var(--vrp-terra), #7A2C12);
+  border-radius: 14px;
+  padding: 28px 32px;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  margin-bottom: 24px;
+}
+.vrp-demo-launch-icon { font-size: 2.8rem; flex-shrink: 0; }
+.vrp-demo-launch h2 { font-family: 'Cormorant Garamond', serif; font-size: 1.5rem; font-weight: 600; margin: 0 0 6px; }
+.vrp-demo-launch p { font-size: 0.84rem; opacity: 0.85; margin: 0 0 16px; line-height: 1.5; }
+.vrp-demo-launch-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(255,255,255,0.18);
+  color: #fff;
+  border: 1.5px solid rgba(255,255,255,0.4);
+  padding: 10px 22px;
+  border-radius: 8px;
+  font-size: 0.88rem;
+  font-weight: 700;
+  cursor: pointer;
+  text-decoration: none;
+  transition: background 0.15s;
+}
+.vrp-demo-launch-btn:hover { background: rgba(255,255,255,0.28); }
+
+/* ── Login page ──────────────────────────────────────────────── */
+.vrp-login-bg {
+  min-height: 100vh;
+  background: linear-gradient(135deg, var(--vrp-terra) 0%, #7A2C12 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+.vrp-login-box {
+  background: #fff;
+  border-radius: 16px;
+  padding: 40px 44px;
+  width: 100%;
+  max-width: 400px;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.25);
+}
+.vrp-login-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.9rem;
+  font-weight: 600;
+  color: var(--vrp-dark);
+  margin: 0 0 4px;
+  text-align: center;
+}
+.vrp-login-sub {
+  text-align: center;
+  font-size: 0.82rem;
+  color: var(--vrp-text3);
+  margin-bottom: 28px;
+}
+.vrp-error-box {
+  background: #FEE2E2;
+  border-left: 4px solid #dc2626;
+  border-radius: 6px;
+  padding: 10px 14px;
+  font-size: 0.82rem;
+  color: #dc2626;
+  margin-bottom: 16px;
+}
+
+/* ── Mobile nav toggle ───────────────────────────────────────── */
+.vrp-mobile-nav-btn {
+  display: none;
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 200;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: var(--vrp-terra);
+  color: #fff;
+  border: none;
+  cursor: pointer;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 16px rgba(158,58,24,0.4);
+}
+.vrp-sidebar.mobile-open {
+  display: flex !important;
+  position: fixed;
+  top: 0; left: 0; bottom: 0;
+  z-index: 300;
+  width: 260px;
+  box-shadow: 4px 0 24px rgba(0,0,0,0.3);
+}
+.vrp-sidebar-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.4);
+  z-index: 299;
+}
+.vrp-sidebar-overlay.show { display: block; }
+
+/* ── Responsive ──────────────────────────────────────────────── */
+@media (max-width: 900px) {
+  .vrp-sidebar { display: none; }
+  .vrp-mobile-nav-btn { display: flex; }
+  .vrp-main { padding: 20px 16px; }
+  .vrp-stats-row { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+  .vrp-resource-grid { grid-template-columns: 1fr; }
+  .vrp-grid-2, .vrp-grid-3 { grid-template-columns: 1fr; }
+  .vrp-demo-launch { flex-direction: column; gap: 16px; padding: 20px; }
+  .vrp-page-title { font-size: 1.5rem; }
+}
+@media (max-width: 480px) {
+  .vrp-stats-row { grid-template-columns: 1fr 1fr; }
+  .vrp-table { display: block; overflow-x: auto; }
+}

@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mon activité — Espace VRP</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/vrp.css">
+</head>
+<body class="vrp-body">
+  <div class="vrp-layout">
+    <div id="vrp-sidebar-slot" data-name="" data-zone=""></div>
+
+    <main class="vrp-main">
+      <div class="vrp-page-header">
+        <h1 class="vrp-page-title">Mon activité</h1>
+        <p class="vrp-page-sub" id="dateLabel"></p>
+      </div>
+
+      <!-- KPIs -->
+      <div class="vrp-stats-row" id="statsRow">
+        <div class="vrp-stat accent">
+          <div class="vrp-stat-label">Commissions ce mois</div>
+          <div class="vrp-stat-val" id="stat-commissions">—</div>
+          <div class="vrp-stat-sub">En attente de calcul</div>
+        </div>
+        <div class="vrp-stat">
+          <div class="vrp-stat-label">Prospects actifs</div>
+          <div class="vrp-stat-val" id="stat-prospects">—</div>
+          <div class="vrp-stat-sub">Dans le pipeline</div>
+        </div>
+        <div class="vrp-stat">
+          <div class="vrp-stat-label">Ventes réalisées</div>
+          <div class="vrp-stat-val" id="stat-sales">—</div>
+          <div class="vrp-stat-sub">Total depuis le début</div>
+        </div>
+        <div class="vrp-stat">
+          <div class="vrp-stat-label">RDV ce mois</div>
+          <div class="vrp-stat-val" id="stat-rdv">—</div>
+          <div class="vrp-stat-sub">Réalisés</div>
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 320px;gap:20px;align-items:start;">
+        <!-- Prospects à rappeler -->
+        <div class="vrp-card">
+          <div class="vrp-card-head">
+            <span class="vrp-card-title">Actions prioritaires</span>
+            <a href="/vrp/prospects" class="vrp-card-action">Voir tous →</a>
+          </div>
+          <div id="priorityList">
+            <div style="padding:16px 20px;text-align:center;color:#A09C95;font-size:0.84rem;">Chargement…</div>
+          </div>
+        </div>
+
+        <!-- Prochains RDV -->
+        <div class="vrp-card">
+          <div class="vrp-card-head">
+            <span class="vrp-card-title">Prochains RDV</span>
+          </div>
+          <div id="rdvList">
+            <div style="padding:16px 20px;text-align:center;color:#A09C95;font-size:0.84rem;">Chargement…</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Dernières ventes VRP -->
+      <div class="vrp-card" style="margin-top:20px;">
+        <div class="vrp-card-head">
+          <span class="vrp-card-title">Mes dernières ventes</span>
+          <a href="/vrp/commissions" class="vrp-card-action">Toutes les commissions →</a>
+        </div>
+        <div id="salesList">
+          <div style="padding:16px 20px;text-align:center;color:#A09C95;font-size:0.84rem;">Chargement…</div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="/js/vrp-sidebar.js"></script>
+  <script>
+    document.getElementById('dateLabel').textContent = new Date().toLocaleDateString('fr-FR', {weekday:'long',day:'numeric',month:'long',year:'numeric'});
+
+    async function load() {
+      try {
+        var r = await fetch('/api/vrp/me');
+        if (!r.ok) { window.location.href = '/vrp/login'; return; }
+        var d = await r.json();
+
+        // Sidebar name
+        var slot = document.getElementById('vrp-sidebar-slot');
+        if (slot) { slot.dataset.name = d.vrp.first_name + ' ' + d.vrp.last_name; slot.dataset.zone = d.vrp.zone || ''; }
+
+        // Stats
+        document.getElementById('stat-commissions').textContent = money(d.stats.commissions_month_ht);
+        document.getElementById('stat-prospects').textContent = d.stats.prospects_active;
+        document.getElementById('stat-sales').textContent = d.stats.sales_total;
+        document.getElementById('stat-rdv').textContent = d.stats.rdv_this_month;
+
+        // Actions prioritaires
+        var pl = document.getElementById('priorityList');
+        var priority = (d.prospects || []).filter(function(p) { return p.next_action_date && new Date(p.next_action_date) <= new Date(Date.now()+3*86400000); }).slice(0,5);
+        if (!priority.length) {
+          pl.innerHTML = '<div style="padding:16px 20px;text-align:center;color:#A09C95;font-size:0.84rem;font-style:italic;">Aucune action urgente aujourd\'hui 🎉</div>';
+        } else {
+          pl.innerHTML = '<table class="vrp-table"><thead><tr><th>Prospect</th><th>Action</th><th>Échéance</th></tr></thead><tbody>'
+            + priority.map(function(p) {
+              var d2 = p.next_action_date ? new Date(p.next_action_date).toLocaleDateString('fr-FR') : '—';
+              return '<tr><td><a href="/vrp/prospects?id='+p.id+'" style="font-weight:600;color:var(--vrp-dark);text-decoration:none;">'+esc(p.first_name)+' '+esc(p.last_name||'')+'</a><br><small style="color:#A09C95;">'+esc(p.city||'')+'</small></td><td style="font-size:0.8rem;">'+esc(p.next_action||'—')+'</td><td style="font-size:0.8rem;color:#b45309;">'+d2+'</td></tr>';
+            }).join('')
+            + '</tbody></table>';
+        }
+
+        // RDV à venir
+        var rl = document.getElementById('rdvList');
+        var rdvs = (d.prospects || []).filter(function(p) { return p.rdv_date && new Date(p.rdv_date) >= new Date(); }).sort(function(a,b){return a.rdv_date.localeCompare(b.rdv_date);}).slice(0,4);
+        if (!rdvs.length) {
+          rl.innerHTML = '<div style="padding:16px 20px;text-align:center;color:#A09C95;font-size:0.84rem;font-style:italic;">Aucun RDV planifié</div>';
+        } else {
+          rl.innerHTML = rdvs.map(function(p) {
+            var d2 = new Date(p.rdv_date).toLocaleDateString('fr-FR',{day:'numeric',month:'short'});
+            return '<div style="display:flex;gap:12px;align-items:center;padding:10px 16px;border-bottom:1px solid #F7F5F2;">'
+              +'<div style="background:rgba(158,58,24,0.1);color:var(--vrp-terra);border-radius:8px;padding:6px 10px;text-align:center;min-width:48px;font-size:0.72rem;font-weight:700;">'+d2+'</div>'
+              +'<div><div style="font-weight:600;font-size:0.84rem;">'+esc(p.first_name)+' '+esc(p.last_name||'')+'</div><div style="font-size:0.76rem;color:#A09C95;">'+esc(p.city||'')+'</div></div>'
+              +'</div>';
+          }).join('');
+        }
+
+        // Dernières ventes
+        var sl = document.getElementById('salesList');
+        if (!d.sales || !d.sales.length) {
+          sl.innerHTML = '<div style="padding:20px;text-align:center;color:#A09C95;font-size:0.84rem;font-style:italic;">Aucune vente enregistrée pour le moment.</div>';
+        } else {
+          sl.innerHTML = '<table class="vrp-table"><thead><tr><th>Vendeur</th><th>Pack</th><th>Montant HT</th><th>Commission HT</th><th>Date</th><th>Statut</th></tr></thead><tbody>'
+            + d.sales.slice(0,5).map(function(s) {
+              var paid = s.commission_paid ? '<span style="color:#065f46;font-weight:600;">Versée</span>' : '<span style="color:#b45309;">En attente</span>';
+              return '<tr><td style="font-weight:600;">'+esc(s.seller_name||'—')+'</td><td>'+esc(s.pack)+'</td><td>'+money(s.pack_amount_ht)+'</td><td style="font-weight:600;color:var(--vrp-terra);">'+money(s.commission_amount_ht)+'</td><td>'+new Date(s.sale_date).toLocaleDateString('fr-FR')+'</td><td>'+paid+'</td></tr>';
+            }).join('')
+            + '</tbody></table>';
+        }
+
+        // Re-init sidebar avec les bonnes données
+        var sidebarSlot = document.getElementById('vrp-sidebar-slot');
+        if (sidebarSlot) {
+          sidebarSlot.dataset.name = d.vrp.first_name + ' ' + d.vrp.last_name;
+          sidebarSlot.dataset.zone = d.vrp.zone || '';
+        }
+      } catch(e) {
+        console.error(e);
+      }
+    }
+
+    function money(n) { if (!n && n !== 0) return '—'; return Number(n).toLocaleString('fr-FR',{style:'currency',currency:'EUR',minimumFractionDigits:0}); }
+    function esc(s) { return String(s||'').replace(/[&<>"']/g,function(c){return({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]);}); }
+
+    load();
+  </script>
+</body>
+</html>

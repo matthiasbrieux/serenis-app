@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mes commissions — Espace VRP</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/vrp.css">
+</head>
+<body class="vrp-body">
+  <div class="vrp-layout">
+    <div id="vrp-sidebar-slot" data-name="" data-zone=""></div>
+
+    <main class="vrp-main">
+      <div class="vrp-page-header">
+        <h1 class="vrp-page-title">Mes commissions</h1>
+        <p class="vrp-page-sub">Suivi de vos ventes et rémunérations</p>
+      </div>
+
+      <!-- Totaux -->
+      <div class="vrp-stats-row" id="commStats">
+        <div class="vrp-stat accent">
+          <div class="vrp-stat-label">Total commissions HT</div>
+          <div class="vrp-stat-val" id="cs-total">—</div>
+          <div class="vrp-stat-sub">Depuis le début</div>
+        </div>
+        <div class="vrp-stat">
+          <div class="vrp-stat-label">Versées</div>
+          <div class="vrp-stat-val" id="cs-paid">—</div>
+          <div class="vrp-stat-sub">Déjà reçues</div>
+        </div>
+        <div class="vrp-stat">
+          <div class="vrp-stat-label">En attente</div>
+          <div class="vrp-stat-val" id="cs-pending">—</div>
+          <div class="vrp-stat-sub">À recevoir</div>
+        </div>
+        <div class="vrp-stat">
+          <div class="vrp-stat-label">Taux moyen</div>
+          <div class="vrp-stat-val" id="cs-rate">—</div>
+          <div class="vrp-stat-sub">De commission</div>
+        </div>
+      </div>
+
+      <!-- Tableau des ventes -->
+      <div class="vrp-card">
+        <div class="vrp-card-head">
+          <span class="vrp-card-title">Historique des ventes</span>
+        </div>
+        <div id="salesTable">
+          <div style="padding:30px;text-align:center;color:#A09C95;">Chargement…</div>
+        </div>
+      </div>
+
+      <!-- Note calcul -->
+      <div style="background:#fdf9f6;border:1px solid #f0e8df;border-radius:10px;padding:14px 18px;margin-top:16px;font-size:0.8rem;color:#8a7a72;line-height:1.6;">
+        <strong style="color:var(--vrp-dark);">Comment sont calculées vos commissions ?</strong><br>
+        Vos commissions sont calculées selon votre taux personnel convenu avec l'administration, appliqué au montant HT du pack souscrit par le client.
+        Les commissions sont versées après validation administrative. Pour toute question, contactez Guillaume ou Matthias.
+      </div>
+    </main>
+  </div>
+
+  <script src="/js/vrp-sidebar.js"></script>
+  <script>
+    function esc(s) { return String(s||'').replace(/[&<>"']/g,function(c){return({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]);}); }
+    function money(n) { if (!n && n!==0) return '—'; return Number(n).toLocaleString('fr-FR',{style:'currency',currency:'EUR',minimumFractionDigits:0}); }
+
+    async function load() {
+      var r = await fetch('/api/vrp/me');
+      if (!r.ok) { window.location.href='/vrp/login'; return; }
+      var d = await r.json();
+
+      var sidebarSlot = document.getElementById('vrp-sidebar-slot');
+      if (sidebarSlot) { sidebarSlot.dataset.name = d.vrp.first_name+' '+d.vrp.last_name; sidebarSlot.dataset.zone = d.vrp.zone||''; }
+
+      var sales = d.sales || [];
+      var total = sales.reduce(function(s,x){ return s+(x.commission_amount_ht||0); },0);
+      var paid  = sales.filter(function(x){ return x.commission_paid; }).reduce(function(s,x){ return s+(x.commission_amount_ht||0); },0);
+      var pending = total - paid;
+      var rate = d.vrp.commission_rate ? (d.vrp.commission_rate + ' %') : '—';
+
+      document.getElementById('cs-total').textContent   = money(total);
+      document.getElementById('cs-paid').textContent    = money(paid);
+      document.getElementById('cs-pending').textContent = money(pending);
+      document.getElementById('cs-rate').textContent    = rate;
+
+      var el = document.getElementById('salesTable');
+      if (!sales.length) {
+        el.innerHTML = '<div style="padding:40px;text-align:center;color:#A09C95;font-style:italic;">Aucune vente enregistrée pour le moment.<br>Vos ventes apparaîtront ici après validation par l\'administration.</div>';
+        return;
+      }
+      el.innerHTML = '<table class="vrp-table"><thead><tr><th>Client</th><th>Pack</th><th>Montant pack HT</th><th>Votre commission HT</th><th>Date de vente</th><th>Statut</th></tr></thead><tbody>'
+        + sales.map(function(s) {
+          var paid = s.commission_paid
+            ? '<span style="color:#065f46;font-weight:600;">✓ Versée</span>'+(s.commission_paid_at ? '<br><small style="color:#A09C95;">'+new Date(s.commission_paid_at).toLocaleDateString('fr-FR')+'</small>' : '')
+            : '<span style="color:#b45309;">En attente</span>';
+          return '<tr>'
+            +'<td style="font-weight:600;">'+esc(s.seller_name||'—')+'<br><small style="color:#A09C95;">'+esc(s.pack)+'</small></td>'
+            +'<td><span style="font-size:0.78rem;background:rgba(158,58,24,0.1);color:var(--vrp-terra);padding:3px 8px;border-radius:12px;font-weight:600;">'+esc(s.pack)+'</span></td>'
+            +'<td>'+money(s.pack_amount_ht)+'</td>'
+            +'<td style="font-weight:700;color:var(--vrp-terra);font-size:1.05rem;">'+money(s.commission_amount_ht)+'</td>'
+            +'<td>'+new Date(s.sale_date).toLocaleDateString('fr-FR',{day:'numeric',month:'long',year:'numeric'})+'</td>'
+            +'<td>'+paid+'</td>'
+            +'</tr>';
+        }).join('')
+        + '</tbody></table>';
+    }
+
+    load();
+  </script>
+</body>
+</html>

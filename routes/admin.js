@@ -432,8 +432,8 @@ router.post('/api/seed-demo', requireAdmin, (req, res) => {
     INSERT INTO sellers (uuid, email, password, pack, first_name, last_name, phone, paid_at, created_at,
       twilio_number, contrat_signe, rdv_photographe, admin_notes,
       photographer_scheduled, photographer_name, photographer_date,
-      photographer_done, photo_report_url, virtual_tour_done)
-    VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+      photographer_done, photo_report_url, virtual_tour_done, is_demo)
+    VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,1)
   `);
   const insertProp = db.prepare(`
     INSERT INTO properties (uuid, seller_id, slug, acheteur_token, notaire_token, type, address, city, postal_code,
@@ -1368,10 +1368,10 @@ router.post('/api/vrp', requireAdmin, express.json(), (req, res) => {
   if (!first_name || !last_name || !email) return res.status(400).json({ error: 'Champs requis manquants' });
   const { v4: uuidv4 } = require('uuid');
   try {
-    db.prepare(`INSERT INTO vrps (uuid, first_name, last_name, email, phone, zone, notes, commission_rate)
+    const r = db.prepare(`INSERT INTO vrps (uuid, first_name, last_name, email, phone, zone, notes, commission_rate)
       VALUES (?,?,?,?,?,?,?,?)`)
       .run(uuidv4(), first_name.trim(), last_name.trim(), email.toLowerCase().trim(), phone||'', zone||'', notes||'', commission_rate||null);
-    res.json({ success: true });
+    res.json({ success: true, vrp: { id: r.lastInsertRowid } });
   } catch(e) {
     res.status(400).json({ error: e.message.includes('UNIQUE') ? 'Email déjà utilisé' : e.message });
   }
@@ -1414,6 +1414,16 @@ router.post('/api/vrp/:id/sales', requireAdmin, express.json(), (req, res) => {
 
 router.patch('/api/vrp/sales/:id/paid', requireAdmin, (req, res) => {
   db.prepare(`UPDATE vrp_sales SET commission_paid=1, commission_paid_at=CURRENT_TIMESTAMP WHERE id=?`).run(+req.params.id);
+  res.json({ success: true });
+});
+
+router.post('/api/vrp/:id/set-password', requireAdmin, express.json(), async (req, res) => {
+  const { password } = req.body || {};
+  if (!password || String(password).length < 8)
+    return res.json({ success: false, error: 'Le mot de passe doit comporter au moins 8 caractères.' });
+  const hash = await bcrypt.hash(String(password), 10);
+  const r = db.prepare('UPDATE vrps SET password=? WHERE id=?').run(hash, +req.params.id);
+  if (!r.changes) return res.status(404).json({ success: false, error: 'VRP introuvable.' });
   res.json({ success: true });
 });
 
@@ -1869,25 +1879,57 @@ router.get('/rappels', requireAdmin, (req, res) => {
   res.sendFile('rappels.html', { root: './views/admin' });
 });
 
-// API unifiée : retourne contact_requests + callback_requests fusionnés
+// API unifiée : retourne contact_requests + callback_requests + estimation_callback_requests fusionnés
 router.get('/api/leads', requireAdmin, (req, res) => {
   const today = new Date().toISOString().slice(0, 10);
-  let contacts = [], callbacks = [];
+  let contacts = [], callbacks = [], estimCallbacks = [];
   try { contacts = db.prepare('SELECT * FROM contact_requests ORDER BY created_at DESC').all(); } catch(e) {}
   try { callbacks = db.prepare('SELECT * FROM callback_requests ORDER BY created_at DESC').all(); } catch(e) {}
+  try {
+    estimCallbacks = db.prepare(`
+      SELECT ecr.*,
+        er.prenom AS er_prenom,
+        er.phone  AS er_phone,
+        er.raw_address, er.surface, er.property_type, er.indicative_value
+      FROM estimation_callback_requests ecr
+      LEFT JOIN estimation_requests er ON ecr.estimation_request_id = er.id
+      ORDER BY ecr.created_at DESC
+    `).all();
+  } catch(e) {}
 
   const STATUT_MAP = { converti: 'traite', rappele: 'a_traiter' };
   const normalize = (r, type) => {
     const rawStatut = r.statut || (type === 'contact' ? 'a_traiter' : 'a_rappeler');
+    let nom = '';
+    let telephone = '';
+    let message = '';
+    if (type === 'contact') {
+      nom       = r.name || '';
+      telephone = r.telephone || r.phone || '';
+      message   = r.message || r.creneau || '';
+    } else if (type === 'estimation') {
+      nom       = r.er_prenom || r.email || '';
+      telephone = r.phone || r.er_phone || '';
+      message   = [
+        r.raw_address ? `${r.raw_address}` : '',
+        r.surface     ? `${r.surface} m²`  : '',
+        r.property_type || '',
+        r.sell_horizon  ? `Horizon : ${r.sell_horizon}` : '',
+      ].filter(Boolean).join(' · ');
+    } else {
+      nom       = `${r.prenom || ''} ${r.nom || ''}`.trim();
+      telephone = r.telephone || r.phone || '';
+      message   = r.moment || '';
+    }
     return {
       id: r.id,
       source_type: type,
-      nom: type === 'contact' ? (r.name || '') : `${r.prenom || ''} ${r.nom || ''}`.trim(),
-      telephone: r.telephone || r.phone || '',
+      nom,
+      telephone,
       email: r.email || '',
-      message: type === 'contact' ? (r.message || r.creneau || '') : (r.moment || ''),
+      message,
       rappel_prevu_le: r.rappel_prevu_le || '',
-      rdv_prevu_le: r.rdv_prevu_le || '',
+      rdv_prevu_le:    r.rdv_prevu_le    || '',
       statut: STATUT_MAP[rawStatut] || rawStatut,
       notes: r.notes || '',
       created_at: r.created_at,
@@ -1897,6 +1939,7 @@ router.get('/api/leads', requireAdmin, (req, res) => {
   const all = [
     ...contacts.map(r => normalize(r, 'contact')),
     ...callbacks.map(r => normalize(r, 'rappel')),
+    ...estimCallbacks.map(r => normalize(r, 'estimation')),
   ].sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
 
   const tomorrow = new Date(Date.now() + 86400000).toISOString().slice(0, 10);
@@ -1921,7 +1964,9 @@ router.patch('/api/leads/:type/:id', requireAdmin, express.json(), (req, res) =>
     if (rdv_prevu_le !== undefined)   { fields.push('rdv_prevu_le=?');    vals.push(rdv_prevu_le || null); }
     if (!fields.length) return res.json({ ok: true });
     fields.push("updated_at=datetime('now')");
-    const table = type === 'contact' ? 'contact_requests' : 'callback_requests';
+    const table = type === 'contact' ? 'contact_requests'
+      : type === 'estimation' ? 'estimation_callback_requests'
+      : 'callback_requests';
     db.prepare(`UPDATE ${table} SET ${fields.join(',')} WHERE id=?`).run(...vals, id);
     res.json({ ok: true });
   } catch(e) { res.status(500).json({ error: e.message }); }
@@ -1932,6 +1977,8 @@ router.delete('/api/leads/:type/:id', requireAdmin, (req, res) => {
   try {
     if (type === 'contact') {
       db.prepare('DELETE FROM contact_requests WHERE id=?').run(id);
+    } else if (type === 'estimation') {
+      db.prepare('DELETE FROM estimation_callback_requests WHERE id=?').run(id);
     } else {
       db.prepare('DELETE FROM callback_requests WHERE id=?').run(id);
     }

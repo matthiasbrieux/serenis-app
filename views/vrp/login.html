@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Espace VRP — Vendu Par Moi</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/vrp.css">
+</head>
+<body>
+  <div class="vrp-login-bg">
+    <div class="vrp-login-box">
+      <div style="text-align:center;margin-bottom:20px;">
+        <img src="/images/vendu-par-moi.svg" alt="Vendu Par Moi" style="height:32px;">
+      </div>
+      <h1 class="vrp-login-title">Espace VRP</h1>
+      <p class="vrp-login-sub">Accès réservé aux commerciaux</p>
+
+      <div id="errorBox" class="vrp-error-box" style="display:none;"></div>
+
+      <form id="loginForm" autocomplete="off">
+        <div class="vrp-form-row">
+          <label class="vrp-label" for="email">Email</label>
+          <input class="vrp-input" type="email" id="email" name="email" required autofocus autocomplete="username">
+        </div>
+        <div class="vrp-form-row">
+          <label class="vrp-label" for="password">Mot de passe</label>
+          <input class="vrp-input" type="password" id="password" name="password" required autocomplete="current-password">
+        </div>
+        <button class="vrp-btn vrp-btn-primary" type="submit" id="submitBtn" style="width:100%;justify-content:center;margin-top:8px;">
+          Connexion
+        </button>
+      </form>
+
+      <p style="text-align:center;font-size:0.75rem;color:#A09C95;margin-top:20px;">
+        Pas encore de compte ? Contactez l'administration.
+      </p>
+    </div>
+  </div>
+
+  <script>
+    document.getElementById('loginForm').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      var btn = document.getElementById('submitBtn');
+      var err = document.getElementById('errorBox');
+      btn.disabled = true;
+      btn.textContent = 'Connexion…';
+      err.style.display = 'none';
+      try {
+        var r = await fetch('/api/vrp/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: document.getElementById('email').value, password: document.getElementById('password').value })
+        });
+        var d = await r.json();
+        if (d.success) { window.location.href = d.redirect || '/vrp/dashboard'; return; }
+        err.textContent = d.error || 'Erreur de connexion.';
+        err.style.display = 'block';
+      } catch(ex) {
+        err.textContent = 'Erreur réseau. Réessayez.';
+        err.style.display = 'block';
+      }
+      btn.disabled = false;
+      btn.textContent = 'Connexion';
+    });
+  </script>
+</body>
+</html>
