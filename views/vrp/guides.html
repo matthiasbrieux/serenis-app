@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Formation — Espace VRP</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/vrp.css">
+  <style>
+    /* ── Tabs ── */
+    .guide-tabs { display:flex; gap:0; border-bottom:2px solid #EAE4DC; margin-bottom:28px; }
+    .guide-tab { padding:10px 22px; font-size:0.84rem; font-weight:600; color:#A09C95; cursor:pointer; border-bottom:2px solid transparent; margin-bottom:-2px; transition:color .15s, border-color .15s; white-space:nowrap; }
+    .guide-tab.active { color:var(--vrp-terra); border-bottom-color:var(--vrp-terra); }
+    .guide-tab:hover:not(.active) { color:#5a5650; }
+    .guide-pane { display:none; }
+    .guide-pane.active { display:block; }
+
+    /* ── Sections typography ── */
+    .g-section { margin-bottom:32px; }
+    .g-h1 { font-family:'Cormorant Garamond',serif; font-size:1.45rem; font-weight:600; color:#1A1A16; margin:0 0 14px; border-left:3px solid var(--vrp-terra); padding-left:12px; }
+    .g-h2 { font-family:'Cormorant Garamond',serif; font-size:1.15rem; font-weight:600; color:#1A1A16; margin:20px 0 10px; }
+    .g-p { font-size:0.86rem; color:#4a4740; line-height:1.75; margin:0 0 10px; }
+    .g-lead { font-size:0.88rem; color:#5a5650; line-height:1.75; background:#fdf9f6; border-left:3px solid #EAE4DC; padding:12px 16px; border-radius:0 6px 6px 0; margin-bottom:18px; }
+
+    /* ── Callouts ── */
+    .g-callout { border-radius:8px; padding:12px 16px; font-size:0.82rem; line-height:1.65; margin:14px 0; display:flex; gap:10px; align-items:flex-start; }
+    .g-callout-warn { background:#fef9ec; border:1px solid #f0c040; color:#7a5c00; }
+    .g-callout-info { background:#eff6ff; border:1px solid #bfdbfe; color:#1e40af; }
+    .g-callout-tip  { background:#ecfdf5; border:1px solid #6ee7b7; color:#065f46; }
+    .g-callout-icon { flex-shrink:0; font-size:1rem; margin-top:1px; }
+
+    /* ── Numbered steps ── */
+    .g-steps { display:flex; flex-direction:column; gap:12px; margin:14px 0; }
+    .g-step { display:flex; gap:14px; align-items:flex-start; background:#fff; border:1px solid #EAE4DC; border-radius:10px; padding:14px 16px; }
+    .g-step-num { width:26px; height:26px; border-radius:50%; background:var(--vrp-terra); color:#fff; font-size:0.74rem; font-weight:700; display:flex; align-items:center; justify-content:center; flex-shrink:0; margin-top:1px; }
+    .g-step-body { flex:1; }
+    .g-step-title { font-weight:600; font-size:0.86rem; color:#1A1A16; margin-bottom:4px; }
+    .g-step-desc { font-size:0.82rem; color:#5a5650; line-height:1.65; }
+
+    /* ── Tables ── */
+    .g-table-wrap { overflow-x:auto; margin:14px 0; border-radius:10px; border:1px solid #EAE4DC; }
+    .g-table { width:100%; border-collapse:collapse; font-size:0.82rem; }
+    .g-table thead th { background:var(--vrp-terra); color:#fff; padding:10px 14px; text-align:left; font-weight:600; font-size:0.76rem; letter-spacing:0.03em; }
+    .g-table thead th:first-child { border-radius:9px 0 0 0; }
+    .g-table thead th:last-child { border-radius:0 9px 0 0; }
+    .g-table tbody td { padding:10px 14px; border-bottom:1px solid #F0EBE4; color:#3a3730; vertical-align:top; line-height:1.6; }
+    .g-table tbody tr:last-child td { border-bottom:none; }
+    .g-table tbody tr:nth-child(even) td { background:#fdfaf7; }
+    .g-table em { font-style:italic; color:#A09C95; }
+    .g-table strong { font-weight:600; color:#1A1A16; }
+
+    /* ── Checklist ── */
+    .g-checklist { list-style:none; padding:0; margin:10px 0; display:flex; flex-direction:column; gap:7px; }
+    .g-checklist li { display:flex; gap:10px; align-items:flex-start; font-size:0.84rem; color:#3a3730; line-height:1.6; }
+    .g-checklist li::before { content:'•'; color:var(--vrp-terra); font-weight:700; flex-shrink:0; margin-top:2px; }
+
+    /* ── Divider ── */
+    .g-divider { height:1px; background:#EAE4DC; margin:28px 0; }
+
+    /* ── Highlight box ── */
+    .g-highlight { background:rgba(158,58,24,0.06); border:1px solid rgba(158,58,24,0.18); border-radius:10px; padding:16px 20px; margin:14px 0; }
+    .g-highlight .g-p { color:#3a3730; margin:0; }
+
+    /* ── Provision table ── */
+    .g-provision-total td { font-weight:700; color:var(--vrp-terra); background:#fdf4ef !important; border-top:2px solid rgba(158,58,24,0.2) !important; }
+  </style>
+</head>
+<body class="vrp-body">
+  <div class="vrp-layout">
+    <div id="vrp-sidebar-slot" data-name="" data-zone=""></div>
+
+    <main class="vrp-main">
+      <div class="vrp-page-header">
+        <h1 class="vrp-page-title">Formation</h1>
+        <p class="vrp-page-sub">Méthode de vente et cadre juridique</p>
+      </div>
+
+      <!-- Tabs -->
+      <div class="guide-tabs">
+        <div class="guide-tab active" onclick="switchTab('methode',this)">Méthode de travail</div>
+        <div class="guide-tab" onclick="switchTab('juridique',this)">Guide auto-entrepreneur</div>
+      </div>
+
+      <!-- ═══════════════════════════════════════════════════════
+           ONGLET 1 — MÉTHODE DE TRAVAIL
+           ═══════════════════════════════════════════════════════ -->
+      <div id="pane-methode" class="guide-pane active">
+
+        <div class="g-lead">
+          Le déroulé complet d'un entretien vendeur, du premier contact jusqu'à l'inscription du client sur la plateforme.
+          Tout se joue sur la qualité de l'échange : des questions posées dans l'ordre, les objections anticipées, et une
+          démonstration concrète de l'économie réalisée. <strong>Bouclez en moins de 45 minutes.</strong>
+        </div>
+
+        <!-- I. Avant le RDV -->
+        <div class="g-section">
+          <div class="g-h1">I. Avant le rendez-vous</div>
+          <div class="g-p">Ayez toujours sur vous votre plaquette VPM imprimée (ou sur tablette) et votre fiche de calcul d'économie. Avant chaque RDV, faites 3 minutes de recherche sur le bien :</div>
+          <div class="g-steps">
+            <div class="g-step">
+              <div class="g-step-num">1</div>
+              <div class="g-step-body">
+                <div class="g-step-title">Cherchez le bien sur les portails (Leboncoin, SeLoger, PAP…)</div>
+                <div class="g-step-desc">S'il est déjà publié, notez le prix affiché. Vous pourrez calculer la commission d'agence sur ce montant exact, en direct pendant l'entretien. C'est toujours plus percutant qu'un exemple générique.</div>
+              </div>
+            </div>
+            <div class="g-step">
+              <div class="g-step-num">2</div>
+              <div class="g-step-body">
+                <div class="g-step-title">Préparez le calcul d'économie sur leur bien</div>
+                <div class="g-step-desc">Prix estimé × 5% = commission agence. Forfait VPM : 999 € (Pack Autonomie) ou 1 547 € (Pack Accompagnement). Économie = différence. <strong>Notez ce chiffre avant d'arriver</strong> — il sera votre accroche principale.</div>
+              </div>
+            </div>
+            <div class="g-step">
+              <div class="g-step-num">3</div>
+              <div class="g-step-body">
+                <div class="g-step-title">Vérifiez que vous avez la plaquette à jour</div>
+                <div class="g-step-desc">Pack Autonomie 999 € TTC — Pack Accompagnement 1 547 € TTC. Option 4 versements sans frais disponible.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- II. Pendant le RDV -->
+        <div class="g-section">
+          <div class="g-h1">II. Pendant le rendez-vous</div>
+          <div class="g-p">Suivez cet ordre. Ne sautez pas d'étape — chaque phase prépare la suivante.</div>
+          <div class="g-table-wrap">
+            <table class="g-table">
+              <thead><tr><th>#</th><th>Étape</th><th>Ce que vous dites / faites</th></tr></thead>
+              <tbody>
+                <tr>
+                  <td><strong>1</strong></td>
+                  <td><strong>Écouter d'abord</strong></td>
+                  <td>Laissez le propriétaire parler de son projet. Notez : prix visé, délai souhaité, a-t-il déjà signé un mandat ? Situation familiale (divorce, succession, mutation) ?</td>
+                </tr>
+                <tr>
+                  <td><strong>2</strong></td>
+                  <td><strong>Révéler le coût caché</strong></td>
+                  <td>« Sur votre bien à [X] €, une agence à 5% prend [X×5%] €. Avec Vendu Par Moi, vous payez à partir de 999 € forfait fixe. La différence, c'est [économie] € qui restent dans votre poche. »</td>
+                </tr>
+                <tr>
+                  <td><strong>3</strong></td>
+                  <td><strong>Montrer les outils</strong></td>
+                  <td>Ouvrez la plaquette à la page "Votre boîte à outils". Détaillez les 3 points qui résonnent le plus avec son profil : formation si première vente, agenda si peu de temps, SMS automatiques si inquiet de gérer les acheteurs.</td>
+                </tr>
+                <tr>
+                  <td><strong>4</strong></td>
+                  <td><strong>Traiter les objections</strong></td>
+                  <td>Voir fiche objections ci-dessous. Posez les questions une par une — si le propriétaire ne sait pas répondre à une objection, ne forcez pas, notez et revenez dessus.</td>
+                </tr>
+                <tr>
+                  <td><strong>5</strong></td>
+                  <td><strong>Proposer l'inscription</strong></td>
+                  <td>« Voulez-vous qu'on le fasse ensemble maintenant ? J'ai 10 minutes. L'accès est immédiat. » Ouvrez venduparmoi.fr sur votre téléphone ou tablette.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="g-h2">Fiche objections — réponses courtes</div>
+          <div class="g-table-wrap">
+            <table class="g-table">
+              <thead><tr><th>Objection</th><th>Réponse</th></tr></thead>
+              <tbody>
+                <tr>
+                  <td><em>« Je ne sais pas vendre un bien. »</em></td>
+                  <td>« C'est exactement pour ça que VPM existe. La formation vous guide étape par étape — estimation, annonce, visites, négociation, compromis. Vous n'avez pas besoin de savoir, vous allez apprendre. »</td>
+                </tr>
+                <tr>
+                  <td><em>« Une agence a des clients. »</em></td>
+                  <td>« Les acheteurs cherchent sur Leboncoin, SeLoger, PAP — les mêmes portails que vous utiliserez. Les "clients" d'une agence viennent d'Internet, pas d'un carnet magique. »</td>
+                </tr>
+                <tr>
+                  <td><em>« Je n'ai pas le temps. »</em></td>
+                  <td>« L'agenda prend les rendez-vous tout seul. Les SMS et emails partent automatiquement. Vous ne gérez que l'essentiel — accueillir les visiteurs. »</td>
+                </tr>
+                <tr>
+                  <td><em>« 999 €, c'est cher. »</em></td>
+                  <td>« Sur votre bien à [prix], une agence vous coûte [commission]. VPM vous coûte à partir de 999 €, soit [ratio] fois moins. Vous récupérez l'investissement dès le premier centime économisé. »</td>
+                </tr>
+                <tr>
+                  <td><em>« J'ai déjà signé un mandat. »</em></td>
+                  <td>« Quand expire-t-il ? Après 3 mois, vous pouvez le résilier par LRAR avec 15 jours de préavis. On peut prévoir de revenir ensemble à ce moment-là. »</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="g-callout g-callout-warn">
+            <span class="g-callout-icon">⚠️</span>
+            <span><strong>Photos :</strong> si le propriétaire veut que vous l'aidiez à prendre des photos, rappelez les règles : grand angle si possible, cadrage horizontal, aucune personne visible (occupants, voisins, reflets dans les miroirs). Une photo avec une personne reconnaissable peut entraîner une demande de retrait immédiate.</span>
+          </div>
+        </div>
+
+        <!-- III. Après le RDV -->
+        <div class="g-section">
+          <div class="g-h1">III. Après le rendez-vous</div>
+          <div class="g-steps">
+            <div class="g-step">
+              <div class="g-step-num">1</div>
+              <div class="g-step-body">
+                <div class="g-step-title">Si le client s'est inscrit : enregistrez la vente dans votre tableau de bord VRP</div>
+                <div class="g-step-desc">Allez dans l'onglet 'Tableau de bord' → cliquez sur "Ventes" à côté de votre nom → ajoutez la vente avec le pack, le montant HT, et l'email du client. Cela déclenche le suivi de votre rétrocession.</div>
+              </div>
+            </div>
+            <div class="g-step">
+              <div class="g-step-num">2</div>
+              <div class="g-step-body">
+                <div class="g-step-title">Si le client est intéressé mais n'a pas signé : relancez à J+3</div>
+                <div class="g-step-desc">Envoyez un message court : « Bonjour [prénom], j'espère que vous avez eu le temps de réfléchir. Je reste disponible si vous avez des questions. Le lien pour vous inscrire : venduparmoi.fr » Pas de relance supplémentaire au-delà de J+7 sans signal d'intérêt.</div>
+              </div>
+            </div>
+            <div class="g-step">
+              <div class="g-step-num">3</div>
+              <div class="g-step-body">
+                <div class="g-step-title">Si le client a un mandat en cours : notez la date d'expiration</div>
+                <div class="g-step-desc">Ajoutez un rappel dans votre calendrier à J-15 avant l'expiration du mandat. Recontactez-le à ce moment : « Votre mandat expire bientôt. Si vous n'avez pas encore vendu, c'est le bon moment pour essayer Vendu Par Moi. »</div>
+              </div>
+            </div>
+            <div class="g-step">
+              <div class="g-step-num">4</div>
+              <div class="g-step-body">
+                <div class="g-step-title">Notez les informations clés sur le prospect</div>
+                <div class="g-step-desc">Prix du bien, délai de vente, situation (primo-vendeur, mutation, succession…), objection principale. Ces informations vous permettront de personnaliser la relance.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- IV. Ressources utiles -->
+        <div class="g-section">
+          <div class="g-h1">IV. Ressources utiles pendant un RDV</div>
+          <div class="g-table-wrap">
+            <table class="g-table">
+              <thead><tr><th>Besoin</th><th>Outil</th><th>Usage</th></tr></thead>
+              <tbody>
+                <tr>
+                  <td>Calculer les frais de notaire</td>
+                  <td><strong>immobilier.notaires.fr</strong></td>
+                  <td>Rassurez l'acheteur potentiel sur ce qu'il devra payer en sus du prix</td>
+                </tr>
+                <tr>
+                  <td>Vérifier le cadastre</td>
+                  <td><strong>cadastre.gouv.fr</strong></td>
+                  <td>Si le propriétaire demande les limites exactes de sa parcelle</td>
+                </tr>
+                <tr>
+                  <td>Risques naturels</td>
+                  <td><strong>georisques.gouv.fr</strong></td>
+                  <td>Vérifier si le bien est en zone à risque (obligatoire dans le dossier vendeur)</td>
+                </tr>
+                <tr>
+                  <td>Coordonnées GPS</td>
+                  <td><strong>Google Maps → clic droit</strong></td>
+                  <td>Latitude + longitude pour l'annonce (1ère valeur = lat, 2e = lon)</td>
+                </tr>
+                <tr>
+                  <td>Prix du marché local</td>
+                  <td><strong>meilleurs-agents.com / DVF</strong></td>
+                  <td>Estimer le prix juste avec des ventes récentes dans la même rue</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="g-callout g-callout-info">
+            <span class="g-callout-icon">ℹ️</span>
+            <span>Pour les coordonnées GPS sur Google Maps : tapez l'adresse, faites un clic droit sur le repère → les coordonnées s'affichent. La première valeur est la latitude, la seconde la longitude. Notez-les à la main — le copier-coller ne fonctionne pas toujours entre les écrans. Lisez-les avant de valider : une décimale inversée déplace le bien de plusieurs kilomètres sur la carte de l'annonce.</span>
+          </div>
+        </div>
+
+      </div><!-- /pane-methode -->
+
+
+      <!-- ═══════════════════════════════════════════════════════
+           ONGLET 2 — GUIDE AUTO-ENTREPRENEUR
+           ═══════════════════════════════════════════════════════ -->
+      <div id="pane-juridique" class="guide-pane">
+
+        <div class="g-callout g-callout-warn" style="margin-bottom:24px;">
+          <span class="g-callout-icon">⚠️</span>
+          <span><strong>À titre informatif.</strong> Cette fiche ne remplace pas l'avis d'un expert-comptable : les taux et seuils peuvent évoluer, et la situation personnelle de chaque VRP (option fiscale, foyer, autres activités) peut changer le résultat.</span>
+        </div>
+
+        <!-- En une phrase -->
+        <div class="g-section">
+          <div class="g-h1">En une phrase</div>
+          <div class="g-highlight">
+            <p class="g-p">La gestion d'une micro-entreprise est la plus simple qui soit — mais comme dans toute activité, il ne faut jamais confondre chiffre d'affaires et revenu réel : sur une commission encaissée, une partie significative appartient à l'État (TVA) et aux organismes sociaux (URSSAF). Ce guide vous montre exactement ce qui reste.</p>
+          </div>
+        </div>
+
+        <!-- Décomposer un encaissement -->
+        <div class="g-section">
+          <div class="g-h1">Décomposer un encaissement</div>
+          <div class="g-p">Tout part de la commission que vous percevez sur chaque pack vendu. L'exemple ci-dessous utilise une commission de <strong>X € HT</strong> — montant à renseigner une fois la rétrocession définie. Il suffit de remplacer X par votre commission réelle pour retrouver vos propres chiffres.</div>
+          <div class="g-table-wrap">
+            <table class="g-table">
+              <thead><tr><th>Élément</th><th>Montant</th><th>Nature</th></tr></thead>
+              <tbody>
+                <tr><td>Commission HT</td><td><strong>X € HT</strong></td><td>Votre commission sur le pack vendu</td></tr>
+                <tr><td>+ TVA collectée (20 %)</td><td><strong>X + 20 %</strong></td><td>Argent de l'État, qui ne fait que transiter</td></tr>
+                <tr class="g-provision-total"><td>Total encaissé (TTC)</td><td><strong>X × 1,20</strong></td><td><strong>Ce qui arrive sur votre compte pro</strong></td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="g-callout g-callout-warn">
+            <span class="g-callout-icon">⚠️</span>
+            <span>La TVA collectée n'est jamais un revenu. Elle doit être isolée dès l'encaissement — idéalement virée sur un sous-compte — car elle sera réclamée par l'État à échéance fixe.</span>
+          </div>
+        </div>
+
+        <!-- Provisions obligatoires -->
+        <div class="g-section">
+          <div class="g-h1">Ce qu'il faut garder de côté — provisions obligatoires</div>
+          <div class="g-p">Ces sommes seront réclamées, à échéance fixe, par l'État et l'URSSAF. <strong>Ne jamais y toucher.</strong></div>
+          <div class="g-table-wrap">
+            <table class="g-table">
+              <thead><tr><th>Charge</th><th>Taux</th><th>Base de calcul</th><th>Montant (sur X € HT)</th></tr></thead>
+              <tbody>
+                <tr><td>TVA à reverser</td><td>20 %</td><td>du HT</td><td>X × 0,20</td></tr>
+                <tr><td>Cotisations sociales</td><td>26 %</td><td>du HT</td><td>X × 0,26</td></tr>
+                <tr><td>CFP (formation pro)</td><td>0,3 %</td><td>du HT</td><td>X × 0,003</td></tr>
+                <tr class="g-provision-total"><td>Total à conserver</td><td><strong>≈ 46,3 %</strong></td><td></td><td><strong>X × 0,463</strong></td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="g-p" style="font-size:0.8rem;color:#6a6560;font-style:italic;margin-top:8px;">Si vous optez pour le <strong>versement libératoire de l'IR</strong> (1,7 % du HT pour les BIC services, sous conditions de revenu), ajoutez ≈ 2 % supplémentaire — total à conserver ≈ 48 %. Sans cette option, l'IR sera calculé en fin d'année sur votre revenu global avec un abattement forfaitaire de 50 % : prévoir une réserve supplémentaire de 5 à 15 % du HT selon votre tranche.</div>
+        </div>
+
+        <!-- Ce qui peut être viré -->
+        <div class="g-section">
+          <div class="g-h1">Ce qui peut être viré sur votre compte courant</div>
+          <div class="g-table-wrap">
+            <table class="g-table">
+              <thead><tr><th>Situation</th><th>Calcul</th><th>Disponible</th></tr></thead>
+              <tbody>
+                <tr><td>Avec versement libératoire IR</td><td>TTC − 48 %</td><td><strong>= 72 % du TTC</strong></td></tr>
+                <tr><td>Sans versement libératoire (réserve IR ~10 %)</td><td>TTC − 46,3 % − ~10 %</td><td><strong>= 63 % du TTC</strong></td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="g-callout g-callout-tip">
+            <span class="g-callout-icon">💡</span>
+            <span>En pratique : sur 1 000 € HT de commission encaissée (1 200 € TTC), comptez entre <strong>760 € et 864 €</strong> réellement disponibles pour vous — selon votre option fiscale.</span>
+          </div>
+        </div>
+
+        <!-- Quand la commission est versée -->
+        <div class="g-section">
+          <div class="g-h1">Quand votre commission vous est versée</div>
+          <div class="g-lead">Chez Vendu Par Moi, le paiement du client intervient au moment de l'inscription — pas à la signature notaire comme en transaction immobilière classique. Votre commission vous est reversée dans les <strong>5 à 15 jours</strong> suivant la confirmation du paiement client et la validation de la vente.</div>
+          <div class="g-callout g-callout-tip">
+            <span class="g-callout-icon">💡</span>
+            <span>C'est un avantage clé par rapport au circuit classique de l'immobilier, où il s'écoule souvent 4 à 5 mois entre la signature du compromis et la perception effective de la commission.</span>
+          </div>
+        </div>
+
+        <!-- Seuil à surveiller -->
+        <div class="g-section">
+          <div class="g-h1">Seuil à surveiller (micro-BIC services)</div>
+          <div class="g-p">En tant qu'auto-entrepreneur exerçant une activité de services (prestation commerciale), vous êtes soumis au plafond du régime micro-BIC. Suivez votre chiffre d'affaires HT en cumul sur l'année civile.</div>
+          <div class="g-table-wrap">
+            <table class="g-table">
+              <thead><tr><th>Seuil</th><th>Conséquence</th></tr></thead>
+              <tbody>
+                <tr><td><strong>~77 700 € HT / an</strong></td><td>Plafond micro-BIC services (à confirmer avec votre expert-comptable — peut évoluer)</td></tr>
+                <tr><td>Dépassement 2 années consécutives</td><td>Sortie du régime micro-entreprise → passage au régime réel</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="g-callout g-callout-warn">
+            <span class="g-callout-icon">⚠️</span>
+            <span>Faites confirmer le seuil applicable à votre situation auprès de votre expert-comptable ou de l'URSSAF. Les plafonds peuvent être révisés chaque année.</span>
+          </div>
+        </div>
+
+        <!-- Points de vigilance -->
+        <div class="g-section">
+          <div class="g-h1">Points de vigilance pratiques</div>
+          <ul class="g-checklist">
+            <li><strong>Ne jamais raisonner sur le TTC.</strong> La TVA collectée n'est pas votre revenu.</li>
+            <li><strong>La TVA est récupérable sur vos achats professionnels.</strong> Ordinateur, téléphone, abonnements pro : la TVA payée vient en déduction de la TVA à reverser. Conservez toutes vos factures d'achat.</li>
+            <li><strong>Les cotisations sociales se calculent sur le CA HT encaissé,</strong> avec une déclaration mensuelle ou trimestrielle à l'URSSAF selon votre option.</li>
+            <li><strong>Ouvrez un compte bancaire professionnel dédié</strong> — il n'est pas obligatoire la première année, mais il clarifie la séparation pro/perso et facilite vos déclarations.</li>
+            <li><strong>Utilisez un logiciel de facturation agréé</strong> pour émettre vos factures (ex. : Indy, Freebe, Henrri). Votre espace VPM ne remplace pas cette obligation légale.</li>
+          </ul>
+        </div>
+
+        <!-- Deux obligations -->
+        <div class="g-section">
+          <div class="g-h1">Deux obligations dès le démarrage</div>
+          <div class="g-steps">
+            <div class="g-step">
+              <div class="g-step-num">1</div>
+              <div class="g-step-body">
+                <div class="g-step-title">Un logiciel de facturation électronique agréé par l'État</div>
+                <div class="g-step-desc">Vous devez émettre des factures conformes pour chaque commission perçue. Exemples de logiciels : <strong>Indy.fr</strong>, <strong>Freebe</strong>, <strong>Henrri</strong> — formulez à partir de 0 €. Votre espace VPM s'occupe de la gestion de votre activité chez nous, mais n'est pas agréé pour la facturation officielle.</div>
+              </div>
+            </div>
+            <div class="g-step">
+              <div class="g-step-num">2</div>
+              <div class="g-step-body">
+                <div class="g-step-title">Un compte bancaire professionnel dédié</div>
+                <div class="g-step-desc">Il n'est pas obligatoire la première année, mais vivement recommandé dès le début. Il sépare nettement le pro du privé — et c'est sur ce compte que seront prélevés la TVA et les charges sociales, ce qui laisse votre compte personnel serein.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- /pane-juridique -->
+
+    </main>
+  </div>
+
+  <script src="/js/vrp-sidebar.js"></script>
+  <script>
+    function switchTab(id, el) {
+      document.querySelectorAll('.guide-pane').forEach(function(p){ p.classList.remove('active'); });
+      document.querySelectorAll('.guide-tab').forEach(function(t){ t.classList.remove('active'); });
+      document.getElementById('pane-' + id).classList.add('active');
+      el.classList.add('active');
+    }
+
+    async function load() {
+      var r = await fetch('/api/vrp/me');
+      if (!r.ok) { window.location.href = '/vrp/login'; return; }
+      var d = await r.json();
+      var slot = document.getElementById('vrp-sidebar-slot');
+      if (slot) { slot.dataset.name = d.vrp.first_name + ' ' + d.vrp.last_name; slot.dataset.zone = d.vrp.zone || ''; }
+    }
+    load();
+  </script>
+</body>
+</html>
