@@ -30,6 +30,9 @@ app.set('trust proxy', 1); // Render / reverse proxy → req.protocol retourne h
 app.use(helmet({
   contentSecurityPolicy: {
     directives: {
+      // L’aperçu Wi-Fi local utilise HTTP ; conserver la mise à niveau HTTPS ailleurs.
+      ...(process.env.VPM_LOCAL_SAFE_MODE === '1' && process.env.NODE_ENV !== 'production'
+        ? { upgradeInsecureRequests: null } : {}),
       defaultSrc: ["'self'"],
       scriptSrc: ["'self'", "'unsafe-inline'", "js.stripe.com", "fonts.googleapis.com"],
       scriptSrcAttr: ["'unsafe-inline'"],
@@ -147,6 +150,7 @@ async function restoreFromCloudinary() { return; }
 // ── Chargement des routes (après restauration DB) ──
 async function loadRoutes() {
   await restoreFromCloudinary();
+  app.use('/', require('./routes/catalogue').createRouter({db:require('./database'),requireAuth:require('./middleware/auth').requireAuth}));
   app.use('/', require('./routes/auth'));
   app.use('/', require('./routes/payment').router);
   app.use('/', require('./routes/seller'));
@@ -154,6 +158,8 @@ async function loadRoutes() {
   app.use('/admin', require('./routes/admin'));
   app.use('/', require('./routes/dossier'));
   app.use('/', require('./routes/partner'));
+  app.use('/', require('./routes/estimation'));
+  app.use('/', require('./routes/vrp'));
 }
 
 
@@ -278,6 +284,7 @@ loadRoutes().then(() => {
 
 app.listen(PORT, () => {
   console.log(`✓ Vendu Par Moi démarré — http://localhost:${PORT}`);
+  if(process.env.VPM_LOCAL_SAFE_MODE==='1'){console.log('Mode local sécurisé : seed, sauvegardes et tâches automatiques désactivés.');return;}
   seedSellerAccount();
 
   // Rappels visites + nudges automatiques — tourne chaque jour à 18h

@@ -4,8 +4,6 @@
     crm:       '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>',
     camera:    '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/></svg>',
     mail:      '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>',
-    user:      '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>',
-    message:   '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>',
     marketing: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 010 14.14M15.54 8.46a5 5 0 010 7.07"/></svg>',
     finance:   '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="20" x2="12" y2="10"/><line x1="18" y1="20" x2="18" y2="4"/><line x1="6" y1="20" x2="6" y2="16"/></svg>',
     gift:      '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 12 20 22 4 22 4 12"/><rect x="2" y="7" width="20" height="5" rx="1"/><path d="M12 22V7M12 7H7.5a2.5 2.5 0 010-5C11 2 12 7 12 7zM12 7h4.5a2.5 2.5 0 000-5C13 2 12 7 12 7z"/></svg>',
@@ -15,40 +13,67 @@
     vrp:       '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="3"/><path d="M6 20v-1a6 6 0 0112 0v1"/><path d="M18 8h3M18 12h3"/></svg>',
     logout:    '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/></svg>',
     chevron:   '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>',
-    house:     '<svg width="20" height="20" viewBox="0 0 32 32"><path d="M16 2L3 13v17h8v-8h10v8h8V13L16 2z" fill="#C4603A"/></svg>',
+    house:     '<svg width="20" height="20" viewBox="0 0 32 32"><path d="M16 2L3 13v17h8v-8h10v8h8V13L16 2z" fill="rgba(255,255,255,0.9)"/></svg>',
+    settings:  '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>',
+    users2:    '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>',
   };
 
-  var NAV_ITEMS = [
-    { label: 'Tableau de bord',   href: '/admin',              icon: 'dashboard', exact: true  },
-    { label: 'Suivi vendeurs',   href: '/admin/crm',          icon: 'crm'    },
-    { label: 'Photos pros',      href: '/admin/missions',     icon: 'camera' },
-    { label: 'Emails',           href: '/admin/emails',       icon: 'mail'   },
-    { label: 'Clients & Contacts', href: '/admin#clients',     icon: 'user'   },
-    { sep: true },
-    { label: 'Pub et contenus',  href: '/admin/marketing',    icon: 'marketing' },
-    { label: 'Finance',          href: '/admin/finance',      icon: 'finance'   },
-    { label: 'Parrainage',       href: '/admin/parrainage',   icon: 'gift'      },
-    { label: 'Rappels',          href: '/admin/rappels',      icon: 'phone'     },
-    { label: 'Prospection',      href: '/admin/prospection',  icon: 'target'    },
-    { sep: true },
-    { label: 'Réseau VRP',       href: '/admin/vrp',          icon: 'vrp'       },
+  // ── Navigation groupée en 5 sections ───────────────────────────────────
+  var NAV_GROUPS = [
+    {
+      label: 'Cockpit',
+      items: [
+        { label: 'Tableau de bord', href: '/admin', icon: 'dashboard', exact: true },
+      ]
+    },
+    {
+      label: 'Vendeurs',
+      items: [
+        { label: 'Suivi vendeurs',    href: '/admin/crm',          icon: 'crm'    },
+        { label: 'Photos & missions', href: '/admin/photographers', icon: 'camera' },
+        { label: 'Rappels',           href: '/admin/rappels',       icon: 'phone'  },
+      ]
+    },
+    {
+      label: 'Communications',
+      items: [
+        { label: 'Emails & auto',  href: '/admin/emails',    icon: 'mail'      },
+        { label: 'Marketing',      href: '/admin/marketing', icon: 'marketing' },
+      ]
+    },
+    {
+      label: 'Réseau VRP',
+      items: [
+        { label: 'VRP & commissions', href: '/admin/vrp',         icon: 'vrp'    },
+        { label: 'Prospection',       href: '/admin/prospection',  icon: 'target' },
+      ]
+    },
+    {
+      label: 'Finances',
+      items: [
+        { label: 'Finance',    href: '/admin/finance',    icon: 'finance' },
+        { label: 'Parrainage', href: '/admin/parrainage', icon: 'gift'    },
+      ]
+    },
   ];
 
+  // ── Liens secondaires dans le pied de sidebar ──────────────────────────
   var FOOTER_ITEMS = [
-    { label: 'Mon compte',  href: '/admin/mon-compte', icon: 'key'    },
-    { label: 'Déconnexion', href: '/admin/logout',     icon: 'logout' },
+    { label: 'Numéros IA',   href: '/admin/numbers',     icon: 'settings' },
+    { label: 'Espace VRP',   href: '/vrp',               icon: 'vrp'      },
+    { label: 'Mon compte',   href: '/admin/mon-compte',  icon: 'key'      },
+    { label: 'Déconnexion',  href: '/admin/logout',      icon: 'logout'   },
   ];
 
-  function isActive(href) {
-    // Les liens avec ancre (#) ne sont jamais "actifs" sur une autre page
+  function isActive(href, exact) {
     if (href.includes('#')) return false;
     var path = window.location.pathname;
-    if (href === '/admin') return path === '/admin';
+    if (exact || href === '/admin') return path === href;
     return path === href || path.startsWith(href + '/');
   }
 
   function navLink(item) {
-    var active = isActive(item.href) ? ' active' : '';
+    var active = isActive(item.href, item.exact) ? ' active' : '';
     return '<a href="' + item.href + '" class="' + active + '" data-label="' + item.label + '">'
       + ICONS[item.icon]
       + '<span class="adm-label">' + item.label + '</span>'
@@ -56,10 +81,13 @@
   }
 
   function buildSidebar() {
-    var navHtml = NAV_ITEMS.map(function(item) {
-      if (item.sep) return '<div class="adm-sep"></div>';
-      return navLink(item);
-    }).join('');
+    var navHtml = '';
+    NAV_GROUPS.forEach(function(group) {
+      navHtml += '<div class="adm-group-title">' + group.label + '</div>';
+      group.items.forEach(function(item) {
+        navHtml += navLink(item);
+      });
+    });
 
     var footerHtml = FOOTER_ITEMS.map(navLink).join('');
 
@@ -67,12 +95,12 @@
       + '<aside class="admin-sidebar" id="admin-sidebar">'
       + '  <div class="adm-logo">'
       + '    <img src="/images/vendu-par-moi.svg" alt="Vendu Par Moi" class="adm-logo-img">'
-      + '    <span class="adm-logo-sub">Espace admin</span>'
+      + '    <span class="adm-logo-sub">Administration</span>'
       + '  </div>'
       + '  <div class="adm-toggle">'
       + '    <button class="adm-toggle-btn" id="adm-toggle-btn" title="Réduire la sidebar">' + ICONS.chevron + '</button>'
       + '  </div>'
-      + '  <nav class="adm-nav">' + navHtml + '</nav>'
+      + '  <nav class="adm-nav" id="adm-main-nav">' + navHtml + '</nav>'
       + '  <div class="adm-footer"><nav class="adm-nav">' + footerHtml + '</nav></div>'
       + '</aside>';
   }
@@ -86,7 +114,6 @@
     var btn = document.getElementById('adm-toggle-btn');
     if (!sidebar || !btn) return;
 
-    // Restore collapsed state
     if (localStorage.getItem('adm-sidebar-collapsed') === '1') {
       sidebar.classList.add('collapsed');
     }

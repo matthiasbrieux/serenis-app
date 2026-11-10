@@ -17,6 +17,9 @@ if("scrollRestoration"in history)history.scrollRestoration="manual";</script>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Mon agenda — Vendu Par Moi</title>
   <link rel="stylesheet" href="/css/style.css?v=5">
+  <link rel="stylesheet" href="/css/seller-header-typography.css?v=1">
+  <link rel="stylesheet" href="/css/dashboard-premium.css?v=5">
+  <link rel="stylesheet" href="/css/ma-vente-5-clics.css?v=1">
   <style>
     /* ——— Design tokens (alignés dashboard) ——— */
     :root {
@@ -1113,10 +1116,95 @@ if("scrollRestoration"in history)history.scrollRestoration="manual";</script>
   .vc-carousel-btn:hover:not(:disabled){background:#f5f0e8;border-color:#C4A882;color:#222;}
   .vc-carousel-btn:disabled{opacity:0.3;cursor:default;}
   .vc-carousel-counter{font-size:0.82rem;color:#888;font-weight:600;flex:1;text-align:center;white-space:nowrap;}
+
+  /* Fond identique au tableau de bord — même perception visuelle du texte */
+  body.vpm-agenda-page { background: #FCFBF9; }
+  /* ── Bandeau bonjour + Mon bien (dashboard) ─────────── */
+  .dash-hero { margin-bottom: 16px; padding: 20px 24px 18px; background: #F5F0E8; border: 1.5px solid rgba(158,58,24,0.12); border-radius: 20px; }
+  .dash-hero-badge { display: inline-flex; align-items: center; gap: 6px; border: 1.5px solid rgba(134,65,42,0.28); border-radius: 100px; padding: 5px 13px; font-size: 0.625rem; font-weight: 700; letter-spacing: 0.11em; text-transform: uppercase; color: #86412A; background: transparent; margin-bottom: 10px; font-family:'Inter',sans-serif; }
+  .dash-hero-title { font-family: 'Cormorant Garamond', serif; font-size: 42px; font-weight: 500; letter-spacing: -0.7px; line-height: 1.07; color: #1A1A16; margin: 12px 0 15px; }
+  .dash-hero-title em { font-style: italic; color: var(--terracotta,#9E3A18); }
+  .dash-hero-welcome { font-family:'Inter',sans-serif; font-size: 0.8125rem; color: #71645B; line-height: 1.8; margin: 0 0 18px; max-width: 660px; }
+  #agendaHero.vpm-dashboard { padding: 0; max-width: none; }
+  @media (max-width: 768px) {
+    #agendaHero .dash-hero { flex-direction: column !important; align-items: stretch !important; }
+    #agendaHero #dbUserCard { min-width: 0 !important; max-width: none !important; width: 100% !important; padding: 10px 14px !important; }
+    #agendaHero #dbEmail, #agendaHero #dbPhone { display: none; }
+  }
+  /* ── Ma vente en 5 clics — bloc dépliable ─────────── */
+  #fiveClicksWrapper { margin-bottom: 14px; }
+  #fiveClicksWrapper .vpm-dashboard { padding: 0; max-width: none; }
+  .five-clicks-chevron { flex-shrink:0; width:32px; height:32px; border-radius:50%; background:rgba(255,255,255,0.18); border:1.5px solid rgba(255,255,255,0.35); display:flex; align-items:center; justify-content:center; transition:transform 0.22s; color:#fff; cursor:pointer; padding:0; }
+  #fiveClicksWrapper.five-closed .five-clicks-chevron { transform:rotate(180deg); }
+  #fiveClicksToggle { cursor: pointer; user-select: none; }
+  /* Bandeau : sous-titre légèrement atténué pour hiérarchie visuelle */
+  #fiveClicksWrapper .five-header p { opacity: 0.84; font-size: 0.92rem; }
+  /* ── Carrousel lisible sur agenda (desktop > 1150 px) ── */
+  /* À ce breakpoint ma-vente-5-clics.css impose une grille 5 colonnes qui
+     écrase les cartes. On substitue un carrousel 3 cartes visibles, scoped à
+     la page agenda pour ne pas toucher le tableau de bord. */
+  @media (min-width: 1151px) {
+    body.vpm-agenda-page #fiveClicksWrapper .vpm-dashboard .five-clicks .db-process-steps {
+      display: flex; gap: 16px; overflow-x: auto; scroll-snap-type: x mandatory;
+      scrollbar-width: none; overscroll-behavior-x: contain; padding: 3px 3px 14px;
+    }
+    body.vpm-agenda-page #fiveClicksWrapper .vpm-dashboard .five-clicks .db-process-steps::-webkit-scrollbar { display: none; }
+    body.vpm-agenda-page #fiveClicksWrapper .vpm-dashboard .five-clicks .db-process-step,
+    body.vpm-agenda-page #fiveClicksWrapper .vpm-dashboard .five-clicks .db-process-step:first-child {
+      flex: 0 0 calc((100% - 32px) / 3.2); min-width: 220px; scroll-snap-align: start;
+    }
+    body.vpm-agenda-page #fiveClicksWrapper .five-clicks .five-controls {
+      display: flex; align-items: center; justify-content: center; gap: 20px; margin: 0 0 12px;
+    }
+    body.vpm-agenda-page #fiveClicksWrapper .five-clicks .five-controls > button {
+      width: 44px; height: 44px; border: 1px solid var(--vpm-border); border-radius: 50%;
+      background: #f8eee3; color: var(--terracotta); font-size: 1.3rem; cursor: pointer;
+    }
+    body.vpm-agenda-page #fiveClicksWrapper .five-clicks .five-controls > button:disabled { opacity: .35; cursor: default; }
+    body.vpm-agenda-page #fiveClicksWrapper .five-clicks .five-dots { display: flex; align-items: center; gap: 0; }
+    body.vpm-agenda-page #fiveClicksWrapper .five-clicks .five-dots button {
+      display: grid; place-items: center; width: 28px; height: 44px; border: 0; background: transparent; padding: 0; cursor: pointer;
+    }
+    body.vpm-agenda-page #fiveClicksWrapper .five-clicks .five-dots button::after {
+      content: ''; width: 8px; height: 8px; border-radius: 50%; background: #e6d2c2;
+    }
+    body.vpm-agenda-page #fiveClicksWrapper .five-clicks .five-dots button[aria-current=true]::after {
+      background: var(--terracotta); width: 10px; height: 10px;
+    }
+  }
+  /* ── Finition espacements (overrides agenda-premium.css) ── */
+  /* avant: 20px → après: 14px */
+  .ap-agenda .agenda-stats { margin-bottom: 14px; }
+  /* avant: 16px → après: 10px */
+  .ap-agenda .ap-agenda-tabs { margin-bottom: 10px; }
+  /* avant: gap 18px → après: 14px */
+  .ap-agenda .ap-bottom { gap: 14px; }
+  /* Mobile : réduction supplémentaire ciblée */
+  @media (max-width: 767px) {
+    .ap-agenda #agendaHero .dash-hero { padding: 14px 18px 12px; margin-bottom: 10px; }
+    .ap-agenda .agenda-stats { margin-bottom: 10px; }
+    .ap-agenda #fiveClicksWrapper { margin-bottom: 10px; }
+  }
+  /* Fusion ap-top + ap-calendar-section */
+  .ap-agenda .ap-calendar-section { padding-top: 0; overflow: visible; }
+  .ap-agenda .ap-calendar-section .ap-top { margin: 0; padding: 0; }
+  body.vpm-agenda-page .ap-agenda .ap-calendar-section .aph { border-bottom: 1px solid #E8D9CC !important; padding: 14px 18px !important; margin-bottom: 0 !important; }
+  /* Corrige le sticky de #pastSection qui couvre #agendaOffersSection */
+  .ap-agenda #pastSection { position: static; }
+  /* Carte Mes offres d'achat — design premium */
+  #agendaOffersSection .mv-track-icon { border-radius: 14px; }
+  #agendaOffersSection .ao-hdr-divider { width: 2px; min-height: 44px; background: var(--terracotta,#9E3A18); border-radius: 2px; flex-shrink: 0; align-self: stretch; margin-top: 2px; }
+  #agendaOffersSection .mv-counters { gap: 10px; }
+  #agendaOffersSection .mv-counter { padding: 14px 6px 12px; gap: 0; justify-content: flex-start; }
+  #agendaOffersSection .ao-ctr-ico { width: 38px; height: 38px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 10px; flex-shrink: 0; }
+  #agendaOffersSection .mv-counter strong { font-size: 1.75rem; font-weight: 700; color: #1A1A16; margin-bottom: 10px; line-height: 1; }
+  #agendaOffersSection .ao-ctr-pill { display: inline-flex; align-items: center; padding: 3px 11px; border-radius: 20px; font-size: 0.72rem; font-weight: 600; line-height: 1.4; }
+  #agendaOffersSection .mv-primary { gap: 0; padding: 13px 16px; font-size: 0.88rem; }
+  #agendaOffersSection .ao-btn-divider { width: 1px; height: 20px; background: rgba(255,255,255,0.32); flex-shrink: 0; margin: 0 14px; }
   </style>
   <link rel="stylesheet" href="/css/seller-reference.css?v=1">
   <link rel="stylesheet" href="/css/seller-navigation.css?v=2">
-<link rel="stylesheet" href="/css/agenda-premium.css?v=62">
+<link rel="stylesheet" href="/css/agenda-premium.css?v=64">
 </head>
 <body class="vpm-seller-reference vpm-agenda-page vpm-header-typography">
 <!-- En-tête mobile : logo complet + bouton menu -->
@@ -1152,6 +1240,42 @@ if("scrollRestoration"in history)history.scrollRestoration="manual";</script>
   </aside>
 
   <main class="main-content">
+
+    <!-- ── Bandeau bonjour + Mon bien (identique tableau de bord) ── -->
+    <div id="agendaHero" class="vpm-dashboard">
+      <div class="dash-hero" style="display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap;">
+        <div>
+          <div class="dash-hero-badge vpm-header-label">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+            Mon agenda
+          </div>
+          <h1 class="dash-hero-title vpm-header-title" id="dashboardGreeting">Bonjour</h1>
+          <p class="dash-hero-welcome vpm-header-subtitle">Gérez vos disponibilités et suivez vos visites avec les acheteurs.</p>
+        </div>
+        <div id="dbUserCard" style="background:#fff;border:1.5px solid rgba(158,58,24,0.12);border-radius:14px;padding:14px 16px;min-width:200px;max-width:260px;flex-shrink:0;">
+          <div style="display:flex;align-items:center;gap:9px;margin-bottom:10px;">
+            <div style="width:32px;height:32px;border-radius:9px;background:rgba(158,58,24,0.08);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#9E3A18" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+            </div>
+            <div style="font-size:0.85rem;font-weight:700;color:var(--noir,#242321);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" id="dbName">—</div>
+          </div>
+          <div style="font-size:0.73rem;color:#6b6560;margin-bottom:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" id="dbEmail">—</div>
+          <div style="font-size:0.73rem;color:#9a9087;margin-bottom:10px;" id="dbPhone"></div>
+          <a href="/mon-bien" style="font-size:0.73rem;color:var(--terracotta,#9E3A18);font-weight:600;text-decoration:none;">Modifier mes infos →</a>
+        </div>
+      </div>
+      <section class="mv-property" aria-labelledby="mvPropertyTitle">
+        <span class="mv-property-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 10l9-7 9 7v11h-6v-8H9v8H3z"/></svg></span>
+        <div class="mv-property-body">
+          <div class="mv-property-heading">
+            <h2 id="mvPropertyTitle">Mon bien en vente</h2>
+            <a href="/mon-bien" class="mv-outline">Modifier mon bien →</a>
+          </div>
+          <p id="mvPropertySummary">Chargement du bien…</p>
+          <div class="mv-property-facts" id="mvPropertyFacts"></div>
+        </div>
+      </section>
+    </div>
 
     <!-- En-tête plat -->
     <div class="aph">
@@ -1230,6 +1354,18 @@ if("scrollRestoration"in history)history.scrollRestoration="manual";</script>
       <p id="noLinkMsg" style="display:none;"></p>
     </div>
 
+
+
+    <!-- ── Ma vente en 5 clics ───────────────────────────────── -->
+    <div id="fiveClicksWrapper">
+      <div class="vpm-dashboard">
+<section class="db-process-card five-clicks" aria-label="Ma vente en 5 clics">
+<header class="five-header" id="fiveClicksToggle"><img class="five-logo" src="/images/vendu-par-moi.svg" alt="Vendu Par Moi"><div><h2>Ma vente en 5 clics</h2><p>Les 5 liens essentiels à utiliser au bon moment pour une vente simple et bien organisée.</p></div><a href="/toolbox/formation/guide-complet.pdf" target="_blank" rel="noopener noreferrer" class="five-guide" onclick="event.stopPropagation()">Voir le guide complet →</a><button type="button" class="five-clicks-chevron" aria-label="Réduire Ma vente en 5 clics" aria-expanded="true" onclick="event.stopPropagation(); toggleFiveClicks();"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="18 15 12 9 6 15"/></svg></button></header>
+<div id="fiveClicksBody">
+<div class="db-process-steps" id="fiveCards"><article class="db-process-step" aria-label="1 — Mon dossier complet"><div class="five-photo-frame"><img class="five-photo" src="/images/ma-vente-5-clics/hd/01_mon_dossier_complet.png" alt="" width="699" height="347"><span class="five-number" aria-hidden="true">1</span></div><div class="db-step-body"><h3 class="db-step-label">Mon dossier complet</h3><p class="five-note"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="m3 10 9-7 9 7M5 9v12h5v-7h4v7h5V9"/></svg>Comprend également vos créneaux de visite.</p><p class="db-step-sub">Envoyez avant la visite un dossier complet de votre bien à l'acheteur.</p><button type="button" class="db-step-btn-link" onclick="copyStepMsg(1, this)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="m3 10 9-7 9 7M5 9v12h5v-7h4v7h5V9"/></svg><span class="db-step-btn-lbl">Copier pour partager</span></button><a class="db-step-preview-link vpm-dossier-preview" id="vpmDossierPreview" data-step="1" aria-disabled="true" target="_blank" rel="noopener noreferrer"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/></svg><span>Voir ce que reçoit l’acheteur</span><span aria-hidden="true">→</span></a></div></article><article class="db-process-step" aria-label="2 — Réservation de visite"><div class="five-photo-frame"><img class="five-photo" src="/images/ma-vente-5-clics/hd/02_reservation_de_visite.png" alt="" width="695" height="347"><span class="five-number" aria-hidden="true">2</span></div><div class="db-step-body"><h3 class="db-step-label">Réservation de visite</h3><p class="db-step-sub">L'acquéreur choisit un créneau dans votre agenda pour une visite de votre bien.</p><button type="button" class="db-step-btn-link" onclick="copyStepMsg(2, this)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="m3 10 9-7 9 7M5 9v12h5v-7h4v7h5V9"/></svg><span class="db-step-btn-lbl">Copier pour partager</span></button><a class="db-step-preview-link" data-step="2" aria-disabled="true" target="_blank" rel="noopener noreferrer"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/></svg><span>Voir ce que reçoit l’acheteur</span><span aria-hidden="true">→</span></a></div></article><article class="db-process-step" aria-label="3 — Dossier acheteur sérieux"><div class="five-photo-frame"><img class="five-photo" src="/images/ma-vente-5-clics/hd/03_dossier_acheteur_serieux.png" alt="" width="758" height="347"><span class="five-number" aria-hidden="true">3</span></div><div class="db-step-body"><h3 class="db-step-label">Dossier acheteur sérieux</h3><p class="db-step-sub">Après la visite, partagez les documents complémentaires aux acheteurs réellement intéressés.</p><button type="button" class="db-step-btn-link" onclick="copyStepMsg(3, this)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="m3 10 9-7 9 7M5 9v12h5v-7h4v7h5V9"/></svg><span class="db-step-btn-lbl">Copier pour partager</span></button><a class="db-step-preview-link" data-step="3" aria-disabled="true" target="_blank" rel="noopener noreferrer"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/></svg><span>Voir ce que reçoit l’acheteur</span><span aria-hidden="true">→</span></a></div></article><article class="db-process-step" aria-label="4 — Soumission d'offre"><div class="five-photo-frame"><img class="five-photo" src="/images/ma-vente-5-clics/hd/04_soumission_offre.png" alt="" width="1051" height="367"><span class="five-number" aria-hidden="true">4</span></div><div class="db-step-body"><h3 class="db-step-label">Soumission d'offre</h3><p class="db-step-sub">L’acheteur soumet son offre — elle apparaît dans “Mes offres”.</p><button type="button" class="db-step-btn-link" onclick="copyStepMsg(4, this)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="m3 10 9-7 9 7M5 9v12h5v-7h4v7h5V9"/></svg><span class="db-step-btn-lbl">Copier pour partager</span></button><a class="db-step-preview-link" data-step="4" aria-disabled="true" target="_blank" rel="noopener noreferrer"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/></svg><span>Voir ce que reçoit l’acheteur</span><span aria-hidden="true">→</span></a></div></article><article class="db-process-step" aria-label="5 — Dossier notaire et suivi"><div class="five-photo-frame"><img class="five-photo" src="/images/ma-vente-5-clics/hd/05_dossier_notaire_suivi.png" alt="" width="1110" height="367"><span class="five-number" aria-hidden="true">5</span></div><div class="db-step-body"><h3 class="db-step-label">Dossier notaire et suivi</h3><p class="db-step-sub">Transmettez les documents demandés au notaire et suivez les étapes jusqu'au compromis.</p><button type="button" class="db-step-btn-link" onclick="copyStepMsg(5, this)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="m3 10 9-7 9 7M5 9v12h5v-7h4v7h5V9"/></svg><span class="db-step-btn-lbl">Copier pour partager</span></button><a class="db-step-preview-link" data-step="5" aria-disabled="true" target="_blank" rel="noopener noreferrer"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/></svg><span>Voir ce que reçoit l’acheteur</span><span aria-hidden="true">→</span></a></div></article></div>
+<nav class="five-controls" aria-label="Navigation des cinq liens"><button type="button" data-five-prev aria-label="Carte précédente" disabled>←</button><div class="five-dots"><button type="button" data-five-index="0" aria-label="Afficher la carte 1" aria-current="true"></button><button type="button" data-five-index="1" aria-label="Afficher la carte 2" aria-current="false"></button><button type="button" data-five-index="2" aria-label="Afficher la carte 3" aria-current="false"></button><button type="button" data-five-index="3" aria-label="Afficher la carte 4" aria-current="false"></button><button type="button" data-five-index="4" aria-label="Afficher la carte 5" aria-current="false"></button></div><button type="button" data-five-next aria-label="Carte suivante">→</button></nav></div></section>
+      </div>
+    </div>
 
     <!-- Partage de l'agenda -->
     <!-- Layout 2 colonnes : calendrier + panneau droit -->
@@ -1460,6 +1596,54 @@ if("scrollRestoration"in history)history.scrollRestoration="manual";</script>
           <div id="pastBannerHint" style="padding:13px 18px;font-size:0.84rem;line-height:1.5;font-style:italic;background:rgba(120,120,120,0.07);color:#6b6b6b;border-bottom:1px solid rgba(120,120,120,0.18);">Après chaque visite, gardez le contact avec vos acheteurs : transmettez vos documents complémentaires ou indiquez si vous souhaitez poursuivre les échanges.</div>
           <div class="vcr-card-wrap" id="pastList"></div>
           <div class="vcr-dots" id="vcr-dots-past" style="display:none;"></div>
+        </div>
+
+        <!-- Mes offres d'achat -->
+        <div id="agendaOffersSection" class="vpm-dashboard" style="padding:0;max-width:none;margin-bottom:0;">
+          <section class="mv-track-card" style="margin:0 0 14px;" aria-label="Mes offres d'achat">
+            <header style="align-items:flex-start;gap:14px;">
+              <span class="mv-track-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><path d="M7 13c.6-.6 1.4-1 2-1s1.4.5 2 1 1.4 1 2 1 1.4-.4 2-1"/><path d="M7 17h.01M10 17h4"/></svg>
+              </span>
+              <div class="ao-hdr-divider" aria-hidden="true"></div>
+              <div style="flex:1;min-width:0;">
+                <h2>Mes offres d'achat</h2>
+                <p>Consultez et gérez les propositions reçues par les acheteurs.</p>
+              </div>
+            </header>
+            <div class="mv-counters">
+              <a href="/mes-offres" class="mv-counter">
+                <span class="ao-ctr-ico" style="background:#FEF3E2;" aria-hidden="true">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#C4603A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>
+                </span>
+                <strong id="agendaOffers0">—</strong>
+                <span class="ao-ctr-pill" style="background:#FEF3E2;color:#C4603A;">En attente</span>
+              </a>
+              <a href="/mes-offres" class="mv-counter">
+                <span class="ao-ctr-ico" style="background:#EAFAF1;" aria-hidden="true">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#27AE60" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                </span>
+                <strong id="agendaOffers1">—</strong>
+                <span class="ao-ctr-pill" style="background:#EAFAF1;color:#27AE60;">Acceptées</span>
+              </a>
+              <a href="/mes-offres" class="mv-counter">
+                <span class="ao-ctr-ico" style="background:#FDEDEC;" aria-hidden="true">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#E74C3C" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                </span>
+                <strong id="agendaOffers2">—</strong>
+                <span class="ao-ctr-pill" style="background:#FDEDEC;color:#E74C3C;">Refusées</span>
+              </a>
+            </div>
+            <details class="mv-details">
+              <summary>Examiner les offres reçues</summary>
+              <div id="agendaOffersList"></div>
+            </details>
+            <a class="mv-primary" href="/mes-offres">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+              <span class="ao-btn-divider" aria-hidden="true"></span>
+              Voir mes offres →
+            </a>
+          </section>
         </div>
 
         <!-- Visites annulées -->
@@ -3610,12 +3794,158 @@ function copyAccroche() {
   showToast('Phrase copiée !');
 }
 
+
+/* ——— Ma vente en 5 clics ——— */
+/* ——— Processus de vente ——— */
+const _stepCtx = { buyerUrl: '', resaUrl: '', offreUrl: '', notaireUrl: '', address: '', firstName: '', phone: '' };
+const _stepUrls = ['', '', '', '', ''];
+
+const _stepMsgs = [
+  () => `Bonjour,\n\nJe suis ${_stepCtx.firstName}, le propriétaire du bien.\n\nSuite à votre intérêt pour la maison, je vous transmets le dossier complet regroupant la fiche descriptive, les photos ainsi que les diagnostics obligatoires.\n\n${_stepCtx.buyerUrl}\n\nAfin de faciliter nos échanges et de pouvoir répondre au mieux à vos questions concernant le bien, j'ai choisi d'être accompagné par Vendu Par Moi. Cela m'aide à centraliser toutes les informations importantes et à mieux organiser les visites. Cette vente directe, sans intermédiaire, signifie aussi qu'aucune commission n'est intégrée dans le prix — tout en bénéficiant d'un accompagnement aussi rigoureux qu'un professionnel.\n\nVous retrouverez également en bas de la page mes disponibilités pour me rencontrer et visiter le bien.\n\nN'hésitez pas à me contacter si vous avez des questions complémentaires.\n\nÀ bientôt,\n${_stepCtx.firstName}`,
+  () => `Bonjour, voici le lien pour réserver directement une date de visite selon mes disponibilités : ${_stepCtx.resaUrl}\n\nCordialement,\n${_stepCtx.firstName}`,
+  () => `Bonjour,\n\nSuite à votre visite et afin de vous accompagner dans votre réflexion, je vous transmets mes documents complémentaires (entretien chaudière, ramonage, travaux réalisés...) :\n\n${_stepCtx.documentsUrl || _stepCtx.buyerUrl}\n\nN'hésitez pas à me contacter si vous avez des questions 🙂\n\nCordialement,\n${_stepCtx.firstName}`,
+  () => `Bonjour, suite à notre échange, voici le lien pour soumettre votre offre d'achat en ligne : ${_stepCtx.offreUrl} — Je la traiterai dans les meilleurs délais.\n\nCordialement,\n${_stepCtx.firstName}`,
+  () => `Bonjour Maître,\n\nSuite à notre accord sur la vente du bien situé au ${_stepCtx.address}, je vous transmets le dossier complet incluant le titre de propriété, les diagnostics, et l'ensemble des documents nécessaires à la rédaction du compromis.\n\nLien sécurisé : ${_stepCtx.notaireUrl}\n\nRestant à votre disposition,\n${_stepCtx.firstName}`
+];
+
+function initStepLinks() {
+  _stepUrls[0] = _stepCtx.buyerUrl;
+  _stepUrls[1] = _stepCtx.resaUrl;
+  _stepUrls[2] = _stepCtx.documentsUrl || _stepCtx.buyerUrl;
+  _stepUrls[3] = _stepCtx.offreUrl;
+  _stepUrls[4] = _stepCtx.notaireUrl;
+  document.querySelectorAll('.db-step-preview-link[data-step]').forEach(el => {
+    const n = parseInt(el.dataset.step, 10);
+    const url = _stepUrls[n - 1];
+    el.removeAttribute('href'); el.setAttribute('aria-disabled', 'true');
+    try {
+      const parsed = new URL(url);
+      if (['https:', 'http:'].includes(parsed.protocol) && !parsed.username && !parsed.password && /^\/(dossier\/(acheteur|notaire)|soumettre-offre)\/[^/]+$/.test(parsed.pathname)) {
+        // Preview the token against the database of the seller's current environment.
+        const sep = parsed.search ? '&' : '?';
+        el.href = new URL(parsed.pathname + parsed.search + sep + 'preview=1' + parsed.hash, window.location.origin).href;
+        el.removeAttribute('aria-disabled');
+      }
+    } catch (_) {}
+  });
+}
+
+function copyStepLink(n, btn) {
+  const url = _stepUrls[n-1];
+  const lbl = btn.querySelector('.db-step-btn-lbl') || btn;
+  if (!url) { lbl.textContent = '⚠ Indisponible'; setTimeout(() => lbl.textContent = 'Copier le lien', 2000); return; }
+  navigator.clipboard.writeText(url).then(() => {
+    btn.classList.add('copied');
+    lbl.textContent = '✓ Lien copié !';
+    setTimeout(() => { btn.classList.remove('copied'); lbl.textContent = 'Copier le lien'; }, 2200);
+  });
+}
+
+async function copyStepMsg(n, btn) {
+  if (!_stepUrls[n-1]) { window.showToast('Lien non disponible — vérifiez votre espace Mon Bien.', 'error'); return; }
+  try {
+    await navigator.clipboard.writeText(_stepMsgs[n-1]());
+    const label = btn?.querySelector('.db-step-btn-lbl');
+    if (label) { label.textContent = 'Copié !'; setTimeout(() => label.textContent = 'Copier pour partager', 2200); }
+    window.showToast('Message et lien copiés !');
+  } catch (_) { openStepMsgModal(n); window.showToast('Copie automatique indisponible. Vous pouvez copier le message dans l’aperçu.', 'error'); }
+}
+
+function shareStepWhatsapp(n) {
+  if (!_stepUrls[n-1]) return;
+  const text = encodeURIComponent(_stepMsgs[n-1]());
+  window.open(`https://api.whatsapp.com/send?text=${text}`, '_blank');
+}
+
+async function loadOffreLink() {
+  try {
+    const res = await fetch('/api/offre-link');
+    if (!res.ok) return;
+    const data = await res.json();
+    if (data.url) { _stepCtx.offreUrl = data.url; initStepLinks(); }
+  } catch(e) {}
+}
+
+// ── Bandeau bonjour + Mon bien ────────────────────────
+function renderAgendaHero(seller, property) {
+  const greeting = document.getElementById('dashboardGreeting');
+  if (greeting) {
+    const s = document.createElement('span');
+    s.textContent = 'Bonjour' + (seller.first_name ? ' ' : '');
+    greeting.replaceChildren(s);
+    if (seller.first_name) { const em = document.createElement('em'); em.textContent = seller.first_name + ','; greeting.append(em); }
+  }
+  const fullName = [seller.first_name, seller.last_name].filter(Boolean).join(' ') || '—';
+  const el = id => document.getElementById(id);
+  if (el('dbName')) el('dbName').textContent = fullName;
+  if (el('dbEmail')) el('dbEmail').textContent = seller.email || '—';
+  if (el('dbPhone')) el('dbPhone').textContent = seller.phone || '';
+  const summary = [property.type, property.rooms ? property.rooms + ' pièces' : null,
+    property.surface_habitable ? property.surface_habitable + ' m²' : null,
+    [property.city, property.postal_code ? '(' + property.postal_code + ')' : null].filter(Boolean).join(' ')
+  ].filter(Boolean).join(' · ');
+  if (el('mvPropertySummary')) el('mvPropertySummary').textContent = summary || 'Renseignez votre logement dans Mon bien pour préparer votre vente.';
+  const facts = el('mvPropertyFacts');
+  if (facts) {
+    facts.replaceChildren();
+    const si = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">';
+    const icons = { room: si+'<rect x="3" y="4" width="18" height="18" rx="2"/><path d="M8 2v4M16 2v4M3 10h18M8 14h1M15 14h1M8 18h1"/></svg>', area: si+'<path d="M3 9V3h6M15 3h6v6M21 15v6h-6M9 21H3v-6M3 3l6 6M21 3l-6 6M21 21l-6-6M3 21l6-6"/></svg>', tree: si+'<path d="M12 21v-7M8 18a4 4 0 0 1-3-7 4 4 0 0 1 3-6 4 4 0 0 1 8 0 4 4 0 0 1 3 6 4 4 0 0 1-3 7z"/></svg>', energy: si+'<path d="M5 3h10l5 4-5 4H5zM5 13h10l5 4-5 4H5z"/></svg>' };
+    for (const [k, v] of [['room', property.rooms ? property.rooms + ' pièces' : 'Pièces à renseigner'], ['area', property.surface_habitable ? property.surface_habitable + ' m²' : 'Surface à renseigner'], ['tree', property.surface_terrain ? 'Terrain ' + property.surface_terrain + ' m²' : 'Terrain non renseigné'], ['energy', property.dpe_class ? 'DPE ' + property.dpe_class : 'DPE à renseigner']]) {
+      const d = document.createElement('div'); d.innerHTML = icons[k]; const sp = document.createElement('span'); sp.textContent = v; d.append(sp); facts.append(d);
+    }
+  }
+}
+
+function renderAgendaOffers(offers) {
+  const pending = offers.filter(o => o.status === 'pending').length;
+  const accepted = offers.filter(o => o.status === 'accepted').length;
+  const refused = offers.filter(o => o.status === 'refused').length;
+  const el = id => document.getElementById(id);
+  if (el('agendaOffers0')) el('agendaOffers0').textContent = pending;
+  if (el('agendaOffers1')) el('agendaOffers1').textContent = accepted;
+  if (el('agendaOffers2')) el('agendaOffers2').textContent = refused;
+  const list = el('agendaOffersList');
+  if (!list) return;
+  if (!offers.length) {
+    list.innerHTML = '<p style="font-size:0.83rem;color:#888;padding:4px 0 8px;">Aucune offre reçue pour le moment.</p>';
+    return;
+  }
+  list.replaceChildren();
+  const statusLabel = {pending:'En attente',accepted:'Acceptée',refused:'Refusée'};
+  const statusColor = {pending:'#C4603A',accepted:'#3D7A4A',refused:'#888'};
+  offers.slice(0, 5).forEach(o => {
+    const row = document.createElement('div');
+    row.style.cssText = 'display:flex;justify-content:space-between;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid #f0e8df;font-size:0.83rem;';
+    const price = o.amount ? new Intl.NumberFormat('fr-FR').format(o.amount) + ' €' : '—';
+    row.innerHTML = `<span style="color:#3a3530;">${price}</span><span style="font-weight:700;color:${statusColor[o.status]||'#888'};">${statusLabel[o.status]||o.status}</span>`;
+    list.append(row);
+  });
+  if (offers.length > 5) {
+    const more = document.createElement('p');
+    more.style.cssText = 'font-size:0.78rem;color:#888;margin:8px 0 0;text-align:center;';
+    more.textContent = `+ ${offers.length - 5} autre${offers.length - 5 > 1 ? 's' : ''} offre${offers.length - 5 > 1 ? 's' : ''}`;
+    list.append(more);
+  }
+}
+
 // ── Data loading ──────────────────────────────────────
 async function loadData() {
   try {
-    const [overviewRes,agendaRes]=await Promise.all([fetch('/api/connect/overview'),fetch('/api/agenda')]);
+    const [overviewRes,agendaRes,offersRes]=await Promise.all([fetch('/api/connect/overview'),fetch('/api/agenda'),fetch('/api/mes-offres')]);
     _data=await overviewRes.json();
     allVisits=_data.visits||[];
+    // ── Ma vente en 5 clics — données ──────────────────────────
+    { const _p=_data.property||{}, _s=_data.seller||{};
+      _stepCtx.address=[_p.address,_p.city].filter(Boolean).join(', ')||'';
+      _stepCtx.firstName=_s.first_name||'';
+      _stepCtx.phone=_s.phone||'';
+      _stepCtx.buyerUrl=_p.acheteur_token?window.location.origin+'/dossier/acheteur/'+_p.acheteur_token:'';
+      _stepCtx.notaireUrl=_p.notaire_token?window.location.origin+'/dossier/notaire/'+_p.notaire_token:'';
+      _stepCtx.resaUrl=_p.acheteur_token?window.location.origin+'/dossier/acheteur/'+_p.acheteur_token+'#reservation':'';
+      _stepCtx.documentsUrl=_stepCtx.buyerUrl?_stepCtx.buyerUrl+'#documents':'';
+      initStepLinks();
+    }
+    renderAgendaHero(_data.seller || {}, _data.property || {});
 
     // Booking link — toujours disponible via acheteur_token (indépendant de la publication)
     if (_data.property?.acheteur_token) {
@@ -3648,6 +3978,8 @@ async function loadData() {
     renderVisits();
     renderContacts();
     renderNotifSidebar();
+    const offersData = await offersRes.json();
+    renderAgendaOffers(offersData.offers || []);
     renderMcTabs();
     renderMcCards();
 
@@ -3969,6 +4301,7 @@ loadData().then(() => {
     if (target) setTimeout(() => target.scrollIntoView({ behavior: 'smooth', block: 'start' }), 200);
   }
 });
+loadOffreLink();
 
 // Rafraîchissement automatique — mode "écran d'accueil" iOS
 (function() {
@@ -4006,6 +4339,103 @@ loadData().then(() => {
   setInterval(() => { if (!document.hidden) refreshVisits(); }, 60000);
 })();
 </script>
+<script>
+/* Ma vente en 5 clics — toggle bandeau terracotta */
+(function() {
+  const wrapper = document.getElementById('fiveClicksWrapper');
+  const body = document.getElementById('fiveClicksBody');
+  const header = document.getElementById('fiveClicksToggle');
+  const btn = wrapper ? wrapper.querySelector('.five-clicks-chevron') : null;
+  if (!wrapper || !body || !header) return;
+  function applyState(open) {
+    wrapper.classList.toggle('five-closed', !open);
+    body.style.display = open ? '' : 'none';
+    if (btn) btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+  }
+  window.toggleFiveClicks = function() {
+    const nowOpen = wrapper.classList.contains('five-closed');
+    applyState(nowOpen);
+    localStorage.setItem('fiveClicksOpen', nowOpen ? '1' : '0');
+  };
+  applyState(localStorage.getItem('fiveClicksOpen') !== '0');
+  header.addEventListener('click', function(e) {
+    if (e.target.closest('a[href]')) return;
+    toggleFiveClicks();
+  });
+})();
+</script>
+<!-- ── Modal aperçu message étape (Ma vente en 5 clics) ───── -->
+<div id="stepMsgModal" style="position:fixed;inset:0;background:rgba(0,0,0,0.48);z-index:2000;display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;pointer-events:none;visibility:hidden;transition:opacity 0.2s,visibility 0.2s;">
+  <div style="background:#fff;border-radius:20px;width:100%;max-width:480px;max-height:90vh;overflow-y:auto;transform:translateY(14px);transition:transform 0.2s;padding:24px 26px;box-shadow:0 20px 60px rgba(0,0,0,0.18);">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;gap:12px;">
+      <div>
+        <div style="font-size:0.68rem;font-weight:700;text-transform:uppercase;letter-spacing:0.09em;color:var(--terracotta);background:rgba(158,58,24,0.06);border:1.5px solid rgba(158,58,24,0.12);border-radius:20px;padding:3px 11px;display:inline-block;margin-bottom:8px;" id="stepMsgModalBadge">Étape 1</div>
+        <div style="font-family:'Cormorant Garamond',serif;font-size:1.2rem;font-weight:600;color:#1A1A16;line-height:1.2;" id="stepMsgModalTitle">Aperçu du message</div>
+      </div>
+      <button onclick="closeStepMsgModal()" style="width:34px;height:34px;border-radius:50%;border:none;background:#f5f0e8;cursor:pointer;font-size:1.1rem;display:flex;align-items:center;justify-content:center;color:#666;flex-shrink:0;font-family:inherit;">✕</button>
+    </div>
+    <div id="stepMsgModalText" style="background:#f8f5f0;border:1.5px solid #e8e0d6;border-radius:12px;padding:16px 18px;font-size:0.86rem;line-height:1.8;color:#2d2d2d;white-space:pre-wrap;word-break:break-word;margin-bottom:18px;max-height:320px;overflow-y:auto;"></div>
+    <div style="display:flex;gap:10px;">
+      <button id="stepMsgCopyBtn" onclick="doStepMsgCopy()" style="flex:1;display:flex;align-items:center;justify-content:center;gap:8px;padding:13px 18px;background:linear-gradient(135deg,var(--terracotta-dark),var(--terracotta));color:#fff;border:none;border-radius:11px;font-family:'DM Sans',sans-serif;font-size:0.9rem;font-weight:700;cursor:pointer;transition:0.15s;">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+        Copier le message
+      </button>
+      <button onclick="closeStepMsgModal()" style="padding:13px 18px;background:#f5f0e8;color:#666;border:none;border-radius:11px;font-family:'DM Sans',sans-serif;font-size:0.9rem;font-weight:600;cursor:pointer;">Fermer</button>
+    </div>
+  </div>
+</div>
+<script>
+let _stepMsgModalN = 0;
+const STEP_LABELS = ['Fiche descriptive + photos + DPE', 'Réservation de visite', 'Dossier acheteur sérieux', 'Soumission d\'offre', 'Dossier notaire'];
+
+function openStepMsgModal(n) {
+  _stepMsgModalN = n;
+  const msg = _stepUrls[n-1] ? _stepMsgs[n-1]() : null;
+  const modal = document.getElementById('stepMsgModal');
+  const inner = modal.querySelector('div');
+  document.getElementById('stepMsgModalBadge').textContent = 'Étape ' + n;
+  document.getElementById('stepMsgModalTitle').textContent = STEP_LABELS[n-1] || 'Aperçu du message';
+  if (!msg) {
+    document.getElementById('stepMsgModalText').textContent = '⚠ Lien non disponible — vérifiez votre espace Mon Bien.';
+  } else {
+    document.getElementById('stepMsgModalText').textContent = msg;
+  }
+  const copyBtn = document.getElementById('stepMsgCopyBtn');
+  copyBtn.textContent = ''; // reset
+  copyBtn.innerHTML = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Copier le message';
+  copyBtn.style.background = 'linear-gradient(135deg,var(--terracotta-dark),#9E3A18)';
+  copyBtn.disabled = !msg;
+  modal.style.opacity = '1'; modal.style.pointerEvents = 'all'; modal.style.visibility = 'visible';
+  inner.style.transform = 'translateY(0)';
+}
+
+function closeStepMsgModal() {
+  const modal = document.getElementById('stepMsgModal');
+  const inner = modal.querySelector('div');
+  modal.style.opacity = '0'; modal.style.pointerEvents = 'none'; modal.style.visibility = 'hidden';
+  inner.style.transform = 'translateY(14px)';
+}
+
+function doStepMsgCopy() {
+  const msg = _stepUrls[_stepMsgModalN-1] ? _stepMsgs[_stepMsgModalN-1]() : null;
+  if (!msg) return;
+  const btn = document.getElementById('stepMsgCopyBtn');
+  navigator.clipboard.writeText(msg).then(() => {
+    btn.innerHTML = '✓ Message copié !';
+    btn.style.background = 'linear-gradient(135deg,#2e7d32,#4CAF50)';
+    setTimeout(() => {
+      btn.innerHTML = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Copier le message';
+      btn.style.background = 'linear-gradient(135deg,var(--terracotta-dark),#9E3A18)';
+    }, 2500);
+  });
+}
+
+document.getElementById('stepMsgModal').addEventListener('click', function(e) {
+  if (e.target === this) closeStepMsgModal();
+});
+</script>
+<script src="/js/ma-vente.js?v=2"></script>
+<script src="/js/ma-vente-5-clics.js?v=1"></script>
 <script src="/js/transitions.js"></script>
 <script src="/js/seller-nav.js?v=3"></script>
 
@@ -4051,7 +4481,25 @@ loadData().then(() => {
 })();
 </script>
 
-<link rel="stylesheet" href="/css/seller-header-typography.css?v=1">
 <script src="/js/agenda-premium.js?v=96"></script>
+<script>
+/* Repositionnements post agenda-premium.js */
+(function() {
+  var block = document.getElementById('fiveClicksWrapper');
+  var tabs = document.querySelector('.ap-agenda-tabs');
+  if (block && tabs) tabs.before(block);
+  /* Fusionne ap-top (.aph) avec ap-calendar-section — supprime le doublon h2 */
+  var apTop = document.querySelector('.ap-top');
+  var calSection = document.querySelector('.ap-calendar-section');
+  if (apTop && calSection) calSection.prepend(apTop);
+  var calHeading = calSection && calSection.querySelector('.ap-calendar-heading');
+  if (calHeading) calHeading.hidden = true;
+  /* agenda-premium.js déplace #pastSection dans actionCol — y placer la carte offres juste après */
+  var offers = document.getElementById('agendaOffersSection');
+  var past = document.getElementById('pastSection');
+  if (offers && past) past.after(offers);
+})();
+</script>
+<link rel="stylesheet" href="/css/seller-header-typography.css?v=1">
 </body>
 </html>

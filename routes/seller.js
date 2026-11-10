@@ -28,8 +28,12 @@ const aiRateLimit = require('express-rate-limit')({
   skip: (req) => !req.seller,
 });
 
+// ChercherTrouver API protection — in-memory, reset on server restart
+let _ctQuotaBlockUntil = 0;  // ms timestamp; 402 received → blocks all API calls for 1h
+let _ctErrorBlockUntil = 0;  // ms timestamp; 429/5xx/network → short backoff
+
 // Pages vendeur (toutes protégées)
-router.get('/dashboard', requireAuth, (req, res) => res.sendFile('dashboard.html', { root: './views/seller' }));
+router.get('/dashboard', requireAuth, (req, res) => res.redirect('/mon-agenda'));
 router.get('/mon-bien', requireAuth, (req, res) => {
   try {
     const base = process.env.BASE_URL || `${req.protocol}://${req.get('host')}`;
@@ -61,7 +65,7 @@ router.use('/ma-formation/documents', requireAuth, require('./formation-document
 router.get('/ma-formation', requireAuth, (req, res) => res.sendFile('library.html', { root: './views/seller' }));
 router.get('/ma-formation/plaquette', requireAuth, (req, res) => res.sendFile('plaquette.html', { root: './views/seller' }));
 router.get('/coaching-vpm', requireAuth, (req, res) => res.sendFile('coaching-vpm.html', { root: './views/seller' }));
-router.get('/mon-agenda', requireAuth, (req, res) => res.sendFile('agenda.html', { root: './views/seller' }));
+router.get('/mon-agenda', requireAuth, (req, res) => { res.set('Cache-Control', 'no-store, no-cache, must-revalidate'); res.sendFile('agenda.html', { root: './views/seller' }); });
 router.get('/ma-bibliotheque', requireAuth, (req, res) => res.sendFile('biblio.html', { root: './views/seller' }));
 router.get('/onboarding', requireAuth, (req, res) => {
   const row = db.prepare('SELECT onboarding_done FROM sellers WHERE id=?').get(req.seller.id);
@@ -87,7 +91,7 @@ router.post('/api/onboarding/complete', requireAuth, express.json(), (req, res) 
 
 // API — seller data
 router.get('/api/me', requireAuth, (req, res) => {
-  const seller = db.prepare('SELECT id, uuid, email, first_name, last_name, phone, pack, twilio_number, paid_at, created_at, client_availability, booking_step, photographer_scheduled, photographer_name, photographer_date, photographer_done, photo_report_url, calendar_token FROM sellers WHERE id = ?').get(req.seller.id);
+  const seller = db.prepare('SELECT id, uuid, email, first_name, last_name, phone, pack, twilio_number, paid_at, created_at, client_availability, booking_step, photographer_scheduled, photographer_name, photographer_date, photographer_done, photo_report_url, calendar_token, is_demo FROM sellers WHERE id = ?').get(req.seller.id);
   const property = db.prepare('SELECT * FROM properties WHERE seller_id = ?').get(req.seller.id);
   const contacts = property ? db.prepare('SELECT COUNT(*) as count FROM buyer_contacts WHERE seller_id = ?').get(req.seller.id) : { count: 0 };
   const visits = property ? db.prepare('SELECT COUNT(*) as count FROM visits WHERE seller_id = ?').get(req.seller.id) : { count: 0 };
@@ -255,82 +259,142 @@ router.get('/api/formation/annonces-marche', requireAuth, async (req, res) => {
 
     const typeRaw = (prop.type || '').toLowerCase();
     const typeLabel = typeRaw.includes('appartement') ? 'Appartement' : 'Maison';
-    const cacheKey = `${(city || cp).toLowerCase().replace(/\s+/g, '_')}_${typeLabel.toLowerCase()}`;
+    const communeKey = (city || cp).toLowerCase().replace(/\s+/g, '_');
 
-    // Serve shared commune+type cache if fresh (< 7 days)
-    const cached = db.prepare('SELECT data, cached_at FROM commune_annonces_cache WHERE cache_key = ?').get(cacheKey);
-    if (cached) {
-      const ageMs = Date.now() - new Date(cached.cached_at).getTime();
-      if (ageMs < 7 * 24 * 60 * 60 * 1000) {
-        try { return res.json(JSON.parse(cached.data)); } catch {}
+    // Normalize to nearest 10m² — cache key shared between sellers with similar surfaces
+    const normalizedSurface = Math.round(surface / 10) * 10;
+
+    const MIN_ANN = 5;
+    const FACTORS = [0.4, 0.5, 0.6];
+    const now = Date.now();
+
+    const quotaBlocked = now < _ctQuotaBlockUntil;
+    const errorBlocked = now < _ctErrorBlockUntil;
+
+    let lastInsufficient = null;
+    let wasBlocked = false;
+
+    for (const factor of FACTORS) {
+      const surfaceMin = Math.round(normalizedSurface * (1 - factor));
+      const surfaceMax = Math.round(normalizedSurface * (1 + factor));
+      const cacheKey = `${communeKey}_${typeLabel.toLowerCase()}_${surfaceMin}_${surfaceMax}`;
+
+      // Check cache for this range
+      const cached = db.prepare('SELECT data, cached_at FROM commune_annonces_cache WHERE cache_key = ?').get(cacheKey);
+      if (cached) {
+        const ageMs = Date.now() - new Date(cached.cached_at).getTime();
+        if (ageMs < 30 * 24 * 60 * 60 * 1000) {
+          let data;
+          try { data = JSON.parse(cached.data); } catch {}
+          if (data) {
+            if (data.status === 'ok') return res.json({ ...data, surfaceMin, surfaceMax, widened: factor > 0.4 });
+            // insufficient: record last and try next range
+            lastInsufficient = { ...data, surfaceMin, surfaceMax };
+            continue;
+          }
+        }
       }
-    }
 
-    const surfaceMin = Math.round(surface * 0.6);
-    const surfaceMax = Math.round(surface * 1.4);
-    const params = new URLSearchParams({
-      transaction: 'vente',
-      type: typeLabel,
-      surface_min: surfaceMin,
-      surface_max: surfaceMax,
-      page_size: 15,
-      fresh: 'true',
-      sort: 'recent',
-    });
-    if (cp) params.set('cp', cp);
-    else params.set('ville', city);
+      // No valid cache — skip API call if globally blocked
+      if (quotaBlocked || errorBlocked) {
+        wasBlocked = true;
+        continue;
+      }
 
-    const apiUrl = `https://cherchertrouver.immo/api/v1/annonces?${params.toString()}`;
-    const apiRes = await fetch(apiUrl, {
-      headers: { 'X-Api-Key': apiKey, 'Accept': 'application/json' }
-    });
+      // Cache miss or stale: call API for this range
+      const params = new URLSearchParams({
+        transaction: 'vente',
+        type: typeLabel,
+        surface_min: surfaceMin,
+        surface_max: surfaceMax,
+        page_size: 15,
+        fresh: 'true',
+        sort: 'recent',
+      });
+      if (cp) params.set('cp', cp);
+      else params.set('ville', city);
 
-    if (apiRes.status === 402) return res.json({ status: 'quota_exceeded' });
-    if (!apiRes.ok) {
-      console.error('[annonces-marche] ChercherTrouver', apiRes.status, await apiRes.text().catch(() => '').then(t => t.slice(0, 200)));
-      return res.status(502).json({ status: 'api_error', code: apiRes.status });
-    }
+      const apiUrl = `https://cherchertrouver.immo/api/v1/annonces?${params.toString()}`;
+      let apiRes;
+      try {
+        apiRes = await fetch(apiUrl, { headers: { 'X-Api-Key': apiKey, 'Accept': 'application/json' } });
+      } catch (fetchErr) {
+        _ctErrorBlockUntil = Date.now() + 5 * 60 * 1000;
+        console.error('[annonces-marche] network error:', fetchErr.message);
+        wasBlocked = true;
+        break;
+      }
 
-    const json = await apiRes.json();
-    const raw = json.items || json.annonces || json.results || json.data
-      || Object.values(json).find(v => Array.isArray(v)) || [];
+      if (apiRes.status === 402) {
+        _ctQuotaBlockUntil = Date.now() + 60 * 60 * 1000;
+        console.error('[annonces-marche] ChercherTrouver 402 — quota épuisé, blocage 1h');
+        wasBlocked = true;
+        break;
+      }
+      if (apiRes.status === 429) {
+        const retryAfter = Number(apiRes.headers.get('Retry-After') || 0);
+        _ctErrorBlockUntil = Date.now() + (retryAfter > 0 ? retryAfter * 1000 : 15 * 60 * 1000);
+        console.error('[annonces-marche] ChercherTrouver 429 — backoff', Math.round((_ctErrorBlockUntil - Date.now()) / 1000) + 's');
+        wasBlocked = true;
+        break;
+      }
+      if (!apiRes.ok) {
+        _ctErrorBlockUntil = Date.now() + 5 * 60 * 1000;
+        console.error('[annonces-marche] ChercherTrouver', apiRes.status, await apiRes.text().catch(() => '').then(t => t.slice(0, 200)));
+        wasBlocked = true;
+        break;
+      }
 
-    const valid = raw.filter(l => {
-      const p = Number(l.price ?? l.prix);
-      const s = Number(l.surface);
-      return p > 50000 && p < 50000000 && s > 9 && s < 2000;
-    });
+      const json = await apiRes.json();
+      const raw = json.items || json.annonces || json.results || json.data
+        || Object.values(json).find(v => Array.isArray(v)) || [];
 
-    let result;
-    if (valid.length < 5) {
-      result = { status: 'insufficient', count: valid.length, commune: city || cp };
-    } else {
-      const pm2s = valid.map(l => {
-        const pm2 = Number(l.price_per_m2 ?? l.prix_m2);
-        if (pm2 > 100 && pm2 < 30000) return pm2;
+      const valid = raw.filter(l => {
         const p = Number(l.price ?? l.prix);
         const s = Number(l.surface);
-        const computed = Math.round(p / s);
-        return computed > 100 && computed < 30000 ? computed : null;
-      }).filter(v => v !== null);
+        return p > 50000 && p < 50000000 && s > 9 && s < 2000;
+      });
 
-      if (pm2s.length < 5) {
-        result = { status: 'insufficient', count: pm2s.length, commune: city || cp };
+      let result;
+      if (valid.length < MIN_ANN) {
+        result = { status: 'insufficient', count: valid.length, commune: city || cp };
       } else {
-        const avgPm2 = Math.round(pm2s.reduce((a, b) => a + b, 0) / pm2s.length);
-        result = {
-          status: 'ok',
-          count: pm2s.length,
-          avgPm2,
-          commune: city || cp,
-          typeLabel,
-        };
+        const pm2s = valid.map(l => {
+          const pm2 = Number(l.price_per_m2 ?? l.prix_m2);
+          if (pm2 > 100 && pm2 < 30000) return pm2;
+          const p = Number(l.price ?? l.prix);
+          const s = Number(l.surface);
+          const computed = Math.round(p / s);
+          return computed > 100 && computed < 30000 ? computed : null;
+        }).filter(v => v !== null);
+
+        if (pm2s.length < MIN_ANN) {
+          result = { status: 'insufficient', count: pm2s.length, commune: city || cp };
+        } else {
+          const avgPm2 = Math.round(pm2s.reduce((a, b) => a + b, 0) / pm2s.length);
+          const sorted = [...pm2s].sort((a, b) => a - b);
+          const mid = Math.floor(sorted.length / 2);
+          const medianPm2 = Math.round(sorted.length % 2 ? sorted[mid] : (sorted[mid - 1] + sorted[mid]) / 2);
+          result = { status: 'ok', count: pm2s.length, avgPm2, medianPm2, commune: city || cp, typeLabel };
+        }
       }
+
+      // Cache this range's result independently
+      db.prepare('INSERT OR REPLACE INTO commune_annonces_cache (cache_key, data, cached_at) VALUES (?, ?, CURRENT_TIMESTAMP)')
+        .run(cacheKey, JSON.stringify(result));
+
+      if (result.status === 'ok') return res.json({ ...result, surfaceMin, surfaceMax, widened: factor > 0.4 });
+      lastInsufficient = { ...result, surfaceMin, surfaceMax };
+      // insufficient: try next range
     }
 
-    db.prepare('INSERT OR REPLACE INTO commune_annonces_cache (cache_key, data, cached_at) VALUES (?, ?, CURRENT_TIMESTAMP)')
-      .run(cacheKey, JSON.stringify(result));
-    res.json(result);
+    // All ranges processed
+    if (wasBlocked) {
+      // Don't confuse a blocked API call with genuine absence of annonces
+      const reason = Date.now() < _ctQuotaBlockUntil ? 'quota_exceeded' : 'api_error';
+      return res.json({ status: reason, commune: city || cp });
+    }
+    res.json(lastInsufficient || { status: 'insufficient', count: 0, commune: city || cp });
   } catch (err) {
     console.error('[annonces-marche]', err.message);
     res.status(500).json({ status: 'error' });
@@ -515,8 +579,8 @@ router.post('/api/property/publish', requireAuth, async (req, res) => {
   // Email confirmation to seller on publish — une seule fois (A4)
   try {
     const { sendPublishedConfirmation } = require('../services/email');
-    const seller = db.prepare('SELECT email FROM sellers WHERE id=?').get(req.seller.id);
-    if (seller) {
+    const seller = db.prepare('SELECT email, is_demo FROM sellers WHERE id=?').get(req.seller.id);
+    if (seller && !seller.is_demo) {
       const alreadySentPublish = db.prepare(
         "SELECT id FROM email_log WHERE recipient_email=? AND trigger_type='published_confirmation'"
       ).get(seller.email);
@@ -554,10 +618,14 @@ function syncCompromisReminders(sellerId, compromisDate, retractionDate, acteDat
     ON CONFLICT(seller_id,kind) DO UPDATE SET
       status=CASE WHEN compromis_reminders.due_date IS NOT excluded.due_date THEN 'open' ELSE compromis_reminders.status END,
       due_date=excluded.due_date, updated_at=CURRENT_TIMESTAMP`);
+  const del = db.prepare(`DELETE FROM compromis_reminders WHERE seller_id=? AND kind=?`);
   const tx = db.transaction(() => {
     if (compromisDate) { upsert.run(sellerId,'j20',addDays(compromisDate,20)); upsert.run(sellerId,'j45',addDays(compromisDate,45)); }
+    else { del.run(sellerId,'j20'); del.run(sellerId,'j45'); }
     if (retractionDate) upsert.run(sellerId,'retraction',retractionDate);
+    else del.run(sellerId,'retraction');
     if (acteDate) { upsert.run(sellerId,'signature',acteDate); upsert.run(sellerId,'etat_lieux',addDays(acteDate,-7)); upsert.run(sellerId,'etat_lieux_veille',addDays(acteDate,-1)); }
+    else { del.run(sellerId,'signature'); del.run(sellerId,'etat_lieux'); del.run(sellerId,'etat_lieux_veille'); }
   });
   tx();
 }
@@ -656,8 +724,9 @@ router.post('/api/compromis', requireAuth, express.json(), (req, res) => {
   const prop = db.prepare('SELECT id FROM properties WHERE seller_id=?').get(req.seller.id);
   if (!prop) return res.status(404).json({ error: 'Aucun bien enregistré' });
   if (dates_explicit) {
-    db.prepare('UPDATE properties SET compromis_date=?, compromis_retraction_date=?, compromis_conditions_date=?, compromis_acte_date=?, compromis_dates_explicit=1 WHERE seller_id=?')
-      .run(compromis_date || null, compromis_retraction_date || null, compromis_conditions_date || null, compromis_acte_date || null, req.seller.id);
+    const explicitFlag = compromis_date ? 1 : 0;
+    db.prepare('UPDATE properties SET compromis_date=?, compromis_retraction_date=?, compromis_conditions_date=?, compromis_acte_date=?, compromis_dates_explicit=? WHERE seller_id=?')
+      .run(compromis_date || null, compromis_retraction_date || null, compromis_conditions_date || null, compromis_acte_date || null, explicitFlag, req.seller.id);
     db.prepare("DELETE FROM delivery_events WHERE event_key LIKE ?").run(`compromis-milestone:${req.seller.id}:%`);
     db.prepare("UPDATE notifications SET read_at=CURRENT_TIMESTAMP WHERE seller_id=? AND type='compromis_reminder' AND read_at IS NULL").run(req.seller.id);
     syncCompromisReminders(req.seller.id, compromis_date||null, compromis_retraction_date||null, compromis_acte_date||null);
@@ -670,6 +739,11 @@ router.post('/api/compromis', requireAuth, express.json(), (req, res) => {
 });
 
 router.get('/api/compromis/reminders', requireAuth, (req, res) => {
+  const prop = db.prepare('SELECT compromis_date FROM properties WHERE seller_id=?').get(req.seller.id);
+  if (!prop?.compromis_date) {
+    db.prepare('DELETE FROM compromis_reminders WHERE seller_id=?').run(req.seller.id);
+    return res.json({ reminders: [], buyer: null });
+  }
   const reminders = db.prepare('SELECT kind,due_date,status FROM compromis_reminders WHERE seller_id=? ORDER BY due_date NULLS LAST').all(req.seller.id);
   const buyer = db.prepare(`SELECT buyer_name,buyer_phone FROM offers WHERE seller_id=? AND status='accepted' ORDER BY responded_at DESC LIMIT 1`).get(req.seller.id)
     || db.prepare(`SELECT buyer_name,buyer_phone FROM visits WHERE seller_id=? AND status IN ('done','confirmed') ORDER BY visit_date DESC LIMIT 1`).get(req.seller.id);
@@ -696,12 +770,14 @@ router.post('/api/property/status', requireAuth, express.json(), async (req, res
 
   if (status === 'vendu' && prev?.status !== 'vendu') {
     const property = db.prepare('SELECT * FROM properties WHERE seller_id=?').get(req.seller.id);
-    const seller = db.prepare('SELECT email, first_name FROM sellers WHERE id=?').get(req.seller.id);
-    sendSoldCongrats({ email: seller.email, firstName: seller.first_name, address: property?.address, price: property?.price }).catch(() => {});
-    if (property) {
-      const visitors = db.prepare("SELECT DISTINCT buyer_email, buyer_name FROM visits WHERE property_id=? AND buyer_email IS NOT NULL AND buyer_email != '' AND status != 'cancelled'").all(property.id);
-      for (const v of visitors) {
-        sendPropertySoldToBuyer({ buyerEmail: v.buyer_email, buyerName: v.buyer_name, propertyType: property.type, propertyCity: property.city }).catch(() => {});
+    const seller = db.prepare('SELECT email, first_name, is_demo FROM sellers WHERE id=?').get(req.seller.id);
+    if (!seller?.is_demo) {
+      sendSoldCongrats({ email: seller.email, firstName: seller.first_name, address: property?.address, price: property?.price }).catch(() => {});
+      if (property) {
+        const visitors = db.prepare("SELECT DISTINCT buyer_email, buyer_name FROM visits WHERE property_id=? AND buyer_email IS NOT NULL AND buyer_email != '' AND status != 'cancelled'").all(property.id);
+        for (const v of visitors) {
+          sendPropertySoldToBuyer({ buyerEmail: v.buyer_email, buyerName: v.buyer_name, propertyType: property.type, propertyCity: property.city }).catch(() => {});
+        }
       }
     }
   }
@@ -712,6 +788,9 @@ router.post('/api/property/status', requireAuth, express.json(), async (req, res
 router.post('/api/property/generate-description', requireAuth, aiRateLimit, express.json(), async (req, res) => {
   const { property } = req.body;
   if (!property || typeof property !== 'object' || Array.isArray(property)) return res.status(400).json({ error: 'Données manquantes' });
+  // Bloquer l'IA pour les comptes démo (protection des coûts API)
+  const demoCheck = db.prepare('SELECT is_demo FROM sellers WHERE id=?').get(req.seller.id);
+  if (demoCheck && demoCheck.is_demo) return res.json({ description: "Ceci est un exemple de description générée par l'IA Vendu Par Moi. Dans votre espace réel, l'IA analysera les caractéristiques de votre bien et rédigera une annonce professionnelle et percutante en quelques secondes. Idéal pour vous démarquer sur SeLoger, Le Bon Coin et les autres portails." });
   if (!process.env.ANTHROPIC_API_KEY) return res.status(503).json({ error: 'Service IA non configuré — ajoutez ANTHROPIC_API_KEY dans les variables d\'environnement.' });
 
   const Anthropic = require('@anthropic-ai/sdk');
@@ -899,6 +978,8 @@ router.post('/api/progress', requireAuth, express.json(), (req, res) => {
 
 // ── Coach IA formation ─────────────��──────────────────────────
 router.post('/api/formation/chat', requireAuth, aiRateLimit, express.json(), async (req, res) => {
+  const demoChk = db.prepare('SELECT is_demo FROM sellers WHERE id=?').get(req.seller.id);
+  if (demoChk && demoChk.is_demo) return res.json({ reply: "Je suis le Coach IA de Vendu Par Moi. Dans votre espace réel, je vous accompagnerai à chaque étape de votre vente avec des conseils personnalisés, des stratégies de négociation et des réponses à toutes vos questions. Ceci est une démonstration — les réponses IA sont désactivées." });
   if (!process.env.ANTHROPIC_API_KEY) return res.status(503).json({ error: 'Coach formation non configuré — ajoutez ANTHROPIC_API_KEY.' });
   const { message, module: moduleName, history = [] } = req.body;
   if (!message) return res.json({ error: 'Message manquant' });
@@ -1159,7 +1240,8 @@ router.post('/api/visits', requireAuth, express.json(), async (req, res) => {
   }
 
   // Confirmation to buyer when seller creates a visit (directly confirmed — no status transition fires)
-  if (buyer_email) {
+  const sellerDemoFlag = db.prepare('SELECT is_demo FROM sellers WHERE id=?').get(req.seller.id);
+  if (buyer_email && !sellerDemoFlag?.is_demo) {
     try {
       const prop = db.prepare('SELECT type, address, city, slug FROM properties WHERE id=?').get(property.id);
       if (prop) await sendVisitConfirmation(buyer_email, buyer_name || 'Acquéreur', prop, visit_date, visit_time, false).catch(() => {});
@@ -1179,10 +1261,11 @@ router.put('/api/visits/:id/status', requireAuth, express.json(), async (req, re
   if (visit.status === status) return res.json({success:true,unchanged:true});
   const changed = db.prepare('UPDATE visits SET status=? WHERE id=? AND seller_id=? AND status=?').run(status, visit.id, req.seller.id, visit.status);
   if (!changed.changes) return res.status(409).json({error:'La visite vient de changer. Actualisez la page.'});
+  const sellerDemoFlagVisit = db.prepare('SELECT is_demo FROM sellers WHERE id=?').get(req.seller.id);
   let notification_sent = null;
   if (status === 'confirmed') {
     db.prepare('INSERT INTO notifications (seller_id,type,title,body,visit_id) VALUES (?,?,?,?,?)').run(req.seller.id,'visit_confirmed','Visite confirmée',`${visit.buyer_name} — ${visit.visit_date} à ${visit.visit_time}`,visit.id);
-    if (visit.buyer_email) notification_sent = await sendVisitConfirmation(visit.buyer_email,visit.buyer_name,visit,visit.visit_date,visit.visit_time,false).catch(()=>false);
+    if (visit.buyer_email && !sellerDemoFlagVisit?.is_demo) notification_sent = await sendVisitConfirmation(visit.buyer_email,visit.buyer_name,visit,visit.visit_date,visit.visit_time,false).catch(()=>false);
   }
   if (status === 'cancelled') {
     db.prepare("UPDATE notifications SET read_at=CURRENT_TIMESTAMP WHERE seller_id=? AND visit_id=? AND type IN ('visit_confirmed','visit_reminder','visit_request') AND read_at IS NULL").run(req.seller.id, visit.id);
@@ -1297,6 +1380,14 @@ router.post('/api/visits/:id/reactivate-followup', requireAuth, (req, res) => {
 router.put('/api/visits/:id/followup-sent', requireAuth, (req, res) => {
   db.prepare('UPDATE visits SET followup_sent_at=? WHERE id=? AND seller_id=?')
     .run(new Date().toISOString(), req.params.id, req.seller.id);
+  res.json({ success: true });
+});
+
+router.put('/api/visits/:id/dossier-serieux-sent', requireAuth, (req, res) => {
+  const visit = db.prepare('SELECT id FROM visits WHERE id=? AND seller_id=?').get(req.params.id, req.seller.id);
+  if (!visit) return res.status(404).json({ error: 'Not found' });
+  db.prepare('UPDATE visits SET dossier_serieux_sent_at=? WHERE id=?')
+    .run(new Date().toISOString(), visit.id);
   res.json({ success: true });
 });
 
@@ -1622,6 +1713,8 @@ router.get('/coach-ia', requireAuth, (req, res) => res.sendFile('coach.html', { 
 router.post('/api/coach-ia', requireAuth, coachRateLimit, express.json(), async (req, res) => {
   const { messages } = req.body;
   if (!Array.isArray(messages) || !messages.length) return res.status(400).json({ error: 'Messages requis' });
+  const demoChk2 = db.prepare('SELECT is_demo FROM sellers WHERE id=?').get(req.seller.id);
+  if (demoChk2 && demoChk2.is_demo) return res.json({ content: [{ type: 'text', text: "Bonjour ! Je suis votre Coach IA personnel. Dans votre espace réel, je vous accompagne à chaque étape : préparer votre bien, fixer le bon prix, gérer les visites et négocier sereinement. Je suis disponible 24h/24 pour répondre à toutes vos questions. Ceci est une démonstration — posez-moi une vraie question dans votre espace personnel !" }] });
   if (!process.env.ANTHROPIC_API_KEY) return res.status(503).json({ error: 'Coach IA non configuré — ajoutez ANTHROPIC_API_KEY dans les variables d\'environnement.' });
 
   const seller = db.prepare('SELECT first_name, pack FROM sellers WHERE id=?').get(req.seller.id);

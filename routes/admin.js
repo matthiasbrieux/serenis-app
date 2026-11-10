@@ -334,153 +334,9 @@ router.get('/api/docs/:filename', requireAdmin, (req, res) => {
 
 // ── Seed de démonstration ─────────────────────────────────
 router.post('/api/seed-demo', requireAdmin, (req, res) => {
-  function ago(days) {
-    const d = new Date(); d.setDate(d.getDate() - days);
-    return d.toISOString().replace('T', ' ').slice(0, 19);
-  }
-  function fromNow(days) {
-    const d = new Date(); d.setDate(d.getDate() + days);
-    return d.toISOString().slice(0, 10);
-  }
-
-  const demoHash = bcrypt.hashSync('demo1234', 10);
-
-  // Supprime les démos existantes (transaction atomique — P3-5)
-  const existing = db.prepare("SELECT id FROM sellers WHERE email LIKE '%@demo.venduparmoi'").all();
-  const deleteDemo = db.transaction((sellers) => {
-    sellers.forEach(s => {
-      const props = db.prepare('SELECT id FROM properties WHERE seller_id=?').all(s.id);
-      props.forEach(p => {
-        db.prepare('DELETE FROM property_photos WHERE property_id=?').run(p.id);
-        db.prepare('DELETE FROM property_documents WHERE property_id=?').run(p.id);
-      });
-      db.prepare('DELETE FROM buyer_contacts WHERE seller_id=?').run(s.id);
-      db.prepare('DELETE FROM visits WHERE seller_id=?').run(s.id);
-      db.prepare('DELETE FROM properties WHERE seller_id=?').run(s.id);
-      db.prepare('DELETE FROM sellers WHERE id=?').run(s.id);
-    });
-  });
-  deleteDemo(existing);
-
-  const PHOTOS = [
-    'https://images.unsplash.com/photo-1568605114967-8130f3a36994?w=800&q=80',
-    'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&q=80',
-    'https://images.unsplash.com/photo-1484154218962-a197022b5858?w=800&q=80',
-    'https://images.unsplash.com/photo-1502005229762-cf1b2da7c5d6?w=800&q=80',
-    'https://images.unsplash.com/photo-1585747860715-2ba37e788b70?w=800&q=80',
-    'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800&q=80',
-  ];
-
-  const demos = [
-    {
-      first_name: 'Jean', last_name: 'Dupont', phone: '06 12 34 56 78',
-      email: 'jean.dupont@demo.venduparmoi', pack: 'serenite', paid_at: ago(8),
-      twilio_number: null, contrat_signe: 0, rdv_photographe: 0,
-      photographer_scheduled: 0, photographer_name: null, photographer_date: null,
-      photographer_done: 0, photo_report_url: null, virtual_tour_done: 0,
-      admin_notes: 'Nouveau client — relance à faire',
-      property: { city: 'Lyon', price: 385000, surface: 112, rooms: 5, address: '14 rue des Lilas', postal: '69003', type: 'maison', description: '', published: 0, status: 'preparation', photosCount: 0, docsCount: 0 },
-    },
-    {
-      first_name: 'Marie', last_name: 'Martin', phone: '06 98 76 54 32',
-      email: 'marie.martin@demo.venduparmoi', pack: 'serenite', paid_at: ago(15),
-      twilio_number: '+33 9 87 65 43 21', contrat_signe: 1, rdv_photographe: 1,
-      photographer_scheduled: 0, photographer_name: null, photographer_date: null,
-      photographer_done: 0, photo_report_url: null, virtual_tour_done: 0,
-      admin_notes: null,
-      property: { city: 'Bordeaux', price: 290000, surface: 78, rooms: 3, address: '5 allée des Pins', postal: '33000', type: 'appartement', description: 'Bel appartement lumineux', published: 0, status: 'preparation', photosCount: 0, docsCount: 1 },
-    },
-    {
-      first_name: 'Pierre', last_name: 'Lefebvre', phone: '07 11 22 33 44',
-      email: 'pierre.lefebvre@demo.venduparmoi', pack: 'serenite', paid_at: ago(22),
-      twilio_number: '+33 9 12 34 56 78', contrat_signe: 1, rdv_photographe: 1,
-      photographer_scheduled: 1, photographer_name: 'Studio Lumière - Julien', photographer_date: fromNow(3),
-      photographer_done: 0, photo_report_url: null, virtual_tour_done: 0,
-      admin_notes: 'RDV confirmé par le photographe',
-      property: { city: 'Nantes', price: 445000, surface: 140, rooms: 6, address: '8 rue du Château', postal: '44000', type: 'maison', description: '', published: 0, status: 'preparation', photosCount: 0, docsCount: 2 },
-    },
-    {
-      first_name: 'Sophie', last_name: 'Bernard', phone: '06 55 44 33 22',
-      email: 'sophie.bernard@demo.venduparmoi', pack: 'serenite', paid_at: ago(34),
-      twilio_number: '+33 9 22 11 33 44', contrat_signe: 1, rdv_photographe: 1,
-      photographer_scheduled: 1, photographer_name: 'Photographe Pro - Clara', photographer_date: ago(10).slice(0,10),
-      photographer_done: 1, photo_report_url: 'https://drive.google.com/drive/folders/demo-sophie',
-      virtual_tour_done: 1, admin_notes: null,
-      property: { city: 'Toulouse', price: 320000, surface: 95, rooms: 4, address: '22 boulevard Victor Hugo', postal: '31000', type: 'appartement', description: 'Magnifique appartement T4 entièrement rénové au cœur de Toulouse. Parquet en chêne massif, cuisine équipée haut de gamme, double exposition sud-ouest.', published: 0, status: 'preparation', photosCount: 15, docsCount: 3 },
-    },
-    {
-      first_name: 'Thomas', last_name: 'Moreau', phone: '06 77 88 99 00',
-      email: 'thomas.moreau@demo.venduparmoi', pack: 'serenite', paid_at: ago(48),
-      twilio_number: '+33 9 44 55 66 77', contrat_signe: 1, rdv_photographe: 1,
-      photographer_scheduled: 1, photographer_name: 'Agence Pixel - Marc', photographer_date: ago(30).slice(0,10),
-      photographer_done: 1, photo_report_url: 'https://drive.google.com/drive/folders/demo-thomas',
-      virtual_tour_done: 1, admin_notes: '3 offres reçues — compromis en cours',
-      property: { city: 'Paris 15e', price: 680000, surface: 88, rooms: 4, address: '3 rue de la Fédération', postal: '75015', type: 'appartement', description: 'Superbe appartement Haussmannien en plein cœur de Paris. Hauts plafonds, moulures d\'époque, parquet point de Hongrie. Vue dégagée sur cour intérieure arborée. Idéal pour investisseur ou résidence principale.', published: 1, published_at: ago(28), status: 'offre', photosCount: 22, docsCount: 5, contactsCount: 8, visitsCount: 5, visitsDone: 3 },
-    },
-    {
-      first_name: 'Emma', last_name: 'Petit', phone: '07 33 22 11 00',
-      email: 'emma.petit@demo.venduparmoi', pack: 'autonome', paid_at: ago(11),
-      twilio_number: null, contrat_signe: 0, rdv_photographe: 0,
-      photographer_scheduled: 0, photographer_name: null, photographer_date: null,
-      photographer_done: 0, photo_report_url: null, virtual_tour_done: 0,
-      admin_notes: null,
-      property: { city: 'Montpellier', price: 198000, surface: 58, rooms: 2, address: '7 place de la Comédie', postal: '34000', type: 'appartement', description: 'Studio entièrement rénové', published: 0, status: 'preparation', photosCount: 4, docsCount: 0 },
-    },
-  ];
-
-  const insertSeller = db.prepare(`
-    INSERT INTO sellers (uuid, email, password, pack, first_name, last_name, phone, paid_at, created_at,
-      twilio_number, contrat_signe, rdv_photographe, admin_notes,
-      photographer_scheduled, photographer_name, photographer_date,
-      photographer_done, photo_report_url, virtual_tour_done)
-    VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
-  `);
-  const insertProp = db.prepare(`
-    INSERT INTO properties (uuid, seller_id, slug, acheteur_token, notaire_token, type, address, city, postal_code,
-      surface_habitable, rooms, price, description, status, published, published_at, created_at)
-    VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
-  `);
-  const insertPhoto = db.prepare('INSERT INTO property_photos (property_id, cloudinary_id, url, order_index) VALUES (?,?,?,?)');
-  const insertDoc   = db.prepare("INSERT INTO property_documents (property_id, name, url, doc_type) VALUES (?,?,?,?)");
-  const insertContact = db.prepare("INSERT INTO buyer_contacts (property_id, seller_id, buyer_phone, buyer_email, source) VALUES (?,?,?,?,'demo')");
-  const insertVisit   = db.prepare("INSERT INTO visits (property_id, seller_id, buyer_name, buyer_email, buyer_phone, visit_date, visit_time, status) VALUES (?,?,?,?,?,?,?,'confirmed')");
-
-  const DOC_TYPES = ["Titre de propriété", "Diagnostics DPE", "Plan cadastral", "Taxe foncière", "Règlement copropriété"];
-
-  demos.forEach((d, idx) => {
-    const uuid = uuidv4();
-    const r = insertSeller.run(
-      uuid, d.email, demoHash, d.pack, d.first_name, d.last_name, d.phone,
-      d.paid_at, d.paid_at,
-      d.twilio_number, d.contrat_signe, d.rdv_photographe, d.admin_notes,
-      d.photographer_scheduled, d.photographer_name, d.photographer_date,
-      d.photographer_done, d.photo_report_url, d.virtual_tour_done
-    );
-    const sellerId = r.lastInsertRowid;
-    const p = d.property;
-    const propUuid = uuidv4();
-    const slug = `demo-${p.city.toLowerCase().replace(/\s/g,'-')}-${sellerId}`;
-    const pr = insertProp.run(propUuid, sellerId, slug, uuidv4(), uuidv4(), p.type, p.address, p.city, p.postal,
-      p.surface, p.rooms, p.price, p.description, p.status, p.published ? 1 : 0, p.published_at || null, d.paid_at);
-    const propertyId = pr.lastInsertRowid;
-    for (let i = 0; i < (p.photosCount||0); i++) {
-      insertPhoto.run(propertyId, `demo_cld_${sellerId}_${i}`, PHOTOS[i % PHOTOS.length], i);
-    }
-    for (let i = 0; i < (p.docsCount||0); i++) {
-      insertDoc.run(propertyId, DOC_TYPES[i] || `Document ${i+1}`, `https://demo.venduparmoi/doc/${sellerId}/${i}`, 'document');
-    }
-    for (let i = 0; i < (p.contactsCount||0); i++) {
-      insertContact.run(propertyId, sellerId, `+336${String(i).padStart(8,'0')}`, `acheteur${i+1}@demo.fr`);
-    }
-    const visitDates = [ago(20).slice(0,10), ago(14).slice(0,10), ago(7).slice(0,10), ago(3).slice(0,10), fromNow(5)];
-    for (let i = 0; i < (p.visitsCount||0); i++) {
-      const status = i < (p.visitsDone||0) ? 'done' : 'confirmed';
-      const stmt = db.prepare(`INSERT INTO visits (property_id, seller_id, buyer_name, buyer_email, buyer_phone, visit_date, visit_time, status) VALUES (?,?,?,?,?,?,?,?)`);
-      stmt.run(propertyId, sellerId, `Acheteur ${i+1}`, `acheteur${i+1}@demo.fr`, `+336${String(i).padStart(8,'0')}`, visitDates[i]||fromNow(i), '10:00', status);
-    }
-  });
-
-  res.json({ success: true, count: demos.length });
+  const { seedDemoAccounts } = require('../services/demo-seed');
+  const result = seedDemoAccounts({ force: true });
+  res.json({ success: true, count: result.count });
 });
 
 router.delete('/api/seed-demo', requireAdmin, (req, res) => {
@@ -1368,10 +1224,10 @@ router.post('/api/vrp', requireAdmin, express.json(), (req, res) => {
   if (!first_name || !last_name || !email) return res.status(400).json({ error: 'Champs requis manquants' });
   const { v4: uuidv4 } = require('uuid');
   try {
-    db.prepare(`INSERT INTO vrps (uuid, first_name, last_name, email, phone, zone, notes, commission_rate)
+    const r = db.prepare(`INSERT INTO vrps (uuid, first_name, last_name, email, phone, zone, notes, commission_rate)
       VALUES (?,?,?,?,?,?,?,?)`)
       .run(uuidv4(), first_name.trim(), last_name.trim(), email.toLowerCase().trim(), phone||'', zone||'', notes||'', commission_rate||null);
-    res.json({ success: true });
+    res.json({ success: true, vrp: { id: r.lastInsertRowid } });
   } catch(e) {
     res.status(400).json({ error: e.message.includes('UNIQUE') ? 'Email déjà utilisé' : e.message });
   }
@@ -1414,6 +1270,16 @@ router.post('/api/vrp/:id/sales', requireAdmin, express.json(), (req, res) => {
 
 router.patch('/api/vrp/sales/:id/paid', requireAdmin, (req, res) => {
   db.prepare(`UPDATE vrp_sales SET commission_paid=1, commission_paid_at=CURRENT_TIMESTAMP WHERE id=?`).run(+req.params.id);
+  res.json({ success: true });
+});
+
+router.post('/api/vrp/:id/set-password', requireAdmin, express.json(), async (req, res) => {
+  const { password } = req.body || {};
+  if (!password || String(password).length < 8)
+    return res.json({ success: false, error: 'Le mot de passe doit comporter au moins 8 caractères.' });
+  const hash = await bcrypt.hash(String(password), 10);
+  const r = db.prepare('UPDATE vrps SET password=? WHERE id=?').run(hash, +req.params.id);
+  if (!r.changes) return res.status(404).json({ success: false, error: 'VRP introuvable.' });
   res.json({ success: true });
 });
 
@@ -1869,25 +1735,57 @@ router.get('/rappels', requireAdmin, (req, res) => {
   res.sendFile('rappels.html', { root: './views/admin' });
 });
 
-// API unifiée : retourne contact_requests + callback_requests fusionnés
+// API unifiée : retourne contact_requests + callback_requests + estimation_callback_requests fusionnés
 router.get('/api/leads', requireAdmin, (req, res) => {
   const today = new Date().toISOString().slice(0, 10);
-  let contacts = [], callbacks = [];
+  let contacts = [], callbacks = [], estimCallbacks = [];
   try { contacts = db.prepare('SELECT * FROM contact_requests ORDER BY created_at DESC').all(); } catch(e) {}
   try { callbacks = db.prepare('SELECT * FROM callback_requests ORDER BY created_at DESC').all(); } catch(e) {}
+  try {
+    estimCallbacks = db.prepare(`
+      SELECT ecr.*,
+        er.prenom AS er_prenom,
+        er.phone  AS er_phone,
+        er.raw_address, er.surface, er.property_type, er.indicative_value
+      FROM estimation_callback_requests ecr
+      LEFT JOIN estimation_requests er ON ecr.estimation_request_id = er.id
+      ORDER BY ecr.created_at DESC
+    `).all();
+  } catch(e) {}
 
   const STATUT_MAP = { converti: 'traite', rappele: 'a_traiter' };
   const normalize = (r, type) => {
     const rawStatut = r.statut || (type === 'contact' ? 'a_traiter' : 'a_rappeler');
+    let nom = '';
+    let telephone = '';
+    let message = '';
+    if (type === 'contact') {
+      nom       = r.name || '';
+      telephone = r.telephone || r.phone || '';
+      message   = r.message || r.creneau || '';
+    } else if (type === 'estimation') {
+      nom       = r.er_prenom || r.email || '';
+      telephone = r.phone || r.er_phone || '';
+      message   = [
+        r.raw_address ? `${r.raw_address}` : '',
+        r.surface     ? `${r.surface} m²`  : '',
+        r.property_type || '',
+        r.sell_horizon  ? `Horizon : ${r.sell_horizon}` : '',
+      ].filter(Boolean).join(' · ');
+    } else {
+      nom       = `${r.prenom || ''} ${r.nom || ''}`.trim();
+      telephone = r.telephone || r.phone || '';
+      message   = r.moment || '';
+    }
     return {
       id: r.id,
       source_type: type,
-      nom: type === 'contact' ? (r.name || '') : `${r.prenom || ''} ${r.nom || ''}`.trim(),
-      telephone: r.telephone || r.phone || '',
+      nom,
+      telephone,
       email: r.email || '',
-      message: type === 'contact' ? (r.message || r.creneau || '') : (r.moment || ''),
+      message,
       rappel_prevu_le: r.rappel_prevu_le || '',
-      rdv_prevu_le: r.rdv_prevu_le || '',
+      rdv_prevu_le:    r.rdv_prevu_le    || '',
       statut: STATUT_MAP[rawStatut] || rawStatut,
       notes: r.notes || '',
       created_at: r.created_at,
@@ -1897,6 +1795,7 @@ router.get('/api/leads', requireAdmin, (req, res) => {
   const all = [
     ...contacts.map(r => normalize(r, 'contact')),
     ...callbacks.map(r => normalize(r, 'rappel')),
+    ...estimCallbacks.map(r => normalize(r, 'estimation')),
   ].sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
 
   const tomorrow = new Date(Date.now() + 86400000).toISOString().slice(0, 10);
@@ -1921,7 +1820,9 @@ router.patch('/api/leads/:type/:id', requireAdmin, express.json(), (req, res) =>
     if (rdv_prevu_le !== undefined)   { fields.push('rdv_prevu_le=?');    vals.push(rdv_prevu_le || null); }
     if (!fields.length) return res.json({ ok: true });
     fields.push("updated_at=datetime('now')");
-    const table = type === 'contact' ? 'contact_requests' : 'callback_requests';
+    const table = type === 'contact' ? 'contact_requests'
+      : type === 'estimation' ? 'estimation_callback_requests'
+      : 'callback_requests';
     db.prepare(`UPDATE ${table} SET ${fields.join(',')} WHERE id=?`).run(...vals, id);
     res.json({ ok: true });
   } catch(e) { res.status(500).json({ error: e.message }); }
@@ -1932,6 +1833,8 @@ router.delete('/api/leads/:type/:id', requireAdmin, (req, res) => {
   try {
     if (type === 'contact') {
       db.prepare('DELETE FROM contact_requests WHERE id=?').run(id);
+    } else if (type === 'estimation') {
+      db.prepare('DELETE FROM estimation_callback_requests WHERE id=?').run(id);
     } else {
       db.prepare('DELETE FROM callback_requests WHERE id=?').run(id);
     }
