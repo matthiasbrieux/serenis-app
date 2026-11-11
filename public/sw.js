@@ -1,4 +1,4 @@
-const CACHE = 'vpm-v2';
+const CACHE = 'vpm-v3';
 const PRECACHE = ['/favicon.ico', '/icons/icon-192.png', '/icons/icon-512.png'];
 
 self.addEventListener('install', e => {
@@ -16,6 +16,8 @@ self.addEventListener('activate', e => {
 self.addEventListener('fetch', e => {
   if (e.request.method !== 'GET') return;
   if (!e.request.url.startsWith(self.location.origin)) return;
+  // CSS/JS ont leurs propres headers Cache-Control — laisser le navigateur les gérer
+  if (/\.(css|js)(\?|$)/.test(e.request.url)) return;
   e.respondWith(
     fetch(e.request, { cache: 'no-store' }).catch(() => caches.match(e.request))
   );

@@ -115,8 +115,12 @@
   const appointmentsHeading=appointmentsPanel.querySelector('.ap-appointments-heading');
   appointmentsHeading.textContent='Mes prochaines visites';
   const availabilityPanel=make('section','ap-availability-panel');
-  const availabilityHeading=make('h2','ap-lower-heading','Mes disponibilités de visite');
-  availabilityPanel.append(availabilityHeading,availBtn,tealShareBtn,msgAccordion,availabilityFormHost,registered);
+  availabilityPanel.append(availBtn,tealShareBtn,msgAccordion,availabilityFormHost,registered);
+  const dispoWrapper=make('div','dispo-wrapper dispo-wrapper-closed');dispoWrapper.id='dispoWrapper';
+  const _dth=document.createElement('header');_dth.id='dispoToggle';
+  _dth.innerHTML='<span aria-hidden="true"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span><div><h2>Mes disponibilités de visite</h2><p id="dispoHeaderCount">0 créneau proposé aux acquéreurs</p></div><button type="button" class="five-clicks-chevron" aria-label="Ouvrir mes disponibilités de visite" aria-expanded="false"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="18 15 12 9 6 15"/></svg></button>';
+  const _dbd=make('div','');_dbd.id='dispoWrapperBody';_dbd.style.display='none';
+  _dbd.append(availabilityPanel);dispoWrapper.append(_dth,_dbd);
   const visitsPanel=make('section','ap-visits-panel');
   visitsPanel.hidden=false;
   const visitsHeading=make('h2','ap-lower-heading','Mes visites');visitsPanel.append(visitsHeading);
@@ -130,8 +134,20 @@
   const vfSubs={scheduled:'Visites à confirmer',confirmed:'Visites validées',rappel:'Rappels à effectuer'};
   for(const [key,label,ico] of [['scheduled','Programmée',_icoS],['confirmed','Confirmée',_icoC],['rappel','Rappel J-1',_icoR]]){if(vfStepsRow.children.length){const arr=make('span','ap-vf-arrow');arr.innerHTML=_arrHtml;vfStepsRow.append(arr);}const b=button('',()=>setVisitsFilter(key),'ap-visits-filter ap-vf-step ap-vf-step-'+key);b.innerHTML=ico+'<span class="ap-vf-label"><span class="ap-vf-title">'+label+'</span><span class="ap-tab-count ap-vf-count">0</span><span class="ap-vf-sub">'+vfSubs[key]+'</span></span>';b.dataset.filter=key;vfStepsRow.append(b);visitsFilterButtons[key]=b;}
   visitsFilters.append(vfStepsRow);
-  visitsPanel.append(visitsFilters);listCol.append(visitsPanel);visitsPanel.append(visits);listCol.append(manualBtn);agendaTabs.after(availabilityPanel);
-  const pastSec=document.getElementById('pastSection');if(pastSec)actionCol.prepend(pastSec);
+  visitsPanel.append(visitsFilters);visitsPanel.append(visits);
+  const visitesWrapper=make('div','dispo-wrapper');visitesWrapper.id='visitesAllWrapper';
+  const _vwToggle=document.createElement('header');_vwToggle.id='visitesAllToggle';
+  _vwToggle.innerHTML='<div class="vb-left"><span class="vb-icon" aria-hidden="true"><svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span><div class="vb-sep-icon" aria-hidden="true"></div><div class="vb-text"><h2>Toutes mes visites</h2><p>Organisez vos rendez-vous, confirmez vos visites et gardez le contact avec vos acheteurs.</p></div></div><div class="vb-sep-vert" aria-hidden="true"></div><div class="vb-stats-cards"><div class="vb-stat-card"><span class="vb-stat-num" id="vbcount-aconfirmer">0</span><span class="vb-stat-label">À confirmer</span><span class="vb-stat-sub">Programmée</span></div><div class="vb-stat-card"><span class="vb-stat-num" id="vbcount-confirmees">0</span><span class="vb-stat-label">Confirmées</span><span class="vb-stat-sub">Confirmée</span></div><div class="vb-stat-card"><span class="vb-stat-num" id="vbcount-rappels">0</span><span class="vb-stat-label">Rappels à faire</span><span class="vb-stat-sub">Rappel J-1</span></div><div class="vb-stat-card"><span class="vb-stat-num" id="vbcount-passees">0</span><span class="vb-stat-label">Passées à suivre</span></div></div><button type="button" class="five-clicks-chevron vb-chevron" aria-label="Réduire Toutes mes visites" aria-expanded="true"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="18 15 12 9 6 15"/></svg></button>';
+  const _vwBody=make('div','');_vwBody.id='visitesAllBody';
+  _vwBody.append(visitsPanel);
+  const pastSec=document.getElementById('pastSection');if(pastSec)_vwBody.append(pastSec);
+  visitesWrapper.append(_vwToggle,_vwBody);
+  listCol.append(dispoWrapper);listCol.append(visitesWrapper);listCol.append(manualBtn);
+  let _vwOpen=true;
+  function _toggleVisitsAll(){_vwOpen=!_vwOpen;_vwBody.style.display=_vwOpen?'':'none';visitesWrapper.classList.toggle('dispo-wrapper-closed',!_vwOpen);const btn=_vwToggle.querySelector('.five-clicks-chevron');if(btn)btn.setAttribute('aria-expanded',String(_vwOpen));}
+  _vwToggle.addEventListener('click',e=>{if(e.target.closest('a[href],button:not(.five-clicks-chevron)'))return;_toggleVisitsAll();});
+  _vwToggle.querySelector('.five-clicks-chevron').addEventListener('click',e=>{e.stopPropagation();_toggleVisitsAll();});
+  _vwToggle.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();_toggleVisitsAll();}});
   const compromisPanel=main.querySelector('#compromis-vente');
   if(compromisPanel){compromisPanel.classList.add('ap-compromis-panel');listCol.append(compromisPanel);}
   if(share)actionCol.append(share);
@@ -158,7 +174,7 @@
       upcoming.dataset.state=key;
       const allUpcoming=allVisits.filter(v=>v.status==='confirmed'&&!isPastVisit(v)).sort((a,b)=>((a.visit_date+(a.visit_time||'')).localeCompare(b.visit_date+(b.visit_time||''))));
       let crFiltered;
-      if(key==='confirmed')crFiltered=allUpcoming.filter(v=>v.sms_copied_at&&v.reminder_sent);
+      if(key==='confirmed')crFiltered=allUpcoming.filter(v=>v.sms_copied_at);
       else if(key==='scheduled')crFiltered=allUpcoming.filter(v=>!v.sms_copied_at);
       else if(key==='rappel')crFiltered=allUpcoming.filter(v=>v.sms_copied_at&&!v.reminder_sent);
       else crFiltered=allUpcoming;
@@ -212,12 +228,14 @@
       const rNav=document.getElementById('vcr-past-nav');
       const lCard=document.getElementById('upcomingList');
       const rCard=document.getElementById('pastList');
-      if(!lFilters||!rTitle||!rNav||!lCard||!rCard)return;
-      rTitle.style.paddingBottom='';rCard.style.marginTop='';
+      const lSection=document.getElementById('upcomingSection');
+      if(!lFilters||!rTitle||!rNav||!lCard||!rCard||!lSection)return;
+      rTitle.style.paddingBottom='';rCard.style.marginTop='';lSection.style.marginTop='';
       const navDiff=lFilters.getBoundingClientRect().top-rNav.getBoundingClientRect().top;
       if(navDiff>2){const pb=parseFloat(getComputedStyle(rTitle).paddingBottom)||0;rTitle.style.paddingBottom=(pb+navDiff)+'px';}
       const cardDiff=lCard.getBoundingClientRect().top-rCard.getBoundingClientRect().top;
       if(cardDiff>2)rCard.style.marginTop=cardDiff+'px';
+      else if(cardDiff<-2)lSection.style.marginTop=(-cardDiff)+'px';
     });
   }
   window.addEventListener('resize',_syncCardsTop);
@@ -225,8 +243,9 @@
   window.setStatFilter=function(value){oldSetFilter(value);pendingPanel.hidden=Boolean(value)||!allVisits.some(v=>v.status==='pending'&&!isPastVisit(v));};
   main.querySelectorAll('.stat-card-agenda[data-filter]').forEach(el=>{el.tabIndex=0;el.setAttribute('role','button');el.addEventListener('keydown',event=>{if(event.key==='Enter'||event.key===' '){event.preventDefault();setStatFilter(el.dataset.filter);}});});
   const oldRenderVisits=window.renderVisits;
-  function updateFilterCounts(){const conf=allVisits.filter(v=>v.status==='confirmed'&&!isPastVisit(v));const pend=allVisits.filter(v=>v.status==='pending'&&!isPastVisit(v)).length;const sc=conf.filter(v=>!v.sms_copied_at).length+pend;const co=conf.filter(v=>v.sms_copied_at&&v.reminder_sent).length;const ra=conf.filter(v=>v.sms_copied_at&&!v.reminder_sent).length;const setC=(key,n)=>{const b=visitsFilterButtons[key];if(!b)return;const el=b.querySelector('.ap-vf-count');if(el)el.textContent=String(n);};setC('scheduled',sc);setC('confirmed',co);setC('rappel',ra);}
-  window.renderVisits=function(){oldRenderVisits();renderHistory(); const pending=allVisits.filter(v=>v.status==='pending'&&!isPastVisit(v));pendingPanel.hidden=Boolean(activeStatFilter)||!pending.length;pendingEmpty.hidden=pending.length>0;pendingList.innerHTML=pending.map(buildVisitCompact).join('');pendingTabCount.textContent=String(pending.length);updateFilterCounts();renderDashboardPanels();renderAppointments();const activeFilter=Object.entries(visitsFilterButtons).find(([,b])=>b.getAttribute('aria-pressed')==='true')?.[0]||'scheduled';const allUp=allVisits.filter(v=>v.status==='confirmed'&&!isPastVisit(v));const fHas={scheduled:allUp.some(v=>!v.sms_copied_at),rappel:allUp.some(v=>v.sms_copied_at&&!v.reminder_sent),confirmed:allUp.some(v=>v.sms_copied_at&&v.reminder_sent)};setVisitsFilter(fHas[activeFilter]?activeFilter:(['scheduled','rappel','confirmed'].find(k=>fHas[k])||'scheduled'));};
+  function updateFilterCounts(){const conf=allVisits.filter(v=>v.status==='confirmed'&&!isPastVisit(v));const sc=conf.filter(v=>!v.sms_copied_at).length;const co=conf.filter(v=>v.sms_copied_at).length;const ra=conf.filter(v=>v.sms_copied_at&&!v.reminder_sent).length;const setC=(key,n)=>{const b=visitsFilterButtons[key];if(!b)return;const el=b.querySelector('.ap-vf-count');if(el)el.textContent=String(n);};setC('scheduled',sc);setC('confirmed',co);setC('rappel',ra);}
+  function updateVisitsBannerCounts(){const conf=allVisits.filter(v=>v.status==='confirmed'&&!isPastVisit(v));const sc=conf.filter(v=>!v.sms_copied_at).length;const co=conf.filter(v=>v.sms_copied_at).length;const ra=conf.filter(v=>v.sms_copied_at&&!v.reminder_sent).length;const pa=allVisits.filter(v=>(v.status==='done'||(v.status==='confirmed'&&isPastVisit(v)))&&!v.followup_sent_at&&!v.skipped_at).length;const setN=(id,n)=>{const el=document.getElementById(id);if(el)el.textContent=String(n);};setN('vbcount-aconfirmer',sc);setN('vbcount-confirmees',co);setN('vbcount-rappels',ra);setN('vbcount-passees',pa);}
+  window.renderVisits=function(){oldRenderVisits();renderHistory(); const pending=allVisits.filter(v=>v.status==='pending'&&!isPastVisit(v));pendingPanel.hidden=Boolean(activeStatFilter)||!pending.length;pendingEmpty.hidden=pending.length>0;pendingList.innerHTML=pending.map(buildVisitCompact).join('');pendingTabCount.textContent=String(pending.length);updateFilterCounts();updateVisitsBannerCounts();renderDashboardPanels();renderAppointments();const activeFilter=Object.entries(visitsFilterButtons).find(([,b])=>b.getAttribute('aria-pressed')==='true')?.[0]||'scheduled';const allUp=allVisits.filter(v=>v.status==='confirmed'&&!isPastVisit(v));const fHas={scheduled:allUp.some(v=>!v.sms_copied_at),rappel:allUp.some(v=>v.sms_copied_at&&!v.reminder_sent),confirmed:allUp.some(v=>v.sms_copied_at)};setVisitsFilter(fHas[activeFilter]?activeFilter:(['scheduled','rappel','confirmed'].find(k=>fHas[k])||'scheduled'));};
   const calendar=main.querySelector('.calendar-card'), header=calendar.querySelector('.cal-header');
   const switcher=make('div','ap-view-switch');switcher.setAttribute('role','group');switcher.setAttribute('aria-label','Vue du calendrier');
   const views={month:'Mois',week:'Semaine',day:'Jour'};

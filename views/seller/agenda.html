@@ -19,7 +19,7 @@ if("scrollRestoration"in history)history.scrollRestoration="manual";</script>
   <link rel="stylesheet" href="/css/style.css?v=5">
   <link rel="stylesheet" href="/css/seller-header-typography.css?v=1">
   <link rel="stylesheet" href="/css/dashboard-premium.css?v=5">
-  <link rel="stylesheet" href="/css/ma-vente-5-clics.css?v=1">
+  <link rel="stylesheet" href="/css/ma-vente-5-clics.css?v=4">
   <style>
     /* ——— Design tokens (alignés dashboard) ——— */
     :root {
@@ -518,6 +518,9 @@ if("scrollRestoration"in history)history.scrollRestoration="manual";</script>
     .confirm-sms-copy { width:100%; padding:11px; background:rgba(158,58,24,0.06); color:var(--terracotta); border:1.5px solid rgba(158,58,24,0.12); border-radius:11px; font-family:'Inter',sans-serif; font-size:0.88rem; font-weight:600; cursor:pointer; transition:0.18s; margin-bottom:12px; }
     .confirm-sms-copy:hover { background:rgba(158,58,24,0.06); }
     .confirm-sms-copy.copied { background:#ecfdf5; color:#059669; border-color:#a7f3d0; }
+    .confirm-sms-btn-confirm { width:100%; padding:12px; background:#2e7d32; color:#fff; border:none; border-radius:11px; font-family:'Inter',sans-serif; font-size:0.9rem; font-weight:700; cursor:pointer; transition:0.18s; margin-bottom:12px; }
+    .confirm-sms-btn-confirm:hover { background:#1b5e20; }
+    .confirm-sms-btn-confirm:disabled { opacity:0.6; cursor:not-allowed; }
     .confirm-sms-close { font-size:0.82rem; color:#bbb; background:none; border:none; cursor:pointer; font-family:'Inter',sans-serif; text-decoration:underline; }
 
     /* ── Buttons ──────────────────────────────────────── */
@@ -648,6 +651,9 @@ if("scrollRestoration"in history)history.scrollRestoration="manual";</script>
 
       /* Agenda panels responsive */
       .vc-confirm, .vc-refuse, .vc-cancel { min-height: 44px; font-size: 0.88rem; }
+
+      /* Titre héros */
+      .dash-hero-title { font-size: 1.75rem !important; }
     }
 
     /* ── Calendrier compact sur mobile (< 640px) ───────── */
@@ -805,6 +811,11 @@ if("scrollRestoration"in history)history.scrollRestoration="manual";</script>
     .vcc2-reminder-sent { display:inline-flex; align-items:center; gap:4px; font-size:0.62rem; font-weight:700; color:#2e7d32; background:#e8f5e9; border:1px solid #c8e6c9; padding:2px 8px; border-radius:10px; }
     .vcc2-profile { margin:0 14px 12px; background:#fdf8f0; border-radius:10px; padding:10px 13px; border-left:3px solid var(--terracotta); }
     .vcc2-profile-title { display:flex; align-items:center; gap:6px; font-size:0.58rem; text-transform:uppercase; letter-spacing:0.07em; font-weight:800; color:var(--terracotta); margin-bottom:7px; }
+    .vcc2-profile-toggle { width:100%; background:none; border:none; cursor:pointer; padding:0; display:flex; align-items:center; gap:6px; font-size:0.58rem; text-transform:uppercase; letter-spacing:0.07em; font-weight:800; color:var(--terracotta); font-family:inherit; text-align:left; }
+    .vcc2-profile-chev { margin-left:auto; flex-shrink:0; color:var(--terracotta); transition:transform 0.2s; }
+    .vcc2-profile-collapsed .vcc2-profile-chev { transform:rotate(-90deg); }
+    .vcc2-profile-collapsed .vcc2-profile-toggle { margin-bottom:0; }
+    .vcc2-profile-collapsed .vcc2-profile-body { display:none; }
     .vcc2-profile-row { font-size:0.79rem; color:var(--noir); line-height:1.7; display:flex; align-items:center; gap:7px; }
     .vcc2-profile-row strong { font-weight:800; color:#111; }
     .vcc2-actions { display:flex; gap:8px; align-items:center; padding:10px 14px 13px; border-top:1px solid #f0f0f0; }
@@ -844,7 +855,7 @@ if("scrollRestoration"in history)history.scrollRestoration="manual";</script>
     .vcc2-banner-full     { background:#e8f5e9; color:#1a7a35; border-bottom-color:#a5d6a7; }
     .vcc2-banner-confirmed { background:#e8f5e9; color:#1a7a35; border-bottom-color:#a5d6a7; }
     .vcc2-banner-rappel   { background:#EEF4FF; color:#1D5EC9; border-bottom-color:#C5D9F5; }
-    .vcc2-banner-scheduled { background:#fef3ee; color:#C4603A; border-bottom-color:#f0c5a0; }
+    .vcc2-banner-scheduled { background:#DDF4F2; color:#168B83; border-bottom-color:#9DD8D4; }
     .vcc2-banner-done     { background:#f0f0f0; color:#757575; border-bottom-color:#d4d4d4; }
     .vcc2-done { border-color:#e0e0e0; }
     .vcc2-done .vcc2-datecol { background:#f0f0f0; border-right-color:#e0e0e0; }
@@ -856,6 +867,8 @@ if("scrollRestoration"in history)history.scrollRestoration="manual";</script>
     .vcc2-done .vcc2-email-link { color:#888 !important; }
     .vcc2-done .vcc2-profile { background:#f8f8f8; border-left-color:#ccc; }
     .vcc2-done .vcc2-profile-title { color:#888; }
+    .vcc2-done .vcc2-profile-toggle { color:#888; }
+    .vcc2-done .vcc2-profile-chev { color:#888; }
     .vcc2-done .vcc2-profile-row { color:#888; }
     .vcc2-done .vcc2-profile-row strong { color:#333; }
     .vcc2-past-label { flex:1; }
@@ -865,6 +878,8 @@ if("scrollRestoration"in history)history.scrollRestoration="manual";</script>
     .vcc2-btn-past-skip:hover { background:#fef3ee; color:#C4603A; border-color:#C4603A; }
     .vcc2-btn-past-followup.sent { background:#e8f5e9; color:#2e7d32; border-color:#a5d6a7; }
     .vcc2-btn-past-followup.sent:hover { background:#d7eedd; }
+    .vcc2-btn-past-dossier.sent { background:#e8f5e9; color:#2e7d32; border:1.5px solid #a5d6a7; }
+    .vcc2-btn-past-dossier.sent:hover { background:#d7eedd; }
     .vcc2-bp-ico { display:flex; align-items:center; flex-shrink:0; }
     .vcc2-bp-text { flex:1; line-height:1.35; }
     .vcc2-bp-chev { font-size:18px; font-weight:400; line-height:1; flex-shrink:0; opacity:0.75; }
@@ -1131,14 +1146,37 @@ if("scrollRestoration"in history)history.scrollRestoration="manual";</script>
     #agendaHero #dbUserCard { min-width: 0 !important; max-width: none !important; width: 100% !important; padding: 10px 14px !important; }
     #agendaHero #dbEmail, #agendaHero #dbPhone { display: none; }
   }
+  /* ── Mes disponibilités — bandeau dépliable ─────────── */
+  #dispoWrapper { margin-bottom: 14px; }
+  #dispoToggle { display:flex; align-items:center; gap:14px; padding:14px 20px; border-radius:12px; background:var(--terracotta,#9E3A18); color:#fff; cursor:pointer; user-select:none; }
+  #dispoToggle > span:first-child { flex-shrink:0; }
+  #dispoToggle > span:first-child svg { width:28px; height:28px; }
+  #dispoToggle > div { flex:1; min-width:0; }
+  #dispoToggle h2 { font:600 24px/1.2 Inter,sans-serif!important; letter-spacing:-.02em; color:#fff!important; margin:0; }
+  #dispoToggle p { font-size:14px; font-family:Inter,'DM Sans',sans-serif; font-weight:400; line-height:1.4; margin:5px 0 0; opacity:0.88; }
+  #dispoWrapper.dispo-wrapper-closed .five-clicks-chevron { transform:rotate(180deg); }
+  #dispoWrapperBody { padding-top:12px; }
+  /* ── Mon agenda — bandeau dépliable ─────────── */
+  #calWrapper { margin-bottom: 14px; }
+  #calToggle { display:flex; align-items:center; gap:14px; padding:14px 20px; border-radius:12px; background:var(--terracotta,#9E3A18); color:#fff; cursor:pointer; user-select:none; }
+  #calToggle > span:first-child { flex-shrink:0; }
+  #calToggle > span:first-child svg { width:28px; height:28px; }
+  #calToggle > div { flex:1; min-width:0; }
+  #calToggle h2 { font:500 32px/1.1 'Cormorant Garamond',serif!important; color:#fff!important; margin:0; }
+  #calToggle p { font-size:14px; font-family:Inter,'DM Sans',sans-serif; font-weight:400; line-height:1.4; margin:5px 0 0; opacity:0.88; }
+  #calWrapper.cal-wrapper-closed .five-clicks-chevron { transform:rotate(180deg); }
+  #calWrapperBody { padding-top:12px; }
   /* ── Ma vente en 5 clics — bloc dépliable ─────────── */
   #fiveClicksWrapper { margin-bottom: 14px; }
   #fiveClicksWrapper .vpm-dashboard { padding: 0; max-width: none; }
-  .five-clicks-chevron { flex-shrink:0; width:32px; height:32px; border-radius:50%; background:rgba(255,255,255,0.18); border:1.5px solid rgba(255,255,255,0.35); display:flex; align-items:center; justify-content:center; transition:transform 0.22s; color:#fff; cursor:pointer; padding:0; }
+  .five-clicks-chevron { flex-shrink:0; flex-grow:0; align-self:center; width:32px; height:32px; min-width:32px; min-height:32px; aspect-ratio:1/1; border-radius:50%; background:rgba(255,255,255,0.18); border:1.5px solid rgba(255,255,255,0.35); display:flex; align-items:center; justify-content:center; transition:transform 0.22s; color:#fff; cursor:pointer; padding:0; line-height:1; -webkit-appearance:none; appearance:none; box-sizing:border-box; }
   #fiveClicksWrapper.five-closed .five-clicks-chevron { transform:rotate(180deg); }
   #fiveClicksToggle { cursor: pointer; user-select: none; }
+  /* Icône maison — remplace le logo SVG */
+  #fiveClicksWrapper span.five-logo { width:28px; height:28px; flex-shrink:0; display:flex; align-items:center; justify-content:center; color:#fff; }
+  #fiveClicksWrapper span.five-logo svg { width:28px; height:28px; }
   /* Bandeau : sous-titre légèrement atténué pour hiérarchie visuelle */
-  #fiveClicksWrapper .five-header p { opacity: 0.84; font-size: 0.92rem; }
+  #fiveClicksWrapper .five-header p { opacity:0.84; font-size:14px; font-family:Inter,'DM Sans',sans-serif; font-weight:400; }
   /* ── Carrousel lisible sur agenda (desktop > 1150 px) ── */
   /* À ce breakpoint ma-vente-5-clics.css impose une grille 5 colonnes qui
      écrase les cartes. On substitue un carrousel 3 cartes visibles, scoped à
@@ -1172,13 +1210,38 @@ if("scrollRestoration"in history)history.scrollRestoration="manual";</script>
       background: var(--terracotta); width: 10px; height: 10px;
     }
   }
+  /* ── Panel inline "Voir le message envoyé" ─────────────── */
+  .vpm-dashboard .five-clicks .db-step-msg-btn{display:flex;align-items:center;justify-content:center;gap:6px;width:100%;min-height:44px;padding:9px 5px;border:1px solid var(--terracotta);border-radius:7px;white-space:normal;font:500 .8125rem/1.4 Inter,sans-serif;background:transparent;color:var(--terracotta);cursor:pointer;transition:background .15s,box-shadow .15s;margin:7px 0 0;order:3}
+  .vpm-dashboard .five-clicks .db-step-msg-panel{display:none;flex-direction:column;gap:0;text-align:left}
+  .vpm-dashboard .five-clicks .db-step--msg-open .five-photo-frame{display:none!important}
+  .vpm-dashboard .five-clicks .db-step--msg-open .db-step-body{min-height:340px;display:flex!important;flex-direction:column}
+  .vpm-dashboard .five-clicks .db-step--msg-open .db-step-body>:not(.db-step-msg-panel){display:none!important}
+  .vpm-dashboard .five-clicks .db-step--msg-open .db-step-msg-panel{display:flex!important;flex:1}
+  /* Header */
+  .vpm-dashboard .five-clicks .db-step-msg-panel-hdr{display:flex;align-items:center;justify-content:space-between;padding-bottom:10px;margin-bottom:10px;border-bottom:1px solid #f0ebe3}
+  .vpm-dashboard .five-clicks .db-step-msg-panel-title{display:flex;align-items:center;gap:8px;font:700 .9rem/1.1 'DM Sans',Inter,sans-serif;color:#1A1A16}
+  .vpm-dashboard .five-clicks .db-step-msg-panel-title .msg-panel-icon{width:30px;height:30px;border-radius:50%;background:#fdf0e8;display:flex;align-items:center;justify-content:center;flex-shrink:0;color:var(--terracotta)}
+  /* Badge contextuel */
+  .vpm-dashboard .five-clicks .db-step-msg-badge{display:flex;align-items:center;gap:6px;background:rgba(158,58,24,0.07);border:1px solid rgba(158,58,24,0.15);border-radius:20px;padding:5px 11px 5px 9px;margin-bottom:10px;font:600 .72rem/1 Inter,sans-serif;color:var(--terracotta);width:fit-content;max-width:100%}
+  /* Bouton fermer */
+  .vpm-dashboard .five-clicks .db-step-msg-close{width:28px;height:28px;border-radius:50%;border:none;background:#f0ebe3;cursor:pointer;font-size:.82rem;display:flex;align-items:center;justify-content:center;color:#888;flex-shrink:0;transition:background .15s}
+  .vpm-dashboard .five-clicks .db-step-msg-close:hover{background:#e2d9d0}
+  /* Texte du message */
+  .vpm-dashboard .five-clicks .db-step-msg-panel-txt{background:#007AFF;border:none;border-radius:16px 16px 4px 16px;padding:14px 16px;font:.8rem/1.75 Inter,sans-serif;color:#fff;white-space:pre-wrap;word-break:break-word;flex:1;max-height:200px;overflow-y:auto;}
+  /* Boutons d'action */
+  .vpm-dashboard .five-clicks .db-step-msg-panel-actions{display:flex;gap:8px;padding-top:10px;border-top:1px solid #f0ebe3;margin-top:auto}
+  .vpm-dashboard .five-clicks .db-step-msg-action-copy,.vpm-dashboard .five-clicks .db-step-msg-action-send{display:flex;align-items:center;justify-content:center;gap:6px;padding:10px 10px;border-radius:8px;font:600 .78rem/1 Inter,sans-serif;cursor:pointer;transition:all .15s}
+  .vpm-dashboard .five-clicks .db-step-msg-action-copy{flex:1;background:transparent;border:1.5px solid var(--terracotta);color:var(--terracotta)}
+  .vpm-dashboard .five-clicks .db-step-msg-action-send{flex:1.5;background:var(--terracotta);border:none;color:#fff}
+  .vpm-dashboard .five-clicks .db-step-msg-action-copy:hover{background:rgba(158,58,24,0.06)}
+  .vpm-dashboard .five-clicks .db-step-msg-action-send:hover{background:var(--terracotta-dark)}
   /* ── Finition espacements (overrides agenda-premium.css) ── */
   /* avant: 20px → après: 14px */
   .ap-agenda .agenda-stats { margin-bottom: 14px; }
   /* avant: 16px → après: 10px */
   .ap-agenda .ap-agenda-tabs { margin-bottom: 10px; }
   /* avant: gap 18px → après: 14px */
-  .ap-agenda .ap-bottom { gap: 14px; }
+  .ap-agenda .ap-bottom { gap: 20px; }
   /* Mobile : réduction supplémentaire ciblée */
   @media (max-width: 767px) {
     .ap-agenda #agendaHero .dash-hero { padding: 14px 18px 12px; margin-bottom: 10px; }
@@ -1189,22 +1252,24 @@ if("scrollRestoration"in history)history.scrollRestoration="manual";</script>
   .ap-agenda .ap-calendar-section { padding-top: 0; overflow: visible; }
   .ap-agenda .ap-calendar-section .ap-top { margin: 0; padding: 0; }
   body.vpm-agenda-page .ap-agenda .ap-calendar-section .aph { border-bottom: 1px solid #E8D9CC !important; padding: 14px 18px !important; margin-bottom: 0 !important; }
-  /* Corrige le sticky de #pastSection qui couvre #agendaOffersSection */
-  .ap-agenda #pastSection { position: static; }
-  /* Carte Mes offres d'achat — design premium */
-  #agendaOffersSection .mv-track-icon { border-radius: 14px; }
-  #agendaOffersSection .ao-hdr-divider { width: 2px; min-height: 44px; background: var(--terracotta,#9E3A18); border-radius: 2px; flex-shrink: 0; align-self: stretch; margin-top: 2px; }
-  #agendaOffersSection .mv-counters { gap: 10px; }
-  #agendaOffersSection .mv-counter { padding: 14px 6px 12px; gap: 0; justify-content: flex-start; }
-  #agendaOffersSection .ao-ctr-ico { width: 38px; height: 38px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 10px; flex-shrink: 0; }
-  #agendaOffersSection .mv-counter strong { font-size: 1.75rem; font-weight: 700; color: #1A1A16; margin-bottom: 10px; line-height: 1; }
-  #agendaOffersSection .ao-ctr-pill { display: inline-flex; align-items: center; padding: 3px 11px; border-radius: 20px; font-size: 0.72rem; font-weight: 600; line-height: 1.4; }
-  #agendaOffersSection .mv-primary { gap: 0; padding: 13px 16px; font-size: 0.88rem; }
-  #agendaOffersSection .ao-btn-divider { width: 1px; height: 20px; background: rgba(255,255,255,0.32); flex-shrink: 0; margin: 0 14px; }
+  /* ── Mobile fixes inline (no-cache) ── */
+  @media(max-width:767px){
+    body.vpm-agenda-page .aph{display:none!important}
+    #calToggle,#dispoToggle{padding:11px 14px!important;gap:10px!important}
+  }
+  @media(max-width:600px){
+    #calToggle h2{font-size:20px!important;line-height:1.25!important}
+    #calToggle p,#dispoToggle p{font-size:12px!important}
+  }
+  @media(max-width:420px){
+    .ap-agenda .agenda-stats{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+    .vcc2-datecol{min-width:58px!important;padding:10px 6px!important}
+    .vcc2-day{font-size:2.2rem!important}
+  }
   </style>
   <link rel="stylesheet" href="/css/seller-reference.css?v=1">
   <link rel="stylesheet" href="/css/seller-navigation.css?v=2">
-<link rel="stylesheet" href="/css/agenda-premium.css?v=64">
+<link rel="stylesheet" href="/css/agenda-premium.css?v=97">
 </head>
 <body class="vpm-seller-reference vpm-agenda-page vpm-header-typography">
 <!-- En-tête mobile : logo complet + bouton menu -->
@@ -1235,7 +1300,7 @@ if("scrollRestoration"in history)history.scrollRestoration="manual";</script>
       </a>
       <button type="button" class="sidebar-close-btn" id="sidebarCloseBtn" aria-label="Fermer le menu">×</button>
     </div>
-    <nav class="sidebar-nav" aria-label="Navigation de l’espace vendeur"><div class="sidebar-section">Gérer ma vente</div><div class="vpm-nav-row"><a href="/dashboard" class="sidebar-item"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.5"></rect><rect x="14" y="3" width="7" height="7" rx="1.5"></rect><rect x="3" y="14" width="7" height="7" rx="1.5"></rect><rect x="14" y="14" width="7" height="7" rx="1.5"></rect></svg><span class="vpm-nav-copy"><span class="vpm-nav-title">Ma vente</span><span class="vpm-nav-sub">Vue d'ensemble et prochaines étapes</span></span><span class="vpm-nav-arrow" aria-hidden="true">›</span></a><button type="button" class="vpm-nav-help" aria-label="Aide : Ma vente">?</button></div><div class="vpm-nav-row"><a href="/mon-agenda" class="sidebar-item active" aria-current="page"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg><span class="vpm-nav-copy"><span class="vpm-nav-title">Mon agenda</span><span class="vpm-nav-sub">Visites et disponibilités</span></span><span class="sidebar-badge" id="agendaBadge" style="display:none"></span><span class="vpm-nav-arrow" aria-hidden="true">›</span></a><button type="button" class="vpm-nav-help" aria-label="Aide : Mon agenda">?</button></div><div class="vpm-nav-row"><a href="/mes-publications" class="sidebar-item"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.55a11 11 0 0 1 14.08 0"></path><path d="M1.42 9a16 16 0 0 1 21.16 0"></path><path d="M8.53 16.11a6 6 0 0 1 6.95 0"></path><circle cx="12" cy="20" r="1"></circle></svg><span class="vpm-nav-copy"><span class="vpm-nav-title">Mon annonce en ligne</span><span class="vpm-nav-sub">Publication et suivi</span></span><span class="vpm-nav-arrow" aria-hidden="true">›</span></a><button type="button" class="vpm-nav-help" aria-label="Aide : Mon annonce en ligne">?</button></div><div class="vpm-nav-row"><a href="/mes-offres" class="sidebar-item"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path><line x1="7" y1="7" x2="7.01" y2="7"></line></svg><span class="vpm-nav-copy"><span class="vpm-nav-title">Mes offres d'achat</span><span class="vpm-nav-sub">Propositions et réponses</span></span><span class="sidebar-badge" id="offresBadge" style="display:none"></span><span class="vpm-nav-arrow" aria-hidden="true">›</span></a><button type="button" class="vpm-nav-help" aria-label="Aide : Mes offres d'achat">?</button></div><div class="sidebar-section">Préparer ma vente</div><div class="vpm-nav-row"><a href="/mon-bien" class="sidebar-item"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg><span class="vpm-nav-copy"><span class="vpm-nav-title">Mon bien</span><span class="vpm-nav-sub">Infos, documents, fiche, photos</span></span><span class="vpm-nav-arrow" aria-hidden="true">›</span></a><button type="button" class="vpm-nav-help" aria-label="Aide : Mon bien">?</button></div><div class="vpm-nav-row"><a href="/ma-formation" class="sidebar-item"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path></svg><span class="vpm-nav-copy"><span class="vpm-nav-title">Ma formation</span><span class="vpm-nav-sub">Les 6 étapes pour vendre</span></span><span class="vpm-nav-arrow" aria-hidden="true">›</span></a><button type="button" class="vpm-nav-help" aria-label="Aide : Ma formation">?</button></div><div class="vpm-nav-row"><a href="/mon-guide-photos" class="sidebar-item"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg><span class="vpm-nav-copy"><span class="vpm-nav-title">Mon guide photos</span><span class="vpm-nav-sub">Des conseils pour réussir vos photos</span></span><span class="vpm-nav-arrow" aria-hidden="true">›</span></a><button type="button" class="vpm-nav-help" aria-label="Aide : Mon guide photos">?</button></div><div class="sidebar-section">Mes outils</div><div class="vpm-nav-row"><a href="/ma-bibliotheque" class="sidebar-item"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"></path></svg><span class="vpm-nav-copy"><span class="vpm-nav-title">Ma boîte à outils</span><span class="vpm-nav-sub">Modèles, checklists et documents</span></span><span class="vpm-nav-arrow" aria-hidden="true">›</span></a><button type="button" class="vpm-nav-help" aria-label="Aide : Ma boîte à outils">?</button></div></nav>
+    <nav class="sidebar-nav" aria-label="Navigation de l’espace vendeur"><div class="sidebar-section">Gérer ma vente</div><div class="vpm-nav-row"><a href="/mon-agenda" class="sidebar-item active" aria-current="page"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.5"></rect><rect x="14" y="3" width="7" height="7" rx="1.5"></rect><rect x="3" y="14" width="7" height="7" rx="1.5"></rect><rect x="14" y="14" width="7" height="7" rx="1.5"></rect></svg><span class="vpm-nav-copy"><span class="vpm-nav-title">Ma vente</span><span class="vpm-nav-sub">Vue d'ensemble et prochaines étapes</span></span><span class="sidebar-badge" id="agendaBadge" style="display:none"></span><span class="vpm-nav-arrow" aria-hidden="true">›</span></a><button type="button" class="vpm-nav-help" aria-label="Aide : Ma vente">?</button></div><div class="vpm-nav-row"><a href="/mes-publications" class="sidebar-item"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.55a11 11 0 0 1 14.08 0"></path><path d="M1.42 9a16 16 0 0 1 21.16 0"></path><path d="M8.53 16.11a6 6 0 0 1 6.95 0"></path><circle cx="12" cy="20" r="1"></circle></svg><span class="vpm-nav-copy"><span class="vpm-nav-title">Mon annonce en ligne</span><span class="vpm-nav-sub">Publication et suivi</span></span><span class="vpm-nav-arrow" aria-hidden="true">›</span></a><button type="button" class="vpm-nav-help" aria-label="Aide : Mon annonce en ligne">?</button></div><div class="vpm-nav-row"><a href="/mes-offres" class="sidebar-item"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path><line x1="7" y1="7" x2="7.01" y2="7"></line></svg><span class="vpm-nav-copy"><span class="vpm-nav-title">Mes offres d'achat</span><span class="vpm-nav-sub">Propositions et réponses</span></span><span class="sidebar-badge" id="offresBadge" style="display:none"></span><span class="vpm-nav-arrow" aria-hidden="true">›</span></a><button type="button" class="vpm-nav-help" aria-label="Aide : Mes offres d'achat">?</button></div><div class="sidebar-section">Préparer ma vente</div><div class="vpm-nav-row"><a href="/mon-bien" class="sidebar-item"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg><span class="vpm-nav-copy"><span class="vpm-nav-title">Mon bien</span><span class="vpm-nav-sub">Infos, documents, fiche, photos</span></span><span class="vpm-nav-arrow" aria-hidden="true">›</span></a><button type="button" class="vpm-nav-help" aria-label="Aide : Mon bien">?</button></div><div class="vpm-nav-row"><a href="/ma-formation" class="sidebar-item"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path></svg><span class="vpm-nav-copy"><span class="vpm-nav-title">Ma formation</span><span class="vpm-nav-sub">Les 6 étapes pour vendre</span></span><span class="vpm-nav-arrow" aria-hidden="true">›</span></a><button type="button" class="vpm-nav-help" aria-label="Aide : Ma formation">?</button></div><div class="vpm-nav-row"><a href="/mon-guide-photos" class="sidebar-item"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg><span class="vpm-nav-copy"><span class="vpm-nav-title">Mon guide photos</span><span class="vpm-nav-sub">Des conseils pour réussir vos photos</span></span><span class="vpm-nav-arrow" aria-hidden="true">›</span></a><button type="button" class="vpm-nav-help" aria-label="Aide : Mon guide photos">?</button></div><div class="sidebar-section">Mes outils</div><div class="vpm-nav-row"><a href="/ma-bibliotheque" class="sidebar-item"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"></path></svg><span class="vpm-nav-copy"><span class="vpm-nav-title">Ma boîte à outils</span><span class="vpm-nav-sub">Modèles, checklists et documents</span></span><span class="vpm-nav-arrow" aria-hidden="true">›</span></a><button type="button" class="vpm-nav-help" aria-label="Aide : Ma boîte à outils">?</button></div></nav>
     <div class="sidebar-footer"><div class="sidebar-section">Mon compte</div><a href="/cgv" target="_blank" class="vpm-account-link"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg><span>CGV</span></a><a href="/confidentialite" target="_blank" class="vpm-account-link"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg><span>Confidentialité</span></a><a href="/logout" class="vpm-account-link"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg><span>Déconnexion</span></a></div>
   </aside>
 
@@ -1247,7 +1312,7 @@ if("scrollRestoration"in history)history.scrollRestoration="manual";</script>
         <div>
           <div class="dash-hero-badge vpm-header-label">
             <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-            Mon agenda
+            Ma vente
           </div>
           <h1 class="dash-hero-title vpm-header-title" id="dashboardGreeting">Bonjour</h1>
           <p class="dash-hero-welcome vpm-header-subtitle">Gérez vos disponibilités et suivez vos visites avec les acheteurs.</p>
@@ -1282,7 +1347,7 @@ if("scrollRestoration"in history)history.scrollRestoration="manual";</script>
       <div class="aph-left">
         <div class="aph-badge vpm-header-label">
           <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-          Mon agenda
+          Ma vente
         </div>
         <h1 class="aph-title vpm-header-title">Mon <em>agenda</em></h1>
         <p class="aph-sub vpm-header-subtitle">Organisez vos visites et suivez vos échanges avec les acheteurs.</p>
@@ -1299,42 +1364,33 @@ if("scrollRestoration"in history)history.scrollRestoration="manual";</script>
       </div>
       <div class="aph-photo" aria-hidden="true"><svg viewBox="0 0 220 190" fill="none" xmlns="http://www.w3.org/2000/svg">
   <ellipse cx="148" cy="86" rx="76" ry="70" fill="#f0c8a8" opacity="0.32"/>
-  <!-- Calendar body -->
   <rect x="86" y="18" width="120" height="130" rx="9" fill="#fdf5ef" stroke="#a85030" stroke-width="1.8"/>
-  <!-- Calendar header -->
   <rect x="86" y="18" width="120" height="32" rx="9" fill="#f0c8a8" opacity="0.65"/>
   <rect x="86" y="38" width="120" height="12" fill="#f0c8a8" opacity="0.65"/>
-  <!-- Rings -->
   <path d="M103 18 a9 9 0 0 1 18 0" stroke="#a85030" stroke-width="1.8" stroke-linecap="round"/>
   <path d="M131 18 a9 9 0 0 1 18 0" stroke="#a85030" stroke-width="1.8" stroke-linecap="round"/>
   <path d="M159 18 a9 9 0 0 1 18 0" stroke="#a85030" stroke-width="1.8" stroke-linecap="round"/>
-  <!-- Header separator -->
   <line x1="86" y1="50" x2="206" y2="50" stroke="#ddb898" stroke-width="1"/>
-  <!-- Grid row 1 -->
   <rect x="94" y="58" width="14" height="12" rx="2.5" stroke="#d4825a" stroke-width="1.2"/>
   <rect x="112" y="58" width="14" height="12" rx="2.5" stroke="#d4825a" stroke-width="1.2"/>
   <rect x="130" y="58" width="14" height="12" rx="2.5" stroke="#d4825a" stroke-width="1.2"/>
   <rect x="148" y="58" width="14" height="12" rx="2.5" stroke="#d4825a" stroke-width="1.2"/>
   <rect x="166" y="58" width="14" height="12" rx="2.5" stroke="#d4825a" stroke-width="1.2"/>
-  <!-- Grid row 2 -->
   <rect x="94" y="74" width="14" height="12" rx="2.5" stroke="#d4825a" stroke-width="1.2"/>
   <rect x="112" y="74" width="14" height="12" rx="2.5" stroke="#d4825a" stroke-width="1.2"/>
   <rect x="130" y="74" width="14" height="12" rx="2.5" stroke="#d4825a" stroke-width="1.2"/>
   <rect x="148" y="74" width="14" height="12" rx="2.5" stroke="#d4825a" stroke-width="1.2"/>
   <rect x="166" y="74" width="14" height="12" rx="2.5" stroke="#d4825a" stroke-width="1.2"/>
-  <!-- Grid row 3 — cellule terracotta -->
   <rect x="94" y="90" width="14" height="12" rx="2.5" stroke="#d4825a" stroke-width="1.2"/>
   <rect x="112" y="90" width="14" height="12" rx="2.5" stroke="#d4825a" stroke-width="1.2"/>
   <rect x="130" y="90" width="14" height="12" rx="2.5" stroke="#d4825a" stroke-width="1.2"/>
   <rect x="148" y="90" width="14" height="12" rx="2.5" fill="#C4603A" stroke="#C4603A" stroke-width="1.2"/>
   <rect x="166" y="90" width="14" height="12" rx="2.5" stroke="#d4825a" stroke-width="1.2"/>
-  <!-- Grid row 4 -->
   <rect x="94" y="106" width="14" height="12" rx="2.5" stroke="#d4825a" stroke-width="1.2"/>
   <rect x="112" y="106" width="14" height="12" rx="2.5" stroke="#d4825a" stroke-width="1.2"/>
   <rect x="130" y="106" width="14" height="12" rx="2.5" stroke="#d4825a" stroke-width="1.2"/>
   <rect x="148" y="106" width="14" height="12" rx="2.5" stroke="#d4825a" stroke-width="1.2"/>
   <rect x="166" y="106" width="14" height="12" rx="2.5" stroke="#d4825a" stroke-width="1.2"/>
-  <!-- Horloge -->
   <circle cx="72" cy="155" r="30" fill="#fdf5ef" stroke="#a85030" stroke-width="2"/>
   <line x1="72" y1="127" x2="72" y2="131" stroke="#a85030" stroke-width="1.5" stroke-linecap="round"/>
   <line x1="72" y1="179" x2="72" y2="183" stroke="#a85030" stroke-width="1.5" stroke-linecap="round"/>
@@ -1343,14 +1399,11 @@ if("scrollRestoration"in history)history.scrollRestoration="manual";</script>
   <line x1="72" y1="155" x2="60" y2="139" stroke="#a85030" stroke-width="2.2" stroke-linecap="round"/>
   <line x1="72" y1="155" x2="84" y2="139" stroke="#a85030" stroke-width="1.8" stroke-linecap="round"/>
   <circle cx="72" cy="155" r="3" fill="#a85030"/>
-  <!-- Maison -->
   <path d="M165 155 L181 135 L197 155" fill="none" stroke="#a85030" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"/>
   <rect x="168" y="155" width="26" height="22" rx="1.5" fill="none" stroke="#a85030" stroke-width="1.8"/>
   <rect x="175" y="163" width="8" height="14" rx="1" fill="none" stroke="#a85030" stroke-width="1.5"/>
 </svg></div>
-      <!-- bookingLink caché (utilisé par copyBookingLink) -->
       <input type="text" id="bookingLink" readonly style="position:absolute;opacity:0;pointer-events:none;width:0;height:0;">
-      <!-- noLinkMsg caché (utilisé par loadData) -->
       <p id="noLinkMsg" style="display:none;"></p>
     </div>
 
@@ -1360,9 +1413,9 @@ if("scrollRestoration"in history)history.scrollRestoration="manual";</script>
     <div id="fiveClicksWrapper">
       <div class="vpm-dashboard">
 <section class="db-process-card five-clicks" aria-label="Ma vente en 5 clics">
-<header class="five-header" id="fiveClicksToggle"><img class="five-logo" src="/images/vendu-par-moi.svg" alt="Vendu Par Moi"><div><h2>Ma vente en 5 clics</h2><p>Les 5 liens essentiels à utiliser au bon moment pour une vente simple et bien organisée.</p></div><a href="/toolbox/formation/guide-complet.pdf" target="_blank" rel="noopener noreferrer" class="five-guide" onclick="event.stopPropagation()">Voir le guide complet →</a><button type="button" class="five-clicks-chevron" aria-label="Réduire Ma vente en 5 clics" aria-expanded="true" onclick="event.stopPropagation(); toggleFiveClicks();"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="18 15 12 9 6 15"/></svg></button></header>
+<header class="five-header" id="fiveClicksToggle"><span class="five-logo" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10l9-7 9 7v11h-6v-5h-6v5H3z"/><polyline points="9 21 9 16 15 16 15 21"/><polyline points="8 13 11 16 16 10"/></svg></span><div><h2>Ma vente en 5 clics</h2><p>Les 5 liens essentiels à utiliser au bon moment pour une vente simple et bien organisée.</p></div><button type="button" class="five-clicks-chevron" aria-label="Réduire Ma vente en 5 clics" aria-expanded="true" onclick="event.stopPropagation(); toggleFiveClicks();"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="18 15 12 9 6 15"/></svg></button></header>
 <div id="fiveClicksBody">
-<div class="db-process-steps" id="fiveCards"><article class="db-process-step" aria-label="1 — Mon dossier complet"><div class="five-photo-frame"><img class="five-photo" src="/images/ma-vente-5-clics/hd/01_mon_dossier_complet.png" alt="" width="699" height="347"><span class="five-number" aria-hidden="true">1</span></div><div class="db-step-body"><h3 class="db-step-label">Mon dossier complet</h3><p class="five-note"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="m3 10 9-7 9 7M5 9v12h5v-7h4v7h5V9"/></svg>Comprend également vos créneaux de visite.</p><p class="db-step-sub">Envoyez avant la visite un dossier complet de votre bien à l'acheteur.</p><button type="button" class="db-step-btn-link" onclick="copyStepMsg(1, this)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="m3 10 9-7 9 7M5 9v12h5v-7h4v7h5V9"/></svg><span class="db-step-btn-lbl">Copier pour partager</span></button><a class="db-step-preview-link vpm-dossier-preview" id="vpmDossierPreview" data-step="1" aria-disabled="true" target="_blank" rel="noopener noreferrer"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/></svg><span>Voir ce que reçoit l’acheteur</span><span aria-hidden="true">→</span></a></div></article><article class="db-process-step" aria-label="2 — Réservation de visite"><div class="five-photo-frame"><img class="five-photo" src="/images/ma-vente-5-clics/hd/02_reservation_de_visite.png" alt="" width="695" height="347"><span class="five-number" aria-hidden="true">2</span></div><div class="db-step-body"><h3 class="db-step-label">Réservation de visite</h3><p class="db-step-sub">L'acquéreur choisit un créneau dans votre agenda pour une visite de votre bien.</p><button type="button" class="db-step-btn-link" onclick="copyStepMsg(2, this)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="m3 10 9-7 9 7M5 9v12h5v-7h4v7h5V9"/></svg><span class="db-step-btn-lbl">Copier pour partager</span></button><a class="db-step-preview-link" data-step="2" aria-disabled="true" target="_blank" rel="noopener noreferrer"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/></svg><span>Voir ce que reçoit l’acheteur</span><span aria-hidden="true">→</span></a></div></article><article class="db-process-step" aria-label="3 — Dossier acheteur sérieux"><div class="five-photo-frame"><img class="five-photo" src="/images/ma-vente-5-clics/hd/03_dossier_acheteur_serieux.png" alt="" width="758" height="347"><span class="five-number" aria-hidden="true">3</span></div><div class="db-step-body"><h3 class="db-step-label">Dossier acheteur sérieux</h3><p class="db-step-sub">Après la visite, partagez les documents complémentaires aux acheteurs réellement intéressés.</p><button type="button" class="db-step-btn-link" onclick="copyStepMsg(3, this)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="m3 10 9-7 9 7M5 9v12h5v-7h4v7h5V9"/></svg><span class="db-step-btn-lbl">Copier pour partager</span></button><a class="db-step-preview-link" data-step="3" aria-disabled="true" target="_blank" rel="noopener noreferrer"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/></svg><span>Voir ce que reçoit l’acheteur</span><span aria-hidden="true">→</span></a></div></article><article class="db-process-step" aria-label="4 — Soumission d'offre"><div class="five-photo-frame"><img class="five-photo" src="/images/ma-vente-5-clics/hd/04_soumission_offre.png" alt="" width="1051" height="367"><span class="five-number" aria-hidden="true">4</span></div><div class="db-step-body"><h3 class="db-step-label">Soumission d'offre</h3><p class="db-step-sub">L’acheteur soumet son offre — elle apparaît dans “Mes offres”.</p><button type="button" class="db-step-btn-link" onclick="copyStepMsg(4, this)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="m3 10 9-7 9 7M5 9v12h5v-7h4v7h5V9"/></svg><span class="db-step-btn-lbl">Copier pour partager</span></button><a class="db-step-preview-link" data-step="4" aria-disabled="true" target="_blank" rel="noopener noreferrer"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/></svg><span>Voir ce que reçoit l’acheteur</span><span aria-hidden="true">→</span></a></div></article><article class="db-process-step" aria-label="5 — Dossier notaire et suivi"><div class="five-photo-frame"><img class="five-photo" src="/images/ma-vente-5-clics/hd/05_dossier_notaire_suivi.png" alt="" width="1110" height="367"><span class="five-number" aria-hidden="true">5</span></div><div class="db-step-body"><h3 class="db-step-label">Dossier notaire et suivi</h3><p class="db-step-sub">Transmettez les documents demandés au notaire et suivez les étapes jusqu'au compromis.</p><button type="button" class="db-step-btn-link" onclick="copyStepMsg(5, this)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="m3 10 9-7 9 7M5 9v12h5v-7h4v7h5V9"/></svg><span class="db-step-btn-lbl">Copier pour partager</span></button><a class="db-step-preview-link" data-step="5" aria-disabled="true" target="_blank" rel="noopener noreferrer"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/></svg><span>Voir ce que reçoit l’acheteur</span><span aria-hidden="true">→</span></a></div></article></div>
+<div class="db-process-steps" id="fiveCards"><article class="db-process-step" aria-label="1 — Mon dossier complet"><div class="five-photo-frame"><img class="five-photo" src="/images/ma-vente-5-clics/hd/01_mon_dossier_complet.png" alt="" width="699" height="347"><span class="five-number" aria-hidden="true">1</span></div><div class="db-step-body"><h3 class="db-step-label">Mon dossier complet</h3><p class="five-note"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="m3 10 9-7 9 7M5 9v12h5v-7h4v7h5V9"/></svg>Comprend également vos créneaux de visite.</p><p class="db-step-sub">Envoyez avant la visite un dossier complet de votre bien à l'acheteur.</p><button type="button" class="db-step-btn-link" onclick="copyStepMsg(1, this)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="m3 10 9-7 9 7M5 9v12h5v-7h4v7h5V9"/></svg><span class="db-step-btn-lbl">Copier pour partager</span></button><button type="button" class="db-step-msg-btn" onclick="openStepMsgInline(1,this.closest(‘article’))"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg><span>Voir le message envoyé</span></button><div class="db-step-msg-panel"><div class="db-step-msg-panel-hdr"><span class="db-step-msg-panel-title">Message à un acheteur</span><button type="button" class="db-step-msg-close" onclick="closeStepMsgInline(this.closest(‘article’))">✕</button></div><div class="db-step-msg-panel-txt"></div><div class="db-step-msg-panel-actions"><button type="button" class="db-step-msg-action-copy" onclick="copyStepMsgInline(this.closest(‘article’))"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>Copier</button><button type="button" class="db-step-msg-action-send" onclick="sendStepMsgInline(this.closest(‘article’))"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>Envoyer</button></div></div></div></article><article class="db-process-step" aria-label="2 — Réservation de visite"><div class="five-photo-frame"><img class="five-photo" src="/images/ma-vente-5-clics/hd/02_reservation_de_visite.png" alt="" width="695" height="347"><span class="five-number" aria-hidden="true">2</span></div><div class="db-step-body"><h3 class="db-step-label">Réservation de visite</h3><p class="db-step-sub">L'acquéreur choisit un créneau dans votre agenda pour une visite de votre bien.</p><button type="button" class="db-step-btn-link" onclick="copyStepMsg(2, this)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="m3 10 9-7 9 7M5 9v12h5v-7h4v7h5V9"/></svg><span class="db-step-btn-lbl">Copier pour partager</span></button><button type="button" class="db-step-msg-btn" onclick="openStepMsgInline(2,this.closest(‘article’))"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg><span>Voir le message envoyé</span></button><div class="db-step-msg-panel"><div class="db-step-msg-panel-hdr"><span class="db-step-msg-panel-title">Message à un acheteur</span><button type="button" class="db-step-msg-close" onclick="closeStepMsgInline(this.closest(‘article’))">✕</button></div><div class="db-step-msg-panel-txt"></div><div class="db-step-msg-panel-actions"><button type="button" class="db-step-msg-action-copy" onclick="copyStepMsgInline(this.closest(‘article’))"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>Copier</button><button type="button" class="db-step-msg-action-send" onclick="sendStepMsgInline(this.closest(‘article’))"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>Envoyer</button></div></div></div></article><article class="db-process-step" aria-label="3 — Dossier acheteur sérieux"><div class="five-photo-frame"><img class="five-photo" src="/images/ma-vente-5-clics/hd/03_dossier_acheteur_serieux.png" alt="" width="758" height="347"><span class="five-number" aria-hidden="true">3</span></div><div class="db-step-body"><h3 class="db-step-label">Dossier acheteur sérieux</h3><p class="db-step-sub">Après la visite, partagez les documents complémentaires aux acheteurs réellement intéressés.</p><button type="button" class="db-step-btn-link" onclick="copyStepMsg(3, this)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="m3 10 9-7 9 7M5 9v12h5v-7h4v7h5V9"/></svg><span class="db-step-btn-lbl">Copier pour partager</span></button><button type="button" class="db-step-msg-btn" onclick="openStepMsgInline(3,this.closest(‘article’))"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg><span>Voir le message envoyé</span></button><div class="db-step-msg-panel"><div class="db-step-msg-panel-hdr"><span class="db-step-msg-panel-title">Message à un acheteur</span><button type="button" class="db-step-msg-close" onclick="closeStepMsgInline(this.closest(‘article’))">✕</button></div><div class="db-step-msg-panel-txt"></div><div class="db-step-msg-panel-actions"><button type="button" class="db-step-msg-action-copy" onclick="copyStepMsgInline(this.closest(‘article’))"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>Copier</button><button type="button" class="db-step-msg-action-send" onclick="sendStepMsgInline(this.closest(‘article’))"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>Envoyer</button></div></div></div></article><article class="db-process-step" aria-label="4 — Soumission d’offre"><div class="five-photo-frame"><img class="five-photo" src="/images/ma-vente-5-clics/hd/04_soumission_offre.png" alt="" width="1051" height="367"><span class="five-number" aria-hidden="true">4</span></div><div class="db-step-body"><h3 class="db-step-label">Soumission d'offre</h3><p class="db-step-sub">L’acheteur soumet son offre — elle apparaît dans “Mes offres”.</p><button type="button" class="db-step-btn-link" onclick="copyStepMsg(4, this)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="m3 10 9-7 9 7M5 9v12h5v-7h4v7h5V9"/></svg><span class="db-step-btn-lbl">Copier pour partager</span></button><button type="button" class="db-step-msg-btn" onclick="openStepMsgInline(4,this.closest(‘article’))"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg><span>Voir le message envoyé</span></button><div class="db-step-msg-panel"><div class="db-step-msg-panel-hdr"><span class="db-step-msg-panel-title">Message à un acheteur</span><button type="button" class="db-step-msg-close" onclick="closeStepMsgInline(this.closest(‘article’))">✕</button></div><div class="db-step-msg-panel-txt"></div><div class="db-step-msg-panel-actions"><button type="button" class="db-step-msg-action-copy" onclick="copyStepMsgInline(this.closest(‘article’))"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>Copier</button><button type="button" class="db-step-msg-action-send" onclick="sendStepMsgInline(this.closest(‘article’))"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>Envoyer</button></div></div></div></article><article class="db-process-step" aria-label="5 — Dossier notaire et suivi"><div class="five-photo-frame"><img class="five-photo" src="/images/ma-vente-5-clics/hd/05_dossier_notaire_suivi.png" alt="" width="1110" height="367"><span class="five-number" aria-hidden="true">5</span></div><div class="db-step-body"><h3 class="db-step-label">Dossier notaire et suivi</h3><p class="db-step-sub">Transmettez les documents demandés au notaire et suivez les étapes jusqu'au compromis.</p><button type="button" class="db-step-btn-link" onclick="copyStepMsg(5, this)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="m3 10 9-7 9 7M5 9v12h5v-7h4v7h5V9"/></svg><span class="db-step-btn-lbl">Copier pour partager</span></button><button type="button" class="db-step-msg-btn" onclick="openStepMsgInline(5,this.closest(‘article’))"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg><span>Voir le message envoyé</span></button><div class="db-step-msg-panel"><div class="db-step-msg-panel-hdr"><span class="db-step-msg-panel-title">Message à un acheteur</span><button type="button" class="db-step-msg-close" onclick="closeStepMsgInline(this.closest(‘article’))">✕</button></div><div class="db-step-msg-panel-txt"></div><div class="db-step-msg-panel-actions"><button type="button" class="db-step-msg-action-copy" onclick="copyStepMsgInline(this.closest(‘article’))"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>Copier</button><button type="button" class="db-step-msg-action-send" onclick="sendStepMsgInline(this.closest(‘article’))"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>Envoyer</button></div></div></div></article></div>
 <nav class="five-controls" aria-label="Navigation des cinq liens"><button type="button" data-five-prev aria-label="Carte précédente" disabled>←</button><div class="five-dots"><button type="button" data-five-index="0" aria-label="Afficher la carte 1" aria-current="true"></button><button type="button" data-five-index="1" aria-label="Afficher la carte 2" aria-current="false"></button><button type="button" data-five-index="2" aria-label="Afficher la carte 3" aria-current="false"></button><button type="button" data-five-index="3" aria-label="Afficher la carte 4" aria-current="false"></button><button type="button" data-five-index="4" aria-label="Afficher la carte 5" aria-current="false"></button></div><button type="button" data-five-next aria-label="Carte suivante">→</button></nav></div></section>
       </div>
     </div>
@@ -1589,62 +1642,25 @@ if("scrollRestoration"in history)history.scrollRestoration="manual";</script>
             <span id="pastCountBadge" style="background:#e8e3db;color:#666;padding:2px 9px;border-radius:12px;font-size:0.72rem;font-weight:700;"></span>
           </div>
           <div class="vcr-past-nav" id="vcr-past-nav">
+            <span class="vcr-past-cnt-badge" id="vcr-past-cnt-badge">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+              <span id="cr-cnt-past-num">0</span>&nbsp;<span id="cr-cnt-past-label">visite</span>
+            </span>
+            <button class="vcr-hdr-btn vcr-btn-prev-past" id="cr-prev-past" onclick="event.stopPropagation();carouselNav('past',-1)">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+              Précédent
+            </button>
             <span class="vcr-hdr-counter" id="cr-ctr-past"></span>
-            <button class="vcr-hdr-btn" id="cr-prev-past" onclick="event.stopPropagation();carouselNav('past',-1)">&#8249;</button>
-            <button class="vcr-hdr-btn" id="cr-next-past" onclick="event.stopPropagation();carouselNav('past',1)">&#8250;</button>
+            <button class="vcr-hdr-btn vcr-btn-next-past" id="cr-next-past" onclick="carouselNav('past',1)">
+              Suivant
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+            </button>
           </div>
-          <div id="pastBannerHint" style="padding:13px 18px;font-size:0.84rem;line-height:1.5;font-style:italic;background:rgba(120,120,120,0.07);color:#6b6b6b;border-bottom:1px solid rgba(120,120,120,0.18);">Après chaque visite, gardez le contact avec vos acheteurs : transmettez vos documents complémentaires ou indiquez si vous souhaitez poursuivre les échanges.</div>
+          <div id="pastBannerHint">Après chaque visite, gardez le contact avec vos acheteurs : transmettez vos documents complémentaires ou indiquez si vous souhaitez poursuivre les échanges.</div>
           <div class="vcr-card-wrap" id="pastList"></div>
           <div class="vcr-dots" id="vcr-dots-past" style="display:none;"></div>
         </div>
 
-        <!-- Mes offres d'achat -->
-        <div id="agendaOffersSection" class="vpm-dashboard" style="padding:0;max-width:none;margin-bottom:0;">
-          <section class="mv-track-card" style="margin:0 0 14px;" aria-label="Mes offres d'achat">
-            <header style="align-items:flex-start;gap:14px;">
-              <span class="mv-track-icon" aria-hidden="true">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><path d="M7 13c.6-.6 1.4-1 2-1s1.4.5 2 1 1.4 1 2 1 1.4-.4 2-1"/><path d="M7 17h.01M10 17h4"/></svg>
-              </span>
-              <div class="ao-hdr-divider" aria-hidden="true"></div>
-              <div style="flex:1;min-width:0;">
-                <h2>Mes offres d'achat</h2>
-                <p>Consultez et gérez les propositions reçues par les acheteurs.</p>
-              </div>
-            </header>
-            <div class="mv-counters">
-              <a href="/mes-offres" class="mv-counter">
-                <span class="ao-ctr-ico" style="background:#FEF3E2;" aria-hidden="true">
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#C4603A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>
-                </span>
-                <strong id="agendaOffers0">—</strong>
-                <span class="ao-ctr-pill" style="background:#FEF3E2;color:#C4603A;">En attente</span>
-              </a>
-              <a href="/mes-offres" class="mv-counter">
-                <span class="ao-ctr-ico" style="background:#EAFAF1;" aria-hidden="true">
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#27AE60" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-                </span>
-                <strong id="agendaOffers1">—</strong>
-                <span class="ao-ctr-pill" style="background:#EAFAF1;color:#27AE60;">Acceptées</span>
-              </a>
-              <a href="/mes-offres" class="mv-counter">
-                <span class="ao-ctr-ico" style="background:#FDEDEC;" aria-hidden="true">
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#E74C3C" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-                </span>
-                <strong id="agendaOffers2">—</strong>
-                <span class="ao-ctr-pill" style="background:#FDEDEC;color:#E74C3C;">Refusées</span>
-              </a>
-            </div>
-            <details class="mv-details">
-              <summary>Examiner les offres reçues</summary>
-              <div id="agendaOffersList"></div>
-            </details>
-            <a class="mv-primary" href="/mes-offres">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
-              <span class="ao-btn-divider" aria-hidden="true"></span>
-              Voir mes offres →
-            </a>
-          </section>
-        </div>
 
         <!-- Visites annulées -->
         <div class="agenda-panel" id="cancelledSection" style="display:none;">
@@ -1681,59 +1697,6 @@ if("scrollRestoration"in history)history.scrollRestoration="manual";</script>
       </div><!-- end visits-below -->
 
 
-      <!-- Nudge compromis — visible quand status=compromis et dates non encore renseignées (R4) -->
-      <div id="compromisNudge" style="display:none;background:#fff8f0;border:1.5px solid #f0d5b8;border-radius:12px;padding:14px 18px;margin-bottom:14px;align-items:center;gap:12px;flex-wrap:wrap;">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#C4603A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-        <span style="font-size:0.87rem;color:#5a3a1a;line-height:1.4;flex:1;">Pensez à renseigner les échéances de votre compromis pour recevoir vos rappels.</span>
-        <button onclick="document.getElementById('compromis-vente').scrollIntoView({behavior:'smooth'});" style="background:#C4603A;color:#fff;border:none;border-radius:8px;padding:8px 14px;font-size:0.83rem;font-family:'DM Sans',sans-serif;cursor:pointer;white-space:nowrap;">Renseigner mes dates</button>
-      </div>
-
-      <div class="compromis-bar" id="compromis-vente">
-        <div class="compromis-bar-hdr">
-          <div class="compromis-bar-hdr-ico">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
-          </div>
-          <div>
-            <h3>Du compromis à la signature</h3>
-            <p class="compromis-bar-hdr-sub">Les prochaines étapes de votre vente, guidées pas à pas.</p>
-          </div>
-        </div>
-        <div class="compromis-bar-body">
-          <!-- Formulaire (masqué quand timeline visible) -->
-          <div id="crForm">
-            <p class="cr2-intro">Renseignez la date de signature de votre compromis pour générer automatiquement votre calendrier de suivi jusqu'à la signature définitive.</p>
-            <div class="cr2-bon-a-savoir">
-              <div class="cr2-bas-title"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6"/><path d="M10 22h4"/><path d="M15.09 14c.18-.98.65-1.74 1.41-2.5A4.65 4.65 0 0 0 18 8 6 6 0 0 0 6 8c0 1 .23 2.23 1.5 3.5A4.61 4.61 0 0 1 8.91 14"/></svg> Bon à savoir</div>
-              <p class="cr2-bas-text">À partir de cette date, Vendu Par Moi génère automatiquement les rappels et les messages prévus dans votre formation (chapitre 6.4).</p>
-            </div>
-            <label class="cr2-form-label">Date de signature du compromis</label>
-            <input type="date" id="compromisDateInput" class="cr2-date-input">
-            <input type="hidden" id="compromisActeInput">
-            <input type="hidden" id="compromisRetractionInput">
-            <input type="hidden" id="compromisConditionsInput">
-            <button onclick="saveCompromis()" class="cr2-save-btn">Enregistrer</button>
-            <div id="crSuccess" style="display:none;">
-              <div class="cr2-success-box">
-                <svg width="22" height="22" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><circle cx="12" cy="12" r="11" fill="#2e7d32"/><polyline points="6 12 10 16 18 8" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
-                <div>
-                  <div class="cr2-success-title">Votre calendrier de suivi a été généré</div>
-                  <div class="cr2-success-sub">Retrouvez ci-dessous toutes les étapes jusqu'à la signature définitive, avec les dates et les messages prêts à l'envoi.</div>
-                </div>
-              </div>
-            </div>
-          </div>
-          <!-- Carte date (visible quand timeline affichée) -->
-          <div id="crDateCard" style="display:none;"></div>
-          <!-- Jalons conservés pour la légende calendrier — masqués visuellement -->
-          <div id="compromisMilestones" style="display:none;">
-            <span class="compromis-milestone-date" id="milestoneSru" style="display:none;"></span>
-            <span class="compromis-milestone-date" id="milestoneConditions" style="display:none;"></span>
-            <span class="compromis-milestone-date" id="milestoneActe" style="display:none;"></span>
-          </div>
-          <!-- Timeline de suivi compromis -->
-          <div id="crTimeline"></div>
-        </div>
-      </div>
 
   </main>
 </div>
@@ -1812,6 +1775,9 @@ if("scrollRestoration"in history)history.scrollRestoration="manual";</script>
     </a>
     <button class="confirm-sms-copy" id="rappelSmsCopyBtn" onclick="copyRappelSms(this)">
       <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:middle;margin-right:5px;"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>Copier le SMS
+    </button>
+    <button class="confirm-sms-btn-confirm" id="rappelConfirmBtn" style="display:none;" onclick="confirmRappelSent()">
+      ✓ J'ai envoyé le rappel
     </button>
 
     <!-- Qualification acheteur -->
@@ -1920,7 +1886,7 @@ if("scrollRestoration"in history)history.scrollRestoration="manual";</script>
       </div>
     </div>
     <div class="confirm-sms-preview" id="confirmSmsText"></div>
-    <a class="confirm-sms-btn-sms" id="confirmSmsSendBtn" href="#">
+    <a class="confirm-sms-btn-sms" id="confirmSmsSendBtn" href="#" onclick="markConfirmSmsSent()">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.41a2 2 0 0 1 2-2.18h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
       Ouvrir l'appli SMS
     </a>
@@ -2225,15 +2191,15 @@ function buildVisitConfirmedCard(v) {
     : isConfirmed
     ? `${svgStar} VISITE CONFIRMÉE À 100 %<img src="/logo-vpm.png" class="vcc2-banner-logo" alt="">`
     : '◉ Visite programmée';
-  const cardState   = isConfirmed ? ' vcc2-confirmed vcc2-full' : isRappel ? ' vcc2-rappel' : '';
+  const cardState   = isConfirmed ? ' vcc2-confirmed vcc2-full' : isRappel ? ' vcc2-rappel' : ' vcc2-scheduled';
   let countdownBadgeLabel = 'J - ?';
   if (isRappel && d) {
     const todayNoon = new Date(); todayNoon.setHours(12,0,0,0);
     const dNoon = new Date(d); dNoon.setHours(12,0,0,0);
     const daysUntil = Math.round((dNoon - todayNoon) / (1000*60*60*24));
-    if (daysUntil <= 0)       countdownBadgeLabel = "Aujourd'hui !";
-    else if (daysUntil === 1) countdownBadgeLabel = 'J - 1';
-    else                      countdownBadgeLabel = `J - ${daysUntil}`;
+    if (daysUntil <= 0)       countdownBadgeLabel = "Envoyer mon rappel";
+    else if (daysUntil === 1) countdownBadgeLabel = 'Envoyer mon rappel J-1';
+    else                      countdownBadgeLabel = `Envoyer mon rappel J-${daysUntil}`;
   }
   const rappelBtnHtml = isRappel
     ? ''
@@ -2242,7 +2208,7 @@ function buildVisitConfirmedCard(v) {
       : `<button class="vcc2-btn-sms vcc2-btn-rappel-action" id="btn-rappel-${v.id}" onclick="sendRappelRdv(${v.id})" style="display:none;">${svgCalIcs} Rappel du rdv</button>`;
   const conseilHtml = isRappel
     ? `<div class="vcc2-rappel-note"><div class="vcc2-rappel-note-content">${svgBell}<span>La visite approche ! Envoyez votre rappel en un clic pour la confirmer à 100 %.</span></div><button class="vcc2-btn-rappel-badge vcc2-btn-rappel-action" id="btn-rappel-${v.id}" onclick="sendRappelRdv(${v.id})">${svgCalIcs} ${countdownBadgeLabel}</button></div>`
-    : (!isConfirmed ? `<div class="vcc2-conseil">${svgBell} Votre visite est confirmée ! Pensez à envoyer un rappel la veille pour la finaliser.</div>` : '');
+    : '';
   const fullFooterHtml = `<div class="vcc2-full-footer" id="full-footer-${v.id}"${isConfirmed ? '' : ' style="display:none;"'}>${svgStar} Tout est prêt ! La visite est confirmée et le rappel a été envoyé.</div>`;
   return `<div class="vcc2${cardState}" id="vcard-${v.id}">
     <div id="status-badge-${v.id}" class="${bannerClass}">${bannerInner}</div>
@@ -2265,7 +2231,7 @@ function buildVisitConfirmedCard(v) {
     ${profileHtml}
     ${conseilHtml}
     <div class="vcc2-actions">
-      <button class="vcc2-btn-sms${v.sms_copied_at?' sent':''}" id="btn-reminder-${v.id}" onclick="sendReminder(${v.id})">${svgPhone} ${v.sms_copied_at?'✓ Confirmation effectuée':'Confirmation de visite'}</button>
+      ${v.sms_copied_at?`<button class="vcc2-btn-sms sent" id="btn-reminder-${v.id}" style="pointer-events:none;cursor:default;">${svgPhone} ✓ Confirmation effectuée</button>`:`<button class="vcc2-btn-sms" id="btn-reminder-${v.id}" onclick="sendReminder(${v.id})">${svgPhone} Confirmation de visite</button>`}
       ${rappelBtnHtml}
       <button class="vcc2-btn-cancel" onclick="openCancelSmsModal(${v.id})">${svgTrash} Annuler</button>
     </div>
@@ -2331,7 +2297,13 @@ function _crRender(key) {
   listEl.innerHTML = c.fn(c.visits[c.idx]);
   const n = c.visits.length;
   const ctrEl = document.getElementById('cr-ctr-' + key);
-  if (ctrEl) ctrEl.textContent = n > 1 ? (c.idx + 1) + ' / ' + n : '';
+  if (ctrEl) ctrEl.textContent = n > 1 ? 'Page ' + (c.idx + 1) + ' sur ' + n : '';
+  if (key === 'past') {
+    const cntNum = document.getElementById('cr-cnt-past-num');
+    const cntLabel = document.getElementById('cr-cnt-past-label');
+    if (cntNum) cntNum.textContent = n;
+    if (cntLabel) cntLabel.textContent = n > 1 ? 'visites' : 'visite';
+  }
   const prevEl = document.getElementById('cr-prev-' + key);
   const nextEl = document.getElementById('cr-next-' + key);
   if (prevEl) prevEl.disabled = c.idx === 0;
@@ -2475,12 +2447,15 @@ function buildPastCard(v) {
   const daysSince = d ? Math.floor((_today - d) / 86400000) : -1;
   const pastBannerClass = isCancelled ? 'vcc2-banner vcc2-banner-cancelled' : 'vcc2-banner vcc2-banner-done';
   const pastBannerText  = isCancelled ? `${svgStop} VISITE ANNULÉE` : `${svgClock} VISITE PASSÉE`;
+  const svgChevDown = `<svg class="vcc2-profile-chev" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>`;
   const profileHtml = (v.buyer_budget||v.buyer_financing||v.buyer_timeline) ? `
-    <div class="vcc2-profile">
-      <div class="vcc2-profile-title">${svgPerson} PROFIL ACHETEUR</div>
-      ${v.buyer_budget?`<div class="vcc2-profile-row">${svgCoins} <span class="vcc2-past-label">Budget :</span><strong>${escapeHtml(v.buyer_budget)}</strong></div>`:''}
-      ${v.buyer_financing?`<div class="vcc2-profile-row">${svgCard} <span class="vcc2-past-label">Financement :</span><strong>${escapeHtml(v.buyer_financing)}</strong></div>`:''}
-      ${v.buyer_timeline?`<div class="vcc2-profile-row">${svgCalSmall} <span class="vcc2-past-label">Délai :</span><strong>${escapeHtml(v.buyer_timeline)}</strong></div>`:''}
+    <div class="vcc2-profile vcc2-profile-collapsed">
+      <button class="vcc2-profile-toggle" onclick="this.closest('.vcc2-profile').classList.toggle('vcc2-profile-collapsed')" type="button">${svgPerson} PROFIL ACHETEUR ${svgChevDown}</button>
+      <div class="vcc2-profile-body">
+        ${v.buyer_budget?`<div class="vcc2-profile-row">${svgCoins} <span class="vcc2-past-label">Budget :</span><strong>${escapeHtml(v.buyer_budget)}</strong></div>`:''}
+        ${v.buyer_financing?`<div class="vcc2-profile-row">${svgCard} <span class="vcc2-past-label">Financement :</span><strong>${escapeHtml(v.buyer_financing)}</strong></div>`:''}
+        ${v.buyer_timeline?`<div class="vcc2-profile-row">${svgCalSmall} <span class="vcc2-past-label">Délai :</span><strong>${escapeHtml(v.buyer_timeline)}</strong></div>`:''}
+      </div>
     </div>` : '';
   const svgRefresh = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>`;
   const isSkipped = !!v.skip_reason;
@@ -2500,16 +2475,22 @@ function buildPastCard(v) {
       </div>
       ${daysSince >= 0 ? `<span class="vcc2-jpast-badge">${svgCalSmall} J + ${daysSince}</span>` : ''}
     </div>`) : '';
+  const conseilsHtml = (!isCancelled && !isSkipped) ? `
+    <div class="vcc2-past-conseils">
+      <div class="vcc2-past-conseils-title">${svgBulb} NOS CONSEILS</div>
+      <div class="vcc2-past-conseils-text">Après chaque visite, transmettez vos documents complémentaires (entretien chaudière, factures, travaux...) ou demandez où en est votre acheteur dans sa réflexion.</div>
+    </div>` : '';
   const buttonsHtml = !isCancelled ? (isSkipped ? `<div class="vcc2-actions">
       <button class="vcc2-btn-past vcc2-btn-reactivate" onclick="reactivateFollowup(${v.id})">
         <span class="vcc2-bp-ico">${svgRefresh}</span>
         <span class="vcc2-bp-text">Réactiver<br>cet acheteur</span>
       </button>
-    </div>` : `<div class="vcc2-actions">
-      <button class="vcc2-btn-past" onclick="sendDossierSerieux(${v.id})">
-        <span class="vcc2-bp-ico">${svgDoc}</span>
-        <span class="vcc2-bp-text">Dossier Acheteur<br>Sérieux</span>
-        <span class="vcc2-bp-chev">›</span>
+    </div>` : `<div class="vcc2-actions" style="position:relative">
+      ${conseilsHtml}
+      <button class="vcc2-btn-past vcc2-btn-past-dossier${v.dossier_serieux_sent_at ? ' sent' : ''}" id="btn-dossier-${v.id}" onclick="sendDossierSerieux(${v.id})">
+        <span class="vcc2-bp-ico">${v.dossier_serieux_sent_at ? svgCheck : svgDoc}</span>
+        <span class="vcc2-bp-text">${v.dossier_serieux_sent_at ? '✓ Dossier<br>envoyé' : 'Dossier Acheteur<br>Sérieux'}</span>
+        ${v.dossier_serieux_sent_at ? '' : '<span class="vcc2-bp-chev">›</span>'}
       </button>
       <button class="vcc2-btn-past vcc2-btn-past-followup${v.followup_sent_at ? ' sent' : ''}" id="btn-followup-${v.id}" onclick="openSuiviMessage(${v.id})">
         <span class="vcc2-bp-ico">${v.followup_sent_at ? svgCheck : svgSend}</span>
@@ -2522,11 +2503,6 @@ function buildPastCard(v) {
         Ne donnera pas suite
       </button>
     </div>`) : '';
-  const conseilsHtml = (!isCancelled && !isSkipped) ? `
-    <div class="vcc2-past-conseils">
-      <div class="vcc2-past-conseils-title">${svgBulb} NOS CONSEILS</div>
-      <div class="vcc2-past-conseils-text">Après chaque visite, transmettez vos documents complémentaires (entretien chaudière, factures, travaux...) ou demandez où en est votre acheteur dans sa réflexion.</div>
-    </div>` : '';
   const svgTrash2 = `<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>`;
   const deleteRowHtml = `<div style="text-align:center;padding:6px 0 10px;"><button onclick="deleteVisitHard(${v.id})" style="background:none;border:none;color:#ccc;font-family:'DM Sans',sans-serif;font-size:0.72rem;cursor:pointer;display:inline-flex;align-items:center;gap:4px;">${svgTrash2} Supprimer définitivement</button></div>`;
   return `<div class="vcc2 ${isCancelled?'vcc2-cancelled':'vcc2-done'}">
@@ -2549,7 +2525,6 @@ function buildPastCard(v) {
     ${profileHtml}
     ${confirmBoxHtml}
     ${buttonsHtml}
-    ${conseilsHtml}
     ${deleteRowHtml}
   </div>`;
 }
@@ -2630,15 +2605,27 @@ function copyConfirmSms(btn) {
       btn.innerHTML = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:middle;margin-right:5px;"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>Copier le SMS';
       btn.classList.remove('copied');
     }, 3000);
-    // Persister l'état en base
+    // Enregistrer uniquement si le bouton Envoyer est absent (acheteur sans téléphone)
     const visitId = _currentConfirmSmsVisitId;
-    if (!visitId) return;
-    fetch(`/api/visits/${visitId}/sms-copied`, { method:'PUT' }).then(() => {
-      const v = allVisits.find(v => v.id === visitId);
-      if (v) { v.sms_copied_at = new Date().toISOString(); }
-      renderVisits();
-    }).catch(() => {});
+    const sendBtn = document.getElementById('confirmSmsSendBtn');
+    if (visitId && sendBtn && sendBtn.style.display === 'none') {
+      fetch(`/api/visits/${visitId}/sms-copied`, { method: 'PUT' }).then(() => {
+        const v = allVisits.find(v => v.id === visitId);
+        if (v) { v.sms_copied_at = new Date().toISOString(); }
+        renderVisits();
+      }).catch(() => {});
+    }
   });
+}
+
+function markConfirmSmsSent() {
+  const visitId = _currentConfirmSmsVisitId;
+  if (!visitId) return;
+  fetch(`/api/visits/${visitId}/sms-copied`, { method: 'PUT' }).then(() => {
+    const v = allVisits.find(v => v.id === visitId);
+    if (v) { v.sms_copied_at = new Date().toISOString(); }
+    renderVisits();
+  }).catch(() => {});
 }
 
 let _currentCancelSmsVisitId = null;
@@ -2804,6 +2791,8 @@ function sendReminder(id) {
   const overlay = document.getElementById('rappelSmsOverlay');
   overlay._visitId = id;
   overlay._mode = 'confirm';
+  const rcb = document.getElementById('rappelConfirmBtn');
+  if (rcb) { rcb.style.display = 'none'; rcb.disabled = false; rcb.textContent = '✓ J\'ai envoyé le rappel'; }
   openModal('rappelSmsOverlay');
 }
 
@@ -2845,6 +2834,8 @@ function sendRappelRdv(id) {
   const overlayRdv = document.getElementById('rappelSmsOverlay');
   overlayRdv._visitId = id;
   overlayRdv._mode = 'rappel';
+  const rcbRdv = document.getElementById('rappelConfirmBtn');
+  if (rcbRdv) { rcbRdv.style.display = 'none'; rcbRdv.disabled = false; rcbRdv.textContent = '✓ J\'ai envoyé le rappel'; }
   openModal('rappelSmsOverlay');
 }
 
@@ -2885,7 +2876,11 @@ function sendDossierSerieux(id) {
   if (qualifPanel) qualifPanel.classList.remove('open');
   if (qualifToggle) qualifToggle.classList.remove('open');
   if (qualifArrow) qualifArrow.style.transform='';
-  document.getElementById('rappelSmsOverlay')._visitId = id;
+  const overlayDs = document.getElementById('rappelSmsOverlay');
+  overlayDs._visitId = id;
+  overlayDs._mode = 'dossier';
+  const rcbDs = document.getElementById('rappelConfirmBtn');
+  if (rcbDs) { rcbDs.style.display = 'none'; rcbDs.disabled = false; rcbDs.textContent = '✓ J\'ai envoyé le rappel'; }
   openModal('rappelSmsOverlay');
 }
 
@@ -2945,7 +2940,7 @@ function openSuiviMessage(id) {
   if (!v) return;
   const bn = (v.buyer_name || '').split(' ')[0] || '[Prénom]';
   const sn = _data?.seller?.first_name || '[Votre prénom]';
-  const msg = `Bonjour ${bn},\n\nMerci d'avoir pris le temps de visiter notre maison.\n\nJ'espère que la visite vous a permis de mieux découvrir le logement.\n\nSi vous avez des questions complémentaires ou souhaitez obtenir davantage d'informations, n'hésitez pas à me contacter.\n\nBonne journée,\n${sn}`;
+  const msg = `Bonjour ${bn},\n\nMerci d'avoir pris le temps de visiter notre maison.\n\nNous espérons que cette visite vous a permis de mieux découvrir le bien et de vous projeter.\n\nDe notre côté, nous avons pris le temps de vous accueillir et de vous présenter notre maison dans les meilleures conditions.\n\nEn retour, nous apprécierions que vous puissiez nous faire part de votre ressenti à la suite de cette visite, que votre avis soit positif ou négatif.\n\nMême si le bien ne correspond pas à vos attentes, un simple retour de votre part nous serait précieux et nous permettrait de savoir où vous en êtes dans votre réflexion.\n\nMerci d'avance pour votre réponse.\n\nBonne journée,\n\n${sn}`;
   document.getElementById('suiviBubbleText').textContent = '« ' + msg + ' »';
   const sendBtn = document.getElementById('suiviSendBtn');
   if (v.buyer_phone) {
@@ -2975,6 +2970,34 @@ function _markFollowupSent(id) {
   fetch('/api/visits/' + id + '/followup-sent', { method: 'PUT' }).catch(() => {});
 }
 
+function _markDossierSent(id) {
+  const v = allVisits.find(v => v.id === id);
+  if (!v || v.dossier_serieux_sent_at) return;
+  v.dossier_serieux_sent_at = new Date().toISOString();
+  const btn = document.getElementById('btn-dossier-' + id);
+  if (btn) {
+    btn.classList.add('sent');
+    btn.innerHTML = '<span class="vcc2-bp-ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="11" fill="#757575"/><polyline points="6 12 10 16 18 8" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg></span><span class="vcc2-bp-text">✓ Dossier<br>envoyé</span>';
+  }
+  fetch('/api/visits/' + id + '/dossier-serieux-sent', { method: 'PUT' }).catch(() => {});
+  closeModal('rappelSmsOverlay');
+}
+
+async function _markRappelSent(id) {
+  const v = allVisits.find(v => v.id === id);
+  if (!v || v.reminder_sent) return;
+  try {
+    const res = await fetch('/api/visits/' + id + '/rappel-rdv', { method: 'POST' });
+    if (!res.ok) throw new Error('Erreur ' + res.status);
+    v.reminder_sent = 1;
+    closeModal('rappelSmsOverlay');
+    renderVisits();
+    if (typeof window._refreshVisits === 'function') window._refreshVisits();
+  } catch(e) {
+    showToast("Impossible d'enregistrer le rappel. Réessayez.", 'error');
+  }
+}
+
 function copySuiviMsg(btn) {
   const overlay = document.getElementById('suiviOverlay');
   const msg = overlay._msg || '';
@@ -3000,15 +3023,14 @@ function copyRappelSms(btn) {
       btn.classList.remove('copied');
     }, 2500);
     if (id) {
-      const v = allVisits.find(v=>v.id===id);
-      if (mode === 'rappel') {
-        if (v) v.reminder_sent = 1;
-        fetch(`/api/visits/${id}/rappel-rdv`, {method:'POST'}).catch(()=>{});
-      } else {
+      if (mode === 'confirm') {
+        const v = allVisits.find(v=>v.id===id);
         if (v) v.sms_copied_at = new Date().toISOString();
         fetch(`/api/visits/${id}/reminder`, {method:'POST'}).catch(()=>{});
+        renderVisits();
       }
-      renderVisits();
+      // mode='rappel' : pas de changement d'état sur copie — le bouton Envoyer le gère
+      // mode='dossier' : pas de changement d'état sur copie — le bouton Envoyer le gère
     }
   }
   if (navigator.clipboard && window.isSecureContext) {
@@ -3027,25 +3049,33 @@ function markRappelSmsSent() {
   if (!id) return;
   const v = allVisits.find(v => v.id === id);
   if (mode === 'rappel') {
-    if (v) v.reminder_sent = 1;
-    const rappelBtn = document.getElementById('btn-rappel-' + id);
-    if (rappelBtn) {
-      const baseClass = rappelBtn.classList.contains('vcc2-btn-sms') ? 'vcc2-btn-sms' : 'btn-sms-reminder';
-      rappelBtn.className = baseClass + ' sent';
-      rappelBtn.innerHTML = '✓ Rappel effectué';
-    }
-    const vcardRappel = document.getElementById('vcard-' + id);
-    if (vcardRappel) { vcardRappel.classList.remove('vcc2-rappel'); vcardRappel.classList.add('vcc2-confirmed','vcc2-full'); const rNote=vcardRappel.querySelector('.vcc2-rappel-note'); if(rNote) rNote.style.display='none'; }
-    const statusBadgeRappel = document.getElementById('status-badge-' + id);
-    if (statusBadgeRappel) { statusBadgeRappel.className = 'vcc2-banner vcc2-banner-full'; statusBadgeRappel.innerHTML = '<svg class="vcc2-full-star-ico" viewBox="0 0 24 24" width="13" height="13" fill="#F5C842" stroke="#D4A800" stroke-width="0.5"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg> VISITE CONFIRMÉE À 100 %<img src="/logo-vpm.png" class="vcc2-banner-logo" alt="">'; }
-    const fullFooter = document.getElementById('full-footer-' + id);
-    if (fullFooter) fullFooter.style.display = '';
-    fetch(`/api/visits/${id}/rappel-rdv`, {method:'POST'}).catch(()=>{});
-    renderVisits();
+    _markRappelSent(id);
+  } else if (mode === 'dossier') {
+    _markDossierSent(id);
   } else {
     if (v) v.sms_copied_at = new Date().toISOString();
     fetch(`/api/visits/${id}/reminder`, {method:'POST'}).catch(()=>{});
     renderVisits();
+  }
+}
+
+async function confirmRappelSent() {
+  const overlay = document.getElementById('rappelSmsOverlay');
+  const id = overlay._visitId;
+  if (!id) { showToast('Identifiant de visite manquant. Fermez et réessayez.', 'error'); return; }
+  const cb = document.getElementById('rappelConfirmBtn');
+  if (cb) { cb.disabled = true; cb.textContent = 'Enregistrement…'; }
+  try {
+    const res = await fetch(`/api/visits/${id}/rappel-rdv`, {method:'POST'});
+    if (!res.ok) throw new Error('Erreur serveur (' + res.status + ')');
+    const v = allVisits.find(v => String(v.id) === String(id));
+    if (v) v.reminder_sent = 1;
+    closeModal('rappelSmsOverlay');
+    renderVisits();
+    if (typeof window._refreshVisits === 'function') window._refreshVisits();
+  } catch(e) {
+    if (cb) { cb.disabled = false; cb.textContent = '✓ J\'ai envoyé le rappel'; }
+    showToast('Impossible d\'enregistrer le rappel. Réessayez.', 'error');
   }
 }
 
@@ -3330,6 +3360,8 @@ function renderAvailMonth() {
   // Update count badge — affiche le total de créneaux futurs (tous mois)
   const badge=document.getElementById('dispoCountBadge');
   if(badge){ const n=availSlots.length; const nm=monthSlots.length; badge.textContent=n+' créneau'+(n>1?'x':'')+(nm<n?' ('+nm+' ce mois)':''); }
+  const hcount=document.getElementById('dispoHeaderCount');
+  if(hcount){ const n=availSlots.length; hcount.textContent=n+' créneau'+(n>1?'x':'')+' proposé'+(n>1?'s':'')+' aux acquéreurs'; }
 
   const svgX=`<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>`;
   const svgClock=`<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>`;
@@ -4017,246 +4049,14 @@ function formatDateFR(dateStr) {
   return d.toLocaleDateString('fr-FR', { day:'numeric', month:'long', year:'numeric' });
 }
 
-function updateCompromisMilestones() {
-  const m = getMilestoneDates();
-  const block = document.getElementById('compromisMilestones');
-  const hasAny=Boolean(m.sru||m.conditions||m.acte);
-  const show = (el, value) => { if(!el)return;el.style.display=value?'inline-flex':'none'; };
-  if (!hasAny) {
-    block.style.display = 'none';
-    show(document.getElementById('legendSru'),false);
-    show(document.getElementById('legendConditions'),false);
-    show(document.getElementById('legendActe'),false);
-    renderCalendar();
-    return;
-  }
-  block.style.display = 'block';
-  show(document.getElementById('legendSru'),m.sru);
-  show(document.getElementById('legendConditions'),m.conditions);
-  show(document.getElementById('legendActe'),m.acte);
-  document.getElementById('milestoneSru').textContent = m.sru?formatDateFR(m.sru):'—';
-  document.getElementById('milestoneConditions').textContent = m.conditions?formatDateFR(m.conditions):'—';
-  document.getElementById('milestoneActe').textContent = m.acte?formatDateFR(m.acte):'—';
-  document.querySelectorAll('#compromisMilestones .compromis-milestone').forEach((row,index)=>row.style.display=[m.sru,m.conditions,m.acte][index]?'flex':'none');
-  renderCalendar();
-}
-
-function updateCompromisNudge() {
-  const nudge = document.getElementById('compromisNudge');
-  if (!nudge) return;
-  const isCompromis = _data?.property?.status === 'compromis';
-  const datesSet = compromisData.compromis_dates_explicit === 1;
-  nudge.style.display = (isCompromis && !datesSet) ? 'flex' : 'none';
-}
-
 async function loadCompromis() {
   try {
     const r = await fetch('/api/compromis');
     if (!r.ok) return;
     compromisData = await r.json();
-    document.getElementById('compromisDateInput').value = compromisData.compromis_date || '';
-    const dates=getMilestoneDates();
-    document.getElementById('compromisRetractionInput').value = compromisData.compromis_retraction_date || dates.sru || '';
-    document.getElementById('compromisConditionsInput').value = compromisData.compromis_conditions_date || dates.conditions || '';
-    document.getElementById('compromisActeInput').value = compromisData.compromis_acte_date || dates.acte || '';
-    updateCompromisMilestones();
-    updateCompromisNudge();
+    renderCalendar();
   } catch(e) {}
 }
-
-async function saveCompromis() {
-  const dateVal = document.getElementById('compromisDateInput').value;
-  if (!dateVal) { showToast('Veuillez saisir une date de compromis.', 'error'); return; }
-  const _addD = (ds, n) => { const d = new Date(ds+'T12:00:00Z'); d.setUTCDate(d.getUTCDate()+n); return d.toISOString().slice(0,10); };
-  const retractionDate = _addD(dateVal, 14);
-  const acteDate = document.getElementById('compromisActeInput').value || _addD(dateVal, 90);
-  const dates = { compromis_retraction_date: retractionDate, compromis_conditions_date: null, compromis_acte_date: acteDate };
-  try {
-    const r = await fetch('/api/compromis', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ compromis_date: dateVal, ...dates, dates_explicit:true }) });
-    if (r.ok) {
-      compromisData = { compromis_date: dateVal, ...dates, compromis_dates_explicit:1 };
-      document.getElementById('compromisActeInput').value = acteDate;
-      document.getElementById('compromisRetractionInput').value = retractionDate;
-      updateCompromisMilestones();
-      updateCompromisNudge();
-      const successEl = document.getElementById('crSuccess');
-      if (successEl) successEl.style.display = '';
-      showToast('Compromis enregistré ✓');
-      await loadCompromisReminders();
-    }
-  } catch(e) { showToast('Erreur de sauvegarde', 'error'); }
-}
-
-let _crBuyer = null;
-async function loadCompromisReminders() {
-  try {
-    const r = await fetch('/api/compromis/reminders');
-    if (!r.ok) return;
-    const { reminders, buyer } = await r.json();
-    _crBuyer = buyer;
-    renderCRTimeline(reminders);
-  } catch(e) {}
-}
-function showCompromisForm() {
-  const formEl = document.getElementById('crForm');
-  const dateCardEl = document.getElementById('crDateCard');
-  const timelineEl = document.getElementById('crTimeline');
-  if (formEl) formEl.style.display = '';
-  if (dateCardEl) dateCardEl.style.display = 'none';
-  if (timelineEl) timelineEl.innerHTML = '';
-}
-function toggleCRMessage(id, btn) {
-  const el = document.getElementById(id);
-  if (!el) return;
-  const isOpen = el.style.display !== 'none';
-  el.style.display = isOpen ? 'none' : '';
-  if (btn) btn.classList.toggle('open', !isOpen);
-}
-function _crFmt(dateStr) {
-  if (!dateStr) return null;
-  const [y,m,d] = dateStr.split('-');
-  return new Date(Number(y),Number(m)-1,Number(d)).toLocaleDateString('fr-FR',{day:'numeric',month:'long',year:'numeric'});
-}
-function _crSmsMsg(kind, buyerFirstName, sellerFirstName) {
-  const bn = buyerFirstName || '[Prénom]';
-  const sn = sellerFirstName || '[Votre prénom]';
-  if (kind==='j20') return `Bonjour ${bn},\n\nJ'espère que vous allez bien.\n\nJe me permets de prendre quelques nouvelles concernant l'avancement de votre dossier de financement.\n\nAvez-vous pu transmettre les éléments nécessaires à votre banque ou à votre courtier ?\n\nBonne journée,\n${sn}`;
-  if (kind==='j45') return `Bonjour ${bn},\n\nJ'espère que tout va bien.\n\nJe souhaitais simplement savoir où en était votre financement et si vous aviez eu un retour de votre banque.\n\nN'hésitez pas à me tenir informé afin que nous puissions suivre sereinement les prochaines étapes avec le notaire.\n\nBonne journée,\n${sn}`;
-  if (kind==='etat_lieux') return `Bonjour ${bn},\n\nEn prévision de notre signature définitive chez le notaire, je vous propose d'organiser une dernière visite du logement afin de vérifier ensemble son état général et de relever les différents compteurs.\n\nSeriez-vous disponible quelques jours avant la signature pour convenir d'un rendez-vous ?\n\nBonne journée,\n${sn}`;
-  if (kind==='etat_lieux_veille') return `Bonjour ${bn},\n\nJe vous contacte pour confirmer notre rendez-vous d'état des lieux prévu demain avant notre signature définitive chez le notaire.\n\nPourriez-vous me confirmer que vous serez bien présent ?\n\nBonne journée,\n${sn}`;
-  return '';
-}
-function copyCompromisMsg(kind) {
-  const sn = _data?.seller?.first_name || '';
-  const bn = _crBuyer ? (_crBuyer.buyer_name||'').split(' ')[0] : '';
-  const msg = _crSmsMsg(kind, bn, sn);
-  if (!msg) return;
-  navigator.clipboard.writeText(msg).then(() => showToast('Message copié ✓')).catch(() => {
-    const el = document.createElement('textarea'); el.value = msg; document.body.appendChild(el); el.select(); document.execCommand('copy'); document.body.removeChild(el); showToast('Message copié ✓');
-  });
-}
-async function markCRDone(kind, isDone) {
-  try {
-    const r = await fetch(`/api/compromis/reminders/${kind}`, { method:'PATCH', headers:{'Content-Type':'application/json'}, body: JSON.stringify({status: isDone?'done':'open'}) });
-    if (r.ok) { await loadCompromisReminders(); showToast(isDone ? 'Étape marquée comme effectuée ✓' : 'Étape réouverte'); }
-  } catch(e) { showToast('Erreur réseau','error'); }
-}
-async function confirmRetractionDate() {
-  const inp = document.getElementById('crRetractionInput');
-  if (!inp || !inp.value) return;
-  document.getElementById('compromisRetractionInput').value = inp.value;
-  await saveCompromis();
-}
-function renderCRTimeline(reminders) {
-  const el = document.getElementById('crTimeline');
-  const formEl = document.getElementById('crForm');
-  const dateCardEl = document.getElementById('crDateCard');
-  if (!el) return;
-  if (!reminders || !reminders.length) {
-    el.innerHTML = '';
-    if (dateCardEl) dateCardEl.style.display = 'none';
-    if (formEl) formEl.style.display = '';
-    return;
-  }
-  // Passer en vue timeline
-  if (formEl) formEl.style.display = 'none';
-  // Carte date du compromis
-  if (dateCardEl) {
-    const ds = compromisData?.compromis_date;
-    const dateDisp = ds ? new Date(ds+'T12:00:00').toLocaleDateString('fr-FR',{day:'numeric',month:'short',year:'numeric'}) : '—';
-    dateCardEl.style.display = '';
-    dateCardEl.innerHTML = `<div class="cr2-date-card">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#C4603A" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-      <div><div class="cr2-date-label">Date du compromis</div><div class="cr2-date-value">${dateDisp}</div></div>
-      <button class="cr2-edit-btn" onclick="showCompromisForm()"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg> Modifier</button>
-    </div>`;
-  }
-  const map = {}; reminders.forEach(r => { map[r.kind] = r; });
-  const sn = _data?.seller?.first_name || '[Votre prénom]';
-  const bn = _crBuyer ? (_crBuyer.buyer_name||'').split(' ')[0] : null;
-  const bphone = _crBuyer?.buyer_phone || '';
-  const svgDoc  = `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>`;
-  const svgCopy = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>`;
-  const svgSend = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>`;
-  const svgPdf  = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>`;
-  const svgChat = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>`;
-  const JOURS = ['DIM.','LUN.','MAR.','MER.','JEU.','VEN.','SAM.'];
-  const MOIS_C = ['janv.','févr.','mars','avr.','mai','juin','juil.','août','sept.','oct.','nov.','déc.'];
-  const fmtBadge = ds => {
-    if (!ds) return {dow:'—',day:'—',moShort:'',mo:''};
-    const [y,m,d]=ds.split('-'); const dt=new Date(Number(y),Number(m)-1,Number(d));
-    const moAbbr = MOIS_C[dt.getMonth()];
-    return {dow:JOURS[dt.getDay()],day:String(Number(d)),moShort:moAbbr,mo:moAbbr+' '+y};
-  };
-  const mkActions = (kind, msgTxt, smsHref, extraTop='') => {
-    const msgId = 'crmsg-'+kind;
-    const safeMsg = escapeHtml(msgTxt).replace(/\n/g,'<br>');
-    return `${extraTop}<button class="cr2-msg-toggle" onclick="toggleCRMessage('${msgId}',this)">${svgChat} Voir le message <span class="cr2-chev">▾</span></button>
-      <div class="cr2-msg-body" id="${msgId}" style="display:none">${safeMsg}</div>
-      <div class="cr2-btn-row">
-        <button class="cr2-btn-copy" onclick="copyCompromisMsg('${kind}')">${svgCopy} Copier le message</button>
-        ${smsHref?`<a class="cr2-btn-send" href="${smsHref}">${svgSend} Envoyer au client</a>`:''}
-      </div>`;
-  };
-  const mkItem = (kind, title, desc, actionsHtml, isLast=false) => {
-    const r=map[kind]; const isDone=r?.status==='done';
-    const {dow,day,moShort,mo}=fmtBadge(r?.due_date);
-    return `<div class="cr2-item${isDone?' cr2-done':''}">
-      <div class="cr2-left">
-        <div class="cr2-circle${isDone?' done':''}"><span class="cr2-dow">${dow}</span><span class="cr2-day">${day}</span></div>
-        ${moShort?`<div class="cr2-mo-short">${moShort}</div>`:''}
-        ${!isLast?'<div class="cr2-vline"></div>':''}
-      </div>
-      <div class="cr2-right">
-        <div class="cr2-item-header"><span class="cr2-item-ico">${svgDoc}</span><span class="cr2-item-title">${title}</span></div>
-        <div class="cr2-item-mo">${mo}</div>
-        <div class="cr2-item-desc">${desc}</div>
-        ${actionsHtml}
-      </div>
-    </div>`;
-  };
-  const items = [];
-  // 1 — Rétractation (info uniquement)
-  if (map['retraction']||map['j20']) {
-    items.push(mkItem('retraction','Fin du délai de rétractation',
-      'Le délai de rétractation arrive à son terme. Aucune action de votre part n\'est nécessaire. Votre notaire reste la référence.','',false));
-  }
-  // 2 — J+20
-  if (map['j20']) {
-    const r=map['j20']; const msg=_crSmsMsg('j20',bn||'[Prénom]',sn);
-    const smsHref=bphone?`sms:${bphone}?body=${encodeURIComponent(msg)}`:'';
-    items.push(mkItem('j20','Suivi financement — J+20','Prenez des nouvelles de votre acheteur concernant l\'avancement de son financement.',mkActions('j20',msg,smsHref),false));
-  }
-  // 3 — J+45
-  if (map['j45']) {
-    const r=map['j45']; const msg=_crSmsMsg('j45',bn||'[Prénom]',sn);
-    const smsHref=bphone?`sms:${bphone}?body=${encodeURIComponent(msg)}`:'';
-    items.push(mkItem('j45','Suivi financement — J+45','Vérifiez où en est le financement de votre acheteur et assurez le suivi avec votre notaire.',mkActions('j45',msg,smsHref),false));
-  }
-  // 4 — État des lieux
-  if (map['etat_lieux']) {
-    const r=map['etat_lieux']; const msg=_crSmsMsg('etat_lieux',bn||'[Prénom]',sn);
-    const smsHref=bphone?`sms:${bphone}?body=${encodeURIComponent(msg)}`:'';
-    const svgChevR=`<svg class="cr2-pdf-arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>`;
-    const pdfLink=`<a class="cr2-pdf-link" href="/ma-formation/documents/etat-des-lieux" target="_blank">${svgPdf} Fiche d'état des lieux <span style="font-size:0.76rem;opacity:0.65;margin-left:2px;">(à imprimer)</span>${svgChevR}</a>`;
-    items.push(mkItem('etat_lieux','Préparez votre dernière visite','Organisez une dernière visite avec votre acheteur pour réaliser l\'état des lieux du logement avant la signature.',mkActions('etat_lieux',msg,smsHref,pdfLink),false));
-  }
-  // 5 — État des lieux veille
-  if (map['etat_lieux_veille']) {
-    const r=map['etat_lieux_veille']; const msg=_crSmsMsg('etat_lieux_veille',bn||'[Prénom]',sn);
-    const smsHref=bphone?`sms:${bphone}?body=${encodeURIComponent(msg)}`:'';
-    items.push(mkItem('etat_lieux_veille','État des lieux — demain','Votre état des lieux est prévu demain. Confirmez le rendez-vous avec votre acheteur et assurez-vous que le logement est prêt.',mkActions('etat_lieux_veille',msg,smsHref),false));
-  }
-  // 6 — Signature
-  if (map['signature']) {
-    const isDoneSignature = map['signature']?.status === 'done';
-    const congratsHtml = isDoneSignature ? `<div class="cr2-congrats"><div class="cr2-congrats-text">Merci, vous avez réussi à vendre ! Vous avez économisé du temps et de l'argent.</div><a class="cr2-avis-btn" href="https://venduparmoi.fr" target="_blank">Laisser un avis</a></div>` : '';
-    items.push(mkItem('signature','Signature définitive chez le notaire',`Dernier rendez-vous pour finaliser la vente. Pensez à prendre tous les documents demandés par votre notaire.${congratsHtml}`,'',true));
-  }
-  if (!items.length) { el.innerHTML=''; return; }
-  el.innerHTML = `<div class="cr2-timeline">${items.join('')}</div>`;
-}
-
 // Auto-marquer les notifs visite comme lues dès l'ouverture de l'agenda
 /* ── Toggle formulaire ajout disponibilité ─────────── */
 function toggleDispoForm(forceOpen) {
@@ -4290,7 +4090,6 @@ loadData().then(() => {
   renderAvailMonth();
   loadNotifications();
   loadCompromis();
-  loadCompromisReminders();
   if (_urlDate) {
     setTimeout(() => {
       const cal = document.querySelector('.cal-panel');
@@ -4333,6 +4132,7 @@ loadOffreLink();
       }
     } catch (_) {}
   }
+  window._refreshVisits = refreshVisits;
   // Reprendre au premier plan (iOS standalone)
   document.addEventListener('visibilitychange', () => { if (!document.hidden) refreshVisits(); });
   // Polling toutes les 60 secondes
@@ -4340,6 +4140,19 @@ loadOffreLink();
 })();
 </script>
 <script>
+/* Mes disponibilités — toggle bandeau terracotta */
+window.toggleDispo = function() {
+  var wrapper = document.getElementById('dispoWrapper');
+  if (!wrapper) return;
+  var body = document.getElementById('dispoWrapperBody');
+  var btn = wrapper.querySelector('.five-clicks-chevron');
+  var nowOpen = wrapper.classList.contains('dispo-wrapper-closed');
+  wrapper.classList.toggle('dispo-wrapper-closed', !nowOpen);
+  if (body) body.style.display = nowOpen ? '' : 'none';
+  if (btn) { btn.setAttribute('aria-expanded', nowOpen ? 'true' : 'false'); btn.setAttribute('aria-label', nowOpen ? 'Réduire mes disponibilités de visite' : 'Ouvrir mes disponibilités de visite'); }
+  localStorage.setItem('dispoOpen', nowOpen ? '1' : '0');
+};
+
 /* Ma vente en 5 clics — toggle bandeau terracotta */
 (function() {
   const wrapper = document.getElementById('fiveClicksWrapper');
@@ -4433,6 +4246,86 @@ function doStepMsgCopy() {
 document.getElementById('stepMsgModal').addEventListener('click', function(e) {
   if (e.target === this) closeStepMsgModal();
 });
+
+var _STEP_BADGES = [
+  { icon: '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>', label: 'Envoi du dossier complet' },
+  { icon: '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>', label: 'Réservation de visite' },
+  { icon: '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>', label: 'Dossier acheteur sérieux' },
+  { icon: '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>', label: "Soumission d'offre" },
+  { icon: '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>', label: 'Dossier notaire' }
+];
+var _CHAT_ICON = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>';
+function _setupPanelVisuals(article, n) {
+  /* Icône chat dans le titre */
+  var titleEl = article.querySelector('.db-step-msg-panel-title');
+  if (titleEl && !titleEl.querySelector('.msg-panel-icon')) {
+    var ic = document.createElement('span');
+    ic.className = 'msg-panel-icon';
+    ic.innerHTML = _CHAT_ICON;
+    titleEl.insertBefore(ic, titleEl.firstChild);
+  }
+  /* Badge contextuel (étape) */
+  var panelTxt = article.querySelector('.db-step-msg-panel-txt');
+  if (panelTxt && !article.querySelector('.db-step-msg-badge') && _STEP_BADGES[n-1]) {
+    var badge = document.createElement('div');
+    badge.className = 'db-step-msg-badge';
+    badge.innerHTML = _STEP_BADGES[n-1].icon + '<span>' + _STEP_BADGES[n-1].label + '</span>';
+    panelTxt.parentNode.insertBefore(badge, panelTxt);
+  }
+  /* Labels des boutons (via nœud texte pour préserver les event listeners) */
+  function setTextNode(el, text) {
+    if (!el) return;
+    for (var i = el.childNodes.length - 1; i >= 0; i--) {
+      if (el.childNodes[i].nodeType === 3) { el.childNodes[i].textContent = text; return; }
+    }
+  }
+  setTextNode(article.querySelector('.db-step-msg-action-copy'), 'Copier le message');
+  setTextNode(article.querySelector('.db-step-msg-action-send'), 'Envoyer le message');
+}
+function openStepMsgInline(n, article) {
+  try {
+    const msg = (typeof _stepUrls !== 'undefined' && _stepUrls[n-1]) ? _stepMsgs[n-1]() : '⚠ Lien non disponible — vérifiez votre espace Mon Bien.';
+    const panel = article.querySelector('.db-step-msg-panel');
+    const txt = article.querySelector('.db-step-msg-panel-txt');
+    const photo = article.querySelector('.five-photo-frame');
+    const body = article.querySelector('.db-step-body');
+    if (!panel || !txt || !body) return;
+    txt.textContent = msg;
+    const sendBtn = article.querySelector('.db-step-msg-action-send');
+    if (sendBtn) sendBtn.disabled = !(typeof _stepUrls !== 'undefined' && _stepUrls[n-1]);
+    if (photo) photo.style.display = 'none';
+    Array.from(body.children).forEach(function(el) {
+      el.style.display = el === panel ? '' : 'none';
+    });
+    panel.style.cssText = 'display:flex;flex-direction:column;gap:0;text-align:left;flex:1;min-height:280px';
+    body.style.minHeight = '340px';
+    article.classList.add('db-step--msg-open');
+  } catch(e) { console.error('openStepMsgInline error:', e); }
+}
+function closeStepMsgInline(article) {
+  try {
+    const photo = article.querySelector('.five-photo-frame');
+    const body = article.querySelector('.db-step-body');
+    const panel = article.querySelector('.db-step-msg-panel');
+    if (photo) photo.style.display = '';
+    if (body) { Array.from(body.children).forEach(function(el) { el.style.display = ''; }); body.style.minHeight = ''; }
+    if (panel) panel.style.cssText = '';
+    article.classList.remove('db-step--msg-open');
+  } catch(e) {}
+}
+function copyStepMsgInline(article) {
+  const txt = article.querySelector('.db-step-msg-panel-txt').textContent;
+  const btn = article.querySelector('.db-step-msg-action-copy');
+  const orig = btn.innerHTML;
+  navigator.clipboard.writeText(txt).then(() => {
+    btn.innerHTML = '✓ Copié !';
+    setTimeout(() => { btn.innerHTML = orig; }, 2000);
+  }).catch(() => window.showToast && window.showToast('Copie indisponible', 'error'));
+}
+function sendStepMsgInline(article) {
+  const txt = article.querySelector('.db-step-msg-panel-txt').textContent;
+  window.open('sms:?body=' + encodeURIComponent(txt), '_blank');
+}
 </script>
 <script src="/js/ma-vente.js?v=2"></script>
 <script src="/js/ma-vente-5-clics.js?v=1"></script>
@@ -4481,25 +4374,205 @@ document.getElementById('stepMsgModal').addEventListener('click', function(e) {
 })();
 </script>
 
-<script src="/js/agenda-premium.js?v=96"></script>
+<script src="/js/agenda-premium.js?v=104"></script>
 <script>
 /* Repositionnements post agenda-premium.js */
 (function() {
   var block = document.getElementById('fiveClicksWrapper');
   var tabs = document.querySelector('.ap-agenda-tabs');
-  if (block && tabs) tabs.before(block);
+  /* Les tabs sont masqués visuellement mais restent dans le DOM —
+     selectAgendaTab() et tabButtons continuent de fonctionner en interne. */
+  if (tabs) tabs.hidden = true;
+  if (block && tabs) tabs.after(block);
   /* Fusionne ap-top (.aph) avec ap-calendar-section — supprime le doublon h2 */
   var apTop = document.querySelector('.ap-top');
   var calSection = document.querySelector('.ap-calendar-section');
   if (apTop && calSection) calSection.prepend(apTop);
   var calHeading = calSection && calSection.querySelector('.ap-calendar-heading');
   if (calHeading) calHeading.hidden = true;
-  /* agenda-premium.js déplace #pastSection dans actionCol — y placer la carte offres juste après */
-  var offers = document.getElementById('agendaOffersSection');
-  var past = document.getElementById('pastSection');
-  if (offers && past) past.after(offers);
+})();
+
+/* Init dispoWrapper — agenda-premium.js vient de créer #dispoWrapper */
+(function() {
+  var wrapper = document.getElementById('dispoWrapper');
+  var body = document.getElementById('dispoWrapperBody');
+  var toggle = document.getElementById('dispoToggle');
+  if (!wrapper || !body || !toggle) return;
+  var open = localStorage.getItem('dispoOpen') === '1';
+  wrapper.classList.toggle('dispo-wrapper-closed', !open);
+  body.style.display = open ? '' : 'none';
+  var btn = wrapper.querySelector('.five-clicks-chevron');
+  if (btn) { btn.setAttribute('aria-expanded', open ? 'true' : 'false'); btn.addEventListener('click', function(e) { e.stopPropagation(); toggleDispo(); }); }
+  toggle.addEventListener('click', function(e) {
+    if (e.target.closest('a[href], button:not(.five-clicks-chevron)')) return;
+    toggleDispo();
+  });
+})();
+
+/* Init calWrapper — bandeau Mon agenda dépliable, fermé par défaut */
+(function() {
+  function initCalWrapper() {
+    var wrapper = document.getElementById('calWrapper');
+    var body = document.getElementById('calWrapperBody');
+    var toggle = document.getElementById('calToggle');
+    if (!wrapper || !body || !toggle) return;
+    function toggleCal() {
+      var wasClosed = wrapper.classList.contains('cal-wrapper-closed');
+      wrapper.classList.toggle('cal-wrapper-closed', !wasClosed);
+      body.style.display = wasClosed ? '' : 'none';
+      var btn = wrapper.querySelector('.five-clicks-chevron');
+      if (btn) btn.setAttribute('aria-expanded', wasClosed ? 'true' : 'false');
+      if (wasClosed && window.renderCalendar) {
+        requestAnimationFrame(function() { window.renderCalendar(); });
+      }
+    }
+    var chevron = toggle.querySelector('.five-clicks-chevron');
+    if (chevron) chevron.addEventListener('click', function(e) { e.stopPropagation(); toggleCal(); });
+    toggle.addEventListener('click', function(e) {
+      if (e.target.closest('a[href], button:not(.five-clicks-chevron)')) return;
+      toggleCal();
+    });
+  }
+  /* calWrapper est créé dynamiquement par le IIFE de réorganisation finale —
+     on attend le prochain tick pour s'assurer qu'il est dans le DOM */
+  setTimeout(initCalWrapper, 0);
+})();
+
+/* Patch openAvailability — ouvre dispoWrapper automatiquement si replié */
+(function() {
+  var orig = window.openAvailability;
+  if (!orig) return;
+  window.openAvailability = function() {
+    var wrapper = document.getElementById('dispoWrapper');
+    if (wrapper && wrapper.classList.contains('dispo-wrapper-closed') && typeof toggleDispo === 'function') toggleDispo();
+    orig.apply(this, arguments);
+  };
+})();
+
+/* Neutralise _syncCardsTop() dans le layout ap-visits-row —
+   la fonction agenda-premium.js ajoute un paddingBottom inline pour aligner
+   les flèches nav avec les chips filtre. Dans le layout côte à côte ce sync
+   n'est plus pertinent et crée un écart visuel. */
+(function() {
+  var obs = new MutationObserver(function(muts) {
+    var el = muts[0] && muts[0].target;
+    if (!el || !el.style.paddingBottom) return;
+    obs.disconnect();
+    el.style.paddingBottom = '';
+    var pl = document.getElementById('pastList');
+    if (pl) pl.style.marginTop = '';
+    if (el.isConnected) obs.observe(el, { attributes: true, attributeFilter: ['style'] });
+  });
+  setTimeout(function() {
+    var el = document.querySelector('.ap-visits-row .ap-history .dispo-add-hdr');
+    if (el) obs.observe(el, { attributes: true, attributeFilter: ['style'] });
+  }, 800);
+})();
+
+/* Réorganisation finale — ordre maquette :
+   dispo → toutes mes visites (bandeau terracotta) → bouton manuel → calendrier → compromis */
+(function() {
+  var bottom = document.querySelector('body.vpm-agenda-page main.ap-agenda .ap-bottom');
+  if (!bottom) return;
+  var visitesWrapper = document.getElementById('visitesAllWrapper');
+  var visitesBody    = document.getElementById('visitesAllBody');
+  var manualBtn     = document.querySelector('.ap-action-btn-secondary');
+  var calSection    = document.querySelector('body.vpm-agenda-page main.ap-agenda .ap-calendar-section');
+  var dispoWrapper  = document.getElementById('dispoWrapper');
+  var syncBtn       = document.querySelector('.ap-sync-trigger');
+  var dashboard     = document.querySelector('.ap-dashboard-panels');
+  var share         = document.getElementById('bookingLinkBox');
+  if (dashboard) dashboard.hidden = true;
+  if (share) share.hidden = true;
+  /* Encapsule visitsPanel + pastSec dans ap-visits-row à l'intérieur du bandeau */
+  if (visitesBody) {
+    var visitsPanel = visitesBody.querySelector('.ap-visits-panel');
+    var pastSec     = visitesBody.querySelector('#pastSection') || document.getElementById('pastSection');
+    var visitsRow = document.createElement('div');
+    visitsRow.className = 'ap-visits-row';
+    if (visitsPanel) visitsRow.append(visitsPanel);
+    if (pastSec)     visitsRow.append(pastSec);
+    visitesBody.append(visitsRow);
+  }
+  while (bottom.firstChild) bottom.removeChild(bottom.firstChild);
+  if (dispoWrapper)   bottom.append(dispoWrapper);
+  if (visitesWrapper) bottom.append(visitesWrapper);
+  /* Enveloppe calSection dans un bandeau dépliable */
+  var calWrapper = document.createElement('div');
+  calWrapper.id = 'calWrapper';
+  calWrapper.className = 'cal-wrapper-closed';
+  var calToggle = document.createElement('div');
+  calToggle.id = 'calToggle';
+  calToggle.innerHTML =
+    '<span><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">' +
+      '<rect x="3" y="4" width="18" height="18" rx="2"/>' +
+      '<line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>' +
+    '</svg></span>' +
+    '<div><h2>Mon agenda</h2><p>Organisez vos visites et suivez vos échanges avec les acheteurs.</p></div>' +
+    '<button class="five-clicks-chevron" aria-expanded="false" aria-label="Afficher le calendrier">' +
+      '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>' +
+    '</button>';
+  var calBody = document.createElement('div');
+  calBody.id = 'calWrapperBody';
+  calBody.style.display = 'none';
+  if (calSection) calBody.append(calSection);
+  if (syncBtn) calBody.append(syncBtn);
+  calWrapper.append(calToggle);
+  calWrapper.append(calBody);
+  bottom.append(calWrapper);
+  if (manualBtn)      bottom.append(manualBtn);
+  if (dashboard) bottom.append(dashboard);
 })();
 </script>
 <link rel="stylesheet" href="/css/seller-header-typography.css?v=1">
+<script>
+/* Liaisons événements "Voir le message envoyé" — remplacement des onclick inline */
+(function() {
+  function bindPanelEvents() {
+    /* boutons "Voir le message envoyé" */
+    document.querySelectorAll('.db-step-msg-btn').forEach(function(btn, i) {
+      btn.removeAttribute('onclick');
+      var art = btn.closest('.db-process-step') || btn.closest('article');
+      if (art) _setupPanelVisuals(art, i + 1);
+      btn.addEventListener('click', function(e) {
+        e.stopPropagation();
+        if (art) openStepMsgInline(i + 1, art);
+      });
+    });
+    /* boutons fermer ✕ */
+    document.querySelectorAll('.db-step-msg-close').forEach(function(btn) {
+      btn.removeAttribute('onclick');
+      btn.addEventListener('click', function(e) {
+        e.stopPropagation();
+        var art = btn.closest('.db-process-step') || btn.closest('article');
+        if (art) closeStepMsgInline(art);
+      });
+    });
+    /* boutons Copier */
+    document.querySelectorAll('.db-step-msg-action-copy').forEach(function(btn) {
+      btn.removeAttribute('onclick');
+      btn.addEventListener('click', function(e) {
+        e.stopPropagation();
+        var art = btn.closest('.db-process-step') || btn.closest('article');
+        if (art) copyStepMsgInline(art);
+      });
+    });
+    /* boutons Envoyer */
+    document.querySelectorAll('.db-step-msg-action-send').forEach(function(btn) {
+      btn.removeAttribute('onclick');
+      btn.addEventListener('click', function(e) {
+        e.stopPropagation();
+        var art = btn.closest('.db-process-step') || btn.closest('article');
+        if (art) sendStepMsgInline(art);
+      });
+    });
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', bindPanelEvents);
+  } else {
+    bindPanelEvents();
+  }
+})();
+</script>
 </body>
 </html>

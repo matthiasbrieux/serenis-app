@@ -65,7 +65,7 @@
       + "<div class=\"pr-bench-card-icon " + mod + "\">" + icon + "</div>"
       + "<span class=\"pr-bench-card-lbl\">" + escHtml(lbl) + "</span>"
       + "</div>"
-      + "<div class=\"pr-bench-card-pm2\">" + euro(raw) + "/m²</div>"
+      + "<div class=\"pr-bench-card-pm2\">" + (raw != null ? euro(raw) + "/m²" : "—") + "</div>"
       + "<div class=\"pr-bench-card-indic\">"
       + "<div class=\"pr-bench-card-indic-lbl\">" + escHtml(surfaceLbl) + "</div>"
       + "<div class=\"pr-bench-card-indic-val\">" + (indic != null ? "≈ " + euro(indic) : "—") + "</div>"
@@ -80,10 +80,11 @@
       + "</div>"
       + "</div>"
       + "<div class=\"pr-bench-cards\">"
-      + card(I_DOWN, "pr-bench-icon-low", "Prix au m² le plus bas", data.priceMin, data.indicMin)
-      + card(I_BARS, "pr-bench-icon-mid", "Prix médian au m²", data.priceMed, data.indicMed)
-      + card(I_UP, "pr-bench-icon-high", "Prix au m² le plus haut", data.priceMax, data.indicMax)
+      + card(I_DOWN, "pr-bench-icon-low", "Bas du marché (1er quartile)", data.priceP25, data.indicP25)
+      + card(I_BARS, "pr-bench-icon-mid", "Médiane de la commune", data.priceMed, data.indicMed)
+      + card(I_UP, "pr-bench-icon-high", "Haut du marché (3e quartile)", data.priceP75, data.indicP75)
       + "</div>"
+      + (count < 8 ? "<div class=\"pr-comp-footer\"><span class=\"pr-footer-icon\">" + I_ALERT + "</span><p>Ces repères reposent sur " + count + " vente" + (count > 1 ? "s" : "") + " seulement. Interprétez-les avec prudence.</p></div>" : "")
       + "</div>";
   }
 
@@ -91,18 +92,34 @@
   function buildBenchmarks(comparables, data) {
     if (!Array.isArray(comparables) || !comparables.length) return "";
     const ratios = comparables.map(c => c.price / c.area);
-    const minRaw = Math.min(...ratios);
-    const maxRaw = Math.max(...ratios);
-    const meanRaw = ratios.reduce((s, r) => s + r, 0) / ratios.length;
+    const sorted = [...ratios].sort((a, b) => a - b);
+    const pct = (arr, p) => { const i = p / 100 * (arr.length - 1), lo = Math.floor(i), hi = Math.ceil(i); return arr[lo] + (i - lo) * (arr[hi] - arr[lo]); };
+    const p25 = pct(sorted, 25);
+    const p50 = pct(sorted, 50);
+    const p75 = pct(sorted, 75);
     const surface = (data && data.surface != null) ? Number(data.surface) : null;
     const surfaceLbl = surface ? "Soit pour votre bien (" + surface + " m²)" : "Surface non renseignée";
     const I_DOWN = '<img src="/images/formation/reperes/pr-bench-icon-low-symbol.png" alt="" width="73" height="72" decoding="async">';
     const I_BARS = '<img src="/images/formation/reperes/pr-bench-icon-mid-symbol.png" alt="" width="73" height="72" decoding="async">';
     const I_UP = '<img src="/images/formation/reperes/pr-bench-icon-high-symbol.png" alt="" width="73" height="72" decoding="async">';
     const I_RULER = '<img src="/images/formation/reperes/header-symbol.png" alt="" width="87" height="85" decoding="async">';
+    const count = comparables.length;
+    const radius = data && data.radiusMeters ? data.radiusMeters : null;
+    const radiusLbl = radius ? (radius >= 1000 ? (radius / 1000) + ' km' : radius + ' m') : null;
+    const cntStr = count + (count > 1 ? ' ventes' : ' vente') + ' sélectionnée' + (count > 1 ? 's' : '');
+    const subText = 'Repères calculés à partir de ' + cntStr + (radiusLbl ? ' dans un rayon de ' + radiusLbl + ' autour de votre bien.' : ' autour de votre bien.');
+    const noteIcon = count < 8 ? I_ALERT : I_INFO;
+    const warningHtml = count < 8
+      ? '<p style="margin-bottom:6px">Peu de ventes comparables sont disponibles dans ce secteur. Interprétez ces repères avec précaution et confrontez-les à d’autres informations sur le marché.</p>'
+      : '';
+    const pedagogy = 'Le premier quartile représente le niveau sous lequel se situent environ 25 % des prix observés. La médiane partage les ventes en deux groupes égaux. Le troisième quartile représente le niveau sous lequel se situent environ 75 % des prix observés. Ces repères sont indicatifs et ne constituent pas une estimation personnalisée de votre bien.';
+    const noteHtml = '<div class="pr-comp-footer">'
+      + '<span class="pr-footer-icon">' + noteIcon + '</span>'
+      + '<div>' + warningHtml + '<p>' + pedagogy + '</p></div>'
+      + '</div>';
     const card = (icon, mod, lbl, raw) => {
       const priceDisp = Math.round(raw);
-      const indic = surface ? Math.round(raw * surface) : null;
+      const indic = surface ? Math.round(raw * surface / 1000) * 1000 : null;
       const indicHtml = indic ? "≈ " + euro(indic) : "—";
       return "<div class=\"pr-bench-card\">"
         + "<div class=\"pr-bench-card-hdr\">"
@@ -124,14 +141,15 @@
       + "<div class=\"pr-bench-icon-box\">" + I_RULER + "</div>"
       + "<div class=\"pr-bench-header-text\">"
       + "<h3 class=\"pr-bench-title\">Vos <span class=\"pr-sector-title-accent\">trois repères de prix</span> selon les ventes du secteur</h3>"
-      + "<p class=\"pr-bench-sub\">À partir des prix au m² observés autour de votre bien et de la surface habitable renseignée dans Mon bien, voici une fourchette de valeurs indicatives.</p>"
+      + "<p class=\"pr-bench-sub\">" + subText + "</p>"
       + "</div>"
       + "</div>"
       + "<div class=\"pr-bench-cards\">"
-      + card(I_DOWN, "pr-bench-icon-low", "Prix au m² le plus bas", minRaw)
-      + card(I_BARS, "pr-bench-icon-mid", "Prix au m² proche de chez moi", meanRaw)
-      + card(I_UP, "pr-bench-icon-high", "Prix au m² le plus haut", maxRaw)
+      + card(I_DOWN, "pr-bench-icon-low", "Bas du marché (1er quartile)", p25)
+      + card(I_BARS, "pr-bench-icon-mid", "Médiane des prix du secteur", p50)
+      + card(I_UP, "pr-bench-icon-high", "Haut du marché (3e quartile)", p75)
       + "</div>"
+      + noteHtml
       + "</div>";
   }
 
@@ -148,10 +166,13 @@
       return;
     }
 
-    const meanPriceM2Raw = comparables.reduce((sum, c) => sum + c.price / c.area, 0) / comparables.length;
-    const meanPriceM2Display = Math.round(meanPriceM2Raw);
+    const ratios = comparables.map(c => c.price / c.area);
+    const sortedRatios = [...ratios].sort((a, b) => a - b);
+    const pctFn = (arr, p) => { const i = p / 100 * (arr.length - 1), lo = Math.floor(i), hi = Math.ceil(i); return arr[lo] + (i - lo) * (arr[hi] - arr[lo]); };
+    const medianPriceM2Raw = pctFn(sortedRatios, 50);
+    const medianPriceM2Display = Math.round(medianPriceM2Raw);
     const surface = (data && data.surface != null) ? Number(data.surface) : null;
-    const indicativeValue = (surface && surface > 0) ? Math.round(meanPriceM2Raw * surface) : null;
+    const indicativeValue = (surface && surface > 0) ? Math.round(medianPriceM2Raw * surface / 1000) * 1000 : null;
 
     const hasStreet = comparables.some(c => c.addr && c.addr.precision === "rue");
     const hasCommune = comparables.some(c => c.addr && c.addr.precision === "commune");
@@ -220,8 +241,8 @@
         <div class="pr-calc-formula">
           <div class="pr-calc-item">
             <span class="pr-value-icon" aria-hidden="true">${calculationBars}</span>
-            <span class="pr-calc-label">Prix moyen au m²<br>(de ces ${count} ventes)</span>
-            <span class="pr-calc-val">${euro(meanPriceM2Display)} / m²</span>
+            <span class="pr-calc-label">Prix médian au m²<br>(de ces ${count} ventes)</span>
+            <span class="pr-calc-val">${euro(medianPriceM2Display)} / m²</span>
           </div>
           <span class="pr-calc-op">×</span>
           <div class="pr-calc-item">
@@ -350,14 +371,24 @@
     if (!data || data.status === "error") {
       inner = "<div class=\"pt-ann-result\"><p class=\"pt-ann-text\">Données en cours de chargement…</p></div>";
     } else if (data.status === "ok") {
-      const pm2Fmt = new Intl.NumberFormat("fr-FR", {maximumFractionDigits: 0}).format(data.avgPm2);
+      const pm2Val = data.medianPm2 != null ? data.medianPm2 : data.avgPm2;
+      const pm2Lbl = data.medianPm2 != null ? "Prix médian des annonces actives" : "Prix moyen des annonces actives";
+      const pm2Adj = data.medianPm2 != null ? "médian" : "moyen";
+      const pm2Fmt = new Intl.NumberFormat("fr-FR", {maximumFractionDigits: 0}).format(pm2Val);
+      const rangeStr = (data.surfaceMin != null && data.surfaceMax != null)
+        ? " · " + escHtml(data.surfaceMin + "–" + data.surfaceMax + " m²")
+        : "";
+      const widenedNote = data.widened
+        ? "<p class=\"pt-ann-widened\">Plage de surface élargie pour disposer d'au moins 5 annonces comparables.</p>"
+        : "";
       inner = "<div class=\"pt-ann-result\">"
         + "<div class=\"pt-ann-pm2-box\">"
         + "<span class=\"pt-ann-pm2-val\">" + escHtml(pm2Fmt) + " €/m²</span>"
-        + "<span class=\"pt-ann-pm2-sub\">Prix moyen des annonces actives</span>"
+        + "<span class=\"pt-ann-pm2-sub\">" + pm2Lbl + "</span>"
         + "</div>"
-        + "<p class=\"pt-ann-text\">Prix moyen demandé pour les " + escHtml(typeLbl) + " actuellement proposés à la vente à " + escHtml(communeLbl) + ".</p>"
-        + "<p class=\"pt-ann-count\">Calculé à partir de " + escHtml(String(data.count)) + " annonce" + (data.count > 1 ? "s" : "") + " comparable" + (data.count > 1 ? "s" : "") + ".</p>"
+        + "<p class=\"pt-ann-text\">Prix " + pm2Adj + " demandé pour les " + escHtml(typeLbl) + " actuellement proposés à la vente à " + escHtml(communeLbl) + ".</p>"
+        + "<p class=\"pt-ann-count\">Calculé à partir de " + escHtml(String(data.count)) + " annonce" + (data.count > 1 ? "s" : "") + " comparable" + (data.count > 1 ? "s" : "") + rangeStr + ".</p>"
+        + widenedNote
         + "<div class=\"pt-ann-divider\"></div>"
         + "<div class=\"pt-ann-cta-wrap\">"
         + "<p class=\"pt-ann-cta-head\">Comparez votre bien aux annonces du marché</p>"
@@ -367,15 +398,19 @@
         + "</div>";
     } else if (data.status === "insufficient") {
       const c = data.count || 0;
-      inner = "<div class=\"pt-ann-result\"><p class=\"pt-ann-text\">Données insuffisantes — " + escHtml(String(c)) + " annonce" + (c > 1 ? "s" : "") + " comparable" + (c > 1 ? "s" : "") + " trouvée" + (c > 1 ? "s" : "") + " à " + escHtml(communeLbl) + " (minimum 5 requis).</p></div>";
+      const rangeNote = (data.surfaceMin != null && data.surfaceMax != null)
+        ? " (plage testée : " + escHtml(data.surfaceMin + "–" + data.surfaceMax + " m²") + ")"
+        : "";
+      inner = "<div class=\"pt-ann-result\"><p class=\"pt-ann-text\">Données insuffisantes — " + escHtml(String(c)) + " annonce" + (c > 1 ? "s" : "") + " comparable" + (c > 1 ? "s" : "") + " trouvée" + (c > 1 ? "s" : "") + " à " + escHtml(communeLbl) + rangeNote + " (minimum 5 requis).</p></div>";
     } else if (data.status === "quota_exceeded") {
       inner = "<div class=\"pt-ann-result\"><p class=\"pt-ann-text\">Le quota mensuel d'annonces est atteint. Cet indicateur sera disponible le mois prochain.</p></div>";
     } else {
       inner = "<div class=\"pt-ann-result\"><p class=\"pt-ann-text\">Indicateur indisponible pour votre commune.</p></div>";
     }
+    const annTitleLbl = (data && data.medianPm2 != null) ? "médian" : "moyen";
     return "<div class=\"pt-bloc\">"
       + "<div class=\"pt-bloc-header\"><div class=\"pt-bloc-num\">" + escHtml(String(num)) + "</div>"
-      + "<h4 class=\"pt-bloc-title\">Le prix moyen au m² des biens en vente dans votre commune</h4></div>"
+      + "<h4 class=\"pt-bloc-title\">Le prix " + annTitleLbl + " au m² des biens en vente dans votre commune</h4></div>"
       + inner + "</div>";
   }
 
@@ -391,8 +426,8 @@
     const communePm2 = communeOk ? commune.priceMed : null;
     const communeIndic = communeOk && commune.indicMed ? commune.indicMed : null;
 
-    const annoncesOk = !!(marcheData && marcheData.status === "ok" && marcheData.avgPm2 > 0);
-    const announcePm2 = annoncesOk ? marcheData.avgPm2 : null;
+    const annoncesOk = !!(marcheData && marcheData.status === "ok" && (marcheData.medianPm2 != null ? marcheData.medianPm2 : marcheData.avgPm2) > 0);
+    const announcePm2 = annoncesOk ? (marcheData.medianPm2 != null ? marcheData.medianPm2 : marcheData.avgPm2) : null;
     const showAnn = !!(marcheData && marcheData.status !== "unconfigured" && marcheData.status !== "no_property" && marcheData.status !== "no_location");
 
     const surface = dvf?.surface != null ? Number(dvf.surface) : (commune?.surface != null ? Number(commune.surface) : null);
@@ -420,32 +455,35 @@
       + (showAnn ? "<tr><td>3. Annonces — Marché actif de la commune</td><td>" + annoncesPm2Cell + "</td><td>" + annoncesIndicCell + "</td></tr>" : "")
       + "</tbody></table></div></div>";
 
-    let meanPm2 = null, meanIndic = null, overlapWarning = false, availCount = 0;
-    if (communeOk) availCount++;
-    if (dvfOk) availCount++;
-    if (annoncesOk) availCount++;
-    if (availCount > 0) {
-      const prices = [communeOk ? communePm2 : null, dvfOk ? dvfPm2 : null, annoncesOk ? announcePm2 : null].filter(function(p) { return p != null; });
-      meanPm2 = Math.round(prices.reduce(function(a, b) { return a + b; }, 0) / prices.length);
-      meanIndic = hasSurface ? Math.round(meanPm2 * surface / 1000) * 1000 : null;
-      overlapWarning = communeOk && dvfOk;
+    let refPm2 = null, refIndic = null, refSourceStr = null, refCount = null;
+    if (dvfOk) {
+      refPm2 = dvfPm2;
+      refIndic = dvfIndic;
+      refSourceStr = "DVF secteur";
+      refCount = dvf.count != null ? dvf.count : null;
+    } else if (communeOk) {
+      refPm2 = communePm2;
+      refIndic = communeIndic;
+      refSourceStr = "DVF commune";
+      refCount = commune.count != null ? commune.count : null;
     }
 
     let bloc3Html;
-    if (meanPm2 != null) {
-      const sourcesLbl = availCount + " source" + (availCount > 1 ? "s" : "") + " disponible" + (availCount > 1 ? "s" : "");
+    if (refPm2 != null) {
+      const countNote = refCount != null ? " · " + refCount + " vente" + (refCount > 1 ? "s" : "") : "";
       bloc3Html = "<div class=\"pt-mean-box\">"
-        + "<div class=\"pt-mean-row\"><span class=\"pt-mean-lbl\">" + escHtml(sourcesLbl) + "</span></div>"
-        + "<div class=\"pt-mean-val\">" + escHtml(euro(meanPm2)) + "/m²</div>"
-        + (meanIndic ? "<div class=\"pt-mean-indic\">≈ " + escHtml(euro(meanIndic)) + " pour votre bien</div>" : "")
-        + (overlapWarning ? "<div class=\"pt-mean-note\">Remarque : les deux sources DVF disponibles proviennent de la même base. Elles peuvent inclure des ventes communes et ne constituent pas deux références totalement indépendantes.</div>" : "")
+        + "<div class=\"pt-mean-row\"><span class=\"pt-mean-lbl\">" + escHtml(refSourceStr + countNote) + "</span></div>"
+        + "<div class=\"pt-mean-val\">" + escHtml(euro(refPm2)) + "/m²</div>"
+        + (refIndic ? "<div class=\"pt-mean-indic\">≈ " + escHtml(euro(refIndic)) + " pour votre bien</div>" : "")
+        + (annoncesOk ? "<div class=\"pt-mean-note\">Les annonces actives (" + escHtml(euro(announcePm2)) + "/m²) constituent un repère de positionnement concurrentiel et ne sont pas intégrées à cette référence DVF.</div>" : "")
         + "</div>";
     } else {
-      bloc3Html = "<div class=\"pt-calc-na-wrap\"><p class=\"pt-calc-na\">Calcul indisponible — les données DVF sont inaccessibles pour cette estimation.</p></div>";
+      const annMsg = annoncesOk ? " Les annonces actives (" + escHtml(euro(announcePm2)) + "/m²) vous donnent une indication du marché local, mais ne remplacent pas les données de ventes officielles." : "";
+      bloc3Html = "<div class=\"pt-calc-na-wrap\"><p class=\"pt-calc-na\">Référence DVF indisponible — données insuffisantes pour ce secteur et cette commune." + annMsg + "</p></div>";
     }
     const bloc3 = "<div class=\"pt-bloc pt-synthesis\">"
       + "<div class=\"pt-bloc-header\"><div class=\"pt-bloc-num\">" + bn3 + "</div>"
-      + "<h4 class=\"pt-bloc-title\">Moyenne des repères de marché</h4></div>"
+      + "<h4 class=\"pt-bloc-title\">Référence de marché DVF</h4></div>"
       + bloc3Html + "</div>";
 
     const savedVal = (savedPrice != null && Number.isFinite(Number(savedPrice))) ? Math.round(Number(savedPrice)) : null;
@@ -453,19 +491,28 @@
     const bloc4 = "<div class=\"pt-bloc pt-desired\">"
       + "<div class=\"pt-bloc-header\"><div class=\"pt-bloc-num\">" + bn4 + "</div>"
       + "<h4 class=\"pt-bloc-title\">Votre prix de vente souhaité</h4></div>"
+      + "<div class=\"pt-desired-cols\">"
+      + "<div class=\"pt-desired-left\">"
       + "<div class=\"pt-price-input-wrap\">"
       + "<label for=\"pt-price-input\" class=\"pt-price-label\">Entrez le prix auquel vous souhaitez vendre votre bien</label>"
       + "<div class=\"pt-price-field\">"
-      + "<input type=\"number\" id=\"pt-price-input\" class=\"pt-price-input\" min=\"0\" max=\"100000000\" step=\"1000\" placeholder=\"Ex. : 250000\" value=\"" + savedStr + "\" autocomplete=\"off\">"
+      + "<input type=\"number\" id=\"pt-price-input\" class=\"pt-price-input\" min=\"0\" max=\"100000000\" step=\"1000\" placeholder=\"Ex. : 250000\" value=\"" + savedStr + "\" autocomplete=\"off\">"
       + "<span class=\"pt-price-currency\">€</span>"
       + "</div>"
       + "<span class=\"pt-save-status\" id=\"pt-save-status\" aria-live=\"polite\"></span>"
       + "</div>"
+      + "</div>"
+      + "<div class=\"pt-desired-right\">"
       + "<div class=\"pt-formula-wrap\">"
       + "<div class=\"pt-formula-title\">Votre prix de référence final</div>"
       + "<div class=\"pt-formula\" id=\"pt-formula\">"
       + "<span class=\"pt-formula-na\">Calcul indisponible — renseignez votre prix souhaité et attendez les données du marché.</span>"
-      + "</div></div></div>";
+      + "</div></div>"
+      + "<div class=\"pt-saviez-note\" style=\"margin:0\"><span class=\"pt-saviez-kw\">Le saviez-vous ?</span> Les intermédiaires immobiliers facturent généralement entre 5 et 8 % d’honoraires. Avec Vendu Par Moi, vous gardez la maîtrise de votre vente, sans commission d’intermédiaire, tout en préservant votre objectif financier.</div>"
+
+      + "</div>"
+      + "</div>"
+      + "</div>";
 
     const advice = (mod, icon, title, body) =>
       "<div class=\"pt-advice-card " + mod + "\">"
@@ -477,7 +524,7 @@
       + "<h4 class=\"pt-bloc-title\">Conseils pour fixer votre prix</h4></div>"
       + "<div class=\"pt-advice-grid\">"
       + advice("pt-advice-green", I_CHECK_CIRC, "Privilégiez un prix cohérent avec le marché", "Un prix trop élevé allonge les délais et signale un bien difficile à vendre. Un prix cohérent génère davantage de visites et d'offres sérieuses.")
-      + advice("pt-advice-info", I_LAYERS, "Tenez compte des caractéristiques de votre bien", "Les repères DVF et les annonces sont des moyennes. Votre bien peut valoir plus ou moins selon son état, son exposition et ses équipements.")
+      + advice("pt-advice-info", I_LAYERS, "Tenez compte des caractéristiques de votre bien", "Les repères DVF reposent sur des ventes réalisées. Les annonces correspondent à des prix demandés et ne sont pas intégrées à la référence de marché DVF. Votre bien peut valoir plus ou moins selon son état, son exposition et ses équipements.")
       + advice("pt-advice-warn", I_ALERT, "Revoyez votre prix après 45 jours sans offre", "Si votre bien ne génère pas d'offres après 45 jours, une réévaluation à la baisse est souvent nécessaire pour relancer les contacts.")
       + "</div></div>";
 
@@ -501,15 +548,16 @@
         formulaEl.innerHTML = "<span class=\"pt-formula-na\">Renseignez votre prix souhaité pour voir l'écart avec le marché.</span>";
         return;
       }
-      if (meanPm2 == null || !hasSurface) {
-        formulaEl.innerHTML = "<span class=\"pt-formula-na\">Données de marché insuffisantes pour calculer un prix de référence.</span>";
+      if (refPm2 == null || !hasSurface) {
+        formulaEl.innerHTML = "<span class=\"pt-formula-na\">Données DVF insuffisantes pour calculer une référence de prix.</span>";
         return;
       }
-      const refPrice = meanIndic != null ? meanIndic : Math.round(meanPm2 * surface);
-      const gapPct = Math.round((priceVal - refPrice) / refPrice * 100);
+      const refPrice = refIndic != null ? refIndic : Math.round(refPm2 * surface);
+      const gapRaw = (priceVal - refPrice) / refPrice * 100;
+      const gapPct = Math.round(gapRaw);
       const gapStr = (gapPct > 0 ? "+" : "") + gapPct + "%";
-      const gapClass = Math.abs(gapPct) <= 10 ? "pt-formula-gap pt-formula-ok" : Math.abs(gapPct) <= 20 ? "pt-formula-gap pt-formula-warn" : "pt-formula-gap pt-formula-alert";
-      const sourceLabel = availCount === 3 ? "Réf. moyennée (3 sources)" : availCount === 2 ? "Réf. moyennée (2 sources)" : communeOk ? "Réf. DVF commune" : dvfOk ? "Réf. DVF secteur" : "Réf. annonces";
+      const gapClass = Math.abs(gapRaw) <= 10 ? "pt-formula-gap pt-formula-ok" : Math.abs(gapRaw) <= 20 ? "pt-formula-gap pt-formula-warn" : "pt-formula-gap pt-formula-alert";
+      const sourceLabel = dvfOk ? "Réf. DVF secteur" : communeOk ? "Réf. DVF commune" : "Réf. DVF indisponible";
       formulaEl.innerHTML =
         "<div class=\"pt-formula-row\">"
         + "<div class=\"pt-formula-item\"><span class=\"pt-formula-lbl\">Votre prix</span><span class=\"pt-formula-num\">" + euro(Math.round(priceVal)) + "</span></div>"

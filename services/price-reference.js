@@ -111,14 +111,30 @@ async function calculate(property,{fetcher=fetch,now=new Date()}={}) {
   if(property.type!=='Maison') return status('unsupported','Ce premier repère est actuellement disponible uniquement pour les maisons du Nord (59).');
   const deadline=Date.now()+45000;
   try {
+    // Geocode via IGN to validate address, postal code and commune.
+    // When BAN coordinates are also provided, cross-check that they are geographically
+    // consistent with the IGN result before using them as the DVF query center.
+    const banLat=num(property.lat), banLon=num(property.lon);
+    const hasBanCoords=Number.isFinite(banLat)&&Number.isFinite(banLon)&&banLat>41&&banLat<52&&banLon>-6&&banLon<10;
     const geourl=new URL(IGN); geourl.search=new URLSearchParams({q:address,limit:'2',postcode:String(property.postal_code)});
     const geo=await requestJSON(geourl,fetcher,deadline), candidates=geo.features;
-    const best=candidates?.[0], gp=best?.properties, origin=best?.geometry?.coordinates;
-    const geoType=gp?.type, geoScore=num(gp?.score);
-    const typeOk=(geoType==='housenumber'&&geoScore>=.5)||(geoType==='street'&&geoScore>=.7);
+    const best=candidates?.[0], gp=best?.properties;
+    const geoScore=num(gp?.score);
+    const typeOk=(gp?.type==='housenumber'&&geoScore>=.5)||(gp?.type==='street'&&geoScore>=.7);
     if(best?.geometry?.type!=='Point'||!typeOk||String(gp?.postcode)!==String(property.postal_code)||!String(gp?.citycode).startsWith('59')) return status('location','Adresse introuvable ou imprécise. Vérifiez le numéro, la rue, le code postal et la ville dans Mon bien.');
+    const ignCoords=best.geometry.coordinates;
+    let origin, geoType;
+    if(hasBanCoords) {
+      // BAN coordinates are only trusted when they lie within 1 500 m of the IGN-geocoded address.
+      if(geometryPointDistance(ignCoords,[banLon,banLat])>1500) return status('location','Les coordonnées transmises ne correspondent pas à l\'adresse renseignée. Vérifiez l\'adresse dans Mon bien.');
+      origin=[banLon,banLat];
+      geoType='ban';
+    } else {
+      if(candidates[1] && num(candidates[1].properties?.score)>=num(gp.score)-.05 && geometryPointDistance(candidates[1].geometry?.coordinates,ignCoords)>100) return status('location','Plusieurs adresses possibles : précisez votre adresse dans Mon bien.');
+      origin=ignCoords;
+      geoType=gp?.type;
+    }
     project(origin,origin);
-    if(candidates[1] && num(candidates[1].properties?.score)>=num(gp.score)-.05 && geometryPointDistance(candidates[1].geometry?.coordinates,origin)>100) return status('location','Plusieurs adresses possibles : précisez votre adresse dans Mon bien.');
     let requests=0;
     for(const radius of [500,1000,2000]) {
       const features=[];
@@ -259,11 +275,16 @@ async function calculateCommune(property,{fetcher=fetch,now=new Date()}={}) {
     const hasSurface=Number.isFinite(surface)&&surface>0;
     dates.sort();
     const priceMin=Math.round(Math.min(...filtered)),priceMed=Math.round(median(filtered)),priceMean=Math.round(filtered.reduce((s,r)=>s+r,0)/filtered.length),priceMax=Math.round(Math.max(...filtered));
-    return {...base,status:'ok',commune,citycode,count:filtered.length,priceMin,priceMed,priceMean,priceMax,
+    const sortedF=[...filtered].sort((a,b)=>a-b);
+    const pctF=(p)=>{const i=p/100*(sortedF.length-1),lo=Math.floor(i),hi=Math.ceil(i);return sortedF[lo]+(i-lo)*(sortedF[hi]-sortedF[lo]);};
+    const priceP25=Math.round(pctF(25)),priceP75=Math.round(pctF(75));
+    return {...base,status:'ok',commune,citycode,count:filtered.length,priceMin,priceMed,priceMean,priceMax,priceP25,priceP75,
       indicMin:hasSurface?Math.round(priceMin*surface/1000)*1000:null,
       indicMed:hasSurface?Math.round(priceMed*surface/1000)*1000:null,
       indicMean:hasSurface?Math.round(priceMean*surface/1000)*1000:null,
       indicMax:hasSurface?Math.round(priceMax*surface/1000)*1000:null,
+      indicP25:hasSurface?Math.round(priceP25*surface/1000)*1000:null,
+      indicP75:hasSurface?Math.round(priceP75*surface/1000)*1000:null,
       periodFrom:dates[0],periodTo:dates[dates.length-1]};
   } catch { return status('unavailable','Les données officielles sont momentanément indisponibles ou incomplètes.'); }
 }

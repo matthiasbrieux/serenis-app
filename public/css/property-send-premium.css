@@ -138,26 +138,27 @@
 /* Recreate only the formation phone's visual treatment for these existing nodes.
    The screen grows with the real text; no clipped text or inner scrolling. */
 #tab-envoi .ev-msg-phone {
-  position: relative;
-  width: min(100%, 358px);
+  border: 1.5px solid var(--send-line);
+  border-radius: 14px;
+  background: #fff;
+  overflow: hidden;
+  width: 100%;
+  max-width: 100%;
   box-sizing: border-box;
-  margin: 0 auto;
-  padding: 0 10px 12px;
-  border: 6px solid #252525;
-  border-radius: 37px;
-  background: #FFF;
-  box-shadow: 0 0 0 2px #B5B1AC, 0 10px 24px #302A2615;
+  margin: 0;
+  padding: 0;
+  box-shadow: none;
 }
-#tab-envoi .ev-msg-phone-handle {display: block;width: 98px;height: 17px;border-radius: 0 0 13px 13px;background: #252525;margin: -1px auto 12px;}
+#tab-envoi .ev-msg-phone-handle {display: none;}
 #tab-envoi .ev-msg-screen-hdr {display: flex;align-items: center;justify-content: center;gap: 8px;padding: 6px 0 14px;margin: 0 0 14px;border-bottom: 1px solid #EEE;border-radius: 0;background: #FFF;}
 #tab-envoi .ev-msg-screen-hdr-txt {font-size: 11px;line-height: 1.5;font-weight: 500;color: #655E58;}
 #tab-envoi .ev-msg-screen-hdr svg {stroke: #8A8A8F;}
-#tab-envoi .ev-msg-bubble {position: relative;margin: 0 0 16px 5px;padding: 18px 16px;border-radius: 19px 19px 5px 19px;background: #0876E5;color: #FFF;font: 400 16px/1.55 'Inter', sans-serif;overflow-wrap: anywhere;}
-#tab-envoi .ev-msg-bubble::after {content: '';position: absolute;right: 0;bottom: 0;width: 12px;height: 12px;background: #0876E5;border-radius: 0 0 0 12px;}
-#tab-envoi .ev-msg-var {display: inline;padding: 0;background: transparent;border-radius: 0;color: inherit;font-weight: 500;white-space: normal;}
-#tab-envoi .ev-msg-bubble [id^='ev-sms-'] {text-decoration: underline;text-underline-offset: 3px;}
+#tab-envoi .ev-msg-bubble {margin: 0;padding: 18px 20px;border-radius: 10px;background: #F8F1E7;color: var(--send-ink);font: 400 15px/1.75 'Inter', sans-serif;overflow-wrap: anywhere;}
+#tab-envoi .ev-msg-bubble::after {display: none;}
+#tab-envoi .ev-msg-var {display: inline;padding: 0;background: transparent;border-radius: 0;color: var(--send-clay);font-weight: 600;white-space: normal;}
+#tab-envoi .ev-msg-bubble [id^='ev-sms-'] {color: var(--send-clay);text-decoration: underline;text-underline-offset: 3px;}
 #tab-envoi .send-approved-bubble {white-space: pre-line;}
-#tab-envoi .ev-msg-phone-handle-bot {display: block;width: 76px;height: 4px;background: #252525;border-radius: 5px;margin: 20px auto 0;}
+#tab-envoi .ev-msg-phone-handle-bot {display: none;}
 #tab-envoi .ev-msg-copy-btn {margin-top: 18px;width: 100%;gap: 8px;}
 #tab-envoi .ev-msg-note {font-size: 11px;line-height: 1.5;margin: 10px 0 0;color: #746D66;}
 #tab-envoi .send-approved-exterior + .send-pedagogy {margin: 20px 0;}
@@ -214,8 +215,8 @@
   #tab-envoi .send-pedagogy p {font-size: 15px;line-height: 1.65;}
   #tab-envoi .ev-link-row {grid-template-columns: minmax(0, 1fr);}
   #tab-envoi .ev-link-row .ev-copy-btn {width: 100%;}
-  #tab-envoi .ev-msg-phone {border-width: 5px;border-radius: 32px;padding: 0 8px 12px;}
-  #tab-envoi .ev-msg-bubble {font-size: 16px;line-height: 1.55;padding: 16px 13px;margin-left: 2px;}
+  #tab-envoi .ev-msg-phone {border-width: 1.5px;border-radius: 14px;padding: 0;}
+  #tab-envoi .ev-msg-bubble {font-size: 15px;line-height: 1.75;padding: 16px 18px;margin: 0;}
   #tab-envoi .ev-msg-screen-hdr-txt {font-size: 11px;}
   #tab-envoi .ev-msg-copy-btn {font-size: 14px;min-height: 50px;}
   #tab-envoi .vpm-share-advice {display: block;margin-top: 22px;padding: 22px;}
@@ -237,8 +238,8 @@
 /* Override the shared Inter reset only for the headings of this tab. */
 #tab-envoi :is(h2, h3, .ev-card-ttl) {font-family: 'Cormorant Garamond', serif !important;font-weight: 600;}
 .main-content:has(#tab-envoi:not(.hidden)) .prop-hero {background: none;border: 0;min-height: 0;box-shadow: none;}
-#tab-envoi .vpm-share-bottom {display: block;}
-#tab-envoi .vpm-notary {margin-top: 28px;}
+#tab-envoi .vpm-share-bottom {display: grid;grid-template-columns: repeat(2, minmax(0, 1fr));gap: 24px;align-items: start;}
+#tab-envoi .vpm-notary {margin-top: 0;}
 @media(min-width: 1001px) {
   #tab-envoi #ev-card-acheteur {grid-template-columns: minmax(0, 1fr) minmax(300px, 358px);gap: 0 32px;}
   #tab-envoi #ev-card-acheteur > .ev-card-btn {grid-column: 1;grid-row: 1;}

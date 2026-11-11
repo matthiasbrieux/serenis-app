@@ -68,7 +68,8 @@
   const copy = document.createElement('button');
   copy.type = 'button';
   copy.className = 'ev-msg-copy-btn';
-  copy.textContent = 'Copier le message';
+  const _sendSvg = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>';
+  copy.innerHTML = _sendSvg + 'Envoyer le message et le lien des photos extérieures';
   approvedMessage.append(phone, copy);
   exteriorBody.querySelector('.send-existing-message').before(approvedMessage, addAdvice('exterieur'));
 
@@ -87,9 +88,9 @@
     if (copy.disabled) return;
     try {
       await navigator.clipboard.writeText(exteriorText());
-      copy.textContent = 'Message copié ✓';
+      copy.textContent = 'Copié ✓';
       copy.classList.add('copied');
-      setTimeout(() => {copy.textContent = 'Copier le message'; copy.classList.remove('copied');}, 2000);
+      setTimeout(() => {copy.innerHTML = _sendSvg + 'Envoyer le message et le lien des photos extérieures'; copy.classList.remove('copied');}, 2000);
     } catch (_) {
       // Reuse the existing copy error guidance; the selectable preview stays available.
       showToast('Copie impossible. Sélectionnez le texte et copiez-le manuellement.', 'error');

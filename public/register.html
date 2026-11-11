@@ -8,190 +8,103 @@
   <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Commencer — Vendu Par Moi</title>
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;1,400&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;1,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/palette-vitrine.css"/>
   <style>
+    @font-face { font-family: 'Inter'; font-style: normal; font-weight: 400; font-display: swap; src: url('/fonts/inter-0.woff2') format('woff2'); }
+    @font-face { font-family: 'Inter'; font-style: normal; font-weight: 500; font-display: swap; src: url('/fonts/inter-1.woff2') format('woff2'); }
+    @font-face { font-family: 'Inter'; font-style: normal; font-weight: 600 900; font-display: swap; src: url('/fonts/inter-2.woff2') format('woff2'); }
+    :root {    --font-serif: 'Cormorant Garamond', Georgia, serif; --font-sans: 'Inter', system-ui, sans-serif; }
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    body {
-      font-family: 'DM Sans', sans-serif;
-      background: #f7f5f0;
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 24px 16px;
-    }
-    .card {
-      background: #fff;
-      border-radius: 20px;
-      box-shadow: 0 4px 40px rgba(0,0,0,0.10);
-      width: 100%;
-      max-width: 480px;
-      padding: 40px 36px 36px;
-    }
-    .logo {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      margin-bottom: 28px;
-      text-decoration: none;
-    }
-    .logo-text {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 1.7rem;
-      color: #1D3A28;
-    }
-    .logo-text em { color: #C4785A; font-style: italic; }
-    h1 {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 1.9rem;
-      font-weight: 600;
-      color: #1a2a1a;
-      margin-bottom: 6px;
-    }
-    .sub {
-      font-size: 0.875rem;
-      color: #6b7280;
-      margin-bottom: 28px;
-      line-height: 1.5;
-    }
-    .row { display: flex; gap: 12px; }
-    .form-group { margin-bottom: 16px; flex: 1; }
-    label { display: block; font-size: 0.8rem; font-weight: 600; color: #374151; margin-bottom: 6px; }
-    input {
-      width: 100%;
-      padding: 11px 14px;
-      border: 1.5px solid #d1d5db;
-      border-radius: 10px;
-      font-size: 0.9rem;
-      font-family: inherit;
-      color: #111;
-      transition: border-color 0.15s;
-      background: #fff;
-    }
-    input:focus { outline: none; border-color: #3D5A47; }
-    input.error { border-color: #ef4444; }
-
-    .separator {
-      text-align: center;
-      font-size: 0.78rem;
-      color: #9ca3af;
-      font-weight: 600;
-      letter-spacing: 0.05em;
-      margin: 24px 0 16px;
-      position: relative;
-    }
-    .separator::before, .separator::after {
-      content: '';
-      position: absolute;
-      top: 50%;
-      width: calc(50% - 60px);
-      height: 1px;
-      background: #e5e7eb;
-    }
-    .separator::before { left: 0; }
-    .separator::after { right: 0; }
-
-    .plan-grid { display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; }
-    .plan-btn {
-      width: 100%;
-      padding: 16px 18px;
-      border-radius: 12px;
-      border: 2px solid transparent;
-      cursor: pointer;
-      font-family: inherit;
-      text-align: left;
-      transition: all 0.15s;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-    }
-    .plan-btn.primary {
-      background: #1D3A28;
-      color: #fff;
-    }
-    .plan-btn.primary:hover { background: #152d1f; }
-    .plan-btn.secondary {
-      background: #f9fafb;
-      border-color: #d1d5db;
-      color: #1a2a1a;
-    }
-    .plan-btn.secondary:hover { border-color: #3D5A47; background: #f0f5f2; }
-    .plan-btn:disabled { opacity: 0.6; cursor: not-allowed; }
-
-    .plan-label { font-size: 0.95rem; font-weight: 600; }
-    .plan-detail { font-size: 0.78rem; opacity: 0.75; margin-top: 2px; }
-    .plan-price { font-size: 1.1rem; font-weight: 700; white-space: nowrap; flex-shrink: 0; }
-    .plan-price small { font-size: 0.72rem; font-weight: 500; opacity: 0.7; display: block; text-align: right; }
-
-    .error-msg {
-      background: #fef2f2;
-      border: 1px solid #fecaca;
-      color: #dc2626;
-      border-radius: 8px;
-      padding: 10px 14px;
-      font-size: 0.82rem;
-      margin-bottom: 16px;
-      display: none;
-    }
-
-    .footer-links {
-      margin-top: 20px;
-      font-size: 0.78rem;
-      color: #9ca3af;
-      text-align: center;
-      line-height: 1.7;
-    }
-    .footer-links a { color: #3D5A47; text-decoration: none; }
-    .footer-links a:hover { text-decoration: underline; }
-
-    .spinner {
-      display: inline-block;
-      width: 14px; height: 14px;
-      border: 2px solid rgba(255,255,255,0.4);
-      border-top-color: #fff;
-      border-radius: 50%;
-      animation: spin 0.6s linear infinite;
-      vertical-align: middle;
-      margin-right: 6px;
-    }
+    body { font-family: var(--font-sans); background: var(--blanc); color: var(--noir); min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 28px 20px; }
+    .card { background: var(--blanc); border-radius: 28px; box-shadow: 0 16px 40px color-mix(in srgb, var(--noir) 9.412%, transparent), 0 2px 4px color-mix(in srgb, var(--noir) 7.059%, transparent); width: 100%; max-width: 680px; overflow: hidden; }
+    .logo { display: flex; align-items: center; justify-content: center; min-height: 100px; background: var(--terracotta); text-decoration: none; padding: 8px 24px; }
+    .logo img { display: block; width: 300px; max-width: 100%; height: auto; filter: brightness(0) invert(1); }
+    .card-content { padding: 24px 40px 30px; }
+    h1 { font-family: var(--font-serif); font-size: 46px; font-weight: 600; line-height: 1.08; letter-spacing: -.025em; color: var(--noir); margin-bottom: 8px; }
+    .sub { font-size: 16px; line-height: 1.5; color: #514840; margin-bottom: 26px; }
+    .row { display: flex; gap: 24px; }
+    .form-group { margin-bottom: 18px; flex: 1; min-width: 0; }
+    label { display: flex; align-items: center; gap: 9px; font-size: 15px; font-weight: 600; color: #382016; margin-bottom: 8px; line-height: 1.4; flex-wrap: wrap; }
+    label svg { width: 19px; height: 19px; color: var(--terracotta); flex-shrink: 0; }
+    label .optional { color: #71665F; font-weight: 400; margin-left: -4px; }
+    input { width: 100%; min-height: 48px; padding: 11px 16px; border: 1.5px solid var(--sable-dore); border-radius: 12px; font: inherit; font-size: 16px; color: var(--noir); transition: border-color 200ms ease, box-shadow 200ms ease; background: var(--blanc); }
+    input::placeholder { color: #756D67; opacity: 1; }
+    input:focus { outline: none; border-color: var(--terracotta); box-shadow: 0 0 0 3px color-mix(in srgb, var(--terracotta) 7.843%, transparent); }
+    input.error { border-color: var(--terracotta); }
+    .separator { display: flex; align-items: center; gap: 20px; text-align: center; font-size: 13px; color: var(--terracotta); font-weight: 600; letter-spacing: .16em; line-height: 1.4; margin: 22px 0 18px; }
+    .separator::before, .separator::after { content: ''; flex: 1; min-width: 12px; height: 1px; background: var(--sable-dore); }
+    .plan-grid { display: flex; flex-direction: column; gap: 20px; margin-bottom: 18px; }
+    .selected-pack { display: grid; grid-template-columns: 50px minmax(0, 1fr) auto; gap: 16px; align-items: center; padding: 18px 20px; border-radius: 18px; background: var(--blanc); }
+    .selected-pack-icon { width: 50px; height: 44px; color: var(--terracotta); }
+    .selected-pack-name { font: 600 29px/1.1 var(--font-serif); color: var(--noir); margin-bottom: 5px; }
+    .selected-pack-desc { color: #514840; font-size: 14px; line-height: 1.4; }
+    .selected-pack-price { padding-left: 20px; border-left: 1px solid var(--sable-dore); color: var(--terracotta); font: 700 32px/1.2 var(--font-serif); white-space: nowrap; }
+    .selected-pack-price small { font: 500 14px var(--font-sans); }
+    .plan-btn { width: 100%; min-height: 56px; padding: 14px 20px; border-radius: 15px; border: 0; cursor: pointer; font: 600 17px/1.4 var(--font-sans); text-align: center; transition: background-color 200ms ease, box-shadow 200ms ease; display: flex; align-items: center; justify-content: center; gap: 18px; background: var(--terracotta); color: var(--blanc); }
+    .plan-btn:hover:not(:disabled) { background: var(--terracotta); box-shadow: 0 5px 12px color-mix(in srgb, var(--terracotta) 14.51%, transparent); }
+    .plan-btn svg { width: 24px; height: 24px; flex-shrink: 0; transition: transform 200ms ease; }
+    .plan-btn:hover:not(:disabled) svg { transform: translateX(3px); }
+    .plan-btn:disabled { opacity: .65; cursor: wait; }
+    a:focus-visible, .plan-btn:focus-visible { outline: 3px solid var(--terracotta); outline-offset: 4px; }
+    .logo:focus-visible { outline-color: var(--blanc); outline-offset: -5px; }
+    .plan-label { font-size: 16px; font-weight: 600; }
+    .plan-detail { font-size: 14px; margin-top: 2px; }
+    .plan-price { font-family: var(--font-serif); font-size: 30px; font-weight: 700; white-space: nowrap; }
+    .error-msg { background: var(--blanc); border: 1px solid var(--sable-dore); color: var(--terracotta); border-radius: 10px; padding: 10px 14px; font-size: 14px; line-height: 1.45; margin-bottom: 16px; display: none; }
+    .footer-links { margin-top: 18px; font-size: 13px; color: #71665F; text-align: center; line-height: 1.8; }
+    .footer-links a { color: var(--terracotta); font-weight: 600; text-decoration: underline; text-underline-offset: 3px; }
+    .footer-links a:hover { color: var(--terracotta); }
+    .footer-links strong { color: #542610; }
+    .spinner { display: inline-block; width: 16px; height: 16px; border: 2px solid color-mix(in srgb, var(--blanc) 40.0%, transparent); border-top-color: var(--blanc); border-radius: 50%; animation: spin .6s linear infinite; vertical-align: middle; margin-right: 6px; flex-shrink: 0; }
     @keyframes spin { to { transform: rotate(360deg); } }
-
-    @media (max-width: 500px) {
-      .card { padding: 28px 20px 24px; }
+    @media (max-width: 540px) {
+      body { padding: 16px 12px; align-items: flex-start; }
+      .card { border-radius: 22px; }
+      .logo { min-height: 88px; padding: 8px 22px; }
+      .logo img { width: 270px; }
+      .card-content { padding: 22px 20px 24px; }
+      h1 { font-size: 36px; }
+      .sub { font-size: 15px; margin-bottom: 22px; }
       .row { flex-direction: column; gap: 0; }
+      .separator { gap: 10px; font-size: 11px; letter-spacing: .11em; margin-top: 18px; }
+      .selected-pack { grid-template-columns: 38px minmax(0, 1fr); gap: 10px 12px; padding: 16px; }
+      .selected-pack-icon { width: 38px; height: 38px; }
+      .selected-pack-name { font-size: 26px; }
+      .selected-pack-price { grid-column: 2; border-left: 0; padding-left: 0; font-size: 30px; }
+      .plan-btn { padding: 14px; font-size: 16px; gap: 12px; }
     }
+    @media (prefers-reduced-motion: reduce) { input, .plan-btn, .plan-btn svg { transition: none; } .plan-btn:hover svg { transform: none; } .spinner { animation: none; } }
   </style>
 </head>
 <body>
   <div class="card">
-    <a href="/" class="logo">
-      <svg width="32" height="32" viewBox="0 0 32 32"><path d="M16 2L3 13v17h8v-8h10v8h8V13L16 2z" fill="#3D5A47"/></svg>
-      <span class="logo-text">Vendu <em>Par Moi</em></span>
+    <a href="/" class="logo" aria-label="Vendu Par Moi — accueil">
+      <img src="/images/vendu-par-moi.svg" alt="Vendu Par Moi — L’immobilier entre particuliers" width="1487" height="430">
     </a>
-
+    <div class="card-content">
     <h1>Créez votre compte</h1>
     <p class="sub">Vos coordonnées, puis vous choisissez votre mode de paiement.</p>
 
-    <div id="errorMsg" class="error-msg"></div>
+    <div id="errorMsg" class="error-msg" role="alert" aria-live="polite"></div>
 
     <form id="registerForm" autocomplete="on">
       <div class="row">
         <div class="form-group">
-          <label for="firstName">Prénom</label>
+          <label for="firstName"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="7" r="4"/><path d="M4 22v-2a8 8 0 0 1 16 0v2"/></svg>Prénom</label>
           <input type="text" id="firstName" name="fname" required placeholder="Marie" autocomplete="given-name">
         </div>
         <div class="form-group">
-          <label for="lastName">Nom</label>
+          <label for="lastName"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="7" r="4"/><path d="M4 22v-2a8 8 0 0 1 16 0v2"/></svg>Nom</label>
           <input type="text" id="lastName" name="lname" required placeholder="Dupont" autocomplete="family-name">
         </div>
       </div>
       <div class="form-group">
-        <label for="email">Email</label>
+        <label for="email"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m2 6 10 7 10-7"/></svg>Email</label>
         <input type="email" id="email" name="email" required placeholder="marie@email.fr" autocomplete="email">
       </div>
       <div class="form-group">
-        <label for="phone">Téléphone <span style="color:#9ca3af;font-weight:400;">(facultatif)</span></label>
+        <label for="phone"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3H3v3c0 8 7 15 15 15h3v-4l-5-2-2 3c-4-2-6-4-8-8l3-2Z"/></svg>Téléphone <span class="optional">(facultatif)</span></label>
         <input type="tel" id="phone" name="phone" placeholder="06 12 34 56 78" autocomplete="tel">
       </div>
     </form>
@@ -200,18 +113,16 @@
 
     <div class="plan-grid">
       <button class="plan-btn primary" id="btnUnique" onclick="submitUnique()">
-        <div>
-          <div class="plan-label">Paiement en une fois</div>
-          <div class="plan-detail">999&nbsp;€ TTC tout compris</div>
-        </div>
-        <div class="plan-price">999&nbsp;€</div>
+        <span>Continuer vers le paiement</span>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12h16m-6-6 6 6-6 6"/></svg>
       </button>
     </div>
 
     <div class="footer-links">
       En continuant, vous acceptez nos <a href="/cgv" target="_blank">CGV</a>.<br>
       Déjà un compte ? <a href="/login">Se connecter</a><br>
-      Une question ? <strong style="color:#1a2a1a;">06 95 44 36 54</strong>
+      Une question ? <strong >06 95 44 36 54</strong>
+    </div>
     </div>
   </div>
 

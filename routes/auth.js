@@ -68,7 +68,7 @@ router.post('/login', loginLimit, express.json(), async (req, res) => {
   db.prepare('UPDATE sellers SET failed_login_attempts = 0 WHERE id=?').run(seller.id);
   const token = require('../services/session').sign(seller, 'seller');
   res.cookie('token', token, { httpOnly: true, secure: process.env.NODE_ENV === 'production', sameSite: 'lax', maxAge: 30 * 24 * 3600 * 1000 });
-  res.json({ success: true, redirect: '/dashboard' });
+  res.json({ success: true, redirect: '/mon-agenda' });
 });
 
 // Deuxième étape : vérification du code reçu par email, pour un compte
@@ -90,7 +90,7 @@ router.post('/api/login/verify-2fa', verify2faLimit, express.json(), async (req,
     db.prepare('UPDATE sellers SET failed_login_attempts = 0 WHERE id=?').run(seller.id);
     const token = require('../services/session').sign(seller, 'seller');
     res.cookie('token', token, { httpOnly: true, secure: process.env.NODE_ENV === 'production', sameSite: 'lax', maxAge: 30 * 24 * 3600 * 1000 });
-    return res.json({ success: true, redirect: '/dashboard' });
+    return res.json({ success: true, redirect: '/mon-agenda' });
   }
 
   if (payload.accountType === 'admin') {

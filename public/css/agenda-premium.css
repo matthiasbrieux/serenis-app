@@ -175,20 +175,33 @@ body.vpm-agenda-page .ap-agenda .ap-month-cell{height:auto;min-height:88px;justi
 .ap-agenda .vcc2.vcc2-done .vcc2-profile-title{color:#888!important;text-transform:uppercase}
 .ap-agenda .vcc2.vcc2-done .vcc2-profile-row{color:#888!important}
 .ap-agenda .vcc2.vcc2-done .vcc2-profile-row strong{color:#111!important;font-weight:700!important}
+/* Séparation head / profil acheteur — cartes confirmées, rappel, programmées */
+.ap-agenda .vcc2:not(.vcc2-done):not(.vcc2-cancelled) .vcc2-head{border-bottom:1px solid #f0ebe3}
+.ap-agenda .vcc2:not(.vcc2-done):not(.vcc2-cancelled) .vcc2-profile{margin-top:10px}
 .vcc2-confirm-box{display:flex;align-items:flex-start;gap:12px;margin:0 14px 12px;padding:13px 15px;background:#f0f0f0;border-radius:12px}
 .vcc2-confirm-check{flex-shrink:0;margin-top:1px}
 .vcc2-confirm-text{font-size:0.88rem;font-weight:700;font-style:italic;color:#222;line-height:1.4}
 .vcc2-confirm-sub{font-size:0.77rem;color:#777;font-style:italic;margin-top:3px;line-height:1.4}
-.vcc2-btn-past-followup{background:#fff!important;color:#C4603A!important;border-color:#C4603A!important;flex-direction:row!important;justify-content:flex-start!important}
-.vcc2-btn-past-followup:hover{background:#fef3ee!important}
+.vcc2-btn-past-dossier:not(.sent){background:#fff!important;color:#9E3A18!important;border-color:#9E3A18!important}
+.vcc2-btn-past-dossier:not(.sent):hover{background:#fef3ee!important}
+.vcc2-btn-past-followup{background:#9E3A18!important;color:#fff!important;border-color:#9E3A18!important;flex-direction:row!important;justify-content:flex-start!important}
+.vcc2-btn-past-followup:hover{background:#8a3215!important;border-color:#8a3215!important}
 .vcc2-btn-past-followup.sent{background:#e8f5e9!important;color:#2e7d32!important;border-color:#a5d6a7!important}
 .vcc2-btn-past-followup.sent:hover{background:#d7eedd!important}
-.vcc2-past-conseils{margin:0 14px 13px;padding:12px 15px;background:#f7f5f2;border-radius:12px;border:1px solid #ece9e4}
+.vcc2-past-conseils{position:absolute;left:0;right:0;bottom:calc(100% + 6px);z-index:5;margin:0;padding:12px 15px;background:#f7f5f2;border-radius:12px;border:1px solid #ece9e4;box-shadow:0 2px 10px rgba(0,0,0,0.08)}
 .vcc2-past-conseils-title{display:flex;align-items:center;gap:6px;font-size:0.6rem;text-transform:uppercase;letter-spacing:0.08em;font-weight:800;color:#888;margin-bottom:6px}
 .vcc2-past-conseils-text{font-size:0.79rem;font-style:italic;color:#666;line-height:1.5}
+/* Conseils cachés par défaut — révélés au survol du bouton correspondant */
+.vcc2-confirm-sub,.vcc2-past-conseils{display:none}
+.vcc2:has(.vcc2-btn-past-followup:hover) .vcc2-confirm-sub{display:block}
+.vcc2:has(.vcc2-btn-past-dossier:hover) .vcc2-past-conseils{display:block}
 .ap-agenda .vcc2.vcc2-cancelled{border-color:#e0e0e0;border-left-color:#9e9e9e;opacity:0.65}
 .ap-agenda .vcc2.vcc2-cancelled .vcc2-datecol{background:#f5f5f5;color:#757575}
 .ap-agenda .vcc2.vcc2-cancelled .vcc2-time-pill{background:#f5f5f5;color:#757575}
+/* Visite programmée — identité turquoise (cohérente avec le filtre "Programmée") */
+.ap-agenda .vcc2.vcc2-scheduled{border-color:var(--ap-indigo-border);border-left-color:var(--ap-indigo)}
+.ap-agenda .vcc2.vcc2-scheduled .vcc2-datecol{background:var(--ap-indigo-bg);color:var(--ap-indigo)}
+.ap-agenda .vcc2.vcc2-scheduled .vcc2-time-pill{background:var(--ap-indigo-bg);color:var(--ap-indigo);border-color:var(--ap-indigo-border)}
 .ap-agenda .ap-timeline .ap-event-confirmed{border-left:3px solid var(--ap-confirmed)}
 .ap-agenda .ap-timeline .ap-event-scheduled{border-left:3px solid var(--ap-indigo)}
 .ap-agenda .ap-timeline .ap-event-rappel{border-left:3px solid var(--ap-blue)}
@@ -293,13 +306,18 @@ body.vpm-agenda-page .ap-agenda .ap-right-rail{grid-column:2;grid-row:1 / span 2
 .ap-agenda .ap-calendar-actions #dispoAddHdr{display:none!important}
 .ap-agenda .ap-calendar-add{display:none!important}
 .ap-agenda .manual-visit-section{display:contents;background:transparent;border:0;padding:0;margin:0}
-.ap-agenda .ap-bottom{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,380px);gap:18px;align-items:start;margin-top:12px}
+.ap-agenda .ap-bottom{display:flex;flex-direction:column;gap:20px;align-items:stretch;margin-top:12px}
+.ap-agenda .ap-visits-row{display:grid;grid-template-columns:minmax(0,1.65fr) minmax(0,1fr);gap:18px;align-items:start}
+.ap-agenda .ap-visits-row .ap-visits-panel{grid-column:auto}
+.ap-agenda .ap-visits-row .ap-history{position:static}
+.ap-agenda .ap-visits-row #pastSection{display:block!important}
+@media(max-width:900px){.ap-agenda .ap-visits-row{grid-template-columns:minmax(0,1fr)}}
 .ap-agenda .ap-lists{display:flex;flex-direction:column;gap:12px}
 /* Colonne droite — visites passées */
 .ap-agenda .ap-history{margin:0;padding:14px;border:1px solid #E9D8CA;border-radius:12px;background:#fff;position:sticky;top:80px}
 .ap-agenda .ap-history .dispo-add-hdr{border-bottom:none;padding-bottom:0}
 .ap-agenda .ap-history .vcr-past-nav{border-bottom:none}
-@media(max-width:1000px){.ap-agenda .ap-bottom{grid-template-columns:minmax(0,1fr);display:block}.ap-agenda .ap-history{position:static}}
+@media(max-width:1000px){.ap-agenda .ap-history{position:static}}
 .ap-agenda .ap-visits-panel{min-width:0;padding:14px;border:1px solid #E9D8CA;border-radius:12px;background:#fff}
 .ap-agenda .ap-availability-panel{min-width:0;padding:16px;border:1.5px solid var(--ap-terra-border);border-radius:14px;background:var(--ap-terra-bg)}
 .ap-agenda .ap-calendar-section{min-width:0;padding:14px;border:1px solid #E9D8CA;border-radius:12px;background:#fff}
@@ -337,7 +355,7 @@ body.vpm-agenda-page .ap-agenda .ap-calendar-section .agenda-layout{grid-templat
 .ap-agenda .ap-vf-title{font:700 11.5px/1.2 'DM Sans',sans-serif;display:flex;align-items:center;gap:4px}
 .ap-agenda .ap-vf-count{display:inline-flex;align-items:center;justify-content:center;min-width:16px;height:16px;padding:0 4px;border-radius:8px;font:700 9.5px/1 'DM Sans',sans-serif;background:rgba(0,0,0,0.12);color:inherit;box-sizing:border-box}
 .ap-agenda .ap-visits-filter[aria-pressed=true] .ap-vf-count{background:rgba(255,255,255,0.25);color:#fff}
-.ap-agenda .ap-vf-sub{font:400 9.5px/1.3 'DM Sans',sans-serif;opacity:0.72;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:80px}
+.ap-agenda .ap-vf-sub{font:400 9.5px/1.3 'DM Sans',sans-serif;opacity:0.72;white-space:normal;word-break:break-word}
 @media(max-width:500px){.ap-agenda .ap-vf-sub{display:none}}
 .ap-agenda .ap-visits-filter.ap-vf-step-scheduled{background:rgba(22,139,131,0.10);color:var(--ap-indigo)}
 .ap-agenda .ap-visits-filter.ap-vf-step-scheduled[aria-pressed=true]{background:var(--ap-indigo)!important;color:#fff!important;box-shadow:0 4px 14px rgba(22,139,131,0.30)!important}
@@ -364,6 +382,10 @@ body.vpm-agenda-page .ap-agenda .ap-calendar-section .agenda-layout{grid-templat
 @media(max-width:1280px){body.vpm-agenda-page .ap-agenda .agenda-layout{grid-template-rows:auto auto auto}.ap-agenda .ap-right-rail{grid-template-columns:repeat(2,minmax(0,1fr))}.ap-agenda .ap-right-rail .ap-mini{grid-column:1/-1}.ap-agenda .ap-calendar-actions{margin-bottom:12px}}
 @media(max-width:767px){.ap-agenda .ap-calendar-actions{display:grid;grid-template-columns:1fr;gap:8px}.ap-agenda .ap-calendar-action,.ap-agenda .ap-share-compact{width:100%;margin:0}.ap-agenda .ap-share-compact{min-height:36px}.ap-agenda .ap-lists{grid-template-columns:minmax(0,1fr)}.ap-agenda .ap-visits-panel,.ap-agenda .ap-dashboard-panels{grid-column:auto}.ap-agenda .ap-todo-row{grid-template-columns:30px minmax(0,1fr)}.ap-agenda .ap-todo-actions{grid-column:2;justify-content:flex-start}.ap-agenda .ap-appointment-row{grid-template-columns:48px 28px minmax(0,1fr);gap:7px}.ap-agenda .ap-appointment-action{grid-column:3;justify-self:start}.ap-agenda .ap-right-rail{grid-template-columns:minmax(0,1fr)}.ap-agenda .ap-right-rail .ap-mini{grid-column:auto}}
 .ap-agenda .ap-compromis-panel{grid-column:1/-1;margin:0;padding:0;border:1px solid #E9D8CA;border-radius:14px;background:#fff;overflow:hidden}
+/* En-tête Mon agenda dans la section calendrier — illustration réduite */
+body.vpm-agenda-page .ap-agenda .ap-calendar-section .aph{grid-template-columns:minmax(0,1fr) auto;padding:12px 0 14px!important;margin-bottom:0}
+body.vpm-agenda-page .ap-agenda .ap-calendar-section .aph-photo{min-height:0;width:90px;padding:0;align-self:center}
+body.vpm-agenda-page .ap-agenda .ap-calendar-section .aph-photo svg{width:90px;height:auto}
 .ap-agenda .ap-compromis-panel .compromis-bar-hdr{padding:18px 20px 14px;display:flex;align-items:center;gap:10px;border-bottom:1px solid #f0e8e0}
 .ap-agenda .ap-compromis-panel .compromis-bar-hdr h3{font:600 1.2rem/1.3 'Cormorant Garamond',serif;color:#1A1A16;margin:0}
 .ap-agenda .ap-compromis-panel .compromis-bar-body{padding:18px 20px 20px}
@@ -440,7 +462,15 @@ body.vpm-agenda-page .ap-agenda .ap-calendar-section .agenda-layout{grid-templat
 #upcomingSection[data-state="rappel"] .vcr-dot-active{background:#1D5EC9}
 #pastSection .vcr-dot-active{background:#888}
 .vcr-count-chip{background:#e8e3db;color:#666;padding:2px 9px;border-radius:12px;font-size:0.72rem;font-weight:700;flex-shrink:0}
-.vcr-past-nav{display:flex;align-items:center;justify-content:flex-end;gap:4px}
+.vcr-past-nav{display:flex;align-items:center;gap:8px}
+.vcr-past-cnt-badge{display:none}
+.vcr-btn-prev-past,.vcr-btn-next-past{width:auto!important;height:34px!important;border-radius:20px!important;font-size:0.78rem!important;font-weight:600!important;padding:0 13px!important;display:inline-flex!important;align-items:center!important;justify-content:center!important;gap:4px!important;white-space:nowrap!important;flex-shrink:0!important}
+.vcr-btn-prev-past{border:1.5px solid #9E3A18!important;background:#fff!important;color:#9E3A18!important}
+.vcr-btn-prev-past:hover:not(:disabled){background:rgba(158,58,24,0.07)!important}
+.vcr-btn-next-past{border:1.5px solid #9E3A18!important;background:#9E3A18!important;color:#fff!important;font-weight:700!important}
+.vcr-btn-next-past:hover:not(:disabled){background:#7A2C12!important;border-color:#7A2C12!important}
+.vcr-btn-prev-past:disabled,.vcr-btn-next-past:disabled{opacity:0.32!important;cursor:default!important}
+#vcr-past-nav #cr-ctr-past{background:#F0ECE6;border-radius:20px;padding:5px 12px;font-size:0.75rem;font-weight:600;color:#8a7a72;white-space:nowrap;flex:1;text-align:center;min-width:0;margin-right:0}
 @media(max-width:500px){.vcr-section-hdr{padding:12px 14px}.vcr-card-wrap{padding:12px 12px 0}}
 
 /* ── Dispo section redesign (disponibilités de visite) ─────────── */
@@ -588,4 +618,174 @@ body.vpm-agenda-page .ap-agenda .aph-actions{display:none!important}
 body.vpm-agenda-page #agendaHero .dash-hero-title{font-family:'Cormorant Garamond',serif!important;font-weight:500!important;font-size:clamp(2.25rem,4.5vw,4.5rem)!important;line-height:1.07!important;letter-spacing:-.025em!important}
 body.vpm-agenda-page #agendaHero .dash-hero-title span{font-family:'Cormorant Garamond',serif!important;font-weight:500!important}
 body.vpm-agenda-page #agendaHero .mv-property-heading h2{font-family:'Cormorant Garamond',serif!important;font-weight:600!important;font-size:1.75rem!important;line-height:1.1!important}
-body.vpm-agenda-page #fiveClicksWrapper .five-clicks .five-header h2{font-family:'Cormorant Garamond',serif!important;font-weight:600!important;font-size:clamp(1.8rem,2.8vw,2.75rem)!important;line-height:1.1!important}
+body.vpm-agenda-page #fiveClicksWrapper .five-clicks .five-header h2{font-family:Inter,sans-serif!important;font-weight:600!important;font-size:24px!important;line-height:1.2!important;letter-spacing:-.02em!important}
+/* ── Du compromis à la signature — bandeau dépliable ─────────── */
+#compromisToggle h2{font-family:'Cormorant Garamond',serif!important;font-weight:500!important;font-size:32px!important;line-height:1.1!important;color:#fff!important;margin:0!important}
+/* ── Harmonisation Mes visites / Mes visites passées ─────────── */
+.ap-agenda .ap-visits-row{align-items:stretch}
+.ap-agenda .ap-visits-row #pastSection{border:1px solid #E9D8CA!important;border-radius:12px!important;box-shadow:none!important}
+.ap-agenda .ap-visits-row #pastSection .dispo-add-hdr,
+.ap-agenda .ap-visits-row #pastSection .agenda-panel-title{padding:0 14px 10px}
+@media(max-width:900px){.ap-agenda .ap-visits-row{align-items:start}}
+/* ── Colonne gauche : chaîne flex ─────────────────────────────── */
+.ap-agenda .ap-visits-row .ap-visits-panel{display:flex;flex-direction:column}
+.ap-agenda .ap-visits-row .ap-visits-panel .visits-below{flex:1}
+.ap-agenda .ap-visits-row .ap-visits-panel #upcomingSection{flex:1;display:flex!important;flex-direction:column}
+.ap-agenda .ap-visits-row #upcomingSection>.vcr-dots{margin-top:auto}
+.ap-agenda .ap-visits-row #upcomingSection>.vcr-card-wrap{flex:1;display:flex!important;flex-direction:column;justify-content:flex-start}
+/* ── Colonne droite : flex-colonne — cohérence avec colonne gauche ── */
+.ap-agenda .ap-visits-row #pastSection{display:flex!important;flex-direction:column}
+.ap-agenda .ap-visits-row #pastSection>#vcr-past-nav{order:1;flex-shrink:0;display:flex!important;align-items:center;justify-content:center;gap:8px;padding:12px 16px;background:linear-gradient(135deg,#fafaf8,#f5f2ec);border-bottom:1px solid #f0ebe3}
+.ap-agenda .ap-visits-row #pastSection>#pastBannerHint{order:2;flex-shrink:0;padding:13px 18px;font-size:0.84rem;line-height:1.5;font-style:italic;background:rgba(120,120,120,0.07);color:#6b6b6b;border-bottom:1px solid rgba(120,120,120,0.18)}
+.ap-agenda .ap-visits-row #pastSection>.vcr-card-wrap{order:3;flex:1;display:flex!important;flex-direction:column;justify-content:flex-start;padding-top:0;margin-top:0!important}
+.ap-agenda .ap-visits-row #pastSection>.vcr-dots{order:4;margin-top:0}
+/* ── Mobile : empilage naturel ─────────────────────────────────── */
+@media(max-width:900px){
+  .ap-agenda .ap-visits-row .ap-visits-panel{display:block!important}
+  .ap-agenda .ap-visits-row .ap-visits-panel #upcomingSection{display:block!important}
+  .ap-agenda .ap-visits-row .ap-visits-panel .visits-below{flex:none}
+  .ap-agenda .ap-visits-row #pastSection{display:block!important}
+  .ap-agenda .ap-visits-row #upcomingSection>.vcr-dots,
+  .ap-agenda .ap-visits-row #pastSection>.vcr-dots{margin-top:0}
+  .ap-agenda .ap-visits-row #upcomingSection>.vcr-card-wrap{flex:none;display:block!important}
+}
+
+/* ── Toutes mes visites — bandeau premium ── */
+#visitesAllToggle{display:flex;align-items:center;padding:20px 20px 20px 24px;border-radius:14px;background:var(--terracotta,#9E3A18);color:#fff;cursor:pointer;user-select:none;position:relative;min-height:88px}
+#visitesAllToggle .vb-left{display:flex;align-items:center;flex-shrink:0}
+#visitesAllToggle .vb-icon{flex-shrink:0;display:flex;align-items:center;justify-content:center;padding-right:20px}
+#visitesAllToggle .vb-icon svg{width:40px;height:40px;opacity:0.95}
+#visitesAllToggle .vb-sep-icon{width:1px;align-self:stretch;background:rgba(255,255,255,0.28);flex-shrink:0;margin:0 20px}
+#visitesAllToggle .vb-text{min-width:150px}
+#visitesAllToggle .vb-text h2{font:600 24px/1.2 Inter,sans-serif!important;letter-spacing:-.02em;color:#fff!important;margin:0 0 5px}
+#visitesAllToggle .vb-text p{font-size:13px;font-family:'DM Sans',sans-serif;font-weight:400;line-height:1.45;margin:0;opacity:0.88;max-width:230px}
+#visitesAllToggle .vb-sep-vert{width:1px;align-self:stretch;background:rgba(255,255,255,0.22);flex-shrink:0;margin:0 22px}
+#visitesAllToggle .vb-stats-cards{display:flex;gap:10px;flex:1;min-width:0}
+#visitesAllToggle .vb-stat-card{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;flex:1;min-width:0;padding:12px 8px;border-radius:10px;background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.22);text-align:center}
+#visitesAllToggle .vb-stat-num{font:600 30px/1 Inter,sans-serif;font-variant-numeric:lining-nums tabular-nums;color:#fff;display:block}
+#visitesAllToggle .vb-stat-label{font-size:11px;font-family:'DM Sans',sans-serif;font-weight:400;color:rgba(255,255,255,0.88);line-height:1.25;display:block}
+#visitesAllToggle .vb-stat-sub{font-size:9px;font-family:'DM Sans',sans-serif;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;display:block;line-height:1;margin-top:3px;opacity:0.82}
+/* Couleurs par carte — saturées, reprises des boutons filtre actifs */
+#visitesAllToggle .vb-stat-card:nth-child(1){background:#168B83;border-color:#168B83}
+#visitesAllToggle .vb-stat-card:nth-child(1) .vb-stat-num,#visitesAllToggle .vb-stat-card:nth-child(1) .vb-stat-label,#visitesAllToggle .vb-stat-card:nth-child(1) .vb-stat-sub{color:#fff}
+#visitesAllToggle .vb-stat-card:nth-child(2){background:#2E7D32;border-color:#2E7D32}
+#visitesAllToggle .vb-stat-card:nth-child(2) .vb-stat-num,#visitesAllToggle .vb-stat-card:nth-child(2) .vb-stat-label,#visitesAllToggle .vb-stat-card:nth-child(2) .vb-stat-sub{color:#fff}
+#visitesAllToggle .vb-stat-card:nth-child(3){background:#1D5EC9;border-color:#1D5EC9}
+#visitesAllToggle .vb-stat-card:nth-child(3) .vb-stat-num,#visitesAllToggle .vb-stat-card:nth-child(3) .vb-stat-label,#visitesAllToggle .vb-stat-card:nth-child(3) .vb-stat-sub{color:#fff}
+#visitesAllToggle .vb-stat-card:nth-child(4){background:#8a8a8a;border-color:#8a8a8a}
+#visitesAllToggle .vb-stat-card:nth-child(4) .vb-stat-num,#visitesAllToggle .vb-stat-card:nth-child(4) .vb-stat-label{color:#fff}
+#visitesAllToggle .vb-chevron{flex-shrink:0;margin-left:16px}
+#visitesAllWrapper.dispo-wrapper-closed .five-clicks-chevron{transform:rotate(180deg)}
+#visitesAllBody{padding-top:14px}
+@media(max-width:600px){
+  #visitesAllToggle{padding:16px 48px 16px 16px;flex-wrap:wrap;gap:12px;min-height:auto}
+  #visitesAllToggle .vb-left{flex:0 0 100%}
+  #visitesAllToggle .vb-icon{padding-right:16px}
+  #visitesAllToggle .vb-icon svg{width:32px;height:32px}
+  #visitesAllToggle .vb-sep-icon{margin:0 16px}
+  #visitesAllToggle .vb-text h2{font-size:20px!important}
+  #visitesAllToggle .vb-text p{max-width:none;font-size:12px}
+  #visitesAllToggle .vb-sep-vert{display:none}
+  #visitesAllToggle .vb-stats-cards{flex:0 0 100%;display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  #visitesAllToggle .vb-chevron{position:absolute;top:16px;right:16px}
+}
+@media(max-width:360px){
+  #visitesAllToggle{padding:14px 46px 14px 14px}
+  #visitesAllToggle .vb-text h2{font-size:19px!important}
+  #visitesAllToggle .vb-stat-num{font-size:22px}
+  #visitesAllToggle .vb-stat-label{font-size:10px}
+  #visitesAllToggle .vb-chevron{top:14px;right:14px}
+}
+
+/* En-têtes utilitaires compacts, sans effet sur les titres de la vitrine. */
+@media(max-width:600px){
+  body.vpm-agenda-page #fiveClicksWrapper .five-clicks .five-header h2,
+  body.vpm-agenda-page #dispoToggle h2{font-size:20px!important;line-height:1.25!important}
+}
+
+/* ── Fondations mobiles (LOT 1-3) ──────────────────────────────────── */
+/* Masquer le header décoratif .aph sur mobile — évite le doublon avec #calToggle */
+@media(max-width:767px){
+  body.vpm-agenda-page .aph{display:none!important}
+  #calToggle,#dispoToggle{padding:11px 14px;gap:10px}
+}
+@media(max-width:600px){
+  #calToggle h2{font-size:20px!important;line-height:1.25!important}
+  #calToggle p,#dispoToggle p{font-size:12px!important}
+}
+/* Visites confirmées : colonne date compacte sur très petits écrans */
+@media(max-width:420px){
+  .ap-agenda .agenda-stats{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .vcc2-datecol{min-width:58px!important;padding:10px 6px!important}
+  .vcc2-day{font-size:2.2rem!important}
+  /* Bloc rappel : icône+texte + bouton en colonne sur <420px */
+  .vcc2.vcc2-rappel .vcc2-rappel-note{flex-direction:column;align-items:stretch;gap:10px}
+  .vcc2.vcc2-rappel .vcc2-rappel-note .vcc2-btn-rappel-badge{width:100%;justify-content:center}
+}
+
+/* ── Cartes visites passées — harmonisation avec cartes actives ──────── */
+/* Séparateur visuel entre zone date+contact et sections inférieures */
+.ap-agenda .vcc2.vcc2-done .vcc2-head{border-bottom:1px solid #e0e0e0}
+/* Espacement profil / zone date (identique aux cartes actives) */
+.ap-agenda .vcc2.vcc2-done .vcc2-profile{margin-top:10px}
+/* Espacement quand le profil est absent (arrivée directe sur confirm-box ou skip-state) */
+.ap-agenda .vcc2.vcc2-done:not(:has(.vcc2-profile)) .vcc2-confirm-box,
+.ap-agenda .vcc2.vcc2-done:not(:has(.vcc2-profile)) .vcc2-skip-state{margin-top:10px}
+/* Boutons à hauteur égale + séparateur cohérent avec le thème gris */
+.ap-agenda .vcc2.vcc2-done .vcc2-actions{align-items:stretch;border-top-color:#e0e0e0}
+
+/* ── Mes visites passées — optimisation mobile ──────────────────────── */
+@media(max-width:767px){
+  /* Titre : premium, lisible, non-uppercase */
+  .ap-agenda .ap-visits-row #pastSection>.agenda-panel-title{
+    padding:14px 16px 10px!important;
+    font-size:1.05rem!important;
+    font-weight:700!important;
+    color:var(--terracotta,#C4603A)!important;
+    text-transform:none!important;
+    letter-spacing:0!important;
+    background:transparent!important;
+    border-bottom:none!important;
+  }
+  /* Conseil : compact, non italique, fond crème visible */
+  .ap-agenda .ap-visits-row #pastSection>#pastBannerHint{
+    order:1!important;
+    display:block!important;
+    margin:0 14px!important;
+    padding:9px 12px!important;
+    font-style:normal!important;
+    font-size:0.78rem!important;
+    line-height:1.55!important;
+    color:#5a4a3f!important;
+    background:#fef4ee!important;
+    border:1px solid rgba(196,96,58,0.22)!important;
+    border-radius:10px!important;
+  }
+  /* Navigation : compact, Précédent | Page X | Suivant */
+  .ap-agenda .ap-visits-row #pastSection>#vcr-past-nav{
+    order:2!important;
+    justify-content:space-between!important;
+    padding:8px 14px 6px!important;
+    background:transparent!important;
+    border-bottom:none!important;
+    gap:6px!important;
+  }
+  /* Badge visites : masqué sur mobile (manque de place) */
+  .ap-agenda #vcr-past-nav .vcr-past-cnt-badge{display:none!important}
+  /* Boutons Précédent / Suivant : compacts sur mobile */
+  .ap-agenda #pastSection .vcr-btn-prev-past,
+  .ap-agenda #pastSection .vcr-btn-next-past{
+    height:36px!important;
+    font-size:0.76rem!important;
+    padding:0 11px!important;
+  }
+  /* Fiche : espace réduit au-dessus */
+  .ap-agenda .ap-visits-row #pastSection>.vcr-card-wrap{
+    padding-top:8px!important;
+  }
+  /* Dots : supprimés visuellement (JS peut les peupler mais ils restent invisibles) */
+  .ap-agenda .ap-visits-row #pastSection>.vcr-dots{
+    max-height:0!important;overflow:hidden!important;
+    padding:0!important;margin:0!important;
+  }
+}

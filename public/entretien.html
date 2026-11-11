@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="fr" data-vpm-vitrine>
+<head>
+  <meta charset="UTF-8">
+  <link rel="icon" href="/favicon.ico" sizes="any"/>
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png"/>
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Demander un échange personnalisé — Vendu Par Moi</title>
+  <meta name="robots" content="noindex">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/palette-vitrine.css"/>
+  <style>
+    :root {
+
+
+
+
+
+      --text-muted: color-mix(in srgb, var(--noir) 55.0%, transparent);
+    }
+    *, *::before, *::after { box-sizing: border-box; }
+    body {
+      background: var(--cream);
+      font-family: 'DM Sans', sans-serif;
+      color: var(--text);
+      min-height: 100vh;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 48px 20px 80px;
+    }
+    .logo-link {
+      display: inline-flex; align-items: center; gap: 10px;
+      text-decoration: none; margin-bottom: 48px;
+    }
+    .logo-icon {
+      width: 36px; height: 36px; background: var(--terracotta);
+      border-radius: 9px; display: flex; align-items: center;
+      justify-content: center; flex-shrink: 0;
+    }
+    .logo-name {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.3rem; font-weight: 600; color: var(--text);
+    }
+    .card {
+      background: var(--blanc);
+      border-radius: 20px;
+      border: 1px solid var(--cream-border);
+      padding: 44px 40px;
+      max-width: 500px;
+      width: 100%;
+      box-shadow: 0 4px 32px color-mix(in srgb, var(--noir) 7.0%, transparent);
+    }
+    @media (max-width: 540px) {
+      .card { padding: 32px 22px; }
+      body { padding: 32px 16px 60px; }
+    }
+    .eyebrow {
+      font-size: 0.7rem; font-weight: 700; letter-spacing: 0.14em;
+      text-transform: uppercase; color: var(--terracotta); margin: 0 0 10px;
+    }
+    h1 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.9rem; font-weight: 600; color: var(--text);
+      line-height: 1.2; margin: 0 0 10px;
+    }
+    .subtitle {
+      font-size: 0.88rem; color: var(--text-muted);
+      line-height: 1.65; margin: 0 0 32px;
+    }
+    .field { margin-bottom: 20px; }
+    .field label {
+      display: block; font-size: 0.75rem; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.06em;
+      color: var(--text-muted); margin-bottom: 7px;
+    }
+    .field input, .field select {
+      width: 100%; padding: 13px 15px;
+      border: 1.5px solid var(--cream-border);
+      border-radius: 10px; font-family: 'DM Sans', sans-serif;
+      font-size: 0.93rem; color: var(--text); background: var(--blanc);
+      transition: border-color .15s;
+      appearance: none; -webkit-appearance: none;
+    }
+    .field input:focus, .field select:focus {
+      outline: none; border-color: var(--terracotta);
+    }
+    .field-err {
+      font-size: 0.72rem; color: #c0392b; margin-top: 4px;
+      min-height: 1em;
+    }
+    .select-wrap { position: relative; }
+    .select-wrap::after {
+      content: '';
+      position: absolute; right: 14px; top: 50%; transform: translateY(-50%);
+      width: 0; height: 0;
+      border-left: 5px solid transparent;
+      border-right: 5px solid transparent;
+      border-top: 6px solid var(--text-muted);
+      pointer-events: none;
+    }
+    .btn-submit {
+      display: flex; align-items: center; justify-content: center;
+      width: 100%; background: var(--terracotta); color: var(--blanc);
+      border: none; border-radius: 10px;
+      padding: 15px 24px; font-family: 'DM Sans', sans-serif;
+      font-size: 0.95rem; font-weight: 600; cursor: pointer;
+      letter-spacing: .02em; transition: background .15s, transform .12s;
+      min-height: 52px; margin-top: 8px;
+    }
+    .btn-submit:hover { background: var(--terracotta-hover); transform: translateY(-1px); }
+    .btn-submit:disabled { background: color-mix(in srgb, var(--terracotta) 40.0%, transparent); cursor: not-allowed; transform: none; }
+    .rgpd {
+      font-size: 0.72rem; color: var(--text-muted);
+      line-height: 1.65; margin-top: 14px; text-align: center;
+    }
+    .rgpd a { color: var(--terracotta); text-decoration: underline; }
+    .global-err {
+      background: #fdf2f2; border: 1px solid #f5c6cb;
+      border-radius: 10px; padding: 12px 16px;
+      font-size: 0.83rem; color: #c0392b;
+      display: none; margin-top: 12px; text-align: center;
+    }
+    /* Confirmation */
+    .confirm-wrap {
+      display: none; flex-direction: column; align-items: center;
+      text-align: center; padding: 16px 0 8px;
+    }
+    .confirm-icon {
+      width: 56px; height: 56px; border-radius: 50%;
+      background: var(--beige-logo); color: var(--terracotta);
+      display: flex; align-items: center; justify-content: center;
+      margin-bottom: 20px;
+    }
+    .confirm-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.7rem; font-weight: 600; color: var(--text);
+      margin: 0 0 10px;
+    }
+    .confirm-msg {
+      font-size: 0.9rem; color: var(--text-muted);
+      line-height: 1.65; margin: 0 0 28px;
+    }
+    .btn-back {
+      font-size: 0.85rem; color: var(--text-muted); background: transparent;
+      border: 1px solid var(--cream-border); border-radius: 10px;
+      padding: 11px 24px; cursor: pointer; font-family: 'DM Sans', sans-serif;
+      transition: border-color .15s; text-decoration: none; display: inline-block;
+    }
+    .btn-back:hover { border-color: var(--terracotta); color: var(--terracotta); }
+  </style>
+<link rel="stylesheet" href="/css/vitrine-actions.css">
+</head>
+<body>
+  <a href="/" class="logo-link">
+    <div class="logo-icon">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--blanc)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+        <polyline points="9 22 9 12 15 12 15 22"/>
+      </svg>
+    </div>
+    <span class="logo-name">Vendu Par Moi</span>
+  </a>
+
+  <div class="card">
+    <!-- Formulaire -->
+    <div id="entretien-form">
+      <p class="eyebrow">Échange personnalisé</p>
+      <h1>Parlons de votre projet</h1>
+      <p class="subtitle">Laissez-nous vos coordonnées et votre horizon de vente. Un membre de l'équipe vous recontactera sous 48 h.</p>
+
+      <div class="field">
+        <label for="ent-email">Votre e-mail *</label>
+        <input type="email" id="ent-email" name="email" autocomplete="email" placeholder="vous@exemple.fr">
+        <p class="field-err" id="err-ent-email" role="alert"></p>
+      </div>
+
+      <div class="field">
+        <label for="ent-phone">Votre téléphone *</label>
+        <input type="tel" id="ent-phone" name="phone" autocomplete="tel" placeholder="06 12 34 56 78">
+        <p class="field-err" id="err-ent-phone" role="alert"></p>
+      </div>
+
+      <div class="field">
+        <label for="ent-horizon">Votre horizon de vente</label>
+        <div class="select-wrap">
+          <select id="ent-horizon" name="sell_horizon">
+            <option value="">— Sélectionnez —</option>
+            <option value="moins_3_mois">Dans moins de 3 mois</option>
+            <option value="3_6_mois">Dans 3 à 6 mois</option>
+            <option value="6_12_mois">Dans 6 à 12 mois</option>
+            <option value="plus_12_mois">Dans plus d'un an</option>
+            <option value="indecis">Pas encore décidé</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Token non-visible (rempli par JS depuis l'URL) -->
+      <input type="hidden" id="ent-token" name="token" value="">
+
+      <button type="button" class="btn-submit" id="ent-submit-btn" style="--vpm-rest-bg:rgb(158, 58, 24);--vpm-rest-ink:rgb(255, 255, 255);--vpm-rest-shadow:none;--vpm-rest-image:none;" data-vpm-action="solid">Envoyer ma demande →</button>
+      <p id="ent-global-err" class="global-err">Une erreur est survenue. Veuillez réessayer ou écrire à <a href="mailto:contact@venduparmoi.fr" style="--vpm-rest-bg:rgba(0, 0, 0, 0);--vpm-rest-ink:rgb(0, 0, 238);--vpm-rest-shadow:none;--vpm-rest-image:none;" data-vpm-action="text" data-vpm-underlined>contact@venduparmoi.fr</a>.</p>
+      <p class="rgpd">
+        Vos données sont utilisées uniquement pour vous contacter.
+        <a href="/confidentialite" target="_blank" rel="noopener" style="--vpm-rest-bg:rgba(0, 0, 0, 0);--vpm-rest-ink:rgb(158, 58, 24);--vpm-rest-shadow:none;--vpm-rest-image:none;" data-vpm-action="text" data-vpm-underlined>Politique de confidentialité</a>.
+      </p>
+    </div>
+
+    <!-- Confirmation -->
+    <div class="confirm-wrap" id="entretien-confirm">
+      <div class="confirm-icon">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="20 6 9 17 4 12"/>
+        </svg>
+      </div>
+      <p class="eyebrow">Demande envoyée</p>
+      <p class="confirm-title">C'est noté !</p>
+      <p class="confirm-msg">Votre demande a bien été enregistrée. L'équipe Vendu Par Moi vous recontactera dans les 48 h.</p>
+      <a href="/" class="btn-back" style="--vpm-rest-bg:rgba(0, 0, 0, 0);--vpm-rest-ink:color(srgb 0.109804 0.0313726 0.0156863 / 0.55);--vpm-rest-shadow:none;--vpm-rest-image:none;" data-vpm-action="outline">Retour à l'accueil</a>
+    </div>
+  </div>
+
+  <script>
+  (function () {
+    'use strict';
+
+    function $(id) { return document.getElementById(id); }
+
+    function showErr(id, msg) {
+      var el = $(id);
+      if (el) el.textContent = msg || '';
+    }
+
+    function validPhone(v) {
+      var clean = v.replace(/[\s.\-()]/g, '');
+      return /^(\+33|0033|0)[1-9](\d{2}){4}$/.test(clean);
+    }
+
+    var params = new URLSearchParams(window.location.search);
+
+    // Remplir le token depuis l'URL
+    var tokenParam = params.get('token');
+    if (tokenParam && /^[0-9a-f]{32}$/.test(tokenParam)) {
+      $('ent-token').value = tokenParam;
+      // Pré-remplir l'e-mail depuis le serveur via le token
+      fetch('/api/public/estimation-hint?token=' + encodeURIComponent(tokenParam))
+        .then(function (r) { return r.ok ? r.json() : null; })
+        .then(function (d) {
+          if (d && d.email) {
+            var inp = $('ent-email');
+            if (inp && !inp.value) inp.value = d.email;
+          }
+        })
+        .catch(function () {});
+    }
+
+    // Fallback : pré-remplir depuis ?email= (compatibilité liens anciens)
+    var emailParam = params.get('email');
+    if (emailParam && !$('ent-email').value) {
+      $('ent-email').value = emailParam;
+    }
+
+    $('ent-submit-btn').addEventListener('click', function () {
+      var email   = ($('ent-email').value || '').trim();
+      var phone   = ($('ent-phone').value || '').trim();
+      var horizon = ($('ent-horizon').value || '').trim();
+      var token   = ($('ent-token').value || '').trim();
+      var ok = true;
+
+      if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) {
+        showErr('err-ent-email', 'Veuillez entrer une adresse e-mail valide.');
+        ok = false;
+      } else {
+        showErr('err-ent-email', '');
+      }
+
+      if (!phone) {
+        showErr('err-ent-phone', 'Veuillez renseigner votre numéro de téléphone.');
+        ok = false;
+      } else if (!validPhone(phone)) {
+        showErr('err-ent-phone', 'Numéro invalide. Format attendu : 06 12 34 56 78.');
+        ok = false;
+      } else {
+        showErr('err-ent-phone', '');
+      }
+
+      if (!ok) return;
+
+      var btn = $('ent-submit-btn');
+      var errBanner = $('ent-global-err');
+      btn.disabled = true;
+      btn.textContent = 'Envoi en cours…';
+      if (errBanner) errBanner.style.display = 'none';
+
+      var payload = { email: email, phone: phone, sell_horizon: horizon, source: 'entretien_page' };
+      if (token) payload.token = token;
+
+      fetch('/api/public/estimation-callback', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      })
+      .then(function (res) {
+        if (!res.ok) throw new Error('server_error');
+        return res.json();
+      })
+      .then(function (data) {
+        if (data && data.error) throw new Error(data.error);
+        $('entretien-form').style.display = 'none';
+        $('entretien-confirm').style.display = 'flex';
+      })
+      .catch(function () {
+        if (errBanner) errBanner.style.display = 'block';
+        btn.disabled = false;
+        btn.textContent = 'Envoyer ma demande →';
+      });
+    });
+  }());
+  </script>
+</body>
+</html>
