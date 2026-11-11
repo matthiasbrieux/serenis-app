@@ -34,8 +34,10 @@
       id: 'vendeurs',
       items: [
         { label: 'Dossiers vendeurs',  href: '/admin/crm',          icon: 'users2'  },
-        { label: 'Photos & missions',  href: '/admin/photographers', icon: 'camera'  },
+        { label: 'Photographes',       href: '/admin/photographers', icon: 'camera'  },
+        { label: 'Missions photo',     href: '/admin/missions',      icon: 'camera'  },
         { label: 'Rappels',            href: '/admin/rappels',       icon: 'phone'   },
+        { label: 'Numéros IA',         href: '/admin/numbers',       icon: 'dashboard' },
       ]
     },
     {
