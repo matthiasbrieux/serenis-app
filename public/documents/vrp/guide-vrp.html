@@ -1,0 +1,1632 @@
+<!DOCTYPE html>
+<html lang="fr"><head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<meta charset="UTF-8">
+<title>Guide VRP — Vendu Par Moi</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --terracotta:      #9E3A18;
+    --terracotta-dark: #7A2B12;
+    --terracotta-pale: #FAF0EB;
+    --terracotta-mid:  #F2D9CF;
+    --sable:           #E8C39E;
+    --sable-pale:      #FBF6EF;
+    --sable-mid:       #F5E8D6;
+    --noir:            #1C0804;
+    --gris:            #6B6B64;
+    --gris-pale:       #F7F6F4;
+    --blanc:           #FFFFFF;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'DM Sans', Arial, sans-serif;
+    font-size: 10.5pt;
+    color: var(--noir);
+    background: white;
+    line-height: 1.65;
+  }
+
+  /* ─── COUVERTURE ─── */
+  .cover {
+    background: var(--terracotta-dark);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 60px 40px;
+    page-break-after: always;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .cover::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background:
+      radial-gradient(ellipse at 20% 30%, rgba(232,195,158,0.08) 0%, transparent 50%),
+      radial-gradient(ellipse at 80% 70%, rgba(158,58,24,0.3) 0%, transparent 50%);
+  }
+
+  .cover-logo {
+    width: 480px;
+    max-width: 80vw;
+    margin: 0 auto 48px;
+    position: relative; z-index: 1;
+  }
+
+  /* Le logo SVG a du texte blanc/sable sur fond transparent — parfait sur fond terracotta */
+  .cover-logo svg {
+    width: 100%;
+    height: auto;
+  }
+
+  .cover-divider {
+    width: 48px;
+    height: 2px;
+    background: var(--sable);
+    margin: 0 auto 40px;
+    position: relative; z-index: 1;
+  }
+
+  .cover-label {
+    font-size: 8pt;
+    letter-spacing: 5px;
+    text-transform: uppercase;
+    color: var(--sable);
+    font-weight: 500;
+    margin-bottom: 16px;
+    position: relative; z-index: 1;
+  }
+
+  .cover-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 58pt;
+    font-weight: 700;
+    color: #fff;
+    line-height: 1;
+    margin-bottom: 12px;
+    position: relative; z-index: 1;
+  }
+
+  .cover-subtitle {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 18pt;
+    font-style: italic;
+    color: rgba(232,195,158,0.75);
+    margin-bottom: 56px;
+    position: relative; z-index: 1;
+  }
+
+  .cover-tagline {
+    font-size: 8pt;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: rgba(232,195,158,0.4);
+    position: relative; z-index: 1;
+  }
+
+  /* ─── MISE EN PAGE ─── */
+  .page {
+    padding: 28mm 22mm 22mm;
+    max-width: 210mm;
+    margin: 0 auto;
+  }
+
+  @media print {
+    .cover { page-break-after: always; }
+    .page-break { page-break-before: always; }
+    body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  }
+
+  /* ─── EN-TÊTE ÉTAPE ─── */
+  .step-header {
+    background: var(--terracotta);
+    color: white;
+    padding: 22px 28px;
+    border-radius: 6px;
+    margin-bottom: 26px;
+    margin-top: 36px;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+  }
+
+  .step-header-main { flex: 1; }
+
+  .step-duration {
+    background: rgba(255,255,255,0.15);
+    border: 1.5px solid rgba(232,195,158,0.5);
+    border-radius: 50px;
+    padding: 8px 18px;
+    text-align: center;
+    flex-shrink: 0;
+    min-width: 72px;
+  }
+
+  .step-duration-value {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 18pt;
+    font-weight: 700;
+    color: var(--sable);
+    line-height: 1;
+    display: block;
+  }
+
+  .step-duration-label {
+    font-size: 7pt;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: rgba(232,195,158,0.65);
+    display: block;
+    margin-top: 2px;
+  }
+
+  .step-num {
+    font-size: 7.5pt;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: var(--sable);
+    margin-bottom: 4px;
+    font-weight: 500;
+  }
+
+  .step-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 21pt;
+    font-weight: 700;
+    line-height: 1.15;
+    margin-bottom: 4px;
+  }
+
+  .step-objectif {
+    font-size: 9pt;
+    color: rgba(255,255,255,0.65);
+    font-style: italic;
+    font-weight: 300;
+  }
+
+  /* ─── TITRE DE PAGE ─── */
+  .page-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 28pt;
+    font-weight: 700;
+    color: var(--terracotta-dark);
+    margin-bottom: 6px;
+    margin-top: 44px;
+    line-height: 1.1;
+  }
+
+  .page-subtitle {
+    font-size: 9.5pt;
+    color: var(--gris);
+    font-weight: 300;
+    margin-bottom: 26px;
+    padding-bottom: 18px;
+    border-bottom: 1px solid var(--sable-mid);
+  }
+
+  /* ─── BLOCS ─── */
+
+  /* PHRASE */
+  .bloc-phrase {
+    background: var(--sable-mid);
+    border-radius: 8px;
+    padding: 22px 26px 22px 24px;
+    margin-bottom: 16px;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 2px 10px rgba(158,58,24,0.08);
+  }
+
+  .bloc-phrase::before {
+    content: '"';
+    position: absolute;
+    top: -10px; left: 14px;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 96pt;
+    color: var(--sable);
+    line-height: 1;
+    pointer-events: none;
+    opacity: 0.5;
+  }
+
+  .bloc-phrase blockquote {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 15pt !important;
+    font-style: italic;
+    color: var(--noir) !important;
+    line-height: 1.65 !important;
+    position: relative;
+    z-index: 1;
+  }
+
+  .bloc-phrase blockquote::before { content: none !important; }
+  .bloc-phrase blockquote::after  { content: none !important; }
+
+  .bloc-label {
+    font-size: 7pt;
+    font-weight: 600;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    margin-bottom: 9px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .bloc-phrase .bloc-label { color: var(--terracotta); }
+  .bloc-faire .bloc-label  { color: var(--terracotta); }
+  .bloc-attention .bloc-label { color: var(--terracotta-dark); }
+  .bloc-montrer .bloc-label { color: #5C3D8F; }
+  .bloc-posture .bloc-label { color: #1a5276; }
+  .bloc-transition .bloc-label { color: var(--gris); }
+  .bloc-objectif .bloc-label { color: #1a7a4a; }
+  .bloc-explication .bloc-label { color: #1a7a4a; }
+  .bloc-logique .bloc-label { color: var(--terracotta); }
+
+  .bloc-phrase blockquote {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 13pt;
+    font-style: italic;
+    color: var(--noir);
+    line-height: 1.6;
+  }
+
+  .bloc-phrase blockquote::before { content: '« '; color: var(--terracotta); }
+  .bloc-phrase blockquote::after  { content: ' »'; color: var(--terracotta); }
+
+  /* À FAIRE */
+  .bloc-faire {
+    background: var(--terracotta-pale);
+    border-left: 4px solid var(--terracotta);
+    border-radius: 0 6px 6px 0;
+    padding: 16px 20px;
+    margin-bottom: 14px;
+  }
+
+  .checklist { list-style: none; }
+  .checklist li {
+    padding: 3px 0 3px 22px;
+    position: relative;
+    font-size: 10pt;
+    color: var(--noir);
+  }
+  .checklist li::before {
+    content: '☐';
+    position: absolute; left: 0;
+    color: var(--terracotta);
+    font-size: 11pt;
+    line-height: 1.4;
+  }
+
+  /* ATTENTION */
+  .bloc-attention {
+    background: #FFF5F2;
+    border-left: 4px solid var(--terracotta-dark);
+    border-radius: 0 6px 6px 0;
+    padding: 16px 20px;
+    margin-bottom: 14px;
+  }
+  .bloc-attention p { color: var(--terracotta-dark); font-size: 10pt; }
+
+  /* À MONTRER */
+  .bloc-montrer {
+    background: #F5F0FA;
+    border-left: 4px solid #7B4CC0;
+    border-radius: 0 6px 6px 0;
+    padding: 16px 20px;
+    margin-bottom: 14px;
+  }
+  .bloc-montrer ul { list-style: none; }
+  .bloc-montrer ul li {
+    padding: 3px 0 3px 18px;
+    position: relative;
+    font-size: 10pt;
+    color: #3b1f66;
+  }
+  .bloc-montrer ul li::before { content: '→'; position: absolute; left: 0; color: #7B4CC0; }
+
+  /* POSTURE */
+  .bloc-posture {
+    background: #EEF4FA;
+    border-left: 4px solid #2874A6;
+    border-radius: 0 6px 6px 0;
+    padding: 16px 20px;
+    margin-bottom: 14px;
+  }
+  .bloc-posture p { color: #1a3d5c; font-size: 10pt; }
+
+  /* TRANSITION */
+  .bloc-transition {
+    border: 1px dashed var(--sable);
+    border-radius: 6px;
+    padding: 12px 18px;
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .bloc-transition::before { content: '→'; font-size: 14pt; color: var(--sable); flex-shrink: 0; }
+  .bloc-transition p { color: var(--gris); font-size: 9.5pt; font-style: italic; }
+
+  /* OBJECTIF */
+  .bloc-objectif {
+    background: #EEF9F3;
+    border-left: 4px solid #1a7a4a;
+    border-radius: 0 6px 6px 0;
+    padding: 16px 20px;
+    margin-bottom: 14px;
+  }
+  .bloc-objectif p { color: #0d4a2c; font-size: 10pt; }
+
+  /* EXPLICATION */
+  .bloc-explication {
+    background: #EEF9F3;
+    border-left: 4px solid #27ae60;
+    border-radius: 0 6px 6px 0;
+    padding: 14px 20px;
+    margin-bottom: 14px;
+  }
+  .bloc-explication p { color: #0d4a2c; font-size: 10pt; }
+
+  /* LOGIQUE / ÉTAPES */
+  .bloc-logique {
+    background: var(--sable-mid);
+    border-radius: 8px;
+    padding: 18px 20px;
+    margin-bottom: 14px;
+  }
+
+  .etapes-inline {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-top: 8px;
+  }
+
+  .etape-chip {
+    background: var(--terracotta);
+    color: white;
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 8.5pt;
+    font-weight: 500;
+  }
+
+  .etape-arrow { color: var(--terracotta); font-size: 12pt; font-weight: 600; }
+
+  /* ─── INTRO BOX ─── */
+  .intro-box {
+    background: var(--sable-pale);
+    border-radius: 8px;
+    padding: 22px 26px;
+    margin-bottom: 26px;
+    border-left: 4px solid var(--sable);
+  }
+  .intro-box p { font-size: 10.5pt; color: var(--noir); line-height: 1.7; }
+
+  /* ─── TABLEAU ─── */
+  .route-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 26px;
+    font-size: 9.5pt;
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  .route-table thead tr { background: var(--terracotta); color: white; }
+  .route-table thead th {
+    padding: 11px 14px;
+    text-align: left;
+    font-weight: 500;
+    font-size: 7.5pt;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+  }
+  .route-table tbody tr:nth-child(odd)  { background: var(--sable-pale); }
+  .route-table tbody tr:nth-child(even) { background: white; }
+  .route-table td { padding: 9px 14px; border-bottom: 1px solid var(--sable-mid); vertical-align: top; }
+  .route-table td:first-child {
+    font-weight: 700;
+    color: var(--terracotta);
+    text-align: center;
+    width: 36px;
+  }
+
+  /* ─── LÉGENDE ─── */
+  .legend-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin: 18px 0 26px;
+  }
+  .legend-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 11px 14px;
+    border-radius: 6px;
+    border: 1px solid var(--sable-mid);
+    background: var(--gris-pale);
+  }
+  .legend-color {
+    width: 14px; min-width: 14px; height: 14px;
+    border-radius: 3px;
+    margin-top: 3px;
+  }
+  .legend-text strong { font-size: 8.5pt; display: block; margin-bottom: 1px; color: var(--noir); }
+  .legend-text span { font-size: 8pt; color: var(--gris); }
+
+  /* ─── OBJECTIONS ─── */
+  .objection-card {
+    border-radius: 8px;
+    overflow: hidden;
+    margin-bottom: 16px;
+    border: 1px solid var(--sable-mid);
+    box-shadow: 0 1px 4px rgba(28,8,4,0.06);
+  }
+  .objection-question {
+    background: var(--terracotta-pale);
+    border-left: 4px solid var(--terracotta);
+    padding: 13px 18px;
+    font-weight: 500;
+    font-size: 10pt;
+    color: var(--terracotta-dark);
+    font-style: italic;
+  }
+  .objection-reponse {
+    padding: 13px 18px;
+    background: var(--sable-pale);
+    border-left: 4px solid var(--sable);
+  }
+  .objection-reponse p {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 12.5pt;
+    font-style: italic;
+    color: var(--noir);
+    line-height: 1.6;
+  }
+
+  /* ─── PROGRAMME ─── */
+  .bloc-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--sable-mid);
+  }
+  .bloc-num {
+    width: 30px; min-width: 30px; height: 30px;
+    background: var(--terracotta);
+    color: white;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 700; font-size: 9.5pt;
+    margin-top: 2px;
+  }
+  .bloc-content strong { font-size: 10pt; display: block; margin-bottom: 1px; }
+  .bloc-content span { font-size: 9pt; color: var(--gris); }
+
+  /* ─── TEST FINAL ─── */
+  .test-item {
+    padding: 8px 0 8px 24px;
+    position: relative;
+    font-size: 10pt;
+    border-bottom: 1px solid var(--sable-mid);
+  }
+  .test-item::before {
+    content: '☐';
+    position: absolute; left: 0;
+    color: var(--terracotta);
+    font-size: 12pt;
+  }
+
+  /* ─── CARTE MÉMO ─── */
+  .memo-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    margin-top: 20px;
+  }
+  .memo-card {
+    background: white;
+    border: 1px solid var(--sable-mid);
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 1px 4px rgba(28,8,4,0.06);
+  }
+  .memo-card-header {
+    background: var(--terracotta);
+    color: white;
+    padding: 9px 14px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .memo-num {
+    width: 22px; height: 22px;
+    background: var(--sable);
+    color: var(--terracotta-dark);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 700; font-size: 8.5pt;
+    flex-shrink: 0;
+  }
+  .memo-card-header span { font-weight: 600; font-size: 9pt; text-transform: uppercase; letter-spacing: 1px; }
+  .memo-card-body { padding: 11px 14px; font-size: 9pt; color: var(--noir); line-height: 1.55; }
+
+  /* ─── PIED DE PAGE ─── */
+  .page-footer {
+    text-align: center;
+    padding: 18px 0 8px;
+    margin-top: 36px;
+    border-top: 1px solid var(--sable-mid);
+    font-size: 7.5pt;
+    color: var(--sable);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+  }
+
+  .h2 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 16pt;
+    font-weight: 700;
+    color: var(--terracotta-dark);
+    margin: 26px 0 12px;
+  }
+
+  /* ─── CHECKLIST AVANT RDV ─── */
+  .pre-check-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 11px 16px;
+    background: var(--gris-pale);
+    border: 1px solid var(--sable-mid);
+    border-radius: 6px;
+    margin-bottom: 8px;
+    font-size: 10pt;
+    color: var(--noir);
+    position: relative;
+  }
+
+  .pre-check-item::before {
+    content: '☐';
+    color: var(--terracotta);
+    font-size: 14pt;
+    line-height: 1.2;
+    flex-shrink: 0;
+  }
+
+  .pre-check-item em {
+    color: var(--terracotta);
+    font-style: italic;
+  }
+
+  .pre-check-ready {
+    background: linear-gradient(135deg, var(--terracotta), var(--terracotta-dark));
+    color: white;
+    border-radius: 8px;
+    padding: 22px 26px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    margin-top: 28px;
+  }
+
+  .pre-check-ready-icon {
+    width: 44px;
+    height: 44px;
+    min-width: 44px;
+    background: var(--sable);
+    color: var(--terracotta-dark);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20pt;
+    font-weight: 700;
+    line-height: 1;
+  }
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════════ COUVERTURE ══════════════════════════ -->
+<div class="cover">
+  <!-- Vrai logo du site -->
+  <div class="cover-logo">
+    <svg xmlns="http://www.w3.org/2000/svg" width="1487" height="430" viewBox="0 0 1487 430">
+      <text x="109.7" y="250" font-family="Poppins, sans-serif" font-weight="700" font-size="150" fill="#FFFFFF">V</text>
+      <text x="226.2" y="250" font-family="Poppins, sans-serif" font-weight="700" font-size="150" fill="#FFFFFF">E</text>
+      <text x="314.3" y="250" font-family="Poppins, sans-serif" font-weight="700" font-size="150" fill="#FFFFFF">N</text>
+      <text x="434.1" y="250" font-family="Poppins, sans-serif" font-weight="700" font-size="150" fill="#FFFFFF">D</text>
+      <text x="550.2" y="250" font-family="Poppins, sans-serif" font-weight="700" font-size="150" fill="#FFFFFF">U</text>
+      <text x="662.9" y="250" font-family="Poppins, sans-serif" font-weight="700" font-size="150" fill="#FFFFFF">&nbsp;</text>
+      <text x="701.7" y="250" font-family="Poppins, sans-serif" font-weight="700" font-size="150" fill="#FFFFFF">P</text>
+      <text x="802.3" y="250" font-family="Poppins, sans-serif" font-weight="700" font-size="150" fill="#FFFFFF">A</text>
+      <text x="919.9" y="250" font-family="Poppins, sans-serif" font-weight="700" font-size="150" fill="#FFFFFF">R</text>
+      <text x="1024.7" y="250" font-family="Poppins, sans-serif" font-weight="700" font-size="150" fill="#FFFFFF">&nbsp;</text>
+      <text x="1056.5" y="250" font-family="Poppins, sans-serif" font-weight="700" font-size="150" fill="#E8C39E">M</text>
+      <text x="1221.2" y="250" font-family="Poppins, sans-serif" font-weight="700" font-size="150" fill="#E8C39E">O</text>
+      <text x="1346.1" y="250" font-family="Poppins, sans-serif" font-weight="700" font-size="150" fill="#E8C39E">I</text>
+      <path d="M 1044.5 138 L 1223.4 64 L 1402.3 138" fill="none" stroke="#E8C39E" stroke-width="20" stroke-linecap="round" stroke-linejoin="round"></path>
+      <line x1="1338.1" y1="109.9" x2="1338.1" y2="69.9" stroke="#E8C39E" stroke-width="18" stroke-linecap="round"></line>
+      <g stroke="#E8C39E" stroke-width="6" fill="none" stroke-linejoin="round">
+        <rect x="1206.4" y="90" width="42" height="42" rx="4"></rect>
+        <line x1="1227.4" y1="90" x2="1227.4" y2="132"></line>
+        <line x1="1206.4" y1="111.0" x2="1248.4" y2="111.0"></line>
+      </g>
+      <text x="743.5" y="370" text-anchor="middle" font-family="Poppins, sans-serif" font-weight="700" font-size="52" fill="#E8C39E">L'IMMOBILIER ENTRE PARTICULIERS</text>
+    </svg>
+  </div>
+
+  <div class="cover-divider"></div>
+  <div class="cover-label">Document confidentiel — Annexe 2 du contrat de partenariat</div>
+  <h1 class="cover-title">Guide VRP</h1>
+  <p class="cover-subtitle">Prospection · Visite · Rémunération · Statut</p>
+  <div class="cover-divider"></div>
+  <p class="cover-tagline">Conseiller Partenaire Indépendant — Vendu Par Moi v1.0</p>
+</div>
+
+<!-- ══════════════════════════ RÉSUMÉ CONTRAT ══════════════════════════ -->
+<div class="page page-break">
+  <h1 class="page-title">Votre contrat — points essentiels</h1>
+  <p class="page-subtitle">Résumé du Contrat de Partenariat Conseiller Partenaire Indépendant (document complet signé séparément)</p>
+
+  <div class="intro-box">
+    <p>Ce résumé ne remplace pas votre contrat. Il rappelle les points pratiques que vous devez connaître avant votre premier rendez-vous. Relisez le contrat complet si vous avez un doute.</p>
+  </div>
+
+  <table class="route-table">
+    <thead><tr><th>Article</th><th>Ce que ça signifie concrètement</th></tr></thead>
+    <tbody>
+      <tr>
+        <td><strong>Art. 1<br>Objet</strong></td>
+        <td>Vous apportez des clients à VPM et accompagnez leur démarrage sur la plateforme. Vous ne vendez pas l'immobilier — vous vendez l'accès à un outil.</td>
+      </tr>
+      <tr>
+        <td><strong>Art. 2<br>Missions</strong></td>
+        <td>Prospection → visite à domicile → collecte d'informations → création de la fiche descriptive → configuration du compte vendeur → paiement du pack → passation. Vous partez après l'étape 5.</td>
+      </tr>
+      <tr>
+        <td><strong>Art. 3<br>Statut</strong></td>
+        <td>Vous êtes prestataire indépendant. Pas de lien de subordination avec VPM. Pas de salaire, pas de charges sociales VPM. Vous gérez votre statut (micro-entrepreneur recommandé).</td>
+      </tr>
+      <tr>
+        <td><strong>Art. 4<br>Commission</strong></td>
+        <td><strong>50% du HT encaissé par VPM = 645 € HT par dossier validé.</strong><br>
+        Paiement : 15 jours ouvrés après réception de votre facture + paiement vendeur confirmé.<br>
+        Si TVA : vous facturez 774 € TTC — VPM récupère la TVA, votre net reste 645 € HT.</td>
+      </tr>
+      <tr>
+        <td><strong>Art. 5<br>Obligations CPI</strong></td>
+        <td>Respecter les prix affichés (1 548 € TTC — vous ne négociez pas). Garder la confidentialité. Ne pas démarcher les vendeurs VPM pour d'autres services pendant 12 mois après la fin du contrat.</td>
+      </tr>
+      <tr>
+        <td><strong>Art. 6<br>Obligations VPM</strong></td>
+        <td>VPM vous fournit : accès plateforme, kit de présentation, formation initiale, support, paiement dans les délais contractuels.</td>
+      </tr>
+      <tr>
+        <td><strong>Art. 7<br>Durée / résiliation</strong></td>
+        <td>Contrat à durée indéterminée. Résiliation : <strong>15 jours de préavis</strong> pendant les 3 premiers mois, <strong>1 mois</strong> ensuite. Résiliation possible par lettre recommandée ou email avec AR.</td>
+      </tr>
+      <tr>
+        <td><strong>Art. 8<br>Confidentialité</strong></td>
+        <td>Vous ne divulguez pas les informations commerciales VPM (prix, process, outils) pendant <strong>24 mois</strong> après la fin du contrat.</td>
+      </tr>
+      <tr>
+        <td><strong>Art. 9<br>Non-sollicitation</strong></td>
+        <td>Pendant <strong>12 mois</strong> après la fin du contrat, vous ne démontrez pas les vendeurs VPM pour leur proposer des services concurrents.</td>
+      </tr>
+      <tr>
+        <td><strong>Art. 13<br>Droit applicable</strong></td>
+        <td>Droit français. Tout litige : Tribunal de commerce du siège social de VPM SAS.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="bloc-attention">
+    <div class="bloc-label">Ce contrat ne vous autorise PAS à</div>
+    <p>Négocier le prix d'un bien · Signer un mandat de vente · Recevoir des fonds d'acheteurs · Vous présenter comme agent immobilier · Accompagner les acheteurs en visite.</p>
+  </div>
+
+  <div style="margin-top:20px;border:1.5px solid var(--sable-mid);border-radius:8px;padding:16px 20px;">
+    <div style="font-size:9pt;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--terracotta);margin-bottom:10px;">Accusé de réception — Annexe 2 du Contrat de Partenariat CPI</div>
+    <p style="font-size:9.5pt;color:var(--gris);margin-bottom:14px;">Je soussigné(e) ______________________________ déclare avoir pris connaissance du présent Guide du Conseiller Partenaire Indépendant et m'engage à en respecter les dispositions.</p>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
+      <div>
+        <p style="font-size:8.5pt;color:var(--gris);margin-bottom:22px;">Fait à : _________________ Le : ___________</p>
+        <div style="border-top:1px solid #bbb;padding-top:4px;font-size:8.5pt;color:var(--gris);">Signature du Conseiller Partenaire</div>
+      </div>
+      <div>
+        <p style="font-size:8.5pt;color:var(--gris);margin-bottom:22px;">Pour VPM SAS, le Gérant</p>
+        <div style="border-top:1px solid #bbb;padding-top:4px;font-size:8.5pt;color:var(--gris);">Matthias Brieux — Gérant VPM SAS</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="page-footer">Vendu Par Moi · Guide CPI · Résumé contrat</div>
+</div>
+<!-- ══════════════════════════ RÉMUNÉRATION ══════════════════════════ -->
+<div class="page page-break">
+  <h1 class="page-title">Votre rémunération</h1>
+  <p class="page-subtitle">Comment se déclenche votre commission et comment la percevoir</p>
+
+  <h2 class="h2">Ce que vous percevez par dossier</h2>
+
+  <table class="route-table">
+    <thead>
+      <tr>
+        <th>Prix vendeur</th>
+        <th>Votre commission</th>
+        <th>Votre statut TVA</th>
+        <th>Facture à émettre</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>1 548 € TTC<br><small>(= 1 290 € HT)</small></td>
+        <td><strong>645 € HT</strong></td>
+        <td>Franchise TVA<br>(CA &lt; 37 500 €/an)</td>
+        <td>645 € HT — sans TVA</td>
+      </tr>
+      <tr>
+        <td>1 548 € TTC</td>
+        <td><strong>645 € HT + 129 € TVA<br>= 774 € TTC</strong></td>
+        <td>Assujetti TVA<br>(CA &gt; 37 500 €/an)</td>
+        <td>645 € HT + 129 € TVA (20%)</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="intro-box">
+    <p>Dans les deux cas, votre commission nette reste identique à <strong>645 € HT</strong>. Si vous êtes assujetti TVA, vous facturez la TVA à VPM, qui la récupère — votre revenu ne change pas.</p>
+  </div>
+
+  <h2 class="h2">Timeline de paiement</h2>
+
+  <table class="route-table">
+    <thead><tr><th>Jour</th><th>Événement</th><th>Action de votre part</th></tr></thead>
+    <tbody>
+      <tr><td><strong>J0</strong></td><td>Le vendeur paie le pack 1 548 € TTC sur la plateforme</td><td>—</td></tr>
+      <tr><td><strong>J1</strong></td><td>Votre dossier passe en statut "validé" dans votre espace partenaire</td><td>Vous recevez une notification email</td></tr>
+      <tr><td><strong>J1-J3</strong></td><td>—</td><td><strong>Vous émettez votre facture</strong> à VPM SAS et la transmettez par email</td></tr>
+      <tr><td><strong>J+15 ouvrés</strong></td><td>VPM règle votre facture</td><td>Vous recevez le virement SEPA</td></tr>
+    </tbody>
+  </table>
+
+  <h2 class="h2">Votre facture — mentions obligatoires</h2>
+
+  <div class="bloc-faire">
+    <div class="bloc-label">Contenu de la facture</div>
+    <ul class="checklist">
+      <li>Vos nom, prénom, adresse complète, numéro SIRET</li>
+      <li>Numéro de facture séquentiel : FAC-[ANNÉE]-001, FAC-[ANNÉE]-002…</li>
+      <li>Date d'émission</li>
+      <li>Désignation : <em>"Apport d'affaires — dossier vendeur [Nom du vendeur] — Vendu Par Moi"</em></li>
+      <li>Montant : 645 € HT (+ TVA si assujetti)</li>
+      <li>Mention "TVA non applicable — article 293 B du CGI" si en franchise de TVA</li>
+      <li>Coordonnées destinataire : VPM SAS, [adresse siège social]</li>
+    </ul>
+  </div>
+
+  <div class="bloc-objectif">
+    <div class="bloc-label">Outils gratuits recommandés</div>
+    <p>Shine, Freebe, ou Facture.net permettent de créer des factures conformes en 2 minutes. L'essentiel : un numéro SIRET + une désignation claire.</p>
+  </div>
+
+  <h2 class="h2">Ce qui annule votre commission</h2>
+
+  <div class="bloc-attention">
+    <div class="bloc-label">Attention</div>
+    <p>Si le vendeur exerce son droit de rétractation dans les <strong>14 jours</strong> suivant le paiement et obtient un remboursement de VPM, votre commission est annulée et non versée. Passé 14 jours : votre commission est acquise.</p>
+  </div>
+
+  <div class="page-footer">Vendu Par Moi · Guide VRP · Rémunération</div>
+</div>
+
+<!-- ══════════════════════════ PROSPECTION ══════════════════════════ -->
+<div class="page page-break">
+  <h1 class="page-title">Trouver des vendeurs</h1>
+  <p class="page-subtitle">Scripts et sources pour générer vos premiers rendez-vous</p>
+
+  <h2 class="h2">Les meilleures sources</h2>
+  <table class="route-table">
+    <thead><tr><th>N°</th><th>Source</th><th>Comment faire</th></tr></thead>
+    <tbody>
+      <tr><td>1</td><td><strong>Leboncoin / PAP annonces PAP</strong></td><td>Chercher "vente appartement" ou "vente maison" + "de particulier" dans votre secteur. Ces vendeurs veulent déjà éviter les agences — VPM répond directement à leur besoin.</td></tr>
+      <tr><td>2</td><td><strong>Réseau personnel</strong></td><td>Famille, amis, voisins, anciens collègues. Parler de VPM à chaque conversation. 1 vente sur 3 vient du bouche à oreille.</td></tr>
+      <tr><td>3</td><td><strong>Groupes Facebook immo locaux</strong></td><td>Rejoindre "Immobilier [ville]", "Vente immo [département]". Publier régulièrement : témoignages, infos pratiques, offre de service.</td></tr>
+      <tr><td>4</td><td><strong>Artisans / notaires / diagnostiqueurs</strong></td><td>Ces professionnels savent qui vend avant que l'annonce paraisse. Une relation de confiance avec eux = accès anticipé à des prospects.</td></tr>
+      <tr><td>5</td><td><strong>Recommandations clients</strong></td><td>Après chaque visite réussie, demander : "Connaissez-vous quelqu'un qui envisage de vendre ?" Un vendeur satisfait vous en amène deux.</td></tr>
+    </tbody>
+  </table>
+
+  <h2 class="h2">Script de prise de contact — Leboncoin</h2>
+
+  <div class="bloc-phrase">
+    <div class="bloc-label">Message à envoyer (SMS ou message Leboncoin)</div>
+    <blockquote>Bonjour, j'ai vu votre annonce sur Leboncoin. Je suis Conseiller Partenaire pour Vendu Par Moi, une plateforme qui aide les particuliers à vendre sans agence. On peut vous aider à créer un dossier professionnel et à gérer les acheteurs — pour une fraction du coût d'une agence. Est-ce que vous seriez disponible pour qu'on en parle 10 minutes ?</blockquote>
+  </div>
+
+  <h2 class="h2">Script d'appel téléphonique — premier contact</h2>
+
+  <div class="bloc-phrase">
+    <div class="bloc-label">Phrase d'accroche</div>
+    <blockquote>Bonjour, je m'appelle [Prénom], je suis Conseiller Partenaire pour Vendu Par Moi. Je vous contacte car j'ai vu que vous mettez en vente votre bien en direct — c'est exactement le type de projet qu'on accompagne.</blockquote>
+  </div>
+
+  <div class="bloc-phrase">
+    <div class="bloc-label">Après la présentation — qualifier rapidement</div>
+    <blockquote>Votre bien, c'est un appartement ou une maison ? Et vous envisagez de vendre dans combien de temps ?</blockquote>
+  </div>
+
+  <div class="bloc-phrase">
+    <div class="bloc-label">Proposer le rendez-vous</div>
+    <blockquote>Je peux passer chez vous en environ 1h30. Je vous aide à créer votre dossier complet, à paramétrer votre compte vendeur et à publier votre annonce. Vous n'avez rien à préparer. Est-ce que vous êtes disponible cette semaine ou en début de semaine prochaine ?</blockquote>
+  </div>
+
+  <div class="bloc-attention">
+    <div class="bloc-label">À ne jamais dire</div>
+    <p>Ne promettez pas de délai de vente, ni de prix. Ne dites pas que vous êtes agent immobilier. Vous êtes Conseiller Partenaire — votre rôle est d'accompagner le démarrage sur la plateforme.</p>
+  </div>
+
+  <div class="page-footer">Vendu Par Moi · Guide VRP · Prospection</div>
+</div>
+
+<!-- ══════════════════════════ MODE D'EMPLOI ══════════════════════════ -->
+<div class="page page-break">
+  <h1 class="page-title">Mode d'emploi</h1>
+  <p class="page-subtitle">Comment utiliser ce guide efficacement</p>
+
+  <div class="intro-box">
+    <p>À chaque étape, le VRP doit savoir exactement <strong>quoi faire</strong>, <strong>quoi dire</strong>, <strong>quoi demander</strong>, <strong>quoi montrer</strong> et comment passer à l'étape suivante. Les phrases dans les encadrés sable sont les phrases de référence à apprendre. Elles doivent rester naturelles à l'oral.</p>
+  </div>
+
+  <h2 class="h2">Légende</h2>
+  <div class="legend-grid">
+    <div class="legend-item">
+      <div class="legend-color" style="background:var(--sable);"></div>
+      <div class="legend-text">
+        <strong>Phrase à apprendre</strong>
+        <span>Formulation de référence à mémoriser</span>
+      </div>
+    </div>
+    <div class="legend-item">
+      <div class="legend-color" style="background:var(--terracotta);"></div>
+      <div class="legend-text">
+        <strong>À faire</strong>
+        <span>Action concrète du VRP pendant le rendez-vous</span>
+      </div>
+    </div>
+    <div class="legend-item">
+      <div class="legend-color" style="background:#7B4CC0;"></div>
+      <div class="legend-text">
+        <strong>À montrer / à faire sur l'outil</strong>
+        <span>Écran, document ou fonctionnalité à présenter</span>
+      </div>
+    </div>
+    <div class="legend-item">
+      <div class="legend-color" style="background:var(--terracotta-dark);"></div>
+      <div class="legend-text">
+        <strong>Attention</strong>
+        <span>Point à ne pas oublier ou erreur à éviter</span>
+      </div>
+    </div>
+  </div>
+
+  <h2 class="h2">La carte du rendez-vous</h2>
+  <table class="route-table">
+    <thead>
+      <tr>
+        <th>N°</th>
+        <th>Étape</th>
+        <th>Objectif</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td>1</td><td>Accueil et découverte</td><td>Comprendre le projet du vendeur</td></tr>
+      <tr><td>2</td><td>Fiche descriptive</td><td>Faire compléter un maximum d'informations</td></tr>
+      <tr><td>3</td><td>Visite du bien</td><td>Mesurer, relever, photographier</td></tr>
+      <tr><td>4</td><td>Retour à table</td><td>Laisser le vendeur découvrir le guide pendant la préparation du dossier</td></tr>
+      <tr><td>5</td><td>Présentation de l'outil</td><td>Montrer l'organisation complète de la vente</td></tr>
+      <tr><td>6</td><td>Ma vente en 5 clics</td><td>Faire mémoriser le parcours de vente</td></tr>
+      <tr><td>7</td><td>Contact acquéreur</td><td>Donner une méthode claire pour gérer les appels</td></tr>
+      <tr><td>8</td><td>Espace Formation</td><td>Préparer le vendeur à gérer sa vente</td></tr>
+      <tr><td>9</td><td>Conclusion</td><td>Rassurer et redonner le contrôle au vendeur</td></tr>
+    </tbody>
+  </table>
+
+  <div class="page-footer">Vendu Par Moi · Guide VRP · Confidentiel</div>
+</div>
+
+<!-- ══════════════════════════ CHECKLIST AVANT RDV ══════════════════════════ -->
+<div class="page page-break">
+  <h1 class="page-title">Avant de sonner</h1>
+  <p class="page-subtitle">À cocher dans la voiture, moteur coupé, avant d'entrer</p>
+
+  <div style="margin-bottom: 28px;">
+    <div style="font-size:7.5pt;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:var(--terracotta);margin-bottom:12px;">📋 Documents</div>
+    <div class="pre-check-item">La fiche descriptive du bien est imprimée (ou ouverte sur le téléphone).</div>
+    <div class="pre-check-item">Le guide vendeur est dans le sac (à remettre au vendeur à l'étape 4).</div>
+    <div class="pre-check-item">Je connais l'adresse et le nom du vendeur.</div>
+  </div>
+
+  <div style="margin-bottom: 28px;">
+    <div style="font-size:7.5pt;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:var(--terracotta);margin-bottom:12px;">📱 Outil</div>
+    <div class="pre-check-item">Mon téléphone est chargé (minimum 50%).</div>
+    <div class="pre-check-item">Je suis connecté à l'espace vendeur sur le navigateur — la page est prête à afficher.</div>
+    <div class="pre-check-item">Le mode avion est désactivé — je peux recevoir des appels si besoin.</div>
+  </div>
+
+  <div style="margin-bottom: 28px;">
+    <div style="font-size:7.5pt;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:var(--terracotta);margin-bottom:12px;">🧠 Script</div>
+    <div class="pre-check-item">Je sais comment je vais me présenter (étape 1 — phrase d'accueil).</div>
+    <div class="pre-check-item">Je connais les 5 clics dans l'ordre : Fiche → Visite → Acheteur sérieux → Offre → Notaire.</div>
+    <div class="pre-check-item">Je connais le script téléphonique acquéreur (étape 7).</div>
+  </div>
+
+  <div style="margin-bottom: 28px;">
+    <div style="font-size:7.5pt;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:var(--terracotta);margin-bottom:12px;">🎯 Posture</div>
+    <div class="pre-check-item">J'ai prévu de poser des questions avant de présenter la solution.</div>
+    <div class="pre-check-item">Je n'ai pas l'intention de réciter — je vais adapter selon ce que le vendeur me dit.</div>
+    <div class="pre-check-item">Si ça coince, je reviens à : <em>« Le vendeur garde le contrôle, on l'accompagne. »</em></div>
+  </div>
+
+  <div class="pre-check-ready">
+    <div class="pre-check-ready-icon">✓</div>
+    <div>
+      <div style="font-family:'Cormorant Garamond',serif;font-size:15pt;font-weight:700;color:#ffffff;margin-bottom:2px;">Tout est bon — tu peux y aller.</div>
+      <div style="font-size:9pt;color:rgba(255,255,255,0.82);">Durée estimée du rendez-vous : <strong style="color:#fff;">1h15 environ</strong>. Tu peux l'annoncer au vendeur dès l'accueil.</div>
+    </div>
+  </div>
+
+  <div class="page-footer">Vendu Par Moi · Guide VRP · Avant le RDV</div>
+</div>
+
+<!-- ══════════════════════════ ÉTAPE 1 ══════════════════════════ -->
+<div class="page page-break">
+  <div class="step-header">
+    <div class="step-header-main">
+      <div class="step-num">Étape 1 / 9</div>
+      <div class="step-title">Accueil et découverte du projet</div>
+      <div class="step-objectif">Créer le contact, comprendre la situation et faire parler le vendeur.</div>
+    </div>
+    <div class="step-duration">
+      <span class="step-duration-value">5'</span>
+      <span class="step-duration-label">environ</span>
+    </div>
+  </div>
+
+  <div class="bloc-faire">
+    <div class="bloc-label">À faire</div>
+    <ul class="checklist">
+      <li>Saluer le vendeur et créer un contact simple et professionnel.</li>
+      <li>Se présenter comme collaborateur de Vendu Par Moi.</li>
+      <li>Demander pourquoi le vendeur souhaite vendre.</li>
+      <li>Demander s'il a déjà fait réaliser une estimation.</li>
+      <li>Demander s'il a déjà un objectif ou un prix en tête.</li>
+      <li>Écouter avant de commencer à présenter la solution.</li>
+    </ul>
+  </div>
+
+  <div class="bloc-phrase">
+    <div class="bloc-label">Phrase à apprendre</div>
+    <blockquote>Bonjour, je suis [Prénom], je travaille avec Vendu Par Moi. Avant de vous expliquer comment nous allons organiser votre vente, j'aimerais d'abord comprendre votre projet.</blockquote>
+  </div>
+
+  <div class="bloc-phrase">
+    <div class="bloc-label">Phrase à apprendre</div>
+    <blockquote>Qu'est-ce qui vous amène à vendre aujourd'hui ?</blockquote>
+  </div>
+
+  <div class="bloc-phrase">
+    <div class="bloc-label">Phrase à apprendre</div>
+    <blockquote>Est-ce que vous avez déjà fait estimer votre maison ?</blockquote>
+  </div>
+
+  <div class="bloc-phrase">
+    <div class="bloc-label">Phrase à apprendre</div>
+    <blockquote>Est-ce que vous avez déjà un prix en tête, ou un objectif de vente ?</blockquote>
+  </div>
+
+  <div class="bloc-posture">
+    <div class="bloc-label">Posture</div>
+    <p>Le VRP ne doit pas réciter trop vite. Cette première partie sert à comprendre le vendeur. Les informations recueillies doivent ensuite servir à personnaliser l'entretien.</p>
+  </div>
+
+  <div class="bloc-transition">
+    <p>Une fois le projet compris, proposer de passer à la table pour préparer le dossier du bien.</p>
+  </div>
+
+  <div class="page-footer">Vendu Par Moi · Guide VRP · Étape 1</div>
+</div>
+
+<!-- ══════════════════════════ ÉTAPE 2 ══════════════════════════ -->
+<div class="page page-break">
+  <div class="step-header">
+    <div class="step-header-main">
+      <div class="step-num">Étape 2 / 9</div>
+      <div class="step-title">Fiche descriptive du bien</div>
+      <div class="step-objectif">Faire recueillir un maximum d'informations directement sur la fiche.</div>
+    </div>
+    <div class="step-duration">
+      <span class="step-duration-value">10'</span>
+      <span class="step-duration-label">environ</span>
+    </div>
+  </div>
+
+  <div class="bloc-faire">
+    <div class="bloc-label">À faire</div>
+    <ul class="checklist">
+      <li>Inviter le vendeur à s'installer à la table.</li>
+      <li>Présenter la fiche descriptive préparée avant le rendez-vous.</li>
+      <li>Faire compléter les informations directement sur cette fiche.</li>
+      <li>Faire répondre le vendeur à chaque question.</li>
+      <li>Chercher la fiche la plus complète possible.</li>
+      <li>Ne pas se contenter de noter quelques informations à côté.</li>
+    </ul>
+  </div>
+
+  <div class="bloc-phrase">
+    <div class="bloc-label">Phrase à apprendre</div>
+    <blockquote>Nous allons maintenant compléter ensemble votre fiche descriptive. Toutes les questions importantes sont déjà prévues. Votre objectif est simplement d'y répondre avec le plus de précision possible.</blockquote>
+  </div>
+
+  <div class="bloc-phrase">
+    <div class="bloc-label">Phrase à apprendre</div>
+    <blockquote>Plus votre fiche est complète, moins vous aurez de choses à gérer ensuite.</blockquote>
+  </div>
+
+  <div class="bloc-attention">
+    <div class="bloc-label">Attention</div>
+    <p>Toutes les informations doivent être collectées directement sur la fiche descriptive. L'objectif est de faire répondre le vendeur à un maximum de questions dès maintenant afin de réduire ce qu'il aura à gérer ensuite.</p>
+  </div>
+
+  <div class="bloc-transition">
+    <p>Quand la fiche est suffisamment complète, passer à la visite du bien avec le vendeur.</p>
+  </div>
+
+  <div class="page-footer">Vendu Par Moi · Guide VRP · Étape 2</div>
+</div>
+
+<!-- ══════════════════════════ ÉTAPE 3 ══════════════════════════ -->
+<div class="page page-break">
+  <div class="step-header">
+    <div class="step-header-main">
+      <div class="step-num">Étape 3 / 9</div>
+      <div class="step-title">Visite du bien et collecte des données</div>
+      <div class="step-objectif">Constituer la matière nécessaire au dossier immobilier et au contenu visuel.</div>
+    </div>
+    <div class="step-duration">
+      <span class="step-duration-value">15'</span>
+      <span class="step-duration-label">environ</span>
+    </div>
+  </div>
+
+  <div class="bloc-faire">
+    <div class="bloc-label">À faire</div>
+    <ul class="checklist">
+      <li>Faire le tour complet de la maison avec le vendeur.</li>
+      <li>Relever chaque mesure utile.</li>
+      <li>Noter chaque caractéristique importante de chaque pièce.</li>
+      <li>Relever les équipements pertinents, notamment les éléments électriques.</li>
+      <li>Prendre au minimum trois photos de chaque pièce sous des angles différents.</li>
+      <li>Conserver une logique de prise de vue cohérente pour constituer le dossier immersif.</li>
+    </ul>
+  </div>
+
+  <div class="bloc-phrase">
+    <div class="bloc-label">Phrase à apprendre</div>
+    <blockquote>Nous allons maintenant faire le tour de la maison. Je vais relever les mesures, les caractéristiques et les équipements importants, et je vais également prendre plusieurs photos de chaque pièce pour construire votre dossier immersif.</blockquote>
+  </div>
+
+  <div class="bloc-attention">
+    <div class="bloc-label">Point de vigilance</div>
+    <p>Pour chaque pièce, penser à trois angles minimum. Les photos ne servent pas seulement à illustrer l'annonce. Elles permettent de constituer une présentation cohérente et immersive du bien.</p>
+  </div>
+
+  <div class="bloc-transition">
+    <p>Une fois le tour terminé, revenir à la table avec le vendeur.</p>
+  </div>
+
+  <div class="page-footer">Vendu Par Moi · Guide VRP · Étape 3</div>
+</div>
+
+<!-- ══════════════════════════ ÉTAPE 4 ══════════════════════════ -->
+<div class="page page-break">
+  <div class="step-header">
+    <div class="step-header-main">
+      <div class="step-num">Étape 4 / 9</div>
+      <div class="step-title">Retour à table et préparation du dossier</div>
+      <div class="step-objectif">Laisser le vendeur découvrir le guide pendant que le VRP prépare les informations du bien.</div>
+    </div>
+    <div class="step-duration">
+      <span class="step-duration-value">10'</span>
+      <span class="step-duration-label">environ</span>
+    </div>
+  </div>
+
+  <div class="bloc-faire">
+    <div class="bloc-label">À faire</div>
+    <ul class="checklist">
+      <li>Installer à nouveau le vendeur à la table.</li>
+      <li>Lui remettre le guide vendeur.</li>
+      <li>L'inviter à commencer sa lecture.</li>
+      <li>Intégrer les informations recueillies dans le dossier d'estimation et de présentation du bien.</li>
+      <li>Utiliser les photos prises dans les différentes sections du dossier.</li>
+    </ul>
+  </div>
+
+  <div class="bloc-phrase">
+    <div class="bloc-label">Phrase à apprendre</div>
+    <blockquote>Je vais maintenant préparer votre dossier avec toutes les informations que nous venons de recueillir. Pendant ce temps, je vous laisse découvrir tranquillement le guide vendeur. Il va vous expliquer comment va se dérouler votre vente.</blockquote>
+  </div>
+
+  <div class="bloc-objectif">
+    <div class="bloc-label">Objectif</div>
+    <p>Cette séquence permet de faire avancer deux choses en même temps : le vendeur découvre sa méthode de vente et le VRP transforme les informations collectées en dossier structuré.</p>
+  </div>
+
+  <div class="bloc-transition">
+    <p>Quand le dossier est suffisamment avancé, passer à la présentation de l'espace vendeur et de l'application.</p>
+  </div>
+
+  <div class="page-footer">Vendu Par Moi · Guide VRP · Étape 4</div>
+</div>
+
+<!-- ══════════════════════════ ÉTAPE 5 ══════════════════════════ -->
+<div class="page page-break">
+  <div class="step-header">
+    <div class="step-header-main">
+      <div class="step-num">Étape 5 / 9</div>
+      <div class="step-title">Présentation de l'espace vendeur</div>
+      <div class="step-objectif">Montrer que le vendeur dispose d'un environnement structuré pour organiser sa vente.</div>
+    </div>
+    <div class="step-duration">
+      <span class="step-duration-value">10'</span>
+      <span class="step-duration-label">environ</span>
+    </div>
+  </div>
+
+  <div class="bloc-montrer">
+    <div class="bloc-label">À montrer / à faire sur l'outil</div>
+    <ul>
+      <li>Présenter le tableau de bord vendeur.</li>
+      <li>Montrer l'agenda et le calendrier de disponibilités.</li>
+      <li>Expliquer que les créneaux doivent être tenus à jour.</li>
+      <li>Montrer l'espace Ma vente en 5 clics.</li>
+      <li>Présenter les cinq étapes comme un parcours logique, et non comme une simple liste de fonctionnalités.</li>
+    </ul>
+  </div>
+
+  <div class="bloc-phrase">
+    <div class="bloc-label">Phrase à apprendre</div>
+    <blockquote>L'objectif de cet espace, c'est de vous permettre de garder la maîtrise de votre vente tout en étant accompagné et organisé à chaque étape.</blockquote>
+  </div>
+
+  <div class="bloc-phrase">
+    <div class="bloc-label">Phrase à apprendre</div>
+    <blockquote>Votre agenda est important. Vous renseignez vos disponibilités et l'acquéreur peut ensuite choisir directement un créneau parmi vos disponibilités.</blockquote>
+  </div>
+
+  <div class="bloc-phrase">
+    <div class="bloc-label">Phrase à apprendre</div>
+    <blockquote>Il faut donc vraiment penser à tenir vos disponibilités à jour. Si vous n'avez aucun créneau disponible, l'acquéreur ne pourra pas réserver directement une visite.</blockquote>
+  </div>
+
+  <div class="bloc-attention">
+    <div class="bloc-label">Attention</div>
+    <p>Si le vendeur n'a aucune disponibilité renseignée, l'acquéreur ne peut pas réserver directement une visite et devra appeler. Le vendeur doit donc maintenir son agenda à jour.</p>
+  </div>
+
+  <div class="page-footer">Vendu Par Moi · Guide VRP · Étape 5</div>
+</div>
+
+<!-- ══════════════════════════ ÉTAPE 6 ══════════════════════════ -->
+<div class="page page-break">
+  <div class="step-header">
+    <div class="step-header-main">
+      <div class="step-num">Étape 6 / 9</div>
+      <div class="step-title">Ma vente en 5 clics</div>
+      <div class="step-objectif">Faire mémoriser au vendeur le parcours complet de la vente.</div>
+    </div>
+    <div class="step-duration">
+      <span class="step-duration-value">10'</span>
+      <span class="step-duration-label">environ</span>
+    </div>
+  </div>
+
+  <div class="bloc-logique">
+    <div class="bloc-label">À apprendre dans l'ordre</div>
+    <div class="etapes-inline">
+      <span class="etape-chip">1. Fiche + photos + DPE</span>
+      <span class="etape-arrow">→</span>
+      <span class="etape-chip">2. Réservation visite</span>
+      <span class="etape-arrow">→</span>
+      <span class="etape-chip">3. Dossier acheteur sérieux</span>
+      <span class="etape-arrow">→</span>
+      <span class="etape-chip">4. Soumission d'offre</span>
+      <span class="etape-arrow">→</span>
+      <span class="etape-chip">5. Dossier notaire</span>
+    </div>
+  </div>
+
+  <div class="bloc-phrase">
+    <div class="bloc-label">Phrase — Étape 1</div>
+    <blockquote>Première étape : le dossier complet du bien. Vous allez retrouver ici votre fiche descriptive, vos photos, votre DPE et vos diagnostics.</blockquote>
+  </div>
+  <div class="bloc-explication">
+    <div class="bloc-label">Explication</div>
+    <p>L'objectif est que l'acquéreur puisse avoir toutes les informations importantes concernant votre maison avant même de se déplacer.</p>
+  </div>
+
+  <div class="bloc-phrase">
+    <div class="bloc-label">Phrase — Étape 2</div>
+    <blockquote>Deuxième étape : la réservation de visite. Vous renseignez vos disponibilités dans votre agenda et l'acquéreur peut ensuite choisir directement un créneau parmi vos disponibilités.</blockquote>
+  </div>
+  <div class="bloc-explication">
+    <div class="bloc-label">Explication</div>
+    <p>Vous gardez donc la maîtrise de votre agenda et vous n'avez pas besoin de gérer les rendez-vous un par un par téléphone.</p>
+  </div>
+
+  <div class="bloc-phrase">
+    <div class="bloc-label">Phrase — Étape 3</div>
+    <blockquote>Troisième étape : le dossier acheteur sérieux. Une fois que l'acquéreur a effectué sa visite et qu'il montre un réel intérêt pour votre maison, vous pouvez lui partager ce dossier.</blockquote>
+  </div>
+  <div class="bloc-explication">
+    <div class="bloc-label">Explication</div>
+    <p>Cela permet d'aller plus loin dans l'échange et d'avoir un échange beaucoup plus transparent et structuré entre vous et l'acquéreur.</p>
+  </div>
+
+  <div class="bloc-phrase">
+    <div class="bloc-label">Phrase — Étape 4</div>
+    <blockquote>Quatrième étape : la soumission d'offre. Si l'acquéreur souhaite faire une offre, il peut la soumettre directement.</blockquote>
+  </div>
+  <div class="bloc-explication">
+    <div class="bloc-label">Explication</div>
+    <p>L'offre apparaît dans votre espace Mes offres, ce qui vous permet de centraliser les différentes propositions que vous pourriez recevoir.</p>
+  </div>
+
+  <div class="bloc-phrase">
+    <div class="bloc-label">Phrase — Étape 5</div>
+    <blockquote>Et enfin, cinquième étape : le dossier notaire complet. Une fois l'offre acceptée, vous allez pouvoir transmettre les documents nécessaires au notaire afin qu'il puisse préparer le compromis.</blockquote>
+  </div>
+
+  <div class="bloc-transition">
+    <p>Une fois les cinq étapes présentées, passer à la manière dont le vendeur va gérer le premier contact téléphonique avec un acquéreur.</p>
+  </div>
+
+  <div class="page-footer">Vendu Par Moi · Guide VRP · Étape 6</div>
+</div>
+
+<!-- ══════════════════════════ ÉTAPE 7 ══════════════════════════ -->
+<div class="page page-break">
+  <div class="step-header">
+    <div class="step-header-main">
+      <div class="step-num">Étape 7 / 9</div>
+      <div class="step-title">Contact téléphonique avec un acquéreur</div>
+      <div class="step-objectif">Donner au vendeur une réponse simple, naturelle et toujours identique.</div>
+    </div>
+    <div class="step-duration">
+      <span class="step-duration-value">5'</span>
+      <span class="step-duration-label">environ</span>
+    </div>
+  </div>
+
+  <div class="bloc-phrase">
+    <div class="bloc-label">Script téléphonique — à apprendre mot pour mot</div>
+    <blockquote>Je vends ma maison de particulier à particulier pour éviter les frais d'agence, mais je suis accompagné par Vendu Par Moi pour organiser ma vente. Je vais vous envoyer toutes les informations concernant la maison, comme les photos, les caractéristiques du bien et les diagnostics. Vous pourrez donc regarder tranquillement si le bien correspond à votre recherche et, si vous êtes toujours intéressé, nous pourrons ensuite organiser une visite.</blockquote>
+  </div>
+
+  <div class="bloc-logique">
+    <div class="bloc-label">Logique à retenir</div>
+    <div class="etapes-inline">
+      <span class="etape-chip">Je vends seul</span>
+      <span class="etape-arrow">→</span>
+      <span class="etape-chip">Je suis accompagné</span>
+      <span class="etape-arrow">→</span>
+      <span class="etape-chip">Je donne les infos</span>
+      <span class="etape-arrow">→</span>
+      <span class="etape-chip">L'acquéreur vérifie</span>
+      <span class="etape-arrow">→</span>
+      <span class="etape-chip">On organise la visite</span>
+    </div>
+  </div>
+
+  <div class="bloc-objectif">
+    <div class="bloc-label">Objectif</div>
+    <p>Le vendeur ne doit pas improviser une longue présentation au téléphone. Il donne les informations nécessaires, renvoie vers le dossier et réserve la visite pour les personnes réellement intéressées.</p>
+  </div>
+
+  <div class="page-footer">Vendu Par Moi · Guide VRP · Étape 7</div>
+</div>
+
+<!-- ══════════════════════════ ÉTAPE 8 ══════════════════════════ -->
+<div class="page page-break">
+  <div class="step-header">
+    <div class="step-header-main">
+      <div class="step-num">Étape 8 / 9</div>
+      <div class="step-title">Espace Formation</div>
+      <div class="step-objectif">Préparer le vendeur à gérer concrètement les différentes situations après la mise en vente.</div>
+    </div>
+    <div class="step-duration">
+      <span class="step-duration-value">5'</span>
+      <span class="step-duration-label">environ</span>
+    </div>
+  </div>
+
+  <div class="bloc-phrase">
+    <div class="bloc-label">Phrase à apprendre</div>
+    <blockquote>Vous avez maintenant préparé votre bien et votre dossier. La suite de l'espace Formation va vous apprendre comment gérer concrètement votre vente.</blockquote>
+  </div>
+
+  <div class="bloc-faire">
+    <div class="bloc-label">À faire</div>
+    <ul class="checklist">
+      <li>Présenter les bonnes pratiques pendant les visites.</li>
+      <li>Présenter la manière de répondre aux objections.</li>
+      <li>Expliquer comment préparer la maison avant une visite.</li>
+      <li>Présenter les quatre grandes étapes entre la signature du compromis et la signature définitive.</li>
+      <li>Rappeler que le filtrage et le dossier en amont doivent limiter les visites inutiles.</li>
+    </ul>
+  </div>
+
+  <div class="bloc-logique">
+    <div class="bloc-label">Les 4 thèmes à faire retenir</div>
+    <div class="etapes-inline">
+      <span class="etape-chip">1. Comportement pendant les visites</span>
+      <span class="etape-chip">2. Les objections</span>
+      <span class="etape-chip">3. Préparation de la maison</span>
+      <span class="etape-chip">4. Du compromis à l'acte définitif</span>
+    </div>
+  </div>
+
+  <div class="page-footer">Vendu Par Moi · Guide VRP · Étape 8</div>
+</div>
+
+<!-- ══════════════════════════ ÉTAPE 9 ══════════════════════════ -->
+<div class="page page-break">
+  <div class="step-header">
+    <div class="step-header-main">
+      <div class="step-num">Étape 9 / 9</div>
+      <div class="step-title">Conclusion de l'entretien</div>
+      <div class="step-objectif">Terminer sur une vision simple : le vendeur reste maître de sa vente, mais il n'est pas seul.</div>
+    </div>
+    <div class="step-duration">
+      <span class="step-duration-value">5'</span>
+      <span class="step-duration-label">environ</span>
+    </div>
+  </div>
+
+  <div class="bloc-phrase">
+    <div class="bloc-label">Phrase à apprendre</div>
+    <blockquote>Vous restez maître de votre vente. Vous avez votre outil pour organiser les différentes étapes, votre dossier pour présenter votre bien et votre espace Formation pour vous accompagner dans les situations que vous allez rencontrer.</blockquote>
+  </div>
+
+  <div class="bloc-phrase">
+    <div class="bloc-label">Phrase à apprendre</div>
+    <blockquote>L'idée, ce n'est pas de faire la vente à votre place. C'est de vous permettre de la gérer vous-même avec une méthode, des outils et un accompagnement.</blockquote>
+  </div>
+
+  <div class="bloc-objectif">
+    <div class="bloc-label">Idée finale à faire passer</div>
+    <p>Le vendeur garde le contrôle de sa vente. Vendu Par Moi apporte une organisation, des outils et une méthode pour que la vente entre particuliers soit structurée.</p>
+  </div>
+
+  <div class="page-footer">Vendu Par Moi · Guide VRP · Étape 9</div>
+</div>
+
+<!-- ══════════════════════════ LIMITES LÉGALES ══════════════════════════ -->
+<div class="page page-break">
+  <h1 class="page-title">Ce que vous pouvez — et ne pouvez pas — faire</h1>
+  <p class="page-subtitle">Limites légales de l'activité de Conseiller Partenaire</p>
+
+  <div class="intro-box">
+    <p>Votre statut de Conseiller Partenaire Indépendant vous permet d'apporter des clients à VPM et d'accompagner leur démarrage. Il <strong>ne vous autorise pas</strong> à exercer les activités régulées par la loi Hoguet (agents immobiliers, mandataires). Respecter ces limites vous protège juridiquement.</p>
+  </div>
+
+  <table class="route-table">
+    <thead>
+      <tr>
+        <th style="background:#7A2B12;">❌ INTERDIT</th>
+        <th style="background:var(--terracotta);">✅ AUTORISÉ</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Négocier le prix de vente avec un acheteur ou vendeur</td>
+        <td>Informer le vendeur sur les prix du marché (via sources publiques)</td>
+      </tr>
+      <tr>
+        <td>Signer ou faire signer un mandat de vente au nom de VPM</td>
+        <td>Guider le vendeur pour signer les CGV VPM en ligne</td>
+      </tr>
+      <tr>
+        <td>Recevoir des fonds d'acheteurs (acompte, séquestre)</td>
+        <td>Accompagner le paiement du pack vendeur sur la plateforme VPM</td>
+      </tr>
+      <tr>
+        <td>Vous présenter comme "agent immobilier" ou "négociateur"</td>
+        <td>Vous présenter comme "Conseiller Partenaire Vendu Par Moi"</td>
+      </tr>
+      <tr>
+        <td>Accompagner des acheteurs lors de leurs visites du bien</td>
+        <td>Configurer l'agenda de visite pour le compte du vendeur</td>
+      </tr>
+      <tr>
+        <td>Promettre un prix de vente ou un délai de vente</td>
+        <td>Expliquer les fonctionnalités de la plateforme VPM</td>
+      </tr>
+      <tr>
+        <td>Diffuser vous-même l'annonce du bien sur d'autres portails</td>
+        <td>Aider le vendeur à publier son annonce dans son compte VPM</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="bloc-attention">
+    <div class="bloc-label">Règle d'or</div>
+    <p>En cas de doute : contactez VPM avant d'agir. contact@venduparmoi.fr — réponse sous 24h. Toute activité hors du cadre de votre contrat relève de votre responsabilité personnelle.</p>
+  </div>
+
+  <h2 class="h2">FAQ statut et administration</h2>
+
+  <div class="bloc-objectif">
+    <div class="bloc-label">Quel statut juridique ?</div>
+    <p><strong>Micro-entrepreneur</strong> recommandé. Code APE : 7490B (Activités professionnelles diverses). Déclaration sur autoentrepreneur.urssaf.fr — gratuit, en ligne, 15 minutes. Cotisations : ~11% du CA déclaré.</p>
+  </div>
+
+  <div class="bloc-objectif">
+    <div class="bloc-label">Ai-je besoin d'une carte professionnelle immobilière ?</div>
+    <p>Non. Vous ne détenez pas de mandat de vente, ne négociez pas de transactions, ne recevez pas de fonds. La loi Hoguet ne s'applique pas à votre activité telle qu'encadrée par votre contrat VPM.</p>
+  </div>
+
+  <div class="bloc-objectif">
+    <div class="bloc-label">Que se passe-t-il si je dépasse 37 500 €/an ?</div>
+    <p>Vous devez facturer la TVA (20%) à VPM à partir du 1er janvier suivant. VPM récupère cette TVA — votre revenu net reste identique à 645 € HT. Aucune démarche bloquante.</p>
+  </div>
+
+  <div class="bloc-objectif">
+    <div class="bloc-label">Puis-je cumuler avec un autre réseau (SAFTI, IAD…) ?</div>
+    <p>Oui, en principe. VPM est une plateforme tech — pas un réseau d'agents concurrents. Vérifiez les clauses de votre propre contrat réseau avant de démarrer. En cas de doute, contactez-nous.</p>
+  </div>
+
+  <div class="page-footer">Vendu Par Moi · Guide VRP · Limites légales et FAQ</div>
+</div>
+
+<!-- ══════════════════════════ OBJECTIONS ══════════════════════════ -->
+<div class="page page-break">
+  <h1 class="page-title">Objections courantes</h1>
+  <p class="page-subtitle">Réponses types à mémoriser pour chaque situation</p>
+
+  <div class="objection-card">
+    <div class="objection-question">Je veux vendre seul, je n'ai pas besoin d'accompagnement.</div>
+    <div class="objection-reponse"><p>Justement, Vendu Par Moi vous permet de rester dans une vente de particulier à particulier tout en vous donnant une méthode et des outils pour organiser les différentes étapes.</p></div>
+  </div>
+
+  <div class="objection-card">
+    <div class="objection-question">Je n'ai pas beaucoup de temps pour gérer les visites.</div>
+    <div class="objection-reponse"><p>C'est justement pour cela que l'agenda est important. Vous indiquez vos disponibilités et les acquéreurs choisissent un créneau parmi celles que vous avez ouvertes.</p></div>
+  </div>
+
+  <div class="objection-card">
+    <div class="objection-question">Pourquoi faut-il remplir autant d'informations ?</div>
+    <div class="objection-reponse"><p>Plus votre fiche est complète dès le départ, moins vous aurez de choses à gérer ensuite. L'objectif est de préparer un maximum d'informations avant que les demandes et les visites commencent.</p></div>
+  </div>
+
+  <div class="objection-card">
+    <div class="objection-question">Que se passe-t-il après la visite ?</div>
+    <div class="objection-reponse"><p>Si l'acquéreur montre un réel intérêt, vous pouvez lui partager le dossier acheteur sérieux. S'il souhaite ensuite faire une offre, elle apparaît dans votre espace Mes offres.</p></div>
+  </div>
+
+  <div class="objection-card">
+    <div class="objection-question">Et après l'offre ?</div>
+    <div class="objection-reponse"><p>Une fois l'offre acceptée, vous passez à la cinquième étape : le dossier notaire complet, afin de transmettre les documents nécessaires au notaire pour préparer le compromis.</p></div>
+  </div>
+
+  <div class="page-footer">Vendu Par Moi · Guide VRP · Objections</div>
+</div>
+
+<!-- ══════════════════════════ PROGRAMME ══════════════════════════ -->
+<div class="page page-break">
+  <h1 class="page-title">Programme d'apprentissage</h1>
+  <p class="page-subtitle">Méthode pour maîtriser le script bloc par bloc</p>
+
+  <div class="intro-box">
+    <p>Ne pas chercher à apprendre tout le document en une seule fois. Apprendre bloc par bloc. Pour chaque bloc : lire, dire à voix haute, répéter sans regarder, jouer la scène, puis recommencer avec une formulation naturelle.</p>
+  </div>
+
+  <div class="bloc-item"><div class="bloc-num">1</div><div class="bloc-content"><strong>Accueil</strong><span>Apprendre l'accueil et les quatre premières questions.</span></div></div>
+  <div class="bloc-item"><div class="bloc-num">2</div><div class="bloc-content"><strong>Fiche descriptive</strong><span>La fiche et la phrase « Plus votre fiche est complète, moins vous aurez de choses à gérer ensuite. »</span></div></div>
+  <div class="bloc-item"><div class="bloc-num">3</div><div class="bloc-content"><strong>Visite du bien</strong><span>La visite et la méthode de prise de photos (3 angles minimum par pièce).</span></div></div>
+  <div class="bloc-item"><div class="bloc-num">4</div><div class="bloc-content"><strong>Espace vendeur</strong><span>La présentation de l'espace vendeur.</span></div></div>
+  <div class="bloc-item"><div class="bloc-num">5</div><div class="bloc-content"><strong>Ma vente en 5 clics</strong><span>Les cinq étapes dans l'ordre, sans exception.</span></div></div>
+  <div class="bloc-item"><div class="bloc-num">6</div><div class="bloc-content"><strong>Script téléphonique</strong><span>Le script téléphonique acquéreur, mot pour mot.</span></div></div>
+  <div class="bloc-item"><div class="bloc-num">7</div><div class="bloc-content"><strong>Espace Formation</strong><span>La présentation de l'Espace Formation et les 4 thèmes.</span></div></div>
+  <div class="bloc-item"><div class="bloc-num">8</div><div class="bloc-content"><strong>Conclusion</strong><span>La conclusion : le vendeur garde le contrôle.</span></div></div>
+  <div class="bloc-item"><div class="bloc-num">9</div><div class="bloc-content"><strong>Jeux de rôle</strong><span>Plusieurs jeux de rôle complets avec objections.</span></div></div>
+
+  <div class="page-footer">Vendu Par Moi · Guide VRP · Programme</div>
+</div>
+
+<!-- ══════════════════════════ TEST FINAL ══════════════════════════ -->
+<div class="page page-break">
+  <h1 class="page-title">Test final du VRP</h1>
+  <p class="page-subtitle">Valider chaque compétence avant le premier rendez-vous terrain</p>
+
+  <div class="test-item">Le VRP sait accueillir et lancer la découverte sans lire ses notes.</div>
+  <div class="test-item">Le VRP sait faire compléter la fiche descriptive.</div>
+  <div class="test-item">Le VRP sait expliquer pourquoi la fiche doit être complète.</div>
+  <div class="test-item">Le VRP sait conduire la visite et collecter les informations.</div>
+  <div class="test-item">Le VRP sait expliquer le rôle des photos.</div>
+  <div class="test-item">Le VRP sait présenter l'agenda et l'importance des disponibilités.</div>
+  <div class="test-item">Le VRP sait réciter les cinq étapes dans le bon ordre.</div>
+  <div class="test-item">Le VRP sait expliquer chacune des cinq étapes avec ses propres mots sans perdre le sens.</div>
+  <div class="test-item">Le VRP sait réciter le script téléphonique acquéreur.</div>
+  <div class="test-item">Le VRP sait présenter l'Espace Formation.</div>
+  <div class="test-item">Le VRP sait conclure en rappelant que le vendeur reste maître de sa vente.</div>
+
+  <div class="page-footer">Vendu Par Moi · Guide VRP · Test final</div>
+</div>
+
+<!-- ══════════════════════════ CARTE MÉMO ══════════════════════════ -->
+<div class="page page-break">
+  <h1 class="page-title">Carte mémo VRP</h1>
+  <p class="page-subtitle">Les 9 étapes en un coup d'œil</p>
+
+  <div class="memo-grid">
+    <div class="memo-card">
+      <div class="memo-card-header"><div class="memo-num">1</div><span>Accueillir</span></div>
+      <div class="memo-card-body">Comprendre le projet, la raison de la vente, l'estimation déjà réalisée et le prix souhaité.</div>
+    </div>
+    <div class="memo-card">
+      <div class="memo-card-header"><div class="memo-num">2</div><span>Fiche</span></div>
+      <div class="memo-card-body">Faire répondre le vendeur à toutes les questions. Maximum d'informations dès maintenant.</div>
+    </div>
+    <div class="memo-card">
+      <div class="memo-card-header"><div class="memo-num">3</div><span>Visite</span></div>
+      <div class="memo-card-body">Mesurer, relever les caractéristiques et les équipements. Au moins 3 photos par pièce.</div>
+    </div>
+    <div class="memo-card">
+      <div class="memo-card-header"><div class="memo-num">4</div><span>Préparer</span></div>
+      <div class="memo-card-body">Le vendeur lit son guide pendant que le VRP prépare le dossier avec les infos et les photos.</div>
+    </div>
+    <div class="memo-card">
+      <div class="memo-card-header"><div class="memo-num">5</div><span>Montrer</span></div>
+      <div class="memo-card-body">Présenter l'espace vendeur, l'agenda et le fonctionnement global.</div>
+    </div>
+    <div class="memo-card">
+      <div class="memo-card-header"><div class="memo-num">6</div><span>Les 5 clics</span></div>
+      <div class="memo-card-body">Dossier → Visite → Acheteur sérieux → Offre → Notaire. Dans cet ordre, toujours.</div>
+    </div>
+    <div class="memo-card">
+      <div class="memo-card-header"><div class="memo-num">7</div><span>Appel</span></div>
+      <div class="memo-card-body">Je vends seul → accompagné → je donne les infos → l'acquéreur vérifie → on organise la visite.</div>
+    </div>
+    <div class="memo-card">
+      <div class="memo-card-header"><div class="memo-num">8</div><span>Formation</span></div>
+      <div class="memo-card-body">Visites, objections, préparation de la maison et étapes du compromis à l'acte définitif.</div>
+    </div>
+    <div class="memo-card" style="grid-column: span 2;">
+      <div class="memo-card-header"><div class="memo-num">9</div><span>Conclure</span></div>
+      <div class="memo-card-body">Le vendeur garde le contrôle. Il dispose d'une méthode, d'outils et d'un accompagnement. Vendu Par Moi ne vend pas à sa place — il lui donne les moyens de réussir seul.</div>
+    </div>
+  </div>
+
+  <div class="page-footer">Vendu Par Moi · Guide VRP · Carte mémo</div>
+</div>
+
+
+
+</body></html>
