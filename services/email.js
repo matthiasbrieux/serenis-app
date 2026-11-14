@@ -59,7 +59,7 @@ function _logEmailSend(to, subject, success, resendId, source = 'auto') {
 }
 
 // ── Helper : envoyer un email via Resend ──────────────────────
-async function send(to, subject, html, source = 'auto') {
+async function send(to, subject, html, source = 'auto', attachments = []) {
   if (_previewCapture !== null) {
     _previewCapture = html;
     return true;
@@ -89,12 +89,9 @@ async function send(to, subject, html, source = 'auto') {
   try {
     const fromName = _sendOverrideFrom?.name || FROM_NAME;
     const fromEmail = _sendOverrideFrom?.email || FROM_EMAIL;
-    const { data, error } = await resend.emails.send({
-      from: `${fromName} <${fromEmail}>`,
-      to: actualTo,
-      subject,
-      html,
-    });
+    const payload = { from: `${fromName} <${fromEmail}>`, to: actualTo, subject, html };
+    if (attachments.length) payload.attachments = attachments;
+    const { data, error } = await resend.emails.send(payload);
     if (error) {
       console.error(`[EMAIL] ✗ Resend error → ${actualTo} : ${JSON.stringify(error)}`);
       _logEmailSend(actualTo, subject, false, null, actualSource);
@@ -385,7 +382,7 @@ async function sendPropertySoldToBuyer({ buyerEmail, buyerName, propertyType, pr
 // 6. FACTURE / PAIEMENT
 // ─────────────────────────────────────────────────────────────
 
-async function sendInvoiceEmail({ email, firstName, lastName, amount, pack, invoiceNumber, date }) {
+async function sendInvoiceEmail({ email, firstName, lastName, amount, pack, invoiceNumber, date, pdfBuffer }) {
   const htCents   = Math.round(amount / 1.2);
   const tvaCents  = amount - htCents;
   const amountTTC = fmtEur(amount);
@@ -428,7 +425,8 @@ async function sendInvoiceEmail({ email, firstName, lastName, amount, pack, invo
     ${divider()}
     ${muted('Pour toute question, contactez-nous à <a href="mailto:contact@venduparmoi.fr" style="color:#C4603A;">contact@venduparmoi.fr</a>')}
   `, { preheader: `Votre facture Vendu Par Moi — ${amountTTC} € TTC` });
-  return send(email, `🧾 Facture Vendu Par Moi — ${amountTTC} € TTC`, html);
+  const attachments = pdfBuffer ? [{ filename: `Facture-${invoiceNumber}.pdf`, content: pdfBuffer }] : [];
+  return send(email, `🧾 Facture Vendu Par Moi — ${amountTTC} € TTC`, html, 'auto', attachments);
 }
 
 // ─────────────────────────────────────────────────────────────

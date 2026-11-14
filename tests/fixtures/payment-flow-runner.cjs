@@ -159,7 +159,7 @@ await test('P-06',async()=>{
   const invoiceCall=emailCalls.find(c=>c.fn==='sendInvoiceEmail');
   assert(invoiceCall,'Invoice email must be attempted');
   assert(seller.invoice_number,'Invoice number must be stored in DB after activation');
-  assert(/^VPM-\d{4}-\d{5}-.+$/.test(seller.invoice_number),'Invoice number must match VPM-YYYY-NNNNN-XXXXX format');
+  assert(/^VPM-\d{4}-\d{5}$/.test(seller.invoice_number),'Invoice number must match VPM-YYYY-NNNNN format');
   const invArgs=invoiceCall?.args?.[0];
   assert.equal(invArgs?.invoiceNumber,seller.invoice_number,'Invoice number sent in email must match the one stored in DB');
   const adminCall=emailCalls.find(c=>c.fn==='sendNewClientAdminNotif');

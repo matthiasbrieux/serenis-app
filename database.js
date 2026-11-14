@@ -907,4 +907,45 @@ try {
 // ── Factures — numéro persistant pour renvoi admin ──────────────
 try { db.exec("ALTER TABLE sellers ADD COLUMN invoice_number TEXT"); } catch(e) {}
 
+// ── Système de facturation professionnel ────────────────────────
+// invoice_sequences : compteur annuel transactionnel (garantit la continuité)
+db.exec(`
+  CREATE TABLE IF NOT EXISTS invoice_sequences (
+    year     INTEGER PRIMARY KEY,
+    next_seq INTEGER NOT NULL DEFAULT 1
+  );
+`);
+
+// invoices : archive durable des factures émises (PDF binaire + métadonnées)
+// Le PDF est stocké en BLOB : il est sauvegardé automatiquement avec la DB,
+// ne dépend pas du système de fichiers, et reste identique pour toujours.
+db.exec(`
+  CREATE TABLE IF NOT EXISTS invoices (
+    id               INTEGER PRIMARY KEY AUTOINCREMENT,
+    seller_id        INTEGER NOT NULL REFERENCES sellers(id),
+    invoice_number   TEXT    NOT NULL UNIQUE,
+    year             INTEGER NOT NULL,
+    seq              INTEGER NOT NULL,
+    amount_ttc       INTEGER NOT NULL,
+    amount_ht        INTEGER,
+    tva_rate         REAL,
+    tva_amount       INTEGER,
+    pack             TEXT    NOT NULL,
+    pdf_data         BLOB    NOT NULL,
+    pdf_hash         TEXT    NOT NULL,
+    created_at       TEXT    DEFAULT (datetime('now')),
+    stripe_session_id TEXT,
+    client_email     TEXT    NOT NULL,
+    client_first_name TEXT,
+    client_last_name  TEXT,
+    UNIQUE(year, seq)
+  );
+  CREATE INDEX IF NOT EXISTS idx_invoices_seller ON invoices(seller_id);
+`);
+
+// Initialiser le compteur depuis les factures existantes (migration one-shot)
+try {
+  require('./services/invoice').initSequenceFromExisting(db);
+} catch(e) {}
+
 module.exports = db;

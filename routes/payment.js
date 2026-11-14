@@ -8,6 +8,7 @@ const { v4: uuidv4 } = require('uuid');
 const db = require('../database');
 const { sendWelcomeImproved, sendInvoiceEmail, sendFirstMeetingEmail, sendNewClientAdminNotif, legalInfoReady } = require('../services/email');
 const { isPasswordPwned } = require('../services/passwordCheck');
+const { issueInvoice } = require('../services/invoice');
 const crypto = require('crypto');
 
 const checkoutLimit = rateLimit({
@@ -273,15 +274,21 @@ async function activateSeller(session) {
     await sendNewClientAdminNotif({ firstName: seller.first_name, lastName: seller.last_name, email: seller.email, pack: activePack, phone: seller.phone, sellerId: seller.id });
   } catch(e) { console.error('Admin todo/notif error:', e.message); }
 
-  // Facture automatique — bloquée si les mentions légales obligatoires ne sont pas configurées
+  // Facture automatique — archivage PDF + envoi email
   try {
     if (!legalInfoReady()) {
       console.error(`[FACTURE] Mentions légales manquantes — facture non envoyée pour vendeur ${seller.id} (${seller.email}). Configurer LEGAL_SIREN et LEGAL_RAISON_SOCIALE, puis envoyer manuellement depuis /admin.`);
     } else {
-      const amount = session.amount_total || (pack === 'serenite' ? 154700 : 99900);
-      const invoiceNumber = `VPM-${new Date().getFullYear()}-${String(seller.id).padStart(5, '0')}-${Date.now().toString(36).toUpperCase()}`;
-      db.prepare('UPDATE sellers SET invoice_number=? WHERE id=? AND invoice_number IS NULL').run(invoiceNumber, seller.id);
-      await sendInvoiceEmail({ email: seller.email, firstName: seller.first_name, lastName: seller.last_name, amount, pack: pack || 'serenite', invoiceNumber, date: new Date() });
+      const amountTTC = session.amount_total || (activePack === 'serenite' ? 154700 : 99900);
+      const record = await issueInvoice(db, seller, { amountTTC, pack: activePack, stripeSessionId: session.id, date: new Date() });
+      if (record) {
+        const pdfBuffer = Buffer.isBuffer(record.pdf_data) ? record.pdf_data : Buffer.from(record.pdf_data);
+        await sendInvoiceEmail({
+          email: seller.email, firstName: seller.first_name, lastName: seller.last_name,
+          amount: amountTTC, pack: activePack, invoiceNumber: record.invoice_number,
+          date: seller.paid_at || new Date(), pdfBuffer,
+        });
+      }
     }
   } catch(e) { console.error('Invoice email error:', e.message); }
 

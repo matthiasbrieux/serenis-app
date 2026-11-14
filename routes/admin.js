@@ -8,6 +8,7 @@ const db = require('../database');
 const { isPasswordPwned } = require('../services/passwordCheck');
 const { requireAdmin } = require('../middleware/auth');
 const { sendWelcomeImproved, sendPostFirstVisitFeedbackSeller, sendCheckInNoOffer, sendNoPhotosNudge, sendMissingDocNudge, sendNotPublishedNudge, sendProspectNudge, sendContractRenewal, sendReviewRequest, sendAdminDirectEmail, sendFirstMeetingEmail, sendNewClientAdminNotif, sendFirstVisitReminderSeller, sendSoldCongrats, sendInvoiceEmail, legalInfoReady } = require('../services/email');
+const { issueInvoice, getArchivedInvoice } = require('../services/invoice');
 
 // ── Tarifs centralisés (en centimes TTC) ─────────────────────
 const PACK_PRICES = { autonome: 99900, serenite: 154700 };
@@ -1982,19 +1983,34 @@ router.get('/api/test-all-emails', requireAdmin, async (req, res) => {
 router.get('/api/crm/:id/invoice-status', requireAdmin, (req, res) => {
   const seller = db.prepare('SELECT id, first_name, last_name, email, pack, paid_at, paid_amount, invoice_number FROM sellers WHERE id=?').get(+req.params.id);
   if (!seller) return res.status(404).json({ error: 'Vendeur introuvable' });
-  let lastInvoice = null;
+  const archived = getArchivedInvoice(db, seller.id);
+  let lastEmail = null;
   try {
-    lastInvoice = db.prepare("SELECT success, sent_at FROM email_sends WHERE seller_id=? AND subject LIKE '🧾 Facture%' ORDER BY sent_at DESC LIMIT 1").get(seller.id);
+    lastEmail = db.prepare("SELECT success, sent_at FROM email_sends WHERE seller_id=? AND subject LIKE '🧾 Facture%' ORDER BY sent_at DESC LIMIT 1").get(seller.id);
   } catch(e) {}
   return res.json({
     paid: !!seller.paid_at,
     paid_at: seller.paid_at,
     paid_amount: seller.paid_amount,
     pack: seller.pack,
-    invoice_number: seller.invoice_number,
-    last_invoice: lastInvoice,
+    invoice_number: archived?.invoice_number || seller.invoice_number || null,
+    pdf_archived: !!archived,
+    pdf_hash: archived?.pdf_hash || null,
+    last_email: lastEmail,
     legal_ready: legalInfoReady(),
   });
+});
+
+// ── Téléchargement PDF facture (admin) ────────────────────────
+router.get('/api/crm/:id/invoice-pdf', requireAdmin, (req, res) => {
+  const seller = db.prepare('SELECT id, email FROM sellers WHERE id=?').get(+req.params.id);
+  if (!seller) return res.status(404).json({ error: 'Vendeur introuvable' });
+  const archived = getArchivedInvoice(db, seller.id);
+  if (!archived) return res.status(404).json({ error: 'Aucune facture archivée pour ce vendeur.' });
+  const pdf = Buffer.isBuffer(archived.pdf_data) ? archived.pdf_data : Buffer.from(archived.pdf_data);
+  res.set('Content-Type', 'application/pdf');
+  res.set('Content-Disposition', `inline; filename="Facture-${archived.invoice_number}.pdf"`);
+  res.send(pdf);
 });
 
 // ── Renvoi facture vendeur (admin) ────────────────────────────
@@ -2019,25 +2035,27 @@ router.post('/api/crm/:id/resend-invoice', requireAdmin, async (req, res) => {
     return res.status(503).json({ error: 'Les informations légales (LEGAL_SIREN, LEGAL_RAISON_SOCIALE…) ne sont pas configurées. Renseignez-les dans le .env et redémarrez PM2.' });
   }
 
-  const amount = seller.paid_amount || PACK_PRICES[seller.pack] || PACK_PRICES.serenite;
-  const invoiceNumber = seller.invoice_number
-    || `VPM-${new Date().getFullYear()}-${String(seller.id).padStart(5, '0')}-${Date.now().toString(36).toUpperCase()}`;
-
-  if (!seller.invoice_number) {
-    db.prepare('UPDATE sellers SET invoice_number=? WHERE id=? AND invoice_number IS NULL').run(invoiceNumber, seller.id);
+  // Récupérer ou créer la facture archivée
+  const amountTTC = seller.paid_amount || PACK_PRICES[seller.pack] || PACK_PRICES.serenite;
+  let record;
+  try {
+    record = await issueInvoice(db, seller, { amountTTC, pack: seller.pack || 'serenite', date: seller.paid_at || new Date() });
+  } catch(e) {
+    return res.status(500).json({ error: `Erreur génération facture : ${e.message}` });
   }
+  if (!record) return res.status(500).json({ error: 'Impossible de générer la facture.' });
+
+  const pdfBuffer = Buffer.isBuffer(record.pdf_data) ? record.pdf_data : Buffer.from(record.pdf_data);
 
   try {
     await sendInvoiceEmail({
-      email: seller.email,
-      firstName: seller.first_name,
-      lastName: seller.last_name,
-      amount,
-      pack: seller.pack || 'serenite',
-      invoiceNumber,
+      email: seller.email, firstName: seller.first_name, lastName: seller.last_name,
+      amount: amountTTC, pack: seller.pack || 'serenite',
+      invoiceNumber: record.invoice_number,
       date: seller.paid_at || new Date(),
+      pdfBuffer,
     });
-    return res.json({ ok: true, invoiceNumber });
+    return res.json({ ok: true, invoiceNumber: record.invoice_number, pdf_hash: record.pdf_hash });
   } catch(e) {
     return res.status(500).json({ error: `Erreur d'envoi : ${e.message}` });
   }

@@ -137,7 +137,7 @@ await test('A-I-05',async()=>{
   const r=await request('GET',`/admin/api/crm/${PAID_NO_INVOICE_ID}/invoice-status`,{cookie:adminCookie()});
   assert.equal(r.status,200);
   assert.equal(r.json.paid,true,'paid must be true');
-  assert(!r.json.last_invoice,'last_invoice must be null when no email sent');
+  assert(!r.json.last_email,'last_email must be null when no email sent');
   assert.equal(r.json.legal_ready,true,'legal_ready must reflect LEGAL vars');
 });
 
@@ -145,7 +145,7 @@ await test('A-I-05',async()=>{
 await test('A-I-06',async()=>{
   const r=await request('GET',`/admin/api/crm/${PAID_WITH_INVOICE_ID}/invoice-status`,{cookie:adminCookie()});
   assert.equal(r.status,200);
-  assert.equal(r.json.last_invoice?.success,1,'last_invoice.success must be 1');
+  assert.equal(r.json.last_email?.success,1,'last_email.success must be 1');
   assert.equal(r.json.invoice_number,'VPM-2026-00099-TEST1','Stored invoice number must be returned');
 });
 
@@ -153,7 +153,7 @@ await test('A-I-06',async()=>{
 await test('A-I-07',async()=>{
   const r=await request('GET',`/admin/api/crm/${PAID_FAILED_INV_ID}/invoice-status`,{cookie:adminCookie()});
   assert.equal(r.status,200);
-  assert.equal(r.json.last_invoice?.success,0,'last_invoice.success must be 0 on failed send');
+  assert.equal(r.json.last_email?.success,0,'last_email.success must be 0 on failed send');
 });
 
 // A-I-08 — Renvoi : vendeur non payant → 400
@@ -180,7 +180,7 @@ await test('A-I-10',async()=>{
   assert.equal(r.status,200,'Resend must return 200');
   assert(r.json.ok,'ok must be true');
   assert(r.json.invoiceNumber,'Invoice number must be returned');
-  assert(/^VPM-\d{4}-\d{5}-.+$/.test(r.json.invoiceNumber),'Invoice number format must match VPM-YYYY-NNNNN-XXXXX');
+  assert(/^VPM-\d{4}-\d{5}$/.test(r.json.invoiceNumber),'Invoice number format must match VPM-YYYY-NNNNN');
   const inv=emailCalls.find(c=>c.fn==='sendInvoiceEmail');
   assert(inv,'sendInvoiceEmail must be called');
   assert.equal(inv.args[0].invoiceNumber,r.json.invoiceNumber,'Email must use same invoice number as response');

@@ -12,6 +12,7 @@ const { sellerUploadLimiter } = require('../middleware/rate-limits');
 const { uploadPhoto, uploadDocument } = require('../services/upload');
 const { sendSoldCongrats, sendPropertySoldToBuyer, sendVisitConfirmation } = require('../services/email');
 const { isPasswordPwned } = require('../services/passwordCheck');
+const { getArchivedInvoice } = require('../services/invoice');
 
 // Désactiver le cache navigateur pour toutes les pages vendeur
 router.use((req, res, next) => {
@@ -1961,6 +1962,30 @@ router.post('/api/dossier/send-email', requireAuth, express.json(), async (req, 
     console.error('[DOSSIER EMAIL] Send error:', e.message);
     res.status(500).json({ error: 'Envoi impossible. Réessayez ou contactez le support.' });
   }
+});
+
+// ── Téléchargement de la facture (espace vendeur) ─────────────
+// Accessible uniquement par le titulaire du compte authentifié.
+router.get('/api/invoice', requireAuth, (req, res) => {
+  const archived = getArchivedInvoice(db, req.seller.id);
+  if (!archived) return res.status(404).json({ error: 'Aucune facture disponible pour votre compte.' });
+  const pdf = Buffer.isBuffer(archived.pdf_data) ? archived.pdf_data : Buffer.from(archived.pdf_data);
+  res.set('Content-Type', 'application/pdf');
+  res.set('Content-Disposition', `inline; filename="Facture-${archived.invoice_number}.pdf"`);
+  res.send(pdf);
+});
+
+// ── Statut facture (espace vendeur) ───────────────────────────
+router.get('/api/invoice-status', requireAuth, (req, res) => {
+  const archived = getArchivedInvoice(db, req.seller.id);
+  if (!archived) return res.json({ available: false });
+  return res.json({
+    available: true,
+    invoice_number: archived.invoice_number,
+    created_at: archived.created_at,
+    amount_ttc: archived.amount_ttc,
+    pack: archived.pack,
+  });
 });
 
 module.exports = router;
