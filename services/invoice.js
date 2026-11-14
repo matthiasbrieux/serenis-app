@@ -3,18 +3,23 @@ const PDFDocument = require('pdfkit');
 const crypto = require('crypto');
 
 // ── Configuration TVA ────────────────────────────────────────────────────────
-// LEGAL_TVA_STATUS accepte trois valeurs :
-//   'franchise'           → TVA non applicable, art. 293 B du CGI  (défaut)
+// LEGAL_TVA_STATUS doit être défini explicitement dans le .env :
+//   'franchise'           → TVA non applicable, art. 293 B du CGI
 //   'taux_20'             → TVA 20 % appliquée
-//   'exonere_formation'   → Exonération art. 261-4-4° du CGI (organismes de formation)
+//   'exonere_formation'   → Exonération art. 261-4-4° du CGI
 //
-// ⚠️  Faire valider le statut TVA applicable par un expert-comptable avant
-//     d'émettre des factures. La valeur par défaut 'franchise' suppose un
-//     chiffre d'affaires inférieur au seuil de franchise (36 800 € HT/an).
-const TVA_STATUS = () => process.env.LEGAL_TVA_STATUS || 'franchise';
+// Aucune valeur par défaut : l'absence de configuration bloque l'émission
+// de factures plutôt que de supposer un régime fiscal.
+const VALID_TVA_STATUS = new Set(['franchise', 'taux_20', 'exonere_formation']);
+function getTvaStatus() {
+  const v = process.env.LEGAL_TVA_STATUS;
+  if (!v) throw new Error('[FACTURE] LEGAL_TVA_STATUS non configuré. Valeurs acceptées : franchise, taux_20, exonere_formation. Faire valider le statut TVA par un comptable avant d\'émettre des factures.');
+  if (!VALID_TVA_STATUS.has(v)) throw new Error(`[FACTURE] LEGAL_TVA_STATUS="${v}" invalide. Valeurs acceptées : franchise, taux_20, exonere_formation.`);
+  return v;
+}
 
 function computeTax(amountTTC) {
-  switch (TVA_STATUS()) {
+  switch (getTvaStatus()) {
     case 'taux_20': {
       const htCents = Math.round(amountTTC / 1.2);
       const tvaCents = amountTTC - htCents;
@@ -318,4 +323,4 @@ function initSequenceFromExisting(db) {
   }
 }
 
-module.exports = { issueInvoice, getArchivedInvoice, allocateInvoiceNumber, computeTax, generatePdf, initSequenceFromExisting };
+module.exports = { issueInvoice, getArchivedInvoice, allocateInvoiceNumber, computeTax, generatePdf, initSequenceFromExisting, VALID_TVA_STATUS };

@@ -382,12 +382,14 @@ async function sendPropertySoldToBuyer({ buyerEmail, buyerName, propertyType, pr
 // 6. FACTURE / PAIEMENT
 // ─────────────────────────────────────────────────────────────
 
-async function sendInvoiceEmail({ email, firstName, lastName, amount, pack, invoiceNumber, date, pdfBuffer }) {
-  const htCents   = Math.round(amount / 1.2);
-  const tvaCents  = amount - htCents;
-  const amountTTC = fmtEur(amount);
-  const amountHT  = fmtEur(htCents);
-  const tva       = fmtEur(tvaCents);
+async function sendInvoiceEmail({ email, firstName, lastName, amount, pack, invoiceNumber, date, pdfBuffer, amountHTCents, tvaAmountCents, tvaRate }) {
+  // Use values from invoice record when provided; fall back to 20% for previews.
+  const resolvedHT   = amountHTCents  !== undefined ? amountHTCents  : Math.round(amount / 1.2);
+  const resolvedTVA  = tvaAmountCents !== undefined ? tvaAmountCents : amount - Math.round(amount / 1.2);
+  const resolvedRate = tvaRate        !== undefined ? tvaRate        : 20;
+  const amountTTC    = fmtEur(amount);
+  const amountHT     = fmtEur(resolvedHT);
+  const tva          = fmtEur(resolvedTVA);
   const packLabel = pack === 'serenite' ? 'Pack Accompagnement' : 'Pack Autonomie';
   const dateStr   = new Date(date).toLocaleDateString('fr-FR');
   const clientName = `${firstName || ''} ${lastName || ''}`.trim() || '—';
@@ -417,7 +419,7 @@ async function sendInvoiceEmail({ email, firstName, lastName, amount, pack, invo
       ${infoRow('Date', dateStr)}
       ${infoRow('Pack', packLabel)}
       ${infoRow('Montant HT', `${amountHT} €`)}
-      ${infoRow('TVA (20%)', `${tva} €`)}
+      ${resolvedRate === 20 ? infoRow('TVA (20%)', `${tva} €`) : infoRow('TVA', resolvedRate === null ? 'Non applicable — art. 293 B CGI' : 'Exonérée — art. 261-4-4° CGI')}
       ${infoRow('Total TTC', `<strong>${amountTTC} €</strong>`)}
     `)}
     ${p('Merci pour votre confiance.')}

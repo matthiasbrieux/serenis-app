@@ -2054,6 +2054,9 @@ router.post('/api/crm/:id/resend-invoice', requireAdmin, async (req, res) => {
       invoiceNumber: record.invoice_number,
       date: seller.paid_at || new Date(),
       pdfBuffer,
+      amountHTCents: record.amount_ht,
+      tvaAmountCents: record.tva_amount,
+      tvaRate: record.tva_rate,
     });
     return res.json({ ok: true, invoiceNumber: record.invoice_number, pdf_hash: record.pdf_hash });
   } catch(e) {

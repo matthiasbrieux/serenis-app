@@ -12,6 +12,7 @@ process.env.LEGAL_RAISON_SOCIALE='VPM SAS';
 process.env.LEGAL_FORME_JURIDIQUE='SAS';
 process.env.LEGAL_ADRESSE_SIEGE='1 rue de la Paix, 59000 Lille';
 process.env.LEGAL_RCS='Lille B 123 456 789';
+process.env.LEGAL_TVA_STATUS='franchise';
 
 // ── Mock externes ──────────────────────────────────────────────────────────
 const emailCalls=[];

@@ -127,7 +127,7 @@ await test('I-02',async()=>{
   assert.equal(b.number,'VPM-2027-00001','Premier de 2027');
 });
 
-// I-03 — computeTax : franchise (défaut)
+// I-03 — computeTax : franchise explicite (statut configuré)
 await test('I-03',async()=>{
   const {htCents,tvaCents,tvaRate,mention}=computeTax(154700);
   assert.equal(htCents,154700,'HT = TTC en franchise');
@@ -365,6 +365,26 @@ await test('I-23',async()=>{
   const row=db.prepare('SELECT next_seq FROM invoice_sequences WHERE year=2024').get();
   assert(row,'Séquence 2024 créée');
   assert.equal(row.next_seq,43,'Reprend à 43 après le numéro 42 existant');
+});
+
+// I-24 — LEGAL_TVA_STATUS absent : computeTax lève une erreur
+await test('I-24',async()=>{
+  const saved=process.env.LEGAL_TVA_STATUS;
+  delete process.env.LEGAL_TVA_STATUS;
+  let threw=false;
+  try{computeTax(154700);}catch(e){threw=true;assert(/LEGAL_TVA_STATUS/i.test(e.message),'Message doit mentionner LEGAL_TVA_STATUS');}
+  process.env.LEGAL_TVA_STATUS=saved;
+  assert(threw,'computeTax doit lever une erreur si LEGAL_TVA_STATUS absent');
+});
+
+// I-25 — LEGAL_TVA_STATUS invalide : computeTax lève une erreur
+await test('I-25',async()=>{
+  const saved=process.env.LEGAL_TVA_STATUS;
+  process.env.LEGAL_TVA_STATUS='taux_inconnu';
+  let threw=false;
+  try{computeTax(154700);}catch(e){threw=true;}
+  process.env.LEGAL_TVA_STATUS=saved;
+  assert(threw,'computeTax doit lever une erreur si LEGAL_TVA_STATUS invalide');
 });
 
 // ── Résultats ─────────────────────────────────────────────────────────────

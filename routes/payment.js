@@ -50,6 +50,11 @@ router.post('/create-checkout', express.json(), checkoutLimit, async (req, res) 
     console.error('[CHECKOUT] Informations légales de facturation manquantes — création Stripe refusée. Configurer LEGAL_SIREN, LEGAL_RAISON_SOCIALE, LEGAL_FORME_JURIDIQUE, LEGAL_ADRESSE_SIEGE et LEGAL_RCS.');
     return res.status(503).json({ error: 'Paiement temporairement indisponible. Réessayez dans quelques instants ou contactez-nous au 06 95 44 36 54.' });
   }
+  const _tvaStatus = process.env.LEGAL_TVA_STATUS;
+  if (!_tvaStatus || !['franchise', 'taux_20', 'exonere_formation'].includes(_tvaStatus)) {
+    console.error('[CHECKOUT] LEGAL_TVA_STATUS absent ou invalide — création Stripe refusée. Configurer franchise, taux_20 ou exonere_formation après validation comptable.');
+    return res.status(503).json({ error: 'Paiement temporairement indisponible. Réessayez dans quelques instants ou contactez-nous au 06 95 44 36 54.' });
+  }
 
   const isSerenite = pack === 'serenite';
 
@@ -287,6 +292,9 @@ async function activateSeller(session) {
           email: seller.email, firstName: seller.first_name, lastName: seller.last_name,
           amount: amountTTC, pack: activePack, invoiceNumber: record.invoice_number,
           date: seller.paid_at || new Date(), pdfBuffer,
+          amountHTCents: record.amount_ht,
+          tvaAmountCents: record.tva_amount,
+          tvaRate: record.tva_rate,
         });
       }
     }
