@@ -213,24 +213,27 @@ async function activateSeller(session) {
 
   if (seller && seller.paid_at) return null; // déjà activé
 
+  const activePack = pack || (seller ? seller.pack : 'serenite');
+  const initSuivi = activePack === 'autonome' ? 'a_contacter' : 'a_appeler';
+
   if (seller) {
     // Activer le compte existant — AND paid_at IS NULL pour idempotence (P2-6)
-    const result = db.prepare('UPDATE sellers SET paid_at=CURRENT_TIMESTAMP, stripe_session_id=?, stripe_customer_id=?, pack=?, paid_amount=? WHERE id=? AND paid_at IS NULL')
-      .run(session.id, session.customer || null, pack || seller.pack, session.amount_total || null, seller.id);
+    const result = db.prepare('UPDATE sellers SET paid_at=CURRENT_TIMESTAMP, stripe_session_id=?, stripe_customer_id=?, pack=?, paid_amount=?, suivi_statut=? WHERE id=? AND paid_at IS NULL')
+      .run(session.id, session.customer || null, activePack, session.amount_total || null, initSuivi, seller.id);
     if (result.changes === 0) return null; // déjà activé (double webhook / double appel)
   } else {
     // Créer le compte (cas webhook sans pré-création)
     const uuid = uuidv4();
     const tempPwd = await bcrypt.hash(crypto.randomBytes(24).toString('base64url'), 12);
-    db.prepare('INSERT OR IGNORE INTO sellers (uuid, email, password, pack, stripe_session_id, stripe_customer_id, paid_at) VALUES (?,?,?,?,?,?,CURRENT_TIMESTAMP)')
-      .run(uuid, (email || '').toLowerCase(), tempPwd, pack || 'serenite', session.id, session.customer || null);
+    db.prepare('INSERT OR IGNORE INTO sellers (uuid, email, password, pack, stripe_session_id, stripe_customer_id, paid_at, suivi_statut) VALUES (?,?,?,?,?,?,CURRENT_TIMESTAMP,?)')
+      .run(uuid, (email || '').toLowerCase(), tempPwd, activePack, session.id, session.customer || null, initSuivi);
     seller = db.prepare('SELECT * FROM sellers WHERE email=?').get((email || '').toLowerCase());
   }
 
   if (!seller) return null;
 
-  // Auto-assigner un numéro dédié
-  if (!seller.twilio_number) {
+  // Auto-assigner un numéro dédié (désactivé par défaut — opt-in via TWILIO_DEDICATED_NUMBERS=true)
+  if (!seller.twilio_number && process.env.TWILIO_DEDICATED_NUMBERS === 'true') {
     const assigned = await assignPhoneNumber(seller);
     if (!assigned) {
       console.warn(`⚠️  Aucun numéro Twilio disponible pour ${seller.email} (id=${seller.id}). Ajoutez un numéro dans l'admin.`);
@@ -253,7 +256,6 @@ async function activateSeller(session) {
 
   // Email avant premier rendez-vous — Pack Sérenité uniquement (A1)
   try {
-    const activePack = pack || seller.pack;
     if (activePack === 'serenite') {
       await sendFirstMeetingEmail({ email: seller.email, firstName: seller.first_name });
     }
@@ -261,7 +263,6 @@ async function activateSeller(session) {
 
   // Todos admin + notif admin
   try {
-    const activePack = pack || seller.pack;
     const todoData = JSON.stringify({ name: `${seller.first_name || ''} ${seller.last_name || ''}`.trim() || seller.email, pack: activePack, email: seller.email, phone: seller.phone });
     db.prepare('INSERT INTO admin_todos (type, seller_id, data) VALUES (?,?,?)').run('new_signup', seller.id, todoData);
     if (activePack === 'autonome') {

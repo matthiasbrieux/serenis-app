@@ -386,6 +386,7 @@ const newCols = [
   "ALTER TABLE sellers ADD COLUMN assigned_at TEXT",
   "ALTER TABLE sellers ADD COLUMN suivi_statut TEXT DEFAULT 'a_appeler'",
   "ALTER TABLE sellers ADD COLUMN suivi_rdv_date TEXT",
+  "ALTER TABLE sellers ADD COLUMN suivi_rdv_time TEXT",
   "ALTER TABLE sellers ADD COLUMN suivi_notes TEXT",
   "ALTER TABLE properties ADD COLUMN diagnostics_ai_summary TEXT",
   "ALTER TABLE properties ADD COLUMN diagnostics_ai_summary_validated BOOLEAN DEFAULT 0",
@@ -856,5 +857,51 @@ try {
 
 // Mode démonstration (flag sur compte vendeur démo)
 try { db.exec("ALTER TABLE sellers ADD COLUMN is_demo INTEGER DEFAULT 0"); } catch(e) {}
+
+// ── Modèles de messages commerciaux VRP ─────────────────────────
+try {
+  db.exec(`
+    CREATE TABLE IF NOT EXISTS vrp_message_templates (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      vrp_id INTEGER REFERENCES vrps(id) ON DELETE CASCADE,
+      category TEXT NOT NULL DEFAULT 'autre',
+      name TEXT NOT NULL,
+      type TEXT NOT NULL DEFAULT 'email',
+      subject TEXT,
+      body TEXT NOT NULL,
+      is_global INTEGER DEFAULT 0,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    )
+  `);
+} catch(e) { console.error('[DB] vrp_message_templates error:', e.message); }
+
+// ── LOT 8 : VRP Outil de prospection terrain ─────────────────────
+// Enrichissement prospect
+try { db.exec("ALTER TABLE vrp_prospects ADD COLUMN opposition_rgpd INTEGER DEFAULT 0"); } catch(e) {}
+try { db.exec("ALTER TABLE vrp_prospects ADD COLUMN situation TEXT"); } catch(e) {}
+try { db.exec("ALTER TABLE vrp_prospects ADD COLUMN interest_level INTEGER DEFAULT 3"); } catch(e) {}
+try { db.exec("ALTER TABLE vrp_prospects ADD COLUMN annonce_url TEXT"); } catch(e) {}
+try { db.exec("ALTER TABLE vrp_prospects ADD COLUMN last_contact_at DATETIME"); } catch(e) {}
+try { db.exec("ALTER TABLE vrp_prospects ADD COLUMN refus_motif TEXT"); } catch(e) {}
+try { db.exec("ALTER TABLE vrp_prospects ADD COLUMN address TEXT"); } catch(e) {}
+try { db.exec("ALTER TABLE vrp_prospects ADD COLUMN next_action_type TEXT"); } catch(e) {}
+try { db.exec("ALTER TABLE vrp_prospects ADD COLUMN situation_immo TEXT DEFAULT 'inconnue'"); } catch(e) {}
+try { db.exec("ALTER TABLE vrp_prospects ADD COLUMN horizon_vente TEXT"); } catch(e) {}
+// Historique des activités (appels, notes, RDV, terrain)
+try {
+  db.exec(`
+    CREATE TABLE IF NOT EXISTS vrp_activities (
+      id          INTEGER PRIMARY KEY AUTOINCREMENT,
+      vrp_id      INTEGER NOT NULL REFERENCES vrps(id) ON DELETE CASCADE,
+      prospect_id INTEGER NOT NULL REFERENCES vrp_prospects(id) ON DELETE CASCADE,
+      type        TEXT NOT NULL,
+      notes       TEXT,
+      outcome     TEXT,
+      created_at  DATETIME DEFAULT CURRENT_TIMESTAMP
+    );
+    CREATE INDEX IF NOT EXISTS idx_vrp_activities_prospect ON vrp_activities(prospect_id, created_at DESC);
+  `);
+} catch(e) { console.error('[DB] vrp_activities error:', e.message); }
 
 module.exports = db;

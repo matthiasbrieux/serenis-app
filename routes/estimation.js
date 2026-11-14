@@ -155,6 +155,9 @@ router.post('/api/public/estimation', estimLimiter, async (req, res) => {
   const ecAt  = wantsEmailMkt ? String(email_consent_at  || now) : null;
   const ecVer = wantsEmailMkt ? String(email_consent_version || 'v1-2026') : null;
 
+  const latVal  = rawLat  != null ? (Number(rawLat)  || null) : null;
+  const lonVal  = rawLon  != null ? (Number(rawLon)  || null) : null;
+
   // ── Estimation ──────────────────────────────────────────────
   let engineResult;
 
@@ -185,8 +188,6 @@ router.post('/api/public/estimation', estimLimiter, async (req, res) => {
   const ctaToken = randomBytes(16).toString('hex'); // 32-char hex non-devinable
 
   const insCode = (hasStructured && rawInsee) ? String(rawInsee).trim().slice(0, 10) : null;
-  const latVal  = rawLat  != null ? (Number(rawLat)  || null) : null;
-  const lonVal  = rawLon  != null ? (Number(rawLon)  || null) : null;
   const addrSrc = String(rawAddressSource || (hasStructured ? 'ban' : 'raw')).trim().slice(0, 20);
 
   let recordId = null;
