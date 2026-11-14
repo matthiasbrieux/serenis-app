@@ -240,6 +240,30 @@ await test('P-12',async()=>{
   assert.equal(r.status,401,'Re-checkout on existing paid email without auth must return 401');
 });
 
+// P-13 — LEGAL_TVA_STATUS absent au webhook : activation du compte non bloquée, facture différée
+await test('P-13',async()=>{
+  const saved=process.env.LEGAL_TVA_STATUS;
+  delete process.env.LEGAL_TVA_STATUS;
+  const noTvaSession={...mockSessionData,id:'cs_test_NOTVA',customer_email:'notva@test.example',metadata:{pack:'serenite',email:'notva@test.example',needs_password_reset:'false'}};
+  const event={type:'checkout.session.completed',data:{object:noTvaSession}};
+  const r=await stripeWebhookPost(event,'valid');
+  process.env.LEGAL_TVA_STATUS=saved;
+  assert.equal(r.status,200,'Webhook doit retourner 200 même sans LEGAL_TVA_STATUS');
+  const seller=db.prepare('SELECT paid_at FROM sellers WHERE email=?').get('notva@test.example');
+  assert(seller?.paid_at,'Compte doit être activé même sans LEGAL_TVA_STATUS');
+  const invoice=db.prepare('SELECT id FROM invoices WHERE client_email=?').get('notva@test.example');
+  assert(!invoice,'Aucune facture archivée si LEGAL_TVA_STATUS absent (à rattraper depuis admin)');
+});
+
+// P-14 — LEGAL_TVA_STATUS absent au checkout : 503 bloque la création Stripe
+await test('P-14',async()=>{
+  const saved=process.env.LEGAL_TVA_STATUS;
+  delete process.env.LEGAL_TVA_STATUS;
+  const r=await request('POST','/create-checkout',{body:{pack:'serenite',email:'notva2@test.example',first_name:'X',last_name:'Y',phone:'0600000000',password:'SecurePass!2026'}});
+  process.env.LEGAL_TVA_STATUS=saved;
+  assert.equal(r.status,503,'Checkout doit être bloqué (503) si LEGAL_TVA_STATUS absent');
+});
+
 // ── Résultats ─────────────────────────────────────────────────────────────
 console.log('\n════════════════════════════════════');
 console.log(`Payment flow: ${passes} réussis, ${failures.length} échecs`);
