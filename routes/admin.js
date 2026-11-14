@@ -7,7 +7,7 @@ const fs = require('fs');
 const db = require('../database');
 const { isPasswordPwned } = require('../services/passwordCheck');
 const { requireAdmin } = require('../middleware/auth');
-const { sendWelcomeImproved, sendPostFirstVisitFeedbackSeller, sendCheckInNoOffer, sendNoPhotosNudge, sendMissingDocNudge, sendNotPublishedNudge, sendProspectNudge, sendContractRenewal, sendReviewRequest, sendAdminDirectEmail, sendFirstMeetingEmail, sendNewClientAdminNotif, sendFirstVisitReminderSeller, sendSoldCongrats } = require('../services/email');
+const { sendWelcomeImproved, sendPostFirstVisitFeedbackSeller, sendCheckInNoOffer, sendNoPhotosNudge, sendMissingDocNudge, sendNotPublishedNudge, sendProspectNudge, sendContractRenewal, sendReviewRequest, sendAdminDirectEmail, sendFirstMeetingEmail, sendNewClientAdminNotif, sendFirstVisitReminderSeller, sendSoldCongrats, sendInvoiceEmail, legalInfoReady } = require('../services/email');
 
 // ── Tarifs centralisés (en centimes TTC) ─────────────────────
 const PACK_PRICES = { autonome: 99900, serenite: 154700 };
@@ -1976,6 +1976,71 @@ router.get('/api/test-all-emails', requireAdmin, async (req, res) => {
   }
 
   res.json({ total: templates.length, results });
+});
+
+// ── Statut facture vendeur ────────────────────────────────────
+router.get('/api/crm/:id/invoice-status', requireAdmin, (req, res) => {
+  const seller = db.prepare('SELECT id, first_name, last_name, email, pack, paid_at, paid_amount, invoice_number FROM sellers WHERE id=?').get(+req.params.id);
+  if (!seller) return res.status(404).json({ error: 'Vendeur introuvable' });
+  let lastInvoice = null;
+  try {
+    lastInvoice = db.prepare("SELECT success, sent_at FROM email_sends WHERE seller_id=? AND subject LIKE '🧾 Facture%' ORDER BY sent_at DESC LIMIT 1").get(seller.id);
+  } catch(e) {}
+  return res.json({
+    paid: !!seller.paid_at,
+    paid_at: seller.paid_at,
+    paid_amount: seller.paid_amount,
+    pack: seller.pack,
+    invoice_number: seller.invoice_number,
+    last_invoice: lastInvoice,
+    legal_ready: legalInfoReady(),
+  });
+});
+
+// ── Renvoi facture vendeur (admin) ────────────────────────────
+router.post('/api/crm/:id/resend-invoice', requireAdmin, async (req, res) => {
+  const seller = db.prepare('SELECT * FROM sellers WHERE id=?').get(+req.params.id);
+  if (!seller) return res.status(404).json({ error: 'Vendeur introuvable' });
+  if (!seller.paid_at) return res.status(400).json({ error: 'Ce vendeur n\'a pas encore payé.' });
+
+  // Blocage si facture déjà envoyée avec succès dans les dernières 24 h
+  let recent = null;
+  try {
+    recent = db.prepare("SELECT sent_at FROM email_sends WHERE seller_id=? AND subject LIKE '🧾 Facture%' AND success=1 AND sent_at > datetime('now','-24 hours')").get(seller.id);
+  } catch(e) {}
+  if (recent && !req.body?.force) {
+    return res.status(409).json({
+      error: `Facture envoyée avec succès le ${new Date(recent.sent_at).toLocaleString('fr-FR')}. Passez force:true pour forcer le renvoi.`,
+      sent_at: recent.sent_at,
+    });
+  }
+
+  if (!legalInfoReady()) {
+    return res.status(503).json({ error: 'Les informations légales (LEGAL_SIREN, LEGAL_RAISON_SOCIALE…) ne sont pas configurées. Renseignez-les dans le .env et redémarrez PM2.' });
+  }
+
+  const amount = seller.paid_amount || PACK_PRICES[seller.pack] || PACK_PRICES.serenite;
+  const invoiceNumber = seller.invoice_number
+    || `VPM-${new Date().getFullYear()}-${String(seller.id).padStart(5, '0')}-${Date.now().toString(36).toUpperCase()}`;
+
+  if (!seller.invoice_number) {
+    db.prepare('UPDATE sellers SET invoice_number=? WHERE id=? AND invoice_number IS NULL').run(invoiceNumber, seller.id);
+  }
+
+  try {
+    await sendInvoiceEmail({
+      email: seller.email,
+      firstName: seller.first_name,
+      lastName: seller.last_name,
+      amount,
+      pack: seller.pack || 'serenite',
+      invoiceNumber,
+      date: seller.paid_at || new Date(),
+    });
+    return res.json({ ok: true, invoiceNumber });
+  } catch(e) {
+    return res.status(500).json({ error: `Erreur d'envoi : ${e.message}` });
+  }
 });
 
 module.exports = router;

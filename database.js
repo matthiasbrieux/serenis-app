@@ -904,4 +904,7 @@ try {
   `);
 } catch(e) { console.error('[DB] vrp_activities error:', e.message); }
 
+// ── Factures — numéro persistant pour renvoi admin ──────────────
+try { db.exec("ALTER TABLE sellers ADD COLUMN invoice_number TEXT"); } catch(e) {}
+
 module.exports = db;

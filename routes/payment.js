@@ -280,6 +280,7 @@ async function activateSeller(session) {
     } else {
       const amount = session.amount_total || (pack === 'serenite' ? 154700 : 99900);
       const invoiceNumber = `VPM-${new Date().getFullYear()}-${String(seller.id).padStart(5, '0')}-${Date.now().toString(36).toUpperCase()}`;
+      db.prepare('UPDATE sellers SET invoice_number=? WHERE id=? AND invoice_number IS NULL').run(invoiceNumber, seller.id);
       await sendInvoiceEmail({ email: seller.email, firstName: seller.first_name, lastName: seller.last_name, amount, pack: pack || 'serenite', invoiceNumber, date: new Date() });
     }
   } catch(e) { console.error('Invoice email error:', e.message); }

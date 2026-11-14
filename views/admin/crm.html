@@ -1685,6 +1685,12 @@ function renderPanel(c) {
       <textarea class="p-input" rows="3" data-field="admin_notes" style="resize:none" placeholder="Notes internes visibles uniquement en admin...">${c.admin_notes||''}</textarea>
     </div>
 
+    <!-- Facture (chargée async) -->
+    <div class="p-sec" id="invoiceSection">
+      <div class="p-title">🧾 Facture</div>
+      <div class="perf-loading">Chargement…</div>
+    </div>
+
     <!-- Performance annonce (chargée async) -->
     <div class="p-sec" id="perfSection">
       <div class="p-title">📊 Performance de l'annonce <span class="auto-label">AUTO</span></div>
@@ -1747,12 +1753,13 @@ async function loadPanelExtras(id) {
   const offresSec = document.getElementById('offresSection');
 
   // Fetch en parallèle
-  const [perfRes, actRes, offresRes, viewsRes, priceRes] = await Promise.all([
+  const [perfRes, actRes, offresRes, viewsRes, priceRes, invoiceRes] = await Promise.all([
     fetch(`/admin/api/crm/${id}/performance`).then(r => r.json()).catch(() => null),
     fetch(`/admin/api/crm/${id}/activity`).then(r => r.json()).catch(() => null),
     fetch(`/admin/api/crm/${id}/offres`).then(r => r.json()).catch(() => null),
     fetch(`/admin/api/crm/${id}/views`).then(r => r.json()).catch(() => null),
     fetch(`/admin/api/crm/${id}/price-history`).then(r => r.json()).catch(() => null),
+    fetch(`/admin/api/crm/${id}/invoice-status`).then(r => r.json()).catch(() => null),
   ]);
 
   // ── Performance ──
@@ -1843,6 +1850,69 @@ async function loadPanelExtras(id) {
 
     actSec.innerHTML = `<div class="p-title">🕐 Historique des actions</div><div class="tl-wrap">${items}</div>`;
   }
+
+  // ── Facture ──
+  const invSec = document.getElementById('invoiceSection');
+  if (invSec && invoiceRes) renderInvoiceSection(invSec, id, invoiceRes);
+}
+
+function renderInvoiceSection(sec, sellerId, d) {
+  if (!d.paid) {
+    sec.innerHTML = `<div class="p-title">🧾 Facture</div><div style="font-size:.8rem;color:var(--text3);font-style:italic">Aucun paiement enregistré pour ce vendeur.</div>`;
+    return;
+  }
+  const fmtEur = c => c != null ? (c / 100).toLocaleString('fr-FR', { minimumFractionDigits: 2 }) : '—';
+  const fmtDate = s => s ? new Date(s).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: 'numeric' }) : '—';
+  const packLabel = d.pack === 'serenite' ? 'Pack Accompagnement' : 'Pack Autonomie';
+  const amount = d.paid_amount != null ? fmtEur(d.paid_amount) : (d.pack === 'serenite' ? '1 547,00' : '999,00');
+
+  let statusHtml = '';
+  if (!d.last_invoice) {
+    statusHtml = `<span style="font-size:.72rem;padding:3px 10px;border-radius:12px;background:#fee2e2;color:#dc2626;font-weight:600">⚠ Aucun envoi enregistré</span>`;
+  } else if (!d.last_invoice.success) {
+    statusHtml = `<span style="font-size:.72rem;padding:3px 10px;border-radius:12px;background:#fef3c7;color:#d97706;font-weight:600">⚠ Dernier envoi échoué — ${fmtDate(d.last_invoice.sent_at)}</span>`;
+  } else {
+    statusHtml = `<span style="font-size:.72rem;padding:3px 10px;border-radius:12px;background:#dcfce7;color:#15803d;font-weight:600">✓ Envoyée le ${fmtDate(d.last_invoice.sent_at)}</span>`;
+  }
+
+  const canResend = d.paid;
+  const legalWarn = !d.legal_ready ? `<div style="margin-top:10px;padding:9px 12px;background:#fff7ed;border:1px solid #fed7aa;border-radius:8px;font-size:.78rem;color:#9a3412">⚠ Mentions légales non configurées — l'envoi de la facture est bloqué côté serveur. Configurez LEGAL_SIREN et redémarrez PM2.</div>` : '';
+
+  sec.innerHTML = `<div class="p-title">🧾 Facture</div>
+    <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:10px">
+      <div>
+        <div style="font-size:.82rem;color:var(--text2);font-weight:600">${packLabel} · ${amount} € TTC</div>
+        <div style="font-size:.72rem;color:var(--text3);margin-top:2px">Paiement : ${fmtDate(d.paid_at)}${d.invoice_number ? ' · N° ' + d.invoice_number : ''}</div>
+      </div>
+      ${statusHtml}
+    </div>
+    ${legalWarn}
+    <button onclick="resendInvoice(${sellerId})" id="resendInvBtn${sellerId}" style="margin-top:10px;padding:8px 16px;border:1px solid #9a3412;border-radius:8px;background:#fff;color:#9a3412;font-size:.8rem;font-weight:600;cursor:pointer" ${canResend ? '' : 'disabled'}>
+      ↩ Renvoyer la facture
+    </button>`;
+}
+
+async function resendInvoice(id) {
+  const btn = document.getElementById(`resendInvBtn${id}`);
+  if (btn) { btn.disabled = true; btn.textContent = '⏳ Envoi…'; }
+  try {
+    const r = await fetch(`/admin/api/crm/${id}/resend-invoice`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{}' });
+    const d = await r.json();
+    if (r.status === 409) {
+      if (confirm(d.error + '\n\nForcer le renvoi quand même ?')) {
+        const r2 = await fetch(`/admin/api/crm/${id}/resend-invoice`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ force: true }) });
+        const d2 = await r2.json();
+        if (d2.ok) { toast('Facture renvoyée ✓', 'ok'); loadPanelExtras(id); return; }
+        toast(d2.error || 'Erreur', 'err');
+      }
+    } else if (d.ok) {
+      toast(`Facture envoyée ✓ — N° ${d.invoiceNumber}`, 'ok');
+      loadPanelExtras(id);
+    } else {
+      toast(d.error || 'Erreur envoi', 'err');
+    }
+  } catch { toast('Erreur réseau', 'err'); }
+  if (btn) { btn.disabled = false; btn.textContent = '↩ Renvoyer la facture'; }
 }
 
 function fmtTimeAgo(dt) {
