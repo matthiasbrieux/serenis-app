@@ -1867,16 +1867,21 @@ function renderInvoiceSection(sec, sellerId, d) {
   const amount = d.paid_amount != null ? fmtEur(d.paid_amount) : (d.pack === 'serenite' ? '1 547,00' : '999,00');
 
   let statusHtml = '';
-  if (!d.last_invoice) {
+  if (!d.last_email) {
     statusHtml = `<span style="font-size:.72rem;padding:3px 10px;border-radius:12px;background:#fee2e2;color:#dc2626;font-weight:600">⚠ Aucun envoi enregistré</span>`;
-  } else if (!d.last_invoice.success) {
-    statusHtml = `<span style="font-size:.72rem;padding:3px 10px;border-radius:12px;background:#fef3c7;color:#d97706;font-weight:600">⚠ Dernier envoi échoué — ${fmtDate(d.last_invoice.sent_at)}</span>`;
+  } else if (!d.last_email.success) {
+    statusHtml = `<span style="font-size:.72rem;padding:3px 10px;border-radius:12px;background:#fef3c7;color:#d97706;font-weight:600">⚠ Dernier envoi échoué — ${fmtDate(d.last_email.sent_at)}</span>`;
   } else {
-    statusHtml = `<span style="font-size:.72rem;padding:3px 10px;border-radius:12px;background:#dcfce7;color:#15803d;font-weight:600">✓ Envoyée le ${fmtDate(d.last_invoice.sent_at)}</span>`;
+    statusHtml = `<span style="font-size:.72rem;padding:3px 10px;border-radius:12px;background:#dcfce7;color:#15803d;font-weight:600">✓ Envoyée le ${fmtDate(d.last_email.sent_at)}</span>`;
   }
+
+  const pdfBadge = d.pdf_archived
+    ? `<span style="font-size:.72rem;padding:3px 8px;border-radius:12px;background:#eff6ff;color:#1d4ed8;font-weight:600">📄 PDF archivé</span>`
+    : `<span style="font-size:.72rem;padding:3px 8px;border-radius:12px;background:#f3f4f6;color:#6b7280;font-weight:600">— Pas de PDF</span>`;
 
   const canResend = d.paid;
   const legalWarn = !d.legal_ready ? `<div style="margin-top:10px;padding:9px 12px;background:#fff7ed;border:1px solid #fed7aa;border-radius:8px;font-size:.78rem;color:#9a3412">⚠ Mentions légales non configurées — l'envoi de la facture est bloqué côté serveur. Configurez LEGAL_SIREN et redémarrez PM2.</div>` : '';
+  const pdfDownload = d.pdf_archived ? `<a href="/admin/api/crm/${sellerId}/invoice-pdf" target="_blank" style="margin-top:10px;display:inline-block;padding:8px 16px;border:1px solid #1d4ed8;border-radius:8px;background:#eff6ff;color:#1d4ed8;font-size:.8rem;font-weight:600;text-decoration:none;margin-right:8px">↓ Télécharger PDF</a>` : '';
 
   sec.innerHTML = `<div class="p-title">🧾 Facture</div>
     <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:10px">
@@ -1884,12 +1889,14 @@ function renderInvoiceSection(sec, sellerId, d) {
         <div style="font-size:.82rem;color:var(--text2);font-weight:600">${packLabel} · ${amount} € TTC</div>
         <div style="font-size:.72rem;color:var(--text3);margin-top:2px">Paiement : ${fmtDate(d.paid_at)}${d.invoice_number ? ' · N° ' + d.invoice_number : ''}</div>
       </div>
-      ${statusHtml}
+      <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center">${pdfBadge} ${statusHtml}</div>
     </div>
     ${legalWarn}
-    <button onclick="resendInvoice(${sellerId})" id="resendInvBtn${sellerId}" style="margin-top:10px;padding:8px 16px;border:1px solid #9a3412;border-radius:8px;background:#fff;color:#9a3412;font-size:.8rem;font-weight:600;cursor:pointer" ${canResend ? '' : 'disabled'}>
-      ↩ Renvoyer la facture
-    </button>`;
+    <div style="margin-top:10px">
+      ${pdfDownload}<button onclick="resendInvoice(${sellerId})" id="resendInvBtn${sellerId}" style="padding:8px 16px;border:1px solid #9a3412;border-radius:8px;background:#fff;color:#9a3412;font-size:.8rem;font-weight:600;cursor:pointer" ${canResend ? '' : 'disabled'}>
+        ↩ Renvoyer la facture
+      </button>
+    </div>`;
 }
 
 async function resendInvoice(id) {
